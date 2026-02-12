@@ -67,7 +67,10 @@ class ErrorBoundary extends Component<Props, State> {
             }
 
             return (
-                <Container className="flex flex-col items-center justify-center min-h-[400px] gap-4 p-8">
+                <Container
+                    className="flex flex-col items-center justify-center min-h-[400px] gap-4 p-8"
+                    data-testid="error-boundary-fallback"
+                >
                     <div className="text-center">
                         <h2 className="text-2xl font-bold text-red-600 mb-4">Something went wrong</h2>
                         <p className="text-gray-600 dark:text-gray-400 mb-4">
@@ -90,7 +93,7 @@ class ErrorBoundary extends Component<Props, State> {
                             </details>
                         )}
                         <div className="mt-6">
-                            <Button onClick={this.handleReset} variant="solid" color="primary">
+                            <Button onClick={this.handleReset} variant="solid" color="primary" data-testid="error-boundary-try-again">
                                 Try Again
                             </Button>
                         </div>

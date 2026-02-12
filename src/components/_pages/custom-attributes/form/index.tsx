@@ -5,6 +5,7 @@ import Widget from 'components/Widget';
 import { actions, selectors } from 'ducks/customAttributes';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
@@ -16,7 +17,8 @@ import TextInput from 'components/TextInput';
 import { CustomAttributeCreateRequestModel, CustomAttributeUpdateRequestModel } from 'types/customAttributes';
 import { AttributeContentType, PlatformEnum } from 'types/openapi';
 import { isObjectSame } from 'utils/common-utils';
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 
 interface CustomAttributeFormProps {
     customAttributeId?: string;
@@ -90,15 +92,6 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
     const formValues = useWatch({ control });
     const watchedList = useWatch({ control, name: 'list' });
 
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
     const areDefaultValuesSame = useCallback(
         (values: FormValues) => {
             if (editMode) {
@@ -136,26 +129,8 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
         }
     }, [dispatch, editMode, id, customAttributeDetail?.uuid]);
 
-    const wasCreating = useRef(isCreating);
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasCreating.current && !isCreating) {
-            if (onSuccess) {
-                onSuccess();
-            }
-        }
-        wasCreating.current = isCreating;
-    }, [isCreating, onSuccess]);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            if (onSuccess) {
-                onSuccess();
-            }
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, onSuccess]);
+    useRunOnFinished(isCreating, onSuccess);
+    useRunOnFinished(isUpdating, onSuccess);
 
     return (
         <>

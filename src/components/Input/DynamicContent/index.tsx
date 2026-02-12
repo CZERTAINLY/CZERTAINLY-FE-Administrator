@@ -2,7 +2,8 @@ import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import { AttributeContentType, PlatformEnum } from 'types/openapi';
-import { composeValidators, validateFloat, validateInteger, validateRequired } from 'utils/validators';
+import { validateFloat, validateInteger, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import ContentDescriptorField from './ContentDescriptorField';
 import Label from 'components/Label';
 import Select from 'components/Select';
@@ -71,15 +72,6 @@ export default function DynamicContent({ editable, isList }: Props) {
     const { control, setValue } = useFormContext();
     const contentTypeValue = useWatch({ control, name: 'contentType' });
     const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
-
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     return (
         <>

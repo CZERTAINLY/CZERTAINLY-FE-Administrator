@@ -21,7 +21,8 @@ import { AuthType, ConnectorStatus, PlatformEnum, Resource } from 'types/openapi
 
 import { attributeFieldNameTransform, collectFormAttributes } from 'utils/attributes/attributes';
 
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired, validateRoutelessUrl } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateRequired, validateRoutelessUrl } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import AttributeEditor from '../../../Attributes/AttributeEditor';
 import TabLayout from '../../../Layout/TabLayout';
@@ -296,16 +297,6 @@ export default function ConnectorForm({ connectorId, onCancel, onSuccess }: Conn
         ],
         [watchedUrl, connectionDetails],
     );
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     return (
         <FormProvider {...methods}>

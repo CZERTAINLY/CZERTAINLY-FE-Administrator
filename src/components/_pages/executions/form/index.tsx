@@ -17,7 +17,8 @@ import { ExecutionType, PlatformEnum, Resource } from 'types/openapi';
 import { ExecutionItemRequestModel } from 'types/rules';
 import { isObjectSame } from 'utils/common-utils';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import { SendNotificationExecutionItems } from 'components/_pages/executions/SendNotificationExecutionItems';
 
 export interface ExecutionFormValues {
@@ -86,16 +87,6 @@ const ExecutionForm = () => {
         control,
         name: 'resource',
     });
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     const onSubmit = useCallback(
         (values: ExecutionFormValues) => {

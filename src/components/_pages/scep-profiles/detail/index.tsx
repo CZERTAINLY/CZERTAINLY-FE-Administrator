@@ -9,7 +9,8 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import CertificateStatus from 'components/_pages/certificates/CertificateStatus';
 
 import { actions, selectors } from 'ducks/scep-profiles';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import ScepProfileForm from '../form';
@@ -59,15 +60,10 @@ export default function ScepProfileDetail() {
         dispatch(groupsActions.listGroups());
     }, [dispatch]);
 
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            setIsEditModalOpen(false);
-            getFreshScepProfile();
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, getFreshScepProfile]);
+    useRunOnFinished(isUpdating, () => {
+        setIsEditModalOpen(false);
+        getFreshScepProfile();
+    });
 
     const handleOpenEditModal = useCallback(() => {
         if (!scepProfile) return;

@@ -29,9 +29,14 @@ function CertificateStatus({ status, badgeSize = 'small', asIcon = false }: Prop
     const text = getStatusText(status);
 
     return asIcon ? (
-        <span title={capitalize(text)} className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: color }} />
+        <span
+            title={capitalize(text)}
+            className="w-3 h-3 rounded-full inline-block"
+            style={{ backgroundColor: color }}
+            data-testid="certificate-status"
+        />
     ) : (
-        <Badge size={badgeSize} style={{ backgroundColor: color }}>
+        <Badge size={badgeSize} style={{ backgroundColor: color }} dataTestId="certificate-status">
             {capitalize(text)}
         </Badge>
     );

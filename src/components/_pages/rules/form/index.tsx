@@ -2,6 +2,7 @@ import Widget from 'components/Widget';
 import { EntityType, actions as filterActions } from 'ducks/filters';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
@@ -15,7 +16,8 @@ import TextInput from 'components/TextInput';
 import { Resource } from 'types/openapi';
 import { isObjectSame } from 'utils/common-utils';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import ConditionFormFilter from 'components/ConditionFormFilter';
 
 export interface ruleFormValues {
@@ -84,26 +86,7 @@ const RulesForm = ({ onCancel, onSuccess }: RulesFormProps = {}) => {
         };
     }, [dispatch]);
 
-    const wasCreating = useRef(isCreatingRule);
-
-    useEffect(() => {
-        if (wasCreating.current && !isCreatingRule) {
-            if (onSuccess) {
-                onSuccess();
-            }
-        }
-        wasCreating.current = isCreatingRule;
-    }, [isCreatingRule, onSuccess]);
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
+    useRunOnFinished(isCreatingRule, onSuccess);
 
     const submitTitle = 'Create';
     const inProgressTitle = 'Creating...';

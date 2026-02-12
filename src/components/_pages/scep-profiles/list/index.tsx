@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import Container from 'components/Container';
@@ -6,6 +7,7 @@ import Container from 'components/Container';
 import { actions, selectors } from 'ducks/scep-profiles';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import ForceDeleteErrorTable from 'components/ForceDeleteErrorTable';
 import Dialog from 'components/Dialog';
 import ScepProfileForm from '../form';
 import StatusBadge from 'components/StatusBadge';
@@ -50,24 +52,14 @@ export default function ScepProfiles() {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
     }, [bulkDeleteErrorMessages]);
 
-    const wasCreating = useRef(isCreating);
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasCreating.current && !isCreating) {
-            setIsAddModalOpen(false);
-            getFreshData();
-        }
-        wasCreating.current = isCreating;
-    }, [isCreating, getFreshData]);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            setEditingScepProfileId(undefined);
-            getFreshData();
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, getFreshData]);
+    useRunOnFinished(isCreating, () => {
+        setIsAddModalOpen(false);
+        getFreshData();
+    });
+    useRunOnFinished(isUpdating, () => {
+        setEditingScepProfileId(undefined);
+        getFreshData();
+    });
 
     const handleOpenAddModal = useCallback(() => {
         setIsAddModalOpen(true);
@@ -143,37 +135,13 @@ export default function ScepProfiles() {
         [checkedRows, handleOpenAddModal, onEnableClick, onDisableClick],
     );
 
-    const forceDeleteBody = useMemo(
-        () => (
-            <div>
-                <div>Failed to delete {checkedRows.length > 1 ? 'SCEP Profiles' : 'a SCEP Profile'}. Please find the details below:</div>
-
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
-                    <thead>
-                        <tr>
-                            <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                <b>Name</b>
-                            </th>
-                            <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                <b>Dependencies</b>
-                            </th>
-                        </tr>
-                    </thead>
-
-                    <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
-                        {bulkDeleteErrorMessages?.map((message) => (
-                            <tr className="hover:bg-gray-50 dark:hover:bg-neutral-800">
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">{message.name}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">
-                                    {message.message}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        ),
-        [bulkDeleteErrorMessages, checkedRows.length],
+    const forceDeleteBody = (
+        <ForceDeleteErrorTable
+            items={bulkDeleteErrorMessages}
+            entityNameSingular="a SCEP Profile"
+            entityNamePlural="SCEP Profiles"
+            itemsCount={checkedRows.length}
+        />
     );
 
     const scepProfilesTableHeader: TableHeader[] = useMemo(
@@ -254,6 +222,7 @@ export default function ScepProfiles() {
     return (
         <Container>
             <Widget
+                dataTestId="scep-profiles-list-widget"
                 title="List of SCEP Profiles"
                 busy={isBusy}
                 widgetLockName={LockWidgetNameEnum.ListOfSCEPProfiles}
@@ -280,8 +249,8 @@ export default function ScepProfiles() {
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
 
@@ -291,8 +260,8 @@ export default function ScepProfiles() {
                 body={forceDeleteBody}
                 toggle={() => setConfirmForceDelete(false)}
                 buttons={[
-                    { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
+                    { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
                 ]}
             />
 

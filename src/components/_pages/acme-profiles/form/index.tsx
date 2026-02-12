@@ -10,6 +10,7 @@ import { actions as customAttributesActions, selectors as customAttributesSelect
 import { actions as raProfileActions, selectors as raProfileSelectors } from 'ducks/ra-profiles';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
@@ -26,7 +27,6 @@ import { RaProfileSimplifiedModel } from 'types/ra-profiles';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
 import {
-    composeValidators,
     validateAlphaNumericWithoutAccents,
     validateCustomIp,
     validateUrlWithRoute,
@@ -34,6 +34,7 @@ import {
     validateLength,
     validateRequired,
 } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import { Resource } from '../../../../types/openapi';
 import useAttributeEditor, { buildGroups, buildOwner } from 'utils/widget';
 import CertificateAssociationsFormWidget from 'components/CertificateAssociationsFormWidget/CertificateAssociationsFormWidget';
@@ -221,16 +222,6 @@ export default function AcmeProfileForm({ acmeProfileId, onCancel, onSuccess }: 
         getValues,
         reset,
     } = methods;
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     const onSubmit = useCallback(
         (values: FormValues) => {
@@ -434,26 +425,8 @@ export default function AcmeProfileForm({ acmeProfileId, onCancel, onSuccess }: 
         groupOptions,
     ]);
 
-    const wasCreating = useRef(isCreating);
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasCreating.current && !isCreating) {
-            if (onSuccess) {
-                onSuccess();
-            }
-        }
-        wasCreating.current = isCreating;
-    }, [isCreating, onSuccess]);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            if (onSuccess) {
-                onSuccess();
-            }
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, onSuccess]);
+    useRunOnFinished(isCreating, onSuccess);
+    useRunOnFinished(isUpdating, onSuccess);
 
     return (
         <FormProvider {...methods}>

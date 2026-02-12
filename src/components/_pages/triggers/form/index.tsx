@@ -2,6 +2,7 @@ import Widget from 'components/Widget';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
@@ -16,7 +17,8 @@ import Button from 'components/Button';
 import Container from 'components/Container';
 import { PlatformEnum, Resource, ResourceEvent, TriggerType } from 'types/openapi';
 import { isObjectSame } from 'utils/common-utils';
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import TextInput from 'components/TextInput';
 
 export interface TriggerFormValues {
@@ -153,16 +155,6 @@ const TriggerForm = ({ onCancel, onSuccess }: TriggerFormProps = {}) => {
         fetchRules(watchedResource as Resource);
     }, [dispatch, watchedResource, fetchActions, fetchRules]);
 
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
-
     const submitTitle = 'Create';
     const inProgressTitle = 'Creating...';
 
@@ -187,16 +179,7 @@ const TriggerForm = ({ onCancel, onSuccess }: TriggerFormProps = {}) => {
         [dispatch],
     );
 
-    const wasCreating = useRef(isCreatingTrigger);
-
-    useEffect(() => {
-        if (wasCreating.current && !isCreatingTrigger) {
-            if (onSuccess) {
-                onSuccess();
-            }
-        }
-        wasCreating.current = isCreatingTrigger;
-    }, [isCreatingTrigger, onSuccess]);
+    useRunOnFinished(isCreatingTrigger, onSuccess);
 
     const areDefaultValuesSame = useCallback(
         (values: TriggerFormValues) => {

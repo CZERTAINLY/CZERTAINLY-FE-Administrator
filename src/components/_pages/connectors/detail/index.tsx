@@ -9,7 +9,8 @@ import ConnectorForm from '../form';
 import { actions, selectors } from 'ducks/connectors';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as userInterfaceActions } from 'ducks/user-interface';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 
@@ -109,15 +110,10 @@ export default function ConnectorDetail() {
         setCurrentFunctionGroupKindAttributes(attrs);
     }, [attributes, connector, currentFunctionGroup, currentFunctionGroupKind]);
 
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            setIsEditModalOpen(false);
-            getFreshConnectorDetails();
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, getFreshConnectorDetails]);
+    useRunOnFinished(isUpdating, () => {
+        setIsEditModalOpen(false);
+        getFreshConnectorDetails();
+    });
 
     const handleCloseEditModal = useCallback(() => {
         setIsEditModalOpen(false);

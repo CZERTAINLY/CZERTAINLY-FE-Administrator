@@ -12,7 +12,8 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/locations';
 import { actions as raActions, selectors as raSelectors } from 'ducks/ra-profiles';
-import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
@@ -375,15 +376,10 @@ export default function LocationDetail() {
         dispatch(raActions.listRaProfiles());
     }, [dispatch, issueDialog]);
 
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            setIsEditModalOpen(false);
-            getFreshLocationDetails();
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, getFreshLocationDetails]);
+    useRunOnFinished(isUpdating, () => {
+        setIsEditModalOpen(false);
+        getFreshLocationDetails();
+    });
 
     const handleOpenEditModal = useCallback(() => {
         if (!location) return;

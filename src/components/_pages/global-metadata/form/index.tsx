@@ -3,7 +3,7 @@ import Widget from 'components/Widget';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions, selectors } from 'ducks/globalMetadata';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
@@ -13,9 +13,11 @@ import Checkbox from 'components/Checkbox';
 import TextInput from 'components/TextInput';
 import { GlobalMetadataCreateRequestModel, GlobalMetadataUpdateRequestModel } from 'types/globalMetadata';
 import { AttributeContentType, PlatformEnum } from 'types/openapi';
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import Select from 'components/Select';
 import Label from 'components/Label';
+import { useRunOnFinished } from 'utils/common-hooks';
 
 interface GlobalMetadataFormProps {
     globalMetadataId?: string;
@@ -66,16 +68,6 @@ export default function GlobalMetadataForm({ globalMetadataId, onCancel, onSucce
         formState: { isDirty, isSubmitting, isValid },
     } = methods;
 
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
-
     const onSubmit = useCallback(
         (values: GlobalMetadataCreateRequestModel) =>
             editMode
@@ -95,26 +87,8 @@ export default function GlobalMetadataForm({ globalMetadataId, onCancel, onSucce
         }
     }, [dispatch, editMode, id, globalMetadataDetail?.uuid]);
 
-    const wasCreating = useRef(isCreating);
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasCreating.current && !isCreating) {
-            if (onSuccess) {
-                onSuccess();
-            }
-        }
-        wasCreating.current = isCreating;
-    }, [isCreating, onSuccess]);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            if (onSuccess) {
-                onSuccess();
-            }
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, onSuccess]);
+    useRunOnFinished(isCreating, onSuccess);
+    useRunOnFinished(isUpdating, onSuccess);
 
     const contentTypeOptions = useMemo(
         () =>

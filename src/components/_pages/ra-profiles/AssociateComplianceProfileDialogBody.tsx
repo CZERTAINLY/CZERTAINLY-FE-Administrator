@@ -14,7 +14,6 @@ import Label from 'components/Label';
 import { actions, selectors } from 'ducks/compliance-profiles';
 import { RaProfileResponseModel } from 'types/ra-profiles';
 import { Resource } from 'types/openapi/models/Resource';
-import { TestableControl, TestableMenu } from 'utils/HOC/withDataTestId';
 import Container from 'components/Container';
 
 interface Props {

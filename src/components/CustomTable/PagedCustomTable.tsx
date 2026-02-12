@@ -36,13 +36,15 @@ export default function PagedCustomTable({ headers, data, totalItems, onReloadDa
     );
 
     return (
-        <CustomTable
-            headers={headers}
-            data={data}
-            hasPagination={true}
-            paginationData={paginationData}
-            onPageChanged={setPageNumber}
-            onPageSizeChanged={setPageSize}
-        />
+        <div data-testid="paged-custom-table">
+            <CustomTable
+                headers={headers}
+                data={data}
+                hasPagination={true}
+                paginationData={paginationData}
+                onPageChanged={setPageNumber}
+                onPageSizeChanged={setPageSize}
+            />
+        </div>
     );
 }

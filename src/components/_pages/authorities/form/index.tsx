@@ -9,6 +9,7 @@ import { actions as authorityActions, selectors as authoritySelectors } from 'du
 import { actions as connectorActions } from 'ducks/connectors';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,7 +28,8 @@ import { selectors as enumSelectors } from 'ducks/enums';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 
 interface AuthorityFormProps {
     authorityId?: string;
@@ -294,15 +296,6 @@ export default function AuthorityForm({ authorityId, onCancel, onSuccess }: Auth
         }
     }, [editMode, authority, id, reset, isFetchingAuthorityDetail]);
 
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
-
     const onSubmit = useCallback(
         (values: FormValues) => {
             if (editMode) {
@@ -353,26 +346,8 @@ export default function AuthorityForm({ authorityId, onCancel, onSuccess }: Auth
         );
     }, [resourceCustomAttributes, authority, isBusy]);
 
-    const wasCreating = useRef(isCreating);
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasCreating.current && !isCreating) {
-            if (onSuccess) {
-                onSuccess();
-            }
-        }
-        wasCreating.current = isCreating;
-    }, [isCreating, onSuccess]);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            if (onSuccess) {
-                onSuccess();
-            }
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, onSuccess]);
+    useRunOnFinished(isCreating, onSuccess);
+    useRunOnFinished(isUpdating, onSuccess);
 
     return (
         <div>

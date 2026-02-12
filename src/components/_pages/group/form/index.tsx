@@ -6,6 +6,7 @@ import TextInput from 'components/TextInput';
 import { actions, selectors } from 'ducks/certificateGroups';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,7 +16,8 @@ import Container from 'components/Container';
 import { CertificateGroupResponseModel } from 'types/certificateGroups';
 import { Resource } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateEmail, validateLength, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateEmail, validateLength, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import TabLayout from '../../../Layout/TabLayout';
 
 interface GroupFormProps {
@@ -125,16 +127,6 @@ export default function GroupForm({ groupId, onCancel, onSuccess }: GroupFormPro
         reset,
     } = methods;
 
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
-
     const title = useMemo(() => (editMode ? 'Edit Group' : 'Add Group'), [editMode]);
     const renderCustomAttributesEditor = useMemo(() => {
         if (isBusy) return <></>;
@@ -176,26 +168,8 @@ export default function GroupForm({ groupId, onCancel, onSuccess }: GroupFormPro
         }
     }, [editMode, group, id, reset, isFetchingDetail]);
 
-    const wasCreating = useRef(isCreating);
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasCreating.current && !isCreating) {
-            if (onSuccess) {
-                onSuccess();
-            }
-        }
-        wasCreating.current = isCreating;
-    }, [isCreating, onSuccess]);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            if (onSuccess) {
-                onSuccess();
-            }
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, onSuccess]);
+    useRunOnFinished(isCreating, onSuccess);
+    useRunOnFinished(isUpdating, onSuccess);
 
     return (
         <FormProvider {...methods}>

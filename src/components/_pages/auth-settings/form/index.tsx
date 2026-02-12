@@ -12,13 +12,8 @@ import TextInput from 'components/TextInput';
 import TextArea from 'components/TextArea';
 import Label from 'components/Label';
 import { isObjectSame } from 'utils/common-utils';
-import {
-    composeValidators,
-    validateAlphaNumericWithSpecialChars,
-    validateRequired,
-    validateUrlWithRoute,
-    validatePositiveInteger,
-} from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateRequired, validateUrlWithRoute, validatePositiveInteger } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import { OAuth2ProviderSettingsUpdateDto } from 'types/auth-settings';
 import { isValidJWTBearerProvider, isValidOAuth2FlowProvider } from 'utils/oauth2Providers';
 
@@ -162,16 +157,6 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
         control,
         name: 'jwkSetUrl',
     });
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     const onSubmit = useCallback(
         (values: FormValues) => {

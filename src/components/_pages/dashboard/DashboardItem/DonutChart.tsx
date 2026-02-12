@@ -106,9 +106,10 @@ function DonutChart({ title, colorOptions, data = {}, entity, redirect, onSetFil
                     <div className="flex-1 flex justify-end">
                         <div className="space-y-1.5 h-full max-w-[140px] overflow-y-auto">
                             {chartLabels.map((label, index) => (
-                                <div
+                                <button
+                                    type="button"
                                     key={label}
-                                    className="flex items-center gap-3 cursor-pointer"
+                                    className="flex items-center gap-3 cursor-pointer bg-transparent border-none p-0 text-left"
                                     onClick={() => {
                                         dispatch(actions.setCurrentFilters({ entity, currentFilters: onLegendClick(index, chartLabels) }));
                                         navigate(redirect);
@@ -119,7 +120,7 @@ function DonutChart({ title, colorOptions, data = {}, entity, redirect, onSetFil
                                         style={{ backgroundColor: chartColors[index] || '#6B7280' }}
                                     />
                                     <span className="text-md text-one-row-ellipsis">{label}</span>
-                                </div>
+                                </button>
                             ))}
                         </div>
                     </div>

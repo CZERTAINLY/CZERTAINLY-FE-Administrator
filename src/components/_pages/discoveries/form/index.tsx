@@ -25,7 +25,8 @@ import { FunctionGroupCode, Resource } from 'types/openapi';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { getStrongFromCronExpression } from 'utils/dateUtil';
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateQuartzCronExpression, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateQuartzCronExpression, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import TriggerEditorWidget from 'components/TriggerEditorWidget';
 import TextInput from 'components/TextInput';
 
@@ -202,16 +203,6 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
         control,
         name: 'cronExpression',
     });
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     // Automatically load attributes when kind changes
     useEffect(() => {

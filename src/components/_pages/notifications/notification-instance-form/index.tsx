@@ -6,16 +6,16 @@ import { selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions as connectorActions } from 'ducks/connectors';
 import { selectors as notificationSelectors, actions as notificationsActions } from 'ducks/notifications';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import Select from 'components/Select';
 import Button from 'components/Button';
 import { AttributeDescriptorModel, AttributeMappingModel, isCustomAttributeModel, isDataAttributeModel } from 'types/attributes';
-import { NotificationInstanceRequestModel } from 'types/notifications';
 import { AttributeContentType, FunctionGroupCode } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
-import { composeValidators, validateAlphaNumericWithoutAccents, validateLength, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithoutAccents, validateLength, validateRequired } from 'utils/validators';
 import { buildValidationRules } from 'utils/validators-helper';
 import TextInput from 'components/TextInput';
 import TextArea from 'components/TextArea';
@@ -186,22 +186,8 @@ const NotificationInstanceForm = ({ notificationInstanceId, onCancel, onSuccess 
         onCancel?.();
     }, [clearNotificationInstanceDetail, onCancel]);
 
-    const wasCreating = useRef(isCreatingNotificationInstance);
-    const wasUpdating = useRef(isEditingNotificationInstance);
-
-    useEffect(() => {
-        if (wasCreating.current && !isCreatingNotificationInstance) {
-            onSuccess?.();
-        }
-        wasCreating.current = isCreatingNotificationInstance;
-    }, [isCreatingNotificationInstance, onSuccess, editMode]);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isEditingNotificationInstance) {
-            onSuccess?.();
-        }
-        wasUpdating.current = isEditingNotificationInstance;
-    }, [isEditingNotificationInstance, onSuccess, editMode]);
+    useRunOnFinished(isCreatingNotificationInstance, onSuccess);
+    useRunOnFinished(isEditingNotificationInstance, onSuccess);
 
     const optionsForNotificationProviders = useMemo(
         () =>

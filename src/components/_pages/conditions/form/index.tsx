@@ -2,6 +2,7 @@ import Widget from 'components/Widget';
 import { EntityType, actions as filterActions } from 'ducks/filters';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
@@ -12,13 +13,13 @@ import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
-import Breadcrumb from 'components/Breadcrumb';
 import TextInput from 'components/TextInput';
 import { ConditionType, PlatformEnum, Resource } from 'types/openapi';
 import { ConditionItemModel } from 'types/rules';
 import { isObjectSame } from 'utils/common-utils';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import ConditionFormFilter from '../../../ConditionFormFilter';
 
 export interface ConditionFormValues {
@@ -49,16 +50,7 @@ const ConditionForm = ({ onCancel, onSuccess }: ConditionFormProps = {}) => {
         };
     }, [dispatch]);
 
-    const wasCreating = useRef(isCreatingCondition);
-
-    useEffect(() => {
-        if (wasCreating.current && !isCreatingCondition) {
-            if (onSuccess) {
-                onSuccess();
-            }
-        }
-        wasCreating.current = isCreatingCondition;
-    }, [isCreatingCondition, onSuccess]);
+    useRunOnFinished(isCreatingCondition, onSuccess);
 
     const defaultValues: ConditionFormValues = useMemo(() => {
         return {
@@ -87,16 +79,6 @@ const ConditionForm = ({ onCancel, onSuccess }: ConditionFormProps = {}) => {
         control,
         name: 'resource',
     });
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     const submitTitle = 'Create';
     const inProgressTitle = 'Creating...';

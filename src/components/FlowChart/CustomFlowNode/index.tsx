@@ -409,6 +409,20 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                                                     }
                                                                 }}
                                                                 className="cursor-pointer"
+                                                                role="button"
+                                                                tabIndex={0}
+                                                                onKeyDown={(event) => {
+                                                                    if (event.key === 'Enter' || event.key === ' ') {
+                                                                        event.preventDefault();
+                                                                        if (typeof property.propertyValue === 'string') {
+                                                                            copyToClipboard(
+                                                                                property.propertyValue,
+                                                                                `${property.propertyName} copied to clipboard`,
+                                                                                `Failed to copy ${property.propertyName} to clipboard`,
+                                                                            );
+                                                                        }
+                                                                    }
+                                                                }}
                                                             >
                                                                 <Copy size={14} />
                                                             </span>

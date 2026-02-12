@@ -1,5 +1,6 @@
 import { TableDataRow, TableHeader } from 'components/CustomTable';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions, selectors } from 'ducks/oids';
 import { EntityType } from 'ducks/filters';
@@ -28,9 +29,6 @@ export default function CustomOIDList() {
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [editingOidId, setEditingOidId] = useState<string | undefined>(undefined);
-
-    const wasCreating = useRef(isCreating);
-    const wasUpdating = useRef(isUpdating);
 
     const oidCategoryEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.OidCategory));
     const oidsRowHeaders: TableHeader[] = useMemo(
@@ -113,22 +111,18 @@ export default function CustomOIDList() {
         onListCallback({ itemsPerPage: 10, pageNumber: 1, filters: [] });
     }, [onListCallback]);
 
-    // Track creation/update state and close dialog on success
-    useEffect(() => {
-        if (wasCreating.current && !isCreating && isAddModalOpen) {
+    useRunOnFinished(isCreating, () => {
+        if (isAddModalOpen) {
             handleCloseAddModal();
             getFreshData();
         }
-        wasCreating.current = isCreating;
-    }, [isCreating, isAddModalOpen, handleCloseAddModal, getFreshData]);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating && isAddModalOpen) {
+    });
+    useRunOnFinished(isUpdating, () => {
+        if (isAddModalOpen) {
             handleCloseAddModal();
             getFreshData();
         }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, isAddModalOpen, handleCloseAddModal, getFreshData]);
+    });
 
     const additionalButtons: WidgetButtonProps[] = useMemo(
         () => [

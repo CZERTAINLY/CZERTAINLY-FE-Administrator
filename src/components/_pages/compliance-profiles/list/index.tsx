@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import Container from 'components/Container';
@@ -6,6 +7,7 @@ import Container from 'components/Container';
 import { actions, selectors } from 'ducks/compliance-profiles';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import ForceDeleteErrorTable from 'components/ForceDeleteErrorTable';
 import Dialog from 'components/Dialog';
 import ComplianceProfileForm from '../form';
 import Widget from 'components/Widget';
@@ -48,15 +50,10 @@ export default function AdministratorsList() {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
     }, [bulkDeleteErrorMessages]);
 
-    const wasCreating = useRef(isCreating);
-
-    useEffect(() => {
-        if (wasCreating.current && !isCreating) {
-            setIsAddModalOpen(false);
-            getFreshData();
-        }
-        wasCreating.current = isCreating;
-    }, [isCreating, getFreshData]);
+    useRunOnFinished(isCreating, () => {
+        setIsAddModalOpen(false);
+        getFreshData();
+    });
 
     const handleOpenAddModal = useCallback(() => {
         setIsAddModalOpen(true);
@@ -119,40 +116,13 @@ export default function AdministratorsList() {
         [checkedRows, handleOpenAddModal],
     );
 
-    const forceDeleteErrorTableHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'name',
-                content: 'Name',
-            },
-            {
-                id: 'dependencies',
-                content: 'Dependencies',
-            },
-        ],
-        [],
-    );
-
-    const forceDeleteErrorTableData: TableDataRow[] = useMemo(
-        () =>
-            bulkDeleteErrorMessages?.map((message) => ({
-                id: message.uuid || message.name,
-                columns: [message.name, message.message],
-            })) || [],
-        [bulkDeleteErrorMessages],
-    );
-
-    const forceDeleteBody = useMemo(
-        () => (
-            <div>
-                <div className="mb-4">
-                    Failed to delete {checkedRows.length > 1 ? 'Compliance Profiles' : 'a Compliance Profile'}. Please find the details
-                    below:
-                </div>
-                <CustomTable headers={forceDeleteErrorTableHeaders} data={forceDeleteErrorTableData} />
-            </div>
-        ),
-        [checkedRows.length, forceDeleteErrorTableHeaders, forceDeleteErrorTableData],
+    const forceDeleteBody = (
+        <ForceDeleteErrorTable
+            items={bulkDeleteErrorMessages}
+            entityNameSingular="a Compliance Profile"
+            entityNamePlural="Compliance Profiles"
+            itemsCount={checkedRows.length}
+        />
     );
 
     const complianceProfilesTableHeader: TableHeader[] = useMemo(

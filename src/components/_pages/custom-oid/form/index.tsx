@@ -10,7 +10,8 @@ import {
     PlatformEnum,
 } from 'types/openapi';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
-import { validateLength, composeValidators, validateRequired, validateOid, validateOidCode } from 'utils/validators';
+import { validateLength, validateRequired, validateOid, validateOidCode } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
@@ -110,16 +111,6 @@ export default function CustomOIDForm({ oidId, onCancel, onSuccess }: CustomOIDF
         control,
         name: 'category',
     });
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     const onSubmit = useCallback(
         (values: FormValues) => {

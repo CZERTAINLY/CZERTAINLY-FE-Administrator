@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
@@ -6,6 +7,7 @@ import Badge from 'components/Badge';
 import { actions, selectors } from 'ducks/connectors';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import ForceDeleteErrorTable from 'components/ForceDeleteErrorTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
@@ -54,24 +56,14 @@ export default function ConnectorList() {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
     }, [bulkDeleteErrorMessages]);
 
-    const wasCreating = useRef(isCreating);
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasCreating.current && !isCreating) {
-            setIsAddModalOpen(false);
-            getFreshData();
-        }
-        wasCreating.current = isCreating;
-    }, [isCreating, getFreshData]);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            setEditingConnectorId(undefined);
-            getFreshData();
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, getFreshData]);
+    useRunOnFinished(isCreating, () => {
+        setIsAddModalOpen(false);
+        getFreshData();
+    });
+    useRunOnFinished(isUpdating, () => {
+        setEditingConnectorId(undefined);
+        getFreshData();
+    });
 
     const handleOpenAddModal = useCallback(() => {
         setIsAddModalOpen(true);
@@ -174,37 +166,13 @@ export default function ConnectorList() {
         [],
     );
 
-    const forceDeleteBody = useMemo(
-        () => (
-            <div>
-                <div>Failed to delete {checkedRows.length > 1 ? 'Connectors' : 'a Connector'}. Please find the details below:</div>
-
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
-                    <thead>
-                        <tr>
-                            <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                <b>Name</b>
-                            </th>
-                            <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                <b>Dependencies</b>
-                            </th>
-                        </tr>
-                    </thead>
-
-                    <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
-                        {bulkDeleteErrorMessages?.map((message) => (
-                            <tr className="hover:bg-gray-50 dark:hover:bg-neutral-800">
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">{message.name}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">
-                                    {message.message}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        ),
-        [bulkDeleteErrorMessages, checkedRows.length],
+    const forceDeleteBody = (
+        <ForceDeleteErrorTable
+            items={bulkDeleteErrorMessages}
+            entityNameSingular="a Connector"
+            entityNamePlural="Connectors"
+            itemsCount={checkedRows.length}
+        />
     );
 
     const connectorsRowHeaders: TableHeader[] = useMemo(
@@ -273,6 +241,7 @@ export default function ConnectorList() {
     return (
         <div>
             <Widget
+                dataTestId="connectors-list-widget"
                 title="Connector Store"
                 busy={isBusy}
                 widgetLockName={LockWidgetNameEnum.ConnectorStore}

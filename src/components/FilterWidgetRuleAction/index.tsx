@@ -555,7 +555,21 @@ export default function FilterWidgetRuleAction({
                     <b>{fieldSource && getEnumLabel(searchGroupEnum, fieldSource)}&nbsp;</b>'{label}
                     '&nbsp;to&nbsp;
                     {value}
-                    {!disableBadgeRemove && <span onClick={() => onRemoveFilterClick(itemNumber)}>&times;</span>}
+                    {!disableBadgeRemove && (
+                        <span
+                            onClick={() => onRemoveFilterClick(itemNumber)}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(event) => {
+                                if (event.key === 'Enter' || event.key === ' ') {
+                                    event.preventDefault();
+                                    onRemoveFilterClick(itemNumber);
+                                }
+                            }}
+                        >
+                            &times;
+                        </span>
+                    )}
                 </React.Fragment>
             );
         },

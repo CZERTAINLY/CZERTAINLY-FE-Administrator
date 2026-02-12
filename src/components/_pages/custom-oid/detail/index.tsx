@@ -4,7 +4,8 @@ import CustomOIDForm from 'components/_pages/custom-oid/form';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/oids';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -29,8 +30,6 @@ export default function CustomOIDDetail() {
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-
-    const wasUpdating = useRef(isUpdating);
 
     const isBusy = useMemo(() => isFetching || isDeleting, [isFetching, isDeleting]);
 
@@ -58,14 +57,12 @@ export default function CustomOIDDetail() {
         setIsEditDialogOpen(false);
     }, []);
 
-    // Track update state and close dialog on success
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating && isEditDialogOpen) {
+    useRunOnFinished(isUpdating, () => {
+        if (isEditDialogOpen) {
             handleCloseEditDialog();
             getFreshOIDDetails();
         }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, isEditDialogOpen, handleCloseEditDialog, getFreshOIDDetails]);
+    });
 
     const onDeleteConfirmed = useCallback(() => {
         if (!oid) return;

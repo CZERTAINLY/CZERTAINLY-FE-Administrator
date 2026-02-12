@@ -8,7 +8,8 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } from 'ducks/token-profiles';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import TokenProfileForm from '../form';
@@ -61,15 +62,10 @@ export default function TokenProfileDetail() {
         getFreshTokenProfileDetails();
     }, [getFreshTokenProfileDetails, id, tokenId]);
 
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            setIsEditModalOpen(false);
-            getFreshTokenProfileDetails();
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, getFreshTokenProfileDetails]);
+    useRunOnFinished(isUpdating, () => {
+        setIsEditModalOpen(false);
+        getFreshTokenProfileDetails();
+    });
 
     const handleCloseEditModal = useCallback(() => {
         setIsEditModalOpen(false);

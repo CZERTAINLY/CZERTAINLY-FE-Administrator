@@ -6,7 +6,8 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/entities';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import EntityForm from '../form';
@@ -46,15 +47,10 @@ export default function EntityDetail() {
         getFreshEntityDetails();
     }, [getFreshEntityDetails, id]);
 
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            setIsEditModalOpen(false);
-            getFreshEntityDetails();
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, getFreshEntityDetails]);
+    useRunOnFinished(isUpdating, () => {
+        setIsEditModalOpen(false);
+        getFreshEntityDetails();
+    });
 
     const handleOpenEditModal = useCallback(() => {
         if (!entity) return;

@@ -4,14 +4,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { Link } from 'react-router';
-import Select from 'components/Select';
 import { PlatformEnum, Resource } from 'types/openapi';
 
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
+import { useResourceFilterButtons } from '../../../rules/list/useResourceFilterButtons';
 import ActionsForm from '../../form';
 
 const ActionsList = () => {
@@ -35,18 +35,14 @@ const ActionsList = () => {
         [isFetchingList, isDeleting, isFetchingResourcesList],
     );
 
-    const wasCreating = useRef(isCreatingAction);
     const getFreshList = useCallback(() => {
         dispatch(rulesActions.listActions({ resource: selectedResource }));
     }, [dispatch, selectedResource]);
 
-    useEffect(() => {
-        if (wasCreating.current && !isCreatingAction) {
-            setIsAddModalOpen(false);
-            getFreshList();
-        }
-        wasCreating.current = isCreatingAction;
-    }, [isCreatingAction, getFreshList]);
+    useRunOnFinished(isCreatingAction, () => {
+        setIsAddModalOpen(false);
+        getFreshList();
+    });
 
     const handleOpenAddModal = useCallback(() => {
         setIsAddModalOpen(true);
@@ -107,42 +103,14 @@ const ActionsList = () => {
         [actionsList, resourceTypeEnum],
     );
 
-    const buttons: WidgetButtonProps[] = useMemo(
-        () => [
-            {
-                icon: 'search',
-                disabled: false,
-                tooltip: 'Select Resource',
-                onClick: () => {},
-                custom: (
-                    <Select
-                        placeholder="Select Resource"
-                        minWidth={180}
-                        id="resource"
-                        options={resourceOptionsWithRuleEvaluator}
-                        value={selectedResource || 'Select Resource'}
-                        onChange={(value) => {
-                            setSelectedResource(value as Resource);
-                        }}
-                        isClearable
-                    />
-                ),
-            },
-            {
-                icon: 'plus',
-                disabled: false,
-                tooltip: 'Create',
-                onClick: handleOpenAddModal,
-            },
-            {
-                icon: 'trash',
-                disabled: checkedRows.length === 0,
-                tooltip: 'Delete',
-                onClick: () => setConfirmDelete(true),
-            },
-        ],
-        [checkedRows, resourceOptionsWithRuleEvaluator, selectedResource, handleOpenAddModal],
-    );
+    const buttons = useResourceFilterButtons({
+        resourceOptionsWithRuleEvaluator,
+        selectedResource,
+        setSelectedResource,
+        checkedRows,
+        handleOpenAddModal,
+        setConfirmDelete,
+    });
 
     return (
         <>

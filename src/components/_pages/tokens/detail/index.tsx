@@ -8,7 +8,8 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions as keyActions, selectors as keySelectors } from 'ducks/cryptographic-keys';
 import { actions, selectors } from 'ducks/tokens';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import TokenForm from '../form';
@@ -65,15 +66,10 @@ export default function TokenDetail() {
         getFreshAttributes();
     }, [getFreshTokenDetails, getFreshAttributes, id]);
 
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            setIsEditModalOpen(false);
-            getFreshTokenDetails();
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, getFreshTokenDetails]);
+    useRunOnFinished(isUpdating, () => {
+        setIsEditModalOpen(false);
+        getFreshTokenDetails();
+    });
 
     const handleOpenEditModal = useCallback(() => {
         if (!token) return;

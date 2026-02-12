@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
 import { actions, selectors } from 'ducks/acme-profiles';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import ForceDeleteErrorTable from 'components/ForceDeleteErrorTable';
 import Container from 'components/Container';
 import Dialog from 'components/Dialog';
 import AcmeProfileForm from '../form';
@@ -50,24 +52,14 @@ export default function AdministratorsList() {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
     }, [bulkDeleteErrorMessages]);
 
-    const wasCreating = useRef(isCreating);
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasCreating.current && !isCreating) {
-            setIsAddModalOpen(false);
-            getFreshData();
-        }
-        wasCreating.current = isCreating;
-    }, [isCreating, getFreshData]);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            setEditingAcmeProfileId(undefined);
-            getFreshData();
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, getFreshData]);
+    useRunOnFinished(isCreating, () => {
+        setIsAddModalOpen(false);
+        getFreshData();
+    });
+    useRunOnFinished(isUpdating, () => {
+        setEditingAcmeProfileId(undefined);
+        getFreshData();
+    });
 
     const handleOpenAddModal = useCallback(() => {
         setIsAddModalOpen(true);
@@ -143,35 +135,13 @@ export default function AdministratorsList() {
         [checkedRows, handleOpenAddModal, onEnableClick, onDisableClick],
     );
 
-    const forceDeleteBody = useMemo(
-        () => (
-            <div>
-                <div>Failed to delete {checkedRows.length > 1 ? 'ACME Profiles' : 'an ACME Profile'}. Please find the details below:</div>
-
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700 mt-4">
-                    <thead className="bg-gray-50 dark:bg-neutral-700">
-                        <tr>
-                            <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-neutral-300">
-                                <b>Name</b>
-                            </th>
-                            <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-neutral-300">
-                                <b>Dependencies</b>
-                            </th>
-                        </tr>
-                    </thead>
-
-                    <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
-                        {bulkDeleteErrorMessages?.map((message, index) => (
-                            <tr key={index} className="hover:bg-gray-50 dark:hover:bg-neutral-800">
-                                <td className="px-4 py-2 text-sm text-gray-900 dark:text-neutral-300">{message.name}</td>
-                                <td className="px-4 py-2 text-sm text-gray-900 dark:text-neutral-300">{message.message}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        ),
-        [bulkDeleteErrorMessages, checkedRows.length],
+    const forceDeleteBody = (
+        <ForceDeleteErrorTable
+            items={bulkDeleteErrorMessages}
+            entityNameSingular="an ACME Profile"
+            entityNamePlural="ACME Profiles"
+            itemsCount={checkedRows.length}
+        />
     );
 
     const acmeProfilesTableHeader: TableHeader[] = [
@@ -241,6 +211,7 @@ export default function AdministratorsList() {
     return (
         <Container gap={4}>
             <Widget
+                dataTestId="acme-profiles-list-widget"
                 title="List of ACME Profiles"
                 busy={isBusy}
                 widgetLockName={LockWidgetNameEnum.ListOfACMEProfiles}

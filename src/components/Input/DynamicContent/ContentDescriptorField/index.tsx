@@ -8,7 +8,8 @@ import TextInput from 'components/TextInput';
 import DatePicker from 'components/DatePicker';
 import { AttributeContentType } from 'types/openapi';
 import { getStepValue } from 'utils/common-utils';
-import { composeValidators, validateRequired } from 'utils/validators';
+import { validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import { ContentFieldConfiguration } from '../index';
 import { Plus } from 'lucide-react';
 import cn from 'classnames';
@@ -44,16 +45,6 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [readOnly, contentType, setValue]);
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     return (
         <>

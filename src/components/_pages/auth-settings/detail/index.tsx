@@ -6,7 +6,8 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/auth-settings';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 
@@ -26,9 +27,6 @@ export default function OAuth2ProviderDetail() {
     const isUpdatingProvider = useSelector(selectors.isUpdatingProvider);
 
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-
-    const wasCreating = useRef(isCreatingProvider);
-    const wasUpdating = useRef(isUpdatingProvider);
 
     const getFreshData = useCallback(() => {
         if (!providerName) return;
@@ -53,14 +51,12 @@ export default function OAuth2ProviderDetail() {
         }
     }, [oauth2Provider, getFreshData]);
 
-    // Track update state and close dialog on success
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdatingProvider && isEditDialogOpen) {
+    useRunOnFinished(isUpdatingProvider, () => {
+        if (isEditDialogOpen) {
             handleCloseEditDialog();
             getFreshData();
         }
-        wasUpdating.current = isUpdatingProvider;
-    }, [isUpdatingProvider, isEditDialogOpen, handleCloseEditDialog, getFreshData]);
+    });
 
     const onDeleteClick = useCallback(() => {
         if (!providerName) return;

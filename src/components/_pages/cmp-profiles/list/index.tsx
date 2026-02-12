@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import Container from 'components/Container';
@@ -6,6 +7,7 @@ import Container from 'components/Container';
 import { actions, selectors } from 'ducks/cmp-profiles';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import ForceDeleteErrorTable from 'components/ForceDeleteErrorTable';
 import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
@@ -54,24 +56,14 @@ export default function AdministratorsList() {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
     }, [bulkDeleteErrorMessages]);
 
-    const wasCreating = useRef(isCreating);
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasCreating.current && !isCreating) {
-            setIsAddModalOpen(false);
-            getFreshData();
-        }
-        wasCreating.current = isCreating;
-    }, [isCreating, getFreshData]);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            setEditingCmpProfileId(undefined);
-            getFreshData();
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, getFreshData]);
+    useRunOnFinished(isCreating, () => {
+        setIsAddModalOpen(false);
+        getFreshData();
+    });
+    useRunOnFinished(isUpdating, () => {
+        setEditingCmpProfileId(undefined);
+        getFreshData();
+    });
 
     const handleOpenAddModal = useCallback(() => {
         setIsAddModalOpen(true);
@@ -147,37 +139,13 @@ export default function AdministratorsList() {
         [checkedRows, handleOpenAddModal, onEnableClick, onDisableClick],
     );
 
-    const forceDeleteBody = useMemo(
-        () => (
-            <div>
-                <div>Failed to delete {checkedRows.length > 1 ? 'CMP Profiles' : 'a CMP Profile'}. Please find the details below:</div>
-
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
-                    <thead>
-                        <tr>
-                            <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                <b>Name</b>
-                            </th>
-                            <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                <b>Dependencies</b>
-                            </th>
-                        </tr>
-                    </thead>
-
-                    <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
-                        {bulkDeleteErrorMessages?.map((message) => (
-                            <tr className="hover:bg-gray-50 dark:hover:bg-neutral-800">
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">{message.name}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">
-                                    {message.message}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        ),
-        [bulkDeleteErrorMessages, checkedRows.length],
+    const forceDeleteBody = (
+        <ForceDeleteErrorTable
+            items={bulkDeleteErrorMessages}
+            entityNameSingular="a CMP Profile"
+            entityNamePlural="CMP Profiles"
+            itemsCount={checkedRows.length}
+        />
     );
 
     const cmpProfilesTableHeader: TableHeader[] = useMemo(

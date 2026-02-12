@@ -6,7 +6,8 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions, selectors } from 'ducks/notification-profiles';
 import { actions as notificationActions, selectors as notificationSelectors } from 'ducks/notifications';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import NotificationProfileForm from '../form';
@@ -51,15 +52,10 @@ export default function NotificationProfileDetail() {
         dispatch(notificationActions.getNotificationInstance({ uuid: notificationProfile.notificationInstance.uuid }));
     }, [dispatch, notificationProfile]);
 
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            setIsEditModalOpen(false);
-            getFreshData();
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, getFreshData]);
+    useRunOnFinished(isUpdating, () => {
+        setIsEditModalOpen(false);
+        getFreshData();
+    });
 
     const handleCloseEditModal = useCallback(() => {
         setIsEditModalOpen(false);
