@@ -2,8 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router';
 import React from 'react';
-import { reducers } from 'ducks/reducers';
-import { initialState } from 'ducks/initial-state';
+import { testReducers, testInitialState } from 'ducks/test-reducers';
 import { ApiClients } from '../api';
 
 /**
@@ -24,17 +23,13 @@ function deepMerge<T extends Record<string, any>>(target: T, source: Partial<T>)
     return output;
 }
 
-export function createMockStore(preloadedState?: Partial<ReturnType<typeof reducers>>, mockApiClients?: ApiClients) {
-    // For component tests, we don't need epics - they're for side effects
-    // Creating store without epic middleware to avoid circular dependency issues
-    // Merge preloadedState with initial state to ensure all reducers are properly initialized
-    const mergedState = preloadedState ? (deepMerge(initialState as any, preloadedState) as ReturnType<typeof reducers>) : initialState;
+export function createMockStore(preloadedState?: Partial<ReturnType<typeof testReducers>>, mockApiClients?: ApiClients) {
+    const baseState = testInitialState as ReturnType<typeof testReducers>;
 
-    // Ensure all reducers have initial state
-    const finalState = { ...initialState, ...mergedState };
+    const finalState = preloadedState ? (deepMerge(baseState as any, preloadedState) as ReturnType<typeof testReducers>) : baseState;
 
     const store = configureStore({
-        reducer: reducers,
+        reducer: testReducers,
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
                 serializableCheck: false,

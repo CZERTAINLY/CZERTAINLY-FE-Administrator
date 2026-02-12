@@ -4,7 +4,6 @@ import { MemoryRouter } from 'react-router';
 import { createMockStore } from 'utils/test-helpers';
 import CertificateStatus from './index';
 import { CertificateState, CertificateValidationStatus, ComplianceStatus, PlatformEnum } from 'types/openapi';
-import { slice as enumsSlice } from 'ducks/enums';
 
 const certificateStateLabels: Record<string, { label: string }> = {
     [CertificateState.Issued]: { label: 'Issued' },
@@ -20,8 +19,8 @@ const complianceStatusLabels: Record<string, { label: string }> = {
     [ComplianceStatus.Nok]: { label: 'NOK' },
 };
 
-const preloadedState = {
-    [enumsSlice.name]: {
+const preloadedState: Parameters<typeof createMockStore>[0] = {
+    enums: {
         platformEnums: {
             [PlatformEnum.CertificateState]: certificateStateLabels,
             [PlatformEnum.CertificateValidationStatus]: validationStatusLabels,

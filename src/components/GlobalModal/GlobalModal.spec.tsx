@@ -1,14 +1,14 @@
 import { test, expect } from '../../../playwright/ct-test';
 import { createMockStore, withProviders } from 'utils/test-helpers';
 import GlobalModal from './index';
-import { initialState as userInterfaceInitialState, slice as userInterfaceSlice } from 'ducks/user-interface';
+import { testInitialState } from 'ducks/test-reducers';
 
 function createGlobalModalPreload(overrides: Record<string, unknown> = {}) {
     return {
-        [userInterfaceSlice.name]: {
-            ...userInterfaceInitialState,
+        userInterface: {
+            ...testInitialState.userInterface,
             globalModal: {
-                ...userInterfaceInitialState.globalModal,
+                ...testInitialState.userInterface.globalModal,
                 ...overrides,
             },
         },

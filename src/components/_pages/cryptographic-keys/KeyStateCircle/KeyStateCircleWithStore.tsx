@@ -4,7 +4,6 @@ import { MemoryRouter } from 'react-router';
 import { createMockStore } from 'utils/test-helpers';
 import KeyStateCircle from './index';
 import { KeyState, PlatformEnum } from 'types/openapi';
-import { slice as enumsSlice } from 'ducks/enums';
 
 const keyStateLabels: Record<string, { label: string }> = {
     [KeyState.Active]: { label: 'Active' },
@@ -15,8 +14,8 @@ const keyStateLabels: Record<string, { label: string }> = {
     [KeyState.DestroyedCompromised]: { label: 'Destroyed compromised' },
 };
 
-const preloadedState = {
-    [enumsSlice.name]: {
+const preloadedState: Parameters<typeof createMockStore>[0] = {
+    enums: {
         platformEnums: {
             [PlatformEnum.KeyState]: keyStateLabels,
         },
