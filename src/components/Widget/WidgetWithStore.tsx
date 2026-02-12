@@ -3,7 +3,6 @@ import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router';
 import { createMockStore } from 'utils/test-helpers';
 import Widget from './index';
-import { initialState as userInterfaceInitialState, slice as userInterfaceSlice } from 'ducks/user-interface';
 import { LockWidgetNameEnum, LockTypeEnum, type WidgetLockModel } from 'types/user-interface';
 
 export type WidgetWithStoreProps = {
@@ -17,7 +16,22 @@ export type WidgetWithStoreProps = {
 };
 
 const defaultPreloadedState: Parameters<typeof createMockStore>[0] = {
-    [userInterfaceSlice.name]: userInterfaceInitialState,
+    userInterface: {
+        widgetLocks: [],
+        globalModal: {
+            title: undefined,
+            size: 'sm',
+            content: undefined,
+            isOpen: false,
+            showCancelButton: false,
+            showOkButton: false,
+            showCloseButton: false,
+            showSubmitButton: false,
+            okButtonCallback: undefined,
+            cancelButtonCallback: undefined,
+        },
+        theme: 'light',
+    },
 };
 
 export function createWidgetLock(overrides: Partial<WidgetLockModel> = {}): WidgetLockModel {

@@ -2,10 +2,7 @@ import React from 'react';
 import { test, expect } from '../../../playwright/ct-test';
 import { MemoryRouter } from 'react-router';
 import ErrorBoundary from './index';
-
-const ThrowError: React.FC = () => {
-    throw new Error('Test error');
-};
+import ThrowError from './ErrorBoundaryThrowError';
 
 test.describe('ErrorBoundary', () => {
     test('should render children when there is no error', async ({ mount, page }) => {
@@ -20,7 +17,7 @@ test.describe('ErrorBoundary', () => {
         await expect(page.getByText('Content')).toBeVisible();
     });
 
-    test.skip('should show error UI when child throws', async ({ mount, page }) => {
+    test('should show error UI when child throws', async ({ mount, page }) => {
         await mount(
             <MemoryRouter initialEntries={['/']}>
                 <ErrorBoundary>
@@ -32,7 +29,7 @@ test.describe('ErrorBoundary', () => {
         await expect(page.getByRole('button', { name: 'Try Again' })).toBeVisible();
     });
 
-    test.skip('should use custom fallback when provided', async ({ mount, page }) => {
+    test('should use custom fallback when provided', async ({ mount, page }) => {
         await mount(
             <MemoryRouter initialEntries={['/']}>
                 <ErrorBoundary fallback={<div data-testid="custom-fallback">Custom error</div>}>

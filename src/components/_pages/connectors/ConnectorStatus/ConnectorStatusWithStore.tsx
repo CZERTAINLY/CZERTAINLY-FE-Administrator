@@ -4,7 +4,6 @@ import { MemoryRouter } from 'react-router';
 import { createMockStore } from 'utils/test-helpers';
 import InventoryStatusBadge from './index';
 import { ConnectorStatus, PlatformEnum } from 'types/openapi';
-import { slice as enumsSlice } from 'ducks/enums';
 
 const connectorStatusLabels: Record<string, { label: string }> = {
     [ConnectorStatus.Connected]: { label: 'Connected' },
@@ -13,8 +12,8 @@ const connectorStatusLabels: Record<string, { label: string }> = {
     [ConnectorStatus.WaitingForApproval]: { label: 'Waiting for approval' },
 };
 
-const preloadedState = {
-    [enumsSlice.name]: {
+const preloadedState: Parameters<typeof createMockStore>[0] = {
+    enums: {
         platformEnums: {
             [PlatformEnum.ConnectorStatus]: connectorStatusLabels,
         },
