@@ -228,7 +228,7 @@ export default function FilterWidget({
         }
 
         if (Array.isArray(currentFilters[selectedFilter].value)) {
-            const currentValue = currentFilters[selectedFilter].value as Array<object>;
+            const currentValue = currentFilters[selectedFilter]?.value as Array<object>;
             const newFilterValue = currentValue.map((v: any) => {
                 let label = '';
                 let value = '';
@@ -439,7 +439,7 @@ export default function FilterWidget({
 
             if (selectedFilter === -1) return objectOptions;
 
-            const currentValue = currentFilters[selectedFilter].value;
+            const currentValue = currentFilters[selectedFilter]?.value;
 
             const filteredOptions = objectOptions.filter((o) => {
                 if (Array.isArray(currentValue)) {
