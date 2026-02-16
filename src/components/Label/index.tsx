@@ -16,23 +16,29 @@ interface Props {
 
 function Label({ htmlFor, title, children, required, className, onClick, dataTestId }: Props) {
     const defaultClasses = 'block text-left text-sm font-medium mb-2 text-center dark:text-white text-[var(--dark-gray-color)]';
+    if (onClick) {
+        return (
+            <button
+                type="button"
+                className={cn(defaultClasses, className)}
+                onClick={onClick}
+                onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        onClick();
+                    }
+                }}
+                data-testid={dataTestId ?? (htmlFor ? `label-${htmlFor}` : 'label')}
+            >
+                {title || children}
+                {required && <span className="text-red-500"> *</span>}
+            </button>
+        );
+    }
     return (
         <label
             htmlFor={htmlFor}
             className={cn(defaultClasses, className)}
-            onClick={onClick}
-            role={onClick ? 'button' : undefined}
-            tabIndex={onClick ? 0 : undefined}
-            onKeyDown={
-                onClick
-                    ? (event) => {
-                          if (event.key === 'Enter' || event.key === ' ') {
-                              event.preventDefault();
-                              onClick();
-                          }
-                      }
-                    : undefined
-            }
             data-testid={dataTestId ?? (htmlFor ? `label-${htmlFor}` : 'label')}
         >
             {title || children}
