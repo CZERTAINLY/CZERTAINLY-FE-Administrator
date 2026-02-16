@@ -19,6 +19,7 @@ import { KeyCompromiseReason, KeyState, KeyUsage, PlatformEnum } from 'types/ope
 import { dateFormatter } from 'utils/dateUtil';
 import KeyStateBadge from '../KeyStateBadge';
 import KeyStatus from '../KeyStatus';
+import KeyUsageSelect from '../KeyUsageSelect';
 import SignVerifyData from './SignVerifyData';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 import EditableTableCell from 'components/CustomTable/EditableTableCell';
@@ -408,17 +409,6 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
         [keyHistory],
     );
 
-    const keyUsageOptions = () => {
-        let options = [];
-        for (const suit in KeyUsage) {
-            options.push({
-                label: getEnumLabel(keyUsageEnum, KeyUsage[suit as keyof typeof KeyUsage]),
-                value: KeyUsage[suit as keyof typeof KeyUsage],
-            });
-        }
-        return options;
-    };
-
     const existingUsages = () => {
         if (!keyItem) return [];
         return keyItem.usage?.map((usage) => {
@@ -453,30 +443,6 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
 
         return returnList;
     };
-
-    const keyUsageBody = (
-        <div>
-            <div className="form-group">
-                <Label htmlFor="field">Key Usage</Label>
-                <Select
-                    isMulti={true}
-                    id="field"
-                    options={keyUsageOptions()}
-                    value={keyUsages.map(
-                        (usage) =>
-                            keyUsageOptions().find((opt) => opt.value === usage) || {
-                                value: usage,
-                                label: getEnumLabel(keyUsageEnum, usage),
-                            },
-                    )}
-                    onChange={(values) => {
-                        setKeyUsages((values || []).map((item) => item.value as KeyUsage));
-                    }}
-                    isClearable={true}
-                />
-            </div>
-        </div>
-    );
 
     return (
         <div className="key-details">
@@ -619,7 +585,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             <Dialog
                 isOpen={keyUsageUpdate}
                 caption="Update Key Usage"
-                body={keyUsageBody}
+                body={<KeyUsageSelect value={keyUsages} onChange={setKeyUsages} keyUsageEnum={keyUsageEnum} />}
                 toggle={() => setKeyUsageUpdate(false)}
                 size="md"
                 buttons={[

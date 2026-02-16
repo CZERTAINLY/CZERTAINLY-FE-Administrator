@@ -19,9 +19,9 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
 import KeyStateCircle from '../KeyStateCircle';
 import KeyStatusCircle from '../KeyStatusCircle';
+import KeyUsageSelect from '../KeyUsageSelect';
 import Badge from 'components/Badge';
 import CryptographicKeyForm from '../form';
-import Label from 'components/Label';
 
 function CryptographicKeyList() {
     const dispatch = useDispatch();
@@ -130,35 +130,6 @@ function CryptographicKeyList() {
             },
         },
     ];
-
-    const keyUsageOptions = useMemo(() => {
-        let options = [];
-        if (keyUsageEnum) {
-            for (const suit in KeyUsage) {
-                options.push({
-                    label: getEnumLabel(keyUsageEnum, KeyUsage[suit as keyof typeof KeyUsage]),
-                    value: KeyUsage[suit as keyof typeof KeyUsage],
-                });
-            }
-        }
-        return options;
-    }, [keyUsageEnum]);
-
-    const keyUsageBody = (
-        <div>
-            <Label>Key Usage</Label>
-            <Select
-                isMulti
-                id="field"
-                options={keyUsageOptions}
-                value={keyUsages.map((usage) => ({ value: usage, label: getEnumLabel(keyUsageEnum, usage) }))}
-                onChange={(values) => {
-                    setKeyUsages((values || []).map((item) => item.value as KeyUsage));
-                }}
-                isClearable
-            />
-        </div>
-    );
 
     const cryptographicKeysTableHeaders: TableHeader[] = useMemo(
         () => [
@@ -379,7 +350,7 @@ function CryptographicKeyList() {
             <Dialog
                 isOpen={keyUsageUpdate}
                 caption="Update Key Usage"
-                body={keyUsageBody}
+                body={<KeyUsageSelect value={keyUsages} onChange={setKeyUsages} keyUsageEnum={keyUsageEnum} />}
                 toggle={() => setKeyUsageUpdate(false)}
                 size="md"
                 buttons={[
