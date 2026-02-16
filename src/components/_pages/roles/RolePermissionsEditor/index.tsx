@@ -327,8 +327,12 @@ function RolePermissionsEditor({
                     key={`${object.uuid}_${action.name}`}
                     role="group"
                     aria-label="Permission action"
+                    tabIndex={0}
                     onClick={(e) => {
                         e.stopPropagation();
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
                     }}
                     className="flex justify-center"
                 >

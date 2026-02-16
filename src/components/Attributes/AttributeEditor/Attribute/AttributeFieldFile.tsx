@@ -36,10 +36,19 @@ export function AttributeFieldFile({
             {descriptor.properties.visible && (
                 <div
                     id={`${name}-dragAndDrop`}
+                    role="region"
+                    aria-label="File drop zone"
+                    tabIndex={0}
                     className="border-2 border-dashed border-gray-200 rounded-lg p-4 dark:border-neutral-700"
                     style={{ display: 'flex', flexWrap: 'wrap' }}
                     onDrop={onFileDrop}
                     onDragOver={onFileDragOver}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            document.getElementById(name)?.click();
+                        }
+                    }}
                 >
                     <div className="flex-grow">
                         <Label htmlFor={`${name}-content`}>File content</Label>

@@ -607,7 +607,11 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
 
                                 <Widget title="CMP Variant Configuration">
                                     <div>
-                                        <label id="variant-label" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                                        <label
+                                            id="variant-label"
+                                            htmlFor="variant-0"
+                                            className="block text-sm font-medium mb-2 text-gray-700 dark:text-white"
+                                        >
                                             Variant <span className="text-red-500">*</span>
                                         </label>
                                         <Controller
@@ -620,6 +624,7 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
                                                         {cmpProfileVariantOptions.map((option, index) => (
                                                             <label key={index} className="flex items-center cursor-pointer">
                                                                 <input
+                                                                    id={index === 0 ? 'variant-0' : undefined}
                                                                     type="radio"
                                                                     name="variant"
                                                                     value={option.value}
