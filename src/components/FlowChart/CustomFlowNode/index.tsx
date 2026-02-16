@@ -284,7 +284,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                         )}
                                     >
                                         {/* <span className="mx-auto">{status}</span> */}
-                                        {expandedHiddenNodeId !== id ? <Eye size={16} /> : <EyeOff size={16} />}
+                                        {expandedHiddenNodeId === id ? <EyeOff size={16} /> : <Eye size={16} />}
                                     </Button>
                                 ) : null}
                                 {/* 
@@ -298,7 +298,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                         title="Add connections to this node"
                                         onClick={() => setAddNodeContentCollapse(!addNodeContentCollapse)}
                                     >
-                                        {!addNodeContentCollapse ? <Plus size={16} /> : <Minus size={16} />}
+                                        {addNodeContentCollapse ? <Minus size={16} /> : <Plus size={16} />}
                                     </Button>
                                 )}
 

@@ -346,16 +346,16 @@ export default function CertificateDetailsContent({ certificate, validationResul
     );
 
     const detailData: TableDataRow[] = useMemo(() => {
-        const certDetail = !certificate
-            ? []
-            : buildCertificateDetailBaseRows(
+        const certDetail = certificate
+            ? buildCertificateDetailBaseRows(
                   certificate,
                   validationResult,
                   isCertificateArchived,
                   certificateKeyUsageEnum,
                   dateFormatter,
                   getEnumLabel,
-              );
+              )
+            : [];
 
         if (certificate?.state !== CertStatus.Requested) {
             certDetail.push({
@@ -483,9 +483,8 @@ export default function CertificateDetailsContent({ certificate, validationResul
     );
 
     const propertiesData: TableDataRow[] = useMemo(() => {
-        return !certificate
-            ? []
-            : [
+        return certificate
+            ? [
                   {
                       id: 'uuid',
                       columns: ['UUID', certificate.uuid, ''],
@@ -620,7 +619,8 @@ export default function CertificateDetailsContent({ certificate, validationResul
                       id: 'type',
                       columns: ['Type', certificate.certificateType || '', ''],
                   },
-              ];
+              ]
+            : [];
     }, [certificate, dispatch, isCertificateArchived]);
 
     return (

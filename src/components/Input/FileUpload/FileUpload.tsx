@@ -117,7 +117,7 @@ export default function FileUpload({ id = '', fileType = '', editable, onFileCon
                         disabled={!editable}
                         value={fileContent}
                         onChange={onFileInputTextChanged}
-                        className={!editable ? 'bg-gray-50 dark:bg-neutral-800' : ''}
+                        className={editable ? '' : 'bg-gray-50 dark:bg-neutral-800'}
                     />
                 </div>
             )}

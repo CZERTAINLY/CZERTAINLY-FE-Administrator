@@ -263,14 +263,14 @@ const LoggingSetting = () => {
                                     />
                                 )}
                             />
-                            {!auditFormValues.logAllModules ? (
+                            {auditFormValues.logAllModules ? (
                                 <Controller
-                                    name="loggedModules"
+                                    name="ignoredModules"
                                     control={auditControl}
                                     render={({ field }) => (
                                         <Select
-                                            id="loggedModules"
-                                            label="Select Modules to Log"
+                                            id="ignoredModules"
+                                            label="Select Modules to Ignore"
                                             options={moduleSelectorItems.map((item) => ({ value: item.value, label: item.label }))}
                                             value={field.value || []}
                                             onChange={(value) => field.onChange(value)}
@@ -280,12 +280,12 @@ const LoggingSetting = () => {
                                 />
                             ) : (
                                 <Controller
-                                    name="ignoredModules"
+                                    name="loggedModules"
                                     control={auditControl}
                                     render={({ field }) => (
                                         <Select
-                                            id="ignoredModules"
-                                            label="Select Modules to Ignore"
+                                            id="loggedModules"
+                                            label="Select Modules to Log"
                                             options={moduleSelectorItems.map((item) => ({ value: item.value, label: item.label }))}
                                             value={field.value || []}
                                             onChange={(value) => field.onChange(value)}
@@ -310,14 +310,14 @@ const LoggingSetting = () => {
                                     />
                                 )}
                             />
-                            {!auditFormValues.logAllResources ? (
+                            {auditFormValues.logAllResources ? (
                                 <Controller
-                                    name="loggedResources"
+                                    name="ignoredResources"
                                     control={auditControl}
                                     render={({ field }) => (
                                         <Select
-                                            id="loggedResources"
-                                            label="Select Resources to Log"
+                                            id="ignoredResources"
+                                            label="Select Resources to Ignore"
                                             options={resourceSelectorItems.map((item) => ({ value: item.value, label: item.label }))}
                                             value={field.value || []}
                                             onChange={(value) => field.onChange(value)}
@@ -327,12 +327,12 @@ const LoggingSetting = () => {
                                 />
                             ) : (
                                 <Controller
-                                    name="ignoredResources"
+                                    name="loggedResources"
                                     control={auditControl}
                                     render={({ field }) => (
                                         <Select
-                                            id="ignoredResources"
-                                            label="Select Resources to Ignore"
+                                            id="loggedResources"
+                                            label="Select Resources to Log"
                                             options={resourceSelectorItems.map((item) => ({ value: item.value, label: item.label }))}
                                             value={field.value || []}
                                             onChange={(value) => field.onChange(value)}
@@ -411,14 +411,14 @@ const LoggingSetting = () => {
                                     />
                                 )}
                             />
-                            {!eventFormValues.logAllModules ? (
+                            {eventFormValues.logAllModules ? (
                                 <Controller
-                                    name="loggedModules"
+                                    name="ignoredModules"
                                     control={eventControl}
                                     render={({ field }) => (
                                         <Select
-                                            id="loggedModules"
-                                            label="Select Modules to Log"
+                                            id="ignoredModules"
+                                            label="Select Modules to Ignore"
                                             options={moduleSelectorItems.map((item) => ({ value: item.value, label: item.label }))}
                                             value={field.value || []}
                                             onChange={(value) => field.onChange(value)}
@@ -428,12 +428,12 @@ const LoggingSetting = () => {
                                 />
                             ) : (
                                 <Controller
-                                    name="ignoredModules"
+                                    name="loggedModules"
                                     control={eventControl}
                                     render={({ field }) => (
                                         <Select
-                                            id="ignoredModules"
-                                            label="Select Modules to Ignore"
+                                            id="loggedModules"
+                                            label="Select Modules to Log"
                                             options={moduleSelectorItems.map((item) => ({ value: item.value, label: item.label }))}
                                             value={field.value || []}
                                             onChange={(value) => field.onChange(value)}
@@ -458,14 +458,14 @@ const LoggingSetting = () => {
                                     />
                                 )}
                             />
-                            {!eventFormValues.logAllResources ? (
+                            {eventFormValues.logAllResources ? (
                                 <Controller
-                                    name="loggedResources"
+                                    name="ignoredResources"
                                     control={eventControl}
                                     render={({ field }) => (
                                         <Select
-                                            id="loggedResources"
-                                            label="Select Resources to Log"
+                                            id="ignoredResources"
+                                            label="Select Resources to Ignore"
                                             options={resourceSelectorItems.map((item) => ({ value: item.value, label: item.label }))}
                                             value={field.value || []}
                                             onChange={(value) => field.onChange(value)}
@@ -475,12 +475,12 @@ const LoggingSetting = () => {
                                 />
                             ) : (
                                 <Controller
-                                    name="ignoredResources"
+                                    name="loggedResources"
                                     control={eventControl}
                                     render={({ field }) => (
                                         <Select
-                                            id="ignoredResources"
-                                            label="Select Resources to Ignore"
+                                            id="loggedResources"
+                                            label="Select Resources to Log"
                                             options={resourceSelectorItems.map((item) => ({ value: item.value, label: item.label }))}
                                             value={field.value || []}
                                             onChange={(value) => field.onChange(value)}
