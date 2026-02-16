@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import Select from 'components/Select';
-import React from 'react';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Widget from 'components/Widget';
 import Container from 'components/Container';
@@ -26,14 +25,16 @@ import { actions as userActions, selectors as userSelectors } from 'ducks/users'
 import { actions as raProfileActions, selectors as raProfileSelectors } from 'ducks/ra-profiles';
 import { CertificateDetailResponseModel } from 'types/certificate';
 import {
-    CertificateValidationResultDto,
-    PlatformEnum,
-    CertificateSubjectType,
-    ComplianceStatus,
-    CertificateRevocationReason,
     CertificateRequestFormat,
+    CertificateRevocationReason,
+    CertificateState as CertStatus,
+    CertificateSubjectType,
+    CertificateValidationResultDto,
+    CertificateValidationStatus,
+    CertificateProtocol,
+    ComplianceStatus,
+    PlatformEnum,
 } from 'types/openapi';
-import { CertificateState as CertStatus, CertificateProtocol, CertificateValidationStatus } from 'types/openapi';
 import CertificateDownloadForm from './CertificateDownloadForm';
 import Button from 'components/Button';
 import { Trash2 } from 'lucide-react';

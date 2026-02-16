@@ -22,14 +22,13 @@ import { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
 import { AttributeRequestModel } from '../../../../types/attributes';
-import { PlatformEnum } from '../../../../types/openapi';
+import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CertificateGroupDialog from '../CertificateGroupDialog';
 import CertificateOwnerDialog from '../CertificateOwnerDialog';
 import CertificateRAProfileDialog from '../CertificateRAProfileDialog';
 import CertificateUploadDialog from '../CertificateUploadDialog';
 import { ArrowDownToLine, KeyRound } from 'lucide-react';
 import Switch from 'components/Switch';
-import { Resource } from '../../../../types/openapi';
 import { buildCertificateRowColumns } from '../certificateTableHelpers';
 
 interface Props {

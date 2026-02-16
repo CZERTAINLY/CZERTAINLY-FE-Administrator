@@ -1,6 +1,5 @@
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { catchError, filter, map, switchMap } from 'rxjs/operators';
-import { Observable } from 'rxjs';
 import { BaseAPI, Configuration } from 'types/openapi/runtime';
 import { AppEpic } from 'ducks';
 import * as slice from './login';

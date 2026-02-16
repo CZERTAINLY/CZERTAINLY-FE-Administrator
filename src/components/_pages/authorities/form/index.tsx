@@ -23,8 +23,7 @@ import { AttributeDescriptorModel } from 'types/attributes';
 import { AuthorityResponseModel } from 'types/authorities';
 import { ConnectorResponseModel } from 'types/connectors';
 import { FunctionGroupCode, PlatformEnum, Resource } from 'types/openapi';
-import { getEnumLabel } from 'ducks/enums';
-import { selectors as enumSelectors } from 'ducks/enums';
+import { getEnumLabel, selectors as enumSelectors } from 'ducks/enums';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
 

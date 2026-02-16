@@ -4,7 +4,7 @@ import Widget from 'components/Widget';
 
 import { actions as profileApprovalActions, selectors as profileApprovalSelectors } from 'ducks/approval-profiles';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useAreDefaultValuesSame, useRunOnFinished } from 'utils/common-hooks';
 
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,7 +13,6 @@ import Button from 'components/Button';
 import Container from 'components/Container';
 import TextInput from 'components/TextInput';
 import { ApprovalStepRequestModel, ProfileApprovalRequestModel } from 'types/approval-profiles';
-import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import {
     validateAlphaNumericWithSpecialChars,
     validateLength,

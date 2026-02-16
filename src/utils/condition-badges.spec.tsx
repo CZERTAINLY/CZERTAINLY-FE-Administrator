@@ -1,9 +1,7 @@
 import { test, expect } from '../../playwright/ct-test';
 import { renderConditionItems } from './condition-badges';
-import type { ConditionItemDto } from 'types/openapi';
 import type { SearchFieldListModel } from 'types/certificate';
-import { FilterFieldSource } from 'types/openapi';
-import { FilterConditionOperator } from 'types/openapi';
+import { type ConditionItemDto, FilterConditionOperator, FilterFieldSource } from 'types/openapi';
 
 const searchGroupEnum = { [FilterFieldSource.Meta]: { label: 'Meta' } };
 const filterConditionOperatorEnum = { [FilterConditionOperator.Equals]: { label: 'equals' } };
