@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { actions, selectors } from 'ducks/settings';
 import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import { validateNonZeroInteger, validatePositiveInteger } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 
 type FormValues = {
     enabled: boolean;
@@ -137,13 +137,7 @@ const CertificateSettingsForm = ({ onCancel, onSuccess }: CertificateSettingsFor
                                         type="number"
                                         label="Validation Frequency"
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -161,13 +155,7 @@ const CertificateSettingsForm = ({ onCancel, onSuccess }: CertificateSettingsFor
                                         type="number"
                                         label="Expiring Threshold"
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />

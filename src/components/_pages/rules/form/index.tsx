@@ -16,7 +16,7 @@ import TextInput from 'components/TextInput';
 import { Resource } from 'types/openapi';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import ConditionFormFilter from 'components/ConditionFormFilter';
 
 export interface ruleFormValues {
@@ -127,13 +127,7 @@ const RulesForm = ({ onCancel, onSuccess }: RulesFormProps = {}) => {
                                     required
                                     placeholder="Enter the Condition Group Name"
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />
@@ -149,13 +143,7 @@ const RulesForm = ({ onCancel, onSuccess }: RulesFormProps = {}) => {
                                     label="Description"
                                     placeholder="Enter the Description"
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />

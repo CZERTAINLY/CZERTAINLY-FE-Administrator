@@ -23,7 +23,7 @@ import { collectFormAttributes } from 'utils/attributes/attributes';
 
 import { EntityType } from 'ducks/filters';
 import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { selectors as pagingSelectors } from '../../../../ducks/paging';
 import { Resource } from '../../../../types/openapi';
@@ -268,13 +268,7 @@ export default function LocationForm({ locationId, entityId: propEntityId, onCan
                                     label="Location Name"
                                     required
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />
@@ -293,13 +287,7 @@ export default function LocationForm({ locationId, entityId: propEntityId, onCan
                                     placeholder="Enter the location description"
                                     label="Location Description"
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />

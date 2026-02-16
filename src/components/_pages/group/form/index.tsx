@@ -17,7 +17,7 @@ import { CertificateGroupResponseModel } from 'types/certificateGroups';
 import { Resource } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { validateAlphaNumericWithSpecialChars, validateEmail, validateLength, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import TabLayout from '../../../Layout/TabLayout';
 
 interface GroupFormProps {
@@ -192,13 +192,7 @@ export default function GroupForm({ groupId, onCancel, onSuccess }: GroupFormPro
                                     label="Group Name"
                                     required
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />
@@ -217,13 +211,7 @@ export default function GroupForm({ groupId, onCancel, onSuccess }: GroupFormPro
                                     placeholder="Group Description"
                                     label="Group Description"
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />
@@ -242,13 +230,7 @@ export default function GroupForm({ groupId, onCancel, onSuccess }: GroupFormPro
                                     placeholder="Group E-mail"
                                     label="Group E-mail"
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />

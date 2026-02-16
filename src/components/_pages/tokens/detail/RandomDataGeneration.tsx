@@ -9,6 +9,7 @@ import Button from 'components/Button';
 import { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
+import { getFieldErrorMessage } from 'utils/validators-helper';
 import TabLayout from '../../../Layout/TabLayout';
 import TextInput from 'components/TextInput';
 import Container from 'components/Container';
@@ -88,13 +89,7 @@ export default function RandomDataGeneration({ tokenUuid, visible, onClose }: Pr
                                 label="Random Data Length (in bytes)"
                                 placeholder="Random Data Length (in bytes)"
                                 invalid={fieldState.error && fieldState.isTouched}
-                                error={
-                                    fieldState.error && fieldState.isTouched
-                                        ? typeof fieldState.error === 'string'
-                                            ? fieldState.error
-                                            : fieldState.error?.message || 'Invalid value'
-                                        : undefined
-                                }
+                                error={getFieldErrorMessage(fieldState)}
                             />
                         )}
                     />

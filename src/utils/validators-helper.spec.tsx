@@ -1,6 +1,27 @@
 import { test, expect } from '../../playwright/ct-test';
-import { buildValidationRules } from './validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from './validators-helper';
 import { validateRequired, validateEmail } from './validators';
+
+test.describe('getFieldErrorMessage', () => {
+    test('returns undefined when no error', () => {
+        expect(getFieldErrorMessage({})).toBeUndefined();
+        expect(getFieldErrorMessage({ error: 'x', isTouched: false })).toBeUndefined();
+        expect(getFieldErrorMessage({ isTouched: true })).toBeUndefined();
+    });
+
+    test('returns string error as-is', () => {
+        expect(getFieldErrorMessage({ error: 'Required', isTouched: true })).toBe('Required');
+    });
+
+    test('returns error.message when error is object', () => {
+        expect(getFieldErrorMessage({ error: { message: 'Invalid email' }, isTouched: true })).toBe('Invalid email');
+    });
+
+    test('returns fallback when error has no message', () => {
+        expect(getFieldErrorMessage({ error: {}, isTouched: true })).toBe('Invalid value');
+        expect(getFieldErrorMessage({ error: {}, isTouched: true }, 'Custom fallback')).toBe('Custom fallback');
+    });
+});
 
 test.describe('validators-helper', () => {
     test('should build validation rules with composed validators', () => {

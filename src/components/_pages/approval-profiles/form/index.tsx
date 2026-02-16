@@ -20,7 +20,7 @@ import {
     validatePositiveInteger,
     validateRequired,
 } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import ApprovalStepField from './approval-step-field';
 
 const defaultApprovalSteps: ApprovalStepRequestModel[] = [
@@ -154,13 +154,7 @@ function ApprovalProfileForm({ approvalProfileId, onCancel, onSuccess }: Approva
                                         label="Profile Name"
                                         required
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -180,13 +174,7 @@ function ApprovalProfileForm({ approvalProfileId, onCancel, onSuccess }: Approva
                                         label="Expiry"
                                         required
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -206,13 +194,7 @@ function ApprovalProfileForm({ approvalProfileId, onCancel, onSuccess }: Approva
                                     placeholder="Approval Profile Description"
                                     label="Profile Description"
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />

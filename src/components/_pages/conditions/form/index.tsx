@@ -18,7 +18,7 @@ import { ConditionType, PlatformEnum, Resource } from 'types/openapi';
 import { ConditionItemModel } from 'types/rules';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import ConditionFormFilter from '../../../ConditionFormFilter';
 
 export interface ConditionFormValues {
@@ -132,13 +132,7 @@ const ConditionForm = ({ onCancel, onSuccess }: ConditionFormProps = {}) => {
                                     required
                                     placeholder="Enter the Condition Group Name"
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />
@@ -154,13 +148,7 @@ const ConditionForm = ({ onCancel, onSuccess }: ConditionFormProps = {}) => {
                                     label="Description"
                                     placeholder="Enter the Description"
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />

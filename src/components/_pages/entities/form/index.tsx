@@ -24,7 +24,7 @@ import { FunctionGroupCode, Resource } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import TabLayout from '../../../Layout/TabLayout';
 
@@ -290,13 +290,7 @@ export default function EntityForm({ entityId, onCancel, onSuccess }: EntityForm
                                     label="Entity Name"
                                     required
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />

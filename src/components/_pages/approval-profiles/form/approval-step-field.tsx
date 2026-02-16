@@ -11,7 +11,7 @@ import Select from 'components/Select';
 import TextInput from 'components/TextInput';
 import { ApprovalStepRequestModel, ApproverType, ProfileApprovalRequestModel } from 'types/approval-profiles';
 import { validateLength, validateNonZeroInteger, validatePositiveInteger, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { Plus, X } from 'lucide-react';
 
 type Props = {
@@ -226,13 +226,7 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
                                 placeholder="Enter Description"
                                 label="Description"
                                 invalid={fieldState.error && fieldState.isTouched}
-                                error={
-                                    fieldState.error && fieldState.isTouched
-                                        ? typeof fieldState.error === 'string'
-                                            ? fieldState.error
-                                            : fieldState.error?.message || 'Invalid value'
-                                        : undefined
-                                }
+                                error={getFieldErrorMessage(fieldState)}
                             />
                         )}
                     />
@@ -266,13 +260,7 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
                                     label="Required Approvals"
                                     disabled={selectedApprovalTypeList && selectedApprovalTypeList[index]?.label === ApproverType.User}
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />

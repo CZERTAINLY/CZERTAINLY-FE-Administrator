@@ -26,7 +26,7 @@ import { collectFormAttributes } from 'utils/attributes/attributes';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { KeyRequestType, PlatformEnum, Resource } from '../../../../types/openapi';
 import Container from 'components/Container';
@@ -382,13 +382,7 @@ export default function CryptographicKeyForm({ keyId, onSuccess, onCancel, usesG
                                 required
                                 placeholder="Enter Key Name"
                                 invalid={fieldState.error && fieldState.isTouched}
-                                error={
-                                    fieldState.error && fieldState.isTouched
-                                        ? typeof fieldState.error === 'string'
-                                            ? fieldState.error
-                                            : fieldState.error?.message || 'Invalid value'
-                                        : undefined
-                                }
+                                error={getFieldErrorMessage(fieldState)}
                             />
                         )}
                     />
@@ -404,13 +398,7 @@ export default function CryptographicKeyForm({ keyId, onSuccess, onCancel, usesG
                                 rows={4}
                                 placeholder="Enter Description / Comment"
                                 invalid={fieldState.error && fieldState.isTouched}
-                                error={
-                                    fieldState.error && fieldState.isTouched
-                                        ? typeof fieldState.error === 'string'
-                                            ? fieldState.error
-                                            : fieldState.error?.message || 'Invalid value'
-                                        : undefined
-                                }
+                                error={getFieldErrorMessage(fieldState)}
                             />
                         )}
                     />

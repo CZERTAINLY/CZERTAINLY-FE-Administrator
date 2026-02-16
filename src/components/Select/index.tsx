@@ -304,7 +304,14 @@ function Select({
                     ref={selectRef}
                     multiple={isMulti}
                     data-testid={dataTestId ? `${dataTestId}-input` : `select-${id}-input`}
-                    value={isMulti ? undefined : getValueFromProp != null ? getOptionValueString(getValueFromProp as OptionValue) : ''}
+                    value={
+                        isMulti
+                            ? undefined
+                            : (() => {
+                                  if (getValueFromProp == null) return '';
+                                  return getOptionValueString(getValueFromProp as OptionValue);
+                              })()
+                    }
                     data-hs-select={JSON.stringify({
                         ...(isMulti && {
                             mode: 'tags',

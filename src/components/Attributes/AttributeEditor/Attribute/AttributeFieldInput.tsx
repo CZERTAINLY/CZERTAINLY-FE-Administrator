@@ -10,6 +10,7 @@ import type { CustomAttributeModel, DataAttributeModel } from 'types/attributes'
 import { AttributeContentType } from 'types/openapi';
 import { getCodeBlockLanguage } from '../../../../utils/attributes/attributes';
 import { getHighLightedCode } from '../../CodeBlock';
+import { getFieldErrorMessage } from 'utils/validators-helper';
 import { transformInputValueForDescriptor, getFormTypeFromAttributeContentType, buildAttributeValidators } from './attributeHelpers';
 
 interface FieldStateLike {
@@ -86,12 +87,14 @@ function StandardInputControl({
 
     if (descriptor.contentType === AttributeContentType.Datetime) {
         const dateValue = field.value ? (field.value.includes('T') ? field.value : field.value.replace(' ', 'T')) : undefined;
-        const errorMessage =
-            fieldState.isTouched && fieldState.invalid
-                ? typeof fieldState.error === 'string'
-                    ? fieldState.error
-                    : fieldState.error?.message || 'Invalid value'
-                : undefined;
+        let errorMessage: string | undefined;
+        if (!fieldState.isTouched || !fieldState.invalid) {
+            errorMessage = undefined;
+        } else if (typeof fieldState.error === 'string') {
+            errorMessage = fieldState.error;
+        } else {
+            errorMessage = fieldState.error?.message || 'Invalid value';
+        }
         return (
             <>
                 <DatePicker
@@ -123,13 +126,7 @@ function StandardInputControl({
                 value={transformed || ''}
                 onChange={(value) => field.onChange(value)}
                 invalid={fieldState.isTouched && !!fieldState.invalid}
-                error={
-                    fieldState.isTouched && fieldState.invalid
-                        ? typeof fieldState.error === 'string'
-                            ? fieldState.error
-                            : fieldState.error?.message
-                        : undefined
-                }
+                error={getFieldErrorMessage(fieldState, undefined)}
             />
             {deleteButton}
         </>

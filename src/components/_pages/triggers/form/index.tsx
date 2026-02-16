@@ -17,7 +17,7 @@ import Button from 'components/Button';
 import Container from 'components/Container';
 import { PlatformEnum, Resource, ResourceEvent, TriggerType } from 'types/openapi';
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import TextInput from 'components/TextInput';
 
 export interface TriggerFormValues {
@@ -207,13 +207,7 @@ const TriggerForm = ({ onCancel, onSuccess }: TriggerFormProps = {}) => {
                                     required
                                     placeholder="Enter Trigger name"
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />
@@ -229,13 +223,7 @@ const TriggerForm = ({ onCancel, onSuccess }: TriggerFormProps = {}) => {
                                     label="Description"
                                     placeholder="Enter the Description"
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />

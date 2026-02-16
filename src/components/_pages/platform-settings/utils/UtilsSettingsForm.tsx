@@ -6,6 +6,7 @@ import { actions, selectors } from 'ducks/settings';
 
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { getFieldErrorMessage } from 'utils/validators-helper';
 import { useDispatch, useSelector } from 'react-redux';
 import { SettingsPlatformModel } from 'types/settings';
 import { useNavigate } from 'react-router';
@@ -150,13 +151,7 @@ const UtilsSettingsForm = ({ onCancel, onSuccess }: UtilsSettingsFormProps = {})
                             label="Utils Service URL"
                             placeholder="Utils Service URL"
                             invalid={fieldState.error && fieldState.isTouched}
-                            error={
-                                fieldState.error && fieldState.isTouched
-                                    ? typeof fieldState.error === 'string'
-                                        ? fieldState.error
-                                        : fieldState.error?.message || 'Invalid value'
-                                    : undefined
-                            }
+                            error={getFieldErrorMessage(fieldState)}
                         />
                     )}
                 />

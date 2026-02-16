@@ -17,7 +17,7 @@ import TextInput from 'components/TextInput';
 import { CustomAttributeCreateRequestModel, CustomAttributeUpdateRequestModel } from 'types/customAttributes';
 import { AttributeContentType, PlatformEnum } from 'types/openapi';
 import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 
 interface CustomAttributeFormProps {
     customAttributeId?: string;
@@ -143,13 +143,7 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
                                         required
                                         disabled={editMode}
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -166,13 +160,7 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
                                         label="Label"
                                         required
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -187,13 +175,7 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
                                         id="description"
                                         label="Description"
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -209,13 +191,7 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
                                         type="text"
                                         label="Group"
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />

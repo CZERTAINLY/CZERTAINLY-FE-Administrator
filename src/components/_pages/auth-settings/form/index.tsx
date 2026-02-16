@@ -13,7 +13,7 @@ import TextArea from 'components/TextArea';
 import Label from 'components/Label';
 import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import { validateAlphaNumericWithSpecialChars, validateRequired, validateUrlWithRoute, validatePositiveInteger } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { OAuth2ProviderSettingsUpdateDto } from 'types/auth-settings';
 import { isValidJWTBearerProvider, isValidOAuth2FlowProvider } from 'utils/oauth2Providers';
 
@@ -277,13 +277,7 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
                                                     required
                                                     disabled={editMode}
                                                     invalid={fieldState.error && fieldState.isTouched}
-                                                    error={
-                                                        fieldState.error && fieldState.isTouched
-                                                            ? typeof fieldState.error === 'string'
-                                                                ? fieldState.error
-                                                                : fieldState.error?.message || 'Invalid value'
-                                                            : undefined
-                                                    }
+                                                    error={getFieldErrorMessage(fieldState)}
                                                 />
                                             )}
                                         />
@@ -316,13 +310,7 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
                                                 required={!watchedJwkSet}
                                                 disabled={!!watchedJwkSet}
                                                 invalid={fieldState.error && fieldState.isTouched}
-                                                error={
-                                                    fieldState.error && fieldState.isTouched
-                                                        ? typeof fieldState.error === 'string'
-                                                            ? fieldState.error
-                                                            : fieldState.error?.message || 'Invalid value'
-                                                        : undefined
-                                                }
+                                                error={getFieldErrorMessage(fieldState)}
                                             />
                                         )}
                                     />
@@ -345,13 +333,7 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
                                                 placeholder="Enter JWK Set encoded in Base64"
                                                 disabled={!!watchedJwkSetUrl}
                                                 invalid={fieldState.error && fieldState.isTouched}
-                                                error={
-                                                    fieldState.error && fieldState.isTouched
-                                                        ? typeof fieldState.error === 'string'
-                                                            ? fieldState.error
-                                                            : fieldState.error?.message || 'Invalid value'
-                                                        : undefined
-                                                }
+                                                error={getFieldErrorMessage(fieldState)}
                                             />
                                         )}
                                     />
@@ -373,13 +355,7 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
                                                 label="Client Id"
                                                 required={!!requiredFields.clientId}
                                                 invalid={fieldState.error && fieldState.isTouched}
-                                                error={
-                                                    fieldState.error && fieldState.isTouched
-                                                        ? typeof fieldState.error === 'string'
-                                                            ? fieldState.error
-                                                            : fieldState.error?.message || 'Invalid value'
-                                                        : undefined
-                                                }
+                                                error={getFieldErrorMessage(fieldState)}
                                             />
                                         )}
                                     />
@@ -401,13 +377,7 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
                                                 label="Client Secret"
                                                 required={!!requiredFields.clientSecret && !editMode}
                                                 invalid={fieldState.error && fieldState.isTouched}
-                                                error={
-                                                    fieldState.error && fieldState.isTouched
-                                                        ? typeof fieldState.error === 'string'
-                                                            ? fieldState.error
-                                                            : fieldState.error?.message || 'Invalid value'
-                                                        : undefined
-                                                }
+                                                error={getFieldErrorMessage(fieldState)}
                                             />
                                         )}
                                     />
@@ -481,13 +451,7 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
                                                 label="Token Url"
                                                 required={!!requiredFields.tokenUrl}
                                                 invalid={fieldState.error && fieldState.isTouched}
-                                                error={
-                                                    fieldState.error && fieldState.isTouched
-                                                        ? typeof fieldState.error === 'string'
-                                                            ? fieldState.error
-                                                            : fieldState.error?.message || 'Invalid value'
-                                                        : undefined
-                                                }
+                                                error={getFieldErrorMessage(fieldState)}
                                             />
                                         )}
                                     />
@@ -513,13 +477,7 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
                                                 label="Authorization Url"
                                                 required={!!requiredFields.authorizationUrl}
                                                 invalid={fieldState.error && fieldState.isTouched}
-                                                error={
-                                                    fieldState.error && fieldState.isTouched
-                                                        ? typeof fieldState.error === 'string'
-                                                            ? fieldState.error
-                                                            : fieldState.error?.message || 'Invalid value'
-                                                        : undefined
-                                                }
+                                                error={getFieldErrorMessage(fieldState)}
                                             />
                                         )}
                                     />
@@ -543,13 +501,7 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
                                                 label="Logout Url"
                                                 required={!!requiredFields.logoutUrl}
                                                 invalid={fieldState.error && fieldState.isTouched}
-                                                error={
-                                                    fieldState.error && fieldState.isTouched
-                                                        ? typeof fieldState.error === 'string'
-                                                            ? fieldState.error
-                                                            : fieldState.error?.message || 'Invalid value'
-                                                        : undefined
-                                                }
+                                                error={getFieldErrorMessage(fieldState)}
                                             />
                                         )}
                                     />
@@ -575,13 +527,7 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
                                                 label="Post Logout Url"
                                                 required={!!requiredFields.postLogoutUrl}
                                                 invalid={fieldState.error && fieldState.isTouched}
-                                                error={
-                                                    fieldState.error && fieldState.isTouched
-                                                        ? typeof fieldState.error === 'string'
-                                                            ? fieldState.error
-                                                            : fieldState.error?.message || 'Invalid value'
-                                                        : undefined
-                                                }
+                                                error={getFieldErrorMessage(fieldState)}
                                             />
                                         )}
                                     />
@@ -608,13 +554,7 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
                                                 label="Issuer Url"
                                                 required={!!requiredFields.issuerUrl}
                                                 invalid={fieldState.error && fieldState.isTouched}
-                                                error={
-                                                    fieldState.error && fieldState.isTouched
-                                                        ? typeof fieldState.error === 'string'
-                                                            ? fieldState.error
-                                                            : fieldState.error?.message || 'Invalid value'
-                                                        : undefined
-                                                }
+                                                error={getFieldErrorMessage(fieldState)}
                                             />
                                         )}
                                     />
@@ -633,13 +573,7 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
                                                 type="text"
                                                 label="User Info Url"
                                                 invalid={fieldState.error && fieldState.isTouched}
-                                                error={
-                                                    fieldState.error && fieldState.isTouched
-                                                        ? typeof fieldState.error === 'string'
-                                                            ? fieldState.error
-                                                            : fieldState.error?.message || 'Invalid value'
-                                                        : undefined
-                                                }
+                                                error={getFieldErrorMessage(fieldState)}
                                             />
                                         )}
                                     />
@@ -659,13 +593,7 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
                                                     label="Skew Time"
                                                     placeholder="Enter Time in Seconds"
                                                     invalid={fieldState.error && fieldState.isTouched}
-                                                    error={
-                                                        fieldState.error && fieldState.isTouched
-                                                            ? typeof fieldState.error === 'string'
-                                                                ? fieldState.error
-                                                                : fieldState.error?.message || 'Invalid value'
-                                                            : undefined
-                                                    }
+                                                    error={getFieldErrorMessage(fieldState)}
                                                 />
                                             )}
                                         />
@@ -688,13 +616,7 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
                                                     label="Session Max Inactive Interval"
                                                     placeholder="Enter Time in Seconds"
                                                     invalid={fieldState.error && fieldState.isTouched}
-                                                    error={
-                                                        fieldState.error && fieldState.isTouched
-                                                            ? typeof fieldState.error === 'string'
-                                                                ? fieldState.error
-                                                                : fieldState.error?.message || 'Invalid value'
-                                                            : undefined
-                                                    }
+                                                    error={getFieldErrorMessage(fieldState)}
                                                 />
                                             )}
                                         />

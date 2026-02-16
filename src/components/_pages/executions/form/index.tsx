@@ -18,7 +18,7 @@ import { ExecutionItemRequestModel } from 'types/rules';
 import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { SendNotificationExecutionItems } from 'components/_pages/executions/SendNotificationExecutionItems';
 
 export interface ExecutionFormValues {
@@ -153,13 +153,7 @@ const ExecutionForm = () => {
                                         required
                                         placeholder="Enter the Execution Name"
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -175,13 +169,7 @@ const ExecutionForm = () => {
                                         label="Description"
                                         placeholder="Enter the Description"
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />

@@ -22,7 +22,7 @@ import { AuthType, ConnectorStatus, PlatformEnum, Resource } from 'types/openapi
 import { attributeFieldNameTransform, collectFormAttributes } from 'utils/attributes/attributes';
 
 import { validateAlphaNumericWithSpecialChars, validateRequired, validateRoutelessUrl } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import AttributeEditor from '../../../Attributes/AttributeEditor';
 import TabLayout from '../../../Layout/TabLayout';
@@ -314,13 +314,7 @@ export default function ConnectorForm({ connectorId, onCancel, onSuccess }: Conn
                             required
                             placeholder="URL of the connector service"
                             invalid={fieldState.error && fieldState.isTouched}
-                            error={
-                                fieldState.error && fieldState.isTouched
-                                    ? typeof fieldState.error === 'string'
-                                        ? fieldState.error
-                                        : fieldState.error?.message || 'Invalid value'
-                                    : undefined
-                            }
+                            error={getFieldErrorMessage(fieldState)}
                         />
                     )}
                 />
@@ -367,13 +361,7 @@ export default function ConnectorForm({ connectorId, onCancel, onSuccess }: Conn
                                     label="Username"
                                     placeholder="Username"
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />
@@ -389,13 +377,7 @@ export default function ConnectorForm({ connectorId, onCancel, onSuccess }: Conn
                                     label="Password"
                                     placeholder="Password"
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />
@@ -512,13 +494,7 @@ export default function ConnectorForm({ connectorId, onCancel, onSuccess }: Conn
                                                 placeholder="Connector Name"
                                                 disabled={editMode}
                                                 invalid={fieldState.error && fieldState.isTouched}
-                                                error={
-                                                    fieldState.error && fieldState.isTouched
-                                                        ? typeof fieldState.error === 'string'
-                                                            ? fieldState.error
-                                                            : fieldState.error?.message || 'Invalid value'
-                                                        : undefined
-                                                }
+                                                error={getFieldErrorMessage(fieldState)}
                                             />
                                         )}
                                     />

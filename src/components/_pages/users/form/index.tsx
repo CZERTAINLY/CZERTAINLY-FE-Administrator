@@ -28,7 +28,7 @@ import { CertificateDetailResponseModel, CertificateListResponseModel } from 'ty
 
 import { EntityType } from 'ducks/filters';
 import { validateAlphaNumericWithSpecialChars, validateEmail, validateLength, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { CertificateState as CertStatus, Resource } from '../../../../types/openapi';
 import { collectFormAttributes } from '../../../../utils/attributes/attributes';
@@ -495,13 +495,7 @@ function UserForm({ userId, onCancel, onSuccess }: UserFormProps) {
                                         placeholder="Username"
                                         disabled={editMode || user?.systemUser}
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -549,13 +543,7 @@ function UserForm({ userId, onCancel, onSuccess }: UserFormProps) {
                                         placeholder="Description"
                                         disabled={user?.systemUser}
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -573,13 +561,7 @@ function UserForm({ userId, onCancel, onSuccess }: UserFormProps) {
                                         placeholder="First Name"
                                         disabled={user?.systemUser}
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -597,13 +579,7 @@ function UserForm({ userId, onCancel, onSuccess }: UserFormProps) {
                                         placeholder="Last name"
                                         disabled={user?.systemUser}
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -621,13 +597,7 @@ function UserForm({ userId, onCancel, onSuccess }: UserFormProps) {
                                         placeholder="Email address"
                                         disabled={user?.systemUser}
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />

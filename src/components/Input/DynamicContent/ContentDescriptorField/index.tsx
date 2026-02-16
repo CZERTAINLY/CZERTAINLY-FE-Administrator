@@ -9,15 +9,10 @@ import DatePicker from 'components/DatePicker';
 import { AttributeContentType } from 'types/openapi';
 import { getStepValue } from 'utils/common-utils';
 import { validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { ContentFieldConfiguration } from '../index';
 import { Plus } from 'lucide-react';
 import cn from 'classnames';
-
-function getFieldError(fieldState: { error?: { message?: string } | string; isTouched: boolean }) {
-    if (!fieldState.error || !fieldState.isTouched) return undefined;
-    return typeof fieldState.error === 'string' ? fieldState.error : fieldState.error?.message || 'Invalid value';
-}
 
 function DescriptorInputControl({
     name,
@@ -33,7 +28,7 @@ function DescriptorInputControl({
     fieldState: { error?: { message?: string } | string; isTouched: boolean };
 }) {
     const inputType = ContentFieldConfiguration[contentType].type;
-    const error = getFieldError(fieldState);
+    const error = getFieldErrorMessage(fieldState);
     const invalid = fieldState.error && fieldState.isTouched;
     const inputClassName = cn(
         'py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600',
@@ -176,8 +171,8 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
                                         ]}
                                     />
                                 );
-                                const feedbackComponent = getFieldError(fieldState) ? (
-                                    <p className="mt-1 text-sm text-red-600">{getFieldError(fieldState)}</p>
+                                const feedbackComponent = getFieldErrorMessage(fieldState) ? (
+                                    <p className="mt-1 text-sm text-red-600">{getFieldErrorMessage(fieldState)}</p>
                                 ) : null;
 
                                 const isBoolean = contentType === AttributeContentType.Boolean;

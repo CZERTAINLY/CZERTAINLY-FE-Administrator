@@ -57,7 +57,12 @@ function ValueFieldInput({
         );
     }
     if (inputType === 'datetime-local') {
-        const dateValue = field.value ? (field.value.includes('T') ? field.value : field.value.replace(' ', 'T')) : undefined;
+        let dateValue: string | undefined;
+        if (field.value) {
+            dateValue = field.value.includes('T') ? field.value : field.value.replace(' ', 'T');
+        } else {
+            dateValue = undefined;
+        }
         return (
             <DatePicker
                 id={descriptor.name}

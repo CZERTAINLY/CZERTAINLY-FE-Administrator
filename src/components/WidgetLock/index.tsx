@@ -21,7 +21,9 @@ const WidgetLock = ({
     dataTestId,
 }: Props) => {
     const getIcon = () => {
-        const iconSize = size === 'small' ? 24 : size === 'normal' ? 32 : 48;
+        let iconSize = 48;
+        if (size === 'small') iconSize = 24;
+        else if (size === 'normal') iconSize = 32;
 
         switch (lockType) {
             case LockTypeEnum.GENERIC:
