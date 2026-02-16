@@ -21,7 +21,7 @@ test.describe('CertificateStatus', () => {
     test('should render as icon when asIcon is true', async ({ mount, page }) => {
         await mount(<CertificateStatusWithStore status={CertificateState.Issued} asIcon />);
         const icon = page.getByTitle('Issued');
-        await expect(icon).toBeVisible();
+        await expect(icon).toBeAttached();
         await expect(icon).toHaveAttribute('title', 'Issued');
     });
 

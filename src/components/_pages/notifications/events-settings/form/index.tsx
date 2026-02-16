@@ -12,7 +12,7 @@ import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
 import Breadcrumb from 'components/Breadcrumb';
-import { isObjectSame } from 'utils/common-utils';
+import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import { EventSettingsDto, PlatformEnum, Resource, ResourceEvent } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import TriggerEditorWidget from 'components/TriggerEditorWidget';
@@ -112,16 +112,7 @@ export default function EventForm() {
         [dispatch, event],
     );
 
-    const areDefaultValuesSame = useCallback(
-        (values: FormValues) => {
-            const areValuesSame = isObjectSame(
-                values as unknown as Record<string, unknown>,
-                defaultValues as unknown as Record<string, unknown>,
-            );
-            return areValuesSame;
-        },
-        [defaultValues],
-    );
+    const areDefaultValuesSame = useAreDefaultValuesSame(defaultValues as unknown as Record<string, unknown>);
 
     const eventLabel = useMemo(() => {
         if (!formValues.event) return '';

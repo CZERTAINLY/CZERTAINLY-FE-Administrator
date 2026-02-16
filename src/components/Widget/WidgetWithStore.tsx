@@ -30,7 +30,6 @@ const defaultPreloadedState: Parameters<typeof createMockStore>[0] = {
             okButtonCallback: undefined,
             cancelButtonCallback: undefined,
         },
-        theme: 'light',
     },
 };
 

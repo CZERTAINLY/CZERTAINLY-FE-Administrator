@@ -14,7 +14,7 @@ import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
 import Switch from 'components/Switch';
-import { isObjectSame } from 'utils/common-utils';
+import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import Label from 'components/Label';
 import {
     validateAlphaNumericWithSpecialChars,
@@ -195,16 +195,7 @@ export default function NotificationProfileForm({
         [dispatch, id, editMode],
     );
 
-    const areDefaultValuesSame = useCallback(
-        (values: FormValues) => {
-            const areValuesSame = isObjectSame(
-                values as unknown as Record<string, unknown>,
-                defaultValues as unknown as Record<string, unknown>,
-            );
-            return areValuesSame;
-        },
-        [defaultValues],
-    );
+    const areDefaultValuesSame = useAreDefaultValuesSame(defaultValues as unknown as Record<string, unknown>);
 
     const notificationInstanceOptions = useMemo(
         () =>

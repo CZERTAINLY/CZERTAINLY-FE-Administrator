@@ -58,4 +58,70 @@ test.describe('Widget', () => {
         await expect(page.getByTestId('locked-widget')).toBeVisible();
         await expect(page.getByRole('heading', { name: 'Locked Widget' })).toBeVisible();
     });
+
+    test('should show spinner when busy is true', async ({ mount, page }) => {
+        const store = createMockStore();
+        await mount(
+            withProviders(
+                <Widget title="Busy Widget" dataTestId="busy-widget" busy={true}>
+                    <p>Content</p>
+                </Widget>,
+                { store },
+            ),
+        );
+        await expect(page.getByTestId('busy-widget')).toBeVisible();
+        const spinner = page.locator('[class*="animate-spin"]');
+        await expect(spinner).toBeVisible();
+    });
+
+    test('should support noBorder', async ({ mount, page }) => {
+        const store = createMockStore();
+        await mount(
+            withProviders(
+                <Widget title="No Border" dataTestId="no-border-widget" noBorder={true}>
+                    <p>Content</p>
+                </Widget>,
+                { store },
+            ),
+        );
+        await expect(page.getByTestId('no-border-widget')).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'No Border' })).toBeVisible();
+    });
+
+    test('should support titleSize large', async ({ mount, page }) => {
+        const store = createMockStore();
+        await mount(withProviders(<Widget title="Large Title" titleSize="large" dataTestId="large-title-widget" />, { store }));
+        const heading = page.getByRole('heading', { name: 'Large Title' });
+        await expect(heading).toBeVisible();
+        await expect(heading).toHaveClass(/text-lg/);
+    });
+
+    test('should render widgetButtons', async ({ mount, page }) => {
+        const store = createMockStore();
+        await mount(
+            withProviders(
+                <Widget
+                    title="With Buttons"
+                    dataTestId="buttons-widget"
+                    widgetButtons={[{ icon: 'pencil', tooltip: 'Edit', disabled: false, onClick: () => {} }]}
+                />,
+                { store },
+            ),
+        );
+        await expect(page.getByTestId('buttons-widget')).toBeVisible();
+        await expect(page.getByTestId('buttons-widget').getByRole('button')).toBeVisible();
+    });
+
+    test('should render widgetInfoCard when provided', async ({ mount, page }) => {
+        const store = createMockStore();
+        await mount(
+            withProviders(
+                <Widget title="With Info" dataTestId="info-widget" widgetInfoCard={{ title: 'Info', description: 'Description text' }} />,
+                { store },
+            ),
+        );
+        await expect(page.getByTestId('info-widget')).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'With Info' })).toBeVisible();
+        await expect(page.getByText('Info: Description text')).toBeVisible();
+    });
 });

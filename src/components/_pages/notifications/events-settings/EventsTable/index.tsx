@@ -17,7 +17,7 @@ import ProgressButton from 'components/ProgressButton';
 import Select from 'components/Select';
 import { Edit } from 'lucide-react';
 import TriggerEditorWidget from 'components/TriggerEditorWidget';
-import { isObjectSame } from 'utils/common-utils';
+import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import Container from 'components/Container';
 
 type Props = (
@@ -295,16 +295,7 @@ const EventsTable = ({ mode, resource, resourceUuid, widgetLocks }: Props) => {
         reset(defaultValues);
     }, [defaultValues, reset]);
 
-    const areDefaultValuesSame = useCallback(
-        (values: FormValues) => {
-            const areValuesSame = isObjectSame(
-                values as unknown as Record<string, unknown>,
-                defaultValues as unknown as Record<string, unknown>,
-            );
-            return areValuesSame;
-        },
-        [defaultValues],
-    );
+    const areDefaultValuesSame = useAreDefaultValuesSame(defaultValues as unknown as Record<string, unknown>);
 
     return (
         <>

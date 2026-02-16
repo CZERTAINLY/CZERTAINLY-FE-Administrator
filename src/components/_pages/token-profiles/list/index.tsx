@@ -14,7 +14,7 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import TokenStatusBadge from 'components/_pages/tokens/TokenStatusBadge';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import Select from 'components/Select';
+import KeyUsageSelect from '../../cryptographic-keys/KeyUsageSelect';
 import { KeyUsage, PlatformEnum } from 'types/openapi';
 import { TokenProfileResponseModel } from 'types/token-profiles';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -156,41 +156,6 @@ function TokenProfileList() {
         [checkedRows, handleOpenAddModal, onEnableClick, onDisableClick, setKeyUsageUpdate],
     );
 
-    const keyUsageOptions = () => {
-        let options = [];
-        for (const suit in KeyUsage) {
-            options.push({
-                label: getEnumLabel(keyUsageEnum, KeyUsage[suit as keyof typeof KeyUsage]),
-                value: KeyUsage[suit as keyof typeof KeyUsage],
-            });
-        }
-        return options;
-    };
-
-    const keyUsageBody = (
-        <div>
-            <div className="form-group">
-                <label className="form-label">Key Usage</label>
-                <Select
-                    isMulti={true}
-                    id="field"
-                    options={keyUsageOptions()}
-                    value={keyUsages.map(
-                        (usage) =>
-                            keyUsageOptions().find((opt) => opt.value === usage) || {
-                                value: usage,
-                                label: getEnumLabel(keyUsageEnum, usage),
-                            },
-                    )}
-                    onChange={(values) => {
-                        setKeyUsages((values || []).map((item) => item.value as KeyUsage));
-                    }}
-                    isClearable={true}
-                />
-            </div>
-        </div>
-    );
-
     const tokenProfilesTableHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -315,7 +280,7 @@ function TokenProfileList() {
             <Dialog
                 isOpen={keyUsageUpdate}
                 caption="Update Key Usage"
-                body={keyUsageBody}
+                body={<KeyUsageSelect value={keyUsages} onChange={setKeyUsages} keyUsageEnum={keyUsageEnum} />}
                 toggle={() => setKeyUsageUpdate(false)}
                 size="md"
                 buttons={[

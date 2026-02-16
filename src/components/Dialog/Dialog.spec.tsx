@@ -1,5 +1,6 @@
 import { test, expect } from '../../../playwright/ct-test';
 import Dialog from './index';
+import DialogWithState from './DialogWithState';
 
 test.describe('Dialog', () => {
     test('should not render when isOpen is false', async ({ mount }) => {
@@ -168,5 +169,29 @@ test.describe('Dialog', () => {
         );
         await expect(component.getByTestId('custom-body')).toBeVisible();
         await expect(component.getByText('Custom body')).toBeVisible();
+    });
+
+    test('should render success icon', async ({ mount }) => {
+        const component = await mount(<Dialog isOpen={true} caption="Success" body="Done" icon="check" dataTestId="test-dialog" />);
+        await expect(component.getByRole('heading', { name: 'Success' })).toBeVisible();
+        await expect(component.locator('.w-12.h-12')).toBeVisible();
+    });
+
+    test('should render destroy icon', async ({ mount }) => {
+        const component = await mount(
+            <Dialog isOpen={true} caption="Destroy" body="Confirm destroy" icon="destroy" dataTestId="test-dialog" />,
+        );
+        await expect(component.getByRole('heading', { name: 'Destroy' })).toBeVisible();
+        await expect(component.locator('.w-12.h-12')).toBeVisible();
+    });
+
+    test('should restore body overflow when closed via toggle', async ({ mount, page }) => {
+        await mount(<DialogWithState />);
+        await page.waitForTimeout(50);
+        expect(await page.evaluate(() => document.body.style.overflow)).toBe('hidden');
+
+        await page.getByTestId('test-dialog').getByRole('button').first().click();
+        await page.waitForTimeout(100);
+        expect(await page.evaluate(() => document.body.style.overflow)).toBe('');
     });
 });

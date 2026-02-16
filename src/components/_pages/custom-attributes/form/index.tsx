@@ -16,7 +16,7 @@ import Checkbox from 'components/Checkbox';
 import TextInput from 'components/TextInput';
 import { CustomAttributeCreateRequestModel, CustomAttributeUpdateRequestModel } from 'types/customAttributes';
 import { AttributeContentType, PlatformEnum } from 'types/openapi';
-import { isObjectSame } from 'utils/common-utils';
+import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
 import { buildValidationRules } from 'utils/validators-helper';
 
@@ -92,18 +92,11 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
     const formValues = useWatch({ control });
     const watchedList = useWatch({ control, name: 'list' });
 
-    const areDefaultValuesSame = useCallback(
-        (values: FormValues) => {
-            if (editMode) {
-                const areValuesSame = isObjectSame(values, defaultValuesUpdate);
-                return areValuesSame;
-            } else {
-                const areValuesSame = isObjectSame(values, defaultValuesCreate);
-                return areValuesSame;
-            }
-        },
+    const defaultValuesToCompare = useMemo(
+        () => (editMode ? defaultValuesUpdate : defaultValuesCreate),
         [editMode, defaultValuesUpdate, defaultValuesCreate],
     );
+    const areDefaultValuesSame = useAreDefaultValuesSame(defaultValuesToCompare as unknown as Record<string, unknown>);
 
     const onSubmit = useCallback(
         (values: FormValues) => {

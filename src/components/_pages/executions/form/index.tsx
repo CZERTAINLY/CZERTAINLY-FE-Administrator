@@ -15,7 +15,7 @@ import TextInput from 'components/TextInput';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { ExecutionType, PlatformEnum, Resource } from 'types/openapi';
 import { ExecutionItemRequestModel } from 'types/rules';
-import { isObjectSame } from 'utils/common-utils';
+import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 import { buildValidationRules } from 'utils/validators-helper';
@@ -126,16 +126,7 @@ const ExecutionForm = () => {
         [dispatch],
     );
 
-    const areDefaultValuesSame = useCallback(
-        (values: ExecutionFormValues) => {
-            const areValuesSame = isObjectSame(
-                values as unknown as Record<string, unknown>,
-                defaultValues as unknown as Record<string, unknown>,
-            );
-            return areValuesSame;
-        },
-        [defaultValues],
-    );
+    const areDefaultValuesSame = useAreDefaultValuesSame(defaultValues as unknown as Record<string, unknown>);
 
     return (
         <>

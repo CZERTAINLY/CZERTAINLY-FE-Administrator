@@ -13,8 +13,7 @@ import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import TokenProfileForm from '../form';
-import Select from 'components/Select';
-
+import KeyUsageSelect from '../../cryptographic-keys/KeyUsageSelect';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import Label from 'components/Label';
 import Badge from 'components/Badge';
@@ -97,17 +96,6 @@ export default function TokenProfileDetail() {
         );
         setConfirmDelete(false);
     }, [dispatch, tokenProfile]);
-
-    const keyUsageOptions = () => {
-        let options: { value: KeyUsage; label: string }[] = [];
-        for (let key in KeyUsage) {
-            options.push({
-                value: KeyUsage[key as keyof typeof KeyUsage],
-                label: getEnumLabel(keyUsageEnum, KeyUsage[key as keyof typeof KeyUsage]),
-            });
-        }
-        return options;
-    };
 
     const existingUsages = () => {
         if (!tokenProfile) return [];
@@ -219,30 +207,6 @@ export default function TokenProfileDetail() {
         [tokenProfile],
     );
 
-    const keyUsageBody = (
-        <div>
-            <div className="form-group">
-                <label className="form-label">Key Usage</label>
-                <Select
-                    isMulti={true}
-                    id="field"
-                    options={keyUsageOptions()}
-                    value={keyUsages.map(
-                        (usage) =>
-                            keyUsageOptions().find((opt) => opt.value === usage) || {
-                                value: usage,
-                                label: getEnumLabel(keyUsageEnum, usage),
-                            },
-                    )}
-                    onChange={(values) => {
-                        setKeyUsages((values || []).map((item) => item.value as KeyUsage));
-                    }}
-                    isClearable={true}
-                />
-            </div>
-        </div>
-    );
-
     const onUpdateKeyUsageConfirmed = useCallback(() => {
         dispatch(
             tokenProfilesActions.updateKeyUsage({
@@ -308,7 +272,7 @@ export default function TokenProfileDetail() {
             <Dialog
                 isOpen={keyUsageUpdate}
                 caption="Update Key Usage"
-                body={keyUsageBody}
+                body={<KeyUsageSelect value={keyUsages} onChange={setKeyUsages} keyUsageEnum={keyUsageEnum} />}
                 toggle={() => setKeyUsageUpdate(false)}
                 size="md"
                 buttons={[

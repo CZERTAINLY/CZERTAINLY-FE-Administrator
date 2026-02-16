@@ -249,4 +249,20 @@ test.describe('CustomTable', () => {
             expect(checkedRows.length).toBeLessThanOrEqual(1);
         }
     });
+
+    test('should not render header checkbox when hasAllCheckBox is false', async ({ mount }) => {
+        const component = await mount(
+            withProviders(<CustomTable headers={mockHeaders} data={mockData} hasCheckboxes={true} hasAllCheckBox={false} />),
+        );
+        const checkboxes = component.locator('input[type="checkbox"]');
+        const count = await checkboxes.count();
+        expect(count).toBe(mockData.length);
+    });
+
+    test('should render empty state when data is empty and no newRowWidgetProps', async ({ mount }) => {
+        const component = await mount(withProviders(<CustomTable headers={mockHeaders} data={[]} />));
+        await expect(component.getByText('Name')).toBeVisible();
+        const table = component.locator('table tbody tr');
+        await expect(table).toHaveCount(0);
+    });
 });

@@ -16,7 +16,7 @@ import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
 import { PlatformEnum, Resource, ResourceEvent, TriggerType } from 'types/openapi';
-import { isObjectSame } from 'utils/common-utils';
+import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 import { buildValidationRules } from 'utils/validators-helper';
 import TextInput from 'components/TextInput';
@@ -181,16 +181,7 @@ const TriggerForm = ({ onCancel, onSuccess }: TriggerFormProps = {}) => {
 
     useRunOnFinished(isCreatingTrigger, onSuccess);
 
-    const areDefaultValuesSame = useCallback(
-        (values: TriggerFormValues) => {
-            const areValuesSame = isObjectSame(
-                values as unknown as Record<string, unknown>,
-                defaultValues as unknown as Record<string, unknown>,
-            );
-            return areValuesSame;
-        },
-        [defaultValues],
-    );
+    const areDefaultValuesSame = useAreDefaultValuesSame(defaultValues as unknown as Record<string, unknown>);
 
     const getEventOptions = useMemo(() => {
         return getResourceEventNameOptions(watchedResource as Resource).map((opt) => ({

@@ -7,7 +7,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions, selectors } from 'ducks/settings';
-import { isObjectSame } from 'utils/common-utils';
+import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import { validateNonZeroInteger, validatePositiveInteger } from 'utils/validators';
 import { buildValidationRules } from 'utils/validators-helper';
 
@@ -111,16 +111,7 @@ const CertificateSettingsForm = ({ onCancel, onSuccess }: CertificateSettingsFor
         wasUpdating.current = isUpdating;
     }, [isUpdating, onSuccess]);
 
-    const areDefaultValuesSame = useCallback(
-        (values: FormValues) => {
-            const areValuesSame = isObjectSame(
-                values as unknown as Record<string, unknown>,
-                defaultValues as unknown as Record<string, unknown>,
-            );
-            return areValuesSame;
-        },
-        [defaultValues],
-    );
+    const areDefaultValuesSame = useAreDefaultValuesSame(defaultValues as unknown as Record<string, unknown>);
 
     return (
         <FormProvider {...methods}>

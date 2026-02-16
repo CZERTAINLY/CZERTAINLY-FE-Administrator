@@ -1,12 +1,10 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Menu, Moon, Sun, User } from 'lucide-react';
+import { Menu, User } from 'lucide-react';
 import Dropdown from 'components/Dropdown';
 import NotificationsOverview from 'components/_pages/notifications/overview';
-import Switch from 'components/Switch';
 
 import { selectors } from 'ducks/auth';
-import { actions as uiActions, selectors as uiSelectors } from 'ducks/user-interface';
 
 import logo from '../../../resources/images/ilm-logo-white.svg';
 
@@ -15,10 +13,7 @@ interface Props {
 }
 
 function Header({ sidebarToggle }: Props) {
-    const dispatch = useDispatch();
     const profile = useSelector(selectors.profile);
-    const theme = useSelector(uiSelectors.selectTheme);
-
     const navigate = useNavigate();
 
     return (
@@ -30,11 +25,6 @@ function Header({ sidebarToggle }: Props) {
                 <img src={logo} alt="ILM Logo" className="h-9" data-testid="header-logo" />
             </Link>
             <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 text-white hidden">
-                    <Sun size={20} className={theme === 'light' ? 'opacity-100' : 'opacity-50'} />
-                    <Switch id="theme-switch" checked={theme === 'dark'} onChange={() => dispatch(uiActions.toggleTheme())} />
-                    <Moon size={20} className={theme === 'dark' ? 'opacity-100' : 'opacity-50'} />
-                </div>
                 {!!profile && (
                     <Dropdown
                         title={

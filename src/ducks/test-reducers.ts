@@ -17,7 +17,6 @@ export type UserInterfaceTestState = {
         okButtonCallback?: () => void;
         cancelButtonCallback?: () => void;
     };
-    theme: 'light' | 'dark';
 };
 
 const userInterfaceTestInitialState: UserInterfaceTestState = {
@@ -34,7 +33,6 @@ const userInterfaceTestInitialState: UserInterfaceTestState = {
         okButtonCallback: undefined,
         cancelButtonCallback: undefined,
     },
-    theme: 'light',
 };
 
 function userInterfaceTestReducer(
