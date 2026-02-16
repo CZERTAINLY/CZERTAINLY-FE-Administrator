@@ -62,4 +62,46 @@ test.describe('DropDownForm', () => {
         const submitButton = component.getByRole('button', { name: 'Submit' });
         await expect(submitButton).toBeDisabled();
     });
+
+    test('should call onClose when Close button is clicked', async ({ mount }) => {
+        let closed = false;
+        const dropDownOptionsList = [
+            {
+                formLabel: 'Field 1',
+                formValue: 'field1',
+                options: [{ label: 'Option 1', value: '1' }],
+            },
+        ];
+        const component = await mount(
+            <div>
+                <DropDownForm dropDownOptionsList={dropDownOptionsList} onSubmit={() => {}} onClose={() => (closed = true)} />
+            </div>,
+        );
+        await component.getByRole('button', { name: 'Close' }).click();
+        expect(closed).toBe(true);
+    });
+
+    test('should call onSubmit with selected value when form is valid', async ({ mount }) => {
+        let submitted: Record<string, string> | null = null;
+        const dropDownOptionsList = [
+            {
+                formLabel: 'Field 1',
+                formValue: 'field1',
+                options: [
+                    { label: 'Option 1', value: '1' },
+                    { label: 'Option 2', value: '2' },
+                ],
+            },
+        ];
+        const component = await mount(
+            <div>
+                <DropDownForm dropDownOptionsList={dropDownOptionsList} onSubmit={(values) => (submitted = values)} onClose={() => {}} />
+            </div>,
+        );
+        await component.getByText('Select Field 1').click();
+        await component.locator('.hs-select-option-row').filter({ hasText: 'Option 1' }).click();
+        await component.getByRole('button', { name: 'Submit' }).click();
+        expect(submitted).not.toBeNull();
+        expect(submitted?.field1).toBe('1');
+    });
 });

@@ -179,4 +179,31 @@ test.describe('MultipleValueTextInput', () => {
         expect(values).toContain('value1');
         expect(values).toContain('value2');
     });
+
+    test('should call onValuesChange when selecting from initialOptions', async ({ mount }) => {
+        let values: string[] = [];
+        const initialOptions = [
+            { label: 'Opt1', value: 'opt1' },
+            { label: 'Opt2', value: 'opt2' },
+        ];
+        const component = await mount(
+            <div>
+                <MultipleValueTextInput selectedValues={values} onValuesChange={(v) => (values = v)} initialOptions={initialOptions} />
+            </div>,
+        );
+        await component.locator('input[type="text"]').fill('opt1');
+        await component.locator('input[type="text"]').press('Enter');
+        expect(values).toContain('opt1');
+    });
+
+    test('should render with pre-filled selectedValues', async ({ mount }) => {
+        const component = await mount(
+            <div>
+                <MultipleValueTextInput selectedValues={['existing1', 'existing2']} onValuesChange={() => {}} />
+            </div>,
+        );
+        const select = component.locator('select[data-hs-select]');
+        await expect(select).toBeAttached();
+        await expect(component.locator('input[type="text"]')).toHaveAttribute('placeholder', 'Add value');
+    });
 });

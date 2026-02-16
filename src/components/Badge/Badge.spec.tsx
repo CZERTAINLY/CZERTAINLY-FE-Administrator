@@ -98,4 +98,32 @@ test.describe('Badge', () => {
         const badge = component.getByText('Badge');
         await expect(badge).toHaveClass(/custom-class/);
     });
+
+    test('should render with gray color', async ({ mount }) => {
+        const component = await mount(<Badge color="gray">Gray</Badge>);
+        await expect(component.getByText('Gray')).toBeVisible();
+    });
+
+    test('should use default data-testid when not provided', async ({ mount }) => {
+        const component = await mount(<Badge>DefaultIdBadge</Badge>);
+        const badge = component.getByText('DefaultIdBadge');
+        await expect(badge).toBeVisible();
+        await expect(badge).toHaveAttribute('data-testid', 'badge');
+    });
+
+    test('should trigger onClick on Enter key', async ({ mount }) => {
+        let clicked = false;
+        const component = await mount(<Badge onClick={() => (clicked = true)}>Keyable</Badge>);
+        await component.getByText('Keyable').focus();
+        await component.getByText('Keyable').press('Enter');
+        expect(clicked).toBe(true);
+    });
+
+    test('should trigger onClick on Space key', async ({ mount }) => {
+        let clicked = false;
+        const component = await mount(<Badge onClick={() => (clicked = true)}>Keyable</Badge>);
+        await component.getByText('Keyable').focus();
+        await component.getByText('Keyable').press(' ');
+        expect(clicked).toBe(true);
+    });
 });
