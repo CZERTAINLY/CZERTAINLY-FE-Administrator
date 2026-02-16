@@ -4,7 +4,6 @@ import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rule
 import { useCallback, useEffect, useMemo } from 'react';
 import { useAreDefaultValuesSame, useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router';
 
 import { actions as resourceActions, selectors as resourceSelectors } from 'ducks/resource';
 

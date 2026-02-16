@@ -4,7 +4,6 @@ import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rule
 import { useCallback, useEffect, useMemo } from 'react';
 import { useAreDefaultValuesSame, useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router';
 
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 
@@ -17,7 +16,6 @@ import { Resource } from 'types/openapi';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
-import ConditionFormFilter from 'components/ConditionFormFilter';
 
 export interface ruleFormValues {
     name: string;
