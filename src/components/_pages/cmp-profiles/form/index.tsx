@@ -27,7 +27,7 @@ import {
 } from 'types/openapi';
 import { RaProfileSimplifiedModel } from 'types/ra-profiles';
 import { collectFormAttributes, mapProfileAttribute, transformAttributes } from 'utils/attributes/attributes';
-import { isObjectSame } from 'utils/common-utils';
+import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import { validateAlphaNumericWithoutAccents, validateLength, validateRequired } from 'utils/validators';
 import { buildValidationRules } from 'utils/validators-helper';
 import useAttributeEditor, { buildGroups, buildOwner, buildSelectedOption } from 'utils/widget';
@@ -555,17 +555,7 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
         withRemoveAction: true,
     });
 
-    const areDefaultValuesSame = useCallback(
-        (values: any) => {
-            const areValuesSame = isObjectSame(
-                values as unknown as Record<string, unknown>,
-                defaultValues as unknown as Record<string, unknown>,
-            );
-
-            return areValuesSame;
-        },
-        [defaultValues],
-    );
+    const areDefaultValuesSame = useAreDefaultValuesSame(defaultValues as unknown as Record<string, unknown>);
 
     const allFormValues = useWatch({ control });
     const isEqual = useMemo(() => deepEqual(defaultValues, allFormValues), [defaultValues, allFormValues]);

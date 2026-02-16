@@ -14,7 +14,7 @@ import Button from 'components/Button';
 import Container from 'components/Container';
 import TextInput from 'components/TextInput';
 import { Resource } from 'types/openapi';
-import { isObjectSame } from 'utils/common-utils';
+import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 import { buildValidationRules } from 'utils/validators-helper';
@@ -108,16 +108,7 @@ const RulesForm = ({ onCancel, onSuccess }: RulesFormProps = {}) => {
         [dispatch],
     );
 
-    const areDefaultValuesSame = useCallback(
-        (values: ruleFormValues) => {
-            const areValuesSame = isObjectSame(
-                values as unknown as Record<string, unknown>,
-                defaultValues as unknown as Record<string, unknown>,
-            );
-            return areValuesSame;
-        },
-        [defaultValues],
-    );
+    const areDefaultValuesSame = useAreDefaultValuesSame(defaultValues as unknown as Record<string, unknown>);
 
     return (
         <FormProvider {...methods}>

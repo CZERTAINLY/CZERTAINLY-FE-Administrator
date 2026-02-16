@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { actions as alertActions } from 'ducks/alerts';
+import { isObjectSame } from 'utils/common-utils';
 
 interface WindowSizes {
     width: number;
@@ -86,4 +87,8 @@ export function useRunOnFinished(flag: boolean, callback?: () => void) {
         }
         wasTrue.current = flag;
     }, [flag, callback]);
+}
+
+export function useAreDefaultValuesSame(defaultValues: Record<string, unknown>) {
+    return useCallback((values: Record<string, unknown>) => isObjectSame(values, defaultValues), [defaultValues]);
 }

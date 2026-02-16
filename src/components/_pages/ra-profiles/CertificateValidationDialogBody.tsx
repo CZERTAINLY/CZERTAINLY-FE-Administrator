@@ -14,7 +14,7 @@ import Container from 'components/Container';
 import Label from 'components/Label';
 import { buildValidationRules } from 'utils/validators-helper';
 import ProgressButton from 'components/ProgressButton';
-import { isObjectSame } from 'utils/common-utils';
+import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import { SettingsPlatformModel } from 'types/settings';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import { renderExpiringThresholdLabel, renderValidationFrequencyLabel } from 'utils/certificate-validation';
@@ -89,10 +89,7 @@ export default function CertificateValidationDialogBody({ raProfile, platformSet
     );
 
     const watchedValues = useWatch({ control });
-    const areDefaultValuesSame = useCallback(() => {
-        const areValuesSame = isObjectSame(watchedValues, defaultValues);
-        return areValuesSame;
-    }, [watchedValues, defaultValues]);
+    const areDefaultValuesSame = useAreDefaultValuesSame(defaultValues as unknown as Record<string, unknown>);
     const certificateValidationHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -238,7 +235,7 @@ export default function CertificateValidationDialogBody({ raProfile, platformSet
                         <ProgressButton
                             title={'Save'}
                             inProgressTitle={'Saving...'}
-                            disabled={formState.isSubmitting || isBusy || areDefaultValuesSame()}
+                            disabled={formState.isSubmitting || isBusy || areDefaultValuesSame(watchedValues as Record<string, unknown>)}
                             inProgress={formState.isSubmitting || isBusy}
                             type="submit"
                         />

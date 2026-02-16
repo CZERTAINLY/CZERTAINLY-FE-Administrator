@@ -11,7 +11,7 @@ import MultipleValueTextInput from 'components/Input/MultipleValueTextInput';
 import TextInput from 'components/TextInput';
 import TextArea from 'components/TextArea';
 import Label from 'components/Label';
-import { isObjectSame } from 'utils/common-utils';
+import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import { validateAlphaNumericWithSpecialChars, validateRequired, validateUrlWithRoute, validatePositiveInteger } from 'utils/validators';
 import { buildValidationRules } from 'utils/validators-helper';
 import { OAuth2ProviderSettingsUpdateDto } from 'types/auth-settings';
@@ -197,16 +197,7 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
         [dispatch, providerName, editMode],
     );
 
-    const areDefaultValuesSame = useCallback(
-        (values: FormValues) => {
-            const areValuesSame = isObjectSame(
-                values as unknown as Record<string, unknown>,
-                defaultValues as unknown as Record<string, unknown>,
-            );
-            return areValuesSame;
-        },
-        [defaultValues],
-    );
+    const areDefaultValuesSame = useAreDefaultValuesSame(defaultValues as unknown as Record<string, unknown>);
 
     const schemeOptions: OptionType[] = [
         authenticationSchemeOptions[AuthenticationScheme.JwtBearer],

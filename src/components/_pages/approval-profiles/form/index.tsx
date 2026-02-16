@@ -13,7 +13,7 @@ import Button from 'components/Button';
 import Container from 'components/Container';
 import TextInput from 'components/TextInput';
 import { ApprovalStepRequestModel, ProfileApprovalRequestModel } from 'types/approval-profiles';
-import { isObjectSame } from 'utils/common-utils';
+import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import {
     validateAlphaNumericWithSpecialChars,
     validateLength,
@@ -77,13 +77,7 @@ function ApprovalProfileForm({ approvalProfileId, onCancel, onSuccess }: Approva
         [profileApprovalDetail, editMode],
     );
 
-    const areDefaultValuesSame = useCallback(
-        (values: ProfileApprovalRequestModel) => {
-            const areValuesSame = isObjectSame(values, defaultValues);
-            return areValuesSame;
-        },
-        [defaultValues],
-    );
+    const areDefaultValuesSame = useAreDefaultValuesSame(defaultValues as unknown as Record<string, unknown>);
 
     const methods = useForm<ProfileApprovalRequestModel>({
         defaultValues,

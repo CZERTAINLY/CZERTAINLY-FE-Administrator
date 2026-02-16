@@ -16,7 +16,7 @@ import Container from 'components/Container';
 import TextInput from 'components/TextInput';
 import { ConditionType, PlatformEnum, Resource } from 'types/openapi';
 import { ConditionItemModel } from 'types/rules';
-import { isObjectSame } from 'utils/common-utils';
+import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 import { buildValidationRules } from 'utils/validators-helper';
@@ -113,16 +113,7 @@ const ConditionForm = ({ onCancel, onSuccess }: ConditionFormProps = {}) => {
         [dispatch],
     );
 
-    const areDefaultValuesSame = useCallback(
-        (values: ConditionFormValues) => {
-            const areValuesSame = isObjectSame(
-                values as unknown as Record<string, unknown>,
-                defaultValues as unknown as Record<string, unknown>,
-            );
-            return areValuesSame;
-        },
-        [defaultValues],
-    );
+    const areDefaultValuesSame = useAreDefaultValuesSame(defaultValues as unknown as Record<string, unknown>);
 
     return (
         <FormProvider {...methods}>
