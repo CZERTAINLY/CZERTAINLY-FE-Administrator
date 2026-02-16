@@ -611,7 +611,17 @@ export default function FilterWidget({
     return (
         <>
             <Widget title={title} busy={isFetchingAvailableFilters} titleSize="large">
-                <div id="unselectFilters" onClick={onUnselectFiltersClick}>
+                <div
+                    id="unselectFilters"
+                    role="button"
+                    tabIndex={0}
+                    onClick={onUnselectFiltersClick}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            onUnselectFiltersClick({ target: { id: 'unselectFilters' } } as unknown as React.MouseEvent<HTMLDivElement>);
+                        }
+                    }}
+                >
                     <div className="flex flex-row gap-2 mb-4 items-end">
                         <div className={`grid w-full ${filterGridCols === 2 ? 'grid-cols-2 gap-4' : 'grid-cols-4 gap-2'}`}>
                             <Select
