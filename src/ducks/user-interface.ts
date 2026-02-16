@@ -15,7 +15,6 @@ export type State = {
     initiateFormCallback?: boolean;
     formCallbackValue?: string;
     reactFlowUI?: ReactFlowUI;
-    theme: 'light' | 'dark';
 };
 
 export const initialState: State = {
@@ -32,7 +31,6 @@ export const initialState: State = {
         okButtonCallback: undefined,
         cancelButtonCallback: undefined,
     },
-    theme: (typeof window !== 'undefined' && window.localStorage ? (localStorage.getItem('theme') as 'light' | 'dark') : null) || 'light',
 };
 
 export const slice = createSlice({
@@ -156,27 +154,6 @@ export const slice = createSlice({
                 state.reactFlowUI?.flowChartNodes.push(action.payload);
             }
         },
-
-        setTheme: (state, action: PayloadAction<'light' | 'dark'>) => {
-            state.theme = action.payload;
-            localStorage.setItem('theme', action.payload);
-            if (action.payload === 'dark') {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        },
-
-        toggleTheme: (state) => {
-            const newTheme = state.theme === 'light' ? 'dark' : 'light';
-            state.theme = newTheme;
-            localStorage.setItem('theme', newTheme);
-            if (newTheme === 'dark') {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        },
     },
 });
 
@@ -192,7 +169,6 @@ const reactFlowUI = createSelector(selectState, (state) => state.reactFlowUI);
 const flowChartNodes = createSelector(reactFlowUI, (state) => state?.flowChartNodes);
 const flowChartEdges = createSelector(reactFlowUI, (state) => state?.flowChartEdges);
 const expandedHiddenNodeId = createSelector(reactFlowUI, (state) => state?.expandedHiddenNodeId);
-const selectTheme = createSelector(selectState, (state) => state.theme);
 
 export const selectors = {
     selectState,
@@ -206,7 +182,6 @@ export const selectors = {
     flowChartNodes,
     flowChartEdges,
     expandedHiddenNodeId,
-    selectTheme,
 };
 
 export const actions = slice.actions;
