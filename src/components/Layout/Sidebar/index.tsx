@@ -45,6 +45,24 @@ type MenuItemMapping = {
       }
 );
 
+function SidebarSubmenuItem({ child, index, totalCount }: { child: { name: string; link: string }; index: number; totalCount: number }) {
+    return (
+        <li className={cn({ 'mb-2': index === totalCount - 1 })}>
+            <NavLink
+                to={child.link}
+                className={({ isActive }) =>
+                    cn(
+                        'font-medium text-sm block px-4 ml-8 py-2 no-underline hover:bg-gray-200 rounded-lg h-[38px] items-center',
+                        isActive && 'text-blue-600',
+                    )
+                }
+            >
+                {child.name}
+            </NavLink>
+        </li>
+    );
+}
+
 const menuItemMappings: MenuItemMapping[] = [
     {
         _key: '/dashboard',
@@ -347,29 +365,13 @@ export default function Sidebar({ allowedResources }: Props) {
                     <ul
                         className={cn(
                             `transition-[max-height] duration-300 ease-in-out overflow-hidden relative before:content-[''] before:absolute before:left-6 before:top-0 before:h-full before:w-0.5 before:bg-gray-200`,
-                            {
-                                'w-0': !isActive,
-                            },
+                            { 'w-0': !isActive },
                         )}
-                        style={{
-                            maxHeight: isActive ? `${38 * mapping.children.length}px` : 0,
-                        }}
+                        style={{ maxHeight: isActive ? `${38 * mapping.children.length}px` : 0 }}
                         id={mapping._key}
                     >
                         {mapping.children.map((child, index) => (
-                            <li key={child.name} className={cn({ 'mb-2': index === mapping.children.length - 1 })}>
-                                <NavLink
-                                    to={child.link}
-                                    className={({ isActive }) =>
-                                        cn(
-                                            'font-medium text-sm block px-4 ml-8 py-2 no-underline hover:bg-gray-200 rounded-lg h-[38px] items-center',
-                                            isActive && 'text-blue-600',
-                                        )
-                                    }
-                                >
-                                    {child.name}
-                                </NavLink>
-                            </li>
+                            <SidebarSubmenuItem key={child.name} child={child} index={index} totalCount={mapping.children.length} />
                         ))}
                     </ul>
                 </li>

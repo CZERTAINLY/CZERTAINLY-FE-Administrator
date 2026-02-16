@@ -171,6 +171,17 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
         [users, roles, groups],
     );
 
+    const handleApproverSelectChange = useCallback(
+        (index: number, fieldOnChange: (v: any) => void) => (value: any) => {
+            fieldOnChange(value);
+            const label = selectedApprovalTypeList?.[index]?.label;
+            if (!label) return;
+            const option = getApproverOptions(label).find((opt) => opt.value === value);
+            if (option) handleApproverChange(option, index);
+        },
+        [selectedApprovalTypeList, getApproverOptions, handleApproverChange],
+    );
+
     const handleAddStepClick = (): void => {
         const newStep: ApprovalStepRequestModel = {
             order: approvalSteps.length + 1,
@@ -278,15 +289,7 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
                                                 value={field.value || ''}
                                                 label={`Select ${selectedApprovalTypeList[index].label}`}
                                                 required
-                                                onChange={(value) => {
-                                                    field.onChange(value);
-                                                    const option = getApproverOptions(selectedApprovalTypeList[index].label).find(
-                                                        (opt) => opt.value === value,
-                                                    );
-                                                    if (option) {
-                                                        handleApproverChange(option, index);
-                                                    }
-                                                }}
+                                                onChange={handleApproverSelectChange(index, field.onChange)}
                                                 options={getApproverOptions(selectedApprovalTypeList[index].label)}
                                                 placeholder="Select Approver"
                                                 placement="bottom"
@@ -307,7 +310,7 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
                 </div>
             );
         },
-        [selectedApprovalTypeList, handleApprovalTypeChange, handleApproverChange, getApproverOptions, control],
+        [selectedApprovalTypeList, handleApprovalTypeChange, handleApproverSelectChange, getApproverOptions, control],
     );
 
     const tabs = useMemo(

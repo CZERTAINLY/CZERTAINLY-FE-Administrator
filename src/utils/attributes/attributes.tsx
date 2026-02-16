@@ -12,10 +12,10 @@ import {
 } from 'types/attributes';
 import {
     AttributeContentType,
-    CodeBlockAttributeContent,
+    CodeBlockAttributeContentV2,
     FileAttributeContentData,
     ProgrammingLanguageEnum,
-    SecretAttributeContent,
+    SecretAttributeContentV2,
 } from 'types/openapi';
 import { base64ToUtf8, utf8ToBase64 } from 'utils/common-utils';
 import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
@@ -115,52 +115,39 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
     return content.map((content) => mapping(content) ?? checkFileNameAndMimeType(content)).join(', ');
 };
 
+function getDatetimeFormValue(item: any): { data: string } {
+    if (item?.value?.data) return { data: new Date(item.value.data).toISOString() };
+    if (typeof item === 'string') return { data: new Date(item).toISOString() };
+    return { data: new Date(item).toISOString() };
+}
+
+function getDateFormValue(item: any): { data: string } {
+    if (item?.value?.data) return { data: new Date(item.value.data).toISOString().slice(0, 10) };
+    if (typeof item === 'string') return { data: new Date(item).toISOString().slice(0, 10) };
+    return { data: new Date(item).toISOString().slice(0, 10) };
+}
+
 const getAttributeFormValue = (
     contentType: AttributeContentType,
     descriptorContent: BaseAttributeContentModel[] | undefined,
     item: any,
 ) => {
-    if (contentType === AttributeContentType.Datetime) {
-        const returnVal = item?.value?.data
-            ? { data: new Date(item.value.data).toISOString() }
-            : typeof item === 'string'
-              ? { data: new Date(item).toISOString() }
-              : new Date(item).toISOString();
-        return returnVal;
-    }
-    if (contentType === AttributeContentType.Date) {
-        const returnVal = item?.value?.data
-            ? { data: new Date(item.value.data).toISOString().slice(0, 10) }
-            : typeof item === 'string'
-              ? { data: new Date(item).toISOString().slice(0, 10) }
-              : new Date(item).toISOString().slice(0, 10);
-
-        return returnVal;
-    }
+    if (contentType === AttributeContentType.Datetime) return getDatetimeFormValue(item);
+    if (contentType === AttributeContentType.Date) return getDateFormValue(item);
     if (contentType === AttributeContentType.Codeblock) {
         const language = getCodeBlockLanguage(item?.language, descriptorContent);
-        return { data: { code: utf8ToBase64(item.code), language: language } } as CodeBlockAttributeContent;
+        return { data: { code: utf8ToBase64(item.code), language } } as CodeBlockAttributeContentV2;
     }
-
     if (contentType === AttributeContentType.Secret) {
-        return {
-            data: {
-                secret: item,
-            },
-        } as SecretAttributeContent;
+        return { data: { secret: item } } as SecretAttributeContentV2;
     }
-
-    if (item && typeof item === 'object' && ('data' in item || 'reference' in item)) {
-        return item;
-    }
-
+    if (item && typeof item === 'object' && ('data' in item || 'reference' in item)) return item;
     if (item && typeof item === 'object' && 'value' in item) {
         if (item.value && typeof item.value === 'object' && ('data' in item.value || 'reference' in item.value)) {
             return item.value;
         }
         return { data: item.value };
     }
-
     return { data: item };
 };
 

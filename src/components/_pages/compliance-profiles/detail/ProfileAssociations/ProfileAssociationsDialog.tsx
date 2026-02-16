@@ -172,6 +172,11 @@ export default function ProfileAssociationsDialog({ isOpen, onClose, profile, as
                                         label: opt.label,
                                     }));
                                     const fieldValue = field.value as { uuid: string; name: string } | undefined;
+                                    const onProfileSelect = (value: unknown) => {
+                                        const uuid = value as string | undefined;
+                                        const option = options.find((opt) => opt.value.uuid === uuid);
+                                        field.onChange(option?.value);
+                                    };
                                     return (
                                         <div className="mb-4">
                                             <label
@@ -184,11 +189,7 @@ export default function ProfileAssociationsDialog({ isOpen, onClose, profile, as
                                                 id="resource-profiles-select"
                                                 options={selectOptions}
                                                 value={fieldValue?.uuid || ''}
-                                                onChange={(value) => {
-                                                    const uuid = value as string | undefined;
-                                                    const option = options.find((opt) => opt.value.uuid === uuid);
-                                                    field.onChange(option?.value);
-                                                }}
+                                                onChange={onProfileSelect}
                                                 placeholder={`Select ${getEnumLabel(resourceEnum, selectedResource)} to be associated`}
                                                 className={cn({
                                                     'border-red-500': fieldState.error && fieldState.isTouched,

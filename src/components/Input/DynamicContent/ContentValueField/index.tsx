@@ -14,6 +14,100 @@ import Container from 'components/Container';
 import cn from 'classnames';
 import Switch from 'components/Switch';
 
+function getValueFieldError(fieldState: { error?: { message?: string }; isTouched: boolean; invalid: boolean }) {
+    if (!fieldState.isTouched || !fieldState.invalid) return undefined;
+    return typeof fieldState.error === 'string' ? fieldState.error : fieldState.error?.message || 'Invalid value';
+}
+
+function ValueFieldInput({
+    descriptor,
+    id,
+    field,
+    fieldState,
+    fieldStepValue,
+    options,
+}: {
+    descriptor: CustomAttributeModel;
+    id?: string;
+    field: { value: any; onChange: (v: any) => void; onBlur: () => void };
+    fieldState: { isTouched: boolean; invalid: boolean; error?: { message?: string } };
+    fieldStepValue: number | undefined;
+    options: { label: string; value: string }[];
+}) {
+    const inputType = ContentFieldConfiguration[descriptor.contentType].type;
+    const displayValue = descriptor.contentType === AttributeContentType.Datetime ? getFormattedDateTime(field.value) : field.value;
+    const error = getValueFieldError(fieldState);
+    const invalid = fieldState.isTouched && !!fieldState.invalid;
+    const inputClassName = cn(
+        'py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600',
+        { 'border-red-500 focus:border-red-500 focus:ring-red-500': invalid },
+    );
+
+    if (descriptor.properties.list) {
+        return (
+            <Select
+                {...field}
+                id={descriptor.name}
+                options={options}
+                isMulti={descriptor.properties.multiSelect}
+                disabled={descriptor.properties.readOnly}
+                isClearable={!descriptor.properties.required}
+                dropdownScope="window"
+            />
+        );
+    }
+    if (inputType === 'datetime-local') {
+        const dateValue = field.value ? (field.value.includes('T') ? field.value : field.value.replace(' ', 'T')) : undefined;
+        return (
+            <DatePicker
+                id={descriptor.name}
+                value={dateValue}
+                onChange={(value) => field.onChange(value)}
+                onBlur={field.onBlur}
+                disabled={descriptor.properties.readOnly}
+                invalid={invalid}
+                error={error}
+                required={descriptor.properties.required}
+                timePicker
+            />
+        );
+    }
+    if (inputType === 'number') {
+        return (
+            <input
+                {...field}
+                disabled={descriptor.properties.readOnly}
+                type={inputType}
+                id={descriptor.name}
+                step={fieldStepValue}
+                value={displayValue || ''}
+                className={inputClassName}
+            />
+        );
+    }
+    if (inputType === 'checkbox') {
+        return (
+            <Switch
+                id={id || descriptor.name || 'checkbox'}
+                checked={field.value}
+                onChange={(checked) => field.onChange(checked)}
+                disabled={descriptor.properties.readOnly}
+            />
+        );
+    }
+    return (
+        <TextInput
+            id={descriptor.name}
+            type={inputType as 'text' | 'textarea' | 'number' | 'email' | 'password' | 'date' | 'time'}
+            disabled={descriptor.properties.readOnly}
+            value={displayValue || ''}
+            onChange={(value) => field.onChange(value)}
+            invalid={invalid}
+            error={fieldState.isTouched && fieldState.invalid ? fieldState.error?.message : undefined}
+        />
+    );
+}
+
 type Props = {
     id?: string;
     descriptor: CustomAttributeModel;
@@ -161,72 +255,14 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
             render={({ field, fieldState }) => {
                 const inputContent = getFieldContent(field);
                 const inputType = ContentFieldConfiguration[descriptor.contentType].type;
-                const isDateTime = inputType === 'datetime-local';
-                const needsStep = inputType === 'number';
-                const displayValue =
-                    descriptor.contentType === AttributeContentType.Datetime ? getFormattedDateTime(field.value) : field.value;
-
-                const inputComponent = descriptor.properties.list ? (
-                    <Select
-                        {...field}
-                        id={descriptor.name}
+                const inputComponent = (
+                    <ValueFieldInput
+                        descriptor={descriptor}
+                        id={id}
+                        field={field}
+                        fieldState={fieldState}
+                        fieldStepValue={fieldStepValue}
                         options={options ?? []}
-                        isMulti={descriptor.properties.multiSelect}
-                        disabled={descriptor.properties.readOnly}
-                        isClearable={!descriptor.properties.required}
-                        dropdownScope="window"
-                    />
-                ) : isDateTime ? (
-                    <DatePicker
-                        id={descriptor.name}
-                        value={field.value ? (field.value.includes('T') ? field.value : field.value.replace(' ', 'T')) : undefined}
-                        onChange={(value) => {
-                            field.onChange(value);
-                        }}
-                        onBlur={field.onBlur}
-                        disabled={descriptor.properties.readOnly}
-                        invalid={fieldState.isTouched && !!fieldState.invalid}
-                        error={
-                            fieldState.isTouched && fieldState.invalid
-                                ? typeof fieldState.error === 'string'
-                                    ? fieldState.error
-                                    : fieldState.error?.message || 'Invalid value'
-                                : undefined
-                        }
-                        required={descriptor.properties.required}
-                        timePicker
-                    />
-                ) : needsStep ? (
-                    <input
-                        {...field}
-                        disabled={descriptor.properties.readOnly}
-                        type={inputType}
-                        id={descriptor.name}
-                        step={fieldStepValue}
-                        value={displayValue || ''}
-                        className={cn(
-                            'py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600',
-                            {
-                                'border-red-500 focus:border-red-500 focus:ring-red-500': fieldState.isTouched && fieldState.invalid,
-                            },
-                        )}
-                    />
-                ) : inputType === 'checkbox' ? (
-                    <Switch
-                        id={id || descriptor.name || 'checkbox'}
-                        checked={field.value}
-                        onChange={(checked) => field.onChange(checked)}
-                        disabled={descriptor.properties.readOnly}
-                    />
-                ) : (
-                    <TextInput
-                        id={descriptor.name}
-                        type={inputType as 'text' | 'textarea' | 'number' | 'email' | 'password' | 'date' | 'time'}
-                        disabled={descriptor.properties.readOnly}
-                        value={displayValue || ''}
-                        onChange={(value) => field.onChange(value)}
-                        invalid={fieldState.isTouched && !!fieldState.invalid}
-                        error={fieldState.isTouched && fieldState.invalid ? fieldState.error?.message : undefined}
                     />
                 );
                 const feedbackComponent = fieldState.error?.message ? (
