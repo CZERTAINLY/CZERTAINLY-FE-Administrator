@@ -1,112 +1,75 @@
+import React from 'react';
 import { test, expect } from '../../../playwright/ct-test';
 import { MemoryRouter } from 'react-router';
 import Breadcrumb from './index';
 
+type BreadcrumbItem = { label: string; href?: string };
+
+async function mountBreadcrumb<T>(mount: (component: React.ReactElement) => Promise<T>, items: BreadcrumbItem[]): Promise<T> {
+    return mount(
+        <MemoryRouter>
+            <Breadcrumb items={items} />
+        </MemoryRouter>,
+    );
+}
+
 test.describe('Breadcrumb', () => {
     test('should render breadcrumb items', async ({ mount }) => {
-        const items = [
+        const component = await mountBreadcrumb(mount, [
             { label: 'Home', href: '/' },
             { label: 'Page', href: '/page' },
-        ];
-
-        const component = await mount(
-            <MemoryRouter>
-                <Breadcrumb items={items} />
-            </MemoryRouter>,
-        );
+        ]);
 
         await expect(component.getByRole('link', { name: 'Home' })).toBeVisible();
         await expect(component.getByRole('link', { name: 'Page' })).toBeVisible();
     });
 
     test('should render items without href as span', async ({ mount }) => {
-        const items = [{ label: 'Home', href: '/' }, { label: 'Current Page' }];
-
-        const component = await mount(
-            <MemoryRouter>
-                <Breadcrumb items={items} />
-            </MemoryRouter>,
-        );
+        const component = await mountBreadcrumb(mount, [{ label: 'Home', href: '/' }, { label: 'Current Page' }]);
 
         await expect(component.getByRole('link', { name: 'Home' })).toBeVisible();
         await expect(component.getByRole('listitem').filter({ hasText: 'Current Page' })).toBeVisible();
     });
 
     test('should render separator between items', async ({ mount }) => {
-        const items = [
+        const component = await mountBreadcrumb(mount, [
             { label: 'First', href: '/first' },
             { label: 'Second', href: '/second' },
-        ];
-
-        const component = await mount(
-            <MemoryRouter>
-                <Breadcrumb items={items} />
-            </MemoryRouter>,
-        );
+        ]);
 
         await expect(component.getByRole('link', { name: 'First' })).toBeVisible();
         await expect(component.getByRole('link', { name: 'Second' })).toBeVisible();
-
-        const separator = component.locator('svg[aria-hidden="true"]');
-        await expect(separator).toBeVisible();
+        await expect(component.locator('svg[aria-hidden="true"]')).toBeVisible();
     });
 
     test('should not render separator for last item', async ({ mount }) => {
-        const items = [{ label: 'Single Item' }];
-
-        const component = await mount(
-            <MemoryRouter>
-                <Breadcrumb items={items} />
-            </MemoryRouter>,
-        );
+        const component = await mountBreadcrumb(mount, [{ label: 'Single Item' }]);
 
         await expect(component.locator('li').filter({ hasText: 'Single Item' })).toBeVisible();
-
-        const separator = component.locator('svg[aria-hidden="true"]');
-        await expect(separator).toHaveCount(0);
+        await expect(component.locator('svg[aria-hidden="true"]')).toHaveCount(0);
     });
 
     test('should render single item', async ({ mount }) => {
-        const items = [{ label: 'Single', href: '/single' }];
-
-        const component = await mount(
-            <MemoryRouter>
-                <Breadcrumb items={items} />
-            </MemoryRouter>,
-        );
+        const component = await mountBreadcrumb(mount, [{ label: 'Single', href: '/single' }]);
 
         await expect(component.getByRole('link', { name: 'Single' })).toBeVisible();
     });
 
     test('should render multiple items', async ({ mount }) => {
-        const items = [
+        const component = await mountBreadcrumb(mount, [
             { label: 'First', href: '/first' },
             { label: 'Second', href: '/second' },
             { label: 'Third', href: '/third' },
-        ];
-
-        const component = await mount(
-            <MemoryRouter>
-                <Breadcrumb items={items} />
-            </MemoryRouter>,
-        );
+        ]);
 
         await expect(component.getByRole('link', { name: 'First' })).toBeVisible();
         await expect(component.getByRole('link', { name: 'Second' })).toBeVisible();
         await expect(component.getByRole('link', { name: 'Third' })).toBeVisible();
-
-        const separators = component.locator('svg[aria-hidden="true"]');
-        await expect(separators).toHaveCount(2);
+        await expect(component.locator('svg[aria-hidden="true"]')).toHaveCount(2);
     });
 
     test('should apply correct styling to non-last items', async ({ mount }) => {
-        const items = [{ label: 'First', href: '/first' }, { label: 'Last' }];
-
-        const component = await mount(
-            <MemoryRouter>
-                <Breadcrumb items={items} />
-            </MemoryRouter>,
-        );
+        const component = await mountBreadcrumb(mount, [{ label: 'First', href: '/first' }, { label: 'Last' }]);
 
         const firstItem = component.getByRole('link', { name: 'First' }).locator('..');
         await expect(firstItem).toHaveClass(/text-gray-700|text-neutral-600/);
