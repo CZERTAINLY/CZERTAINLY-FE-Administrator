@@ -84,17 +84,14 @@ function Dropdown({ title, items, disabled = false, btnStyle, className, menuCla
                     {items &&
                         items.length > 0 &&
                         items.map((item, index) => (
-                            <a
+                            <button
                                 key={index}
-                                className="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700 cursor-pointer"
-                                href="#"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    item.onClick();
-                                }}
+                                type="button"
+                                className="flex items-center gap-x-3.5 py-2 px-3 w-full text-left rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700 cursor-pointer"
+                                onClick={() => item.onClick()}
                             >
                                 {item.title}
-                            </a>
+                            </button>
                         ))}
                 </div>
             </div>

@@ -62,10 +62,10 @@ export default defineConfig({
                 name: 'CT Report',
                 outputFile: './monocart-report/index.html',
                 sourcePath: (filePath: string) => {
-                    const fp = filePath.replace(/\\/g, '/');
+                    const fp = filePath.replaceAll('\\', '/');
                     const m = fp.match(/(^|\/)(src\/.*)$/);
                     if (m) return m[2];
-                    const cwd = process.cwd().replace(/\\/g, '/');
+                    const cwd = process.cwd().replaceAll('\\', '/');
                     if (fp.startsWith(cwd + '/')) return fp.slice(cwd.length + 1);
                     return fp;
                 },

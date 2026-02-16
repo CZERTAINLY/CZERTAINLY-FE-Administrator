@@ -28,7 +28,7 @@ function DatePicker({ value, onChange, onBlur, disabled, id, invalid, error, cla
     const [selectedTime, setSelectedTime] = useState<{ hours: number; minutes: number; seconds: number }>(() => {
         if (value && timePicker) {
             const date = new Date(value);
-            if (!isNaN(date.getTime())) {
+            if (!Number.isNaN(date.getTime())) {
                 return {
                     hours: date.getHours(),
                     minutes: date.getMinutes(),
@@ -61,7 +61,7 @@ function DatePicker({ value, onChange, onBlur, disabled, id, invalid, error, cla
     useEffect(() => {
         if (value) {
             const date = new Date(value);
-            if (!isNaN(date.getTime())) {
+            if (!Number.isNaN(date.getTime())) {
                 setSelectedDate(date);
                 setCurrentMonth(date.getMonth());
                 setCurrentYear(date.getFullYear());
@@ -434,15 +434,21 @@ function DatePicker({ value, onChange, onBlur, disabled, id, invalid, error, cla
                         {timePicker && (
                             <div className="border-t border-gray-200 dark:border-neutral-700 p-3">
                                 <div className="flex items-center justify-center gap-2">
-                                    <label className="text-sm font-medium text-[var(--dark-gray-color)] dark:text-neutral-300">Time:</label>
+                                    <label
+                                        htmlFor="datepicker-time-hours"
+                                        className="text-sm font-medium text-[var(--dark-gray-color)] dark:text-neutral-300"
+                                    >
+                                        Time:
+                                    </label>
                                     <div className="flex items-center gap-1">
                                         <input
+                                            id="datepicker-time-hours"
                                             type="number"
                                             min="0"
                                             max="23"
                                             value={selectedTime.hours}
                                             onChange={(e) => {
-                                                const val = parseInt(e.target.value) || 0;
+                                                const val = Number.parseInt(e.target.value, 10) || 0;
                                                 handleTimeChange('hours', Math.max(0, Math.min(23, val)));
                                             }}
                                             className="w-12 px-2 py-1 text-sm border border-gray-300 rounded-md text-center focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -454,7 +460,7 @@ function DatePicker({ value, onChange, onBlur, disabled, id, invalid, error, cla
                                             max="59"
                                             value={selectedTime.minutes}
                                             onChange={(e) => {
-                                                const val = parseInt(e.target.value) || 0;
+                                                const val = Number.parseInt(e.target.value, 10) || 0;
                                                 handleTimeChange('minutes', Math.max(0, Math.min(59, val)));
                                             }}
                                             className="w-12 px-2 py-1 text-sm border border-gray-300 rounded-md text-center focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -466,7 +472,7 @@ function DatePicker({ value, onChange, onBlur, disabled, id, invalid, error, cla
                                             max="59"
                                             value={selectedTime.seconds}
                                             onChange={(e) => {
-                                                const val = parseInt(e.target.value) || 0;
+                                                const val = Number.parseInt(e.target.value, 10) || 0;
                                                 handleTimeChange('seconds', Math.max(0, Math.min(59, val)));
                                             }}
                                             className="w-12 px-2 py-1 text-sm border border-gray-300 rounded-md text-center focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"

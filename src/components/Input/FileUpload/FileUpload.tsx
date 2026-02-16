@@ -80,7 +80,7 @@ export default function FileUpload({ id = '', fileType = '', editable, onFileCon
     );
 
     return (
-        <div onDrop={onFileDrop} onDragOver={onFileDragOver}>
+        <div role="region" aria-label="File upload area" tabIndex={0} onDrop={onFileDrop} onDragOver={onFileDragOver}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                     <TextInput

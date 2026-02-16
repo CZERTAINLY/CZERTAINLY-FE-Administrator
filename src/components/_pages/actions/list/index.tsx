@@ -9,8 +9,8 @@ const RulesList = () => {
     const [activeTab, setActiveTab] = useState(0);
 
     useEffect(() => {
-        if (tabIndex && parseInt(tabIndex) <= 1) {
-            setActiveTab(parseInt(tabIndex));
+        if (tabIndex && Number.parseInt(tabIndex, 10) <= 1) {
+            setActiveTab(Number.parseInt(tabIndex, 10));
         }
     }, [tabIndex]);
 

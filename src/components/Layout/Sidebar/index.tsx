@@ -402,6 +402,8 @@ export default function Sidebar({ allowedResources }: Props) {
         <>
             {menuSize === 'flying' && (
                 <div
+                    role="region"
+                    aria-label="Sidebar menu"
                     className={cn(
                         'fixed top-[var(--header-height)] left-0 h-[calc(100vh-var(--header-height))] bg-white shadow-lg w-[260px] z-50',
                         {},

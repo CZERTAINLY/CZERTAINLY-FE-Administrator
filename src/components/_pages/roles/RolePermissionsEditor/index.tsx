@@ -325,10 +325,11 @@ function RolePermissionsEditor({
             currentResource?.actions.map((action) => (
                 <div
                     key={`${object.uuid}_${action.name}`}
+                    role="group"
+                    aria-label="Permission action"
                     onClick={(e) => {
                         e.stopPropagation();
                     }}
-                    onKeyDown={() => {}}
                     className="flex justify-center"
                 >
                     <Checkbox

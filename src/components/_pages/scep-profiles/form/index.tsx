@@ -224,7 +224,7 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
             const scepRequest: ScepProfileEditRequestModel | ScepProfileAddRequestModel = {
                 name: values.name,
                 description: values.description,
-                renewalThreshold: parseInt(values.renewalThreshold),
+                renewalThreshold: Number.parseInt(values.renewalThreshold, 10),
                 includeCaCertificate: values.includeCaCertificate,
                 includeCaCertificateChain: values.includeCaCertificateChain,
                 challengePassword: values.challengePassword || undefined,

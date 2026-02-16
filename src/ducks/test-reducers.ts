@@ -1,4 +1,4 @@
-import { AnyAction, combineReducers } from '@reduxjs/toolkit';
+import { combineReducers, type UnknownAction } from '@reduxjs/toolkit';
 
 // IMPORTANT: This file is used ONLY in component tests (Playwright CT).
 // It must NOT import the real duck modules
@@ -37,7 +37,7 @@ const userInterfaceTestInitialState: UserInterfaceTestState = {
 
 function userInterfaceTestReducer(
     state: UserInterfaceTestState = userInterfaceTestInitialState,
-    _action: AnyAction,
+    _action: UnknownAction,
 ): UserInterfaceTestState {
     return state;
 }
@@ -50,7 +50,7 @@ const enumsTestInitialState: EnumsTestState = {
     platformEnums: {},
 };
 
-function enumsTestReducer(state: EnumsTestState = enumsTestInitialState, _action: AnyAction): EnumsTestState {
+function enumsTestReducer(state: EnumsTestState = enumsTestInitialState, _action: UnknownAction): EnumsTestState {
     return state;
 }
 
@@ -64,7 +64,7 @@ const infoTestInitialState: InfoTestState = {
     isFetching: false,
 };
 
-function infoTestReducer(state: InfoTestState = infoTestInitialState, action: AnyAction): InfoTestState {
+function infoTestReducer(state: InfoTestState = infoTestInitialState, action: UnknownAction): InfoTestState {
     switch (action.type) {
         case 'info/getPlatformInfo':
             return { platformInfo: undefined, isFetching: true };
@@ -89,7 +89,7 @@ const notificationsTestInitialState: NotificationsTestState = {
 
 function notificationsTestReducer(
     state: NotificationsTestState = notificationsTestInitialState,
-    _action: AnyAction,
+    _action: UnknownAction,
 ): NotificationsTestState {
     return state;
 }
@@ -112,7 +112,7 @@ const authTestInitialState: AuthTestState = {
     },
 };
 
-function authTestReducer(state: AuthTestState = authTestInitialState, _action: AnyAction): AuthTestState {
+function authTestReducer(state: AuthTestState = authTestInitialState, _action: UnknownAction): AuthTestState {
     return state;
 }
 

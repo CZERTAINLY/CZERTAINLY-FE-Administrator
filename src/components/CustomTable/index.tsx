@@ -350,11 +350,11 @@ function CustomTable({
     const onPageSizeChange = useCallback(
         (value: string | number) => {
             if (onPageSizeChanged) {
-                onPageSizeChanged(typeof value === 'string' ? parseInt(value) : value);
+                onPageSizeChanged(typeof value === 'string' ? Number.parseInt(value, 10) : value);
                 return;
             }
 
-            setPageSize(typeof value === 'string' ? parseInt(value) : value);
+            setPageSize(typeof value === 'string' ? Number.parseInt(value, 10) : value);
             setPage(1);
         },
         [onPageSizeChanged],

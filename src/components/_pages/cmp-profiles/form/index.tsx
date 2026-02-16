@@ -619,7 +619,7 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
 
                                 <Widget title="CMP Variant Configuration">
                                     <div>
-                                        <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                                        <label id="variant-label" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
                                             Variant <span className="text-red-500">*</span>
                                         </label>
                                         <Controller
@@ -628,7 +628,7 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
                                             rules={buildValidationRules([validateRequired()])}
                                             render={({ field, fieldState }) => (
                                                 <>
-                                                    <div className="flex flex-wrap gap-4">
+                                                    <div className="flex flex-wrap gap-4" role="radiogroup" aria-labelledby="variant-label">
                                                         {cmpProfileVariantOptions.map((option, index) => (
                                                             <label key={index} className="flex items-center cursor-pointer">
                                                                 <input

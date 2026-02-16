@@ -90,8 +90,8 @@ const CertificateSettingsForm = ({ onCancel, onSuccess }: CertificateSettingsFor
                     certificates: {
                         validation: {
                             enabled: values.enabled,
-                            frequency: values.frequency ? parseInt(values.frequency) : undefined,
-                            expiringThreshold: values.expiringThreshold ? parseInt(values.expiringThreshold) : undefined,
+                            frequency: values.frequency ? Number.parseInt(values.frequency, 10) : undefined,
+                            expiringThreshold: values.expiringThreshold ? Number.parseInt(values.expiringThreshold, 10) : undefined,
                         },
                     },
                 }),

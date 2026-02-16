@@ -247,7 +247,7 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
                             render={({ field, fieldState }) => (
                                 <TextInput
                                     value={field.value !== undefined ? field.value.toString() : ''}
-                                    onChange={(value) => field.onChange(value ? parseInt(value, 10) : undefined)}
+                                    onChange={(value) => field.onChange(value ? Number.parseInt(value, 10) : undefined)}
                                     onBlur={field.onBlur}
                                     id={`requiredApprovals-${index}`}
                                     type="number"

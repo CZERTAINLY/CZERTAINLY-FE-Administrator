@@ -172,8 +172,10 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
                 postLogoutUrl: values.postLogoutUrl || undefined,
                 userInfoUrl: values.userInfoUrl || undefined,
                 audiences: values.audiences && values.audiences.length > 0 ? values.audiences : undefined,
-                skew: values.skew ? parseInt(values.skew) : undefined,
-                sessionMaxInactiveInterval: values.sessionMaxInactiveInterval ? parseInt(values.sessionMaxInactiveInterval) : undefined,
+                skew: values.skew ? Number.parseInt(values.skew, 10) : undefined,
+                sessionMaxInactiveInterval: values.sessionMaxInactiveInterval
+                    ? Number.parseInt(values.sessionMaxInactiveInterval, 10)
+                    : undefined,
             };
 
             Object.assign(updateModel, { clientSecret: values.clientSecret || undefined });

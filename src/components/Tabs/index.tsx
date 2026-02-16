@@ -13,7 +13,7 @@ interface Props {
 function Tabs({ tabs, selectedTab, onTabChange }: Props) {
     return (
         <SimpleBar forceVisible="x">
-            <nav className="flex gap-x-1" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
+            <div className="flex gap-x-1" role="tablist" aria-label="Tabs" aria-orientation="horizontal">
                 {tabs.map((tab, index) => (
                     <button
                         key={index}
@@ -37,7 +37,7 @@ function Tabs({ tabs, selectedTab, onTabChange }: Props) {
                         {tab.title}
                     </button>
                 ))}
-            </nav>
+            </div>
         </SimpleBar>
     );
 }

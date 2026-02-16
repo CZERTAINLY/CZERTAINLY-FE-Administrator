@@ -168,7 +168,7 @@ export default function NotificationProfileForm({
             const updateNotificationProfileRequest: NotificationProfileUpdateRequestModel = {
                 description: values.description,
                 frequency: values.frequency ? getIso8601StringFromInputString(values.frequency) : undefined,
-                repetitions: values.repetitions ? parseInt(values.repetitions) : undefined,
+                repetitions: values.repetitions ? Number.parseInt(values.repetitions, 10) : undefined,
                 internalNotification: values.internalNotification ?? false,
                 notificationInstanceUuid: values.notificationInstance,
                 ...recipients,
