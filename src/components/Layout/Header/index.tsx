@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Menu, User } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import Dropdown from 'components/Dropdown';
 import NotificationsOverview from 'components/_pages/notifications/overview';
 

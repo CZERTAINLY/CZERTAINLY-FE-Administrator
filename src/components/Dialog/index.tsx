@@ -22,6 +22,7 @@ export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
 export type ModalIcon = 'delete' | 'info' | 'warning' | 'success' | 'error' | 'users' | 'user' | 'download' | 'plug' | React.ReactNode;
 
 export interface DialogButton {
+    key?: string;
     color: ButtonColor;
     body: string | React.ReactNode;
     onClick: (formData?: any) => void;
@@ -197,7 +198,7 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
                         <div className={cn('flex justify-end items-center gap-4 py-4 mt-2 dark:border-neutral-700 modal-footer')}>
                             {buttons.map((button, index) => (
                                 <Button
-                                    key={index}
+                                    key={button.key ?? index}
                                     color={button.color}
                                     onClick={() => button.onClick()}
                                     disabled={button.disabled || false}

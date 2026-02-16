@@ -11,7 +11,7 @@ import { useNavigate, useParams } from 'react-router';
 import Button from 'components/Button';
 import Container from 'components/Container';
 import { validateAlphaNumericWithSpecialChars, validateEmail, validateLength, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { Resource } from '../../../../types/openapi';
 import { collectFormAttributes } from '../../../../utils/attributes/attributes';
@@ -77,7 +77,7 @@ function RoleForm({ roleId, onCancel, onSuccess }: RoleFormProps) {
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
+        formState: { isDirty, isSubmitting },
         reset,
     } = methods;
 
@@ -170,13 +170,7 @@ function RoleForm({ roleId, onCancel, onSuccess }: RoleFormProps) {
                                     placeholder="Enter name of the role"
                                     disabled={editMode || roleSelector?.systemRole}
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />
@@ -194,13 +188,7 @@ function RoleForm({ roleId, onCancel, onSuccess }: RoleFormProps) {
                                     placeholder="Enter description of the role"
                                     disabled={roleSelector?.systemRole}
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />
@@ -217,13 +205,7 @@ function RoleForm({ roleId, onCancel, onSuccess }: RoleFormProps) {
                                     label="E-mail"
                                     placeholder="Enter e-mail of the role"
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />

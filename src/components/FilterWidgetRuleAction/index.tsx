@@ -29,6 +29,27 @@ interface CurrentActionOptions {
     value: string | any;
 }
 
+function mapActionToExecutionItem(a: ExecutionItemRequestModel, availableFilters: SearchFieldListModel[]): ExecutionItemModel {
+    const fieldOfAction = availableFilters
+        .find((f) => f.filterFieldSource === a.fieldSource)
+        ?.searchFieldData?.find((s) => s.fieldIdentifier === a.fieldIdentifier);
+    const formatData = (v: any) => {
+        if (typeof v === 'object' && Object.prototype.hasOwnProperty.call(v, 'uuid')) return v.uuid;
+        if (fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldAttributeTypeIsDate(fieldOfAction)) {
+            return Object.prototype.hasOwnProperty.call(v, 'value')
+                ? getFormattedUtc(fieldOfAction.attributeContentType, v.value)
+                : getFormattedUtc(fieldOfAction.attributeContentType, v);
+        }
+        return v;
+    };
+    const data = Array.isArray(a.data)
+        ? a.data.map(formatData)
+        : fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldAttributeTypeIsDate(fieldOfAction)
+          ? [getFormattedUtc(fieldOfAction.attributeContentType, a.data as unknown as string) as Object]
+          : a.data;
+    return { fieldSource: a.fieldSource, fieldIdentifier: a.fieldIdentifier, data };
+}
+
 interface Props {
     title: string;
     entity: EntityType;
@@ -130,68 +151,14 @@ export default function FilterWidgetRuleAction({
         setFilterValue(undefined);
 
         if (selectedFilter.filterNumber === -1) {
-            let updatedActions = [];
-
-            updatedActions = [...actions, newExecution];
+            const updatedActions = [...actions, newExecution];
             setActions(updatedActions);
-            const updatedActionDataActions = updatedActions.map((a) => {
-                const fieldOfAction = availableFilters
-                    .find((f) => f.filterFieldSource === a.fieldSource)
-                    ?.searchFieldData?.find((s) => s.fieldIdentifier === a.fieldIdentifier);
-                return {
-                    fieldSource: a.fieldSource,
-                    fieldIdentifier: a.fieldIdentifier,
-                    data: Array.isArray(a.data)
-                        ? a.data.map((v) => {
-                              if (typeof v === 'object' && v.hasOwnProperty('uuid')) {
-                                  return v.uuid;
-                              }
-                              if (fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldAttributeTypeIsDate(fieldOfAction)) {
-                                  if (v.hasOwnProperty('value')) {
-                                      return getFormattedUtc(fieldOfAction.attributeContentType, v.value);
-                                  }
-
-                                  return getFormattedUtc(fieldOfAction.attributeContentType, v);
-                              }
-                              return v;
-                          })
-                        : fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldAttributeTypeIsDate(fieldOfAction)
-                          ? [getFormattedUtc(fieldOfAction.attributeContentType, a.data as unknown as string) as Object]
-                          : a.data,
-                };
-            });
-
-            onActionsUpdate && onActionsUpdate(updatedActionDataActions);
+            onActionsUpdate?.(updatedActions.map((a) => mapActionToExecutionItem(a, availableFilters)));
             setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
         } else {
             const updatedActions = actions.map((a, i) => (i === selectedFilter.filterNumber ? newExecution : a));
             setActions(updatedActions);
-            const updatedActionDataActions = updatedActions.map((a) => {
-                const fieldOfAction = availableFilters
-                    .find((f) => f.filterFieldSource === a.fieldSource)
-                    ?.searchFieldData?.find((s) => s.fieldIdentifier === a.fieldIdentifier);
-                return {
-                    fieldSource: a.fieldSource,
-                    fieldIdentifier: a.fieldIdentifier,
-                    data: Array.isArray(a.data)
-                        ? a.data.map((v) => {
-                              if (typeof v === 'object' && v.hasOwnProperty('uuid')) {
-                                  return v.uuid;
-                              }
-                              if (fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldAttributeTypeIsDate(fieldOfAction)) {
-                                  if (v.hasOwnProperty('value')) {
-                                      return getFormattedUtc(fieldOfAction.attributeContentType, v.value);
-                                  }
-                                  return getFormattedUtc(fieldOfAction.attributeContentType, v);
-                              }
-                              return v;
-                          })
-                        : fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldAttributeTypeIsDate(fieldOfAction)
-                          ? [getFormattedUtc(fieldOfAction.attributeContentType, a.data as unknown as string) as Object]
-                          : a.data,
-                };
-            });
-            onActionsUpdate && onActionsUpdate(updatedActionDataActions);
+            onActionsUpdate?.(updatedActions.map((a) => mapActionToExecutionItem(a, availableFilters)));
             setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
         }
     }, [
@@ -221,33 +188,7 @@ export default function FilterWidgetRuleAction({
             const newActions = actions.filter((_, i) => i !== index);
             setActions(newActions);
             if (onActionsUpdate) {
-                const actionsWithItemsUuids = newActions.map((a) => {
-                    const fieldOfAction = availableFilters
-                        .find((f) => f.filterFieldSource === a.fieldSource)
-                        ?.searchFieldData?.find((s) => s.fieldIdentifier === a.fieldIdentifier);
-                    return {
-                        fieldSource: a.fieldSource,
-                        fieldIdentifier: a.fieldIdentifier,
-                        data: Array.isArray(a.data)
-                            ? a.data.map((v) => {
-                                  if (typeof v === 'object' && v.hasOwnProperty('uuid')) {
-                                      return v.uuid;
-                                  }
-                                  if (
-                                      fieldOfAction?.attributeContentType &&
-                                      fieldOfAction &&
-                                      checkIfFieldAttributeTypeIsDate(fieldOfAction)
-                                  ) {
-                                      return getFormattedUtc(fieldOfAction.attributeContentType, v);
-                                  }
-                                  return v;
-                              })
-                            : fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldAttributeTypeIsDate(fieldOfAction)
-                              ? [getFormattedUtc(fieldOfAction.attributeContentType, a.data as unknown as string) as Object]
-                              : a.data,
-                    };
-                });
-                onActionsUpdate(actionsWithItemsUuids);
+                onActionsUpdate(newActions.map((a) => mapActionToExecutionItem(a, availableFilters)));
                 setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
             }
         },

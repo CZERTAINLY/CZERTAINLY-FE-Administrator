@@ -22,7 +22,7 @@ import { CredentialResponseModel } from 'types/credentials';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
 import { FunctionGroupCode, Resource } from '../../../../types/openapi';
@@ -62,7 +62,7 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
     const isUpdating = useSelector(selectors.isUpdating);
 
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
-    const [attributeValuesMap, setAttributeValuesMap] = useState<Record<string, Record<string, any>>>({});
+    const [attributeValuesMap] = useState<Record<string, Record<string, any>>>({});
 
     const [credential, setCredential] = useState<CredentialResponseModel>();
     const [credentialProvider, setCredentialProvider] = useState<ConnectorResponseModel>();
@@ -258,9 +258,7 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
-        setValue,
-        getValues,
+        formState: { isSubmitting, isValid, isDirty },
         reset,
     } = methods;
 
@@ -347,13 +345,7 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
                                     placeholder="Enter the Credential Name"
                                     disabled={editMode}
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />

@@ -43,9 +43,7 @@ test.describe('jsxInnerText', () => {
         expect(
             jsxInnerText(
                 <div>
-                    Text
-                    <span> and </span>
-                    more
+                    Text<span> and </span>more
                 </div>,
             ),
         ).toBe('Text and more');

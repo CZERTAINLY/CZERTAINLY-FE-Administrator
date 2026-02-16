@@ -26,7 +26,7 @@ import { FunctionGroupCode, Resource } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { getStrongFromCronExpression } from 'utils/dateUtil';
 import { validateAlphaNumericWithSpecialChars, validateQuartzCronExpression, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import TriggerEditorWidget from 'components/TriggerEditorWidget';
 import TextInput from 'components/TextInput';
 
@@ -183,10 +183,9 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
+        formState: { isSubmitting, isValid },
         setValue,
         getValues,
-        watch,
     } = methods;
 
     const watchedScheduled = useWatch({
@@ -254,13 +253,7 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
                                             id="jobName"
                                             placeholder="Enter Job Name"
                                             invalid={fieldState.error && fieldState.isTouched}
-                                            error={
-                                                fieldState.error && fieldState.isTouched
-                                                    ? typeof fieldState.error === 'string'
-                                                        ? fieldState.error
-                                                        : fieldState.error?.message || 'Invalid value'
-                                                    : undefined
-                                            }
+                                            error={getFieldErrorMessage(fieldState)}
                                         />
                                     )}
                                 />
@@ -336,13 +329,7 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
                                         id="name"
                                         placeholder="Enter the Discovery Name"
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />

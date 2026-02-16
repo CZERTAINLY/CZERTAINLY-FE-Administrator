@@ -13,7 +13,6 @@ import { Link, useNavigate } from 'react-router';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 
 import Dropdown from 'components/Dropdown';
-import Badge from 'components/Badge';
 
 import { ApiClients } from '../../../../api';
 import PagedList from 'components/PagedList/PagedList';
@@ -23,15 +22,14 @@ import { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
 import { AttributeRequestModel } from '../../../../types/attributes';
-import { CertificateType, PlatformEnum } from '../../../../types/openapi';
+import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CertificateGroupDialog from '../CertificateGroupDialog';
 import CertificateOwnerDialog from '../CertificateOwnerDialog';
 import CertificateRAProfileDialog from '../CertificateRAProfileDialog';
-import CertificateStatus from '../CertificateStatus';
 import CertificateUploadDialog from '../CertificateUploadDialog';
 import { ArrowDownToLine, KeyRound } from 'lucide-react';
 import Switch from 'components/Switch';
-import { Resource } from '../../../../types/openapi';
+import { buildCertificateRowColumns } from '../certificateTableHelpers';
 
 interface Props {
     selectCertsOnly?: boolean;
@@ -320,91 +318,18 @@ export default function CertificateList({
 
     const certificateList: TableDataRow[] = useMemo(
         () =>
-            certificates.map((certificate) => {
-                return {
-                    id: certificate.uuid,
-                    columns: [
-                        <CertificateStatus status={certificate.state} asIcon={true} />,
-                        <CertificateStatus status={certificate.validationStatus} asIcon={true} />,
-                        certificate.complianceStatus ? <CertificateStatus status={certificate.complianceStatus} asIcon={true} /> : '',
-
-                        certificate.privateKeyAvailability ? <KeyRound size={16} aria-hidden="true" strokeWidth={1.5} /> : '',
-                        selectCertsOnly || isLinkDisabled ? (
-                            certificate.commonName || '(empty)'
-                        ) : (
-                            <Link
-                                onClick={() =>
-                                    dispatch(
-                                        filterActions.setPreservedFilters({
-                                            entity: EntityType.CERTIFICATE,
-                                            preservedFilters: currentFilters,
-                                        }),
-                                    )
-                                }
-                                to={`./detail/${certificate.uuid}`}
-                            >
-                                {certificate.commonName || '(empty)'}
-                            </Link>
-                        ),
-                        certificate.notBefore ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(certificate.notBefore)}</span> : '',
-                        certificate.notAfter ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(certificate.notAfter)}</span> : '',
-                        certificate?.groups?.length
-                            ? certificate?.groups.map((group, i) => (
-                                  <React.Fragment key={group.uuid}>
-                                      {isLinkDisabled ? group.name : <Link to={`../../groups/detail/${group.uuid}`}>{group.name}</Link>}
-                                      {certificate?.groups?.length && i !== certificate.groups.length - 1 ? `, ` : ``}
-                                  </React.Fragment>
-                              ))
-                            : 'Unassigned',
-                        <span style={{ whiteSpace: 'nowrap' }}>
-                            {certificate.raProfile ? (
-                                isLinkDisabled ? (
-                                    (certificate.raProfile.name ?? 'Unassigned')
-                                ) : (
-                                    <Link
-                                        to={`../raprofiles/detail/${certificate?.raProfile.authorityInstanceUuid}/${certificate?.raProfile.uuid}`}
-                                    >
-                                        {certificate.raProfile.name ?? 'Unassigned'}
-                                    </Link>
-                                )
-                            ) : (
-                                (certificate.raProfile ?? 'Unassigned')
-                            )}
-                        </span>,
-                        certificate?.ownerUuid ? (
-                            isLinkDisabled ? (
-                                (certificate.owner ?? 'Unassigned')
-                            ) : (
-                                <Link to={`../users/detail/${certificate?.ownerUuid}`}>{certificate.owner ?? 'Unassigned'}</Link>
-                            )
-                        ) : (
-                            (certificate.owner ?? 'Unassigned')
-                        ),
-                        certificate.serialNumber || '',
-                        certificate.signatureAlgorithm || '',
-                        certificate.publicKeyAlgorithm || '',
-                        certificate.issuerCommonName && certificate?.issuerCertificateUuid ? (
-                            isLinkDisabled ? (
-                                certificate.issuerCommonName
-                            ) : (
-                                <Link to={`./detail/${certificate.issuerCertificateUuid}`}>{certificate.issuerCommonName}</Link>
-                            )
-                        ) : (
-                            certificate.issuerCommonName || ''
-                        ),
-                        certificate.certificateType ? (
-                            <Badge color={certificate.certificateType === CertificateType.X509 ? 'primary' : 'gray'} size="small">
-                                {getEnumLabel(certificateTypeEnum, certificate.certificateType)}
-                            </Badge>
-                        ) : (
-                            ''
-                        ),
-                        <Badge key="archivationStatus" color={certificate.archived ? 'gray' : 'success'} size="small">
-                            {certificate.archived ? 'Yes' : 'No'}
-                        </Badge>,
-                    ],
-                };
-            }),
+            certificates.map((certificate) => ({
+                id: certificate.uuid,
+                columns: buildCertificateRowColumns(certificate, {
+                    isLinkDisabled,
+                    selectCertsOnly,
+                    currentFilters,
+                    dispatch,
+                    dateFormatter,
+                    certificateTypeEnum,
+                    getEnumLabel,
+                }),
+            })),
         [certificates, selectCertsOnly, isLinkDisabled, certificateTypeEnum, dispatch, currentFilters],
     );
 

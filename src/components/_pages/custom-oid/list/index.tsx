@@ -1,5 +1,5 @@
 import { TableDataRow, TableHeader } from 'components/CustomTable';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions, selectors } from 'ducks/oids';
@@ -23,8 +23,6 @@ export default function CustomOIDList() {
     const isDeleting = useSelector(selectors.isDeleting);
     const isUpdating = useSelector(selectors.isUpdating);
     const isCreating = useSelector(selectors.isCreating);
-    const isFetching = useSelector(selectors.isFetching);
-
     const isBusy = isDeleting || isUpdating;
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -100,11 +98,6 @@ export default function CustomOIDList() {
     const handleCloseAddModal = useCallback(() => {
         setIsAddModalOpen(false);
         setEditingOidId(undefined);
-    }, []);
-
-    const handleOpenEditModal = useCallback((oidId: string) => {
-        setEditingOidId(oidId);
-        setIsAddModalOpen(true);
     }, []);
 
     const getFreshData = useCallback(() => {

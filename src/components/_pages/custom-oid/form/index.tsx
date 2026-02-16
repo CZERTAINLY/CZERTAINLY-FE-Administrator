@@ -11,7 +11,7 @@ import {
 } from 'types/openapi';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { validateLength, validateRequired, validateOid, validateOidCode } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
@@ -158,13 +158,7 @@ export default function CustomOIDForm({ oidId, onCancel, onSuccess }: CustomOIDF
                                     placeholder="Enter the OID"
                                     disabled={editMode}
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />
@@ -181,13 +175,7 @@ export default function CustomOIDForm({ oidId, onCancel, onSuccess }: CustomOIDF
                                     required
                                     placeholder="Enter the Display name"
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />
@@ -203,13 +191,7 @@ export default function CustomOIDForm({ oidId, onCancel, onSuccess }: CustomOIDF
                                     rows={3}
                                     placeholder="Enter Description / Comment"
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />
@@ -257,13 +239,7 @@ export default function CustomOIDForm({ oidId, onCancel, onSuccess }: CustomOIDF
                                             required
                                             placeholder="Enter OID code"
                                             invalid={fieldState.error && fieldState.isTouched}
-                                            error={
-                                                fieldState.error && fieldState.isTouched
-                                                    ? typeof fieldState.error === 'string'
-                                                        ? fieldState.error
-                                                        : fieldState.error?.message || 'Invalid value'
-                                                    : undefined
-                                            }
+                                            error={getFieldErrorMessage(fieldState)}
                                         />
                                     )}
                                 />

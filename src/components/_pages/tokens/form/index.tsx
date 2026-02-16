@@ -26,7 +26,7 @@ import { TokenDetailResponseDto } from 'types/tokens';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 
 interface TokenFormProps {
     tokenId?: string;
@@ -313,13 +313,7 @@ export default function TokenForm({ tokenId, onCancel, onSuccess }: TokenFormPro
                                     label="Token Name"
                                     required
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />

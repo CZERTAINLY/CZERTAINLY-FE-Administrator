@@ -5,7 +5,7 @@ import Select from 'components/Select';
 import Button from 'components/Button';
 import { useComplianceProfileResourceOptions } from 'utils/rules';
 import { composeValidators, validateLength, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import ProgressButton from 'components/ProgressButton';
 import { EntityType, actions as filterActions } from 'ducks/filters';
 import { useDispatch, useSelector } from 'react-redux';
@@ -143,13 +143,7 @@ export default function InternalRuleForm({ rule, onCancel }: Props) {
                                 onBlur={field.onBlur}
                                 required
                                 invalid={fieldState.error && fieldState.isTouched}
-                                error={
-                                    fieldState.error && fieldState.isTouched
-                                        ? typeof fieldState.error === 'string'
-                                            ? fieldState.error
-                                            : fieldState.error?.message || 'Invalid value'
-                                        : undefined
-                                }
+                                error={getFieldErrorMessage(fieldState)}
                             />
                         )}
                     />
@@ -167,13 +161,7 @@ export default function InternalRuleForm({ rule, onCancel }: Props) {
                                 onChange={(value) => field.onChange(value)}
                                 onBlur={field.onBlur}
                                 invalid={fieldState.error && fieldState.isTouched}
-                                error={
-                                    fieldState.error && fieldState.isTouched
-                                        ? typeof fieldState.error === 'string'
-                                            ? fieldState.error
-                                            : fieldState.error?.message || 'Invalid value'
-                                        : undefined
-                                }
+                                error={getFieldErrorMessage(fieldState)}
                             />
                         )}
                     />
@@ -199,13 +187,7 @@ export default function InternalRuleForm({ rule, onCancel }: Props) {
                                     'border-red-500': fieldState.error && fieldState.isTouched,
                                 })}
                                 label="Resource"
-                                error={
-                                    fieldState.error && fieldState.isTouched
-                                        ? typeof fieldState.error === 'string'
-                                            ? fieldState.error
-                                            : fieldState.error?.message || 'Invalid value'
-                                        : undefined
-                                }
+                                error={getFieldErrorMessage(fieldState)}
                             />
                         )}
                     />

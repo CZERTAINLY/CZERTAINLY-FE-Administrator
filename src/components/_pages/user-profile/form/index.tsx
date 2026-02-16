@@ -11,7 +11,7 @@ import TextInput from 'components/TextInput';
 import { actions, selectors } from 'ducks/auth';
 
 import { validateAlphaNumericWithSpecialChars, validateEmail, validateLength } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 
 interface FormValues {
     description: string;
@@ -106,13 +106,7 @@ export default function UserProfileForm({ onCancel, onSuccess }: UserProfileForm
                                         placeholder="Description"
                                         label="Description"
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -130,13 +124,7 @@ export default function UserProfileForm({ onCancel, onSuccess }: UserProfileForm
                                         placeholder="First Name"
                                         label="First Name"
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -154,13 +142,7 @@ export default function UserProfileForm({ onCancel, onSuccess }: UserProfileForm
                                         placeholder="Last name"
                                         label="Last Name"
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -178,13 +160,7 @@ export default function UserProfileForm({ onCancel, onSuccess }: UserProfileForm
                                         placeholder="Email address"
                                         label="Email"
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />

@@ -6,7 +6,7 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/authorities';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
 import Label from 'components/Label';
@@ -28,7 +28,7 @@ export default function AuthorityDetail() {
 
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
-    const isUpdating = useSelector(selectors.isUpdating);
+    const _isUpdating = useSelector(selectors.isUpdating);
 
     const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));

@@ -61,7 +61,7 @@ export default function CertificateValidationDialogBody({ raProfile, platformSet
         defaultValues,
     });
 
-    const { control, handleSubmit, formState, watch, reset } = methods;
+    const { control, handleSubmit, formState, reset } = methods;
 
     useEffect(() => {
         reset(defaultValues);

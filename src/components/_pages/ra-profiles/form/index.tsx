@@ -19,7 +19,7 @@ import { RaProfileResponseModel } from 'types/ra-profiles';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
 import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { Resource } from '../../../../types/openapi';
 import TabLayout from '../../../Layout/TabLayout';
@@ -255,13 +255,7 @@ export default function RaProfileForm({ raProfileId, authorityId: propAuthorityI
                                     placeholder="Enter RA Profile Name"
                                     disabled={editMode}
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />
@@ -278,13 +272,7 @@ export default function RaProfileForm({ raProfileId, authorityId: propAuthorityI
                                     rows={3}
                                     placeholder="Enter Description / Comment"
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />

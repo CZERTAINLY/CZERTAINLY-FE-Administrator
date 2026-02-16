@@ -3,7 +3,7 @@ import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
 
 import { actions, selectors } from 'ducks/compliance-profiles';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useRunOnFinished } from 'utils/common-hooks';
 
 import { Controller, FormProvider, useForm } from 'react-hook-form';
@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router';
 import Button from 'components/Button';
 import Container from 'components/Container';
 import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { Resource } from '../../../../types/openapi';
 import { collectFormAttributes } from '../../../../utils/attributes/attributes';
@@ -75,8 +75,7 @@ function ComplianceProfileForm({ complianceProfileId, onCancel, onSuccess }: Com
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
-        reset,
+        formState: { isSubmitting, isValid, isDirty },
     } = methods;
 
     useRunOnFinished(isCreating, onSuccess);
@@ -101,13 +100,7 @@ function ComplianceProfileForm({ complianceProfileId, onCancel, onSuccess }: Com
                                         id="name"
                                         placeholder="Compliance Profile Name"
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -126,13 +119,7 @@ function ComplianceProfileForm({ complianceProfileId, onCancel, onSuccess }: Com
                                         id="description"
                                         placeholder="Compliance Profile Description"
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />

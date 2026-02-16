@@ -34,7 +34,6 @@ const AuthenticationSettings = () => {
     const oauth2Provider = useSelector(authSettingsSelectors.oauth2Provider);
     const isFetchingProvider = useSelector(authSettingsSelectors.isFetchingProvider);
     const isCreatingProvider = useSelector(authSettingsSelectors.isCreatingProvider);
-    const isUpdatingProvider = useSelector(authSettingsSelectors.isUpdatingProvider);
 
     const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
     const [jwkSetKeysDialog, setJwkSetKeysDialog] = useState(false);

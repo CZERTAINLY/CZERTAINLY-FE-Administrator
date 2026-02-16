@@ -27,7 +27,6 @@ import { keyWithoutTokenInstanceActionNotes } from './constants';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import Button from 'components/Button';
 import { Info } from 'lucide-react';
-import Label from 'components/Label';
 interface Props {
     keyUuid: string;
     tokenInstanceUuid?: string;
@@ -294,7 +293,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                           id: 'format',
                           columns: [
                               'Key Format',
-                              <div className="flex items-center gap-2">
+                              <div key="format-actions" className="flex items-center gap-2">
                                   {keyItem.format}
                                   <Button variant="transparent" onClick={() => setDisplayKeyData(true)} title="Show Additional Information">
                                       <Info size={16} />
@@ -315,7 +314,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                       },
                       {
                           id: 'enabled',
-                          columns: ['Enabled', <StatusBadge enabled={keyItem!.enabled} />],
+                          columns: ['Enabled', <StatusBadge key="enabled" enabled={keyItem!.enabled} />],
                       },
                       {
                           id: 'state',

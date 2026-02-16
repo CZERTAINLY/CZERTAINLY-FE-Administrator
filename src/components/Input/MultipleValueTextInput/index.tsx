@@ -32,7 +32,7 @@ export default function MultipleValueTextInput({
     const [internalOptions, setInternalOptions] = useState<OptionType[]>(initialOptions);
 
     // Use external options if provided, otherwise use internal
-    const options = externalOptions !== undefined ? externalOptions : internalOptions;
+    const options = externalOptions === undefined ? internalOptions : externalOptions;
     const setOptions = externalSetOptions || setInternalOptions;
 
     // Update internal options when initialOptions change

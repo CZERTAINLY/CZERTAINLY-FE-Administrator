@@ -23,7 +23,7 @@ import {
     validateNonZeroInteger,
     validateDuration,
 } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { PlatformEnum, RecipientType } from 'types/openapi';
 import { NotificationProfileUpdateRequestModel } from 'types/notification-profiles';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -146,9 +146,7 @@ export default function NotificationProfileForm({
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
-        setValue,
-        reset,
+        formState: { isSubmitting, isValid },
     } = methods;
 
     const formValues = useWatch({ control });
@@ -168,7 +166,7 @@ export default function NotificationProfileForm({
             const updateNotificationProfileRequest: NotificationProfileUpdateRequestModel = {
                 description: values.description,
                 frequency: values.frequency ? getIso8601StringFromInputString(values.frequency) : undefined,
-                repetitions: values.repetitions ? parseInt(values.repetitions) : undefined,
+                repetitions: values.repetitions ? Number.parseInt(values.repetitions, 10) : undefined,
                 internalNotification: values.internalNotification ?? false,
                 notificationInstanceUuid: values.notificationInstance,
                 ...recipients,
@@ -232,13 +230,7 @@ export default function NotificationProfileForm({
                                             required
                                             disabled={editMode}
                                             invalid={fieldState.error && fieldState.isTouched}
-                                            error={
-                                                fieldState.error && fieldState.isTouched
-                                                    ? typeof fieldState.error === 'string'
-                                                        ? fieldState.error
-                                                        : fieldState.error?.message || 'Invalid value'
-                                                    : undefined
-                                            }
+                                            error={getFieldErrorMessage(fieldState)}
                                         />
                                     )}
                                 />
@@ -254,13 +246,7 @@ export default function NotificationProfileForm({
                                         label="Description"
                                         rows={3}
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -325,13 +311,7 @@ export default function NotificationProfileForm({
                                             label="Frequency"
                                             placeholder="ex: 5d 4h"
                                             invalid={fieldState.error && fieldState.isTouched}
-                                            error={
-                                                fieldState.error && fieldState.isTouched
-                                                    ? typeof fieldState.error === 'string'
-                                                        ? fieldState.error
-                                                        : fieldState.error?.message || 'Invalid value'
-                                                    : undefined
-                                            }
+                                            error={getFieldErrorMessage(fieldState)}
                                         />
                                         {!fieldState.error && <p className="mt-1 text-sm text-gray-500">Enter duration in format: 0d 0h</p>}
                                     </>
@@ -351,13 +331,7 @@ export default function NotificationProfileForm({
                                             type="number"
                                             label="Repetitions"
                                             invalid={fieldState.error && fieldState.isTouched}
-                                            error={
-                                                fieldState.error && fieldState.isTouched
-                                                    ? typeof fieldState.error === 'string'
-                                                        ? fieldState.error
-                                                        : fieldState.error?.message || 'Invalid value'
-                                                    : undefined
-                                            }
+                                            error={getFieldErrorMessage(fieldState)}
                                         />
                                     )}
                                 />
@@ -384,7 +358,7 @@ export default function NotificationProfileForm({
 }
 
 function RecipientTypeFields() {
-    const { control, setValue, watch } = useFormContext<FormValues>();
+    const { control, setValue } = useFormContext<FormValues>();
     const recipientTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RecipientType));
 
     const users = useSelector(userSelectors.users);

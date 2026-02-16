@@ -23,13 +23,12 @@ import { AttributeDescriptorModel } from 'types/attributes';
 import { AuthorityResponseModel } from 'types/authorities';
 import { ConnectorResponseModel } from 'types/connectors';
 import { FunctionGroupCode, PlatformEnum, Resource } from 'types/openapi';
-import { getEnumLabel } from 'ducks/enums';
-import { selectors as enumSelectors } from 'ducks/enums';
+import { getEnumLabel, selectors as enumSelectors } from 'ducks/enums';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 
 interface AuthorityFormProps {
     authorityId?: string;
@@ -378,13 +377,7 @@ export default function AuthorityForm({ authorityId, onCancel, onSuccess }: Auth
                                             label="Certification Authority Name"
                                             required
                                             invalid={fieldState.error && fieldState.isTouched}
-                                            error={
-                                                fieldState.error && fieldState.isTouched
-                                                    ? typeof fieldState.error === 'string'
-                                                        ? fieldState.error
-                                                        : fieldState.error?.message || 'Invalid value'
-                                                    : undefined
-                                            }
+                                            error={getFieldErrorMessage(fieldState)}
                                         />
                                     )}
                                 />

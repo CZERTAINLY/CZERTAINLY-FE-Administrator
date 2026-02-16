@@ -79,7 +79,7 @@ export default function CertificateForm({ onCancel }: CertificateFormProps = {})
     const [fileContent, setFileContent] = useState<string>('');
     const [certificate, setCertificate] = useState<CertificateDetailResponseModel | undefined>();
 
-    const [attributeValuesMap, setAttributeValuesMap] = useState<Record<string, Record<string, any>>>({});
+    const [attributeValuesMap] = useState<Record<string, Record<string, any>>>({});
     const attributeValuesRef = useRef<Record<string, any>>({});
 
     const methods = useForm<CertificateFormValues>({

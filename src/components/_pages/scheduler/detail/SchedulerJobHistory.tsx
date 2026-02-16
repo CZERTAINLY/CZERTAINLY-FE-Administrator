@@ -71,7 +71,7 @@ function SchedulerJobHistory({ uuid }: Props) {
                     history.startTime && history.endTime
                         ? timeFormatter(new Date(history.endTime).valueOf() - new Date(history.startTime).valueOf())
                         : '',
-                    <div className="flex items-center gap-1">
+                    <div key="status-actions" className="flex items-center gap-1">
                         <Badge
                             color={
                                 history.status === SchedulerJobExecutionStatus.Failed

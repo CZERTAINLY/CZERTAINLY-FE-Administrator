@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import { Handle, Position } from 'reactflow';
 import Button from 'components/Button';
-import CustomTable from 'components/CustomTable';
 import { EntityNodeProps } from 'types/flowchart';
 import { CertificateValidationStatus } from 'types/openapi';
 import { useCopyToClipboard } from 'utils/common-hooks';
@@ -117,7 +116,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
     const getIconComponent = () => {
         if (!data.icon) return null;
         // Normalize icon string (remove extra spaces, handle both 'fa fa-icon' and 'fa-icon' formats)
-        const normalizedIcon = data.icon.trim().replace(/\s+/g, ' ');
+        const normalizedIcon = data.icon.trim().replaceAll(/\s+/g, ' ');
 
         // Map FontAwesome icon classes to Lucide icons
         const iconMap: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
@@ -284,7 +283,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                         )}
                                     >
                                         {/* <span className="mx-auto">{status}</span> */}
-                                        {expandedHiddenNodeId !== id ? <Eye size={16} /> : <EyeOff size={16} />}
+                                        {expandedHiddenNodeId === id ? <EyeOff size={16} /> : <Eye size={16} />}
                                     </Button>
                                 ) : null}
                                 {/* 
@@ -298,7 +297,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                         title="Add connections to this node"
                                         onClick={() => setAddNodeContentCollapse(!addNodeContentCollapse)}
                                     >
-                                        {!addNodeContentCollapse ? <Plus size={16} /> : <Minus size={16} />}
+                                        {addNodeContentCollapse ? <Minus size={16} /> : <Plus size={16} />}
                                     </Button>
                                 )}
 

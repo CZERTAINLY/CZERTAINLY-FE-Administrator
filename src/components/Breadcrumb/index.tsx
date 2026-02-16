@@ -1,4 +1,3 @@
-import { Fragment } from 'react';
 import cn from 'classnames';
 import { Link } from 'react-router';
 

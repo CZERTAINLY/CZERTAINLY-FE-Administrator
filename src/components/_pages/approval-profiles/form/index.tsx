@@ -4,7 +4,7 @@ import Widget from 'components/Widget';
 
 import { actions as profileApprovalActions, selectors as profileApprovalSelectors } from 'ducks/approval-profiles';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useAreDefaultValuesSame, useRunOnFinished } from 'utils/common-hooks';
 
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,7 +13,6 @@ import Button from 'components/Button';
 import Container from 'components/Container';
 import TextInput from 'components/TextInput';
 import { ApprovalStepRequestModel, ProfileApprovalRequestModel } from 'types/approval-profiles';
-import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import {
     validateAlphaNumericWithSpecialChars,
     validateLength,
@@ -21,7 +20,7 @@ import {
     validatePositiveInteger,
     validateRequired,
 } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import ApprovalStepField from './approval-step-field';
 
 const defaultApprovalSteps: ApprovalStepRequestModel[] = [
@@ -87,19 +86,11 @@ function ApprovalProfileForm({ approvalProfileId, onCancel, onSuccess }: Approva
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid, errors },
+        formState: { isSubmitting, isValid },
         reset,
     } = methods;
 
     const formValues = useWatch({ control });
-
-    const validateApprovalSteps = useCallback((values: ProfileApprovalRequestModel) => {
-        const hasInvalidSteps = values.approvalSteps.some((step) => {
-            const { roleUuid, groupUuid, userUuid } = step;
-            return !roleUuid && !groupUuid && !userUuid;
-        });
-        return hasInvalidSteps ? 'Approval Steps are not valid' : undefined;
-    }, []);
 
     const onSubmit = useCallback(
         (values: ProfileApprovalRequestModel) => {
@@ -163,13 +154,7 @@ function ApprovalProfileForm({ approvalProfileId, onCancel, onSuccess }: Approva
                                         label="Profile Name"
                                         required
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -181,7 +166,7 @@ function ApprovalProfileForm({ approvalProfileId, onCancel, onSuccess }: Approva
                                 render={({ field, fieldState }) => (
                                     <TextInput
                                         value={field.value !== undefined ? field.value.toString() : ''}
-                                        onChange={(value) => field.onChange(value ? parseInt(value, 10) : undefined)}
+                                        onChange={(value) => field.onChange(value ? Number.parseInt(value, 10) : undefined)}
                                         onBlur={field.onBlur}
                                         id="expiry"
                                         type="number"
@@ -189,13 +174,7 @@ function ApprovalProfileForm({ approvalProfileId, onCancel, onSuccess }: Approva
                                         label="Expiry"
                                         required
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -215,13 +194,7 @@ function ApprovalProfileForm({ approvalProfileId, onCancel, onSuccess }: Approva
                                     placeholder="Approval Profile Description"
                                     label="Profile Description"
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />

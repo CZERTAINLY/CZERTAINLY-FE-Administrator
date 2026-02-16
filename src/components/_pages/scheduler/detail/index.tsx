@@ -216,21 +216,31 @@ export default function SchedulerJobDetail() {
                       },
                       {
                           id: 'oneTime',
-                          columns: ['One Time Only', <Switch checked={schedulerJob.oneTime} onChange={() => {}} id="oneTime" disabled />],
+                          columns: [
+                              'One Time Only',
+                              <Switch key="oneTime" checked={schedulerJob.oneTime} onChange={() => {}} id="oneTime" disabled />,
+                          ],
                       },
                       {
                           id: 'system',
-                          columns: ['System Job', <Switch checked={schedulerJob.system} onChange={() => {}} id="system" disabled />],
+                          columns: [
+                              'System Job',
+                              <Switch key="system" checked={schedulerJob.system} onChange={() => {}} id="system" disabled />,
+                          ],
                       },
                       {
                           id: 'enabled',
-                          columns: ['Enabled', <Switch checked={schedulerJob.enabled} onChange={() => {}} id="enabled" disabled />],
+                          columns: [
+                              'Enabled',
+                              <Switch key="enabled" checked={schedulerJob.enabled} onChange={() => {}} id="enabled" disabled />,
+                          ],
                       },
                       {
                           id: 'status',
                           columns: [
                               'Last Execution Status',
                               <Badge
+                                  key="lastExecutionStatus"
                                   color={
                                       schedulerJob.lastExecutionStatus === SchedulerJobExecutionStatus.Failed
                                           ? 'danger'

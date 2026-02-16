@@ -284,7 +284,7 @@ const EventsTable = ({ mode, resource, resourceUuid, widgetLocks }: Props) => {
         handleSubmit,
         control,
         setValue,
-        formState: { isDirty, isSubmitting, isValid },
+        formState: { isSubmitting, isValid },
         reset,
     } = methods;
 

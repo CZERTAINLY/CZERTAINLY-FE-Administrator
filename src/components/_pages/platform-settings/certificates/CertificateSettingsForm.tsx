@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { actions, selectors } from 'ducks/settings';
 import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import { validateNonZeroInteger, validatePositiveInteger } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 
 type FormValues = {
     enabled: boolean;
@@ -67,7 +67,7 @@ const CertificateSettingsForm = ({ onCancel, onSuccess }: CertificateSettingsFor
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
+        formState: { isSubmitting, isValid },
         reset,
     } = methods;
 
@@ -90,8 +90,8 @@ const CertificateSettingsForm = ({ onCancel, onSuccess }: CertificateSettingsFor
                     certificates: {
                         validation: {
                             enabled: values.enabled,
-                            frequency: values.frequency ? parseInt(values.frequency) : undefined,
-                            expiringThreshold: values.expiringThreshold ? parseInt(values.expiringThreshold) : undefined,
+                            frequency: values.frequency ? Number.parseInt(values.frequency, 10) : undefined,
+                            expiringThreshold: values.expiringThreshold ? Number.parseInt(values.expiringThreshold, 10) : undefined,
                         },
                     },
                 }),
@@ -137,13 +137,7 @@ const CertificateSettingsForm = ({ onCancel, onSuccess }: CertificateSettingsFor
                                         type="number"
                                         label="Validation Frequency"
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -161,13 +155,7 @@ const CertificateSettingsForm = ({ onCancel, onSuccess }: CertificateSettingsFor
                                         type="number"
                                         label="Expiring Threshold"
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />

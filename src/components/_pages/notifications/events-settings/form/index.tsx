@@ -90,8 +90,7 @@ export default function EventForm() {
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting },
-        setValue,
+        formState: { isSubmitting },
     } = methods;
 
     const formValues = useWatch({ control });
@@ -113,16 +112,6 @@ export default function EventForm() {
     );
 
     const areDefaultValuesSame = useAreDefaultValuesSame(defaultValues as unknown as Record<string, unknown>);
-
-    const eventLabel = useMemo(() => {
-        if (!formValues.event) return '';
-        return getEnumLabel(resourceEventEnum, formValues.event as ResourceEvent);
-    }, [formValues.event, resourceEventEnum]);
-
-    const resourceLabel = useMemo(() => {
-        if (!formValues.resource) return '';
-        return getEnumLabel(resourceEnum, formValues.resource as Resource);
-    }, [formValues.resource, resourceEnum]);
 
     return (
         <>

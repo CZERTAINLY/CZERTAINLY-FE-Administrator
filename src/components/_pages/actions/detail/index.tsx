@@ -190,7 +190,7 @@ const RuleDetails = () => {
                               ) : (
                                   actionDetails.description || ''
                               ),
-                              <div className="flex items-center gap-2">
+                              <div key="description-actions" className="flex items-center gap-2">
                                   {updateDescriptionEditEnable ? (
                                       <>
                                           <Button

@@ -5,7 +5,7 @@ import Widget from 'components/Widget';
 import { selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions as connectorActions } from 'ducks/connectors';
 import { selectors as notificationSelectors, actions as notificationsActions } from 'ducks/notifications';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRunOnFinished } from 'utils/common-hooks';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,7 +16,7 @@ import { AttributeDescriptorModel, AttributeMappingModel, isCustomAttributeModel
 import { AttributeContentType, FunctionGroupCode } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { validateAlphaNumericWithoutAccents, validateLength, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import TextInput from 'components/TextInput';
 import TextArea from 'components/TextArea';
 import Container from 'components/Container';
@@ -395,13 +395,7 @@ const NotificationInstanceForm = ({ notificationInstanceId, onCancel, onSuccess 
                                     required
                                     placeholder="Notification Instance Name"
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />
@@ -419,13 +413,7 @@ const NotificationInstanceForm = ({ notificationInstanceId, onCancel, onSuccess 
                                     data-testid="notification-description"
                                     rows={3}
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />

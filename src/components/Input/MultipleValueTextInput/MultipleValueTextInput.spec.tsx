@@ -112,6 +112,7 @@ test.describe('MultipleValueTextInput', () => {
         await input.fill('value1');
         await input.press('Enter');
         await expect(input).toHaveValue('');
+        expect(values).toContain('value1');
     });
 
     test('should support id prop', async ({ mount }) => {

@@ -41,35 +41,46 @@ export default function Login() {
 
                 <h1 className="text-xl font-bold mt-8 mb-9 text-center text-gray-800 dark:text-white">Login with</h1>
 
-                {isLoading ? (
-                    <div className="text-center py-8">
-                        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
-                        <p className="mt-4 text-gray-600 dark:text-gray-400">Loading login options...</p>
-                    </div>
-                ) : error ? (
-                    <div className="text-center py-8">
-                        <p className="text-red-600 dark:text-red-400">{error}</p>
-                    </div>
-                ) : !loginMethods || loginMethods.length === 0 ? (
-                    <div className="text-center py-8">
-                        <p className="text-gray-600 dark:text-neutral-400">No login methods available</p>
-                    </div>
-                ) : (
-                    <ul className="flex flex-wrap -mx-2.5 w-full">
-                        {(loginMethods || []).map((method) => (
-                            <li key={method.name} className="w-1/2 p-2.5">
-                                <Button
-                                    onClick={() => handleLoginClick(method.loginUrl)}
-                                    variant="outline"
-                                    color="lightGray"
-                                    className="w-full capitalize !text-base font-semibold justify-center"
-                                >
-                                    {capitalizeFirst(method.name)}
-                                </Button>
-                            </li>
-                        ))}
-                    </ul>
-                )}
+                {(() => {
+                    if (isLoading) {
+                        return (
+                            <div className="text-center py-8">
+                                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+                                <p className="mt-4 text-gray-600 dark:text-gray-400">Loading login options...</p>
+                            </div>
+                        );
+                    }
+                    if (error) {
+                        return (
+                            <div className="text-center py-8">
+                                <p className="text-red-600 dark:text-red-400">{error}</p>
+                            </div>
+                        );
+                    }
+                    if (!loginMethods || loginMethods.length === 0) {
+                        return (
+                            <div className="text-center py-8">
+                                <p className="text-gray-600 dark:text-neutral-400">No login methods available</p>
+                            </div>
+                        );
+                    }
+                    return (
+                        <ul className="flex flex-wrap -mx-2.5 w-full">
+                            {(loginMethods || []).map((method) => (
+                                <li key={method.name} className="w-1/2 p-2.5">
+                                    <Button
+                                        onClick={() => handleLoginClick(method.loginUrl)}
+                                        variant="outline"
+                                        color="lightGray"
+                                        className="w-full capitalize !text-base font-semibold justify-center"
+                                    >
+                                        {capitalizeFirst(method.name)}
+                                    </Button>
+                                </li>
+                            ))}
+                        </ul>
+                    );
+                })()}
             </main>
         </div>
     );

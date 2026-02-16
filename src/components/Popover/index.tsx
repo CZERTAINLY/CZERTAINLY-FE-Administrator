@@ -39,7 +39,19 @@ function Popover({ content, children, title, width = 300 }: Props) {
 
     return (
         <div className="hs-tooltip [--trigger:click] inline-block">
-            <div ref={toggleRef} className="hs-tooltip-toggle block text-center" tabIndex={0}>
+            <div
+                ref={toggleRef}
+                role="button"
+                tabIndex={0}
+                aria-haspopup="dialog"
+                className="hs-tooltip-toggle block text-center"
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        (e.currentTarget as HTMLElement).click();
+                    }
+                }}
+            >
                 {children}
                 <div
                     ref={contentRef}

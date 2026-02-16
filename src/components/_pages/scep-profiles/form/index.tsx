@@ -25,7 +25,7 @@ import { ScepProfileAddRequestModel, ScepProfileEditRequestModel, ScepProfileRes
 import { collectFormAttributes, mapProfileAttribute, transformAttributes } from 'utils/attributes/attributes';
 
 import { validateAlphaNumericWithoutAccents, validateInteger, validateLength, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { KeyAlgorithm, Resource } from '../../../../types/openapi';
 import CertificateField from '../CertificateField';
 import useAttributeEditor, { buildGroups, buildOwner } from 'utils/widget';
@@ -199,7 +199,7 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
+        formState: { isSubmitting, isValid },
         setValue,
         getValues,
         reset,
@@ -224,7 +224,7 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
             const scepRequest: ScepProfileEditRequestModel | ScepProfileAddRequestModel = {
                 name: values.name,
                 description: values.description,
-                renewalThreshold: parseInt(values.renewalThreshold),
+                renewalThreshold: Number.parseInt(values.renewalThreshold, 10),
                 includeCaCertificate: values.includeCaCertificate,
                 includeCaCertificateChain: values.includeCaCertificateChain,
                 challengePassword: values.challengePassword || undefined,
@@ -428,13 +428,7 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
                                     required
                                     disabled={editMode}
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />
@@ -450,13 +444,7 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
                                     type="text"
                                     label="Description"
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />
@@ -475,13 +463,7 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
                                         id="challengePassword"
                                         type="password"
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -500,13 +482,7 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
                                         type="number"
                                         label="Renewal Threshold"
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -561,13 +537,7 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
                                         type="text"
                                         disabled={!watchedEnableIntune}
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -588,13 +558,7 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
                                         type="text"
                                         disabled={!watchedEnableIntune}
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -615,13 +579,7 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
                                         type="password"
                                         disabled={!watchedEnableIntune}
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />

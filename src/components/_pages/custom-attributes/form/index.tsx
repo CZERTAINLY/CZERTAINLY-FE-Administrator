@@ -4,8 +4,8 @@ import Widget from 'components/Widget';
 
 import { actions, selectors } from 'ducks/customAttributes';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useCallback, useEffect, useMemo } from 'react';
+import { useAreDefaultValuesSame, useRunOnFinished } from 'utils/common-hooks';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
@@ -16,9 +16,8 @@ import Checkbox from 'components/Checkbox';
 import TextInput from 'components/TextInput';
 import { CustomAttributeCreateRequestModel, CustomAttributeUpdateRequestModel } from 'types/customAttributes';
 import { AttributeContentType, PlatformEnum } from 'types/openapi';
-import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 
 interface CustomAttributeFormProps {
     customAttributeId?: string;
@@ -85,7 +84,7 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
+        formState: { isSubmitting, isValid },
         setValue,
     } = methods;
 
@@ -144,13 +143,7 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
                                         required
                                         disabled={editMode}
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -167,13 +160,7 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
                                         label="Label"
                                         required
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -188,13 +175,7 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
                                         id="description"
                                         label="Description"
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />
@@ -210,13 +191,7 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
                                         type="text"
                                         label="Group"
                                         invalid={fieldState.error && fieldState.isTouched}
-                                        error={
-                                            fieldState.error && fieldState.isTouched
-                                                ? typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'
-                                                : undefined
-                                        }
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
                                 )}
                             />

@@ -29,7 +29,7 @@ import { RaProfileSimplifiedModel } from 'types/ra-profiles';
 import { collectFormAttributes, mapProfileAttribute, transformAttributes } from 'utils/attributes/attributes';
 import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import { validateAlphaNumericWithoutAccents, validateLength, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import useAttributeEditor, { buildGroups, buildOwner, buildSelectedOption } from 'utils/widget';
 import CertificateAssociationsFormWidget from 'components/CertificateAssociationsFormWidget/CertificateAssociationsFormWidget';
 import { deepEqual } from 'utils/deep-equal';
@@ -228,7 +228,7 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
+        formState: { isSubmitting, isValid },
         setValue,
         getValues,
         reset,
@@ -583,13 +583,7 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
                                             placeholder="CMP Profile Name"
                                             disabled={editMode}
                                             invalid={fieldState.error && fieldState.isTouched}
-                                            error={
-                                                fieldState.error && fieldState.isTouched
-                                                    ? typeof fieldState.error === 'string'
-                                                        ? fieldState.error
-                                                        : fieldState.error?.message || 'Invalid value'
-                                                    : undefined
-                                            }
+                                            error={getFieldErrorMessage(fieldState)}
                                         />
                                     )}
                                 />
@@ -606,20 +600,14 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
                                             rows={3}
                                             placeholder="Enter Description"
                                             invalid={fieldState.error && fieldState.isTouched}
-                                            error={
-                                                fieldState.error && fieldState.isTouched
-                                                    ? typeof fieldState.error === 'string'
-                                                        ? fieldState.error
-                                                        : fieldState.error?.message || 'Invalid value'
-                                                    : undefined
-                                            }
+                                            error={getFieldErrorMessage(fieldState)}
                                         />
                                     )}
                                 />
 
                                 <Widget title="CMP Variant Configuration">
                                     <div>
-                                        <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                                        <label id="variant-label" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
                                             Variant <span className="text-red-500">*</span>
                                         </label>
                                         <Controller
@@ -628,7 +616,7 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
                                             rules={buildValidationRules([validateRequired()])}
                                             render={({ field, fieldState }) => (
                                                 <>
-                                                    <div className="flex flex-wrap gap-4">
+                                                    <div className="flex flex-wrap gap-4" role="radiogroup" aria-labelledby="variant-label">
                                                         {cmpProfileVariantOptions.map((option, index) => (
                                                             <label key={index} className="flex items-center cursor-pointer">
                                                                 <input
@@ -704,13 +692,7 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
                                                         required
                                                         placeholder="Shared Secret"
                                                         invalid={fieldState.error && fieldState.isTouched}
-                                                        error={
-                                                            fieldState.error && fieldState.isTouched
-                                                                ? typeof fieldState.error === 'string'
-                                                                    ? fieldState.error
-                                                                    : fieldState.error?.message || 'Invalid value'
-                                                                : undefined
-                                                        }
+                                                        error={getFieldErrorMessage(fieldState)}
                                                     />
                                                 )}
                                             />

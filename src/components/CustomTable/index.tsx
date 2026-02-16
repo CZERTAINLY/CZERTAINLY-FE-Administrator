@@ -4,6 +4,8 @@ import { useDispatch } from 'react-redux';
 import { actions as userInterfaceActions } from 'ducks/user-interface';
 
 import NewRowWidget, { NewRowWidgetProps } from './NewRowWidget';
+import { TableRowCell } from './TableRowCell';
+import type { TableDataRow, TableHeader } from './types';
 import Select from 'components/Select';
 import Pagination from 'components/Pagination';
 import Checkbox from 'components/Checkbox';
@@ -11,24 +13,7 @@ import Button from 'components/Button';
 import SimpleBar from 'simplebar-react';
 import cn from 'classnames';
 
-export interface TableHeader {
-    id: string;
-    content: string | React.ReactNode;
-    align?: 'left' | 'center' | 'right';
-    sortable?: boolean;
-    sort?: 'asc' | 'desc';
-    sortType?: 'string' | 'numeric' | 'date';
-    width?: string;
-}
-
-export interface TableDataRow {
-    id: number | string;
-    columns: (string | React.ReactNode | React.ReactNode[])[];
-    detailColumns?: (string | React.ReactNode | React.ReactNode[])[];
-    options?: {
-        useAccentBottomBorder?: boolean;
-    };
-}
+export type { TableDataRow, TableHeader } from './types';
 
 interface Props {
     headers: TableHeader[];
@@ -349,12 +334,12 @@ function CustomTable({
 
     const onPageSizeChange = useCallback(
         (value: string | number) => {
+            const num = typeof value === 'string' ? Number.parseInt(value, 10) : value;
             if (onPageSizeChanged) {
-                onPageSizeChanged(typeof value === 'string' ? parseInt(value) : value);
+                onPageSizeChanged(num);
                 return;
             }
-
-            setPageSize(typeof value === 'string' ? parseInt(value) : value);
+            setPageSize(num);
             setPage(1);
         },
         [onPageSizeChanged],
@@ -472,33 +457,17 @@ function CustomTable({
                             </td>
                         )}
 
-                        {row.columns.map((column, index) => {
-                            const isFirstColumn = index === 0;
-                            const shouldShowButton = hasDetails && isFirstColumn && row.detailColumns && row.detailColumns.length > 0;
-
-                            return (
-                                <td
-                                    key={index}
-                                    style={tblHeaders && tblHeaders[index]?.align ? { textAlign: tblHeaders[index]?.align } : {}}
-                                    className="px-2.5 py-2 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200"
-                                >
-                                    {shouldShowButton ? (
-                                        <Button
-                                            variant="transparent"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleRowDetailClick(row.id);
-                                            }}
-                                            className="!p-0 hover:bg-transparent text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-0 h-auto font-medium"
-                                        >
-                                            {column}
-                                        </Button>
-                                    ) : (
-                                        <div>{column ? column : <></>}</div>
-                                    )}
-                                </td>
-                            );
-                        })}
+                        {row.columns.map((column, index) => (
+                            <TableRowCell
+                                key={index}
+                                column={column}
+                                index={index}
+                                row={row}
+                                tblHeaders={tblHeaders}
+                                hasDetails={hasDetails}
+                                onDetailClick={handleRowDetailClick}
+                            />
+                        ))}
                     </tr>
                 </Fragment>
             ));
@@ -564,7 +533,7 @@ function CustomTable({
                                     value: option.toString(),
                                 }))}
                                 value={(paginationData ? paginationData.pageSize : pageSize).toString()}
-                                onChange={onPageSizeChange}
+                                onChange={(v) => onPageSizeChange(v as string | number)}
                                 minWidth={90}
                             />
                         )}

@@ -212,7 +212,7 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
         defaultValues,
     });
 
-    const { control, handleSubmit, setValue, formState } = methods;
+    const { control, handleSubmit, formState } = methods;
 
     useEffect(() => {
         if (defaultValues.altTokenProfile) {

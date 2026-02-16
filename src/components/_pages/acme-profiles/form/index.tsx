@@ -34,7 +34,7 @@ import {
     validateLength,
     validateRequired,
 } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { Resource } from '../../../../types/openapi';
 import useAttributeEditor, { buildGroups, buildOwner } from 'utils/widget';
 import CertificateAssociationsFormWidget from 'components/CertificateAssociationsFormWidget/CertificateAssociationsFormWidget';
@@ -217,7 +217,7 @@ export default function AcmeProfileForm({ acmeProfileId, onCancel, onSuccess }: 
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
+        formState: { isSubmitting, isValid },
         setValue,
         getValues,
         reset,
@@ -232,8 +232,8 @@ export default function AcmeProfileForm({ acmeProfileId, onCancel, onSuccess }: 
                 requireTermsOfService: values.requireTermsOfService,
                 dnsResolverIp: values.dnsIpAddress,
                 dnsResolverPort: values.dnsPort,
-                retryInterval: parseInt(values.retryInterval),
-                validity: parseInt(values.orderValidity),
+                retryInterval: Number.parseInt(values.retryInterval, 10),
+                validity: Number.parseInt(values.orderValidity, 10),
                 termsOfServiceUrl: values.termsUrl,
                 websiteUrl: values.webSite,
                 termsOfServiceChangeUrl: values.termsChangeUrl,
@@ -449,13 +449,7 @@ export default function AcmeProfileForm({ acmeProfileId, onCancel, onSuccess }: 
                                     label="ACME Profile Name"
                                     required
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />
@@ -473,13 +467,7 @@ export default function AcmeProfileForm({ acmeProfileId, onCancel, onSuccess }: 
                                     placeholder="Enter Description / Comment"
                                     label="Description"
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />
@@ -500,13 +488,7 @@ export default function AcmeProfileForm({ acmeProfileId, onCancel, onSuccess }: 
                                             placeholder="Enter DNS Resolver IP address. If not provided system default will be used"
                                             label="DNS Resolver IP address"
                                             invalid={fieldState.error && fieldState.isTouched}
-                                            error={
-                                                fieldState.error && fieldState.isTouched
-                                                    ? typeof fieldState.error === 'string'
-                                                        ? fieldState.error
-                                                        : fieldState.error?.message || 'Invalid value'
-                                                    : undefined
-                                            }
+                                            error={getFieldErrorMessage(fieldState)}
                                         />
                                     )}
                                 />
@@ -525,13 +507,7 @@ export default function AcmeProfileForm({ acmeProfileId, onCancel, onSuccess }: 
                                             placeholder="Enter DNS Resolver port number"
                                             label="DNS Resolver port number"
                                             invalid={fieldState.error && fieldState.isTouched}
-                                            error={
-                                                fieldState.error && fieldState.isTouched
-                                                    ? typeof fieldState.error === 'string'
-                                                        ? fieldState.error
-                                                        : fieldState.error?.message || 'Invalid value'
-                                                    : undefined
-                                            }
+                                            error={getFieldErrorMessage(fieldState)}
                                         />
                                     )}
                                 />
@@ -549,13 +525,7 @@ export default function AcmeProfileForm({ acmeProfileId, onCancel, onSuccess }: 
                                             placeholder="Enter Retry Interval"
                                             label="Retry Interval (In seconds)"
                                             invalid={fieldState.error && fieldState.isTouched}
-                                            error={
-                                                fieldState.error && fieldState.isTouched
-                                                    ? typeof fieldState.error === 'string'
-                                                        ? fieldState.error
-                                                        : fieldState.error?.message || 'Invalid value'
-                                                    : undefined
-                                            }
+                                            error={getFieldErrorMessage(fieldState)}
                                         />
                                     )}
                                 />
@@ -573,13 +543,7 @@ export default function AcmeProfileForm({ acmeProfileId, onCancel, onSuccess }: 
                                             placeholder="Enter Order Validity"
                                             label="Order Validity (In seconds)"
                                             invalid={fieldState.error && fieldState.isTouched}
-                                            error={
-                                                fieldState.error && fieldState.isTouched
-                                                    ? typeof fieldState.error === 'string'
-                                                        ? fieldState.error
-                                                        : fieldState.error?.message || 'Invalid value'
-                                                    : undefined
-                                            }
+                                            error={getFieldErrorMessage(fieldState)}
                                         />
                                     )}
                                 />
@@ -602,13 +566,7 @@ export default function AcmeProfileForm({ acmeProfileId, onCancel, onSuccess }: 
                                             placeholder="Enter Terms of Service URL"
                                             label="Terms of Service URL"
                                             invalid={fieldState.error && fieldState.isTouched}
-                                            error={
-                                                fieldState.error && fieldState.isTouched
-                                                    ? typeof fieldState.error === 'string'
-                                                        ? fieldState.error
-                                                        : fieldState.error?.message || 'Invalid value'
-                                                    : undefined
-                                            }
+                                            error={getFieldErrorMessage(fieldState)}
                                         />
                                     )}
                                 />
@@ -626,13 +584,7 @@ export default function AcmeProfileForm({ acmeProfileId, onCancel, onSuccess }: 
                                             placeholder="Enter Website URL"
                                             label="Website URL"
                                             invalid={fieldState.error && fieldState.isTouched}
-                                            error={
-                                                fieldState.error && fieldState.isTouched
-                                                    ? typeof fieldState.error === 'string'
-                                                        ? fieldState.error
-                                                        : fieldState.error?.message || 'Invalid value'
-                                                    : undefined
-                                            }
+                                            error={getFieldErrorMessage(fieldState)}
                                         />
                                     )}
                                 />
@@ -653,13 +605,7 @@ export default function AcmeProfileForm({ acmeProfileId, onCancel, onSuccess }: 
                                                     placeholder="Enter Changes of Terms of Service URL"
                                                     label="Changes of Terms of Service URL"
                                                     invalid={fieldState.error && fieldState.isTouched}
-                                                    error={
-                                                        fieldState.error && fieldState.isTouched
-                                                            ? typeof fieldState.error === 'string'
-                                                                ? fieldState.error
-                                                                : fieldState.error?.message || 'Invalid value'
-                                                            : undefined
-                                                    }
+                                                    error={getFieldErrorMessage(fieldState)}
                                                 />
                                             )}
                                         />

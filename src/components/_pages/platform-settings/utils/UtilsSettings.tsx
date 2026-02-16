@@ -54,8 +54,8 @@ const UtilsSettings = ({ platformSettings }: Props) => {
                                               <path
                                                   d="M7.5 10L9.16667 11.6667L12.5 8.33334"
                                                   stroke="white"
-                                                  stroke-linecap="round"
-                                                  stroke-linejoin="round"
+                                                  strokeLinecap="round"
+                                                  strokeLinejoin="round"
                                               />
                                           </svg>
                                       ) : (

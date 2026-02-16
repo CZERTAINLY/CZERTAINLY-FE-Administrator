@@ -173,6 +173,7 @@ export default function ScepProfileDetail() {
                           columns: [
                               'Include CA Certificate',
                               <Switch
+                                  key="includeCaCertificate"
                                   checked={scepProfile.includeCaCertificate}
                                   onChange={() => {}}
                                   id="includeCaCertificateSwitch"
@@ -186,6 +187,7 @@ export default function ScepProfileDetail() {
                           columns: [
                               'Include CA Certificate Chain',
                               <Switch
+                                  key="includeCaCertificateChain"
                                   checked={scepProfile.includeCaCertificateChain}
                                   onChange={() => {}}
                                   id="includeCaCertificateChainSwitch"
@@ -199,6 +201,7 @@ export default function ScepProfileDetail() {
                           columns: [
                               'Intune Enabled',
                               <Switch
+                                  key="intuneEnabled"
                                   checked={!!scepProfile.enableIntune}
                                   onChange={() => {}}
                                   disabled

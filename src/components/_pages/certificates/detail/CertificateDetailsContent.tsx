@@ -1,15 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import Select from 'components/Select';
-import React from 'react';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Widget from 'components/Widget';
 import Container from 'components/Container';
 import Dialog from 'components/Dialog';
 import Switch from 'components/Switch';
 import Badge from 'components/Badge';
-import CertificateStatus from '../CertificateStatus';
 import Asn1Dialog from '../Asn1Dialog/Asn1Dialog';
 import CertificateRenewDialog from '../CertificateRenewDialog';
 import CertificateRekeyDialog from '../CertificateRekeyDialog';
@@ -27,18 +25,21 @@ import { actions as userActions, selectors as userSelectors } from 'ducks/users'
 import { actions as raProfileActions, selectors as raProfileSelectors } from 'ducks/ra-profiles';
 import { CertificateDetailResponseModel } from 'types/certificate';
 import {
-    CertificateValidationResultDto,
-    PlatformEnum,
-    CertificateSubjectType,
-    ComplianceStatus,
-    CertificateRevocationReason,
     CertificateRequestFormat,
+    CertificateRevocationReason,
+    CertificateState as CertStatus,
+    CertificateSubjectType,
+    CertificateValidationResultDto,
+    CertificateValidationStatus,
+    CertificateProtocol,
+    ComplianceStatus,
+    PlatformEnum,
 } from 'types/openapi';
-import { CertificateState as CertStatus, CertificateProtocol, CertificateValidationStatus } from 'types/openapi';
 import CertificateDownloadForm from './CertificateDownloadForm';
 import Button from 'components/Button';
 import { Trash2 } from 'lucide-react';
 import EditIcon from 'components/icons/EditIcon';
+import { buildCertificateDetailBaseRows } from '../certificateTableHelpers';
 
 interface SelectChangeValue {
     value: string;
@@ -345,181 +346,27 @@ export default function CertificateDetailsContent({ certificate, validationResul
     );
 
     const detailData: TableDataRow[] = useMemo(() => {
-        const certDetail = !certificate
-            ? []
-            : ([
-                  {
-                      id: 'commonName',
-                      columns: [<span style={{ whiteSpace: 'nowrap' }}>Common Name</span>, certificate.commonName],
-                  },
-                  {
-                      id: 'serialNumber',
-                      columns: ['Serial Number', certificate.serialNumber || ''],
-                  },
-                  {
-                      id: 'key',
-                      columns: [
-                          'Key',
-                          certificate.key ? <Link to={`../keys/detail/${certificate.key.uuid}`}>{certificate.key.name}</Link> : '',
-                      ],
-                  },
-                  certificate.hybridCertificate
-                      ? {
-                            id: 'altKey',
-                            columns: [
-                                'Alternative Key',
-                                certificate.altKey ? (
-                                    <Link to={`../keys/detail/${certificate.altKey.uuid}`}>{certificate.altKey.name}</Link>
-                                ) : (
-                                    ''
-                                ),
-                            ],
-                        }
-                      : null,
-                  {
-                      id: 'issuerCommonName',
-                      columns: [
-                          'Issuer Common Name',
-                          certificate?.issuerCommonName && certificate?.issuerCertificateUuid ? (
-                              <Link to={`../certificates/detail/${certificate.issuerCertificateUuid}`}>{certificate.issuerCommonName}</Link>
-                          ) : certificate?.issuerCommonName ? (
-                              certificate.issuerCommonName
-                          ) : (
-                              ''
-                          ),
-                      ],
-                  },
-                  {
-                      id: 'issuerDN',
-                      columns: ['Issuer DN', certificate.issuerDn || ''],
-                  },
-                  {
-                      id: 'subjectDN',
-                      columns: ['Subject DN', certificate.subjectDn],
-                  },
-                  {
-                      id: 'validFrom',
-                      columns: [
-                          'Valid From',
-                          certificate.notBefore ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(certificate.notBefore)}</span> : '',
-                      ],
-                  },
-                  {
-                      id: 'expiresAt',
-                      columns: [
-                          'Expires At',
-                          certificate.notAfter ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(certificate.notAfter)}</span> : '',
-                      ],
-                  },
-                  {
-                      id: 'publicKeyAlgorithm',
-                      columns: ['Public Key Algorithm', certificate.publicKeyAlgorithm],
-                  },
-                  certificate.hybridCertificate
-                      ? {
-                            id: 'altPublicKeyAlgorithm',
-                            columns: ['Alternative Public Key Algorithm', certificate.altPublicKeyAlgorithm],
-                        }
-                      : null,
-                  {
-                      id: 'signatureAlgorithm',
-                      columns: ['Signature Algorithm', certificate.signatureAlgorithm],
-                  },
-                  certificate.hybridCertificate
-                      ? {
-                            id: 'altSignatureAlgorithm',
-                            columns: ['Alternative Signature Algorithm', certificate.altSignatureAlgorithm],
-                        }
-                      : null,
-                  {
-                      id: 'certState',
-                      columns: ['State', <CertificateStatus status={certificate.state} />],
-                  },
-                  {
-                      id: 'validationStatus',
-                      columns: [
-                          'Validation Status',
-                          validationResult?.resultStatus ? (
-                              <CertificateStatus status={validationResult?.resultStatus} />
-                          ) : (
-                              <CertificateStatus status={CertificateValidationStatus.NotChecked} />
-                          ),
-                      ],
-                  },
-                  {
-                      id: 'complianceStatus',
-                      columns: ['Compliance Status', <CertificateStatus status={certificate.complianceStatus || ComplianceStatus.Na} />],
-                  },
-                  {
-                      id: 'fingerprint',
-                      columns: ['Fingerprint', certificate.fingerprint || ''],
-                  },
-                  {
-                      id: 'fingerprintAlgorithm',
-                      columns: ['Fingerprint Algorithm', 'SHA256'],
-                  },
-                  {
-                      id: 'keySize',
-                      columns: ['Key Size', certificate.keySize.toString()],
-                  },
-                  certificate.hybridCertificate
-                      ? {
-                            id: 'altKeySize',
-                            columns: ['Alternative Key Size', certificate.altKeySize?.toString()],
-                        }
-                      : null,
-                  {
-                      id: 'keyUsage',
-                      columns: [
-                          'Key Usage',
-                          certificate?.keyUsage?.map(function (name) {
-                              return (
-                                  <div key={name} style={{ margin: '1px' }}>
-                                      <Badge>{getEnumLabel(certificateKeyUsageEnum, name)}</Badge>
-                                      &nbsp;
-                                  </div>
-                              );
-                          }) || '',
-                      ],
-                  },
-                  {
-                      id: 'extendedKeyUsage',
-                      columns: [
-                          'Extended Key Usage',
-                          certificate.extendedKeyUsage?.map(function (name) {
-                              return (
-                                  <div key={name} style={{ margin: '1px' }}>
-                                      <Badge>{name}</Badge>
-                                      &nbsp;
-                                  </div>
-                              );
-                          }) || '',
-                      ],
-                  },
-                  {
-                      id: 'subjectType',
-                      columns: [
-                          'Subject Type',
-                          certificate.subjectType ? <CertificateStatus status={certificate.subjectType} /> : <>n/a</>,
-                      ],
-                  },
-                  {
-                      id: 'archivationStatus',
-                      columns: [
-                          'Archived',
-                          <Badge key="archivationStatus" color={isCertificateArchived ? 'secondary' : 'success'}>
-                              {isCertificateArchived ? 'Yes' : 'No'}
-                          </Badge>,
-                      ],
-                  },
-              ].filter((el) => el !== null) as NonNullable<TableDataRow>[]);
+        const certDetail = certificate
+            ? buildCertificateDetailBaseRows(
+                  certificate,
+                  validationResult,
+                  isCertificateArchived,
+                  certificateKeyUsageEnum,
+                  dateFormatter,
+                  getEnumLabel,
+              )
+            : [];
 
         if (certificate?.state !== CertStatus.Requested) {
             certDetail.push({
                 id: 'asn1structure',
                 columns: [
                     'ASN.1 Structure',
-                    certificate?.certificateContent ? <Asn1Dialog content={certificate.certificateContent} /> : <>n/a</>,
+                    certificate?.certificateContent ? (
+                        <Asn1Dialog key="asn1" content={certificate.certificateContent} />
+                    ) : (
+                        <span key="asn1-na">n/a</span>
+                    ),
                 ],
             });
         }
@@ -530,6 +377,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 columns: [
                     certificate?.subjectType == CertificateSubjectType.SelfSignedEndEntity ? 'Trusted Self-Signed' : 'Trusted CA',
                     <Switch
+                        key="trustedCa-switch"
                         id="trustedCa"
                         disabled={isUpdatingTrustedStatus}
                         checked={certificate.trustedCa ?? false}
@@ -540,14 +388,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
         }
 
         return certDetail;
-    }, [
-        certificate,
-        validationResult?.resultStatus,
-        isCertificateArchived,
-        certificateKeyUsageEnum,
-        isUpdatingTrustedStatus,
-        switchCallback,
-    ]);
+    }, [certificate, validationResult, isCertificateArchived, certificateKeyUsageEnum, isUpdatingTrustedStatus, switchCallback]);
 
     const sanData: TableDataRow[] = useMemo(() => {
         let sanList: TableDataRow[] = [];
@@ -647,9 +488,8 @@ export default function CertificateDetailsContent({ certificate, validationResul
     );
 
     const propertiesData: TableDataRow[] = useMemo(() => {
-        return !certificate
-            ? []
-            : [
+        return certificate
+            ? [
                   {
                       id: 'uuid',
                       columns: ['UUID', certificate.uuid, ''],
@@ -659,11 +499,13 @@ export default function CertificateDetailsContent({ certificate, validationResul
                       columns: [
                           'Owner',
                           certificate?.ownerUuid ? (
-                              <Link to={`../../users/detail/${certificate.ownerUuid}`}>{certificate.owner ?? 'Unassigned'}</Link>
+                              <Link key="owner-link" to={`../../users/detail/${certificate.ownerUuid}`}>
+                                  {certificate.owner ?? 'Unassigned'}
+                              </Link>
                           ) : (
                               (certificate.owner ?? 'Unassigned')
                           ),
-                          <div className="flex">
+                          <div key="owner-actions" className="flex">
                               <Button
                                   disabled={isCertificateArchived}
                                   variant="transparent"
@@ -707,7 +549,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                                     </React.Fragment>
                                 ))
                               : 'Unassigned',
-                          <div className="flex">
+                          <div key="groups-actions" className="flex">
                               <Button
                                   disabled={isCertificateArchived}
                                   variant="transparent"
@@ -743,6 +585,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                           'RA Profile',
                           certificate?.raProfile?.name ? (
                               <Link
+                                  key="raProfile-link"
                                   to={`../../raProfiles/detail/${certificate?.raProfile.authorityInstanceUuid}/${certificate?.raProfile.uuid}`}
                               >
                                   {certificate?.raProfile.name}
@@ -750,7 +593,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                           ) : (
                               'Unassigned'
                           ),
-                          <div className="flex">
+                          <div key="raProfile-actions" className="flex">
                               <Button
                                   disabled={isCertificateArchived}
                                   variant="transparent"
@@ -784,7 +627,8 @@ export default function CertificateDetailsContent({ certificate, validationResul
                       id: 'type',
                       columns: ['Type', certificate.certificateType || '', ''],
                   },
-              ];
+              ]
+            : [];
     }, [certificate, dispatch, isCertificateArchived]);
 
     return (
@@ -823,8 +667,8 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
-                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { key: 'cancel', color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { key: 'delete', color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
 
@@ -870,8 +714,8 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 toggle={() => setRevoke(false)}
                 icon="minus"
                 buttons={[
-                    { color: 'secondary', variant: 'outline', onClick: () => setRevoke(false), body: 'Cancel' },
-                    { color: 'primary', onClick: onRevoke, body: 'Revoke' },
+                    { key: 'cancel', color: 'secondary', variant: 'outline', onClick: () => setRevoke(false), body: 'Cancel' },
+                    { key: 'revoke', color: 'primary', onClick: onRevoke, body: 'Revoke' },
                 ]}
                 size="lg"
             />
@@ -895,8 +739,14 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 }
                 toggle={onCancelGroupUpdate}
                 buttons={[
-                    { color: 'primary', variant: 'outline', onClick: onCancelGroupUpdate, body: 'Cancel' },
-                    { color: 'primary', onClick: onUpdateGroup, body: 'Update', disabled: isUpdatingGroup || groups.length === 0 },
+                    { key: 'cancel', color: 'primary', variant: 'outline', onClick: onCancelGroupUpdate, body: 'Cancel' },
+                    {
+                        key: 'update',
+                        color: 'primary',
+                        onClick: onUpdateGroup,
+                        body: 'Update',
+                        disabled: isUpdatingGroup || groups.length === 0,
+                    },
                 ]}
             />
 
@@ -916,8 +766,14 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 size="md"
                 toggle={onCancelOwnerUpdate}
                 buttons={[
-                    { color: 'primary', variant: 'outline', onClick: onCancelOwnerUpdate, body: 'Cancel' },
-                    { color: 'primary', onClick: onUpdateOwner, body: 'Update', disabled: ownerUuid === undefined || isUpdatingOwner },
+                    { key: 'cancel', color: 'primary', variant: 'outline', onClick: onCancelOwnerUpdate, body: 'Cancel' },
+                    {
+                        key: 'update',
+                        color: 'primary',
+                        onClick: onUpdateOwner,
+                        body: 'Update',
+                        disabled: ownerUuid === undefined || isUpdatingOwner,
+                    },
                 ]}
             />
 
@@ -940,8 +796,9 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 size="md"
                 toggle={onCancelRaProfileUpdate}
                 buttons={[
-                    { color: 'primary', variant: 'outline', onClick: onCancelRaProfileUpdate, body: 'Cancel' },
+                    { key: 'cancel', color: 'primary', variant: 'outline', onClick: onCancelRaProfileUpdate, body: 'Cancel' },
                     {
+                        key: 'update',
                         color: 'primary',
                         onClick: onUpdateRaProfile,
                         body: 'Update',

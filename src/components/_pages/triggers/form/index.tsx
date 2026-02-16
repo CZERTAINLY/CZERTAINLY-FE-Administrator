@@ -1,10 +1,9 @@
 import Widget from 'components/Widget';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useCallback, useEffect, useMemo } from 'react';
+import { useAreDefaultValuesSame, useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router';
 
 import { actions as resourceActions, selectors as resourceSelectors } from 'ducks/resource';
 
@@ -16,9 +15,8 @@ import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
 import { PlatformEnum, Resource, ResourceEvent, TriggerType } from 'types/openapi';
-import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import TextInput from 'components/TextInput';
 
 export interface TriggerFormValues {
@@ -129,7 +127,7 @@ const TriggerForm = ({ onCancel, onSuccess }: TriggerFormProps = {}) => {
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
+        formState: { isSubmitting, isValid },
         setValue,
     } = methods;
 
@@ -208,13 +206,7 @@ const TriggerForm = ({ onCancel, onSuccess }: TriggerFormProps = {}) => {
                                     required
                                     placeholder="Enter Trigger name"
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />
@@ -230,13 +222,7 @@ const TriggerForm = ({ onCancel, onSuccess }: TriggerFormProps = {}) => {
                                     label="Description"
                                     placeholder="Enter the Description"
                                     invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
                             )}
                         />

@@ -23,7 +23,6 @@ export default function OAuth2ProviderDetail() {
 
     const oauth2Provider = useSelector(selectors.oauth2Provider);
     const isFetchingProvider = useSelector(selectors.isFetchingProvider);
-    const isCreatingProvider = useSelector(selectors.isCreatingProvider);
     const isUpdatingProvider = useSelector(selectors.isUpdatingProvider);
 
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
