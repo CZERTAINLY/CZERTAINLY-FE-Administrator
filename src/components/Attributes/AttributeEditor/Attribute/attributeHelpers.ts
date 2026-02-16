@@ -64,32 +64,34 @@ export function getFormTypeFromAttributeContentType(
     }
 }
 
+function addDataAttributeConstraintValidators(descriptor: DataAttributeModel, validators: any[]): void {
+    const regexValidator = descriptor.constraints?.find((c) => c.type === AttributeConstraintType.RegExp);
+    if (regexValidator) {
+        const pattern = new RegExp((regexValidator as RegexpAttributeConstraintModel).data ?? '');
+        validators.push(validatePattern(pattern, regexValidator.errorMessage));
+    }
+    const rangeValidator = descriptor.constraints?.find((c) => c.type === AttributeConstraintType.Range);
+    if (!rangeValidator?.data) return;
+    const rangeData = rangeValidator.data as RangeAttributeConstraintData;
+    const { from, to } = rangeData;
+    if (from && to) {
+        const pattern = new RegExp(`^(?:${from === 1 ? '[1-9]\\d{0,' + (to.toString().length - 1) + '}' : from}|${to})$`);
+        validators.push(validatePattern(pattern, rangeValidator.errorMessage));
+    }
+}
+
 export function buildAttributeValidators(descriptor: DataAttributeModel | CustomAttributeModel | undefined): any {
     const validators: any[] = [];
     if (!descriptor) return composeValidators.apply(undefined, validators);
 
-    if (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
-        if (descriptor.properties.required) validators.push(validateRequired());
-        if (descriptor.contentType === AttributeContentType.Integer) validators.push(validateInteger());
-        if (descriptor.contentType === AttributeContentType.Float) validators.push(validateFloat());
-        if (isDataAttributeModel(descriptor)) {
-            const regexValidator = descriptor.constraints?.find((c) => c.type === AttributeConstraintType.RegExp);
-            if (regexValidator) {
-                const pattern = new RegExp((regexValidator as RegexpAttributeConstraintModel).data ?? '');
-                const errorMessage = regexValidator.errorMessage;
-                validators.push(validatePattern(pattern, errorMessage));
-            }
-            const rangeValidator = descriptor.constraints?.find((c) => c.type === AttributeConstraintType.Range);
-            if (rangeValidator?.data) {
-                const rangeData = rangeValidator.data as RangeAttributeConstraintData;
-                const { from, to } = rangeData;
-                if (from && to) {
-                    const pattern = new RegExp(`^(?:${from === 1 ? '[1-9]\\d{0,' + (to.toString().length - 1) + '}' : from}|${to})$`);
-                    const errorMessage = rangeValidator.errorMessage;
-                    validators.push(validatePattern(pattern, errorMessage));
-                }
-            }
-        }
+    if (!isDataAttributeModel(descriptor) && !isCustomAttributeModel(descriptor)) {
+        return composeValidators.apply(undefined, validators);
+    }
+    if (descriptor.properties.required) validators.push(validateRequired());
+    if (descriptor.contentType === AttributeContentType.Integer) validators.push(validateInteger());
+    if (descriptor.contentType === AttributeContentType.Float) validators.push(validateFloat());
+    if (isDataAttributeModel(descriptor)) {
+        addDataAttributeConstraintValidators(descriptor, validators);
     }
     return composeValidators.apply(undefined, validators);
 }

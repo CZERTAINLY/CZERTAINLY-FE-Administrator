@@ -65,17 +65,27 @@ function NotificationsList() {
                 id: notification.uuid,
                 columns: [
                     dateFormatter(notification.sentAt),
-                    <div
-                        key={notification.uuid}
-                        className={notification.readAt ? '' : 'font-semibold'}
-                        onClick={(event) => {
-                            event.stopPropagation();
-                            if (!notification.readAt) {
-                                dispatch(actions.markAsReadNotification({ uuid: notification.uuid }));
-                            }
-                        }}
-                    >
-                        {notification.message}
+                    <div key={notification.uuid} className={notification.readAt ? '' : 'font-semibold'}>
+                        <button
+                            type="button"
+                            className="text-left w-full bg-transparent border-0 p-0 font-inherit"
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                if (!notification.readAt) {
+                                    dispatch(actions.markAsReadNotification({ uuid: notification.uuid }));
+                                }
+                            }}
+                            onKeyDown={(event) => {
+                                if (event.key === 'Enter' || event.key === ' ') {
+                                    event.stopPropagation();
+                                    if (!notification.readAt) {
+                                        dispatch(actions.markAsReadNotification({ uuid: notification.uuid }));
+                                    }
+                                }
+                            }}
+                        >
+                            {notification.message}
+                        </button>
                         {notification.targetObjectType && notification.targetObjectIdentification && (
                             <Button
                                 color="secondary"

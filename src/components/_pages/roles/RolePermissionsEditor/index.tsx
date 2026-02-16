@@ -323,14 +323,12 @@ function RolePermissionsEditor({
     const getObjectRowActions = useCallback(
         (object: ObjectPermissionsResponseModel): React.ReactNode[] =>
             currentResource?.actions.map((action) => (
-                <div
+                <button
                     key={`${object.uuid}_${action.name}`}
-                    role="group"
+                    type="button"
                     aria-label="Permission action"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                    }}
-                    className="flex justify-center"
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex justify-center bg-transparent border-0 p-0 cursor-pointer"
                 >
                     <Checkbox
                         id={`${object.uuid}_${action.name}`}
@@ -340,7 +338,7 @@ function RolePermissionsEditor({
                             setOLP(currentResource.uuid, object.uuid, object.name, action.name, checked ? 'allow' : 'deny')
                         }
                     />
-                </div>
+                </button>
             )) || [],
         [currentResource, disabled, setOLP],
     );

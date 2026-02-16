@@ -99,17 +99,14 @@ const PlatformInfoDialogLink = () => {
 
     return (
         <>
-            <a
-                href="#"
-                className="text-blue-600"
+            <button
+                type="button"
+                className="text-blue-600 bg-transparent border-0 p-0 cursor-pointer font-inherit"
                 data-testid="footer-version-info-link"
-                onClick={(e) => {
-                    e.preventDefault();
-                    setIsOpen(true);
-                }}
+                onClick={() => setIsOpen(true)}
             >
                 Version Info
-            </a>
+            </button>
             <Dialog
                 isOpen={isOpen}
                 caption="Platform versions info"

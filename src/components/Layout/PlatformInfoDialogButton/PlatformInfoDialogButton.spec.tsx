@@ -13,18 +13,17 @@ const preloadedState = {
 };
 
 test.describe('PlatformInfoDialogButton', () => {
-    test('should render Version Info link', async ({ mount, page }) => {
+    test('should render Version Info button', async ({ mount, page }) => {
         await mount(<PlatformInfoDialogButtonWithStore preloadedState={preloadedState} />);
 
-        const link = page.getByRole('link', { name: 'Version Info' });
-        await expect(link).toBeVisible({ timeout: 10000 });
-        await expect(link).toHaveAttribute('href', '#');
+        const trigger = page.getByRole('button', { name: 'Version Info' });
+        await expect(trigger).toBeVisible({ timeout: 10000 });
     });
 
-    test('should open dialog when link is clicked', async ({ mount, page }) => {
+    test('should open dialog when button is clicked', async ({ mount, page }) => {
         await mount(<PlatformInfoDialogButtonWithStore preloadedState={preloadedState} />);
 
-        await page.getByRole('link', { name: 'Version Info' }).click();
+        await page.getByRole('button', { name: 'Version Info' }).click();
 
         await expect(page.getByRole('heading', { name: 'Platform versions info' })).toBeVisible();
     });
@@ -32,7 +31,7 @@ test.describe('PlatformInfoDialogButton', () => {
     test('should show Spinner after opening dialog (getPlatformInfo clears data)', async ({ mount, page }) => {
         await mount(<PlatformInfoDialogButtonWithStore preloadedState={preloadedState} />);
 
-        await page.getByRole('link', { name: 'Version Info' }).click();
+        await page.getByRole('button', { name: 'Version Info' }).click();
 
         await expect(page.getByRole('heading', { name: 'Platform versions info' })).toBeVisible();
         await expect(page.getByRole('status', { name: 'loading' })).toBeVisible();
@@ -41,7 +40,7 @@ test.describe('PlatformInfoDialogButton', () => {
     test('should show Close button in dialog', async ({ mount, page }) => {
         await mount(<PlatformInfoDialogButtonWithStore preloadedState={preloadedState} />);
 
-        await page.getByRole('link', { name: 'Version Info' }).click();
+        await page.getByRole('button', { name: 'Version Info' }).click();
 
         await expect(page.getByRole('button', { name: 'Close' })).toBeVisible();
     });
