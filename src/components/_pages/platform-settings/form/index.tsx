@@ -5,7 +5,7 @@ import Widget from 'components/Widget';
 
 import { selectors } from 'ducks/settings';
 import { useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 interface PlatformSettingsFormProps {
     onCancel?: () => void;
@@ -13,7 +13,6 @@ interface PlatformSettingsFormProps {
 }
 
 export default function PlatformSettingsForm({ onCancel, onSuccess }: PlatformSettingsFormProps) {
-    const dispatch = useDispatch();
     const isFetchingPlatform = useSelector(selectors.isFetchingPlatform);
     const isUpdatingPlatform = useSelector(selectors.isUpdatingPlatform);
 

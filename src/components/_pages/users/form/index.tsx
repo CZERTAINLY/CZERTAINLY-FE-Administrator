@@ -344,8 +344,6 @@ function UserForm({ userId, onCancel, onSuccess }: UserFormProps) {
         handleSubmit,
         control,
         formState: { isDirty, isSubmitting, isValid },
-        setValue,
-        getValues,
         reset,
     } = methods;
 

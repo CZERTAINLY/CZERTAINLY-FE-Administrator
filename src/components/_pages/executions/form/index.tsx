@@ -73,7 +73,7 @@ const ExecutionForm = () => {
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
+        formState: { isSubmitting, isValid },
         setValue,
     } = methods;
 

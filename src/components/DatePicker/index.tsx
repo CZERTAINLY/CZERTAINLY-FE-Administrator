@@ -224,15 +224,6 @@ function DatePicker({ value, onChange, onBlur, disabled, id, invalid, error, cla
         }
     };
 
-    const generateYearOptions = () => {
-        const currentYearValue = new Date().getFullYear();
-        const years = [];
-        for (let i = currentYearValue - 10; i <= currentYearValue + 10; i++) {
-            years.push(i);
-        }
-        return years;
-    };
-
     const renderCalendarDays = () => {
         const daysInMonth = getDaysInMonth(currentMonth, currentYear);
         const firstDay = getFirstDayOfMonth(currentMonth, currentYear);
@@ -270,12 +261,6 @@ function DatePicker({ value, onChange, onBlur, disabled, id, invalid, error, cla
     const isSelectedDate = (day: number, isCurrentMonth: boolean) => {
         if (!isCurrentMonth || !selectedDate) return false;
         return selectedDate.getDate() === day && selectedDate.getMonth() === currentMonth && selectedDate.getFullYear() === currentYear;
-    };
-
-    const isToday = (day: number, isCurrentMonth: boolean) => {
-        if (!isCurrentMonth) return false;
-        const today = new Date();
-        return day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
     };
 
     const calendarRows = renderCalendarDays();

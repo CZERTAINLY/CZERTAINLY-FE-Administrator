@@ -36,13 +36,11 @@ test.describe('Dropdown', () => {
         await expect(item2).toBeAttached();
     });
 
-    test('should call onClick when item is clicked', async ({ mount }) => {
+    test('should call onClick when item 1 is clicked', async ({ mount }) => {
         let item1Clicked = false;
-        let item2Clicked = false;
-
         const items = [
             { title: 'Item 1', onClick: () => (item1Clicked = true) },
-            { title: 'Item 2', onClick: () => (item2Clicked = true) },
+            { title: 'Item 2', onClick: () => {} },
         ];
 
         const component = await mount(
@@ -58,6 +56,28 @@ test.describe('Dropdown', () => {
         const item1 = component.getByText('Item 1');
         await item1.click();
         expect(item1Clicked).toBe(true);
+    });
+
+    test('should call onClick when item 2 is clicked', async ({ mount }) => {
+        let item2Clicked = false;
+        const items = [
+            { title: 'Item 1', onClick: () => {} },
+            { title: 'Item 2', onClick: () => (item2Clicked = true) },
+        ];
+
+        const component = await mount(
+            <div>
+                <Dropdown title="Dropdown" items={items} />
+            </div>,
+        );
+
+        const button = component.getByRole('button', { name: 'Dropdown' });
+        await button.click();
+        await component.page().waitForTimeout(100);
+
+        const item2 = component.getByText('Item 2');
+        await item2.click();
+        expect(item2Clicked).toBe(true);
     });
 
     test('should be disabled when disabled prop is true', async ({ mount }) => {

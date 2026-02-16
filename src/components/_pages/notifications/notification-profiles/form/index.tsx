@@ -146,9 +146,7 @@ export default function NotificationProfileForm({
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
-        setValue,
-        reset,
+        formState: { isSubmitting, isValid },
     } = methods;
 
     const formValues = useWatch({ control });
@@ -384,7 +382,7 @@ export default function NotificationProfileForm({
 }
 
 function RecipientTypeFields() {
-    const { control, setValue, watch } = useFormContext<FormValues>();
+    const { control, setValue } = useFormContext<FormValues>();
     const recipientTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RecipientType));
 
     const users = useSelector(userSelectors.users);

@@ -75,8 +75,7 @@ function ComplianceProfileForm({ complianceProfileId, onCancel, onSuccess }: Com
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
-        reset,
+        formState: { isSubmitting, isValid },
     } = methods;
 
     useRunOnFinished(isCreating, onSuccess);

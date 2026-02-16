@@ -77,7 +77,7 @@ function RoleForm({ roleId, onCancel, onSuccess }: RoleFormProps) {
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
+        formState: { isDirty, isSubmitting },
         reset,
     } = methods;
 

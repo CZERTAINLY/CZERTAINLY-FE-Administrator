@@ -29,7 +29,7 @@ const approverTypeOptions = Object.values(ApproverType).map((type) => ({
 }));
 
 export default function ApprovalStepField({ approvalSteps }: Props) {
-    const { control, setValue, watch } = useFormContext<ProfileApprovalRequestModel>();
+    const { control, setValue } = useFormContext<ProfileApprovalRequestModel>();
     const [selectedApprovalTypeList, setselectedApprovalTypeList] = useState<SelectOptionApproverType[] | undefined>(undefined);
     const [selectedApproverList, setSelectedApproverList] = useState<SelectOptionApprover[]>([]);
     const profileApprovalDetail = useSelector(profileApprovalSelectors.profileApprovalDetail);

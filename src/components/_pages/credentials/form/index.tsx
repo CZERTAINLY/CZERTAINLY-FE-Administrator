@@ -62,7 +62,7 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
     const isUpdating = useSelector(selectors.isUpdating);
 
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
-    const [attributeValuesMap, setAttributeValuesMap] = useState<Record<string, Record<string, any>>>({});
+    const [attributeValuesMap] = useState<Record<string, Record<string, any>>>({});
 
     const [credential, setCredential] = useState<CredentialResponseModel>();
     const [credentialProvider, setCredentialProvider] = useState<ConnectorResponseModel>();
@@ -258,9 +258,7 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
-        setValue,
-        getValues,
+        formState: { isSubmitting, isValid },
         reset,
     } = methods;
 

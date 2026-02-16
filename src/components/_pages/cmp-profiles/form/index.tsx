@@ -228,7 +228,7 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
+        formState: { isSubmitting, isValid },
         setValue,
         getValues,
         reset,

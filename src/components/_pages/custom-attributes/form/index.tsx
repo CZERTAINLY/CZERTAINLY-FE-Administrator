@@ -85,7 +85,7 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
+        formState: { isSubmitting, isValid },
         setValue,
     } = methods;
 

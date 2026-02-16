@@ -183,10 +183,9 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
+        formState: { isSubmitting, isValid },
         setValue,
         getValues,
-        watch,
     } = methods;
 
     const watchedScheduled = useWatch({

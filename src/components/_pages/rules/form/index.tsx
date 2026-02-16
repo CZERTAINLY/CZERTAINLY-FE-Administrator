@@ -65,7 +65,7 @@ const RulesForm = ({ onCancel, onSuccess }: RulesFormProps = {}) => {
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
+        formState: { isSubmitting, isValid },
         setValue,
     } = methods;
 

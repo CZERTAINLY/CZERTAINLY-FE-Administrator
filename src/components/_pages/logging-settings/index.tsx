@@ -164,8 +164,7 @@ const LoggingSetting = () => {
     const {
         handleSubmit: auditHandleSubmit,
         control: auditControl,
-        watch: auditWatch,
-        formState: { isDirty: auditIsDirty, isSubmitting: auditIsSubmitting, isValid: auditIsValid },
+        formState: { isDirty: auditIsDirty, isSubmitting: auditIsSubmitting },
         reset: auditReset,
     } = auditFormMethods;
 
@@ -234,8 +233,7 @@ const LoggingSetting = () => {
     const {
         handleSubmit: eventHandleSubmit,
         control: eventControl,
-        watch: eventWatch,
-        formState: { isDirty: eventIsDirty, isSubmitting: eventIsSubmitting, isValid: eventIsValid },
+        formState: { isDirty: eventIsDirty, isSubmitting: eventIsSubmitting },
         reset: eventReset,
     } = eventFormMethods;
 

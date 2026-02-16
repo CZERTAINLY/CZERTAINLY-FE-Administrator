@@ -129,7 +129,7 @@ const TriggerForm = ({ onCancel, onSuccess }: TriggerFormProps = {}) => {
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
+        formState: { isSubmitting, isValid },
         setValue,
     } = methods;
 

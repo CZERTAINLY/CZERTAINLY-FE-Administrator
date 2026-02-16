@@ -70,7 +70,7 @@ const ConditionForm = ({ onCancel, onSuccess }: ConditionFormProps = {}) => {
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
+        formState: { isSubmitting, isValid },
         setValue,
     } = methods;
 

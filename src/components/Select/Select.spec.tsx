@@ -64,10 +64,7 @@ test.describe('Select', () => {
             { value: '2', label: 'Option 2' },
         ];
 
-        let selectedValue: string | number = '';
-        const handleChange = (value: string | number) => {
-            selectedValue = value;
-        };
+        const handleChange = (_value: string | number | object | { value: string | number | object; label: string }) => {};
 
         const component = await mount(
             <div>
@@ -108,10 +105,7 @@ test.describe('Select', () => {
             { value: '2', label: 'Option 2' },
         ];
 
-        let selectedValues: { value: string | number; label: string }[] | undefined = undefined;
-        const handleChange = (value: { value: string | number; label: string }[] | undefined) => {
-            selectedValues = value;
-        };
+        const handleChange = (_value: { value: string | number; label: string }[] | undefined) => {};
 
         const component = await mount(
             <div>

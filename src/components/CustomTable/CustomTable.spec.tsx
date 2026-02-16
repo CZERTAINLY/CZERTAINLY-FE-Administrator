@@ -96,10 +96,7 @@ test.describe('CustomTable', () => {
     });
 
     test('should call onPageChanged when page is changed', async ({ mount }) => {
-        let currentPage = 1;
-        const handlePageChange = (page: number) => {
-            currentPage = page;
-        };
+        const handlePageChange = (_page: number) => {};
 
         const paginationData = {
             page: 1,
@@ -129,10 +126,7 @@ test.describe('CustomTable', () => {
     });
 
     test('should call onPageSizeChanged when page size is changed', async ({ mount }) => {
-        let pageSize = 10;
-        const handlePageSizeChange = (size: number) => {
-            pageSize = size;
-        };
+        const handlePageSizeChange = (_size: number) => {};
 
         const paginationData = {
             page: 1,
@@ -243,7 +237,6 @@ test.describe('CustomTable', () => {
         const checkboxCount = await checkboxes.count();
         if (checkboxCount > 1) {
             await checkboxes.nth(1).click();
-            const firstChecked = checkedRows.length;
             await checkboxes.nth(2).click();
 
             expect(checkedRows.length).toBeLessThanOrEqual(1);

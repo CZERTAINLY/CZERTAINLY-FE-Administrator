@@ -87,19 +87,11 @@ function ApprovalProfileForm({ approvalProfileId, onCancel, onSuccess }: Approva
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid, errors },
+        formState: { isSubmitting, isValid },
         reset,
     } = methods;
 
     const formValues = useWatch({ control });
-
-    const validateApprovalSteps = useCallback((values: ProfileApprovalRequestModel) => {
-        const hasInvalidSteps = values.approvalSteps.some((step) => {
-            const { roleUuid, groupUuid, userUuid } = step;
-            return !roleUuid && !groupUuid && !userUuid;
-        });
-        return hasInvalidSteps ? 'Approval Steps are not valid' : undefined;
-    }, []);
 
     const onSubmit = useCallback(
         (values: ProfileApprovalRequestModel) => {
