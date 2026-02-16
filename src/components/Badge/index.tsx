@@ -34,28 +34,64 @@ function Badge({ color = 'secondary', onClick, onRemove, children, style, classN
         }
     };
 
+    const sharedClassName = cn(
+        'preline-badge inline-flex items-center justify-center gap-x-1.5 rounded-md font-medium min-w-[24px]',
+        colorClasses[color],
+        {
+            'cursor-pointer': !!onClick,
+            'text-xs py-0.5 px-1.5': size === 'small',
+            'text-xs py-1.5 px-2.5': size === 'medium',
+            'text-sm py-2 px-3': size === 'large',
+        },
+        className,
+    );
+
+    if (onClick) {
+        return (
+            <button
+                type="button"
+                onClick={onClick}
+                onKeyDown={handleKeyDown}
+                data-testid={dataTestId || 'badge'}
+                className={sharedClassName}
+                style={style}
+                title={title}
+                id={id}
+            >
+                {children}
+                {onRemove && (
+                    <button
+                        type="button"
+                        className="shrink-0 size-4 inline-flex items-center justify-center rounded-full hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-500 dark:hover:bg-gray-900"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onRemove();
+                        }}
+                    >
+                        <span className="sr-only">Remove badge</span>
+                        <svg
+                            className="shrink-0 size-3"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        >
+                            <path d="M18 6 6 18"></path>
+                            <path d="m6 6 12 12"></path>
+                        </svg>
+                    </button>
+                )}
+            </button>
+        );
+    }
+
     return (
-        <span
-            onClick={onClick}
-            onKeyDown={handleKeyDown}
-            role={onClick ? 'button' : undefined}
-            tabIndex={onClick ? 0 : undefined}
-            data-testid={dataTestId || 'badge'}
-            className={cn(
-                'preline-badge inline-flex items-center justify-center gap-x-1.5 rounded-md font-medium min-w-[24px]',
-                colorClasses[color],
-                {
-                    'cursor-pointer': !!onClick,
-                    'text-xs py-0.5 px-1.5': size === 'small',
-                    'text-xs py-1.5 px-2.5': size === 'medium',
-                    'text-sm py-2 px-3': size === 'large',
-                },
-                className,
-            )}
-            style={style}
-            title={title}
-            id={id}
-        >
+        <span data-testid={dataTestId || 'badge'} className={sharedClassName} style={style} title={title} id={id}>
             {children}
             {onRemove && (
                 <button
