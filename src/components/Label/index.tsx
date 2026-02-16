@@ -1,5 +1,4 @@
 import cn from 'classnames';
-import { useEffect, useRef } from 'react';
 
 export type SingleValue<T> = T | undefined;
 export type MultiValue<T> = T[] | undefined;

@@ -4,7 +4,6 @@ import {
     CertificateState,
     CertificateSubjectType,
     CertificateValidationStatus,
-    ComplianceRuleStatus,
     ComplianceStatus,
 } from 'types/openapi';
 import { formatPEM, getCertificateStatusColor } from './certificate';

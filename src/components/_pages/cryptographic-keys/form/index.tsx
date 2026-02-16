@@ -31,7 +31,6 @@ import { actions as customAttributesActions, selectors as customAttributesSelect
 import { KeyRequestType, PlatformEnum, Resource } from '../../../../types/openapi';
 import Container from 'components/Container';
 import Button from 'components/Button';
-import Breadcrumb from 'components/Breadcrumb';
 
 interface CryptographicKeyFormProps {
     usesGlobalModal?: boolean;

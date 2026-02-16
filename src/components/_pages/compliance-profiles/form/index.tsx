@@ -3,7 +3,7 @@ import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
 
 import { actions, selectors } from 'ducks/compliance-profiles';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useRunOnFinished } from 'utils/common-hooks';
 
 import { Controller, FormProvider, useForm } from 'react-hook-form';

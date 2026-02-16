@@ -1,4 +1,3 @@
-import cn from 'classnames';
 import { useCallback, useMemo } from 'react';
 import { TriggerHistoryObjectSummaryModel, TriggerHistoryObjectTriggerSummaryModel } from 'types/rules';
 interface TriggerHistorySummaryProps {
@@ -93,11 +92,23 @@ const TriggerHistorySummaryViewer = ({ triggerHistoryObjectSummary }: TriggerHis
 
     const getIcon = useMemo(() => {
         if (!triggerHistoryObjectSummary.matched) {
-            return <X size={16} title="Not Matched" />;
+            return (
+                <span title="Not Matched">
+                    <X size={16} aria-hidden />
+                </span>
+            );
         } else if (triggerHistoryObjectSummary.matched && !triggerHistoryObjectSummary.ignored) {
-            return <Check size={16} title="Matched" />;
+            return (
+                <span title="Matched">
+                    <Check size={16} aria-hidden />
+                </span>
+            );
         } else {
-            return <Ban size={16} title="Ignored" />;
+            return (
+                <span title="Ignored">
+                    <Ban size={16} aria-hidden />
+                </span>
+            );
         }
     }, [triggerHistoryObjectSummary.matched, triggerHistoryObjectSummary.ignored]);
     return (

@@ -5,7 +5,6 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import RoleForm from '../RoleForm';
 import RoleUsersForm from '../RoleUsersForm';
-import RolePermissionsForm from '../RolePermissionsForm';
 
 import { actions, selectors } from 'ducks/roles';
 import { useCallback, useEffect, useMemo, useState } from 'react';

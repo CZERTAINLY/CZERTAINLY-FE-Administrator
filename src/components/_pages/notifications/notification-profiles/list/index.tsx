@@ -5,7 +5,7 @@ import Dialog from 'components/Dialog';
 import NotificationProfileForm from '../form';
 import { getEnumLabel, selectors as enumSelectors } from 'ducks/enums';
 import { actions, selectors } from 'ducks/notification-profiles';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useRunOnFinished } from 'utils/common-hooks';
 
 import { useDispatch, useSelector } from 'react-redux';

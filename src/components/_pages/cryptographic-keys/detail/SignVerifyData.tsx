@@ -7,7 +7,6 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
 import Button from 'components/Button';
-import Label from 'components/Label';
 import { KeyAlgorithm } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import FileUpload from '../../../Input/FileUpload/FileUpload';

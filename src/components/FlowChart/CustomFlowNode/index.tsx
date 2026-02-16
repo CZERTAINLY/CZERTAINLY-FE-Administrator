@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import { Handle, Position } from 'reactflow';
 import Button from 'components/Button';
-import CustomTable from 'components/CustomTable';
 import { EntityNodeProps } from 'types/flowchart';
 import { CertificateValidationStatus } from 'types/openapi';
 import { useCopyToClipboard } from 'utils/common-hooks';

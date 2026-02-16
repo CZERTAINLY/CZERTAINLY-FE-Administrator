@@ -27,7 +27,6 @@ import { keyWithoutTokenInstanceActionNotes } from './constants';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import Button from 'components/Button';
 import { Info } from 'lucide-react';
-import Label from 'components/Label';
 interface Props {
     keyUuid: string;
     tokenInstanceUuid?: string;

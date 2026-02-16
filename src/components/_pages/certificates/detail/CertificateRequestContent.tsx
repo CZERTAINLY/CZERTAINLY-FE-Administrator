@@ -16,7 +16,7 @@ import { PlatformEnum, Resource } from 'types/openapi';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import Asn1Dialog from '../Asn1Dialog/Asn1Dialog';
 import { AttributeResponseModel } from 'types/attributes';
-import { Download, Copy } from 'lucide-react';
+import { Download } from 'lucide-react';
 import Dropdown from 'components/Dropdown';
 
 interface Props {

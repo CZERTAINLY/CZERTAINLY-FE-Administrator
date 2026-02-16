@@ -34,7 +34,6 @@ import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import TabLayout from '../../../Layout/TabLayout';
 import CertificateStatusBadge from '../../../_pages/certificates/CertificateStatus';
 
-import cn from 'classnames';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import Container from 'components/Container';
