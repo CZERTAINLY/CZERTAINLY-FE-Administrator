@@ -1,7 +1,6 @@
-import cn from 'classnames';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
-import FlowChart, { CustomNode } from 'components/FlowChart';
+import FlowChart from 'components/FlowChart';
 import TabLayout from 'components/Layout/TabLayout';
 import Switch from 'components/Switch';
 import Widget from 'components/Widget';
@@ -13,9 +12,7 @@ import { useTransformTriggerObjectToNodesAndEdges } from 'ducks/transform/rules'
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
-import { Edge } from 'reactflow';
 import Button from 'components/Button';
-import Container from 'components/Container';
 import TextInput from 'components/TextInput';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { DeviceType, useDeviceType } from 'utils/common-hooks';
@@ -55,13 +52,6 @@ const TriggerDetails = () => {
         [deviceType],
     );
     const { nodes, edges } = useTransformTriggerObjectToNodesAndEdges(triggerDetails, rules, actions);
-
-    // useEffect(() => {
-    //     if (!triggerDetails) return;
-    //     const { nodes, edges } = useTransformTriggerObjectToNodesAndEdges(triggerDetails);
-    //     setTriggerNodes(nodes);
-    //     setTriggerEdges(edges);
-    // }, [triggerDetails]);
 
     useEffect(() => {
         if (!triggerDetails?.description || triggerDetails.uuid !== id) return;
