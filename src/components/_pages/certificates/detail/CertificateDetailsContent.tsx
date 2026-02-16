@@ -362,7 +362,11 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 id: 'asn1structure',
                 columns: [
                     'ASN.1 Structure',
-                    certificate?.certificateContent ? <Asn1Dialog content={certificate.certificateContent} /> : <>n/a</>,
+                    certificate?.certificateContent ? (
+                        <Asn1Dialog key="asn1" content={certificate.certificateContent} />
+                    ) : (
+                        <span key="asn1-na">n/a</span>
+                    ),
                 ],
             });
         }
@@ -373,6 +377,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 columns: [
                     certificate?.subjectType == CertificateSubjectType.SelfSignedEndEntity ? 'Trusted Self-Signed' : 'Trusted CA',
                     <Switch
+                        key="trustedCa-switch"
                         id="trustedCa"
                         disabled={isUpdatingTrustedStatus}
                         checked={certificate.trustedCa ?? false}
@@ -494,11 +499,13 @@ export default function CertificateDetailsContent({ certificate, validationResul
                       columns: [
                           'Owner',
                           certificate?.ownerUuid ? (
-                              <Link to={`../../users/detail/${certificate.ownerUuid}`}>{certificate.owner ?? 'Unassigned'}</Link>
+                              <Link key="owner-link" to={`../../users/detail/${certificate.ownerUuid}`}>
+                                  {certificate.owner ?? 'Unassigned'}
+                              </Link>
                           ) : (
                               (certificate.owner ?? 'Unassigned')
                           ),
-                          <div className="flex">
+                          <div key="owner-actions" className="flex">
                               <Button
                                   disabled={isCertificateArchived}
                                   variant="transparent"
@@ -542,7 +549,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                                     </React.Fragment>
                                 ))
                               : 'Unassigned',
-                          <div className="flex">
+                          <div key="groups-actions" className="flex">
                               <Button
                                   disabled={isCertificateArchived}
                                   variant="transparent"
@@ -578,6 +585,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                           'RA Profile',
                           certificate?.raProfile?.name ? (
                               <Link
+                                  key="raProfile-link"
                                   to={`../../raProfiles/detail/${certificate?.raProfile.authorityInstanceUuid}/${certificate?.raProfile.uuid}`}
                               >
                                   {certificate?.raProfile.name}
@@ -585,7 +593,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                           ) : (
                               'Unassigned'
                           ),
-                          <div className="flex">
+                          <div key="raProfile-actions" className="flex">
                               <Button
                                   disabled={isCertificateArchived}
                                   variant="transparent"
@@ -659,8 +667,8 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
-                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { key: 'cancel', color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { key: 'delete', color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
 
@@ -706,8 +714,8 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 toggle={() => setRevoke(false)}
                 icon="minus"
                 buttons={[
-                    { color: 'secondary', variant: 'outline', onClick: () => setRevoke(false), body: 'Cancel' },
-                    { color: 'primary', onClick: onRevoke, body: 'Revoke' },
+                    { key: 'cancel', color: 'secondary', variant: 'outline', onClick: () => setRevoke(false), body: 'Cancel' },
+                    { key: 'revoke', color: 'primary', onClick: onRevoke, body: 'Revoke' },
                 ]}
                 size="lg"
             />
@@ -731,8 +739,14 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 }
                 toggle={onCancelGroupUpdate}
                 buttons={[
-                    { color: 'primary', variant: 'outline', onClick: onCancelGroupUpdate, body: 'Cancel' },
-                    { color: 'primary', onClick: onUpdateGroup, body: 'Update', disabled: isUpdatingGroup || groups.length === 0 },
+                    { key: 'cancel', color: 'primary', variant: 'outline', onClick: onCancelGroupUpdate, body: 'Cancel' },
+                    {
+                        key: 'update',
+                        color: 'primary',
+                        onClick: onUpdateGroup,
+                        body: 'Update',
+                        disabled: isUpdatingGroup || groups.length === 0,
+                    },
                 ]}
             />
 
@@ -752,8 +766,14 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 size="md"
                 toggle={onCancelOwnerUpdate}
                 buttons={[
-                    { color: 'primary', variant: 'outline', onClick: onCancelOwnerUpdate, body: 'Cancel' },
-                    { color: 'primary', onClick: onUpdateOwner, body: 'Update', disabled: ownerUuid === undefined || isUpdatingOwner },
+                    { key: 'cancel', color: 'primary', variant: 'outline', onClick: onCancelOwnerUpdate, body: 'Cancel' },
+                    {
+                        key: 'update',
+                        color: 'primary',
+                        onClick: onUpdateOwner,
+                        body: 'Update',
+                        disabled: ownerUuid === undefined || isUpdatingOwner,
+                    },
                 ]}
             />
 
@@ -776,8 +796,9 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 size="md"
                 toggle={onCancelRaProfileUpdate}
                 buttons={[
-                    { color: 'primary', variant: 'outline', onClick: onCancelRaProfileUpdate, body: 'Cancel' },
+                    { key: 'cancel', color: 'primary', variant: 'outline', onClick: onCancelRaProfileUpdate, body: 'Cancel' },
                     {
+                        key: 'update',
                         color: 'primary',
                         onClick: onUpdateRaProfile,
                         body: 'Update',

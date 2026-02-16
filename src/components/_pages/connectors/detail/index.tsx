@@ -229,7 +229,12 @@ export default function ConnectorDetail() {
             },
             {
                 id: 'status',
-                columns: ['Status', <Badge style={{ backgroundColor: connectorStatus[1] }}>{connectorStatus[0]}</Badge>],
+                columns: [
+                    'Status',
+                    <Badge key="status" style={{ backgroundColor: connectorStatus[1] }}>
+                        {connectorStatus[0]}
+                    </Badge>,
+                ],
             },
             {
                 id: 'authType',

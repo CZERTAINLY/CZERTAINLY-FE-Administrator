@@ -175,7 +175,7 @@ export default function TriggerEditorWidget({ resource, event, selectedTriggers,
                     getEnumLabel(eventNameEnum, trigger.event ?? ''),
                     getEnumLabel(resourceTypeEnum, trigger.resource ?? ''),
                     trigger.description ?? '',
-                    <div className="flex">
+                    <div key="actions" className="flex">
                         <Button variant="transparent" title="Delete Trigger" onClick={() => onDeleteTrigger(trigger)}>
                             <Trash2 size={16} />
                         </Button>

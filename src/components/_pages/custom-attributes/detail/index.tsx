@@ -5,7 +5,7 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/customAttributes';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import Badge from 'components/Badge';
@@ -169,7 +169,7 @@ export default function CustomAttributeDetail() {
                           id: 'content',
                           columns: [
                               'Content',
-                              <div className="flex items-center gap-2">
+                              <div key="content-actions" className="flex items-center gap-2">
                                   {getAttributeContent(customAttribute.contentType, customAttribute.content)}
                                   {customAttribute?.content?.length ? (
                                       <Button variant="transparent" onClick={onContentCopyClick}>
@@ -186,14 +186,14 @@ export default function CustomAttributeDetail() {
                           id: 'properties',
                           columns: [
                               'Properties',
-                              <>
+                              <Fragment key="properties-badges">
                                   <StatusBadge style={{ margin: '1px' }} enabled={customAttribute.enabled} />
                                   {getBadge(customAttribute.visible, 'Visible')}
                                   {getBadge(customAttribute.required, 'Required')}
                                   {getBadge(customAttribute.readOnly, 'Read Only')}
                                   {getBadge(customAttribute.list, 'List')}
                                   {getBadge(customAttribute.multiSelect, 'Multi Select')}
-                              </>,
+                              </Fragment>,
                           ],
                       },
                   ],

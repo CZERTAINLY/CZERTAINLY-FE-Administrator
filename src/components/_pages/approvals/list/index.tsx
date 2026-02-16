@@ -173,9 +173,13 @@ export default function ApprovalsList() {
         return data.map((approval) => ({
             id: approval.approvalUuid,
             columns: [
-                <Link to={`./detail/${approval.approvalUuid}`}>{approval.approvalUuid}</Link>,
-                <Link to={`../../../approvalprofiles/detail/${approval.approvalProfileUuid}`}>{approval.approvalProfileName}</Link>,
-                <div className="flex items-center gap-1">
+                <Link key="uuid" to={`./detail/${approval.approvalUuid}`}>
+                    {approval.approvalUuid}
+                </Link>,
+                <Link key="profile" to={`../../../approvalprofiles/detail/${approval.approvalProfileUuid}`}>
+                    {approval.approvalProfileName}
+                </Link>,
+                <div key="status-nav" className="flex items-center gap-1">
                     <StatusBadge textStatus={approval.status} />
                     <Button
                         variant="transparent"
@@ -188,7 +192,9 @@ export default function ApprovalsList() {
                     </Button>
                 </div>,
                 approval.creatorUsername ? (
-                    <Link to={`../users/detail/${approval.creatorUuid}`}>{approval.creatorUsername ?? 'Unassigned'}</Link>
+                    <Link key="creator" to={`../users/detail/${approval.creatorUuid}`}>
+                        {approval.creatorUsername ?? 'Unassigned'}
+                    </Link>
                 ) : (
                     (approval.creatorUsername ?? 'Unassigned')
                 ),

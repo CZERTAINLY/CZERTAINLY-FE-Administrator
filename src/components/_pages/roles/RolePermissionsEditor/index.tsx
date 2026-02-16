@@ -480,8 +480,11 @@ function RolePermissionsEditor({
                 )
                 .map((object) => ({
                     id: object.uuid,
-
-                    columns: [<span className="whitespace-nowrap">{object.name}</span>],
+                    columns: [
+                        <span key={object.uuid} className="whitespace-nowrap">
+                            {object.name}
+                        </span>,
+                    ],
                 })) || [],
         [currentResource, objects, permissions],
     );

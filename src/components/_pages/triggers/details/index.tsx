@@ -305,6 +305,7 @@ const TriggerDetails = () => {
                           columns: [
                               'Ignore Trigger',
                               <Switch
+                                  key="ignoreTrigger"
                                   id="ignoreTrigger"
                                   checked={triggerDetails.ignoreTrigger}
                                   onChange={(checked) => {
