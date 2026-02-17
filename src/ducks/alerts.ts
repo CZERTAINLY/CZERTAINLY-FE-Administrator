@@ -6,7 +6,7 @@ import { alertsSlice, State } from './alert-slice';
 
 const selectState = createFeatureSelector<State>(alertsSlice.name);
 
-const selectMessages = createSelector(selectState, (state) => state.messages);
+const selectMessages = createSelector(selectState, (state) => state?.messages ?? []);
 
 export const selectors = {
     selectState,
@@ -17,6 +17,7 @@ export const actions = alertsSlice.actions;
 
 setInterval(() => {
     const alerts = store.getState().alerts;
+    if (!alerts?.messages?.length) return;
     alerts.messages.forEach((message: MessageModel) => {
         if (Date.now() - message.time > 17000) {
             store.dispatch(actions.hide(message.id));

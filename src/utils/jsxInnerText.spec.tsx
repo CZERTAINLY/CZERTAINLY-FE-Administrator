@@ -48,4 +48,8 @@ test.describe('jsxInnerText', () => {
             ),
         ).toBe('Text and more');
     });
+
+    test('should return empty string for empty array', () => {
+        expect(jsxInnerText([])).toBe('');
+    });
 });

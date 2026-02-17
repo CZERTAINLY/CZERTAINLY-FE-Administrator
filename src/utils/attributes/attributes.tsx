@@ -20,6 +20,7 @@ import {
 import { base64ToUtf8, utf8ToBase64 } from 'utils/common-utils';
 import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
 import CodeBlock from '../../components/Attributes/CodeBlock';
+import { getDatetimeFormValue, getDateFormValue } from './attributeFormValues';
 
 export const attributeFieldNameTransform: { [name: string]: string } = {
     name: 'Name',
@@ -114,18 +115,6 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
 
     return content.map((content) => mapping(content) ?? checkFileNameAndMimeType(content)).join(', ');
 };
-
-function getDatetimeFormValue(item: any): { data: string } {
-    if (item?.value?.data) return { data: new Date(item.value.data).toISOString() };
-    if (typeof item === 'string') return { data: new Date(item).toISOString() };
-    return { data: new Date(item).toISOString() };
-}
-
-function getDateFormValue(item: any): { data: string } {
-    if (item?.value?.data) return { data: new Date(item.value.data).toISOString().slice(0, 10) };
-    if (typeof item === 'string') return { data: new Date(item).toISOString().slice(0, 10) };
-    return { data: new Date(item).toISOString().slice(0, 10) };
-}
 
 const getAttributeFormValue = (
     contentType: AttributeContentType,

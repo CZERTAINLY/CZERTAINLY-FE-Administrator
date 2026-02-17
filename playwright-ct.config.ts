@@ -38,6 +38,10 @@ export default defineConfig({
                 rollupOptions: {
                     output: {
                         sourcemapExcludeSources: false,
+                        manualChunks: (id) => {
+                            if (id.includes('node_modules/react-hook-form')) return 'vendor-react-hook-form';
+                            return undefined;
+                        },
                     },
                 },
                 commonjsOptions: {
