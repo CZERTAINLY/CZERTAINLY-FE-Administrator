@@ -94,7 +94,7 @@ export default function CertificateAssociationsFormWidget({
                     )}
                 />
 
-                <Widget noBorder title="Custom Attributes">
+                <Widget noBorder title="Certificate Custom Attributes">
                     {renderCustomAttributes}
                 </Widget>
             </div>
