@@ -704,11 +704,12 @@ export default function FilterWidget({
 
                             function mapArrayValue(v: any) {
                                 if (field?.platformEnum) {
-                                    return platformEnums[field.platformEnum][v]?.label;
+                                    return platformEnums[field.platformEnum][v]?.label ?? v;
                                 }
                                 if (v?.name) return v.name;
-                                if (field?.type && checkIfFieldTypeIsDate(field.type) && checkIfFieldOperatorIsInterval(f.condition))
+                                if (field?.type && checkIfFieldTypeIsDate(field.type) && checkIfFieldOperatorIsInterval(f.condition)) {
                                     return getIso8601StringFromDurationString(v as string);
+                                }
                                 if (field && field?.attributeContentType === AttributeContentType.Date) return getFormattedDate(v);
                                 if (field && field?.attributeContentType === AttributeContentType.Datetime) return getFormattedDateTime(v);
                                 return v;
