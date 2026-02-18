@@ -17,6 +17,8 @@ import {
     validateAlphaNumericWithSpecialChars,
     validateOid,
     validateOidCode,
+    validateQuartzCronExpression,
+    validatePostgresPosixRegex,
 } from './validators';
 
 test.describe('validators', () => {
@@ -115,6 +117,12 @@ test.describe('validators', () => {
         test('should reject invalid duration', () => {
             expect(validateDuration()('invalid')).toBeTruthy();
             expect(validateDuration()('1x')).toBeTruthy();
+        });
+
+        test('should respect custom denominations', () => {
+            const validator = validateDuration(['h', 'm']);
+            expect(validator('1h 30m')).toBeUndefined();
+            expect(validator('1d')).toBeTruthy();
         });
     });
 
@@ -251,6 +259,35 @@ test.describe('validators', () => {
 
         test('should reject invalid OID code', () => {
             expect(validateOidCode()('123')).toBe('Value must be a valid OID code');
+        });
+    });
+
+    test.describe('validateQuartzCronExpression', () => {
+        test('should accept empty value', () => {
+            const validator = validateQuartzCronExpression(undefined);
+            expect(validator('')).toBeUndefined();
+        });
+        test('should accept valid cron expression', () => {
+            const validator = validateQuartzCronExpression(undefined);
+            expect(validator('0 0 12 * * ?')).toBeUndefined();
+        });
+        test('should reject invalid cron', () => {
+            const validator = validateQuartzCronExpression(undefined);
+            expect(validator('not cron')).toBeTruthy();
+        });
+    });
+
+    test.describe('validatePostgresPosixRegex', () => {
+        test('returns empty string for empty value', () => {
+            expect(validatePostgresPosixRegex('')).toBe('');
+        });
+        test('returns empty string for valid simple pattern', () => {
+            expect(validatePostgresPosixRegex('^[a-z]+$')).toBe('');
+        });
+        test('returns error message for invalid pattern', () => {
+            const result = validatePostgresPosixRegex('(unclosed');
+            expect(result).toBeTruthy();
+            expect(typeof result).toBe('string');
         });
     });
 });

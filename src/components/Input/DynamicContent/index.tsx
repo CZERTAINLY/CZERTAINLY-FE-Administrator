@@ -2,11 +2,14 @@ import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import { AttributeContentType, PlatformEnum } from 'types/openapi';
-import { validateFloat, validateInteger, validateRequired } from 'utils/validators';
 import { buildValidationRules } from 'utils/validators-helper';
+import { validateRequired } from 'utils/validators';
 import ContentDescriptorField from './ContentDescriptorField';
 import Label from 'components/Label';
 import Select from 'components/Select';
+import { ContentFieldConfiguration } from './contentFieldConfiguration';
+
+export { ContentFieldConfiguration };
 
 const AllowedAttributeContentType = [
     AttributeContentType.String,
@@ -22,50 +25,6 @@ const AllowedAttributeContentType = [
 type Props = {
     editable: boolean;
     isList: boolean;
-};
-
-export const ContentFieldConfiguration: {
-    [key: string]: { validators?: ((value: any) => undefined | string)[]; type: string; initial: string | boolean | number };
-} = {
-    [AttributeContentType.Text]: {
-        validators: [],
-        type: 'textarea',
-        initial: '',
-    },
-    [AttributeContentType.String]: {
-        validators: [],
-        type: 'text',
-        initial: '',
-    },
-    [AttributeContentType.Integer]: {
-        validators: [validateInteger()],
-        type: 'number',
-        initial: '0',
-    },
-    [AttributeContentType.Float]: {
-        validators: [validateFloat()],
-        type: 'number',
-        initial: '0',
-    },
-    [AttributeContentType.Boolean]: {
-        type: 'checkbox',
-        initial: false,
-    },
-    [AttributeContentType.Datetime]: {
-        validators: [validateRequired()],
-        type: 'datetime-local',
-        initial: '',
-    },
-    [AttributeContentType.Date]: {
-        validators: [validateRequired()],
-        type: 'date',
-        initial: '',
-    },
-    [AttributeContentType.Time]: {
-        validators: [validateRequired()],
-        type: 'time',
-        initial: '',
-    },
 };
 
 export default function DynamicContent({ editable, isList }: Props) {
