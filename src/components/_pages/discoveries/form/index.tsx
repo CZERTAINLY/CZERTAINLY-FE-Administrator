@@ -183,7 +183,7 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
     const {
         handleSubmit,
         control,
-        formState: { isSubmitting, isValid },
+        formState: { isDirty, isSubmitting, isValid },
         setValue,
         getValues,
     } = methods;
