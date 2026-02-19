@@ -26,6 +26,7 @@ export default function OAuth2ProviderDetail() {
     const isUpdatingProvider = useSelector(selectors.isUpdatingProvider);
 
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     const getFreshData = useCallback(() => {
         if (!providerName) return;
@@ -59,6 +60,12 @@ export default function OAuth2ProviderDetail() {
 
     const onDeleteClick = useCallback(() => {
         if (!providerName) return;
+        setIsDeleteDialogOpen(true);
+    }, [providerName]);
+
+    const onDeleteConfirmed = useCallback(() => {
+        if (!providerName) return;
+        setIsDeleteDialogOpen(false);
         dispatch(actions.removeOAuth2Provider({ providerName }));
     }, [dispatch, providerName]);
 
@@ -169,6 +176,18 @@ export default function OAuth2ProviderDetail() {
                     caption="Edit OAuth2 Provider"
                     size="xl"
                     body={<OAuth2ProviderForm providerName={providerName} onCancel={handleCloseEditDialog} />}
+                />
+                <Dialog
+                    isOpen={isDeleteDialogOpen}
+                    toggle={() => setIsDeleteDialogOpen(false)}
+                    size="lg"
+                    caption="Delete Authentication Provider"
+                    body="You’re about to delete this authentication provider. This action can’t be undone and may affect user sign-in. Do you want to continue?"
+                    icon="delete"
+                    buttons={[
+                        { color: 'secondary', variant: 'outline', onClick: () => setIsDeleteDialogOpen(false), body: 'Cancel' },
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    ]}
                 />
             </Container>
         </div>
