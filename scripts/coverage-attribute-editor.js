@@ -7,7 +7,8 @@ const arg2 = process.argv[3];
 /** Restrict to subfolder, e.g. "Attribute" => only AttributeEditor/Attribute/ */
 const subfolder = arg1 === 'Attribute' ? 'AttributeEditor/Attribute' : null;
 /** Path filter for any folder (e.g. "DatePicker") — show coverage for files under that path */
-const pathFilter = arg1 && arg1 !== 'Attribute' && (arg1.includes('/') || arg1.includes('DatePicker') || !/\.(ts|tsx|js|jsx)$/.test(arg1)) ? arg1 : null;
+const pathFilter =
+    arg1 && arg1 !== 'Attribute' && (arg1.includes('/') || arg1.includes('DatePicker') || !/\.(ts|tsx|js|jsx)$/.test(arg1)) ? arg1 : null;
 const fileFilter = subfolder ? arg2 : pathFilter ? null : arg1; // e.g. AttributeFieldInput.tsx
 
 if (!fs.existsSync(input)) {

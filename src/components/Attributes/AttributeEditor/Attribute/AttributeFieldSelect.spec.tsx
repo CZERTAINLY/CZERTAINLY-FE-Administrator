@@ -28,9 +28,7 @@ test.describe('AttributeFieldSelect', () => {
         const descriptor = minimalDescriptor({
             properties: { ...defaultProperties, label: 'My Select Field' },
         } as any);
-        await mount(
-            <AttributeFieldSelectTestWrapper name="testSelect" descriptor={descriptor} />,
-        );
+        await mount(<AttributeFieldSelectTestWrapper name="testSelect" descriptor={descriptor} />);
 
         await expect(page.getByText('My Select Field')).toBeVisible();
         await expect(page.getByTestId('select-testSelectSelect')).toBeVisible();
@@ -40,9 +38,7 @@ test.describe('AttributeFieldSelect', () => {
         const descriptor = minimalDescriptor({
             properties: { ...defaultProperties, label: 'Choose one' },
         } as any);
-        await mount(
-            <AttributeFieldSelectTestWrapper name="testSelect" descriptor={descriptor} />,
-        );
+        await mount(<AttributeFieldSelectTestWrapper name="testSelect" descriptor={descriptor} />);
 
         const selectContainer = page.getByTestId('select-testSelectSelect');
         await expect(selectContainer).toBeVisible();
@@ -53,9 +49,7 @@ test.describe('AttributeFieldSelect', () => {
         const descriptor = minimalDescriptor({
             properties: { ...defaultProperties, visible: false, label: 'Hidden Label' },
         } as any);
-        await mount(
-            <AttributeFieldSelectTestWrapper name="testSelect" descriptor={descriptor} />,
-        );
+        await mount(<AttributeFieldSelectTestWrapper name="testSelect" descriptor={descriptor} />);
 
         await expect(page.getByText('Hidden Label')).toHaveCount(0);
         await expect(page.getByTestId('select-testSelectSelect')).toBeVisible();
@@ -65,9 +59,7 @@ test.describe('AttributeFieldSelect', () => {
         const descriptor = minimalDescriptor({
             description: 'Pick an option from the list.',
         } as any);
-        await mount(
-            <AttributeFieldSelectTestWrapper name="testSelect" descriptor={descriptor} />,
-        );
+        await mount(<AttributeFieldSelectTestWrapper name="testSelect" descriptor={descriptor} />);
 
         await expect(page.getByText('Pick an option from the list.')).toBeVisible();
     });
@@ -89,9 +81,7 @@ test.describe('AttributeFieldSelect', () => {
         const descriptor = minimalDescriptor({
             properties: { ...defaultProperties, required: true, label: 'Required Select' },
         } as any);
-        await mount(
-            <AttributeFieldSelectTestWrapper name="testSelect" descriptor={descriptor} />,
-        );
+        await mount(<AttributeFieldSelectTestWrapper name="testSelect" descriptor={descriptor} />);
 
         await expect(page.getByText('Required Select')).toBeVisible();
         await expect(page.locator('label[for="testSelectSelect"]')).toContainText('Required Select');
@@ -99,9 +89,7 @@ test.describe('AttributeFieldSelect', () => {
 
     test('Select is disabled when busy is true', async ({ mount, page }) => {
         const descriptor = minimalDescriptor();
-        await mount(
-            <AttributeFieldSelectTestWrapper name="testSelect" descriptor={descriptor} busy />,
-        );
+        await mount(<AttributeFieldSelectTestWrapper name="testSelect" descriptor={descriptor} busy />);
 
         const selectInput = page.getByTestId('select-testSelectSelect-input');
         await expect(selectInput).toHaveAttribute('disabled');
@@ -111,9 +99,7 @@ test.describe('AttributeFieldSelect', () => {
         const descriptor = minimalDescriptor({
             properties: { ...defaultProperties, readOnly: true },
         } as any);
-        await mount(
-            <AttributeFieldSelectTestWrapper name="testSelect" descriptor={descriptor} />,
-        );
+        await mount(<AttributeFieldSelectTestWrapper name="testSelect" descriptor={descriptor} />);
 
         const selectInput = page.getByTestId('select-testSelectSelect-input');
         await expect(selectInput).toHaveAttribute('disabled');
@@ -127,9 +113,7 @@ test.describe('AttributeFieldSelect', () => {
             { label: 'Active', value: 'active' },
             { label: 'Inactive', value: 'inactive' },
         ];
-        await mount(
-            <AttributeFieldSelectTestWrapper name="testSelect" descriptor={descriptor} options={options} />,
-        );
+        await mount(<AttributeFieldSelectTestWrapper name="testSelect" descriptor={descriptor} options={options} />);
 
         await expect(page.getByTestId('label-testSelectSelect')).toHaveText('Status');
         await expect(page.getByTestId('select-testSelectSelect')).toBeVisible();
@@ -142,9 +126,7 @@ test.describe('AttributeFieldSelect', () => {
         const descriptor = minimalDescriptor({
             properties: { ...defaultProperties, multiSelect: false },
         } as any);
-        await mount(
-            <AttributeFieldSelectTestWrapper name="testSelect" descriptor={descriptor} />,
-        );
+        await mount(<AttributeFieldSelectTestWrapper name="testSelect" descriptor={descriptor} />);
 
         await expect(page.getByTestId('select-testSelectSelect')).toBeVisible();
         await expect(page.getByTestId('select-testSelectSelect-input')).toBeAttached();
@@ -154,9 +136,7 @@ test.describe('AttributeFieldSelect', () => {
         const descriptor = minimalDescriptor({
             properties: { ...defaultProperties, multiSelect: true },
         } as any);
-        await mount(
-            <AttributeFieldSelectTestWrapper name="testSelect" descriptor={descriptor} />,
-        );
+        await mount(<AttributeFieldSelectTestWrapper name="testSelect" descriptor={descriptor} />);
 
         await expect(page.getByTestId('select-testSelectSelect')).toBeVisible();
         await expect(page.getByTestId('select-testSelectSelect-input')).toBeAttached();

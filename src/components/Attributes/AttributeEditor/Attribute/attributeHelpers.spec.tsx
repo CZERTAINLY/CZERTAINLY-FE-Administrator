@@ -57,7 +57,10 @@ test.describe('attributeHelpers', () => {
 
         test('multiSelect: maps array of primitives to { value, label }', () => {
             const result = getSelectValueFromField([1, 'a'], true);
-            expect(result).toEqual([{ value: 1, label: '1' }, { value: 'a', label: 'a' }]);
+            expect(result).toEqual([
+                { value: 1, label: '1' },
+                { value: 'a', label: 'a' },
+            ]);
         });
 
         test('multiSelect: maps array of objects with reference to { value, label }', () => {

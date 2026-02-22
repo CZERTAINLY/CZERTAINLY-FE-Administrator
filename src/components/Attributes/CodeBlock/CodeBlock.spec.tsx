@@ -5,11 +5,8 @@ import { createMockStore, withProviders } from 'utils/test-helpers';
 import { ProgrammingLanguageEnum } from 'types/openapi';
 import type { CodeBlockAttributeContentModel } from 'types/attributes';
 
-
 function base64Encode(s: string): string {
-    return typeof Buffer !== 'undefined'
-        ? Buffer.from(s, 'utf8').toString('base64')
-        : btoa(unescape(encodeURIComponent(s)));
+    return typeof Buffer !== 'undefined' ? Buffer.from(s, 'utf8').toString('base64') : btoa(unescape(encodeURIComponent(s)));
 }
 
 test.describe('CodeBlock getHighLightedCode', () => {

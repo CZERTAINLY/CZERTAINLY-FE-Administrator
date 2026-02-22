@@ -26,12 +26,7 @@ export function AttributeFieldInputTestWrapper({
     });
     return (
         <ReactHookForm.FormProvider {...methods}>
-            <AttributeFieldInput
-                name={name}
-                descriptor={descriptor}
-                busy={busy}
-                deleteButton={deleteButton}
-            />
+            <AttributeFieldInput name={name} descriptor={descriptor} busy={busy} deleteButton={deleteButton} />
         </ReactHookForm.FormProvider>
     );
 }

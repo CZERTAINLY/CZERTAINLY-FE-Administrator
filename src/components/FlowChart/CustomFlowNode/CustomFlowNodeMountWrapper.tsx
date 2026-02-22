@@ -17,10 +17,7 @@ type Props = {
     onStoreReady?: (store: StoreType) => void;
 };
 
-class ErrorBoundary extends React.Component<
-    { children: React.ReactNode },
-    { error: Error | null }
-> {
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { error: Error | null }> {
     state = { error: null as Error | null };
     static getDerivedStateFromError(error: Error) {
         return { error };
@@ -38,10 +35,7 @@ class ErrorBoundary extends React.Component<
  * Must live outside the spec file so CT can mount it.
  */
 export default function CustomFlowNodeMountWrapper({ nodeProps, initialStoreState, onStoreReady }: Props) {
-    const store = React.useMemo(
-        () => createMockStore((initialStoreState ?? testInitialState) as any),
-        [initialStoreState],
-    );
+    const store = React.useMemo(() => createMockStore((initialStoreState ?? testInitialState) as any), [initialStoreState]);
     React.useEffect(() => {
         onStoreReady?.(store);
     }, [store, onStoreReady]);
