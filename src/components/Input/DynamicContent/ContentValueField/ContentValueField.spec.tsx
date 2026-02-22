@@ -3,10 +3,64 @@ import ContentValueFieldTestWrapper from './ContentValueFieldTestWrapper';
 import { buildDescriptor } from './ContentValueFieldTestWrapper';
 import { AttributeContentType } from 'types/openapi';
 
+const fieldLocator = '[id="testAttr"]';
+const readOnlyTextProps = {
+    label: 'Test',
+    visible: true,
+    required: false,
+    readOnly: true,
+    list: false,
+    multiSelect: false,
+};
+const requiredTextProps = {
+    label: 'Test',
+    visible: true,
+    required: true,
+    readOnly: false,
+    list: false,
+    multiSelect: false,
+};
+
+function buildListDescriptor({
+    name,
+    contentType = AttributeContentType.String,
+    multiSelect = false,
+    content,
+}: {
+    name: string;
+    contentType?: AttributeContentType;
+    multiSelect?: boolean;
+    content: Array<{ data: string; reference?: string }>;
+}) {
+    return buildDescriptor({
+        name,
+        contentType,
+        properties: {
+            label: 'List',
+            visible: true,
+            required: false,
+            readOnly: false,
+            list: true,
+            multiSelect,
+        },
+        content,
+    });
+}
+
+async function setTimeValue(page: import('@playwright/test').Page, value: string) {
+    const input = page.locator(fieldLocator);
+    await input.evaluate((element) => {
+        const field = element as HTMLInputElement;
+        field.removeAttribute('readonly');
+        field.setAttribute('type', 'text');
+    });
+    await input.fill(value);
+}
+
 test.describe('ContentValueField', () => {
     test('renders string field and Save button', async ({ mount, page }) => {
         await mount(<ContentValueFieldTestWrapper descriptor={buildDescriptor({ contentType: AttributeContentType.String })} />);
-        await expect(page.locator(`[id="testAttr"]`)).toBeVisible();
+        await expect(page.locator(fieldLocator)).toBeVisible();
         const saveBtn = page.getByTestId('save-button');
         await expect(saveBtn).toBeDisabled();
     });
@@ -21,7 +75,7 @@ test.describe('ContentValueField', () => {
                 }}
             />,
         );
-        const input = page.locator('[id="testAttr"]');
+        const input = page.locator(fieldLocator);
         await input.focus();
         await input.fill('hello');
         await expect(page.getByTestId('save-button')).toBeEnabled();
@@ -33,7 +87,7 @@ test.describe('ContentValueField', () => {
 
     test('textarea type renders', async ({ mount, page }) => {
         await mount(<ContentValueFieldTestWrapper descriptor={buildDescriptor({ contentType: AttributeContentType.Text })} />);
-        await expect(page.locator('[id="testAttr"]')).toBeVisible();
+        await expect(page.locator(fieldLocator)).toBeVisible();
     });
 
     test('number type (Integer) renders and Save submits value', async ({ mount, page }) => {
@@ -46,7 +100,7 @@ test.describe('ContentValueField', () => {
                 }}
             />,
         );
-        const input = page.locator('[id="testAttr"]');
+        const input = page.locator(fieldLocator);
         await input.fill('42');
         await page.getByTestId('save-button').click();
         expect(submitted).toHaveLength(1);
@@ -55,7 +109,7 @@ test.describe('ContentValueField', () => {
 
     test('Float type renders number input', async ({ mount, page }) => {
         await mount(<ContentValueFieldTestWrapper descriptor={buildDescriptor({ contentType: AttributeContentType.Float })} />);
-        await expect(page.locator('[id="testAttr"]')).toBeVisible();
+        await expect(page.locator(fieldLocator)).toBeVisible();
     });
 
     test('checkbox (Boolean) renders Switch and Save submits boolean', async ({ mount, page }) => {
@@ -84,7 +138,7 @@ test.describe('ContentValueField', () => {
                 }}
             />,
         );
-        const input = page.locator('[id="testAttr"]');
+        const input = page.locator(fieldLocator);
         await input.click();
         await expect(page.locator('div.fixed').first()).toBeVisible({ timeout: 5000 });
         const day15 = page.locator('div.fixed').getByRole('button', { name: '15' }).first();
@@ -104,9 +158,8 @@ test.describe('ContentValueField', () => {
                 }}
             />,
         );
-        const input = page.locator('[id="testAttr"]');
-        await input.focus();
-        await input.fill('14:30');
+        await setTimeValue(page, '14:30');
+        await expect(page.getByTestId('save-button')).toBeEnabled();
         await page.getByTestId('save-button').click();
         expect(submitted).toHaveLength(1);
         expect((submitted[0] as { data: string }).data).toBe('14:30:00');
@@ -114,7 +167,7 @@ test.describe('ContentValueField', () => {
 
     test('datetime type renders DatePicker', async ({ mount, page }) => {
         await mount(<ContentValueFieldTestWrapper descriptor={buildDescriptor({ contentType: AttributeContentType.Datetime })} />);
-        await expect(page.locator('[id="testAttr"]')).toBeVisible();
+        await expect(page.locator(fieldLocator)).toBeVisible();
     });
 
     test('initialContent sets initial value for non-list', async ({ mount, page }) => {
@@ -124,7 +177,7 @@ test.describe('ContentValueField', () => {
                 initialContent={[{ data: 'initial' }]}
             />,
         );
-        const input = page.locator('[id="testAttr"]');
+        const input = page.locator(fieldLocator);
         await expect(input).toHaveValue('initial');
     });
 
@@ -137,22 +190,13 @@ test.describe('ContentValueField', () => {
                 })}
             />,
         );
-        const input = page.locator('[id="testAttr"]');
+        const input = page.locator(fieldLocator);
         await expect(input).toHaveValue('fromDescriptor');
     });
 
     test('list single select: descriptor with content options', async ({ mount, page }) => {
-        const descriptor = buildDescriptor({
+        const descriptor = buildListDescriptor({
             name: 'listAttr',
-            contentType: AttributeContentType.String,
-            properties: {
-                label: 'List',
-                visible: true,
-                required: false,
-                readOnly: false,
-                list: true,
-                multiSelect: false,
-            },
             content: [{ data: 'opt1' }, { data: 'opt2' }],
         });
         await mount(<ContentValueFieldTestWrapper descriptor={descriptor} />);
@@ -160,17 +204,9 @@ test.describe('ContentValueField', () => {
     });
 
     test('list multiSelect', async ({ mount, page }) => {
-        const descriptor = buildDescriptor({
+        const descriptor = buildListDescriptor({
             name: 'multiAttr',
-            contentType: AttributeContentType.String,
-            properties: {
-                label: 'Multi',
-                visible: true,
-                required: false,
-                readOnly: false,
-                list: true,
-                multiSelect: true,
-            },
+            multiSelect: true,
             content: [{ data: 'a' }, { data: 'b' }],
         });
         await mount(<ContentValueFieldTestWrapper descriptor={descriptor} />);
@@ -178,17 +214,8 @@ test.describe('ContentValueField', () => {
     });
 
     test('initialContent with list single matches option', async ({ mount, page }) => {
-        const descriptor = buildDescriptor({
+        const descriptor = buildListDescriptor({
             name: 'listAttr',
-            contentType: AttributeContentType.String,
-            properties: {
-                label: 'List',
-                visible: true,
-                required: false,
-                readOnly: false,
-                list: true,
-                multiSelect: false,
-            },
             content: [{ data: 'opt1' }, { data: 'opt2' }],
         });
         await mount(<ContentValueFieldTestWrapper descriptor={descriptor} initialContent={[{ data: 'opt2' }]} />);
@@ -200,18 +227,11 @@ test.describe('ContentValueField', () => {
             <ContentValueFieldTestWrapper
                 descriptor={buildDescriptor({
                     contentType: AttributeContentType.String,
-                    properties: {
-                        label: 'Test',
-                        visible: true,
-                        required: false,
-                        readOnly: true,
-                        list: false,
-                        multiSelect: false,
-                    },
+                    properties: readOnlyTextProps,
                 })}
             />,
         );
-        const input = page.locator('[id="testAttr"]');
+        const input = page.locator(fieldLocator);
         await expect(input).toBeDisabled();
     });
 
@@ -220,14 +240,7 @@ test.describe('ContentValueField', () => {
             <ContentValueFieldTestWrapper
                 descriptor={buildDescriptor({
                     contentType: AttributeContentType.String,
-                    properties: {
-                        label: 'Test',
-                        visible: true,
-                        required: true,
-                        readOnly: false,
-                        list: false,
-                        multiSelect: false,
-                    },
+                    properties: requiredTextProps,
                 })}
             />,
         );
@@ -242,14 +255,7 @@ test.describe('ContentValueField', () => {
             <ContentValueFieldTestWrapper
                 descriptor={buildDescriptor({
                     contentType: AttributeContentType.String,
-                    properties: {
-                        label: 'Test',
-                        visible: true,
-                        required: true,
-                        readOnly: false,
-                        list: false,
-                        multiSelect: false,
-                    },
+                    properties: requiredTextProps,
                 })}
             />,
         );
@@ -272,17 +278,8 @@ test.describe('ContentValueField', () => {
     });
 
     test('content options with reference use reference as label', async ({ mount, page }) => {
-        const descriptor = buildDescriptor({
+        const descriptor = buildListDescriptor({
             name: 'refAttr',
-            contentType: AttributeContentType.String,
-            properties: {
-                label: 'Ref',
-                visible: true,
-                required: false,
-                readOnly: false,
-                list: true,
-                multiSelect: false,
-            },
             content: [
                 { data: 'v1', reference: 'Label One' },
                 { data: 'v2', reference: 'Label Two' },
@@ -313,21 +310,13 @@ test.describe('ContentValueField', () => {
                 initialContent={[{ data: '2024-06-10 12:00' }]}
             />,
         );
-        await expect(page.locator('[id="testAttr"]')).toBeVisible();
+        await expect(page.locator(fieldLocator)).toBeVisible();
     });
 
     test('initialContent with list multiSelect sets initial options', async ({ mount, page }) => {
-        const descriptor = buildDescriptor({
+        const descriptor = buildListDescriptor({
             name: 'multiList',
-            contentType: AttributeContentType.String,
-            properties: {
-                label: 'Multi',
-                visible: true,
-                required: false,
-                readOnly: false,
-                list: true,
-                multiSelect: true,
-            },
+            multiSelect: true,
             content: [{ data: 'a' }, { data: 'b' }, { data: 'c' }],
         });
         await mount(<ContentValueFieldTestWrapper descriptor={descriptor} initialContent={[{ data: 'a' }, { data: 'c' }]} />);
@@ -335,17 +324,9 @@ test.describe('ContentValueField', () => {
     });
 
     test('initialContent with list single Datetime matches option', async ({ mount, page }) => {
-        const descriptor = buildDescriptor({
+        const descriptor = buildListDescriptor({
             name: 'dtList',
             contentType: AttributeContentType.Datetime,
-            properties: {
-                label: 'DT',
-                visible: true,
-                required: false,
-                readOnly: false,
-                list: true,
-                multiSelect: false,
-            },
             content: [{ data: '2024-01-15T10:00:00' }, { data: '2024-01-16T10:00:00' }],
         });
         await mount(<ContentValueFieldTestWrapper descriptor={descriptor} initialContent={[{ data: '2024-01-16T10:00:00' }]} />);
@@ -362,9 +343,8 @@ test.describe('ContentValueField', () => {
                 }}
             />,
         );
-        const input = page.locator('[id="testAttr"]');
-        await input.focus();
-        await input.fill('14:30:00');
+        await setTimeValue(page, '14:30:00');
+        await expect(page.getByTestId('save-button')).toBeEnabled();
         await page.getByTestId('save-button').click();
         expect(submitted).toHaveLength(1);
         expect((submitted[0] as { data: string }).data).toBe('14:30:00');

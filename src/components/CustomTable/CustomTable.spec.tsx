@@ -406,9 +406,8 @@ test.describe('CustomTable', () => {
         }));
         const component = await mount(withProviders(<CustomTable headers={mockHeaders} data={manyRows} hasPagination={true} />));
         await expect(component.getByText(/Showing 1 to 10/)).toBeVisible();
-        const nextBtn = component.getByRole('button', { name: /next|>/i }).or(component.locator('a').filter({ hasText: /2/ }));
-        if ((await nextBtn.count()) > 0) await nextBtn.first().click();
-        await expect(component.getByText(/Showing.*11 to 20/)).toBeVisible();
+        await component.getByTestId('pagination-next').click();
+        await expect(component.getByText(/Showing 11 to 20/)).toBeVisible();
     });
 
     test('should use internal page size when onPageSizeChanged not provided', async ({ mount }) => {
