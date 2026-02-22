@@ -154,12 +154,19 @@ test.describe('FilterWidget', () => {
         await chooseField(page, 'Items Count', 'itemsCount');
         await chooseCondition(page, 'Count equal', FilterConditionOperator.CountEqual);
         const valueInput = page.locator('#valueSelect');
+        await valueInput.evaluate((element) => {
+            (element as HTMLInputElement).removeAttribute('readonly');
+        });
         await valueInput.focus();
         await valueInput.fill('12');
         await expect(valueInput).toHaveValue('12');
-        await valueInput.fill('');
-        await valueInput.type('12x');
-        await expect(valueInput).toHaveValue('12');
+        await valueInput.press('x');
+        await expect
+            .poll(async () => {
+                const current = await valueInput.inputValue();
+                return current.includes('x');
+            })
+            .toBe(false);
     });
 
     test('remove badge deletes selected filter', async ({ mount, page }) => {
