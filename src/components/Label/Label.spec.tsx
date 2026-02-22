@@ -64,4 +64,58 @@ test.describe('Label', () => {
         await expect(component.getByText('Label')).toBeVisible();
         await expect(component.getByText('Text')).toBeVisible();
     });
+
+    test('clicking button when onClick is provided calls onClick', async ({ mount }) => {
+        let clicked = false;
+        const component = await mount(
+            <div data-testid="wrap">
+                <Label onClick={() => (clicked = true)} dataTestId="click-label">
+                    Click me
+                </Label>
+            </div>,
+        );
+        await component.getByTestId('click-label').click();
+        expect(clicked).toBe(true);
+    });
+
+    test('Enter key on button triggers onClick', async ({ mount }) => {
+        let triggered = false;
+        const component = await mount(
+            <div data-testid="wrap">
+                <Label onClick={() => (triggered = true)} dataTestId="enter-label">
+                    Press Enter
+                </Label>
+            </div>,
+        );
+        const btn = component.getByTestId('enter-label');
+        await btn.focus();
+        await btn.press('Enter');
+        expect(triggered).toBe(true);
+    });
+
+    test('Space key on button triggers onClick', async ({ mount }) => {
+        let triggered = false;
+        const component = await mount(
+            <div data-testid="wrap">
+                <Label onClick={() => (triggered = true)} dataTestId="space-label">
+                    Press Space
+                </Label>
+            </div>,
+        );
+        const btn = component.getByTestId('space-label');
+        await btn.focus();
+        await btn.press(' ');
+        expect(triggered).toBe(true);
+    });
+
+    test('dataTestId is used when provided (button)', async ({ mount }) => {
+        const component = await mount(
+            <div data-testid="wrap">
+                <Label onClick={() => {}} dataTestId="custom-label-id">
+                    Text
+                </Label>
+            </div>,
+        );
+        await expect(component.getByTestId('custom-label-id')).toBeVisible();
+    });
 });

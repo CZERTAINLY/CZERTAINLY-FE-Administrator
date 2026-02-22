@@ -1,10 +1,10 @@
 import Dialog, { DialogButton } from 'components/Dialog';
 import { actions, selectors } from 'ducks/user-interface';
+import type { GlobalModalModel } from 'types/user-interface';
+import type { Dispatch } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 
-export default function GlobalModal() {
-    const globalModal = useSelector(selectors.selectGlobalModal);
-
+export function getGlobalModalDialogProps(globalModal: GlobalModalModel, dispatch: Dispatch): Parameters<typeof Dialog>[0] {
     const {
         isOpen,
         size,
@@ -18,7 +18,6 @@ export default function GlobalModal() {
         cancelButtonCallback,
         icon,
     } = globalModal;
-    const dispatch = useDispatch();
 
     const buttons = [] as DialogButton[];
     if (showOkButton) {
@@ -60,22 +59,26 @@ export default function GlobalModal() {
         });
     }
 
-    return (
-        <Dialog
-            dataTestId="global-modal"
-            isOpen={isOpen}
-            toggle={() => {
-                if (cancelButtonCallback) {
-                    cancelButtonCallback();
-                } else {
-                    dispatch(actions.resetState());
-                }
-            }}
-            size={size || undefined}
-            buttons={buttons}
-            caption={title}
-            body={content}
-            icon={icon}
-        />
-    );
+    return {
+        dataTestId: 'global-modal',
+        isOpen,
+        toggle: () => {
+            if (cancelButtonCallback) {
+                cancelButtonCallback();
+            } else {
+                dispatch(actions.resetState());
+            }
+        },
+        size: size || undefined,
+        buttons,
+        caption: title,
+        body: content,
+        icon,
+    };
+}
+
+export default function GlobalModal() {
+    const globalModal = useSelector(selectors.selectGlobalModal);
+    const dispatch = useDispatch();
+    return <Dialog {...getGlobalModalDialogProps(globalModal, dispatch)} />;
 }

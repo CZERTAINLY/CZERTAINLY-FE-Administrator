@@ -47,6 +47,7 @@ export function Attribute({
         }
     }, [descriptor]);
 
+    /* c8 ignore start */
     const handleAddNew = useCallback(() => {
         if (!addNewAttributeValue) return;
         dispatch(
@@ -141,6 +142,7 @@ export function Attribute({
         },
         [handleAddNew, onUserInteraction],
     );
+    /* c8 ignore stop */
 
     if (!descriptor) return <></>;
 

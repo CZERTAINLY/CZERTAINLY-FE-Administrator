@@ -194,4 +194,115 @@ test.describe('Dialog', () => {
         await page.waitForTimeout(100);
         expect(await page.evaluate(() => document.body.style.overflow)).toBe('');
     });
+
+    test('should render upload icon', async ({ mount }) => {
+        const component = await mount(<Dialog isOpen={true} caption="Upload" body="Upload file" icon="upload" dataTestId="test-dialog" />);
+        await expect(component.getByRole('heading', { name: 'Upload' })).toBeVisible();
+        await expect(component.locator('.w-12.h-12')).toBeVisible();
+    });
+
+    test('should render users icon', async ({ mount }) => {
+        const component = await mount(<Dialog isOpen={true} caption="Users" body="Manage users" icon="users" dataTestId="test-dialog" />);
+        await expect(component.getByRole('heading', { name: 'Users' })).toBeVisible();
+        await expect(component.locator('.w-12.h-12')).toBeVisible();
+    });
+
+    test('should render user icon', async ({ mount }) => {
+        const component = await mount(<Dialog isOpen={true} caption="User" body="User profile" icon="user" dataTestId="test-dialog" />);
+        await expect(component.getByRole('heading', { name: 'User' })).toBeVisible();
+        await expect(component.locator('.w-12.h-12')).toBeVisible();
+    });
+
+    test('should render download icon', async ({ mount }) => {
+        const component = await mount(
+            <Dialog isOpen={true} caption="Download" body="Download file" icon="download" dataTestId="test-dialog" />,
+        );
+        await expect(component.getByRole('heading', { name: 'Download' })).toBeVisible();
+        await expect(component.locator('.w-12.h-12')).toBeVisible();
+    });
+
+    test('should render refresh icon', async ({ mount }) => {
+        const component = await mount(
+            <Dialog isOpen={true} caption="Refresh" body="Refresh data" icon="refresh" dataTestId="test-dialog" />,
+        );
+        await expect(component.getByRole('heading', { name: 'Refresh' })).toBeVisible();
+        await expect(component.locator('.w-12.h-12')).toBeVisible();
+    });
+
+    test('should render shuffle icon', async ({ mount }) => {
+        const component = await mount(
+            <Dialog isOpen={true} caption="Shuffle" body="Shuffle items" icon="shuffle" dataTestId="test-dialog" />,
+        );
+        await expect(component.getByRole('heading', { name: 'Shuffle' })).toBeVisible();
+        await expect(component.locator('.w-12.h-12')).toBeVisible();
+    });
+
+    test('should render minus icon', async ({ mount }) => {
+        const component = await mount(<Dialog isOpen={true} caption="Remove" body="Remove item" icon="minus" dataTestId="test-dialog" />);
+        await expect(component.getByRole('heading', { name: 'Remove' })).toBeVisible();
+        await expect(component.locator('.w-12.h-12')).toBeVisible();
+    });
+
+    test('should render plug icon', async ({ mount }) => {
+        const component = await mount(
+            <Dialog isOpen={true} caption="Connect" body="Connect plugin" icon="plug" dataTestId="test-dialog" />,
+        );
+        await expect(component.getByRole('heading', { name: 'Connect' })).toBeVisible();
+        await expect(component.locator('.w-12.h-12')).toBeVisible();
+    });
+
+    test('should render custom icon as React node', async ({ mount }) => {
+        const component = await mount(
+            <Dialog
+                isOpen={true}
+                caption="Custom"
+                body="Content"
+                icon={<span data-testid="custom-icon">Icon</span>}
+                dataTestId="test-dialog"
+            />,
+        );
+        await expect(component.getByTestId('custom-icon')).toBeVisible();
+        await expect(component.getByText('Icon')).toBeVisible();
+    });
+
+    test('should use button key when provided', async ({ mount }) => {
+        const buttons = [
+            { key: 'save-btn', color: 'primary' as const, onClick: () => {}, body: 'Save' },
+            { key: 'cancel-btn', color: 'secondary' as const, onClick: () => {}, body: 'Cancel' },
+        ];
+        const component = await mount(<Dialog isOpen={true} caption="Test" body="Content" buttons={buttons} dataTestId="test-dialog" />);
+        await expect(component.getByText('Save')).toBeVisible();
+        await expect(component.getByText('Cancel')).toBeVisible();
+    });
+
+    test('should pass button variant to Button', async ({ mount }) => {
+        const buttons = [
+            {
+                color: 'primary' as const,
+                variant: 'outline' as const,
+                onClick: () => {},
+                body: 'Outline',
+            },
+        ];
+        const component = await mount(<Dialog isOpen={true} caption="Test" body="Content" buttons={buttons} dataTestId="test-dialog" />);
+        const btn = component.getByText('Outline');
+        await expect(btn).toBeVisible();
+    });
+
+    test('should render without buttons section when buttons is empty', async ({ mount }) => {
+        const component = await mount(
+            <Dialog isOpen={true} caption="No Buttons" body="Just content" buttons={[]} dataTestId="test-dialog" />,
+        );
+        await expect(component.getByText('No Buttons')).toBeVisible();
+        await expect(component.getByText('Just content')).toBeVisible();
+        await expect(component.locator('.modal-footer')).not.toBeVisible();
+    });
+
+    test('should render caption as React node', async ({ mount }) => {
+        const component = await mount(
+            <Dialog isOpen={true} caption={<span data-testid="custom-caption">Custom title</span>} body="Body" dataTestId="test-dialog" />,
+        );
+        await expect(component.getByTestId('custom-caption')).toBeVisible();
+        await expect(component.getByText('Custom title')).toBeVisible();
+    });
 });

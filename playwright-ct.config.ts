@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import istanbul from 'vite-plugin-istanbul';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,7 +18,15 @@ export default defineConfig({
             define: {
                 __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
             },
-            plugins: [react(), tailwindcss()],
+            plugins: [
+                react(),
+                tailwindcss(),
+                istanbul({
+                    include: ['src/**/*.ts', 'src/**/*.tsx'],
+                    exclude: ['node_modules', '**/*.spec.ts', '**/*.spec.tsx'],
+                    extension: ['.ts', '.tsx'],
+                }),
+            ],
             resolve: {
                 alias: [
                     { find: 'react-hook-form', replacement: path.resolve(__dirname, 'node_modules/react-hook-form/dist/index.esm.mjs') },

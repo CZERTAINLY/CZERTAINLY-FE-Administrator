@@ -271,20 +271,26 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                 )}
 
                                 {hasHiddenChildren ? (
-                                    <Button
-                                        color="primary"
-                                        onClick={() => {
-                                            // setShowHiddenNodes(!expandedHiddenNodeId);
-                                            toggleHiddenNodes();
-                                        }}
-                                        className={cn(
-                                            'mt-1 !rounded-full !w-[26px] !h-[26px] !p-0 !text-[10px]',
-                                            getExpandButtonStatusClasses(),
-                                        )}
+                                    <span
+                                        data-expanded={expandedHiddenNodeId === id ? 'true' : 'false'}
+                                        data-testid="flow-node-toggle-hidden-wrap"
                                     >
-                                        {/* <span className="mx-auto">{status}</span> */}
-                                        {expandedHiddenNodeId === id ? <EyeOff size={16} /> : <Eye size={16} />}
-                                    </Button>
+                                        <Button
+                                            color="primary"
+                                            data-testid="flow-node-toggle-hidden"
+                                            onClick={() => {
+                                                // setShowHiddenNodes(!expandedHiddenNodeId);
+                                                toggleHiddenNodes();
+                                            }}
+                                            className={cn(
+                                                'mt-1 !rounded-full !w-[26px] !h-[26px] !p-0 !text-[10px]',
+                                                getExpandButtonStatusClasses(),
+                                            )}
+                                        >
+                                            {/* <span className="mx-auto">{status}</span> */}
+                                            {expandedHiddenNodeId === id ? <EyeOff size={16} /> : <Eye size={16} />}
+                                        </Button>
+                                    </span>
                                 ) : null}
                                 {/* 
                                 {/* TODO: Make this button to be collapsible and expandable to the right side, show attachable items to that
@@ -292,6 +298,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                 {data.addButtonContent && (
                                     <Button
                                         color="primary"
+                                        data-testid="flow-node-add"
                                         className="mt-1 !rounded-full !w-[26px] !h-[26px] !p-0 !text-[10px] !bg-indigo-300 !border-none hover:!bg-[#3754a5ec] active:!bg-[#3754a5d8]"
                                         // onClick={data.addButtonContent}
                                         title="Add connections to this node"
@@ -304,6 +311,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                 {data.deleteAction && (
                                     <Button
                                         color="danger"
+                                        data-testid="flow-node-delete"
                                         className="mt-1 !rounded-full !w-[26px] !h-[26px] !p-0 !text-[10px] !bg-[#e37582] !border-none hover:!bg-[#ef4444ec] active:!bg-[#ef4444d8]"
                                         onClick={() => {
                                             if (data.deleteAction) {
