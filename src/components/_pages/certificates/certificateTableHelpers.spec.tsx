@@ -8,6 +8,33 @@ const mockDateFormatter = (d: Date) => d.toISOString().slice(0, 10);
 const mockGetEnumLabel = (_e: any, key: string) => key;
 const mockDispatch = () => {};
 
+function buildListCertificate(overrides: Partial<CertificateListResponseModel> = {}): CertificateListResponseModel {
+    return {
+        uuid: 'u',
+        commonName: 'c',
+        serialNumber: '1',
+        signatureAlgorithm: '',
+        publicKeyAlgorithm: '',
+        keySize: 2048,
+        notBefore: '2024-01-01',
+        notAfter: '2025-01-01',
+        state: 0,
+        validationStatus: 0,
+        fingerprint: '',
+        subjectDn: '',
+        issuerDn: '',
+        issuerCommonName: '',
+        groups: [],
+        raProfile: undefined,
+        owner: undefined,
+        ownerUuid: undefined,
+        privateKeyAvailability: false,
+        archived: false,
+        certificateType: CertificateType.X509,
+        ...overrides,
+    } as unknown as CertificateListResponseModel;
+}
+
 test.describe('certificateTableHelpers', () => {
     test.describe('buildCertificateRowColumns', () => {
         const baseOpts = {
@@ -21,29 +48,19 @@ test.describe('certificateTableHelpers', () => {
         };
 
         test('returns array of 17 columns for minimal certificate', () => {
-            const cert: CertificateListResponseModel = {
+            const cert = buildListCertificate({
                 uuid: 'uuid-1',
                 commonName: 'cn.example.com',
                 serialNumber: 'SN123',
                 signatureAlgorithm: 'SHA256-RSA',
                 publicKeyAlgorithm: 'RSA',
-                keySize: 2048,
                 notBefore: '2024-01-01T00:00:00Z',
                 notAfter: '2025-01-01T00:00:00Z',
-                state: 0,
-                validationStatus: 0,
                 fingerprint: 'fp',
                 subjectDn: 'CN=cn',
                 issuerDn: 'CN=issuer',
                 issuerCommonName: 'issuer.example.com',
-                groups: [],
-                raProfile: undefined,
-                owner: undefined,
-                ownerUuid: undefined,
-                privateKeyAvailability: false,
-                archived: false,
-                certificateType: CertificateType.X509,
-            } as unknown as CertificateListResponseModel;
+            });
 
             const result = buildCertificateRowColumns(cert, baseOpts);
             expect(Array.isArray(result)).toBe(true);
@@ -51,26 +68,7 @@ test.describe('certificateTableHelpers', () => {
         });
 
         test('with isLinkDisabled true commonName is plain text', () => {
-            const cert = {
-                uuid: 'u',
-                commonName: 'test.example.com',
-                serialNumber: '1',
-                groups: [],
-                notBefore: '2024-01-01',
-                notAfter: '2025-01-01',
-                state: 0,
-                validationStatus: 0,
-                keySize: 2048,
-                fingerprint: '',
-                subjectDn: '',
-                issuerDn: '',
-                issuerCommonName: '',
-                signatureAlgorithm: '',
-                publicKeyAlgorithm: '',
-                privateKeyAvailability: false,
-                archived: false,
-                certificateType: CertificateType.X509,
-            } as unknown as CertificateListResponseModel;
+            const cert = buildListCertificate({ commonName: 'test.example.com' });
 
             const result = buildCertificateRowColumns(cert, baseOpts);
             // commonName is 5th column (index 4): state, validationStatus, compliance, key, commonName
@@ -79,26 +77,7 @@ test.describe('certificateTableHelpers', () => {
         });
 
         test('groups Unassigned when no groups', () => {
-            const cert = {
-                uuid: 'u',
-                commonName: 'c',
-                serialNumber: '1',
-                groups: [],
-                notBefore: '2024-01-01',
-                notAfter: '2025-01-01',
-                state: 0,
-                validationStatus: 0,
-                keySize: 2048,
-                fingerprint: '',
-                subjectDn: '',
-                issuerDn: '',
-                issuerCommonName: '',
-                signatureAlgorithm: '',
-                publicKeyAlgorithm: '',
-                privateKeyAvailability: false,
-                archived: false,
-                certificateType: CertificateType.X509,
-            } as unknown as CertificateListResponseModel;
+            const cert = buildListCertificate();
 
             const result = buildCertificateRowColumns(cert, baseOpts);
             // groups is 8th column (index 7): state, validationStatus, compliance, key, commonName, notBefore, notAfter, groups

@@ -45,6 +45,18 @@ async function fillEditableInput(page: import('@playwright/test').Page, placehol
     await input.fill(value);
 }
 
+async function configureMetaFilter(
+    page: import('@playwright/test').Page,
+    fieldLabel: string,
+    fieldValue: string,
+    conditionLabel: string,
+    conditionValue: string,
+) {
+    await chooseGroupMeta(page);
+    await chooseField(page, fieldLabel, fieldValue);
+    await chooseCondition(page, conditionLabel, conditionValue);
+}
+
 test.describe('FilterWidget', () => {
     test('renders controls and Add disabled by default', async ({ mount, page }) => {
         await mount(<FilterWidgetTestWrapper title="Filter widget" />);
@@ -63,9 +75,7 @@ test.describe('FilterWidget', () => {
                 }}
             />,
         );
-        await chooseGroupMeta(page);
-        await chooseField(page, 'Status', 'status');
-        await chooseCondition(page, 'Contains', FilterConditionOperator.Contains);
+        await configureMetaFilter(page, 'Status', 'status', 'Contains', FilterConditionOperator.Contains);
         await fillEditableInput(page, 'Enter filter value', 'active');
         await page.getByRole('button', { name: 'Add', exact: true }).click();
 
@@ -83,15 +93,11 @@ test.describe('FilterWidget', () => {
 
     test('duplicate filter combination is not added second time', async ({ mount, page }) => {
         await mount(<FilterWidgetTestWrapper onFilterUpdate={() => {}} />);
-        await chooseGroupMeta(page);
-        await chooseField(page, 'Status', 'status');
-        await chooseCondition(page, 'Contains', FilterConditionOperator.Contains);
+        await configureMetaFilter(page, 'Status', 'status', 'Contains', FilterConditionOperator.Contains);
         await fillEditableInput(page, 'Enter filter value', 'one');
         await page.getByRole('button', { name: 'Add', exact: true }).click();
 
-        await chooseGroupMeta(page);
-        await chooseField(page, 'Status', 'status');
-        await chooseCondition(page, 'Contains', FilterConditionOperator.Contains);
+        await configureMetaFilter(page, 'Status', 'status', 'Contains', FilterConditionOperator.Contains);
         await fillEditableInput(page, 'Enter filter value', 'two');
         await page.getByRole('button', { name: 'Add', exact: true }).click();
 
@@ -107,9 +113,7 @@ test.describe('FilterWidget', () => {
                 }}
             />,
         );
-        await chooseGroupMeta(page);
-        await chooseField(page, 'Status', 'status');
-        await chooseCondition(page, 'Contains', FilterConditionOperator.Contains);
+        await configureMetaFilter(page, 'Status', 'status', 'Contains', FilterConditionOperator.Contains);
         await fillEditableInput(page, 'Enter filter value', 'old');
         await page.getByRole('button', { name: 'Add', exact: true }).click();
 
@@ -122,9 +126,7 @@ test.describe('FilterWidget', () => {
 
     test('empty condition can be added without value', async ({ mount, page }) => {
         await mount(<FilterWidgetTestWrapper onFilterUpdate={() => {}} />);
-        await chooseGroupMeta(page);
-        await chooseField(page, 'Custom Date', 'customDate');
-        await chooseCondition(page, 'Empty', FilterConditionOperator.Empty);
+        await configureMetaFilter(page, 'Custom Date', 'customDate', 'Empty', FilterConditionOperator.Empty);
         await expect(page.getByRole('button', { name: 'Add', exact: true })).toBeEnabled();
         await page.getByRole('button', { name: 'Add', exact: true }).click();
         await expect(page.getByText("'Custom Date'")).toBeVisible();
@@ -132,9 +134,7 @@ test.describe('FilterWidget', () => {
 
     test('regex validation disables add and shows error', async ({ mount, page }) => {
         await mount(<FilterWidgetTestWrapper />);
-        await chooseGroupMeta(page);
-        await chooseField(page, 'Status', 'status');
-        await chooseCondition(page, 'Matches', FilterConditionOperator.Matches);
+        await configureMetaFilter(page, 'Status', 'status', 'Matches', FilterConditionOperator.Matches);
         await fillEditableInput(page, 'Enter regex value', '(');
         await expect(page.getByRole('button', { name: 'Add', exact: true })).toBeDisabled();
         await expect(page.locator('p.text-red-600')).toBeVisible();
@@ -142,17 +142,13 @@ test.describe('FilterWidget', () => {
 
     test('interval condition renders duration input helper', async ({ mount, page }) => {
         await mount(<FilterWidgetTestWrapper />);
-        await chooseGroupMeta(page);
-        await chooseField(page, 'Created', 'created');
-        await chooseCondition(page, 'In past', FilterConditionOperator.InPast);
+        await configureMetaFilter(page, 'Created', 'created', 'In past', FilterConditionOperator.InPast);
         await expect(page.getByPlaceholder('eg. 2d 30m')).toBeVisible();
     });
 
     test('count condition uses numeric input and blocks non-digit typing', async ({ mount, page }) => {
         await mount(<FilterWidgetTestWrapper />);
-        await chooseGroupMeta(page);
-        await chooseField(page, 'Items Count', 'itemsCount');
-        await chooseCondition(page, 'Count equal', FilterConditionOperator.CountEqual);
+        await configureMetaFilter(page, 'Items Count', 'itemsCount', 'Count equal', FilterConditionOperator.CountEqual);
         const valueInput = page.locator('#valueSelect');
         await valueInput.evaluate((element) => {
             (element as HTMLInputElement).removeAttribute('readonly');
@@ -178,9 +174,7 @@ test.describe('FilterWidget', () => {
                 }}
             />,
         );
-        await chooseGroupMeta(page);
-        await chooseField(page, 'Status', 'status');
-        await chooseCondition(page, 'Contains', FilterConditionOperator.Contains);
+        await configureMetaFilter(page, 'Status', 'status', 'Contains', FilterConditionOperator.Contains);
         await fillEditableInput(page, 'Enter filter value', 'x');
         await page.getByRole('button', { name: 'Add', exact: true }).click();
         await expect(page.getByText("'Status'")).toBeVisible();
@@ -190,9 +184,7 @@ test.describe('FilterWidget', () => {
 
     test('list field renders selectable value options', async ({ mount, page }) => {
         await mount(<FilterWidgetTestWrapper />);
-        await chooseGroupMeta(page);
-        await chooseField(page, 'Severity', 'severity');
-        await chooseCondition(page, 'Equals', FilterConditionOperator.Equals);
+        await configureMetaFilter(page, 'Severity', 'severity', 'Equals', FilterConditionOperator.Equals);
         await expect(page.getByTestId('select-valueSelect')).toBeVisible();
         await chooseSelectOption(page, 'select-valueSelect', 'High');
         await page.getByRole('button', { name: 'Add', exact: true }).click();
@@ -201,9 +193,7 @@ test.describe('FilterWidget', () => {
 
     test('boolean field renders select and allows choosing true', async ({ mount, page }) => {
         await mount(<FilterWidgetTestWrapper />);
-        await chooseGroupMeta(page);
-        await chooseField(page, 'Enabled', 'enabled');
-        await chooseCondition(page, 'Equals', FilterConditionOperator.Equals);
+        await configureMetaFilter(page, 'Enabled', 'enabled', 'Equals', FilterConditionOperator.Equals);
         await expect(page.getByTestId('select-valueSelect')).toBeVisible();
         await chooseSelectOption(page, 'select-valueSelect', 'True');
         await page.getByRole('button', { name: 'Add', exact: true }).click();
