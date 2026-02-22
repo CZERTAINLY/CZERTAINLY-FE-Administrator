@@ -1,5 +1,6 @@
 import { test, expect } from '../../../playwright/ct-test';
 import Popover from './index';
+import { PopoverUnmountWrapper } from './PopoverUnmountWrapper';
 
 test.describe('Popover', () => {
     test('should render popover with children', async ({ mount }) => {
@@ -76,5 +77,95 @@ test.describe('Popover', () => {
 
         const tooltip = component.locator('[role="tooltip"]');
         await expect(tooltip).toBeAttached();
+    });
+
+    test('should trigger click on Enter key', async ({ mount }) => {
+        const component = await mount(
+            <div>
+                <Popover content="Popover content">
+                    <button>Trigger</button>
+                </Popover>
+            </div>,
+        );
+        const toggle = component.locator('.hs-tooltip-toggle');
+        await toggle.focus();
+        await toggle.press('Enter');
+        await expect(component.locator('.hs-tooltip-toggle')).toBeAttached();
+    });
+
+    test('should trigger click on Space key', async ({ mount }) => {
+        const component = await mount(
+            <div>
+                <Popover content="Content">
+                    <span>Label</span>
+                </Popover>
+            </div>,
+        );
+        const toggle = component.locator('.hs-tooltip-toggle');
+        await toggle.focus();
+        await toggle.press(' ');
+        await expect(component.locator('.hs-tooltip-toggle')).toBeAttached();
+    });
+
+    test('should apply width style when width prop is set', async ({ mount }) => {
+        const component = await mount(
+            <div>
+                <Popover content="X" width={400}>
+                    <button>Open</button>
+                </Popover>
+            </div>,
+        );
+        const tooltip = component.locator('[role="tooltip"]');
+        await expect(tooltip).toHaveAttribute('style', /width:\s*400px/);
+    });
+
+    test('should not apply width style when width is 0', async ({ mount }) => {
+        const component = await mount(
+            <div>
+                <Popover content="Y" width={0}>
+                    <button>Open</button>
+                </Popover>
+            </div>,
+        );
+        const tooltip = component.locator('[role="tooltip"]');
+        const style = await tooltip.getAttribute('style');
+        expect(style).toBeFalsy();
+    });
+
+    test('should mount with interactive content and run useEffect', async ({ mount }) => {
+        const component = await mount(
+            <div>
+                <Popover content={<button type="button">Inside</button>}>
+                    <button type="button">Trigger</button>
+                </Popover>
+            </div>,
+        );
+        await expect(component.getByText('Inside')).toBeAttached();
+    });
+
+    test('should stop propagation when click happens inside content', async ({ mount }) => {
+        const component = await mount(
+            <div>
+                <Popover content="Content">
+                    <button>Open</button>
+                </Popover>
+            </div>,
+        );
+        const tooltip = component.locator('[role="tooltip"]');
+        await tooltip.evaluate((el) => {
+            el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+        });
+        await expect(component.getByText('Content')).toBeAttached();
+    });
+
+    test('should run useEffect cleanup on unmount', async ({ mount }) => {
+        const component = await mount(
+            <div>
+                <PopoverUnmountWrapper />
+            </div>,
+        );
+        await expect(component.getByText('Trigger')).toBeVisible();
+        await component.getByRole('button', { name: 'Unmount' }).click();
+        await expect(component.getByText('Trigger')).not.toBeVisible();
     });
 });

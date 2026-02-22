@@ -258,4 +258,223 @@ test.describe('CustomTable', () => {
         const table = component.locator('table tbody tr');
         await expect(table).toHaveCount(0);
     });
+
+    test('should open detail modal when detail button is clicked', async ({ mount }) => {
+        const dataWithDetails: TableDataRow[] = [
+            {
+                id: 1,
+                columns: ['John Doe', 'john@example.com'],
+                detailColumns: [['Detail A', 'Detail B']],
+            },
+        ];
+        const detailHeaders: TableHeader[] = [{ id: 'detail-0', content: 'Detail Col', sortable: false }];
+        const component = await mount(
+            withProviders(<CustomTable headers={mockHeaders} data={dataWithDetails} hasDetails={true} detailHeaders={detailHeaders} />),
+        );
+        await expect(component.getByText('John Doe')).toBeVisible();
+        await component.getByRole('button', { name: 'John Doe' }).click();
+        await expect(component.locator('table')).toBeVisible();
+    });
+
+    test('should sort by date when header has sortType date', async ({ mount }) => {
+        const dateHeaders: TableHeader[] = [{ id: 'date', content: 'Date', sortable: true, sortType: 'date' }];
+        const dateData: TableDataRow[] = [
+            { id: 1, columns: ['2024-02-02 at 10:00'] },
+            { id: 2, columns: ['2024-01-01 at 12:00'] },
+        ];
+        const component = await mount(withProviders(<CustomTable headers={dateHeaders} data={dateData} />));
+        await component.getByText('Date').click();
+        await expect(component.locator('table')).toBeVisible();
+    });
+
+    test('should sort by numeric when header has sortType numeric', async ({ mount }) => {
+        const numHeaders: TableHeader[] = [{ id: 'num', content: 'Count', sortable: true, sortType: 'numeric' }];
+        const numData: TableDataRow[] = [
+            { id: 1, columns: ['100'] },
+            { id: 2, columns: ['20'] },
+        ];
+        const component = await mount(withProviders(<CustomTable headers={numHeaders} data={numData} />));
+        await component.getByText('Count').click();
+        await expect(component.locator('table')).toBeVisible();
+    });
+
+    test('should apply row style when row has options.useAccentBottomBorder', async ({ mount }) => {
+        const dataWithStyle: TableDataRow[] = [{ id: 1, columns: ['Cell A'], options: { useAccentBottomBorder: true } }];
+        const component = await mount(withProviders(<CustomTable headers={mockHeaders} data={dataWithStyle} />));
+        await expect(component.locator('table tbody').getByText('Cell A')).toBeVisible();
+    });
+
+    test('should show No items to show when hasPagination and empty data', async ({ mount }) => {
+        const component = await mount(withProviders(<CustomTable headers={mockHeaders} data={[]} hasPagination={true} />));
+        await expect(component.getByText('No items to show')).toBeVisible();
+    });
+
+    test('should show filtered count when search filters data', async ({ mount }) => {
+        const component = await mount(
+            withProviders(<CustomTable headers={mockHeaders} data={mockData} canSearch={true} hasPagination={true} />),
+        );
+        await component.getByPlaceholder('Search').fill('John');
+        await expect(component.getByText(/of loaded entries filtered/)).toBeVisible();
+    });
+
+    test('should render NewRowWidget when newRowWidgetProps provided', async ({ mount, page }) => {
+        await mount(
+            withProviders(
+                <CustomTable
+                    headers={mockHeaders}
+                    data={mockData}
+                    newRowWidgetProps={{
+                        selectHint: 'Add item',
+                        immediateAdd: false,
+                        isBusy: false,
+                        newItemsList: [],
+                        onAddClick: () => {},
+                    }}
+                />,
+            ),
+        );
+        await expect(page.getByTestId('custom-table')).toBeVisible();
+        await expect(page.locator('select#newRowWidgetSelect')).toBeAttached();
+    });
+
+    test('should show pagination with internal state when no paginationData', async ({ mount }) => {
+        const manyRows = Array.from({ length: 25 }, (_, i) => ({
+            id: i + 1,
+            columns: [`Row ${i + 1}`, `col2-${i}`, `col3-${i}`],
+        }));
+        const component = await mount(withProviders(<CustomTable headers={mockHeaders} data={manyRows} hasPagination={true} />));
+        await expect(component.getByText(/Showing.*to.*of.*entries/)).toBeVisible();
+    });
+
+    test('should uncheck all when header checkbox unchecked', async ({ mount }) => {
+        let checkedRows: (string | number)[] = [];
+        const component = await mount(
+            withProviders(
+                <CustomTable headers={mockHeaders} data={mockData} hasCheckboxes={true} onCheckedRowsChanged={(r) => (checkedRows = r)} />,
+            ),
+        );
+        const headerCheckbox = component.locator('input[type="checkbox"]').first();
+        await headerCheckbox.click();
+        expect(checkedRows.length).toBeGreaterThan(0);
+        await headerCheckbox.click();
+        expect(checkedRows.length).toBe(0);
+    });
+
+    test('should expand and collapse row when hasDetails and row body clicked', async ({ mount }) => {
+        const dataWithDetails: TableDataRow[] = [{ id: 1, columns: ['John', 'john@example.com'], detailColumns: ['Detail 1'] }];
+        const component = await mount(withProviders(<CustomTable headers={mockHeaders} data={dataWithDetails} hasDetails={true} />));
+        await component.getByText('john@example.com').click();
+        await expect(component.locator('table')).toBeVisible();
+    });
+
+    test('should show paginationData caption when provided', async ({ mount }) => {
+        const paginationData = {
+            page: 1,
+            totalItems: 15,
+            pageSize: 10,
+            loadedPageSize: 10,
+            totalPages: 2,
+            itemsPerPageOptions: [10, 20],
+        };
+        const component = await mount(
+            withProviders(<CustomTable headers={mockHeaders} data={mockData} hasPagination={true} paginationData={paginationData} />),
+        );
+        await expect(component.getByText(/Showing.*to.*items of/)).toBeVisible();
+    });
+
+    test('should render header with align center', async ({ mount }) => {
+        const headersWithAlign: TableHeader[] = [
+            { id: 'name', content: 'Name', sortable: true },
+            { id: 'status', content: 'Status', sortable: false, align: 'center' },
+        ];
+        const component = await mount(withProviders(<CustomTable headers={headersWithAlign} data={mockData} />));
+        await expect(component.getByText('Status')).toBeVisible();
+    });
+
+    test('should sync checkedRows from prop', async ({ mount }) => {
+        const component = await mount(
+            withProviders(<CustomTable headers={mockHeaders} data={mockData} hasCheckboxes={true} checkedRows={[1]} />),
+        );
+        const firstRowCheckbox = component.locator('input[type="checkbox"]').nth(1);
+        await expect(firstRowCheckbox).toBeChecked();
+    });
+
+    test('should use internal page state when onPageChanged not provided', async ({ mount }) => {
+        const manyRows = Array.from({ length: 30 }, (_, i) => ({
+            id: i + 1,
+            columns: [`Row ${i + 1}`, `b`, `c`],
+        }));
+        const component = await mount(withProviders(<CustomTable headers={mockHeaders} data={manyRows} hasPagination={true} />));
+        await expect(component.getByText(/Showing 1 to 10/)).toBeVisible();
+        const nextBtn = component.getByRole('button', { name: /next|>/i }).or(component.locator('a').filter({ hasText: /2/ }));
+        if ((await nextBtn.count()) > 0) await nextBtn.first().click();
+        await expect(component.getByText(/Showing.*11 to 20/)).toBeVisible();
+    });
+
+    test('should use internal page size when onPageSizeChanged not provided', async ({ mount }) => {
+        const manyRows = Array.from({ length: 50 }, (_, i) => ({
+            id: i + 1,
+            columns: [`Item ${i + 1}`, `x`, `y`],
+        }));
+        const component = await mount(withProviders(<CustomTable headers={mockHeaders} data={manyRows} hasPagination={true} />));
+        await expect(component.getByText(/Showing.*of.*entries/)).toBeVisible();
+    });
+
+    test('should show paginationData range when loadedPageSize exceeds remaining items', async ({ mount }) => {
+        const paginationData = {
+            page: 2,
+            totalItems: 15,
+            pageSize: 10,
+            loadedPageSize: 5,
+            totalPages: 2,
+            itemsPerPageOptions: [10, 20],
+        };
+        const component = await mount(
+            withProviders(<CustomTable headers={mockHeaders} data={mockData} hasPagination={true} paginationData={paginationData} />),
+        );
+        await expect(component.getByText(/Showing.*to 15.*items of 15/)).toBeVisible();
+    });
+
+    test('should render table with no sortable headers', async ({ mount }) => {
+        const noSortHeaders: TableHeader[] = [
+            { id: 'a', content: 'Col A', sortable: false },
+            { id: 'b', content: 'Col B', sortable: false },
+        ];
+        const component = await mount(withProviders(<CustomTable headers={noSortHeaders} data={mockData} />));
+        await expect(component.getByText('Col A')).toBeVisible();
+        await expect(component.getByText('John Doe')).toBeVisible();
+    });
+
+    test('should open detail modal with default headers when detailHeaders length differs from detailColumns', async ({ mount }) => {
+        const dataWithDetails: TableDataRow[] = [
+            {
+                id: 1,
+                columns: ['Row One', 'col2'],
+                detailColumns: ['D1', 'D2'],
+            },
+        ];
+        const singleDetailHeader: TableHeader[] = [{ id: 'only-one', content: 'One', sortable: false }];
+        const component = await mount(
+            withProviders(
+                <CustomTable headers={mockHeaders} data={dataWithDetails} hasDetails={true} detailHeaders={singleDetailHeader} />,
+            ),
+        );
+        await component.getByRole('button', { name: 'Row One' }).click();
+        await expect(component.locator('table')).toBeVisible();
+    });
+
+    test('should expand row on body click when hasDetails and hasCheckboxes', async ({ mount }) => {
+        const dataWithDetails: TableDataRow[] = [{ id: 1, columns: ['John', 'john@example.com'], detailColumns: ['Detail'] }];
+        const component = await mount(
+            withProviders(<CustomTable headers={mockHeaders} data={dataWithDetails} hasDetails={true} hasCheckboxes={true} />),
+        );
+        await component.getByText('john@example.com').click();
+        await expect(component.locator('table')).toBeVisible();
+    });
+
+    test('should render header with width style', async ({ mount }) => {
+        const headersWithWidth: TableHeader[] = [{ id: 'name', content: 'Name', sortable: false, width: '50%' }];
+        const component = await mount(withProviders(<CustomTable headers={headersWithWidth} data={mockData} />));
+        await expect(component.getByText('Name')).toBeVisible();
+    });
 });

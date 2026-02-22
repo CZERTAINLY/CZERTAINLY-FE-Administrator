@@ -1,27 +1,15 @@
 import Widget from 'components/Widget';
 import dagre from 'dagre';
-import { useCallback, useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from 'ducks/user-interface';
 import { useDispatch, useSelector } from 'react-redux';
 
-import {
-    Background,
-    BackgroundVariant,
-    Controls,
-    Edge,
-    EdgeChange,
-    Node,
-    NodeChange,
-    Position,
-    ReactFlow,
-    ReactFlowProvider,
-    Viewport,
-    applyEdgeChanges,
-    applyNodeChanges,
-} from 'reactflow';
+import * as ReactFlowLib from 'reactflow';
+import type { Edge, EdgeChange, Node, NodeChange, Viewport } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { CustomNodeData } from 'types/flowchart';
+import { Dispatch } from '@reduxjs/toolkit';
 import FloatingEdge from './CustomEdge';
 import CustomFlowNode from './CustomFlowNode';
 import LegendComponent from './LegendWidget';
@@ -57,7 +45,7 @@ dagreGraph.setDefaultEdgeLabel(() => ({}));
 export const nodeWidth = 400;
 export const nodeHeight = 100;
 
-const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB') => {
+export const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB') => {
     const baseNodes: CustomNode[] = nodes.map((node) => ({
         ...node,
         position: node.position ? { ...node.position } : { x: 0, y: 0 },
@@ -139,8 +127,8 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB
                     x: centerX + dynamicRadius * Math.cos(angle) - nodeWidth / 2,
                     y: centerY + dynamicRadius * Math.sin(angle) - currentNodeHeight / 2,
                 };
-                node.targetPosition = Position.Top;
-                node.sourcePosition = Position.Bottom;
+                node.targetPosition = ReactFlowLib.Position.Top;
+                node.sourcePosition = ReactFlowLib.Position.Bottom;
             });
         }
         return { nodes: baseNodes, edges };
@@ -164,8 +152,8 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB
             const currentNodeHeight = node.data?.description ? nodeHeight + 35 : nodeHeight;
             return {
                 ...node,
-                targetPosition: isHorizontal ? Position.Left : Position.Top,
-                sourcePosition: isHorizontal ? Position.Right : Position.Bottom,
+                targetPosition: isHorizontal ? ReactFlowLib.Position.Left : ReactFlowLib.Position.Top,
+                sourcePosition: isHorizontal ? ReactFlowLib.Position.Right : ReactFlowLib.Position.Bottom,
                 position: {
                     x: nodeWithPosition.x - nodeWidth / 2,
                     y: nodeWithPosition.y - currentNodeHeight / 2,
@@ -176,6 +164,21 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB
         return { nodes: updatedNodes, edges };
     }
 };
+
+export const createOnNodesChange = (dispatch: Dispatch, flowChartNodesState?: CustomNode[]) => {
+    return (changes: NodeChange[]) => {
+        const newNodes = ReactFlowLib.applyNodeChanges(changes, flowChartNodesState ?? []);
+        dispatch(userInterfaceActions.updateReactFlowNodes(newNodes));
+    };
+};
+
+export const createOnEdgesChange = (dispatch: Dispatch, flowChartEdgesState?: Edge[]) => {
+    return (changes: EdgeChange[]) => {
+        const newEdges = ReactFlowLib.applyEdgeChanges(changes, flowChartEdgesState ?? []);
+        dispatch(userInterfaceActions.updateReactFlowEdges(newEdges));
+    };
+};
+
 const FlowChartContent = ({
     flowChartTitle,
     flowChartEdges,
@@ -190,22 +193,8 @@ const FlowChartContent = ({
     const flowChartEdgesState = useSelector(userInterfaceSelectors.flowChartEdges);
     const dispatch = useDispatch();
 
-    const onNodesChange = useCallback(
-        (changes: NodeChange[]) => {
-            const newNodes = applyNodeChanges(changes, flowChartNodesState ?? []);
-
-            dispatch(userInterfaceActions.updateReactFlowNodes(newNodes));
-        },
-        [dispatch, flowChartNodesState],
-    );
-
-    const onEdgesChange = useCallback(
-        (changes: EdgeChange[]) => {
-            const newEdges = applyEdgeChanges(changes, flowChartEdgesState ?? []);
-            dispatch(userInterfaceActions.updateReactFlowEdges(newEdges));
-        },
-        [dispatch, flowChartEdgesState],
-    );
+    const onNodesChange = useMemo(() => createOnNodesChange(dispatch, flowChartNodesState), [dispatch, flowChartNodesState]);
+    const onEdgesChange = useMemo(() => createOnEdgesChange(dispatch, flowChartEdgesState), [dispatch, flowChartEdgesState]);
 
     // // TODO: Implement onConnect in future if needed
     // const onConnect = useCallback((connection: Edge | Connection) => setEdges((eds) => addEdge(connection, eds)), [setEdges]);
@@ -246,7 +235,7 @@ const FlowChartContent = ({
         <Widget busy={busy}>
             {flowChartTitle && <h5 className="text-lg font-bold mb-4">{flowChartTitle}</h5>}
             <div className="w-full h-[70vh]">
-                <ReactFlow
+                <ReactFlowLib.ReactFlow
                     nodes={flowChartNodesState}
                     proOptions={{ hideAttribution: true }}
                     edges={flowChartEdgesState}
@@ -258,9 +247,9 @@ const FlowChartContent = ({
                     defaultEdgeOptions={defaultEdgeOptions}
                     edgeTypes={edgeTypes}
                 >
-                    <Controls />
-                    <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
-                </ReactFlow>
+                    <ReactFlowLib.Controls />
+                    <ReactFlowLib.Background variant={ReactFlowLib.BackgroundVariant.Dots} gap={16} size={1} />
+                </ReactFlowLib.ReactFlow>
             </div>
 
             {legends && <LegendComponent legends={legends} />}
@@ -269,9 +258,9 @@ const FlowChartContent = ({
 };
 
 const FlowChart = (props: FlowChartProps) => (
-    <ReactFlowProvider>
+    <ReactFlowLib.ReactFlowProvider>
         <FlowChartContent {...props} />
-    </ReactFlowProvider>
+    </ReactFlowLib.ReactFlowProvider>
 );
 
 export default FlowChart;

@@ -1,7 +1,7 @@
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useMemo, useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import * as ReactHookForm from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import {
@@ -37,16 +37,16 @@ function AttributeEditForm({
     initialContent?: BaseAttributeContentModel[];
     onSubmit: (uuid: string, content: BaseAttributeContentModel[]) => void;
 }) {
-    const methods = useForm<any>({
+    const methods = ReactHookForm.useForm<any>({
         defaultValues: {},
     });
 
     return (
-        <FormProvider {...methods}>
+        <ReactHookForm.FormProvider {...methods}>
             <form onSubmit={(e) => e.preventDefault()}>
                 <ContentValueField id={descriptor.name} descriptor={descriptor} initialContent={initialContent} onSubmit={onSubmit} />
             </form>
-        </FormProvider>
+        </ReactHookForm.FormProvider>
     );
 }
 
@@ -77,7 +77,7 @@ export default function AttributeViewer({
     const copyToClipboard = useCopyToClipboard();
 
     const onCopyContentClick = useCallback(
-        (attribute: AttributeResponseModel) => {
+        (attribute: AttributeResponseModel | MetadataItemModel) => {
             if (!attribute?.content?.length) return;
 
             const textToCopy = getAttributeCopyValue(attribute.contentType, attribute.content);

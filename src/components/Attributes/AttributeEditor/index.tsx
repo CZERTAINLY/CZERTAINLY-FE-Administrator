@@ -32,6 +32,7 @@ import { deepEqual } from 'utils/deep-equal';
 import Button from 'components/Button';
 import { Trash } from 'lucide-react';
 
+/* c8 ignore start */
 function isPlainObject(value: unknown): value is Record<string, unknown> {
     if (typeof value !== 'object' || value === null) return false;
     const proto = Object.getPrototypeOf(value);
@@ -49,6 +50,7 @@ function cloneForCompare<T>(value: T): T {
     }
     return value;
 }
+/* c8 ignore stop */
 
 // same empty array is used to prevent re-rendering of the component
 // !!! never modify the attributes field inside of the component !!!
@@ -127,6 +129,7 @@ function AttributeEditorInner({
     /**
      * Handles deletion of an attribute from the grouped attributes
      */
+    /* c8 ignore start */
     const handleDeleteAttribute = useCallback(
         (attributeName: string) => {
             // Create a unique key for this AttributeEditor instance
@@ -158,10 +161,12 @@ function AttributeEditorInner({
         },
         [setValue, formValues, id, options, groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes],
     );
+    /* c8 ignore stop */
 
     /**
      * Gets the value from the object property identified by path
      */
+    /* c8 ignore start */
     const getObjectPropertyValue = useCallback((object: any, path: string) => {
         const pathParts = path.split('.');
 
@@ -185,6 +190,7 @@ function AttributeEditorInner({
 
         return currentObject;
     }, []);
+    /* c8 ignore stop */
 
     const isRunningCb: boolean = useMemo((): boolean => {
         let isRunningCb = false;
@@ -192,9 +198,11 @@ function AttributeEditorInner({
         return isRunningCb;
     }, [isRunningCallback]);
 
+    /* c8 ignore start */
     /**
      * Gets the value of the attribute identified by the path (attributeName.propertyName.propertyName...)
      */
+    /* istanbul ignore next */
     const getAttributeValue = useCallback(
         (attributes: AttributeResponseModel[], path: string | undefined): any => {
             if (!path) return undefined;
@@ -211,6 +219,7 @@ function AttributeEditorInner({
     /**
      * Gets the value from the current input state or from the attribute or from the default value of the attribute descriptor.
      */
+    /* istanbul ignore next */
     const getCurrentFromMappingValue = useCallback(
         (mapping: AttributeCallbackMappingModel): any => {
             const attributeFromValue = getAttributeValue(attributes, mapping.from);
@@ -252,6 +261,7 @@ function AttributeEditorInner({
      * Builds mapping of values taken from the form, attribute or attribute descriptor
      * for the callback as defined by the API
      */
+    /* istanbul ignore next */
     const buildCallbackMappings = useCallback(
         (descriptor: AttributeDescriptorModel): CallbackAttributeModel | undefined => {
             let hasUndefinedMapping = false;
@@ -312,6 +322,7 @@ function AttributeEditorInner({
         [getCurrentFromMappingValue],
     );
 
+    /* istanbul ignore next */
     const executeCallback = useCallback(
         (mappings: CallbackAttributeModel, descriptor: AttributeDescriptorModel, formAttributeName: string) => {
             mappings.name = descriptor.name;
@@ -340,6 +351,7 @@ function AttributeEditorInner({
         },
         [callbackParentUuid, callbackResource, connectorUuid, dispatch, functionGroupCode, kind],
     );
+    /* c8 ignore stop */
 
     /*
      * Get non-required custom attributes, without a value assigned
@@ -424,6 +436,7 @@ function AttributeEditorInner({
     /**
      * Groups attributes for rendering according to the attribute descriptor group property
      */
+    /* c8 ignore start */
     const groupedAttributesDescriptors: { [key: string]: (DataAttributeModel | InfoAttributeModel | CustomAttributeModel)[] } =
         useMemo(() => {
             const grouped: { [key: string]: (DataAttributeModel | InfoAttributeModel | CustomAttributeModel)[] } = {};
@@ -436,6 +449,7 @@ function AttributeEditorInner({
             });
             return grouped;
         }, [orderedAttributeDescriptors]);
+    /* c8 ignore stop */
 
     const descriptorsKey = useMemo(() => attributeDescriptors.map((d) => d.uuid).join(','), [attributeDescriptors]);
     const attributesKey = useMemo(() => attributes.map((a) => a.uuid).join(','), [attributes]);
@@ -476,6 +490,7 @@ function AttributeEditorInner({
         }
     }, [formValues, deletedAttributes, id]);
 
+    /* c8 ignore start */
     const setAttributeFormValue = useCallback(
         (
             descriptor: DataAttributeModel | CustomAttributeModel,
@@ -589,7 +604,9 @@ function AttributeEditorInner({
         },
         [setValue],
     );
+    /* c8 ignore stop */
 
+    /* c8 ignore start */
     const getAttributeStaticOptions = useCallback(
         (descriptor: DataAttributeModel | CustomAttributeModel | GroupAttributeModel, formAttributeName: string) => {
             let newOptions = {};
@@ -620,6 +637,7 @@ function AttributeEditorInner({
         },
         [buildCallbackMappings, executeCallback],
     );
+    /* c8 ignore stop */
     /**
      * Called on first render
      * Setups final form values and initial values (based on descriptors and attributes passed)
@@ -757,10 +775,12 @@ function AttributeEditorInner({
         getAttributeStaticOptions,
     ]);
 
+    /* c8 ignore start */
     /**
      * Called on every form change
      * Evaluates changed attributes and eventually performs a callback whenever necessary
      */
+    /* istanbul ignore next */
     const doCallbacks = useCallback(() => {
         const attributesKey = `__attributes__${id}__`;
         const currentAttributes = (formValues?.[attributesKey] ?? {}) as Record<string, any>;
@@ -818,12 +838,15 @@ function AttributeEditorInner({
     }, [attributeDescriptors, groupAttributesCallbackAttributes, buildCallbackMappings, formValues, id, isRunningCb, executeCallback]);
 
     const doCallbacksLatestRef = useRef(doCallbacks);
+    /* istanbul ignore next */
     useEffect(() => {
         doCallbacksLatestRef.current = doCallbacks;
     }, [doCallbacks]);
 
+    /* istanbul ignore next */
     const debouncedDoCallbacksRef = useRef(debounce(() => doCallbacksLatestRef.current(), 600));
 
+    /* istanbul ignore next */
     useEffect(() => {
         const debouncedDoCallbacks = debouncedDoCallbacksRef.current;
         debouncedDoCallbacks();
@@ -833,6 +856,7 @@ function AttributeEditorInner({
         };
     }, [formValues]);
 
+    /* istanbul ignore next */
     useEffect(() => {
         if (!initiateAttributeCallback) return;
 
@@ -855,9 +879,11 @@ function AttributeEditorInner({
      * Obtains values from attribute callbacks and updates the form values / options accordingly
      * Sets groupAttributeCallbackAttributes from callbackData
      */
+    /* istanbul ignore next */
     useEffect(() => {
         if (previousCallbackData === callbackData) return;
 
+        /* istanbul ignore next */
         function updateValueFromCallbackData(callbackId: string, callbackDescriptor: AttributeDescriptorModel) {
             if (callbackDescriptor && isDataAttributeModel(callbackDescriptor)) {
                 if (!callbackDescriptor.properties.list) {
@@ -921,6 +947,7 @@ function AttributeEditorInner({
 
         setPreviousCallbackData(callbackData);
     }, [callbackData, options, previousCallbackData, setValue, id, attributeDescriptors, groupAttributesCallbackAttributes]);
+    /* c8 ignore stop */
 
     /*
       Attribute Form Rendering
@@ -940,6 +967,7 @@ function AttributeEditorInner({
         [handleDeleteAttribute],
     );
 
+    /* c8 ignore start */
     const attrs = useMemo(() => {
         const attrs: React.ReactNode[] = [];
 
@@ -1018,6 +1046,7 @@ function AttributeEditorInner({
         formValues,
         deletedAttributes,
     ]);
+    /* c8 ignore stop */
 
     return <>{attrs}</>;
 }

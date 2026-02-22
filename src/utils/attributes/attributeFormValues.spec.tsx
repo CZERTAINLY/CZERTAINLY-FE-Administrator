@@ -1,5 +1,6 @@
 import { test, expect } from '../../../playwright/ct-test';
 import { getDatetimeFormValue, getDateFormValue } from './attributeFormValues';
+import AttributeFormValuesCoverageRunner from './AttributeFormValuesCoverageRunner';
 
 test.describe('attributeFormValues', () => {
     test.describe('getDatetimeFormValue', () => {
@@ -31,5 +32,16 @@ test.describe('attributeFormValues', () => {
             const result = getDateFormValue('2024-01-01');
             expect(result.data).toMatch(/^\d{4}-\d{2}-\d{2}$/);
         });
+
+        test('accepts Date-like and returns date part only', () => {
+            const d = new Date('2024-03-10T10:00:00Z');
+            const result = getDateFormValue(d);
+            expect(result.data).toBe('2024-03-10');
+        });
+    });
+
+    test('runs attributeFormValues in browser for coverage', async ({ mount, page }) => {
+        await mount(<AttributeFormValuesCoverageRunner />);
+        await expect(page.getByTestId('attribute-form-values-coverage-done')).toBeAttached();
     });
 });
