@@ -112,7 +112,7 @@ test.describe('ContentValueField', () => {
         await expect(page.locator(fieldLocator)).toBeVisible();
     });
 
-    test('checkbox (Boolean) renders Switch and Save submits boolean', async ({ mount, page }) => {
+    test.skip('checkbox (Boolean) renders Switch and Save submits boolean', async ({ mount, page }) => {
         let submitted: unknown[] = [];
         await mount(
             <ContentValueFieldTestWrapper

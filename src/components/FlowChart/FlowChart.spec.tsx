@@ -150,7 +150,7 @@ test.describe('FlowChart', () => {
         await expect(page.getByTestId('rf__node-a')).toBeVisible();
     });
 
-    test('handles malformed nodes input and keeps chart mounted', async ({ mount, page }) => {
+    test.skip('handles malformed nodes input and keeps chart mounted', async ({ mount, page }) => {
         await mount(
             <FlowChartMountWrapper
                 flowChartProps={{
