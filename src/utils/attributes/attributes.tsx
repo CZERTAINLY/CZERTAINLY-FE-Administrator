@@ -121,6 +121,20 @@ const getAttributeFormValue = (
     descriptorContent: BaseAttributeContentModel[] | undefined,
     item: any,
 ) => {
+    const normalizePrimitiveAttributeValue = (value: unknown) => {
+        if (value === undefined || value === null || value === '') return value;
+
+        if (contentType === AttributeContentType.Integer || contentType === AttributeContentType.Float) {
+            const parsedNumber = typeof value === 'number' ? value : Number(value);
+            if (Number.isNaN(parsedNumber)) return value;
+
+            if (contentType === AttributeContentType.Integer) return Math.trunc(parsedNumber);
+            return parsedNumber;
+        }
+
+        return value;
+    };
+
     if (contentType === AttributeContentType.Datetime) return getDatetimeFormValue(item);
     if (contentType === AttributeContentType.Date) return getDateFormValue(item);
     if (contentType === AttributeContentType.Codeblock) {
@@ -130,14 +144,24 @@ const getAttributeFormValue = (
     if (contentType === AttributeContentType.Secret) {
         return { data: { secret: item } } as SecretAttributeContentV2;
     }
-    if (item && typeof item === 'object' && ('data' in item || 'reference' in item)) return item;
+    if (item && typeof item === 'object' && ('data' in item || 'reference' in item)) {
+        if ('data' in item) {
+            return { ...item, data: normalizePrimitiveAttributeValue(item.data) };
+        }
+
+        return item;
+    }
     if (item && typeof item === 'object' && 'value' in item) {
         if (item.value && typeof item.value === 'object' && ('data' in item.value || 'reference' in item.value)) {
+            if ('data' in item.value) {
+                return { ...item.value, data: normalizePrimitiveAttributeValue(item.value.data) };
+            }
+
             return item.value;
         }
-        return { data: item.value };
+        return { data: normalizePrimitiveAttributeValue(item.value) };
     }
-    return { data: item };
+    return { data: normalizePrimitiveAttributeValue(item) };
 };
 
 /**
@@ -207,6 +231,7 @@ export function collectFormAttributes(
                     content: Array.isArray(content) ? content : [content],
                     contentType: descriptor.contentType,
                     uuid: descriptor.uuid,
+                    version: descriptor.version,
                 };
 
                 attrs.push(attr);
