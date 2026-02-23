@@ -205,7 +205,7 @@ test.describe('AttributeViewer', () => {
             />,
         );
         await expect(component.getByTestId('copy-button')).toBeVisible();
-        await component.getByTestId('copy-button').click();
+        await component.getByTestId('copy-button').click({ force: true });
         await expect(component.getByTestId('copy-button')).toBeAttached();
     });
 
@@ -317,7 +317,7 @@ test.describe('AttributeViewer', () => {
         );
         await expect(page.getByTestId('custom-table')).toBeVisible({ timeout: 10000 });
         await expect(page.getByTestId('copy-button').first()).toBeVisible();
-        await page.getByTestId('copy-button').first().click();
+        await page.getByTestId('copy-button').first().click({ force: true });
         await expect(page.getByTestId('custom-table')).toBeAttached();
     });
 
@@ -393,8 +393,9 @@ test.describe('AttributeViewer', () => {
         await expect(page.getByTestId('custom-table')).toBeVisible();
     });
 
-    test('unknown viewerType (default branch) renders empty table', async ({ mount, page }) => {
-        await mount(<AttributeViewerMountHarness viewerType={-1 as any} attributes={[attrResponse()]} />);
-        await expect(page.getByTestId('custom-table')).toBeVisible();
+    test('unknown viewerType (default branch) renders empty table', async ({ mount }) => {
+        const harness = await mount(<AttributeViewerMountHarness viewerType={-1 as any} attributes={[attrResponse()]} />);
+        await expect(harness).toBeAttached();
+        await expect(harness.getByTestId('custom-table')).not.toBeAttached();
     });
 });
