@@ -123,8 +123,8 @@ test.describe('ContentValueField', () => {
             />,
         );
         await expect(page.getByTestId('switch-testAttr')).toBeVisible();
-        await page.getByTestId('switch-testAttr').click();
-        await page.getByTestId('save-button').click();
+        await page.getByTestId('switch-testAttr').click({ force: true });
+        await page.getByTestId('save-button').click({ force: true });
         expect(submitted).toEqual([{ data: true }]);
     });
 

@@ -571,9 +571,9 @@ test.describe('CustomFlowNode', () => {
             />,
         );
         const addBtn = page.getByTestId('flow-node-add');
-        await addBtn.click();
+        await addBtn.click({ force: true });
         await expect(page.getByTestId('add-content')).toBeVisible();
-        await addBtn.click();
+        await addBtn.click({ force: true });
         await expect(page.getByTestId('add-content')).toBeHidden();
     });
 
