@@ -162,6 +162,42 @@ test.describe('attributes utils', () => {
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result).toHaveLength(0);
         });
+
+        test('casts Integer attributes to number in payload', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'parallelExecutions',
+                    uuid: 'u-integer',
+                    contentType: AttributeContentType.Integer,
+                    content: [],
+                    properties: { required: false, label: 'Parallel executions', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { parallelExecutions: '50' } };
+
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toHaveLength(1);
+            expect(result[0].content).toEqual([{ data: 50 }]);
+        });
+
+        test('casts Float attributes to number in payload', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'threshold',
+                    uuid: 'u-float',
+                    contentType: AttributeContentType.Float,
+                    content: [],
+                    properties: { required: false, label: 'Threshold', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { threshold: '3.14' } };
+
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toHaveLength(1);
+            expect(result[0].content).toEqual([{ data: 3.14 }]);
+        });
     });
 
     test.describe('mapAttributeContentToOptionValue', () => {
