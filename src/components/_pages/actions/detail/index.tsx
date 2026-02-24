@@ -2,7 +2,7 @@ import { ApiClients } from '../../../../api';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import ConditionsExecutionsList from 'components/ExecutionConditionItemsList';
-import GoBackButton from 'components/GoBackButton';
+import Breadcrumb from 'components/Breadcrumb';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -10,8 +10,12 @@ import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rule
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
-import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
 import { PlatformEnum, Resource } from 'types/openapi';
+import Button from 'components/Button';
+import Container from 'components/Container';
+import TextInput from 'components/TextInput';
+import { Check, X, Trash2 } from 'lucide-react';
+import EditIcon from 'components/icons/EditIcon';
 interface SelectChangeValue {
     value: string;
     label: string;
@@ -178,21 +182,20 @@ const RuleDetails = () => {
                           columns: [
                               'Description',
                               updateDescriptionEditEnable ? (
-                                  <Input
+                                  <TextInput
                                       value={updatedDescription}
-                                      onChange={(e) => setUpdatedDescription(e.target.value)}
+                                      onChange={(value) => setUpdatedDescription(value)}
                                       placeholder="Enter Description"
                                   />
                               ) : (
                                   actionDetails.description || ''
                               ),
-                              <div>
+                              <div key="description-actions" className="flex items-center gap-2">
                                   {updateDescriptionEditEnable ? (
-                                      <ButtonGroup>
+                                      <>
                                           <Button
-                                              className="btn btn-link mx-auto"
-                                              size="sm"
-                                              color="secondary"
+                                              variant="transparent"
+                                              color="primary"
                                               title="Update Description"
                                               onClick={onUpdateDescriptionConfirmed}
                                               disabled={
@@ -201,11 +204,11 @@ const RuleDetails = () => {
                                                   updatedDescription === ''
                                               }
                                           >
-                                              <i className="fa fa-check" />
+                                              <Check size={16} />
                                           </Button>
                                           <Button
-                                              className="btn btn-link mx-auto danger"
-                                              size="sm"
+                                              variant="transparent"
+                                              color="danger"
                                               title="Cancel"
                                               disabled={isUpdatingAction}
                                               onClick={() => {
@@ -213,20 +216,19 @@ const RuleDetails = () => {
                                                   setUpdatedDescription(actionDetails?.description || '');
                                               }}
                                           >
-                                              <i className="fa fa-close text-danger" />
+                                              <X size={16} />
                                           </Button>
-                                      </ButtonGroup>
+                                      </>
                                   ) : (
                                       <Button
-                                          className="btn btn-link mx-auto"
-                                          size="sm"
+                                          variant="transparent"
                                           color="secondary"
                                           title="Update Description"
                                           onClick={() => {
                                               setUpdateDescription(true);
                                           }}
                                       >
-                                          <i className="fa fa-pencil-square-o" />
+                                          <EditIcon size={16} />
                                       </Button>
                                   )}
                               </div>,
@@ -278,8 +280,7 @@ const RuleDetails = () => {
                           getEnumLabel(executionTypeEnum, conditionGroup.type) || '',
                           conditionGroup.description || '',
                           <Button
-                              className="btn btn-link text-danger"
-                              size="sm"
+                              variant="transparent"
                               color="danger"
                               title={
                                   isDeleteDisabled
@@ -291,7 +292,7 @@ const RuleDetails = () => {
                               }}
                               disabled={isDeleteDisabled}
                           >
-                              <i className="fa fa-trash" />
+                              <Trash2 size={16} />
                           </Button>,
                       ],
                   };
@@ -318,53 +319,63 @@ const RuleDetails = () => {
     }, [actionDetails]);
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/actions"
-                text={`${getEnumLabel(resourceTypeEnum, Resource.Actions)} Inventory`}
-            />
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
-                    <Widget refreshAction={getFreshDetails} busy={isBusy} title="Action Details" titleSize="large" widgetButtons={buttons}>
-                        <CustomTable data={conditionGroupsDetailData} headers={tableHeader} />
-                    </Widget>
-                </Col>
-                <Col>
-                    <Widget
-                        busy={isBusy}
-                        title="Executions"
-                        titleSize="large"
-                        widgetInfoCard={{
-                            title: 'Information',
-                            description: 'Execution is named set of execution items',
-                        }}
-                    >
-                        <CustomTable
-                            data={executionsData}
-                            headers={executionDataHeaders}
-                            newRowWidgetProps={{
-                                isBusy: isUpdatingAction,
-                                newItemsList: executionsOptions,
-                                onAddClick: onUpdateExecutionsConfirmed,
-                            }}
-                        />
-                    </Widget>
-                </Col>
-            </Row>
-
-            {renderActionExecutions}
-            <Dialog
-                isOpen={confirmDelete}
-                caption={`Delete an Action`}
-                body={`You are about to delete an action. Is this what you want to do?`}
-                toggle={() => setConfirmDelete(false)}
-                buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceTypeEnum, Resource.Actions)} Inventory`, href: '/actions' },
+                    { label: actionDetails?.name || 'Action Details', href: '' },
                 ]}
             />
-        </Container>
+            <Container>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <Widget
+                            refreshAction={getFreshDetails}
+                            busy={isBusy}
+                            title="Action Details"
+                            titleSize="large"
+                            widgetButtons={buttons}
+                        >
+                            <CustomTable data={conditionGroupsDetailData} headers={tableHeader} />
+                        </Widget>
+                    </div>
+                    <div>
+                        <Widget
+                            busy={isBusy}
+                            title="Executions"
+                            titleSize="large"
+                            widgetInfoCard={{
+                                title: 'Information',
+                                description: 'Execution is named set of execution items',
+                            }}
+                        >
+                            <CustomTable
+                                data={executionsData}
+                                headers={executionDataHeaders}
+                                newRowWidgetProps={{
+                                    isBusy: isUpdatingAction,
+                                    newItemsList: executionsOptions,
+                                    onAddClick: onUpdateExecutionsConfirmed,
+                                }}
+                            />
+                        </Widget>
+                    </div>
+                </div>
+
+                {renderActionExecutions}
+                <Dialog
+                    isOpen={confirmDelete}
+                    caption={`Delete an Action`}
+                    body={`You are about to delete an action. Is this what you want to do?`}
+                    toggle={() => setConfirmDelete(false)}
+                    icon="delete"
+                    buttons={[
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    ]}
+                />
+            </Container>
+        </div>
     );
 };
 

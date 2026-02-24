@@ -6,29 +6,32 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/certificateGroups';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
+import GroupForm from '../form';
 
-import { Container } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import EventsTable from 'components/_pages/notifications/events-settings/EventsTable';
 import TabLayout from 'components/Layout/TabLayout';
 import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import Container from 'components/Container';
+import Breadcrumb from 'components/Breadcrumb';
 
 export default function GroupDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id } = useParams();
 
     const group = useSelector(selectors.certificateGroup);
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
+    const isUpdating = useSelector(selectors.isUpdating);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const getFreshGroupDetails = useCallback(() => {
         if (!id) return;
@@ -39,9 +42,23 @@ export default function GroupDetail() {
         getFreshGroupDetails();
     }, [getFreshGroupDetails, id]);
 
+    useRunOnFinished(isUpdating, () => {
+        setIsEditModalOpen(false);
+        getFreshGroupDetails();
+    });
+
+    const handleOpenEditModal = useCallback(() => {
+        if (!group) return;
+        setIsEditModalOpen(true);
+    }, [group]);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
+
     const onEditClick = useCallback(() => {
-        navigate(`../../edit/${group?.uuid}`, { relative: 'path' });
-    }, [group, navigate]);
+        handleOpenEditModal();
+    }, [handleOpenEditModal]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!group) return;
@@ -80,67 +97,79 @@ export default function GroupDetail() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/groups"
-                text={`${getEnumLabel(resourceEnum, Resource.Groups)} Inventory`}
-            />
-            <TabLayout
-                tabs={[
-                    {
-                        title: 'Details',
-                        content: (
-                            <Widget>
-                                <Widget
-                                    title="Group Details"
-                                    busy={isFetchingDetail}
-                                    widgetButtons={buttons}
-                                    titleSize="large"
-                                    refreshAction={getFreshGroupDetails}
-                                    widgetLockName={LockWidgetNameEnum.GroupDetails}
-                                >
-                                    <CustomTable headers={detailHeaders} data={detailData} />
-                                </Widget>
-
-                                {group && (
-                                    <CustomAttributeWidget
-                                        resource={Resource.Groups}
-                                        resourceUuid={group.uuid}
-                                        attributes={group.customAttributes}
-                                    />
-                                )}
-                            </Widget>
-                        ),
-                    },
-                    {
-                        title: 'Events',
-                        content: (
-                            <Widget>
-                                {group && (
-                                    <EventsTable
-                                        mode="association"
-                                        resource={Resource.Groups}
-                                        resourceUuid={group.uuid}
-                                        widgetLocks={[LockWidgetNameEnum.GroupDetails, LockWidgetNameEnum.EventSettings]}
-                                    />
-                                )}
-                            </Widget>
-                        ),
-                    },
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.Groups)} Inventory`, href: '/groups' },
+                    { label: group?.name || 'Group Details', href: '' },
                 ]}
             />
+            <Container>
+                <TabLayout
+                    tabs={[
+                        {
+                            title: 'Details',
+                            content: (
+                                <Container>
+                                    <Widget
+                                        title="Group Details"
+                                        busy={isFetchingDetail}
+                                        widgetButtons={buttons}
+                                        titleSize="large"
+                                        refreshAction={getFreshGroupDetails}
+                                        widgetLockName={LockWidgetNameEnum.GroupDetails}
+                                    >
+                                        <CustomTable headers={detailHeaders} data={detailData} />
+                                    </Widget>
 
-            <Dialog
-                isOpen={confirmDelete}
-                caption="Delete Group"
-                body="You are about to delete an Group. Is this what you want to do?"
-                toggle={() => setConfirmDelete(false)}
-                buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                ]}
-            />
-        </Container>
+                                    {group && (
+                                        <CustomAttributeWidget
+                                            resource={Resource.Groups}
+                                            resourceUuid={group.uuid}
+                                            attributes={group.customAttributes}
+                                        />
+                                    )}
+                                </Container>
+                            ),
+                        },
+                        {
+                            title: 'Events',
+                            content: (
+                                <>
+                                    {group && (
+                                        <EventsTable
+                                            mode="association"
+                                            resource={Resource.Groups}
+                                            resourceUuid={group.uuid}
+                                            widgetLocks={[LockWidgetNameEnum.GroupDetails, LockWidgetNameEnum.EventSettings]}
+                                        />
+                                    )}
+                                </>
+                            ),
+                        },
+                    ]}
+                />
+
+                <Dialog
+                    isOpen={confirmDelete}
+                    caption="Delete Group"
+                    body="You are about to delete a Group. Is this what you want to do?"
+                    toggle={() => setConfirmDelete(false)}
+                    icon="delete"
+                    buttons={[
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    ]}
+                />
+
+                <Dialog
+                    isOpen={isEditModalOpen}
+                    toggle={handleCloseEditModal}
+                    caption="Edit Group"
+                    size="xl"
+                    body={<GroupForm groupId={group?.uuid} onCancel={handleCloseEditModal} onSuccess={handleCloseEditModal} />}
+                />
+            </Container>
+        </div>
     );
 }

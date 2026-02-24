@@ -12,14 +12,15 @@ import {
 } from 'types/attributes';
 import {
     AttributeContentType,
-    CodeBlockAttributeContent,
+    CodeBlockAttributeContentV2,
     FileAttributeContentData,
     ProgrammingLanguageEnum,
-    SecretAttributeContent,
+    SecretAttributeContentV2,
 } from 'types/openapi';
 import { base64ToUtf8, utf8ToBase64 } from 'utils/common-utils';
 import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
 import CodeBlock from '../../components/Attributes/CodeBlock';
+import { getDatetimeFormValue, getDateFormValue } from './attributeFormValues';
 
 export const attributeFieldNameTransform: { [name: string]: string } = {
     name: 'Name',
@@ -75,7 +76,7 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
         return <CodeBlock content={content[0] as CodeBlockAttributeContentModel} />;
     }
 
-    const mapping = (content: BaseAttributeContentModel): string | JSX.Element | undefined => {
+    const mapping = (content: BaseAttributeContentModel): string | React.ReactNode | undefined => {
         switch (contentType) {
             case AttributeContentType.Boolean:
                 return content.data ? 'true' : 'false';
@@ -120,37 +121,47 @@ const getAttributeFormValue = (
     descriptorContent: BaseAttributeContentModel[] | undefined,
     item: any,
 ) => {
-    if (contentType === AttributeContentType.Datetime) {
-        const returnVal = item?.value?.data
-            ? { data: new Date(item.value.data).toISOString() }
-            : typeof item === 'string'
-              ? { data: new Date(item).toISOString() }
-              : new Date(item).toISOString();
-        return returnVal;
-    }
-    if (contentType === AttributeContentType.Date) {
-        const returnVal = item?.value?.data
-            ? { data: new Date(item.value.data).toISOString().slice(0, 10) }
-            : typeof item === 'string'
-              ? { data: new Date(item).toISOString().slice(0, 10) }
-              : new Date(item).toISOString().slice(0, 10);
+    const normalizePrimitiveAttributeValue = (value: unknown) => {
+        if (value === undefined || value === null || value === '') return value;
 
-        return returnVal;
-    }
+        if (contentType === AttributeContentType.Integer || contentType === AttributeContentType.Float) {
+            const parsedNumber = typeof value === 'number' ? value : Number(value);
+            if (Number.isNaN(parsedNumber)) return value;
+
+            if (contentType === AttributeContentType.Integer) return Math.trunc(parsedNumber);
+            return parsedNumber;
+        }
+
+        return value;
+    };
+
+    if (contentType === AttributeContentType.Datetime) return getDatetimeFormValue(item);
+    if (contentType === AttributeContentType.Date) return getDateFormValue(item);
     if (contentType === AttributeContentType.Codeblock) {
         const language = getCodeBlockLanguage(item?.language, descriptorContent);
-        return { data: { code: utf8ToBase64(item.code), language: language } } as CodeBlockAttributeContent;
+        return { data: { code: utf8ToBase64(item.code), language } } as CodeBlockAttributeContentV2;
     }
-
     if (contentType === AttributeContentType.Secret) {
-        return {
-            data: {
-                secret: item,
-            },
-        } as SecretAttributeContent;
+        return { data: { secret: item } } as SecretAttributeContentV2;
     }
+    if (item && typeof item === 'object' && ('data' in item || 'reference' in item)) {
+        if ('data' in item) {
+            return { ...item, data: normalizePrimitiveAttributeValue(item.data) };
+        }
 
-    return item.value ?? { data: item };
+        return item;
+    }
+    if (item && typeof item === 'object' && 'value' in item) {
+        if (item.value && typeof item.value === 'object' && ('data' in item.value || 'reference' in item.value)) {
+            if ('data' in item.value) {
+                return { ...item.value, data: normalizePrimitiveAttributeValue(item.value.data) };
+            }
+
+            return item.value;
+        }
+        return { data: normalizePrimitiveAttributeValue(item.value) };
+    }
+    return { data: normalizePrimitiveAttributeValue(item) };
 };
 
 /**
@@ -220,6 +231,7 @@ export function collectFormAttributes(
                     content: Array.isArray(content) ? content : [content],
                     contentType: descriptor.contentType,
                     uuid: descriptor.uuid,
+                    version: descriptor.version,
                 };
 
                 attrs.push(attr);

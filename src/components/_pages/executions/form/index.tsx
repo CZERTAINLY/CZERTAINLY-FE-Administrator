@@ -1,37 +1,33 @@
 import Widget from 'components/Widget';
 import { selectors as rulesSelectors, actions as rulesActions } from 'ducks/rules';
 import { useCallback, useMemo } from 'react';
-import { Field, Form, FormProps } from 'react-final-form';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
-import { mutators } from 'utils/attributes/attributeEditorMutators';
-
+import Select from 'components/Select';
+import Button from 'components/Button';
+import Container from 'components/Container';
+import Breadcrumb from 'components/Breadcrumb';
 import ConditionFormFilter from 'components/ConditionFormFilter';
 import ProgressButton from 'components/ProgressButton';
+import TextInput from 'components/TextInput';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import Select from 'react-select';
 import { ExecutionType, PlatformEnum, Resource } from 'types/openapi';
 import { ExecutionItemRequestModel } from 'types/rules';
-import { isObjectSame } from 'utils/common-utils';
+import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { SendNotificationExecutionItems } from 'components/_pages/executions/SendNotificationExecutionItems';
-interface SelectChangeValue {
-    value: string;
-    label: string;
-}
 
 export interface ExecutionFormValues {
     name: string;
-    selectedResource?: SelectChangeValue;
     resource: Resource;
-    description?: string;
+    description: string;
     items: ExecutionItemRequestModel[];
-    notificationProfileItems?: SelectChangeValue[];
-    selectedType?: SelectChangeValue;
-    type?: ExecutionType;
+    notificationProfileItems: { value: string; label: string }[];
+    type: ExecutionType | '';
 }
 
 const ExecutionForm = () => {
@@ -55,12 +51,10 @@ const ExecutionForm = () => {
         return {
             name: '',
             resource: Resource.None,
-            selectedResource: undefined,
-            description: undefined,
-            actions: [],
+            description: '',
             items: [],
-            selectedType: undefined,
-            type: undefined,
+            notificationProfileItems: [],
+            type: '',
         };
     }, []);
 
@@ -70,6 +64,29 @@ const ExecutionForm = () => {
     const onCancel = useCallback(() => {
         navigate('../actions/1');
     }, [navigate]);
+
+    const methods = useForm<ExecutionFormValues>({
+        defaultValues,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit,
+        control,
+        formState: { isSubmitting, isValid },
+        setValue,
+    } = methods;
+
+    const formValues = useWatch({ control });
+    const watchedType = useWatch({
+        control,
+        name: 'type',
+    });
+
+    const watchedResource = useWatch({
+        control,
+        name: 'resource',
+    });
 
     const onSubmit = useCallback(
         (values: ExecutionFormValues) => {
@@ -109,176 +126,159 @@ const ExecutionForm = () => {
         [dispatch],
     );
 
-    const areDefaultValuesSame = useCallback(
-        (values: ExecutionFormValues) => {
-            const areValuesSame = isObjectSame(
-                values as unknown as Record<string, unknown>,
-                defaultValues as unknown as Record<string, unknown>,
-            );
-            return areValuesSame;
-        },
-        [defaultValues],
-    );
-
-    const renderExecutionItems = useCallback(({ values, form }: Partial<FormProps<ExecutionFormValues>>) => {
-        switch (values.selectedType?.value) {
-            case ExecutionType.SetField:
-                return values?.resource && <ConditionFormFilter formType="executionItem" resource={values.resource} />;
-            case ExecutionType.SendNotification:
-                return (
-                    <SendNotificationExecutionItems
-                        mode="form"
-                        notificationProfileItems={values.notificationProfileItems}
-                        onNotificationProfileItemsChange={(newItems) => form?.change('notificationProfileItems', newItems)}
-                    />
-                );
-        }
-    }, []);
+    const areDefaultValuesSame = useAreDefaultValuesSame(defaultValues as unknown as Record<string, unknown>);
 
     return (
-        <Widget title={title} busy={isBusy}>
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<ExecutionFormValues>() }}>
-                {({ handleSubmit, pristine, submitting, values, valid, form }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
-                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="name">Execution Name</Label>
-
-                                    <Input
-                                        {...input}
+        <>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.Actions)} Inventory`, href: '/actions/1' },
+                    { label: title, href: '' },
+                ]}
+            />
+            <FormProvider {...methods}>
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <Widget title={title} busy={isBusy}>
+                        <div className="space-y-4">
+                            <Controller
+                                name="name"
+                                control={control}
+                                rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        {...field}
                                         id="name"
-                                        valid={!meta.error && meta.touched}
-                                        invalid={!!meta.error && meta.touched}
                                         type="text"
+                                        label="Execution Name"
+                                        required
                                         placeholder="Enter the Execution Name"
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
+                                )}
+                            />
 
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        <Field name="description">
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="description">Description</Label>
-
-                                    <Input
+                            <Controller
+                                name="description"
+                                control={control}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        {...field}
                                         id="description"
-                                        {...input}
-                                        valid={!meta.error && meta.touched}
-                                        invalid={!!meta.error && meta.touched}
                                         type="text"
+                                        label="Description"
                                         placeholder="Enter the Description"
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
+                                )}
+                            />
 
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
+                            <Controller
+                                name="type"
+                                control={control}
+                                rules={buildValidationRules([validateRequired()])}
+                                render={({ field, fieldState }) => (
+                                    <>
+                                        <Select
+                                            id="typeSelect"
+                                            label="Execution Type"
+                                            value={field.value || ''}
+                                            onChange={(value) => {
+                                                field.onChange(value);
+                                                setValue('resource', Resource.Any);
+                                            }}
+                                            options={executionTypeOptions}
+                                            placeholder="Select Execution Type"
+                                            isClearable
+                                            placement="bottom"
+                                        />
+                                        {fieldState.error && fieldState.isTouched && (
+                                            <p className="mt-1 text-sm text-red-600">
+                                                {typeof fieldState.error === 'string'
+                                                    ? fieldState.error
+                                                    : fieldState.error?.message || 'Invalid value'}
+                                            </p>
+                                        )}
+                                    </>
+                                )}
+                            />
+
+                            <Controller
+                                name="resource"
+                                control={control}
+                                rules={buildValidationRules([validateRequired()])}
+                                render={({ field, fieldState }) => (
+                                    <>
+                                        <Select
+                                            id="resourceSelect"
+                                            label="Resource"
+                                            value={field.value || ''}
+                                            onChange={(value) => {
+                                                field.onChange(value);
+                                                setValue('items', []);
+                                            }}
+                                            options={resourceOptionsWithRuleEvaluator || []}
+                                            placeholder="Select Resource"
+                                            minWidth={180}
+                                            disabled={watchedType === ExecutionType.SendNotification}
+                                            placement="bottom"
+                                        />
+                                        {fieldState.error && fieldState.isTouched && (
+                                            <p className="mt-1 text-sm text-red-600">
+                                                {typeof fieldState.error === 'string'
+                                                    ? fieldState.error
+                                                    : fieldState.error?.message || 'Invalid value'}
+                                            </p>
+                                        )}
+                                    </>
+                                )}
+                            />
+
+                            {watchedType === ExecutionType.SetField && watchedResource && (
+                                <ConditionFormFilter formType="executionItem" resource={watchedResource} />
                             )}
-                        </Field>
 
-                        <Field name="selectedType" validate={validateRequired()}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="typeSelect">Execution Type</Label>
-
-                                    <Select
-                                        {...input}
-                                        inputId="typeSelect"
-                                        options={executionTypeOptions}
-                                        placeholder="Select Execution Type"
-                                        onChange={(event) => {
-                                            input.onChange(event);
-                                            if (event?.value) {
-                                                form.change('type', event.value);
-                                            }
-                                            form.change('resource', Resource.Any);
-                                            form.change('selectedResource', {
-                                                value: Resource.Any,
-                                                label: getEnumLabel(resourceEnum, Resource.Any),
-                                            });
-                                        }}
-                                        styles={{
-                                            control: (provided) =>
-                                                meta.touched && meta.invalid
-                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                    : { ...provided },
-                                        }}
-                                        isClearable
-                                    />
-
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                        {meta.error}
-                                    </div>
-                                </FormGroup>
+                            {watchedType === ExecutionType.SendNotification && (
+                                <Controller
+                                    name="notificationProfileItems"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <SendNotificationExecutionItems
+                                            mode="form"
+                                            notificationProfileItems={field.value}
+                                            onNotificationProfileItemsChange={(newItems) => {
+                                                field.onChange(newItems);
+                                            }}
+                                        />
+                                    )}
+                                />
                             )}
-                        </Field>
 
-                        <Field name="selectedResource" validate={validateRequired()}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="resourceSelect">Resource</Label>
-
-                                    <Select
-                                        {...input}
-                                        id="resource"
-                                        inputId="resourceSelect"
-                                        maxMenuHeight={140}
-                                        menuPlacement="auto"
-                                        options={resourceOptionsWithRuleEvaluator || []}
-                                        placeholder="Select Resource"
-                                        onChange={(event) => {
-                                            input.onChange(event);
-                                            if (event?.value) {
-                                                form.change('resource', event.value);
-                                            }
-                                            form.change('items', []);
-                                        }}
-                                        styles={{
-                                            control: (provided) =>
-                                                meta.touched && meta.invalid
-                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                    : { ...provided },
-                                        }}
-                                        isClearable
-                                        isDisabled={values.type === ExecutionType.SendNotification}
-                                    />
-
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                        {meta.error}
-                                    </div>
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        {renderExecutionItems({ values, form })}
-
-                        <div className="d-flex justify-content-end">
-                            <ButtonGroup>
+                            <Container className="flex-row justify-end" gap={4}>
+                                <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
+                                    Cancel
+                                </Button>
                                 <ProgressButton
                                     title={submitTitle}
                                     inProgressTitle={inProgressTitle}
-                                    inProgress={submitting}
+                                    inProgress={isSubmitting}
                                     disabled={
-                                        areDefaultValuesSame(values) ||
-                                        (values.resource === Resource.None && values.type !== ExecutionType.SendNotification) ||
-                                        submitting ||
-                                        !valid ||
+                                        areDefaultValuesSame(formValues) ||
+                                        (formValues.resource === Resource.None && formValues.type !== ExecutionType.SendNotification) ||
+                                        isSubmitting ||
+                                        !isValid ||
                                         isBusy ||
-                                        (!values.items.length && !values.notificationProfileItems?.length)
+                                        (!formValues.items.length && !formValues.notificationProfileItems?.length)
                                     }
+                                    type="submit"
                                 />
-
-                                <Button color="default" onClick={onCancel} disabled={submitting}>
-                                    Cancel
-                                </Button>
-                            </ButtonGroup>
+                            </Container>
                         </div>
-                    </BootstrapForm>
-                )}
-            </Form>
-        </Widget>
+                    </Widget>
+                </form>
+            </FormProvider>
+        </>
     );
 };
 

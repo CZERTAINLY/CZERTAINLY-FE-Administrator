@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router';
 
-import { Button, ButtonGroup, Container } from 'reactstrap';
+import Button from 'components/Button';
+import Container from 'components/Container';
 
 import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
@@ -12,44 +12,60 @@ import { actions as userActions, selectors as usersSelectors } from 'ducks/users
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 
-function RoleForm() {
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+interface RoleUsersFormProps {
+    roleId?: string;
+    onCancel?: () => void;
+    onSuccess?: () => void;
+}
 
-    const { id } = useParams();
+function RoleUsersForm({ roleId, onCancel, onSuccess }: RoleUsersFormProps = {}) {
+    const dispatch = useDispatch();
 
     const roleSelector = useSelector(rolesSelectors.role);
     const usersSelector = useSelector(usersSelectors.users);
 
     const isFetchingRoleDetail = useSelector(rolesSelectors.isFetchingDetail);
     const isFetchingUsers = useSelector(usersSelectors.isFetchingList);
-    const isUpdatingUsers = useSelector(rolesSelectors.isUpdatingUsers);
 
     const [assignedUsers, setAssignedUsers] = useState<string[]>([]);
+
+    const isUpdatingUsers = useSelector(rolesSelectors.isUpdatingUsers);
+    const wasUpdating = useRef(isUpdatingUsers);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdatingUsers) {
+            if (onSuccess) {
+                onSuccess();
+            }
+        }
+        wasUpdating.current = isUpdatingUsers;
+    }, [isUpdatingUsers, onSuccess]);
 
     /* Load all users */
 
     useEffect(() => {
-        if (!id) return;
+        if (!roleId) return;
         dispatch(userActions.list());
-        dispatch(rolesActions.getDetail({ uuid: id }));
-    }, [dispatch, id]);
+        dispatch(rolesActions.getDetail({ uuid: roleId }));
+    }, [dispatch, roleId]);
 
     /* Set assigned users */
 
     useEffect(() => {
-        if (!roleSelector || roleSelector.uuid !== id) return;
+        if (!roleSelector || roleSelector.uuid !== roleId) return;
         setAssignedUsers(roleSelector.users.map((user) => user.uuid));
-    }, [id, roleSelector]);
+    }, [roleId, roleSelector]);
 
-    const onSubmit = useCallback(() => {
-        if (!id) return;
-        dispatch(rolesActions.updateUsers({ uuid: id, users: assignedUsers }));
-    }, [assignedUsers, dispatch, id]);
+    const handleSubmit = useCallback(() => {
+        if (!roleId) return;
+        dispatch(rolesActions.updateUsers({ uuid: roleId, users: assignedUsers }));
+    }, [assignedUsers, dispatch, roleId]);
 
-    const onCancel = useCallback(() => {
-        navigate(-1);
-    }, [navigate]);
+    const handleCancel = useCallback(() => {
+        if (onCancel) {
+            onCancel();
+        }
+    }, [onCancel]);
 
     const usersTableHeader: TableHeader[] = useMemo(
         () => [
@@ -91,33 +107,26 @@ function RoleForm() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <Widget title={`${roleSelector?.name || ''} Role Users `} busy={isFetchingRoleDetail || isFetchingUsers || isUpdatingUsers}>
-                <br />
+        <Widget noBorder busy={isFetchingRoleDetail || isFetchingUsers || isUpdatingUsers}>
+            <CustomTable
+                headers={usersTableHeader}
+                data={usersTableData}
+                checkedRows={assignedUsers}
+                hasCheckboxes={true}
+                hasAllCheckBox={false}
+                onCheckedRowsChanged={(rows) => {
+                    setAssignedUsers(rows as string[]);
+                }}
+            />
 
-                <CustomTable
-                    headers={usersTableHeader}
-                    data={usersTableData}
-                    checkedRows={assignedUsers}
-                    hasCheckboxes={true}
-                    hasAllCheckBox={false}
-                    onCheckedRowsChanged={(rows) => {
-                        setAssignedUsers(rows as string[]);
-                    }}
-                />
-
-                <div className="d-flex justify-content-end">
-                    <ButtonGroup>
-                        <ProgressButton title="Save" inProgressTitle="Saving..." inProgress={isUpdatingUsers} onClick={onSubmit} />
-
-                        <Button color="default" onClick={onCancel} disabled={isUpdatingUsers}>
-                            Cancel
-                        </Button>
-                    </ButtonGroup>
-                </div>
-            </Widget>
-        </Container>
+            <Container className="flex-row justify-end modal-footer" gap={4}>
+                <Button variant="outline" onClick={handleCancel} disabled={isUpdatingUsers}>
+                    Cancel
+                </Button>
+                <ProgressButton title="Save" inProgressTitle="Saving..." inProgress={isUpdatingUsers} onClick={handleSubmit} />
+            </Container>
+        </Widget>
     );
 }
 
-export default RoleForm;
+export default RoleUsersForm;

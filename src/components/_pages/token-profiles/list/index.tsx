@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
-import { Badge, Container } from 'reactstrap';
+import { Link } from 'react-router';
+import TokenProfileForm from '../form';
+import Badge from 'components/Badge';
 
 import { actions, selectors } from 'ducks/token-profiles';
 
@@ -12,14 +14,13 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import TokenStatusBadge from 'components/_pages/tokens/TokenStatusBadge';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import Select from 'react-select';
+import KeyUsageSelect from '../../cryptographic-keys/KeyUsageSelect';
 import { KeyUsage, PlatformEnum } from 'types/openapi';
 import { TokenProfileResponseModel } from 'types/token-profiles';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
 function TokenProfileList() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const checkedRows = useSelector(selectors.checkedRows);
     const tokenProfiles = useSelector(selectors.tokenProfiles);
@@ -28,6 +29,7 @@ function TokenProfileList() {
     const isDeleting = useSelector(selectors.isDeleting);
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
     const isUpdating = useSelector(selectors.isUpdating);
+    const isCreating = useSelector(selectors.isCreating);
     const isEnabling = useSelector(selectors.isEnabling);
     const isBulkEnabling = useSelector(selectors.isBulkEnabling);
     const isBulkDisabling = useSelector(selectors.isBulkDisabling);
@@ -45,10 +47,11 @@ function TokenProfileList() {
         isBulkUpdatingKeyUsage;
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
-
     const [keyUsageUpdate, setKeyUsageUpdate] = useState<boolean>(false);
-
     const [keyUsages, setKeyUsages] = useState<KeyUsage[]>([]);
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+    const [editingTokenProfileId, setEditingTokenProfileId] = useState<string | undefined>(undefined);
+    const [editingTokenId, setEditingTokenId] = useState<string | undefined>(undefined);
 
     const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
@@ -59,9 +62,30 @@ function TokenProfileList() {
         getFreshData();
     }, [getFreshData]);
 
+    useRunOnFinished(isCreating, () => {
+        setIsAddModalOpen(false);
+        setEditingTokenId(undefined);
+        getFreshData();
+    });
+    useRunOnFinished(isUpdating, () => {
+        setEditingTokenProfileId(undefined);
+        setEditingTokenId(undefined);
+        getFreshData();
+    });
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingTokenProfileId(undefined);
+        setEditingTokenId(undefined);
+    }, []);
+
     const onAddClick = useCallback(() => {
-        navigate(`./add`);
-    }, [navigate]);
+        handleOpenAddModal();
+    }, [handleOpenAddModal]);
 
     const onEnableClick = useCallback(() => {
         dispatch(actions.bulkEnableTokenProfiles({ uuids: checkedRows }));
@@ -94,9 +118,7 @@ function TokenProfileList() {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => {
-                    onAddClick();
-                },
+                onClick: handleOpenAddModal,
             },
             {
                 icon: 'trash',
@@ -131,35 +153,7 @@ function TokenProfileList() {
                 },
             },
         ],
-        [checkedRows, onAddClick, onEnableClick, onDisableClick, setKeyUsageUpdate],
-    );
-
-    const keyUsageOptions = () => {
-        let options = [];
-        for (const suit in KeyUsage) {
-            options.push({
-                label: getEnumLabel(keyUsageEnum, KeyUsage[suit as keyof typeof KeyUsage]),
-                value: KeyUsage[suit as keyof typeof KeyUsage],
-            });
-        }
-        return options;
-    };
-
-    const keyUsageBody = (
-        <div>
-            <div className="form-group">
-                <label className="form-label">Key Usage</label>
-                <Select
-                    isMulti={true}
-                    id="field"
-                    options={keyUsageOptions()}
-                    onChange={(e) => {
-                        setKeyUsages(e.map((item) => item.value));
-                    }}
-                    isClearable={true}
-                />
-            </div>
-        </div>
+        [checkedRows, handleOpenAddModal, onEnableClick, onDisableClick, setKeyUsageUpdate],
     );
 
     const tokenProfilesTableHeaders: TableHeader[] = useMemo(
@@ -250,7 +244,7 @@ function TokenProfileList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
                 title="List of Token Profiles"
                 busy={isBusy}
@@ -259,7 +253,6 @@ function TokenProfileList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={tokenProfilesTableHeaders}
                     data={profilesTableData}
@@ -274,26 +267,36 @@ function TokenProfileList() {
                 isOpen={confirmDelete}
                 caption={`Delete Token ${checkedRows.length > 1 ? 'Profiles' : 'Profile'}`}
                 body={`You are about to delete ${
-                    checkedRows.length > 1 ? 'a Token Profile' : 'Token Profiles'
+                    checkedRows.length > 1 ? 'Token Profiles' : 'a Token Profile'
                 }. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
 
             <Dialog
                 isOpen={keyUsageUpdate}
-                caption={`Update Key Usage`}
-                body={keyUsageBody}
+                caption="Update Key Usage"
+                body={<KeyUsageSelect value={keyUsages} onChange={setKeyUsages} keyUsageEnum={keyUsageEnum} />}
                 toggle={() => setKeyUsageUpdate(false)}
+                size="md"
                 buttons={[
+                    { color: 'secondary', variant: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
                     { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
-                    { color: 'secondary', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+
+            <Dialog
+                isOpen={isAddModalOpen || !!editingTokenProfileId}
+                toggle={handleCloseAddModal}
+                caption={editingTokenProfileId ? 'Edit Token Profile' : 'Create Token Profile'}
+                size="xl"
+                body={<TokenProfileForm tokenProfileId={editingTokenProfileId} tokenId={editingTokenId} onCancel={handleCloseAddModal} />}
+            />
+        </>
     );
 }
 

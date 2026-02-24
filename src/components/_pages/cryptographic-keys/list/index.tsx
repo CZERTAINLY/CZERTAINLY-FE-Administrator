@@ -12,14 +12,16 @@ import { selectors as pagingSelectors } from 'ducks/paging';
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import Select from 'react-select';
-import { Badge, Container } from 'reactstrap';
+import Select from 'components/Select';
 import { SearchRequestModel } from 'types/certificate';
 import { KeyCompromiseReason, KeyUsage, PlatformEnum } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
 import KeyStateCircle from '../KeyStateCircle';
 import KeyStatusCircle from '../KeyStatusCircle';
+import KeyUsageSelect from '../KeyUsageSelect';
+import Badge from 'components/Badge';
+import CryptographicKeyForm from '../form';
 
 function CryptographicKeyList() {
     const dispatch = useDispatch();
@@ -47,6 +49,8 @@ function CryptographicKeyList() {
     const [keyUsages, setKeyUsages] = useState<KeyUsage[]>([]);
 
     const [compromiseReason, setCompromiseReason] = useState<KeyCompromiseReason>();
+
+    const [isAddOpen, setIsAddOpen] = useState<boolean>(false);
 
     useEffect(() => {
         dispatch(actions.clearDeleteErrorMessages());
@@ -76,81 +80,56 @@ function CryptographicKeyList() {
         setConfirmDestroy(false);
     }, [checkedRows, dispatch]);
 
-    const buttons: WidgetButtonProps[] = useMemo(
-        () => [
-            {
-                icon: 'check',
-                disabled: checkedRows.length === 0,
-                tooltip: 'Enable',
-                onClick: () => {
-                    onEnableClick();
-                },
+    const buttons: WidgetButtonProps[] = [
+        {
+            icon: 'plus',
+            tooltip: 'Create Key',
+            disabled: false,
+            onClick: () => {
+                setIsAddOpen(true);
             },
-            {
-                icon: 'times',
-                disabled: checkedRows.length === 0,
-                tooltip: 'Disable',
-                onClick: () => {
-                    onDisableClick();
-                },
+        },
+        {
+            icon: 'check',
+            disabled: checkedRows.length === 0,
+            tooltip: 'Enable',
+            onClick: () => {
+                onEnableClick();
             },
-            {
-                icon: 'key',
-                disabled: checkedRows.length === 0,
-                tooltip: 'Update Key Usage',
-                onClick: () => {
-                    setKeyUsageUpdate(true);
-                },
+        },
+        {
+            icon: 'times',
+            disabled: checkedRows.length === 0,
+            tooltip: 'Disable',
+            onClick: () => {
+                onDisableClick();
             },
-            {
-                icon: 'compromise',
-                disabled: checkedRows.length === 0,
-                tooltip: 'Compromise',
-                onClick: () => {
-                    setConfirmCompromise(true);
-                },
+        },
+        {
+            icon: 'key',
+            disabled: checkedRows.length === 0,
+            tooltip: 'Update Key Usage',
+            onClick: () => {
+                setKeyUsageUpdate(true);
             },
-            {
-                icon: 'destroy',
-                disabled: checkedRows.length === 0,
-                tooltip: 'Destroy',
-                onClick: () => {
-                    setConfirmDestroy(true);
-                },
+        },
+        {
+            icon: 'compromise',
+            disabled: checkedRows.length === 0,
+            tooltip: 'Compromise',
+            onClick: () => {
+                setConfirmCompromise(true);
             },
-        ],
-        [checkedRows, onEnableClick, onDisableClick, setKeyUsageUpdate],
-    );
-
-    const keyUsageOptions = useMemo(() => {
-        let options = [];
-        if (keyUsageEnum) {
-            for (const suit in KeyUsage) {
-                options.push({
-                    label: getEnumLabel(keyUsageEnum, KeyUsage[suit as keyof typeof KeyUsage]),
-                    value: KeyUsage[suit as keyof typeof KeyUsage],
-                });
-            }
-        }
-        return options;
-    }, [keyUsageEnum]);
-
-    const keyUsageBody = (
-        <div>
-            <div className="form-group">
-                <label className="form-label">Key Usage</label>
-                <Select
-                    isMulti={true}
-                    id="field"
-                    options={keyUsageOptions}
-                    onChange={(e) => {
-                        setKeyUsages(e.map((item) => item.value));
-                    }}
-                    isClearable={true}
-                />
-            </div>
-        </div>
-    );
+        },
+        {
+            icon: 'destroy',
+            disabled: checkedRows.length === 0,
+            tooltip: 'Destroy',
+            onClick: () => {
+                setConfirmDestroy(true);
+            },
+        },
+    ];
 
     const cryptographicKeysTableHeaders: TableHeader[] = useMemo(
         () => [
@@ -297,8 +276,13 @@ function CryptographicKeyList() {
 
     const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listCryptographicKeys(filters)), [dispatch]);
 
+    const handleFormSuccess = useCallback(() => {
+        setIsAddOpen(false);
+        onListCallback({ itemsPerPage: 10, pageNumber: 1, filters: [] });
+    }, [onListCallback]);
+
     return (
-        <Container className="themed-container" fluid>
+        <>
             <PagedList
                 entity={EntityType.KEY}
                 onListCallback={onListCallback}
@@ -316,28 +300,40 @@ function CryptographicKeyList() {
                 entityNameSingular="a Key"
                 entityNamePlural="Keys"
                 filterTitle="Key Inventory Filter"
+                addHidden
+            />
+            <Dialog
+                isOpen={isAddOpen}
+                caption="Create Key"
+                body={<CryptographicKeyForm onSuccess={handleFormSuccess} onCancel={() => setIsAddOpen(false)} />}
+                toggle={() => {
+                    setIsAddOpen(false);
+                }}
+                size="xl"
+                buttons={[]}
             />
             <Dialog
                 isOpen={confirmCompromise}
                 caption={`Compromise ${checkedRows.length > 1 ? 'Keys' : 'Key'}`}
                 body={
                     <div>
-                        <p>You are about to mark the Key as compromised. Is this what you want to do?</p>
-                        <p>
+                        <p className="text-center">You are about to mark the Key as compromised. Is this what you want to do?</p>
+                        <p className="mt-2 mb-4 text-center">
                             <b>Warning:</b> This action cannot be undone.
                         </p>
                         <Select
-                            name="compromiseReason"
                             id="compromiseReason"
                             options={optionForCompromise}
-                            onChange={(e) => setCompromiseReason(e?.value)}
+                            value={compromiseReason || ''}
+                            onChange={(value) => setCompromiseReason(value as KeyCompromiseReason)}
                         />
                     </div>
                 }
                 toggle={() => setConfirmCompromise(false)}
+                size="md"
                 buttons={[
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
                     { color: 'danger', onClick: onCompromise, body: 'Yes' },
-                    { color: 'secondary', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
                 ]}
             />
             <Dialog
@@ -345,22 +341,24 @@ function CryptographicKeyList() {
                 caption={`Destroy ${checkedRows.length > 1 ? 'Keys' : 'Key'}`}
                 body={`You are about to destroy ${checkedRows.length > 1 ? 'a Key' : 'Keys'}. Is this what you want to do?`}
                 toggle={() => setConfirmDestroy(false)}
+                icon="destroy"
                 buttons={[
-                    { color: 'danger', onClick: onDestroy, body: 'Yes, Destroy' },
-                    { color: 'secondary', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDestroy, body: 'Destroy' },
                 ]}
             />
             <Dialog
                 isOpen={keyUsageUpdate}
-                caption={`Update Key Usage`}
-                body={keyUsageBody}
+                caption="Update Key Usage"
+                body={<KeyUsageSelect value={keyUsages} onChange={setKeyUsages} keyUsageEnum={keyUsageEnum} />}
                 toggle={() => setKeyUsageUpdate(false)}
+                size="md"
                 buttons={[
+                    { color: 'secondary', variant: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
                     { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
-                    { color: 'secondary', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </>
     );
 }
 

@@ -7,14 +7,14 @@ import { actions, selectors } from 'ducks/discoveries';
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { Button } from 'reactstrap';
+import Button from 'components/Button';
 
 import { TriggerHistorySummaryModel } from 'types/rules';
 import { dateFormatter } from 'utils/dateUtil';
 import PagedCustomTable from '../../../CustomTable/PagedCustomTable';
 import TabLayout from '../../../Layout/TabLayout';
 import TriggerHistorySummaryViewer from './TriggerHistorySummaryViewer';
-import styles from './discoveryCertificates.module.scss';
+import { Info } from 'lucide-react';
 
 interface Props {
     id: string;
@@ -92,11 +92,11 @@ export default function DiscoveryCertificates({ id, triggerHistorySummary }: Pro
             discoveryCertificates?.certificates.map((r) => {
                 const certificateColumns = [
                     r.inventoryUuid ? <Link to={`../../certificates/detail/${r.inventoryUuid}`}>{r.commonName}</Link> : r.commonName,
-                    <span className={styles.wordWrap}>{r.serialNumber}</span>,
+                    <span>{r.serialNumber}</span>,
                     <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(r.notAfter)}</span>,
                     <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(r.notBefore)}</span>,
                     r.issuerCommonName,
-                    <span className={styles.wordWrap}>{r.fingerprint}</span>,
+                    <span>{r.fingerprint}</span>,
                 ];
 
                 if (newlyDiscovered === true) {
@@ -111,15 +111,14 @@ export default function DiscoveryCertificates({ id, triggerHistorySummary }: Pro
                         ),
                         r.processedError ? (
                             <Button
-                                color="white"
-                                size="sm"
+                                variant="transparent"
                                 className="p-1"
                                 onClick={() => {
                                     setMessage(r.processedError ?? '');
                                     setShowMessage(true);
                                 }}
                             >
-                                <i className="fa fa-info-circle"></i>
+                                <Info size={16} />
                             </Button>
                         ) : (
                             ''
@@ -144,16 +143,15 @@ export default function DiscoveryCertificates({ id, triggerHistorySummary }: Pro
     );
 
     return (
-        <Widget title="Discovered Certificates" busy={isFetchingDiscoveryCertificates}>
-            <br />
-
+        <Widget title="Discovered Certificates" titleSize="large" busy={isFetchingDiscoveryCertificates}>
             <TabLayout
                 tabs={[
                     { title: 'All', onClick: () => setNewlyDiscovered(undefined), content: pagedTable },
                     { title: 'New', onClick: () => setNewlyDiscovered(true), content: pagedTable },
                     { title: 'Existing', onClick: () => setNewlyDiscovered(false), content: pagedTable },
                 ]}
-                onlyActiveTabContent={true}
+                onlyActiveTabContent
+                noBorder
             />
             <Dialog
                 isOpen={showMessage}

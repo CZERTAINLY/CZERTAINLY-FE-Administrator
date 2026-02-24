@@ -10,7 +10,6 @@ import { SearchFieldListModel } from 'types/certificate';
 import { ConditionModel, ExecutionModel } from 'types/rules';
 import ConditionsItemsList from './ConditionsItemsList';
 import ExecutionsItemsList from './ExecutionsItemsList';
-import styles from './executionConditionItemsList.module.scss';
 
 type ListType = 'conditionsItems' | 'executionItems';
 
@@ -66,7 +65,6 @@ const ConditionsExecutionsList = ({
         } else if (actionExecutions?.length) {
             return actionExecutions.map((execution, i) => (
                 <React.Fragment key={execution.uuid}>
-                    <hr className={styles.conditionListHr} />
                     <ExecutionsItemsList
                         executionName={execution.name}
                         executionUuid={execution.uuid}
@@ -80,8 +78,8 @@ const ConditionsExecutionsList = ({
     }, [ruleConditions, actionExecutions, isBusy]);
 
     return (
-        <Widget title={widgetTitle} titleSize="larger" busy={isBusy}>
-            <div>{renderListData}</div>
+        <Widget title={widgetTitle} titleSize="large" busy={isBusy}>
+            <div className="flex flex-col gap-2">{renderListData}</div>
         </Widget>
     );
 };

@@ -1,6 +1,5 @@
-import { Field } from 'react-final-form';
-import { FormGroup, Label } from 'reactstrap';
-import Select, { components } from 'react-select';
+import { Controller, useFormContext } from 'react-hook-form';
+import Select from 'components/Select';
 import Widget from 'components/Widget';
 import { actions as groupsActions, selectors as groupsSelectors } from 'ducks/certificateGroups';
 import { actions as userAction, selectors as userSelectors } from 'ducks/users';
@@ -52,92 +51,53 @@ export default function CertificateAssociationsFormWidget({
         }
     }, [groups, setGroupOptions]);
 
+    const { control } = useFormContext();
+
     return (
         <Widget title="Default Certificate associations">
-            <Field name="owner">
-                {({ input }) => (
-                    <FormGroup>
-                        <Label for="owner">Owner</Label>
+            <div className="space-y-4">
+                <Controller
+                    name="owner"
+                    control={control}
+                    render={({ field }) => (
                         <Select
-                            {...input}
                             id="owner"
-                            instanceId="owner"
+                            label="Owner"
+                            value={field.value || ''}
+                            onChange={(value) => {
+                                field.onChange(value);
+                            }}
                             options={userOptions}
                             placeholder="Select Owner"
                             isClearable
-                            components={{
-                                Menu: (props) => (
-                                    <components.Menu
-                                        {...props}
-                                        innerProps={{ ...props.innerProps, 'data-testid': 'certificate-associations-owner-menu' } as any}
-                                    />
-                                ),
-                                Control: (props) => (
-                                    <components.Control
-                                        {...props}
-                                        innerProps={{ ...props.innerProps, 'data-testid': 'certificate-associations-owner-control' } as any}
-                                    />
-                                ),
-                                ClearIndicator: (props) => (
-                                    <components.ClearIndicator
-                                        {...props}
-                                        innerProps={
-                                            {
-                                                ...props.innerProps,
-                                                'data-testid': 'certificate-associations-owner-clear-button',
-                                            } as any
-                                        }
-                                    />
-                                ),
-                            }}
+                            placement="bottom"
                         />
-                    </FormGroup>
-                )}
-            </Field>
-
-            <Field name="groups">
-                {({ input }) => (
-                    <FormGroup>
-                        <Label for="groups">Groups</Label>
+                    )}
+                />
+                <Controller
+                    name="groups"
+                    control={control}
+                    render={({ field }) => (
                         <Select
-                            {...input}
                             id="groups"
-                            instanceId="groups"
+                            label="Groups"
+                            isMulti
+                            value={field.value || []}
+                            onChange={(value) => {
+                                field.onChange(value);
+                            }}
                             options={groupOptions}
                             placeholder="Select Groups"
                             isClearable
-                            isMulti
-                            components={{
-                                Menu: (props) => (
-                                    <components.Menu
-                                        {...props}
-                                        innerProps={{ ...props.innerProps, 'data-testid': 'certificate-associations-group-menu' } as any}
-                                    />
-                                ),
-                                Control: (props) => (
-                                    <components.Control
-                                        {...props}
-                                        innerProps={{ ...props.innerProps, 'data-testid': 'certificate-associations-group-control' } as any}
-                                    />
-                                ),
-                                ClearIndicator: (props) => (
-                                    <components.ClearIndicator
-                                        {...props}
-                                        innerProps={
-                                            {
-                                                ...props.innerProps,
-                                                'data-testid': 'certificate-associations-group-clear-button',
-                                            } as any
-                                        }
-                                    />
-                                ),
-                            }}
+                            placement="bottom"
                         />
-                    </FormGroup>
-                )}
-            </Field>
+                    )}
+                />
 
-            <Widget title="Custom Attributes">{renderCustomAttributes}</Widget>
+                <Widget noBorder title="Certificate Custom Attributes">
+                    {renderCustomAttributes}
+                </Widget>
+            </div>
         </Widget>
     );
 }

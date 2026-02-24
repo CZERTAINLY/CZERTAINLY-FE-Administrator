@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
-import { Container, Table } from 'reactstrap';
+import { Link } from 'react-router';
+import Container from 'components/Container';
 
 import { actions, selectors } from 'ducks/scep-profiles';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import ForceDeleteErrorTable from 'components/ForceDeleteErrorTable';
 import Dialog from 'components/Dialog';
+import ScepProfileForm from '../form';
 import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
@@ -14,7 +17,6 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 
 export default function ScepProfiles() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const checkedRows = useSelector(selectors.checkedRows);
     const scepProfiles = useSelector(selectors.scepProfiles);
@@ -28,11 +30,14 @@ export default function ScepProfiles() {
     const isBulkEnabling = useSelector(selectors.isBulkEnabling);
     const isBulkDisabling = useSelector(selectors.isBulkDisabling);
     const isBulkForceDeleting = useSelector(selectors.isBulkForceDeleting);
+    const isCreating = useSelector(selectors.isCreating);
 
     const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isBulkEnabling || isBulkDisabling || isBulkForceDeleting;
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [confirmForceDelete, setConfirmForceDelete] = useState<boolean>(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+    const [editingScepProfileId, setEditingScepProfileId] = useState<string | undefined>(undefined);
 
     const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
@@ -47,9 +52,27 @@ export default function ScepProfiles() {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
     }, [bulkDeleteErrorMessages]);
 
+    useRunOnFinished(isCreating, () => {
+        setIsAddModalOpen(false);
+        getFreshData();
+    });
+    useRunOnFinished(isUpdating, () => {
+        setEditingScepProfileId(undefined);
+        getFreshData();
+    });
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingScepProfileId(undefined);
+    }, []);
+
     const onAddClick = useCallback(() => {
-        navigate(`./add`);
-    }, [navigate]);
+        handleOpenAddModal();
+    }, [handleOpenAddModal]);
 
     const onEnableClick = useCallback(() => {
         dispatch(actions.bulkEnableScepProfiles({ uuids: checkedRows }));
@@ -82,9 +105,7 @@ export default function ScepProfiles() {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => {
-                    onAddClick();
-                },
+                onClick: handleOpenAddModal,
             },
             {
                 icon: 'trash',
@@ -111,38 +132,16 @@ export default function ScepProfiles() {
                 },
             },
         ],
-        [checkedRows, onAddClick, onEnableClick, onDisableClick],
+        [checkedRows, handleOpenAddModal, onEnableClick, onDisableClick],
     );
 
-    const forceDeleteBody = useMemo(
-        () => (
-            <div>
-                <div>Failed to delete {checkedRows.length > 1 ? 'SCEP Profiles' : 'a SCEP Profile'}. Please find the details below:</div>
-
-                <Table className="table-hover" size="sm">
-                    <thead>
-                        <tr>
-                            <th>
-                                <b>Name</b>
-                            </th>
-                            <th>
-                                <b>Dependencies</b>
-                            </th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {bulkDeleteErrorMessages?.map((message) => (
-                            <tr>
-                                <td>{message.name}</td>
-                                <td>{message.message}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </Table>
-            </div>
-        ),
-        [bulkDeleteErrorMessages, checkedRows.length],
+    const forceDeleteBody = (
+        <ForceDeleteErrorTable
+            items={bulkDeleteErrorMessages}
+            entityNameSingular="a SCEP Profile"
+            entityNamePlural="SCEP Profiles"
+            itemsCount={checkedRows.length}
+        />
     );
 
     const scepProfilesTableHeader: TableHeader[] = useMemo(
@@ -152,7 +151,7 @@ export default function ScepProfiles() {
                 content: 'Name',
                 sortable: true,
                 sort: 'asc',
-                width: '10%',
+                width: '30%',
             },
             {
                 id: 'description',
@@ -164,7 +163,7 @@ export default function ScepProfiles() {
                 id: 'raProfileName',
                 content: 'RA Profile Name',
                 sortable: true,
-                width: '10%',
+                width: '13%',
                 align: 'center',
             },
             {
@@ -178,7 +177,7 @@ export default function ScepProfiles() {
                 id: 'scepUrl',
                 content: 'SCEP URL',
                 sortable: true,
-                width: '10%',
+                width: '33%',
                 align: 'center',
             },
             {
@@ -221,8 +220,9 @@ export default function ScepProfiles() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <Container>
             <Widget
+                dataTestId="scep-profiles-list-widget"
                 title="List of SCEP Profiles"
                 busy={isBusy}
                 widgetLockName={LockWidgetNameEnum.ListOfSCEPProfiles}
@@ -230,7 +230,6 @@ export default function ScepProfiles() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={scepProfilesTableHeader}
                     data={scepProfilesTableData}
@@ -248,9 +247,10 @@ export default function ScepProfiles() {
                     checkedRows.length > 1 ? 'SCEP Profiles' : 'a SCEP Profile'
                 } which may have associated SCEP Account(s). When deleted the SCEP Account(s) will be revoked. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
 
@@ -260,9 +260,19 @@ export default function ScepProfiles() {
                 body={forceDeleteBody}
                 toggle={() => setConfirmForceDelete(false)}
                 buttons={[
+                    { color: 'secondary', variant: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                     { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
-                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
+            />
+
+            <Dialog
+                isOpen={isAddModalOpen || !!editingScepProfileId}
+                toggle={handleCloseAddModal}
+                caption={editingScepProfileId ? 'Edit SCEP Profile' : 'Create SCEP Profile'}
+                size="xl"
+                body={
+                    <ScepProfileForm scepProfileId={editingScepProfileId} onCancel={handleCloseAddModal} onSuccess={handleCloseAddModal} />
+                }
             />
         </Container>
     );

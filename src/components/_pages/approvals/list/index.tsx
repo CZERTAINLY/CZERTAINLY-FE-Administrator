@@ -2,7 +2,6 @@ import { actions as approvalActions, selectors as approvalSelectors } from 'duck
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Button, Container } from 'reactstrap';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
@@ -13,6 +12,8 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { ApprovalDtoStatusEnum } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
+import Button from 'components/Button';
+import { ArrowRight } from 'lucide-react';
 
 export default function ApprovalsList() {
     const dispatch = useDispatch();
@@ -172,25 +173,28 @@ export default function ApprovalsList() {
         return data.map((approval) => ({
             id: approval.approvalUuid,
             columns: [
-                <Link to={`./detail/${approval.approvalUuid}`}>{approval.approvalUuid}</Link>,
-                <Link to={`../../../approvalprofiles/detail/${approval.approvalProfileUuid}`}>{approval.approvalProfileName}</Link>,
-                (
-                    <>
-                        <StatusBadge textStatus={approval.status} />
-                        <Button
-                            color="white"
-                            size="sm"
-                            className="p-0 ms-1"
-                            onClick={() => {
-                                navigate(`../../${approval.resource}/detail/${approval.objectUuid}`);
-                            }}
-                        >
-                            <i className="fa fa-circle-arrow-right"></i>
-                        </Button>
-                    </>
-                ) || '',
+                <Link key="uuid" to={`./detail/${approval.approvalUuid}`}>
+                    {approval.approvalUuid}
+                </Link>,
+                <Link key="profile" to={`../../../approvalprofiles/detail/${approval.approvalProfileUuid}`}>
+                    {approval.approvalProfileName}
+                </Link>,
+                <div key="status-nav" className="flex items-center gap-1">
+                    <StatusBadge textStatus={approval.status} />
+                    <Button
+                        variant="transparent"
+                        className="!p-1"
+                        onClick={() => {
+                            navigate(`../../${approval.resource}/detail/${approval.objectUuid}`);
+                        }}
+                    >
+                        <ArrowRight size={16} strokeWidth={1.5} />
+                    </Button>
+                </div>,
                 approval.creatorUsername ? (
-                    <Link to={`../users/detail/${approval.creatorUuid}`}>{approval.creatorUsername ?? 'Unassigned'}</Link>
+                    <Link key="creator" to={`../users/detail/${approval.creatorUuid}`}>
+                        {approval.creatorUsername ?? 'Unassigned'}
+                    </Link>
                 ) : (
                     (approval.creatorUsername ?? 'Unassigned')
                 ),
@@ -203,7 +207,7 @@ export default function ApprovalsList() {
     }, [approvals, userApprovals, showAllApprovals, navigate]);
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <TabLayout
                 tabs={[
                     {
@@ -216,7 +220,6 @@ export default function ApprovalsList() {
                                 titleSize="large"
                                 refreshAction={listUserApprovals}
                             >
-                                <br />
                                 <CustomTable
                                     headers={approvalProfilesTableHeader}
                                     data={approvalProfilesTableData}
@@ -257,7 +260,6 @@ export default function ApprovalsList() {
                                 titleSize="large"
                                 refreshAction={listApprovals}
                             >
-                                <br />
                                 <CustomTable
                                     headers={approvalProfilesTableHeader}
                                     data={approvalProfilesTableData}
@@ -296,8 +298,8 @@ export default function ApprovalsList() {
                 body="Are you sure you want to accept the selected Approval?"
                 toggle={() => setApproveApprovalDialogOpen(false)}
                 buttons={[
+                    { color: 'secondary', variant: 'outline', onClick: () => setApproveApprovalDialogOpen(false), body: 'Cancel' },
                     { color: 'primary', onClick: onApproveApprover, body: 'Yes, approve' },
-                    { color: 'secondary', onClick: () => setApproveApprovalDialogOpen(false), body: 'Cancel' },
                 ]}
             />
 
@@ -307,10 +309,10 @@ export default function ApprovalsList() {
                 body="Are you sure you want to reject the selected Approval?"
                 toggle={() => setRejectApprovalDialogOpen(false)}
                 buttons={[
+                    { color: 'secondary', variant: 'outline', onClick: () => setRejectApprovalDialogOpen(false), body: 'Cancel' },
                     { color: 'primary', onClick: onRejectApprover, body: 'Yes, reject' },
-                    { color: 'secondary', onClick: () => setRejectApprovalDialogOpen(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </>
     );
 }

@@ -1,9 +1,14 @@
+import * as FloatingUIDOM from '@floating-ui/dom';
+(window as any).FloatingUIDOM = FloatingUIDOM;
+
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import 'reactflow/dist/style.css';
 import reportWebVitals from './reportWebVitals';
-import './resources/styles/theme.scss';
+import 'preline/dist/preline.js';
+import './tailwindcss.css';
 import App from './App';
+import '@preline/tooltip';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);

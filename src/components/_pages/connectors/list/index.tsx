@@ -1,14 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
-import { Badge, Container, Table } from 'reactstrap';
+import { Link } from 'react-router';
 
+import Badge from 'components/Badge';
 import { actions, selectors } from 'ducks/connectors';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import ForceDeleteErrorTable from 'components/ForceDeleteErrorTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
+import ConnectorForm from '../form';
 
 import { FunctionGroupModel } from 'types/connectors';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -17,7 +20,6 @@ import { inventoryStatus } from 'utils/connector';
 
 export default function ConnectorList() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const checkedRows = useSelector(selectors.checkedRows);
     const connectors = useSelector(selectors.connectors);
@@ -30,16 +32,20 @@ export default function ConnectorList() {
     const isForceDeleting = useSelector(selectors.isBulkForceDeleting);
     const isBulkReconnecting = useSelector(selectors.isBulkReconnecting);
     const isBulkAuthorizing = useSelector(selectors.isBulkAuthorizing);
+    const isCreating = useSelector(selectors.isCreating);
+    const isUpdating = useSelector(selectors.isUpdating);
 
     const isBusy = isFetching || isDeleting || isBulkDeleting || isForceDeleting || isBulkReconnecting || isBulkAuthorizing;
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [confirmAuthorize, setConfirmAuthorize] = useState<boolean>(false);
     const [confirmForceDelete, setConfirmForceDelete] = useState<boolean>(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+    const [editingConnectorId, setEditingConnectorId] = useState<string | undefined>(undefined);
 
     const getFreshData = useCallback(() => {
         dispatch(actions.clearDeleteErrorMessages());
-        dispatch(actions.listConnectors());
+        dispatch(actions.listConnectors({}));
     }, [dispatch]);
 
     useEffect(() => {
@@ -50,9 +56,27 @@ export default function ConnectorList() {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
     }, [bulkDeleteErrorMessages]);
 
+    useRunOnFinished(isCreating, () => {
+        setIsAddModalOpen(false);
+        getFreshData();
+    });
+    useRunOnFinished(isUpdating, () => {
+        setEditingConnectorId(undefined);
+        getFreshData();
+    });
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingConnectorId(undefined);
+    }, []);
+
     const onAddClick = useCallback(() => {
-        navigate(`./add`);
-    }, [navigate]);
+        handleOpenAddModal();
+    }, [handleOpenAddModal]);
 
     const onReconnectClick = useCallback(() => {
         dispatch(actions.bulkReconnectConnectors({ uuids: checkedRows }));
@@ -87,9 +111,7 @@ export default function ConnectorList() {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => {
-                    onAddClick();
-                },
+                onClick: handleOpenAddModal,
             },
             {
                 icon: 'trash',
@@ -116,7 +138,7 @@ export default function ConnectorList() {
                 },
             },
         ],
-        [checkedRows, onAddClick, onReconnectClick],
+        [checkedRows, handleOpenAddModal, onReconnectClick],
     );
 
     const getKinds = useCallback((functionGroups: FunctionGroupModel[]) => {
@@ -144,35 +166,13 @@ export default function ConnectorList() {
         [],
     );
 
-    const forceDeleteBody = useMemo(
-        () => (
-            <div>
-                <div>Failed to delete {checkedRows.length > 1 ? 'Connectors' : 'a Connector'}. Please find the details below:</div>
-
-                <Table className="table-hover" size="sm">
-                    <thead>
-                        <tr>
-                            <th>
-                                <b>Name</b>
-                            </th>
-                            <th>
-                                <b>Dependencies</b>
-                            </th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {bulkDeleteErrorMessages?.map((message) => (
-                            <tr>
-                                <td>{message.name}</td>
-                                <td>{message.message}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </Table>
-            </div>
-        ),
-        [bulkDeleteErrorMessages, checkedRows.length],
+    const forceDeleteBody = (
+        <ForceDeleteErrorTable
+            items={bulkDeleteErrorMessages}
+            entityNameSingular="a Connector"
+            entityNamePlural="Connectors"
+            itemsCount={checkedRows.length}
+        />
     );
 
     const connectorsRowHeaders: TableHeader[] = useMemo(
@@ -231,7 +231,7 @@ export default function ConnectorList() {
 
                         <span style={{ whiteSpace: 'nowrap' }}>{connector.url}</span>,
 
-                        <Badge color={`${connectorStatus[1]}`}>{connectorStatus[0]}</Badge>,
+                        <Badge style={{ backgroundColor: connectorStatus[1] }}>{connectorStatus[0]}</Badge>,
                     ],
                 };
             }),
@@ -239,8 +239,9 @@ export default function ConnectorList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <div>
             <Widget
+                dataTestId="connectors-list-widget"
                 title="Connector Store"
                 busy={isBusy}
                 widgetLockName={LockWidgetNameEnum.ConnectorStore}
@@ -248,8 +249,6 @@ export default function ConnectorList() {
                 widgetButtons={buttons}
                 titleSize="large"
             >
-                <br />
-
                 <CustomTable
                     headers={connectorsRowHeaders}
                     data={connectorList}
@@ -265,21 +264,28 @@ export default function ConnectorList() {
                 caption={`Delete ${checkedRows.length > 1 ? 'Connectors' : 'a Connector'}`}
                 body={`You are about to delete ${checkedRows.length > 1 ? 'Connectors' : 'a Connector'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
 
             <Dialog
                 isOpen={confirmAuthorize}
                 caption={`Approve ${checkedRows.length > 1 ? 'Connectors' : 'a Connector'}`}
-                body={`You are about to approve a ${checkedRows.length > 1 ? 'Connectors' : 'a Connector'}. Is this what you want to do?`}
+                body={
+                    <span className="text-center">
+                        {`You are about to approve ${checkedRows.length > 1 ? 'Connectors' : 'a Connector'}. Is this what you want to do?`}
+                    </span>
+                }
                 toggle={() => setConfirmAuthorize(false)}
                 buttons={[
-                    { color: 'danger', onClick: onAuthorizeConfirmed, body: 'Yes, approve' },
-                    { color: 'secondary', onClick: () => setConfirmAuthorize(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmAuthorize(false), body: 'Cancel' },
+                    { color: 'primary', onClick: onAuthorizeConfirmed, body: 'Approve' },
                 ]}
+                noBorder
+                icon="check"
             />
 
             <Dialog
@@ -288,10 +294,18 @@ export default function ConnectorList() {
                 body={forceDeleteBody}
                 toggle={() => setConfirmForceDelete(false)}
                 buttons={[
+                    { color: 'secondary', variant: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                     { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
-                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
             />
-        </Container>
+
+            <Dialog
+                isOpen={isAddModalOpen || !!editingConnectorId}
+                toggle={handleCloseAddModal}
+                caption="Create Connector"
+                size="xl"
+                body={<ConnectorForm connectorId={editingConnectorId} onCancel={handleCloseAddModal} />}
+            />
+        </div>
     );
 }

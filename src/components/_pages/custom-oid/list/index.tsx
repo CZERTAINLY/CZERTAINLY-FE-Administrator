@@ -1,9 +1,9 @@
 import { TableDataRow, TableHeader } from 'components/CustomTable';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions, selectors } from 'ducks/oids';
 import { EntityType } from 'ducks/filters';
-import { Container } from 'reactstrap';
 import PagedList from 'components/PagedList/PagedList';
 import { ApiClients } from 'src/api';
 import { Link } from 'react-router';
@@ -11,6 +11,9 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import { SearchRequestModel } from 'types/certificate';
 import { selectors as enumSelectors } from 'ducks/enums';
 import { OidCategory, PlatformEnum } from 'types/openapi';
+import Dialog from 'components/Dialog';
+import CustomOIDForm from 'components/_pages/custom-oid/form';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
 export default function CustomOIDList() {
     const dispatch = useDispatch();
@@ -19,8 +22,11 @@ export default function CustomOIDList() {
 
     const isDeleting = useSelector(selectors.isDeleting);
     const isUpdating = useSelector(selectors.isUpdating);
-
+    const isCreating = useSelector(selectors.isCreating);
     const isBusy = isDeleting || isUpdating;
+
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [editingOidId, setEditingOidId] = useState<string | undefined>(undefined);
 
     const oidCategoryEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.OidCategory));
     const oidsRowHeaders: TableHeader[] = useMemo(
@@ -84,8 +90,47 @@ export default function CustomOIDList() {
         [dispatch],
     );
 
+    const handleOpenAddModal = useCallback(() => {
+        setEditingOidId(undefined);
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingOidId(undefined);
+    }, []);
+
+    const getFreshData = useCallback(() => {
+        onListCallback({ itemsPerPage: 10, pageNumber: 1, filters: [] });
+    }, [onListCallback]);
+
+    useRunOnFinished(isCreating, () => {
+        if (isAddModalOpen) {
+            handleCloseAddModal();
+            getFreshData();
+        }
+    });
+    useRunOnFinished(isUpdating, () => {
+        if (isAddModalOpen) {
+            handleCloseAddModal();
+            getFreshData();
+        }
+    });
+
+    const additionalButtons: WidgetButtonProps[] = useMemo(
+        () => [
+            {
+                icon: 'plus',
+                disabled: false,
+                tooltip: 'Create Custom OID',
+                onClick: handleOpenAddModal,
+            },
+        ],
+        [handleOpenAddModal],
+    );
+
     return (
-        <Container className="themed-container" fluid>
+        <>
             <PagedList
                 entity={EntityType.OID}
                 onListCallback={onListCallback}
@@ -99,7 +144,16 @@ export default function CustomOIDList() {
                 entityNamePlural="OIDs"
                 filterTitle="Certificates by Compliance"
                 pageWidgetLockName={LockWidgetNameEnum.EntityStore}
+                addHidden
+                additionalButtons={additionalButtons}
             />
-        </Container>
+            <Dialog
+                isOpen={isAddModalOpen || !!editingOidId}
+                toggle={handleCloseAddModal}
+                caption={editingOidId ? 'Edit Custom OID' : 'Create Custom OID'}
+                size="xl"
+                body={<CustomOIDForm oidId={editingOidId} onCancel={handleCloseAddModal} />}
+            />
+        </>
     );
 }

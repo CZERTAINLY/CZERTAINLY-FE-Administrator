@@ -10,28 +10,33 @@ import { actions as userActions, selectors as userSelectors } from 'ducks/users'
 
 import { actions as cryptographicKeysActions, selectors as cryptographicKeysSelectors } from 'ducks/cryptographic-keys';
 import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } from 'ducks/token-profiles';
-import { FormApi } from 'final-form';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Field, Form } from 'react-final-form';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
-import Select, { SingleValue } from 'react-select';
+import Select from 'components/Select';
+import TextInput from 'components/TextInput';
+import TextArea from 'components/TextArea';
 
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
 import { AttributeDescriptorModel } from 'types/attributes';
 import { TokenProfileResponseModel } from 'types/token-profiles';
 import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
 
-import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { KeyRequestType, PlatformEnum, Resource } from '../../../../types/openapi';
+import Container from 'components/Container';
+import Button from 'components/Button';
 
 interface CryptographicKeyFormProps {
     usesGlobalModal?: boolean;
+    keyId?: string;
+    onSuccess?: () => void;
+    onCancel?: () => void;
 }
 
 interface SelectChangeValue {
@@ -41,17 +46,18 @@ interface SelectChangeValue {
 interface FormValues {
     name: string;
     description: string;
-    tokenProfile: { value: TokenProfileResponseModel; label: string } | undefined;
-    type?: { value: KeyRequestType; label: string } | undefined;
+    tokenProfile: string | undefined;
+    type?: string | undefined;
     selectedGroups: SelectChangeValue[];
-    owner?: { value: string; label: string } | undefined;
+    owner?: string | undefined;
 }
 
-export default function CryptographicKeyForm({ usesGlobalModal = false }: CryptographicKeyFormProps) {
+export default function CryptographicKeyForm({ keyId, onSuccess, onCancel, usesGlobalModal = false }: CryptographicKeyFormProps) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { id, tokenId } = useParams();
+    const { id: routeId, tokenId } = useParams();
+    const id = keyId || routeId;
 
     const editMode = useMemo(() => !!id, [id]);
 
@@ -88,9 +94,9 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
         dispatch(tokenProfilesActions.listTokenProfiles({}));
         dispatch(connectorActions.clearCallbackData());
         dispatch(groupActions.listGroups());
-        if (editMode) {
+        if (editMode && id) {
             dispatch(userActions.list());
-            dispatch(cryptographicKeysActions.getCryptographicKeyDetail({ uuid: id! }));
+            dispatch(cryptographicKeysActions.getCryptographicKeyDetail({ uuid: id }));
         }
     }, [dispatch, editMode, id, tokenId]);
 
@@ -99,19 +105,14 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
     }, [dispatch]);
 
     const onTokenProfileChange = useCallback(
-        (
-            event: SingleValue<{
-                label: string | undefined;
-                value: TokenProfileResponseModel | undefined;
-            }>,
-        ) => {
-            if (!event) return;
+        (tokenProfileUuid: string | undefined) => {
+            if (!tokenProfileUuid) return;
             dispatch(cryptographicKeysActions.clearKeyAttributeDescriptors());
             dispatch(connectorActions.clearCallbackData());
             setGroupAttributesCallbackAttributes([]);
 
-            if (!event.value || !tokenProfiles) return;
-            const provider = tokenProfiles.find((p) => p.uuid === event.value?.uuid);
+            if (!tokenProfiles) return;
+            const provider = tokenProfiles.find((p) => p.uuid === tokenProfileUuid);
 
             if (!provider) return;
             setTokenProfile(provider);
@@ -119,85 +120,10 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
         [dispatch, tokenProfiles],
     );
 
-    const onKeyTypeChange = useCallback(
-        (type: KeyRequestType, form: FormApi<FormValues>) => {
-            if (editMode) return;
-            if (!tokenProfile) return;
-            if (!type) return;
-            dispatch(connectorActions.clearCallbackData());
-            setGroupAttributesCallbackAttributes([]);
-            form.mutators.clearAttributes('cryptographicKey');
-            dispatch(cryptographicKeysActions.clearKeyAttributeDescriptors());
-            dispatch(
-                cryptographicKeysActions.listAttributeDescriptors({
-                    tokenInstanceUuid: tokenProfile.tokenInstanceUuid,
-                    tokenProfileUuid: tokenProfile.uuid,
-                    keyRequestType: type,
-                }),
-            );
-        },
-        [dispatch, editMode, tokenProfile],
-    );
-
-    const onCancelClick = useCallback(() => {
-        navigate(-1);
-    }, [navigate]);
-
-    const onSubmit = useCallback(
-        (values: FormValues) => {
-            if (editMode) {
-                dispatch(
-                    cryptographicKeysActions.updateCryptographicKey({
-                        profileUuid: id!,
-                        redirect: `../../keys/detail/${id}`,
-                        cryptographicKeyEditRequest: {
-                            description: values.description,
-                            tokenProfileUuid: values.tokenProfile ? values.tokenProfile.value.uuid : undefined,
-                            ownerUuid: values.owner ? values.owner.value : undefined,
-                            groupUuids: values?.selectedGroups?.length ? values?.selectedGroups?.map((group) => group.value) : [],
-                            customAttributes: collectFormAttributes('customCryptographicKey', resourceCustomAttributes, values),
-                            name: values.name,
-                        },
-                    }),
-                );
-            } else {
-                dispatch(
-                    cryptographicKeysActions.createCryptographicKey({
-                        tokenInstanceUuid: values.tokenProfile!.value.tokenInstanceUuid,
-                        tokenProfileUuid: values.tokenProfile!.value.uuid,
-                        type: values.type!.value,
-                        cryptographicKeyAddRequest: {
-                            groupUuids: values?.selectedGroups?.length ? values?.selectedGroups?.map((group) => group.value) : [],
-                            name: values.name,
-                            description: values.description,
-                            attributes: collectFormAttributes(
-                                'cryptographicKey',
-                                [...(cryptographicKeyAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
-                                values,
-                            ),
-                            customAttributes: collectFormAttributes('customCryptographicKey', resourceCustomAttributes, values),
-                            enabled: usesGlobalModal,
-                        },
-                        usesGlobalModal,
-                    }),
-                );
-            }
-        },
-        [
-            dispatch,
-            editMode,
-            id,
-            cryptographicKeyAttributeDescriptors,
-            groupAttributesCallbackAttributes,
-            resourceCustomAttributes,
-            usesGlobalModal,
-        ],
-    );
-
     const optionsForKeys = useMemo(
         () =>
             tokenProfiles.map((token) => ({
-                value: token,
+                value: token.uuid,
                 label: token.name,
             })),
         [tokenProfiles],
@@ -221,8 +147,133 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
         [groups],
     );
 
+    const defaultValues: FormValues = useMemo(
+        () => ({
+            name: editMode ? keyDetail?.name || '' : '',
+            description: editMode ? keyDetail?.description || '' : '',
+            tokenProfile: editMode ? keyDetail?.tokenProfileUuid || undefined : undefined,
+            selectedGroups: editMode
+                ? keyDetail && keyDetail.groups?.length
+                    ? keyDetail.groups?.map((group) => ({ value: group.uuid, label: group.name }))
+                    : []
+                : [],
+            owner: editMode ? keyDetail?.ownerUuid || undefined : undefined,
+            type: undefined,
+        }),
+        [editMode, keyDetail],
+    );
+
+    const methods = useForm<FormValues>({
+        defaultValues,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit,
+        control,
+        formState: { isDirty, isSubmitting, isValid },
+        setValue,
+        getValues,
+        reset,
+    } = methods;
+
+    const watchedTokenProfileUuid = useWatch({
+        control,
+        name: 'tokenProfile',
+    });
+
+    const onKeyTypeChange = useCallback(
+        (type: KeyRequestType) => {
+            if (editMode) return;
+            if (!tokenProfile) return;
+            if (!type) return;
+            dispatch(connectorActions.clearCallbackData());
+            setGroupAttributesCallbackAttributes([]);
+            // Clear attributes that start with __attributes__cryptographicKey__
+            const formValues = getValues();
+            Object.keys(formValues).forEach((key) => {
+                if (key.startsWith('__attributes__cryptographicKey__')) {
+                    (setValue as any)(key, undefined);
+                }
+            });
+            dispatch(cryptographicKeysActions.clearKeyAttributeDescriptors());
+            dispatch(
+                cryptographicKeysActions.listAttributeDescriptors({
+                    tokenInstanceUuid: tokenProfile.tokenInstanceUuid,
+                    tokenProfileUuid: tokenProfile.uuid,
+                    keyRequestType: type,
+                }),
+            );
+        },
+        [dispatch, editMode, tokenProfile, getValues, setValue],
+    );
+
+    const onCancelClick = useCallback(() => {
+        if (onCancel) {
+            onCancel();
+        } else {
+            dispatch(userInterfaceActions.resetState());
+        }
+    }, [dispatch, onCancel]);
+
+    const onSubmit = useCallback(
+        (values: FormValues) => {
+            if (editMode) {
+                dispatch(
+                    cryptographicKeysActions.updateCryptographicKey({
+                        profileUuid: id!,
+                        cryptographicKeyEditRequest: {
+                            description: values.description || '',
+                            tokenProfileUuid: values.tokenProfile || undefined,
+                            ownerUuid: values.owner || undefined,
+                            groupUuids: values?.selectedGroups?.length ? values?.selectedGroups?.map((group) => group.value) : [],
+                            customAttributes: collectFormAttributes('customCryptographicKey', resourceCustomAttributes, values),
+                            name: values.name,
+                        },
+                    }),
+                );
+                onSuccess?.();
+            } else {
+                const selectedTokenProfile = tokenProfiles.find((p) => p.uuid === values.tokenProfile);
+                if (!selectedTokenProfile || !values.type) return;
+
+                dispatch(
+                    cryptographicKeysActions.createCryptographicKey({
+                        tokenInstanceUuid: selectedTokenProfile.tokenInstanceUuid,
+                        tokenProfileUuid: selectedTokenProfile.uuid,
+                        type: values.type as KeyRequestType,
+                        cryptographicKeyAddRequest: {
+                            groupUuids: values?.selectedGroups?.length ? values?.selectedGroups?.map((group) => group.value) : [],
+                            name: values.name,
+                            description: values.description || '',
+                            attributes: collectFormAttributes(
+                                'cryptographicKey',
+                                [...(cryptographicKeyAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
+                                values,
+                            ),
+                            customAttributes: collectFormAttributes('customCryptographicKey', resourceCustomAttributes, values),
+                        },
+                        usesGlobalModal: usesGlobalModal,
+                    }),
+                );
+                onSuccess?.();
+            }
+        },
+        [
+            dispatch,
+            editMode,
+            id,
+            cryptographicKeyAttributeDescriptors,
+            groupAttributesCallbackAttributes,
+            resourceCustomAttributes,
+            tokenProfiles,
+            onSuccess,
+            usesGlobalModal,
+        ],
+    );
+
     const optionsForType = () => {
-        let options: { value: KeyRequestType; label: string }[] = [];
+        let options: { value: string; label: string }[] = [];
         for (let key in KeyRequestType) {
             options.push({
                 value: KeyRequestType[key as keyof typeof KeyRequestType],
@@ -232,7 +283,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
         return options;
     };
 
-    const attributeTabs = (form: FormApi<FormValues>) => {
+    const attributeTabs = (tokenProfileUuid: string | undefined) => {
         if (!editMode) {
             return [
                 {
@@ -242,7 +293,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                     ) : (
                         <AttributeEditor
                             id="cryptographicKey"
-                            callbackParentUuid={keyDetail?.tokenProfileUuid || form.getFieldState('tokenProfile')?.value?.value.uuid || ''}
+                            callbackParentUuid={keyDetail?.tokenProfileUuid || tokenProfileUuid || ''}
                             callbackResource={Resource.Keys}
                             attributeDescriptors={cryptographicKeyAttributeDescriptors || []}
                             groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
@@ -277,254 +328,247 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
         }
     };
 
-    const defaultValues: FormValues = useMemo(
-        () => ({
-            name: editMode ? keyDetail?.name || '' : '',
-            description: editMode ? keyDetail?.description || '' : '',
-            tokenProfile: editMode
-                ? keyDetail
-                    ? optionsForKeys.find((option) => option.value.uuid === (keyDetail.tokenProfileUuid || ''))
-                    : undefined
-                : undefined,
-            selectedGroups: editMode
-                ? keyDetail && keyDetail.groups?.length
-                    ? keyDetail.groups?.map((group) => ({ value: group.uuid, label: group.name }))
-                    : []
-                : [],
-            owner: editMode
-                ? keyDetail && keyDetail.ownerUuid && keyDetail.owner
-                    ? { value: keyDetail.ownerUuid, label: keyDetail.owner }
-                    : undefined
-                : undefined,
-            type: undefined,
-        }),
-        [editMode, optionsForKeys, keyDetail],
-    );
+    // Reset form values when keyDetail is loaded in edit mode
+    useEffect(() => {
+        if (editMode && keyDetail && keyDetail.uuid === id) {
+            const newDefaultValues: FormValues = {
+                name: keyDetail.name || '',
+                description: keyDetail.description || '',
+                tokenProfile: keyDetail.tokenProfileUuid || undefined,
+                selectedGroups: keyDetail.groups?.length ? keyDetail.groups.map((group) => ({ value: group.uuid, label: group.name })) : [],
+                owner: keyDetail.ownerUuid || undefined,
+                type: undefined,
+            };
+            reset(newDefaultValues);
 
-    const title = useMemo(() => (editMode ? 'Edit Key' : 'Create Key'), [editMode]);
+            // Set token profile state if available
+            if (keyDetail.tokenProfileUuid && tokenProfiles.length > 0) {
+                const profile = tokenProfiles.find((p) => p.uuid === keyDetail.tokenProfileUuid);
+                if (profile) {
+                    setTokenProfile(profile);
+                }
+            }
+        }
+    }, [editMode, keyDetail, id, reset, tokenProfiles]);
+
+    // Clear attributes when token profile changes
+    useEffect(() => {
+        if (watchedTokenProfileUuid) {
+            const formValues = getValues();
+            Object.keys(formValues).forEach((key) => {
+                if (key.startsWith('__attributes__cryptographicKey__')) {
+                    (setValue as any)(key, undefined);
+                }
+            });
+            setValue('type', undefined);
+            onTokenProfileChange(watchedTokenProfileUuid);
+        }
+    }, [watchedTokenProfileUuid, setValue, getValues, onTokenProfileChange]);
 
     return (
-        <Widget title={title} busy={isBusy}>
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
-                {({ handleSubmit, pristine, submitting, valid, form }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
-                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="name">Key Name</Label>
-
-                                    <Input
-                                        {...input}
-                                        id="name"
-                                        type="text"
-                                        placeholder="Enter Key Name"
-                                        valid={!meta.touched || !meta.error}
-                                        invalid={meta.touched && meta.error}
-                                    />
-
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        <Field name="description" validate={composeValidators(validateLength(0, 300))}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="description">Description</Label>
-
-                                    <Input
-                                        {...input}
-                                        id="description"
-                                        type="textarea"
-                                        className="form-control"
-                                        placeholder="Enter Description / Comment"
-                                        valid={!meta.touched || !meta.error}
-                                        invalid={meta.touched && meta.error}
-                                    />
-
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        {editMode ? (
-                            <Field name="owner" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="ownerSelect">Owner</Label>
-
-                                        <Select
-                                            inputId="ownerSelect"
-                                            {...input}
-                                            maxMenuHeight={140}
-                                            menuPlacement="auto"
-                                            options={optionsForUsers}
-                                            placeholder="Select Owner"
-                                            onChange={(event) => {
-                                                input.onChange(event);
-                                            }}
-                                            styles={{
-                                                control: (provided) =>
-                                                    meta.touched && meta.invalid
-                                                        ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                        : { ...provided },
-                                            }}
-                                        />
-
-                                        <FormFeedback>{meta.error}</FormFeedback>
-                                    </FormGroup>
-                                )}
-                            </Field>
-                        ) : (
-                            <Field name="owner">
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="owner">Owner</Label>
-
-                                        <Input
-                                            {...input}
-                                            id="owner"
-                                            type="text"
-                                            className="form-control"
-                                            placeholder="Enter Key Owner"
-                                            disabled={!editMode}
-                                            value={auth?.username || ''}
-                                            valid={!meta.touched || !meta.error}
-                                            invalid={meta.touched && meta.error}
-                                        />
-
-                                        <FormFeedback>{meta.error}</FormFeedback>
-                                    </FormGroup>
-                                )}
-                            </Field>
+        <Widget noBorder busy={isBusy}>
+            <FormProvider {...methods}>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    <Controller
+                        name="name"
+                        control={control}
+                        rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
+                        render={({ field, fieldState }) => (
+                            <TextInput
+                                {...field}
+                                id="name"
+                                type="text"
+                                label="Key Name"
+                                required
+                                placeholder="Enter Key Name"
+                                invalid={fieldState.error && fieldState.isTouched}
+                                error={getFieldErrorMessage(fieldState)}
+                            />
                         )}
+                    />
+                    <Controller
+                        name="description"
+                        control={control}
+                        rules={buildValidationRules([validateLength(0, 300)])}
+                        render={({ field, fieldState }) => (
+                            <TextArea
+                                {...field}
+                                id="description"
+                                label="Description"
+                                rows={4}
+                                placeholder="Enter Description / Comment"
+                                invalid={fieldState.error && fieldState.isTouched}
+                                error={getFieldErrorMessage(fieldState)}
+                            />
+                        )}
+                    />
 
-                        <Field name="selectedGroups">
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="selectedGroupsSelect">Groups</Label>
-
+                    {editMode ? (
+                        <Controller
+                            name="owner"
+                            control={control}
+                            rules={buildValidationRules([validateAlphaNumericWithSpecialChars()])}
+                            render={({ field, fieldState }) => (
+                                <>
                                     <Select
-                                        {...input}
-                                        inputId="selectedGroupsSelect"
-                                        maxMenuHeight={140}
-                                        menuPlacement="auto"
-                                        options={optionsForGroups}
-                                        placeholder="Select Groups"
-                                        onChange={(event) => {
-                                            input.onChange(event);
+                                        id="ownerSelect"
+                                        label="Owner"
+                                        value={field.value || ''}
+                                        onChange={(value) => {
+                                            field.onChange(value);
                                         }}
-                                        isMulti
-                                        styles={{
-                                            control: (provided) =>
-                                                meta.touched && meta.invalid
-                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                    : { ...provided },
-                                        }}
+                                        options={optionsForUsers}
+                                        placeholder="Select Owner"
+                                        placement="bottom"
+                                        isDisabled={false}
                                     />
-
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                        {meta.error}
-                                    </div>
-                                </FormGroup>
+                                    {fieldState.error && fieldState.isTouched && (
+                                        <p className="mt-1 text-sm text-red-600">
+                                            {typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'}
+                                        </p>
+                                    )}
+                                </>
                             )}
-                        </Field>
+                        />
+                    ) : (
+                        <TextInput
+                            id="owner"
+                            type="text"
+                            label="Owner"
+                            placeholder="Enter Key Owner"
+                            disabled
+                            value={auth?.username || ''}
+                            onChange={() => {}}
+                        />
+                    )}
 
-                        <Field name="tokenProfile" validate={editMode ? undefined : validateRequired()}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="tokenProfileSelect">Token Profile</Label>
+                    <Controller
+                        name="selectedGroups"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                            <>
+                                <Select
+                                    id="selectedGroupsSelect"
+                                    label="Groups"
+                                    value={field.value || []}
+                                    onChange={(value) => {
+                                        field.onChange(value);
+                                    }}
+                                    options={optionsForGroups}
+                                    placeholder="Select Groups"
+                                    isMulti
+                                    placement="bottom"
+                                />
+                                {fieldState.error && fieldState.isTouched && (
+                                    <p className="mt-1 text-sm text-red-600">
+                                        {typeof fieldState.error === 'string'
+                                            ? fieldState.error
+                                            : fieldState.error?.message || 'Invalid value'}
+                                    </p>
+                                )}
+                            </>
+                        )}
+                    />
 
+                    <Controller
+                        name="tokenProfile"
+                        control={control}
+                        rules={editMode ? undefined : buildValidationRules([validateRequired()])}
+                        render={({ field, fieldState }) => (
+                            <>
+                                <div>
+                                    <label
+                                        htmlFor="tokenProfileSelect"
+                                        className="block text-sm font-medium mb-2 text-gray-700 dark:text-white"
+                                    >
+                                        Token Profile {!editMode && <span className="text-red-500">*</span>}
+                                    </label>
                                     <Select
-                                        {...input}
-                                        inputId="tokenProfileSelect"
-                                        maxMenuHeight={140}
-                                        menuPlacement="auto"
+                                        id="tokenProfileSelect"
+                                        value={field.value || ''}
+                                        onChange={(value) => {
+                                            const formValues = getValues();
+                                            Object.keys(formValues).forEach((key) => {
+                                                if (key.startsWith('__attributes__cryptographicKey__')) {
+                                                    (setValue as any)(key, undefined);
+                                                }
+                                            });
+                                            setValue('type', undefined);
+                                            field.onChange(value);
+                                        }}
                                         options={optionsForKeys}
                                         placeholder="Select Token Profile"
-                                        onChange={(event) => {
-                                            onTokenProfileChange(event);
-                                            form.mutators.clearAttributes('cryptographicKey');
-                                            form.mutators.setAttribute('type', undefined);
-                                            input.onChange(event);
-                                        }}
-                                        styles={{
-                                            control: (provided) =>
-                                                meta.touched && meta.invalid
-                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                    : { ...provided },
-                                        }}
+                                        placement="bottom"
                                         isDisabled={editMode}
                                     />
+                                </div>
+                                {fieldState.error && fieldState.isTouched && (
+                                    <p className="mt-1 text-sm text-red-600">
+                                        {typeof fieldState.error === 'string'
+                                            ? fieldState.error
+                                            : fieldState.error?.message || 'Invalid value'}
+                                    </p>
+                                )}
+                            </>
+                        )}
+                    />
 
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                        {meta.error}
-                                    </div>
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        {tokenProfile && !editMode ? (
-                            <Field name="type" validate={validateRequired()}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="typeSelect">Select Key Type</Label>
-
+                    {tokenProfile && !editMode && (
+                        <Controller
+                            name="type"
+                            control={control}
+                            rules={buildValidationRules([validateRequired()])}
+                            render={({ field, fieldState }) => (
+                                <>
+                                    <div>
+                                        <label
+                                            htmlFor="typeSelect"
+                                            className="block text-sm font-medium mb-2 text-gray-700 dark:text-white"
+                                        >
+                                            Select Key Type <span className="text-red-500">*</span>
+                                        </label>
                                         <Select
-                                            {...input}
-                                            id="type"
-                                            inputId="typeSelect"
-                                            maxMenuHeight={140}
-                                            menuPlacement="auto"
+                                            id="typeSelect"
+                                            value={field.value || ''}
+                                            onChange={(value) => {
+                                                onKeyTypeChange(value as KeyRequestType);
+                                                field.onChange(value);
+                                            }}
                                             options={optionsForType()}
                                             placeholder="Select to change Key Type"
-                                            onChange={(event: any) => {
-                                                onKeyTypeChange(event.value, form);
-                                                input.onChange(event);
-                                            }}
-                                            styles={{
-                                                control: (provided) =>
-                                                    meta.touched && meta.invalid
-                                                        ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                        : { ...provided },
-                                            }}
+                                            placement="bottom"
                                         />
+                                    </div>
+                                    {fieldState.error && fieldState.isTouched && (
+                                        <p className="mt-1 text-sm text-red-600">
+                                            {typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'}
+                                        </p>
+                                    )}
+                                </>
+                            )}
+                        />
+                    )}
 
-                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                            {meta.error}
-                                        </div>
-                                    </FormGroup>
-                                )}
-                            </Field>
-                        ) : (
-                            <></>
-                        )}
+                    <TabLayout tabs={attributeTabs(watchedTokenProfileUuid)} noBorder />
 
-                        <br />
-
-                        <TabLayout tabs={attributeTabs(form)} />
-
-                        <div className="d-flex justify-content-end">
-                            <ButtonGroup>
-                                <ProgressButton
-                                    title={editMode ? 'Update' : 'Create'}
-                                    inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
-                                    inProgress={submitting}
-                                    disabled={pristine || submitting || !valid}
-                                />
-
-                                <Button
-                                    color="default"
-                                    onClick={() => (usesGlobalModal ? dispatch(userInterfaceActions.hideGlobalModal()) : onCancelClick())}
-                                    disabled={submitting}
-                                >
-                                    Cancel
-                                </Button>
-                            </ButtonGroup>
-                        </div>
-                    </BootstrapForm>
-                )}
-            </Form>
+                    <Container className="flex-row justify-end modal-footer mt-4" gap={4}>
+                        <Button variant="outline" onClick={onCancelClick} disabled={isSubmitting} type="button">
+                            Cancel
+                        </Button>
+                        <ProgressButton
+                            title={editMode ? 'Update' : 'Create'}
+                            inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
+                            inProgress={isSubmitting}
+                            disabled={!isDirty || isSubmitting || !isValid}
+                            type="submit"
+                        />
+                    </Container>
+                </form>
+            </FormProvider>
         </Widget>
     );
 }

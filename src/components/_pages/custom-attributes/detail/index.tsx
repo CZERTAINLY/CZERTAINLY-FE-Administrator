@@ -1,4 +1,3 @@
-import cx from 'classnames';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
@@ -6,21 +5,22 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/customAttributes';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router';
-import { Badge, Container } from 'reactstrap';
+import { useParams } from 'react-router';
+import Badge from 'components/Badge';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { getAttributeContent } from 'utils/attributes/attributes';
 import { useCopyToClipboard } from 'utils/common-hooks';
-import styles from './customAttribute.module.scss';
 import { createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
+import Breadcrumb from 'components/Breadcrumb';
+import { Copy } from 'lucide-react';
+import CustomAttributeForm from '../form';
+import Button from 'components/Button';
 
 export default function CustomAttributeDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id } = useParams();
 
@@ -32,6 +32,7 @@ export default function CustomAttributeDetail() {
     const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const getFreshCustomAttribute = useCallback(() => {
         if (!id) return;
@@ -44,9 +45,22 @@ export default function CustomAttributeDetail() {
         }
     }, [getFreshCustomAttribute, id, customAttribute]);
 
+    const handleOpenEditModal = useCallback(() => {
+        setIsEditModalOpen(true);
+    }, []);
+
+    const handleCancelEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
+
+    const handleSuccessEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+        getFreshCustomAttribute();
+    }, [getFreshCustomAttribute]);
+
     const onEditClick = useCallback(() => {
-        navigate(`../../edit/${customAttribute?.uuid}`, { relative: 'path' });
-    }, [customAttribute, navigate]);
+        handleOpenEditModal();
+    }, [handleOpenEditModal]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!customAttribute) return;
@@ -155,28 +169,31 @@ export default function CustomAttributeDetail() {
                           id: 'content',
                           columns: [
                               'Content',
-                              <>
+                              <div key="content-actions" className="flex items-center gap-2">
                                   {getAttributeContent(customAttribute.contentType, customAttribute.content)}
                                   {customAttribute?.content?.length ? (
-                                      <i className={cx('fa fa-copy', styles.copyCustomContentButton)} onClick={onContentCopyClick} />
+                                      <Button variant="transparent" onClick={onContentCopyClick}>
+                                          {' '}
+                                          <Copy size={16} />{' '}
+                                      </Button>
                                   ) : (
                                       <> </>
                                   )}
-                              </>,
+                              </div>,
                           ],
                       },
                       {
                           id: 'properties',
                           columns: [
                               'Properties',
-                              <>
+                              <Fragment key="properties-badges">
                                   <StatusBadge style={{ margin: '1px' }} enabled={customAttribute.enabled} />
                                   {getBadge(customAttribute.visible, 'Visible')}
                                   {getBadge(customAttribute.required, 'Required')}
                                   {getBadge(customAttribute.readOnly, 'Read Only')}
                                   {getBadge(customAttribute.list, 'List')}
                                   {getBadge(customAttribute.multiSelect, 'Multi Select')}
-                              </>,
+                              </Fragment>,
                           ],
                       },
                   ],
@@ -184,11 +201,12 @@ export default function CustomAttributeDetail() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/customattributes"
-                text={`${getEnumLabel(resourceEnum, Resource.CustomAttributes)} Inventory`}
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.CustomAttributes)} Inventory`, href: '/customattributes' },
+                    { label: customAttribute?.name || 'Custom Attribute Details', href: '' },
+                ]}
             />
             <Widget
                 title="Custom Attribute Details"
@@ -204,13 +222,28 @@ export default function CustomAttributeDetail() {
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Custom Attribute"
-                body="You are about to delete an Custom Attribute. Is this what you want to do?"
+                body="You are about to delete a Custom Attribute. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
-        </Container>
+
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCancelEditModal}
+                caption="Edit Custom Attribute"
+                size="xl"
+                body={
+                    <CustomAttributeForm
+                        customAttributeId={customAttribute?.uuid}
+                        onCancel={handleCancelEditModal}
+                        onSuccess={handleSuccessEditModal}
+                    />
+                }
+            />
+        </div>
     );
 }

@@ -1,10 +1,9 @@
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useMemo, useState } from 'react';
-import { Form } from 'react-final-form';
+import * as ReactHookForm from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { Form as BootstrapForm, Button } from 'reactstrap';
 import {
     AttributeDescriptorModel,
     AttributeResponseModel,
@@ -19,12 +18,36 @@ import { useCopyToClipboard } from 'utils/common-hooks';
 import { actions as userInterfaceActions } from '../../../ducks/user-interface';
 import ContentValueField from '../../Input/DynamicContent/ContentValueField';
 import WidgetButtons, { WidgetButtonProps } from '../../WidgetButtons';
+import { InfoIcon } from 'lucide-react';
+import Button from 'components/Button';
 
 export enum ATTRIBUTE_VIEWER_TYPE {
     ATTRIBUTE,
     METADATA,
     METADATA_FLAT,
     ATTRIBUTE_EDIT,
+}
+
+function AttributeEditForm({
+    descriptor,
+    initialContent,
+    onSubmit,
+}: {
+    descriptor: CustomAttributeModel;
+    initialContent?: BaseAttributeContentModel[];
+    onSubmit: (uuid: string, content: BaseAttributeContentModel[]) => void;
+}) {
+    const methods = ReactHookForm.useForm<any>({
+        defaultValues: {},
+    });
+
+    return (
+        <ReactHookForm.FormProvider {...methods}>
+            <form onSubmit={(e) => e.preventDefault()}>
+                <ContentValueField id={descriptor.name} descriptor={descriptor} initialContent={initialContent} onSubmit={onSubmit} />
+            </form>
+        </ReactHookForm.FormProvider>
+    );
 }
 
 export interface Props {
@@ -46,7 +69,7 @@ export default function AttributeViewer({
     onSubmit,
     onRemove,
 }: Props) {
-    const getContent = useCallback(getAttributeContent, []);
+    const getContent = getAttributeContent;
     const [editingAttributesNames, setEditingAttributesNames] = useState<string[]>([]);
     const contentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
@@ -54,7 +77,7 @@ export default function AttributeViewer({
     const copyToClipboard = useCopyToClipboard();
 
     const onCopyContentClick = useCallback(
-        (attribute: AttributeResponseModel) => {
+        (attribute: AttributeResponseModel | MetadataItemModel) => {
             if (!attribute?.content?.length) return;
 
             const textToCopy = getAttributeCopyValue(attribute.contentType, attribute.content);
@@ -140,8 +163,8 @@ export default function AttributeViewer({
     const renderSourceObjectsButton = useCallback(
         (attribute: AttributeResponseModel | MetadataItemModel, resource: Resource) => {
             const headers = [
-                { id: 'sourceObject', content: 'Name', sortable: true },
-                { id: 'uuid', content: 'UUID', sortable: true },
+                { id: 'sourceObject', content: 'Name' },
+                { id: 'uuid', content: 'UUID' },
             ];
 
             const createData = (so: NameAndUuidDto) => ({
@@ -158,22 +181,21 @@ export default function AttributeViewer({
                 return (
                     <Button
                         data-testid="source-button"
-                        className="btn btn-link p-0 ms-2"
-                        color="white"
-                        title="Source objects"
+                        variant="transparent"
+                        className="!p-1 ml-1 relative top-[3px]"
                         onClick={() => {
                             dispatch(
                                 userInterfaceActions.showGlobalModal({
-                                    content: <CustomTable headers={headers} data={attribute.sourceObjects.map(createData)} />,
                                     isOpen: true,
-                                    showCloseButton: true,
+                                    size: 'xl',
                                     title: 'Source objects',
-                                    size: 'lg',
+                                    content: <CustomTable headers={headers} data={attribute.sourceObjects.map(createData)} />,
+                                    showCloseButton: true,
                                 }),
                             );
                         }}
                     >
-                        <i className="fa fa-info" style={{ color: 'auto', marginBottom: '9.5px', marginLeft: '4px', fontSize: '14px' }} />
+                        <InfoIcon size={16} />
                     </Button>
                 );
             }
@@ -290,21 +312,14 @@ export default function AttributeViewer({
                             a.label || '',
                             getEnumLabel(contentTypeEnum, a.contentType),
                             onSubmit && descriptor && editingAttributesNames.find((n) => n === a.name) ? (
-                                <Form onSubmit={() => {}}>
-                                    {({ values }) => (
-                                        <BootstrapForm className="mt-3">
-                                            <ContentValueField
-                                                id={descriptor.name}
-                                                descriptor={descriptor}
-                                                initialContent={a.content}
-                                                onSubmit={(uuid, content) => {
-                                                    setEditingAttributesNames(editingAttributesNames.filter((n) => n !== descriptor.name));
-                                                    onSubmit(uuid, content);
-                                                }}
-                                            />
-                                        </BootstrapForm>
-                                    )}
-                                </Form>
+                                <AttributeEditForm
+                                    descriptor={descriptor}
+                                    initialContent={a.content}
+                                    onSubmit={(uuid, content) => {
+                                        setEditingAttributesNames(editingAttributesNames.filter((n) => n !== descriptor.name));
+                                        onSubmit(uuid, content);
+                                    }}
+                                />
                             ) : (
                                 getContent(a.contentType, a.content)
                             ),

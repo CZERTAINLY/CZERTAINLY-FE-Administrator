@@ -1,23 +1,30 @@
-import SwitchField from 'components/Input/SwitchField';
+import Switch from 'components/Switch';
 import ProgressButton from 'components/ProgressButton';
-import { useCallback, useEffect, useMemo } from 'react';
-import { Form } from 'react-final-form';
+import TextInput from 'components/TextInput';
+import Container from 'components/Container';
+import Button from 'components/Button';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions, selectors } from 'ducks/settings';
-import { Form as BootstrapForm, ButtonGroup } from 'reactstrap';
-import { isObjectSame } from 'utils/common-utils';
+import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import { validateNonZeroInteger, validatePositiveInteger } from 'utils/validators';
-import TextField from 'components/Input/TextField';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 
 type FormValues = {
     enabled: boolean;
-    frequency?: number;
-    expiringThreshold?: number;
+    frequency?: string;
+    expiringThreshold?: string;
 };
 
-const CertificateSettingsForm = () => {
-    const DEFAULT_FREQUENCY = 1;
-    const DEFAULT_EXPIRING_THRESHOLD = 30;
+interface CertificateSettingsFormProps {
+    onCancel?: () => void;
+    onSuccess?: () => void;
+}
+
+const CertificateSettingsForm = ({ onCancel, onSuccess }: CertificateSettingsFormProps) => {
+    const DEFAULT_FREQUENCY = '1';
+    const DEFAULT_EXPIRING_THRESHOLD = '30';
 
     const dispatch = useDispatch();
 
@@ -35,23 +42,57 @@ const CertificateSettingsForm = () => {
 
     const isBusy = useMemo(() => isFetching || isUpdating, [isFetching, isUpdating]);
 
-    const initialValues = useMemo(() => {
+    const defaultValues = useMemo(() => {
         const validationSettings = platformSettings?.certificates?.validation;
-        if (!validationSettings) return {};
+        if (!validationSettings) {
+            return {
+                enabled: false,
+                expiringThreshold: DEFAULT_EXPIRING_THRESHOLD,
+                frequency: DEFAULT_FREQUENCY,
+            };
+        }
 
         return {
             enabled: validationSettings.enabled,
             expiringThreshold: validationSettings.expiringThreshold?.toString() || DEFAULT_EXPIRING_THRESHOLD,
             frequency: validationSettings.frequency?.toString() || DEFAULT_FREQUENCY,
-        } as FormValues;
+        };
     }, [platformSettings?.certificates?.validation]);
+
+    const methods = useForm<FormValues>({
+        defaultValues,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit,
+        control,
+        formState: { isSubmitting, isValid },
+        reset,
+    } = methods;
+
+    const watchedEnabled = useWatch({
+        control,
+        name: 'enabled',
+    });
+
+    const formValues = useWatch({ control });
+
+    // Reset form when platformSettings change
+    useEffect(() => {
+        reset(defaultValues);
+    }, [defaultValues, reset]);
 
     const onSubmit = useCallback(
         (values: FormValues) => {
             dispatch(
                 actions.updatePlatformSettings({
                     certificates: {
-                        validation: values,
+                        validation: {
+                            enabled: values.enabled,
+                            frequency: values.frequency ? Number.parseInt(values.frequency, 10) : undefined,
+                            expiringThreshold: values.expiringThreshold ? Number.parseInt(values.expiringThreshold, 10) : undefined,
+                        },
                     },
                 }),
             );
@@ -59,55 +100,85 @@ const CertificateSettingsForm = () => {
         [dispatch],
     );
 
-    const areDefaultValuesSame = useCallback(
-        (values: FormValues) => {
-            const areValuesSame = isObjectSame(values, initialValues);
-            return areValuesSame;
-        },
-        [initialValues],
-    );
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            if (onSuccess) {
+                onSuccess();
+            }
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, onSuccess]);
+
+    const areDefaultValuesSame = useAreDefaultValuesSame(defaultValues as unknown as Record<string, unknown>);
 
     return (
-        <div style={{ paddingTop: '1.5em', paddingBottom: '1.5em' }}>
-            <Form initialValues={initialValues} onSubmit={onSubmit}>
-                {({ handleSubmit, pristine, submitting, valid, values }) => (
-                    <BootstrapForm onSubmit={handleSubmit} className="mt-2">
-                        <SwitchField id="enabled" label="Enable Certificate Validation" />
-                        {values.enabled && (
-                            <>
-                                <TextField
-                                    id="frequency"
-                                    label="Validation Frequency"
-                                    description="Validation frequency of certificates specified in days."
-                                    validators={[validateNonZeroInteger(), validatePositiveInteger()]}
-                                    inputType="number"
-                                />
-                                <TextField
-                                    id="expiringThreshold"
-                                    label="Expiring Threshold"
-                                    description="How many days before expiration should certificate's validation status change to Expiring."
-                                    validators={[validateNonZeroInteger(), validatePositiveInteger()]}
-                                    inputType="number"
-                                />
-                            </>
-                        )}
-                        {
-                            <div className="d-flex justify-content-end">
-                                <ButtonGroup>
-                                    <ProgressButton
-                                        title={'Save'}
-                                        inProgressTitle={'Saving...'}
-                                        disabled={submitting || isBusy || areDefaultValuesSame(values)}
-                                        inProgress={submitting || isBusy}
-                                        type="submit"
+        <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)} className="mt-2 space-y-4">
+                <Controller
+                    name="enabled"
+                    control={control}
+                    render={({ field }) => (
+                        <Switch id="enabled" checked={field.value} onChange={field.onChange} label="Enable Certificate Validation" />
+                    )}
+                />
+                {watchedEnabled && (
+                    <>
+                        <div>
+                            <Controller
+                                name="frequency"
+                                control={control}
+                                rules={buildValidationRules([validateNonZeroInteger(), validatePositiveInteger()])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        {...field}
+                                        id="frequency"
+                                        type="number"
+                                        label="Validation Frequency"
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
-                                </ButtonGroup>
-                            </div>
-                        }
-                    </BootstrapForm>
+                                )}
+                            />
+                            <p className="text-sm text-gray-500 mt-2">Validation frequency of certificates specified in days.</p>
+                        </div>
+                        <div>
+                            <Controller
+                                name="expiringThreshold"
+                                control={control}
+                                rules={buildValidationRules([validateNonZeroInteger(), validatePositiveInteger()])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        {...field}
+                                        id="expiringThreshold"
+                                        type="number"
+                                        label="Expiring Threshold"
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={getFieldErrorMessage(fieldState)}
+                                    />
+                                )}
+                            />
+                            <p className="text-sm text-gray-500 mt-2">
+                                How many days before expiration should certificate's validation status change to Expiring.
+                            </p>
+                        </div>
+                    </>
                 )}
-            </Form>
-        </div>
+                <Container className="flex-row justify-end modal-footer" gap={4}>
+                    <Button variant="outline" onClick={onCancel} disabled={isSubmitting || isBusy} type="button">
+                        Cancel
+                    </Button>
+                    <ProgressButton
+                        title={'Save'}
+                        inProgressTitle={'Saving...'}
+                        inProgress={isSubmitting || isBusy}
+                        disabled={isSubmitting || isBusy || areDefaultValuesSame(formValues as FormValues)}
+                        type="submit"
+                    />
+                </Container>
+            </form>
+        </FormProvider>
     );
 };
 

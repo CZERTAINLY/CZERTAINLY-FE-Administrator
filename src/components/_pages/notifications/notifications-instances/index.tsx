@@ -6,8 +6,9 @@ import { actions as notificationsActions, selectors as notificationsSelectors } 
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Badge } from 'reactstrap';
+import Badge from 'components/Badge';
 import { LockWidgetNameEnum } from 'types/user-interface';
+import NotificationInstanceForm from '../notification-instance-form';
 
 const NotificationInstanceList = () => {
     const dispatch = useDispatch();
@@ -18,18 +19,28 @@ const NotificationInstanceList = () => {
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
 
     const isDeleting = useSelector(notificationsSelectors.isDeleting);
+    const isCreating = useSelector(notificationsSelectors.isCreatingNotificationInstance);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [createNotificationInstanceModalOpen, setCreateNotificationInstanceModalOpen] = useState<boolean>(false);
 
-    const isBusy = useMemo(() => isFetchingNotificationInstances || isDeleting, [isFetchingNotificationInstances, isDeleting]);
+    const isBusy = useMemo(
+        () => isFetchingNotificationInstances || isDeleting || isCreating,
+        [isFetchingNotificationInstances, isDeleting, isCreating],
+    );
 
     const getFreshNotificationInstances = useCallback(() => {
         dispatch(notificationsActions.listNotificationInstances());
     }, [dispatch]);
 
     const onAddClick = useCallback(() => {
-        navigate(`../../../notificationinstances/add`);
-    }, [navigate]);
+        setCreateNotificationInstanceModalOpen(true);
+    }, []);
+
+    const handleCloseCreateModal = useCallback(() => {
+        setCreateNotificationInstanceModalOpen(false);
+        getFreshNotificationInstances();
+    }, [getFreshNotificationInstances]);
 
     const onDeleteConfirmed = useCallback(() => {
         dispatch(notificationsActions.clearDeleteErrorMessages());
@@ -113,14 +124,14 @@ const NotificationInstanceList = () => {
     return (
         <>
             <Widget
-                titleSize="larger"
+                noBorder
+                titleSize="large"
                 title="Notification Store"
                 refreshAction={getFreshNotificationInstances}
                 busy={isBusy}
                 widgetButtons={buttons}
                 widgetLockName={LockWidgetNameEnum.NotificationStore}
             >
-                <br />
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes
@@ -141,10 +152,19 @@ const NotificationInstanceList = () => {
                 caption={`Delete a Notification Instance`}
                 body={`You are about to delete a Notification Instance. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
+            />
+
+            <Dialog
+                isOpen={createNotificationInstanceModalOpen}
+                toggle={handleCloseCreateModal}
+                caption="Create Notification Instance"
+                size="xl"
+                body={<NotificationInstanceForm onCancel={handleCloseCreateModal} onSuccess={handleCloseCreateModal} />}
             />
         </>
     );

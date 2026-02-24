@@ -12,8 +12,6 @@ export default [
             'github/',
             'build/',
             'config-overrides.js',
-            'cypress.config.js',
-            'cypress/support',
             'src/setupProxy.cjs',
         ],
     },
@@ -31,8 +29,8 @@ export default [
         rules: {
             'prettier/prettier': 'error',
             ...reactHooks.configs.recommended.rules,
-            // TODO: Enable jsx-a11y and fix linter errors
-            // ...jsxA11y.configs.recommended.rules
+            'react-hooks/set-state-in-effect': 'off',
+            ...jsxA11y.configs.recommended.rules,
         },
     },
     prettierConfig,

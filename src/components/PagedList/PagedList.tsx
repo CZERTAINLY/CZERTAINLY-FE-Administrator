@@ -33,6 +33,7 @@ interface Props {
     hideWidgetButtons?: boolean;
     hasCheckboxes?: boolean;
     hasDetails?: boolean;
+    columnForDetail?: string;
     extraFilterComponent?: React.ReactNode;
 }
 
@@ -55,6 +56,7 @@ function PagedList({
     hideWidgetButtons = false,
     hasCheckboxes = true,
     hasDetails = false,
+    columnForDetail,
     extraFilterComponent,
 }: Props) {
     const dispatch = useDispatch();
@@ -126,7 +128,7 @@ function PagedList({
         if (additionalButtons) {
             result.push(...additionalButtons);
         }
-        return result;
+        return result.sort((a, b) => (a.icon === 'plus' ? -1 : 1));
     }, [checkedRows, additionalButtons, navigate, addHidden, onDeleteCallback]);
 
     const paginationData = useMemo(
@@ -142,7 +144,7 @@ function PagedList({
     );
 
     return (
-        <>
+        <div className="flex flex-col gap-4 md:gap-8">
             {getAvailableFiltersApi && filterTitle && (
                 <FilterWidget
                     entity={entity}
@@ -166,7 +168,8 @@ function PagedList({
                     data={data}
                     hasCheckboxes={hasCheckboxes}
                     hasDetails={hasDetails}
-                    hasPagination={true}
+                    columnForDetail={columnForDetail}
+                    hasPagination
                     multiSelect={multiSelect}
                     paginationData={paginationData}
                     onPageChanged={setPageNumber}
@@ -174,7 +177,6 @@ function PagedList({
                     onPageSizeChanged={onPageSizeChanged}
                 />
             </Widget>
-
             {onDeleteCallback && (
                 <Dialog
                     isOpen={confirmDelete}
@@ -183,13 +185,14 @@ function PagedList({
                         checkedRows.length > 1 ? entityNamePlural : entityNameSingular
                     }. Is this what you want to do?`}
                     toggle={() => setConfirmDelete(false)}
+                    icon="delete"
                     buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                        { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     ]}
                 />
             )}
-        </>
+        </div>
     );
 }
 

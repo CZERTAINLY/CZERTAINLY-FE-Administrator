@@ -6,8 +6,11 @@ import { ApiClients } from '../../api';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { EntityType, actions as filterActions, selectors } from 'ducks/filters';
 import { useDispatch, useSelector } from 'react-redux';
-import Select, { MultiValue, SingleValue } from 'react-select';
-import { Badge, Button, Col, FormGroup, Input, Label, Row } from 'reactstrap';
+import Select from 'components/Select';
+import Button from 'components/Button';
+import Label from 'components/Label';
+import TextInput from 'components/TextInput';
+import Badge from 'components/Badge';
 import { Observable } from 'rxjs';
 import { SearchFieldListModel } from 'types/certificate';
 import { AttributeContentType, FilterFieldSource, FilterFieldType, PlatformEnum } from 'types/openapi';
@@ -20,11 +23,31 @@ import {
     getFormattedDateTime,
     getFormattedUtc,
 } from 'utils/dateUtil';
-import styles from './FilterWidgetRuleAction.module.scss';
 
 interface CurrentActionOptions {
     label: string;
     value: string | any;
+}
+
+function mapActionToExecutionItem(a: ExecutionItemRequestModel, availableFilters: SearchFieldListModel[]): ExecutionItemModel {
+    const fieldOfAction = availableFilters
+        .find((f) => f.filterFieldSource === a.fieldSource)
+        ?.searchFieldData?.find((s) => s.fieldIdentifier === a.fieldIdentifier);
+    const formatData = (v: any) => {
+        if (typeof v === 'object' && Object.prototype.hasOwnProperty.call(v, 'uuid')) return v.uuid;
+        if (fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldAttributeTypeIsDate(fieldOfAction)) {
+            return Object.prototype.hasOwnProperty.call(v, 'value')
+                ? getFormattedUtc(fieldOfAction.attributeContentType, v.value)
+                : getFormattedUtc(fieldOfAction.attributeContentType, v);
+        }
+        return v;
+    };
+    const data = Array.isArray(a.data)
+        ? a.data.map(formatData)
+        : fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldAttributeTypeIsDate(fieldOfAction)
+          ? [getFormattedUtc(fieldOfAction.attributeContentType, a.data as unknown as string) as Object]
+          : a.data;
+    return { fieldSource: a.fieldSource, fieldIdentifier: a.fieldIdentifier, data };
 }
 
 interface Props {
@@ -64,16 +87,12 @@ export default function FilterWidgetRuleAction({
         isEditEnabled: false,
     });
 
-    const [fieldSource, setFieldSource] = useState<SingleValue<{ label: string; value: FilterFieldSource }> | undefined>(undefined);
+    const [fieldSource, setFieldSource] = useState<FilterFieldSource | undefined>(undefined);
 
-    const [filterField, setFilterField] = useState<SingleValue<{ label: string; value: string }> | undefined>(undefined);
+    const [filterField, setFilterField] = useState<string | undefined>(undefined);
 
     const [filterValue, setFilterValue] = useState<
-        | string
-        | object
-        | SingleValue<object | object[] | { label: string; value: object }>
-        | MultiValue<object | object[] | { label: string; value: object }>
-        | undefined
+        string | object | { value: string | number; label: string }[] | { value: string | number; label: string } | undefined
     >(undefined);
 
     const booleanOptions = useMemo(
@@ -88,6 +107,13 @@ export default function FilterWidgetRuleAction({
         dispatch(filterActions.getAvailableFilters({ entity, getAvailableFiltersApi }));
     }, [dispatch, entity, getAvailableFiltersApi]);
 
+    useEffect(() => {
+        setFilterValue(undefined);
+        setFilterField(undefined);
+        setFieldSource(undefined);
+        setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
+    }, [getAvailableFiltersApi]);
+
     const onUnselectFiltersClick = useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
             if ((e.target as HTMLDivElement).id === 'unselectFilters') {
@@ -98,20 +124,20 @@ export default function FilterWidgetRuleAction({
     );
 
     const currentFields = useMemo(
-        () => availableFilters.find((f) => f.filterFieldSource === fieldSource?.value)?.searchFieldData,
+        () => availableFilters.find((f) => f.filterFieldSource === fieldSource)?.searchFieldData,
         [availableFilters, fieldSource],
     );
 
-    const currentField = useMemo(() => currentFields?.find((f) => f.fieldIdentifier === filterField?.value), [filterField, currentFields]);
+    const currentField = useMemo(() => currentFields?.find((f) => f.fieldIdentifier === filterField), [filterField, currentFields]);
 
     const onUpdateClick = useCallback(() => {
-        if (!fieldSource?.value) return;
-        if (!filterField?.value) return;
+        if (!fieldSource) return;
+        if (!filterField) return;
         if (!filterValue) return;
 
         const newExecution: ExecutionItemRequestModel = {
-            fieldSource: fieldSource?.value,
-            fieldIdentifier: filterField?.value,
+            fieldSource: fieldSource!,
+            fieldIdentifier: filterField!,
             data: filterValue
                 ? typeof filterValue === 'string'
                     ? filterValue
@@ -125,68 +151,14 @@ export default function FilterWidgetRuleAction({
         setFilterValue(undefined);
 
         if (selectedFilter.filterNumber === -1) {
-            let updatedActions = [];
-
-            updatedActions = [...actions, newExecution];
+            const updatedActions = [...actions, newExecution];
             setActions(updatedActions);
-            const updatedActionDataActions = updatedActions.map((a) => {
-                const fieldOfAction = availableFilters
-                    .find((f) => f.filterFieldSource === a.fieldSource)
-                    ?.searchFieldData?.find((s) => s.fieldIdentifier === a.fieldIdentifier);
-                return {
-                    fieldSource: a.fieldSource,
-                    fieldIdentifier: a.fieldIdentifier,
-                    data: Array.isArray(a.data)
-                        ? a.data.map((v) => {
-                              if (typeof v === 'object' && v.hasOwnProperty('uuid')) {
-                                  return v.uuid;
-                              }
-                              if (fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldAttributeTypeIsDate(fieldOfAction)) {
-                                  if (v.hasOwnProperty('value')) {
-                                      return getFormattedUtc(fieldOfAction.attributeContentType, v.value);
-                                  }
-
-                                  return getFormattedUtc(fieldOfAction.attributeContentType, v);
-                              }
-                              return v;
-                          })
-                        : fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldAttributeTypeIsDate(fieldOfAction)
-                          ? [getFormattedUtc(fieldOfAction.attributeContentType, a.data as unknown as string) as Object]
-                          : a.data,
-                };
-            });
-
-            onActionsUpdate && onActionsUpdate(updatedActionDataActions);
+            onActionsUpdate?.(updatedActions.map((a) => mapActionToExecutionItem(a, availableFilters)));
             setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
         } else {
             const updatedActions = actions.map((a, i) => (i === selectedFilter.filterNumber ? newExecution : a));
             setActions(updatedActions);
-            const updatedActionDataActions = updatedActions.map((a) => {
-                const fieldOfAction = availableFilters
-                    .find((f) => f.filterFieldSource === a.fieldSource)
-                    ?.searchFieldData?.find((s) => s.fieldIdentifier === a.fieldIdentifier);
-                return {
-                    fieldSource: a.fieldSource,
-                    fieldIdentifier: a.fieldIdentifier,
-                    data: Array.isArray(a.data)
-                        ? a.data.map((v) => {
-                              if (typeof v === 'object' && v.hasOwnProperty('uuid')) {
-                                  return v.uuid;
-                              }
-                              if (fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldAttributeTypeIsDate(fieldOfAction)) {
-                                  if (v.hasOwnProperty('value')) {
-                                      return getFormattedUtc(fieldOfAction.attributeContentType, v.value);
-                                  }
-                                  return getFormattedUtc(fieldOfAction.attributeContentType, v);
-                              }
-                              return v;
-                          })
-                        : fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldAttributeTypeIsDate(fieldOfAction)
-                          ? [getFormattedUtc(fieldOfAction.attributeContentType, a.data as unknown as string) as Object]
-                          : a.data,
-                };
-            });
-            onActionsUpdate && onActionsUpdate(updatedActionDataActions);
+            onActionsUpdate?.(updatedActions.map((a) => mapActionToExecutionItem(a, availableFilters)));
             setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
         }
     }, [
@@ -216,33 +188,7 @@ export default function FilterWidgetRuleAction({
             const newActions = actions.filter((_, i) => i !== index);
             setActions(newActions);
             if (onActionsUpdate) {
-                const actionsWithItemsUuids = newActions.map((a) => {
-                    const fieldOfAction = availableFilters
-                        .find((f) => f.filterFieldSource === a.fieldSource)
-                        ?.searchFieldData?.find((s) => s.fieldIdentifier === a.fieldIdentifier);
-                    return {
-                        fieldSource: a.fieldSource,
-                        fieldIdentifier: a.fieldIdentifier,
-                        data: Array.isArray(a.data)
-                            ? a.data.map((v) => {
-                                  if (typeof v === 'object' && v.hasOwnProperty('uuid')) {
-                                      return v.uuid;
-                                  }
-                                  if (
-                                      fieldOfAction?.attributeContentType &&
-                                      fieldOfAction &&
-                                      checkIfFieldAttributeTypeIsDate(fieldOfAction)
-                                  ) {
-                                      return getFormattedUtc(fieldOfAction.attributeContentType, v);
-                                  }
-                                  return v;
-                              })
-                            : fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldAttributeTypeIsDate(fieldOfAction)
-                              ? [getFormattedUtc(fieldOfAction.attributeContentType, a.data as unknown as string) as Object]
-                              : a.data,
-                    };
-                });
-                onActionsUpdate(actionsWithItemsUuids);
+                onActionsUpdate(newActions.map((a) => mapActionToExecutionItem(a, availableFilters)));
                 setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
             }
         },
@@ -528,9 +474,11 @@ export default function FilterWidgetRuleAction({
             <Select
                 id="value"
                 options={objectValueOptions}
-                value={filterValue}
-                onChange={(e) => {
-                    setFilterValue(e);
+                value={
+                    Array.isArray(filterValue) ? filterValue : filterValue ? [filterValue as { value: string | number; label: string }] : []
+                }
+                onChange={(values) => {
+                    setFilterValue(currentField?.multiValue ? values || [] : values?.[0] || undefined);
                 }}
                 isMulti={currentField?.multiValue}
                 placeholder="Select filter value from options"
@@ -549,7 +497,17 @@ export default function FilterWidgetRuleAction({
                     '&nbsp;to&nbsp;
                     {value}
                     {!disableBadgeRemove && (
-                        <span className={styles.filterBadgeSpan} onClick={() => onRemoveFilterClick(itemNumber)}>
+                        <span
+                            onClick={() => onRemoveFilterClick(itemNumber)}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(event) => {
+                                if (event.key === 'Enter' || event.key === ' ') {
+                                    event.preventDefault();
+                                    onRemoveFilterClick(itemNumber);
+                                }
+                            }}
+                        >
                             &times;
                         </span>
                     )}
@@ -563,156 +521,153 @@ export default function FilterWidgetRuleAction({
 
     return (
         <>
-            <Widget title={title} busy={isFetchingAvailableFilters} titleSize="larger">
-                <div id="unselectFilters" onClick={onUnselectFiltersClick}>
-                    <div style={{ width: '99%', borderBottom: 'solid 1px silver', marginBottom: '1rem' }}>
-                        <Row>
-                            <Col>
-                                <FormGroup>
-                                    <Label for="groupSelect">Field Source</Label>
-                                    <Select
-                                        id="group"
-                                        inputId="groupSelect"
-                                        options={availableFilters.map((f) => ({
-                                            label: getEnumLabel(searchGroupEnum, f.filterFieldSource),
-                                            value: f.filterFieldSource,
-                                        }))}
-                                        onChange={(e) => {
-                                            setFieldSource(e);
-                                            setFilterField(undefined);
-                                            setFilterValue(undefined);
+            <Widget title={title} busy={isFetchingAvailableFilters} titleSize="large">
+                <div
+                    id="unselectFilters"
+                    role="button"
+                    tabIndex={0}
+                    onClick={onUnselectFiltersClick}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            onUnselectFiltersClick({ target: { id: 'unselectFilters' } } as unknown as React.MouseEvent<HTMLDivElement>);
+                        }
+                    }}
+                >
+                    <div className="flex flex-row gap-2 mb-4 items-end">
+                        <div className="grid grid-cols-4 gap-2 w-full">
+                            <Select
+                                id="group"
+                                options={availableFilters.map((f) => ({
+                                    label: getEnumLabel(searchGroupEnum, f.filterFieldSource),
+                                    value: f.filterFieldSource,
+                                }))}
+                                onChange={(value) => {
+                                    setFieldSource((value as FilterFieldSource) || undefined);
+                                    setFilterField(undefined);
+                                    setFilterValue(undefined);
+                                }}
+                                value={fieldSource || ''}
+                                isClearable
+                                label="Field Source"
+                            />
+
+                            <Select
+                                id="field"
+                                options={currentFields?.map((f) => ({ label: f.fieldLabel, value: f.fieldIdentifier }))}
+                                onChange={(value) => {
+                                    setFilterField((value as string) || undefined);
+                                    setFilterValue(undefined);
+                                }}
+                                value={filterField || ''}
+                                isDisabled={!fieldSource}
+                                isClearable
+                                label="Field"
+                            />
+
+                            <div>
+                                <Label htmlFor="valueSelect">Value</Label>
+                                {currentField?.type === undefined ||
+                                currentField?.type === FilterFieldType.String ||
+                                currentField?.type === FilterFieldType.Date ||
+                                currentField?.type === FilterFieldType.Number ? (
+                                    <TextInput
+                                        id="valueSelect"
+                                        type={
+                                            currentField?.attributeContentType && checkIfFieldAttributeTypeIsDate(currentField)
+                                                ? getFormTypeFromAttributeContentType(currentField?.attributeContentType)
+                                                : currentField?.type
+                                                  ? getFormTypeFromFilterFieldType(currentField?.type)
+                                                  : 'text'
+                                        }
+                                        value={filterValue?.toString() || ''}
+                                        onChange={(value) => {
+                                            setFilterValue(JSON.parse(JSON.stringify(value)));
                                         }}
-                                        value={fieldSource || null}
-                                        isClearable={true}
+                                        placeholder="Enter filter value"
+                                        disabled={!filterField}
                                     />
-                                </FormGroup>
-                            </Col>
-
-                            <Col>
-                                <FormGroup>
-                                    <Label for="fieldSelect">Field</Label>
+                                ) : currentField?.type === FilterFieldType.Boolean ? (
                                     <Select
-                                        id="field"
-                                        inputId="fieldSelect"
-                                        options={currentFields?.map((f) => ({ label: f.fieldLabel, value: f.fieldIdentifier }))}
-                                        onChange={(e) => {
-                                            setFilterField(e);
-                                            setFilterValue(undefined);
+                                        id="value"
+                                        options={
+                                            filterField ? booleanOptions.map((opt) => ({ label: opt.label, value: String(opt.value) })) : []
+                                        }
+                                        value={filterValue ? String(filterValue) : ''}
+                                        onChange={(value) => {
+                                            setFilterValue(value === 'true' ? true : value === 'false' ? false : undefined);
                                         }}
-                                        value={filterField || null}
-                                        isDisabled={!fieldSource}
-                                        isClearable={true}
+                                        isDisabled={!filterField}
                                     />
-                                </FormGroup>
-                            </Col>
+                                ) : (
+                                    renderObjectValueSelector
+                                )}
+                            </div>
 
-                            <Col>
-                                <FormGroup>
-                                    <Label for="valueSelect">Value</Label>
-                                    {currentField?.type === undefined ||
-                                    currentField?.type === FilterFieldType.String ||
-                                    currentField?.type === FilterFieldType.Date ||
-                                    currentField?.type === FilterFieldType.Number ? (
-                                        <Input
-                                            id="valueSelect"
-                                            type={
-                                                currentField?.attributeContentType && checkIfFieldAttributeTypeIsDate(currentField)
-                                                    ? getFormTypeFromAttributeContentType(currentField?.attributeContentType)
-                                                    : currentField?.type
-                                                      ? getFormTypeFromFilterFieldType(currentField?.type)
-                                                      : 'text'
-                                            }
-                                            step={
-                                                currentField?.attributeContentType
-                                                    ? getStepValue(currentField?.attributeContentType)
-                                                    : undefined
-                                            }
-                                            value={filterValue?.toString() || ''}
-                                            onChange={(e) => {
-                                                setFilterValue(JSON.parse(JSON.stringify(e.target.value)));
-                                            }}
-                                            placeholder="Enter filter value"
-                                            disabled={!filterField}
-                                        />
-                                    ) : currentField?.type === FilterFieldType.Boolean ? (
-                                        <Select
-                                            id="value"
-                                            inputId="valueSelect"
-                                            options={filterField ? booleanOptions : undefined}
-                                            value={filterValue || null}
-                                            onChange={(e) => {
-                                                setFilterValue(e);
-                                            }}
-                                            isDisabled={!filterField}
-                                        />
-                                    ) : (
-                                        renderObjectValueSelector
-                                    )}
-                                </FormGroup>
-                            </Col>
-
-                            <Col md="auto">
+                            <div className="flex items-end">
                                 <Button
-                                    style={{ width: '7em', marginTop: '2em' }}
                                     color="primary"
+                                    className="py-3 min-w-[62px]"
                                     onClick={onUpdateClick}
                                     disabled={isUpdateButtonDisabled}
                                 >
                                     {selectedFilter.filterNumber === -1 ? 'Add' : 'Update'}
                                 </Button>
-                            </Col>
-                        </Row>
+                            </div>
+                        </div>
                     </div>
 
-                    {actions.map((f, i) => {
-                        const field = availableFilters
-                            .find((a) => a.filterFieldSource === f.fieldSource)
-                            ?.searchFieldData?.find((s) => s.fieldIdentifier === f.fieldIdentifier);
-                        const label = field ? field.fieldLabel : f.fieldIdentifier;
-                        const value =
-                            field && field.type === FilterFieldType.Boolean
-                                ? `'${booleanOptions.find((b) => !!f.data === b.value)?.label}'`
-                                : Array.isArray(f.data)
-                                  ? `${f.data
-                                        .map(
-                                            (v) =>
-                                                `'${
-                                                    field?.platformEnum
-                                                        ? platformEnums[field.platformEnum][v]?.label
-                                                        : v?.name
-                                                          ? v.name
-                                                          : field && checkIfFieldAttributeTypeIsDate(field)
-                                                            ? v?.label
-                                                                ? getFormattedDateTime(v?.label)
-                                                                : getFormattedDateTime(v)
-                                                            : v?.label
-                                                              ? v.label
-                                                              : v
-                                                }'`,
-                                        )
-                                        .join(', ')}`
-                                  : f.data
-                                    ? `'${
-                                          field?.platformEnum
-                                              ? platformEnums[field.platformEnum][f.data as unknown as string]?.label
-                                              : field && field.attributeContentType === AttributeContentType.Date
-                                                ? getFormattedDate(f.data as unknown as string)
-                                                : field && field.attributeContentType === AttributeContentType.Datetime
-                                                  ? getFormattedDateTime(f.data as unknown as string)
-                                                  : f.data
-                                      }'`
-                                    : '';
-                        return (
-                            <Badge
-                                className={styles.filterBadge}
-                                key={i}
-                                onClick={() => toggleFilter(i)}
-                                color={selectedFilter.filterNumber === i ? 'primary' : 'secondary'}
-                            >
-                                {!isFetchingAvailableFilters && !busyBadges && <>{renderBadgeContent(i, value, label, f.fieldSource)}</>}
-                            </Badge>
-                        );
-                    })}
+                    <div className="flex gap-2 flex-wrap">
+                        {actions.map((f, i) => {
+                            const field = availableFilters
+                                .find((a) => a.filterFieldSource === f.fieldSource)
+                                ?.searchFieldData?.find((s) => s.fieldIdentifier === f.fieldIdentifier);
+                            const label = field ? field.fieldLabel : f.fieldIdentifier;
+                            const value =
+                                field && field.type === FilterFieldType.Boolean
+                                    ? `'${booleanOptions.find((b) => !!f.data === b.value)?.label}'`
+                                    : Array.isArray(f.data)
+                                      ? `${f.data
+                                            .map(
+                                                (v) =>
+                                                    `'${
+                                                        field?.platformEnum
+                                                            ? platformEnums[field.platformEnum][v]?.label
+                                                            : v?.name
+                                                              ? v.name
+                                                              : field && checkIfFieldAttributeTypeIsDate(field)
+                                                                ? v?.label
+                                                                    ? getFormattedDateTime(v?.label)
+                                                                    : getFormattedDateTime(v)
+                                                                : v?.label
+                                                                  ? v.label
+                                                                  : v
+                                                    }'`,
+                                            )
+                                            .join(', ')}`
+                                      : f.data
+                                        ? `'${
+                                              field?.platformEnum
+                                                  ? platformEnums[field.platformEnum][f.data as unknown as string]?.label
+                                                  : field && field.attributeContentType === AttributeContentType.Date
+                                                    ? getFormattedDate(f.data as unknown as string)
+                                                    : field && field.attributeContentType === AttributeContentType.Datetime
+                                                      ? getFormattedDateTime(f.data as unknown as string)
+                                                      : f.data
+                                          }'`
+                                        : '';
+                            return (
+                                <Badge
+                                    key={i}
+                                    onClick={() => toggleFilter(i)}
+                                    color={selectedFilter.filterNumber === i ? 'primary' : 'secondary'}
+                                >
+                                    {!isFetchingAvailableFilters && !busyBadges && (
+                                        <>{renderBadgeContent(i, value, label, f.fieldSource)}</>
+                                    )}
+                                </Badge>
+                            );
+                        })}
+                    </div>
                 </div>
             </Widget>
         </>

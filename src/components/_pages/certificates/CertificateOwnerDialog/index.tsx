@@ -3,9 +3,10 @@ import { useDispatch } from 'react-redux';
 
 import { actions } from 'ducks/certificates';
 
-import Select from 'react-select';
-import { Button, ButtonGroup, FormGroup } from 'reactstrap';
+import Select from 'components/Select';
+import Button from 'components/Button';
 import { UserResponseModel } from 'types/users';
+import Container from 'components/Container';
 
 interface Props {
     uuids: string[];
@@ -48,31 +49,29 @@ export default function CertificateOwnerDialog({ uuids, onCancel, onUpdate, user
 
     return (
         <>
-            <FormGroup>
+            <div className="mb-4">
                 <Select
-                    maxMenuHeight={140}
-                    menuPlacement="auto"
+                    id="certificateOwner"
                     options={userOptions}
                     placeholder={`Select Owner`}
-                    onChange={(event) => setOwnerUuid(event?.value)}
+                    value={ownerUuid || ''}
+                    onChange={(value) => setOwnerUuid(value as string)}
+                    label="Owner"
                 />
-            </FormGroup>
-
-            <div className="d-flex justify-content-end">
-                <ButtonGroup>
-                    <Button color="danger" onClick={removeOwner}>
-                        <span className="text-white">Remove</span>
-                    </Button>
-
-                    <Button color="primary" onClick={updateOwner} disabled={!ownerUuid}>
-                        Update
-                    </Button>
-
-                    <Button color="default" onClick={onCancel}>
-                        Cancel
-                    </Button>
-                </ButtonGroup>
             </div>
+
+            <Container className="flex-row justify-end modal-footer" gap={4}>
+                <Button color="secondary" variant="outline" onClick={onCancel} className="mr-auto">
+                    Cancel
+                </Button>
+                <Button color="danger" onClick={removeOwner}>
+                    Remove
+                </Button>
+
+                <Button color="primary" onClick={updateOwner} disabled={!ownerUuid}>
+                    Update
+                </Button>
+            </Container>
         </>
     );
 }

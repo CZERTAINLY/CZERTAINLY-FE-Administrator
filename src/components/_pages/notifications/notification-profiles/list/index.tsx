@@ -1,13 +1,17 @@
 import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
 import { TableDataRow, TableHeader } from 'components/CustomTable';
 import PagedList from 'components/PagedList/PagedList';
+import Dialog from 'components/Dialog';
+import NotificationProfileForm from '../form';
 import { getEnumLabel, selectors as enumSelectors } from 'ducks/enums';
 import { actions, selectors } from 'ducks/notification-profiles';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { Badge, Container } from 'reactstrap';
+import Badge from 'components/Badge';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 import { EntityType } from 'ducks/filters';
 import { SearchRequestModel } from 'types/certificate';
 import { PlatformEnum } from 'types/openapi';
@@ -17,12 +21,50 @@ const NotificationProfilesList = () => {
     const dispatch = useDispatch();
 
     const notificationProfiles = useSelector(selectors.notificationProfiles);
+    const isCreating = useSelector(selectors.isCreating);
+    const isUpdating = useSelector(selectors.isUpdating);
 
     const recipientTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RecipientType));
+
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+    const [editingNotificationProfileId, setEditingNotificationProfileId] = useState<string | undefined>(undefined);
+    const [editingVersion, setEditingVersion] = useState<string | undefined>(undefined);
 
     const onListCallback = useCallback(
         (pagination: SearchRequestModel) => dispatch(actions.listNotificationProfiles(pagination)),
         [dispatch],
+    );
+
+    useRunOnFinished(isCreating, () => {
+        setIsAddModalOpen(false);
+        onListCallback({ itemsPerPage: 10, pageNumber: 1, filters: [] });
+    });
+    useRunOnFinished(isUpdating, () => {
+        setEditingNotificationProfileId(undefined);
+        setEditingVersion(undefined);
+        onListCallback({ itemsPerPage: 10, pageNumber: 1, filters: [] });
+    });
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingNotificationProfileId(undefined);
+        setEditingVersion(undefined);
+    }, []);
+
+    const additionalButtons: WidgetButtonProps[] = useMemo(
+        () => [
+            {
+                icon: 'plus',
+                disabled: false,
+                tooltip: 'Create',
+                onClick: handleOpenAddModal,
+            },
+        ],
+        [handleOpenAddModal],
     );
 
     const headers: TableHeader[] = useMemo(
@@ -79,7 +121,7 @@ const NotificationProfilesList = () => {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <PagedList
                 entity={EntityType.NOTIFICATION_PROFILES}
                 onListCallback={onListCallback}
@@ -89,8 +131,25 @@ const NotificationProfilesList = () => {
                 entityNameSingular="a Notification Profile"
                 entityNamePlural="Notification Profiles"
                 pageWidgetLockName={LockWidgetNameEnum.ListOfNotificationProfiles}
+                addHidden
+                additionalButtons={additionalButtons}
+                hasCheckboxes={false}
             />
-        </Container>
+
+            <Dialog
+                isOpen={isAddModalOpen || !!editingNotificationProfileId}
+                toggle={handleCloseAddModal}
+                caption={editingNotificationProfileId ? 'Edit Notification Profile' : 'Create Notification Profile'}
+                size="xl"
+                body={
+                    <NotificationProfileForm
+                        notificationProfileId={editingNotificationProfileId}
+                        version={editingVersion}
+                        onCancel={handleCloseAddModal}
+                    />
+                }
+            />
+        </>
     );
 };
 

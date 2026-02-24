@@ -1,27 +1,35 @@
-import CheckboxField from 'components/Input/CheckboxField';
 import DynamicContent from 'components/Input/DynamicContent';
-import TextField from 'components/Input/TextField';
 import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
 
 import { actions, selectors } from 'ducks/customAttributes';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useEffect, useMemo } from 'react';
-import { Field, Form } from 'react-final-form';
+import { useAreDefaultValuesSame, useRunOnFinished } from 'utils/common-hooks';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router';
-import Select from 'react-select';
-import { Form as BootstrapForm, Button, ButtonGroup, FormGroup, Label } from 'reactstrap';
+import { useParams } from 'react-router';
+import Select from 'components/Select';
+import Button from 'components/Button';
+import Container from 'components/Container';
+import Checkbox from 'components/Checkbox';
+import TextInput from 'components/TextInput';
 import { CustomAttributeCreateRequestModel, CustomAttributeUpdateRequestModel } from 'types/customAttributes';
 import { AttributeContentType, PlatformEnum } from 'types/openapi';
-import { isObjectSame } from 'utils/common-utils';
 import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 
-export default function CustomAttributeForm() {
+interface CustomAttributeFormProps {
+    customAttributeId?: string;
+    onCancel?: () => void;
+    onSuccess?: () => void;
+}
+
+export default function CustomAttributeForm({ customAttributeId, onCancel, onSuccess }: CustomAttributeFormProps) {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
-    const { id } = useParams();
+    const { id: routeId } = useParams();
+    const id = customAttributeId || routeId;
     const editMode = useMemo(() => !!id, [id]);
 
     const customAttributeDetail = useSelector(selectors.customAttribute);
@@ -37,7 +45,9 @@ export default function CustomAttributeForm() {
         [isCreating, isFetchingDetail, isUpdating, isFetchingResources],
     );
 
-    type FormValues = Omit<CustomAttributeCreateRequestModel, 'resources'> & { resources?: Array<{ label: string; value: string }> };
+    type FormValues = Omit<CustomAttributeCreateRequestModel, 'resources'> & {
+        resources?: Array<{ label: string; value: string }>;
+    };
     const defaultValuesCreate: FormValues = useMemo(
         () => ({
             name: '',
@@ -65,108 +75,214 @@ export default function CustomAttributeForm() {
                 : defaultValuesCreate,
         [customAttributeDetail, defaultValuesCreate, resourceEnum],
     );
-    const areDefaultValuesSame = useCallback(
-        (values: FormValues) => {
-            if (editMode) {
-                const areValuesSame = isObjectSame(values, defaultValuesUpdate);
-                return areValuesSame;
-            } else {
-                const areValuesSame = isObjectSame(values, defaultValuesCreate);
-                return areValuesSame;
-            }
-        },
+
+    const methods = useForm<FormValues>({
+        defaultValues: editMode ? defaultValuesUpdate : defaultValuesCreate,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit,
+        control,
+        formState: { isSubmitting, isValid },
+        setValue,
+    } = methods;
+
+    const formValues = useWatch({ control });
+    const watchedList = useWatch({ control, name: 'list' });
+
+    const defaultValuesToCompare = useMemo(
+        () => (editMode ? defaultValuesUpdate : defaultValuesCreate),
         [editMode, defaultValuesUpdate, defaultValuesCreate],
     );
+    const areDefaultValuesSame = useAreDefaultValuesSame(defaultValuesToCompare as unknown as Record<string, unknown>);
 
-    const onSubmitCreate = useCallback(
-        (values: CustomAttributeCreateRequestModel) => dispatch(actions.createCustomAttribute(values)),
-        [dispatch],
-    );
-    const onSubmitUpdate = useCallback(
-        (values: CustomAttributeUpdateRequestModel) =>
-            dispatch(
-                actions.updateCustomAttribute({
-                    uuid: id!,
-                    customAttributeUpdateRequest: values,
-                }),
-            ),
-        [dispatch, id],
+    const onSubmit = useCallback(
+        (values: FormValues) => {
+            const valuesToSubmit = { ...values, resources: values.resources?.map((r: any) => r.value) };
+            if (editMode) {
+                dispatch(
+                    actions.updateCustomAttribute({
+                        uuid: id!,
+                        customAttributeUpdateRequest: valuesToSubmit as CustomAttributeUpdateRequestModel,
+                    }),
+                );
+            } else {
+                dispatch(actions.createCustomAttribute(valuesToSubmit as CustomAttributeCreateRequestModel));
+            }
+        },
+        [dispatch, editMode, id],
     );
 
     useEffect(() => {
         dispatch(actions.listResources());
-        if (editMode && id !== customAttributeDetail?.uuid) {
-            dispatch(actions.getCustomAttribute(id!));
+        if (editMode && id && id !== customAttributeDetail?.uuid) {
+            dispatch(actions.getCustomAttribute(id));
         }
     }, [dispatch, editMode, id, customAttributeDetail?.uuid]);
 
+    useRunOnFinished(isCreating, onSuccess);
+    useRunOnFinished(isUpdating, onSuccess);
+
     return (
-        <Widget title={editMode ? 'Edit Custom Attribute' : 'Add Custom Attribute'} busy={isBusy}>
-            <Form<FormValues>
-                initialValues={editMode ? defaultValuesUpdate : defaultValuesCreate}
-                onSubmit={(values) => {
-                    const valuesToSubmit = { ...values, resources: values.resources?.map((r: any) => r.value) };
-                    if (editMode) {
-                        onSubmitUpdate(valuesToSubmit);
-                    } else {
-                        onSubmitCreate(valuesToSubmit);
-                    }
-                }}
-            >
-                {({ handleSubmit, pristine, submitting, valid, values, form }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
-                        <TextField
-                            label={'Name'}
-                            id={'name'}
-                            disabled={editMode}
-                            validators={[validateRequired(), validateAlphaNumericWithSpecialChars()]}
-                        />
-                        <TextField label={'Label'} id={'label'} validators={[validateRequired(), validateAlphaNumericWithSpecialChars()]} />
-                        <TextField label={'Description'} id={'description'} validators={[validateLength(0, 300)]} />
-                        <TextField label={'Group'} id={'group'} validators={[validateAlphaNumericWithSpecialChars()]} />
-
-                        <Field name="resources" type={'text'}>
-                            {({ input }) => (
-                                <FormGroup>
-                                    <Label for="resourcesSelect">Resources</Label>
-                                    <Select
-                                        {...input}
-                                        id="resources"
-                                        inputId="resourcesSelect"
-                                        placeholder="Resources"
-                                        options={resources.map((r) => ({ label: getEnumLabel(resourceEnum, r), value: r }))}
-                                        isMulti={true}
-                                        isClearable={true}
+        <>
+            <FormProvider {...methods}>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    <Widget noBorder busy={isBusy}>
+                        <div className="space-y-4">
+                            <Controller
+                                name="name"
+                                control={control}
+                                rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        {...field}
+                                        id="name"
+                                        type="text"
+                                        label="Name"
+                                        required
+                                        disabled={editMode}
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
-                                </FormGroup>
-                            )}
-                        </Field>
+                                )}
+                            />
 
-                        <CheckboxField label={'Required'} id={'required'} />
-                        <CheckboxField label={'Read Only'} id={'readOnly'} />
-                        <CheckboxField
-                            label={'List'}
-                            id={'list'}
-                            onChange={(value) => (!value ? form.change('multiSelect', false) : false)}
-                        />
-                        <CheckboxField label={'Multi Select'} id={'multiSelect'} disabled={!values['list']} />
-                        <DynamicContent editable={!editMode} isList={!!values['list']} />
-                        <div className="d-flex justify-content-end">
-                            <ButtonGroup>
+                            <Controller
+                                name="label"
+                                control={control}
+                                rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        {...field}
+                                        id="label"
+                                        type="text"
+                                        label="Label"
+                                        required
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={getFieldErrorMessage(fieldState)}
+                                    />
+                                )}
+                            />
+
+                            <Controller
+                                name="description"
+                                control={control}
+                                rules={buildValidationRules([validateLength(0, 300)])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        {...field}
+                                        id="description"
+                                        label="Description"
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={getFieldErrorMessage(fieldState)}
+                                    />
+                                )}
+                            />
+
+                            <Controller
+                                name="group"
+                                control={control}
+                                rules={buildValidationRules([validateAlphaNumericWithSpecialChars()])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        {...field}
+                                        id="group"
+                                        type="text"
+                                        label="Group"
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={getFieldErrorMessage(fieldState)}
+                                    />
+                                )}
+                            />
+
+                            <div>
+                                <Controller
+                                    name="resources"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            id="resourcesSelect"
+                                            label="Resources"
+                                            isMulti
+                                            value={field.value || []}
+                                            onChange={(value) => {
+                                                field.onChange(value);
+                                            }}
+                                            options={resources.map((r) => ({ label: getEnumLabel(resourceEnum, r), value: r }))}
+                                            placeholder="Resources"
+                                            isClearable
+                                        />
+                                    )}
+                                />
+                            </div>
+
+                            <Controller
+                                name="required"
+                                control={control}
+                                render={({ field }) => (
+                                    <Checkbox id="required" checked={field.value ?? false} onChange={field.onChange} label="Required" />
+                                )}
+                            />
+
+                            <Controller
+                                name="readOnly"
+                                control={control}
+                                render={({ field }) => (
+                                    <Checkbox id="readOnly" checked={field.value ?? false} onChange={field.onChange} label="Read Only" />
+                                )}
+                            />
+
+                            <Controller
+                                name="list"
+                                control={control}
+                                render={({ field }) => (
+                                    <Checkbox
+                                        id="list"
+                                        checked={field.value ?? false}
+                                        onChange={(checked) => {
+                                            field.onChange(checked);
+                                            if (!checked) {
+                                                setValue('multiSelect', false);
+                                            }
+                                        }}
+                                        label="List"
+                                    />
+                                )}
+                            />
+
+                            <Controller
+                                name="multiSelect"
+                                control={control}
+                                render={({ field }) => (
+                                    <Checkbox
+                                        id="multiSelect"
+                                        checked={field.value ?? false}
+                                        onChange={field.onChange}
+                                        label="Multi Select"
+                                        disabled={!watchedList}
+                                    />
+                                )}
+                            />
+
+                            <DynamicContent editable={!editMode} isList={!!watchedList} />
+
+                            <Container className="flex-row justify-end modal-footer" gap={4}>
+                                <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
+                                    Cancel
+                                </Button>
                                 <ProgressButton
                                     title={editMode ? 'Update' : 'Create'}
                                     inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
-                                    inProgress={submitting}
-                                    disabled={submitting || !valid || areDefaultValuesSame(values)}
+                                    inProgress={isSubmitting}
+                                    disabled={isSubmitting || !isValid || areDefaultValuesSame(formValues as FormValues)}
+                                    type="submit"
                                 />
-                                <Button color="default" onClick={() => navigate(-1)} disabled={submitting}>
-                                    Cancel
-                                </Button>
-                            </ButtonGroup>
+                            </Container>
                         </div>
-                    </BootstrapForm>
-                )}
-            </Form>
-        </Widget>
+                    </Widget>
+                </form>
+            </FormProvider>
+        </>
     );
 }

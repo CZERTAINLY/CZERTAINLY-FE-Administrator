@@ -1,66 +1,48 @@
-import cx from 'classnames';
-import { useEffect, useMemo, useState } from 'react';
-import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
+import Tabs from 'components/Tabs';
+import { useMemo, useState, useEffect } from 'react';
+import Widget from 'components/Widget';
 
 type Props = {
     tabs: {
-        title: string | JSX.Element;
+        title: string | React.ReactNode;
         hidden?: boolean;
-        content: JSX.Element;
         disabled?: boolean;
+        content: React.ReactNode;
         onClick?: () => void;
     }[];
     onlyActiveTabContent?: boolean;
     selectedTab?: number;
+    noBorder?: boolean;
 };
 
-export default function TabLayout({ tabs, onlyActiveTabContent = false, selectedTab }: Props) {
-    const [activeTab, setActiveTab] = useState(selectedTab || 0);
+export default function TabLayout({ tabs, onlyActiveTabContent = true, selectedTab, noBorder = false }: Props) {
+    const [activeTab, setActiveTab] = useState(selectedTab ?? 0);
 
     const memoizedTabs = useMemo(() => {
         return tabs.filter((e) => !e.hidden);
     }, [tabs]);
 
+    const currentTab = selectedTab !== undefined ? selectedTab : activeTab;
+
     useEffect(() => {
-        if (selectedTab !== undefined && selectedTab !== activeTab) {
+        if (selectedTab !== undefined) {
             setActiveTab(selectedTab);
-        } else if (tabs.length <= activeTab) {
+        } else if (tabs.length > 0 && activeTab >= tabs.length) {
             setActiveTab(0);
         }
-    }, [activeTab, tabs, selectedTab]);
+    }, [selectedTab, tabs.length, activeTab]);
+
+    const handleTabChange = (tab: number) => {
+        if (selectedTab === undefined) {
+            setActiveTab(tab);
+        }
+    };
 
     return (
-        <>
-            <Nav tabs>
-                {memoizedTabs.map((t, i) => (
-                    <NavItem key={`nav-${i}`}>
-                        <NavLink
-                            className={cx({ active: activeTab === i })}
-                            disabled={t.disabled}
-                            onClick={() => {
-                                if (t.disabled) {
-                                    return;
-                                }
-                                setActiveTab(i);
-                                if (t.onClick) {
-                                    t.onClick();
-                                }
-                            }}
-                        >
-                            {t.title}
-                        </NavLink>
-                    </NavItem>
-                ))}
-            </Nav>
-            <TabContent activeTab={activeTab}>
-                {memoizedTabs.map((t, i) =>
-                    onlyActiveTabContent === false || activeTab === i ? (
-                        <TabPane key={`pane-${i}`} tabId={i}>
-                            {t.content}
-                        </TabPane>
-                    ) : null,
-                )}
-            </TabContent>
-        </>
+        <Widget noBorder={noBorder} dataTestId="tab-layout">
+            <Tabs tabs={memoizedTabs} selectedTab={currentTab} onTabChange={handleTabChange} />
+            <hr className="my-4 border-gray-200" />
+            {memoizedTabs.map((t, i) => (onlyActiveTabContent === false || currentTab === i ? <div key={i}>{t.content}</div> : null))}
+        </Widget>
     );
 }

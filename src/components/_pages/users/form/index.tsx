@@ -4,6 +4,7 @@ import CertificateAttributes from 'components/CertificateAttributes';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import ProgressButton from 'components/ProgressButton';
+import Label from 'components/Label';
 
 import Widget from 'components/Widget';
 import { actions as groupActions, selectors as groupSelectors } from 'ducks/certificateGroups';
@@ -12,48 +13,53 @@ import { selectors as pagingSelectors } from 'ducks/paging';
 import { actions as rolesActions, selectors as rolesSelectors } from 'ducks/roles';
 
 import { actions as userActions, selectors as userSelectors } from 'ducks/users';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Field, Form } from 'react-final-form';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router';
-import Select from 'react-select';
+import { useParams } from 'react-router';
+import Select from 'components/Select';
+import Button from 'components/Button';
+import Container from 'components/Container';
+import Switch from 'components/Switch';
 
-import { Badge, Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, FormText, Input, Label } from 'reactstrap';
+import Badge from 'components/Badge';
 import { UserDetailModel } from 'types/auth';
 import { CertificateDetailResponseModel, CertificateListResponseModel } from 'types/certificate';
 
 import { EntityType } from 'ducks/filters';
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateEmail, validateLength, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateEmail, validateLength, validateRequired } from 'utils/validators';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { CertificateState as CertStatus, Resource } from '../../../../types/openapi';
-import { mutators } from '../../../../utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from '../../../../utils/attributes/attributes';
 import AttributeEditor from '../../../Attributes/AttributeEditor';
 import TabLayout from '../../../Layout/TabLayout';
+import TextInput from 'components/TextInput';
 
-interface SelectChangeValue {
-    value: string;
-    label: string;
+interface UserFormProps {
+    userId?: string;
+    onCancel?: () => void;
+    onSuccess?: () => void;
 }
 
 interface FormValues {
     username: string;
-    selectedGroups: SelectChangeValue[];
+    selectedGroups: { value: string; label: string }[];
     description: string;
     firstName: string;
     lastName: string;
     email: string;
-    inputType: { value: 'upload' | 'select' };
+    inputType: 'upload' | 'select';
     certFile: FileList | undefined;
     certificateUuid?: string;
     enabled: boolean;
 }
 
-function UserForm() {
+function UserForm({ userId, onCancel, onSuccess }: UserFormProps) {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
-    const { id } = useParams();
+    const { id: routeId } = useParams();
+    const id = userId || routeId;
 
     const editMode = useMemo(() => !!id, [id]);
 
@@ -83,8 +89,6 @@ function UserForm() {
 
     const [userRoles, setUserRoles] = useState<string[]>([]);
 
-    const [optionsForCertificate, setOptionsForCertificate] = useState<{ label: string; value: string }[]>([]);
-
     const isBusy = useMemo(
         () =>
             isFetchingUserDetail ||
@@ -109,7 +113,7 @@ function UserForm() {
         ],
     );
 
-    const optionsForInput: { label: string; value: 'upload' | 'select' }[] = useMemo(
+    const optionsForInput = useMemo(
         () => [
             {
                 label: 'Upload a new Certificate',
@@ -143,7 +147,6 @@ function UserForm() {
     useEffect(() => {
         dispatch(certActions.resetState());
         dispatch(rolesActions.resetState());
-        dispatch(userActions.resetState());
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Users));
 
         dispatch(
@@ -158,21 +161,31 @@ function UserForm() {
         dispatch(groupActions.listGroups());
     }, [dispatch]);
 
+    const previousIdRef = useRef<string | undefined>(undefined);
+
     /* Load user */
 
     useEffect(() => {
-        if (id && (!userSelector || userSelector.uuid !== id)) dispatch(userActions.getDetail({ uuid: id }));
-    }, [dispatch, id, userSelector]);
+        if (editMode && id) {
+            // Fetch if id changed or if we don't have the correct user loaded
+            if (previousIdRef.current !== id || !userSelector || userSelector.uuid !== id) {
+                dispatch(userActions.getDetail({ uuid: id }));
+                previousIdRef.current = id;
+            }
+        } else {
+            previousIdRef.current = undefined;
+        }
+    }, [dispatch, editMode, id, userSelector]);
 
     /* Copy loaded user to the state && possibly load the certificate */
 
     useEffect(() => {
-        if (id && userSelector?.uuid === id) {
+        if (editMode && id && userSelector?.uuid === id) {
             setUser(userSelector);
             setUserRoles(userSelector.roles.map((role) => role.uuid));
 
             if (userSelector.certificate) dispatch(certActions.getCertificateDetail({ uuid: userSelector.certificate.uuid }));
-        } else {
+        } else if (!editMode) {
             if (!user)
                 setUser({
                     uuid: '',
@@ -189,7 +202,7 @@ function UserForm() {
 
             setUserRoles([]);
         }
-    }, [dispatch, id, user, userSelector]);
+    }, [dispatch, editMode, id, user, userSelector]);
 
     /* Process cert detail loaded for user */
 
@@ -228,10 +241,10 @@ function UserForm() {
         setCurrentPage(currentPage + 1);
     }, [certificates, currentPage, loadedCerts]);
 
-    /* Update cert list */
+    /* Compute cert options from loaded certs */
 
-    useEffect(() => {
-        setOptionsForCertificate(
+    const optionsForCertificate = useMemo(
+        () =>
             loadedCerts
                 .filter((e) => e.state !== CertStatus.Requested)
                 .map((loadedCert) => ({
@@ -241,8 +254,8 @@ function UserForm() {
                             : `( ${loadedCert.commonName} ) ( empty )`,
                     value: loadedCert.uuid,
                 })),
-        );
-    }, [loadedCerts]);
+        [loadedCerts],
+    );
 
     const onSubmit = useCallback(
         (values: FormValues) => {
@@ -257,13 +270,8 @@ function UserForm() {
                             lastName: values.lastName || undefined,
                             email: values.email,
                             groupUuids: values.selectedGroups.map((g) => g.value),
-                            certificateUuid:
-                                values.inputType.value === 'select'
-                                    ? values.certificateUuid
-                                        ? values.certificateUuid
-                                        : undefined
-                                    : undefined,
-                            certificateData: values.inputType?.value === 'upload' ? certFileContent : undefined,
+                            certificateUuid: values.inputType === 'select' ? values.certificateUuid : undefined,
+                            certificateData: values.inputType === 'upload' ? certFileContent : undefined,
                             customAttributes: collectFormAttributes('customUser', resourceCustomAttributes, values),
                         },
                     }),
@@ -280,26 +288,16 @@ function UserForm() {
                             email: values.email || undefined,
                             groupUuids: values.selectedGroups.map((g) => g.value),
                             enabled: values.enabled,
-                            certificateData: values.inputType?.value === 'upload' ? certFileContent : undefined,
-                            certificateUuid:
-                                values.inputType?.value === 'select'
-                                    ? values.certificateUuid
-                                        ? values.certificateUuid
-                                        : undefined
-                                    : undefined,
+                            certificateData: values.inputType === 'upload' ? certFileContent : undefined,
+                            certificateUuid: values.inputType === 'select' ? values.certificateUuid : undefined,
                             customAttributes: collectFormAttributes('customUser', resourceCustomAttributes, values),
                         },
                     }),
                 );
             }
         },
-
         [user, certFileContent, dispatch, editMode, userRoles, resourceCustomAttributes],
     );
-
-    const onCancel = useCallback(() => {
-        navigate(-1);
-    }, [navigate]);
 
     const loadNextCertificates = useCallback(() => {
         if (loadedCerts.length === 0) return;
@@ -317,25 +315,75 @@ function UserForm() {
 
     const inProgressTitle = useMemo(() => (editMode ? 'Saving...' : 'Creating...'), [editMode]);
 
-    const defaultValues = useMemo(
+    const defaultValues: FormValues = useMemo(
         () => ({
-            username: editMode ? user?.username : '',
-            description: editMode ? user?.description : '',
+            username: editMode ? user?.username || '' : '',
+            description: editMode ? user?.description || '' : '',
             selectedGroups: editMode
                 ? user?.groups?.length
-                    ? user?.groups.map((group) => ({ label: group.name, value: group.uuid }))
+                    ? user.groups.map((group) => ({ label: group.name, value: group.uuid }))
                     : []
                 : [],
             firstName: editMode ? user?.firstName || '' : '',
-            lastName: editMode ? user?.lastName : '',
-            email: editMode ? user?.email : '',
-            enabled: editMode ? user?.enabled : true,
-            systemUser: editMode ? user?.systemUser : false,
-            inputType: optionsForInput[1],
+            lastName: editMode ? user?.lastName || '' : '',
+            email: editMode ? user?.email || '' : '',
+            enabled: editMode ? (user?.enabled ?? true) : true,
+            inputType: 'select',
+            certFile: undefined,
             certificateUuid: editMode && user?.certificate ? user.certificate.uuid : undefined,
         }),
-        [user, editMode, optionsForInput],
+        [user, editMode],
     );
+
+    const methods = useForm<FormValues>({
+        defaultValues,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit,
+        control,
+        formState: { isDirty, isSubmitting, isValid },
+        reset,
+    } = methods;
+
+    const watchedInputType = useWatch({
+        control,
+        name: 'inputType',
+    });
+
+    // Reset form values when user is loaded in edit mode
+    useEffect(() => {
+        if (editMode && id && user && user.uuid === id && !isFetchingUserDetail) {
+            const newDefaultValues: FormValues = {
+                username: user.username || '',
+                description: user.description || '',
+                selectedGroups: user.groups?.length ? user.groups.map((group) => ({ label: group.name, value: group.uuid })) : [],
+                firstName: user.firstName || '',
+                lastName: user.lastName || '',
+                email: user.email || '',
+                enabled: user.enabled ?? true,
+                inputType: 'select',
+                certFile: undefined,
+                certificateUuid: user.certificate ? user.certificate.uuid : undefined,
+            };
+            reset(newDefaultValues, { keepDefaultValues: false });
+        } else if (!editMode) {
+            // Reset form when switching to create mode
+            reset({
+                username: '',
+                description: '',
+                selectedGroups: [],
+                firstName: '',
+                lastName: '',
+                email: '',
+                enabled: true,
+                inputType: 'select',
+                certFile: undefined,
+                certificateUuid: undefined,
+            });
+        }
+    }, [editMode, user, id, reset, isFetchingUserDetail]);
 
     const rolesTableHeader: TableHeader[] = useMemo(
         () => [
@@ -393,21 +441,16 @@ function UserForm() {
 
     const enableCheckButton = useMemo(
         () =>
-            editMode ? (
-                <></>
-            ) : (
-                <div className="ms-auto">
-                    <Field name="enabled">
-                        {({ input, meta }) => (
-                            <Label for="enabled">
-                                <Input {...input} id="enabled" type="checkbox" label="Enabled" checked={input.value} />
-                                &nbsp;&nbsp;Enabled
-                            </Label>
-                        )}
-                    </Field>
+            editMode ? null : (
+                <div className="ml-auto">
+                    <Controller
+                        name="enabled"
+                        control={control}
+                        render={({ field }) => <Switch id="enabled" checked={field.value} onChange={field.onChange} label="Enabled" />}
+                    />
                 </div>
             ),
-        [editMode],
+        [editMode, control],
     );
     const title = useMemo(() => (editMode ? 'Edit user' : 'Create user'), [editMode]);
 
@@ -415,6 +458,7 @@ function UserForm() {
         if (isBusy) return <></>;
         return (
             <TabLayout
+                noBorder
                 tabs={[
                     {
                         title: 'Custom attributes',
@@ -433,264 +477,273 @@ function UserForm() {
 
     return (
         <>
-            <Form onSubmit={onSubmit} initialValues={defaultValues} mutators={{ ...mutators<FormValues>() }}>
-                {({ handleSubmit, pristine, submitting, values, valid, form }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
-                        <Widget title={title} busy={isBusy} widgetExtraTopNode={enableCheckButton}>
-                            <Field name="username" validate={composeValidators(validateRequired())}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="username">Username</Label>
-
-                                        <Input
-                                            id="username"
-                                            {...input}
-                                            valid={!meta.error && meta.touched}
-                                            invalid={!!meta.error && meta.touched}
-                                            disabled={editMode || user?.systemUser}
-                                            type="text"
-                                            placeholder="Username"
-                                        />
-
-                                        <FormFeedback>{meta.error}</FormFeedback>
-                                    </FormGroup>
+            <FormProvider {...methods}>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    <Widget noBorder busy={isBusy} widgetExtraTopNode={enableCheckButton}>
+                        <div className="space-y-4">
+                            <Controller
+                                name="username"
+                                control={control}
+                                rules={buildValidationRules([validateRequired()])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        {...field}
+                                        id="username"
+                                        type="text"
+                                        label="Username"
+                                        required
+                                        placeholder="Username"
+                                        disabled={editMode || user?.systemUser}
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={getFieldErrorMessage(fieldState)}
+                                    />
                                 )}
-                            </Field>
+                            />
 
-                            <Field name="selectedGroups">
-                                {({ input }) => (
-                                    <FormGroup>
-                                        <Label for="selectedGroupsSelect">Groups</Label>
+                            <div>
+                                <Controller
+                                    name="selectedGroups"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <>
+                                            <Select
+                                                id="selectedGroupsSelect"
+                                                label="Groups"
+                                                isMulti
+                                                value={field.value || []}
+                                                onChange={(value) => {
+                                                    field.onChange(value);
+                                                }}
+                                                options={optionsForGroup}
+                                                placeholder="Select Groups"
+                                                isClearable
+                                            />
+                                            {fieldState.error && fieldState.isTouched && (
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {typeof fieldState.error === 'string'
+                                                        ? fieldState.error
+                                                        : fieldState.error?.message || 'Invalid value'}
+                                                </p>
+                                            )}
+                                        </>
+                                    )}
+                                />
+                            </div>
 
-                                        <Select
-                                            {...input}
-                                            inputId="selectedGroupsSelect"
-                                            maxMenuHeight={140}
-                                            menuPlacement="auto"
-                                            options={optionsForGroup}
-                                            placeholder="Select Groups"
-                                            isClearable
-                                            isMulti
-                                        />
-                                    </FormGroup>
+                            <Controller
+                                name="description"
+                                control={control}
+                                rules={buildValidationRules([validateLength(0, 300)])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        {...field}
+                                        id="description"
+                                        type="text"
+                                        label="Description"
+                                        placeholder="Description"
+                                        disabled={user?.systemUser}
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={getFieldErrorMessage(fieldState)}
+                                    />
                                 )}
-                            </Field>
+                            />
 
-                            <Field name="description" validate={composeValidators(validateLength(0, 300))}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="description">Description</Label>
-
-                                        <Input
-                                            {...input}
-                                            id="description"
-                                            valid={!meta.error && meta.touched}
-                                            invalid={!!meta.error && meta.touched}
-                                            type="text"
-                                            placeholder="Description"
-                                            disabled={user?.systemUser}
-                                        />
-
-                                        <FormFeedback>{meta.error}</FormFeedback>
-                                    </FormGroup>
+                            <Controller
+                                name="firstName"
+                                control={control}
+                                rules={buildValidationRules([validateAlphaNumericWithSpecialChars()])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        {...field}
+                                        id="firstName"
+                                        type="text"
+                                        label="First Name"
+                                        placeholder="First Name"
+                                        disabled={user?.systemUser}
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={getFieldErrorMessage(fieldState)}
+                                    />
                                 )}
-                            </Field>
+                            />
 
-                            <Field name="firstName" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="firstName">First Name</Label>
-
-                                        <Input
-                                            id="firstName"
-                                            {...input}
-                                            valid={!meta.error && meta.touched}
-                                            invalid={!!meta.error && meta.touched}
-                                            type="text"
-                                            placeholder="First Name"
-                                            disabled={user?.systemUser}
-                                        />
-
-                                        <FormFeedback>{meta.error}</FormFeedback>
-                                    </FormGroup>
+                            <Controller
+                                name="lastName"
+                                control={control}
+                                rules={buildValidationRules([validateAlphaNumericWithSpecialChars()])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        {...field}
+                                        id="lastName"
+                                        type="text"
+                                        label="Last Name"
+                                        placeholder="Last name"
+                                        disabled={user?.systemUser}
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={getFieldErrorMessage(fieldState)}
+                                    />
                                 )}
-                            </Field>
+                            />
 
-                            <Field name="lastName" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="lastName">Last Name</Label>
-
-                                        <Input
-                                            id="lastName"
-                                            {...input}
-                                            valid={!meta.error && meta.touched}
-                                            invalid={!!meta.error && meta.touched}
-                                            type="text"
-                                            placeholder="Last name"
-                                            disabled={user?.systemUser}
-                                        />
-
-                                        <FormFeedback>{meta.error}</FormFeedback>
-                                    </FormGroup>
+                            <Controller
+                                name="email"
+                                control={control}
+                                rules={buildValidationRules([validateEmail()])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        {...field}
+                                        id="email"
+                                        type="email"
+                                        label="Email"
+                                        placeholder="Email address"
+                                        disabled={user?.systemUser}
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={getFieldErrorMessage(fieldState)}
+                                    />
                                 )}
-                            </Field>
+                            />
 
-                            <Field name="email" validate={composeValidators(validateEmail())}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="email">Email</Label>
+                            <div>
+                                <Controller
+                                    name="inputType"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <>
+                                            <Select
+                                                id="inputTypeSelect"
+                                                label="Input Type"
+                                                value={field.value || 'select'}
+                                                onChange={(value) => {
+                                                    field.onChange(value);
+                                                }}
+                                                options={optionsForInput}
+                                                placeholder="Select Input Type"
+                                                isDisabled={user?.systemUser}
+                                            />
+                                            {fieldState.error && fieldState.isTouched && (
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {typeof fieldState.error === 'string'
+                                                        ? fieldState.error
+                                                        : fieldState.error?.message || 'Invalid value'}
+                                                </p>
+                                            )}
+                                        </>
+                                    )}
+                                />
+                            </div>
 
-                                        <Input
-                                            id="email"
-                                            {...input}
-                                            valid={!meta.error && meta.touched}
-                                            invalid={!!meta.error && meta.touched}
-                                            type="text"
-                                            placeholder="Email address"
-                                            disabled={user?.systemUser}
-                                        />
-
-                                        <FormFeedback>{meta.error}</FormFeedback>
-                                    </FormGroup>
-                                )}
-                            </Field>
-
-                            <Field name="inputType">
-                                {({ input }) => (
-                                    <FormGroup>
-                                        <Label for="inputTypeSelect">Input Type</Label>
-
-                                        <Select
-                                            inputId="inputTypeSelect"
-                                            {...input}
-                                            maxMenuHeight={140}
-                                            menuPlacement="auto"
-                                            options={optionsForInput}
-                                            placeholder="Select Input Type"
-                                            isDisabled={user?.systemUser}
-                                        />
-                                    </FormGroup>
-                                )}
-                            </Field>
-
-                            {values.inputType.value === 'upload' ? (
-                                <FormGroup>
-                                    <Label for="certFile">Client Certificate</Label>
-
-                                    <div>
+                            {watchedInputType === 'upload' ? (
+                                <div>
+                                    <Label htmlFor="certFile">Client Certificate</Label>
+                                    <div className="flex items-center gap-2 mb-2">
                                         {certToUpload ? (
                                             <CertificateAttributes certificate={certToUpload} />
                                         ) : certFileContent ? (
-                                            <>Certificate to be uploaded selected.&nbsp;&nbsp;&nbsp;</>
+                                            <span className="text-sm text-gray-600 dark:text-neutral-400">
+                                                Certificate to be uploaded selected.
+                                            </span>
                                         ) : (
-                                            <>Certificate to be uploaded not selected&nbsp;&nbsp;&nbsp;</>
+                                            <span className="text-sm text-gray-600 dark:text-neutral-400">
+                                                Certificate to be uploaded not selected
+                                            </span>
                                         )}
 
-                                        <Button color="secondary" onClick={() => setCertUploadDialog(true)}>
+                                        <Button variant="outline" color="secondary" onClick={() => setCertUploadDialog(true)} type="button">
                                             Choose File
                                         </Button>
                                     </div>
-
-                                    <FormText color="muted">
+                                    <p className="text-sm text-gray-500 dark:text-neutral-400">
                                         Upload certificate of client based on which will be authenticated to RA profile.
-                                    </FormText>
-                                </FormGroup>
+                                    </p>
+                                </div>
                             ) : (
-                                <Field name="certificateUuid">
-                                    {({ input, meta }) => (
-                                        <FormGroup>
-                                            <Label for="certificateUuidSelect">Certificate</Label>
-
-                                            <Select
-                                                {...input}
-                                                //ref={certSelectRef}
-                                                inputId="certificateUuidSelect"
-                                                maxMenuHeight={140}
-                                                menuPlacement="auto"
-                                                value={selectedCertificate}
-                                                onChange={(value) => {
-                                                    if (!value) {
-                                                        setSelectedCertificate(undefined);
-                                                        form.change('certificateUuid', undefined);
-                                                        return;
-                                                    }
-                                                    setSelectedCertificate({
-                                                        label: value.label,
-                                                        value: value.value,
-                                                    });
-                                                    input.onChange(value.value);
-                                                }}
-                                                options={optionsForCertificate}
-                                                placeholder="Select Certificate"
-                                                onMenuScrollToBottom={loadNextCertificates}
-                                                isDisabled={user?.systemUser}
-                                                styles={{
-                                                    control: (provided) =>
-                                                        meta.touched && meta.invalid
-                                                            ? {
-                                                                  ...provided,
-                                                                  border: 'solid 1px red',
-                                                                  '&:hover': { border: 'solid 1px red' },
-                                                              }
-                                                            : { ...provided },
-                                                }}
-                                                isClearable={true}
-                                            />
-
-                                            <div
-                                                className="invalid-feedback"
-                                                style={meta.touched && meta.invalid ? { display: 'block' } : {}}
-                                            >
-                                                {meta.error}
-                                            </div>
-                                        </FormGroup>
-                                    )}
-                                </Field>
+                                <div>
+                                    <Controller
+                                        name="certificateUuid"
+                                        control={control}
+                                        render={({ field, fieldState }) => (
+                                            <>
+                                                <Select
+                                                    id="certificateUuidSelect"
+                                                    label="Certificate"
+                                                    value={selectedCertificate?.value || field.value || ''}
+                                                    onChange={(value) => {
+                                                        if (!value) {
+                                                            setSelectedCertificate(undefined);
+                                                            field.onChange(undefined);
+                                                            return;
+                                                        }
+                                                        const matchedOption = optionsForCertificate.find((opt) => opt.value === value);
+                                                        if (matchedOption) {
+                                                            setSelectedCertificate({
+                                                                label: matchedOption.label,
+                                                                value: matchedOption.value,
+                                                            });
+                                                            field.onChange(value);
+                                                        }
+                                                    }}
+                                                    options={optionsForCertificate}
+                                                    placeholder="Select Certificate"
+                                                    isDisabled={user?.systemUser}
+                                                    isClearable
+                                                />
+                                                {fieldState.error && fieldState.isTouched && (
+                                                    <p className="mt-1 text-sm text-red-600">
+                                                        {typeof fieldState.error === 'string'
+                                                            ? fieldState.error
+                                                            : fieldState.error?.message || 'Invalid value'}
+                                                    </p>
+                                                )}
+                                            </>
+                                        )}
+                                    />
+                                    {/* Note: onMenuScrollToBottom functionality would need to be handled differently with Preline Select */}
+                                </div>
                             )}
 
-                            <br />
                             {renderCustomAttributesEditor()}
-                            <br />
 
-                            <p>Assigned User Roles</p>
-
-                            <CustomTable
-                                headers={rolesTableHeader}
-                                data={rolesTableData}
-                                checkedRows={userRoles}
-                                hasCheckboxes={true}
-                                hasAllCheckBox={false}
-                                onCheckedRowsChanged={(roles) => {
-                                    setUserRoles(roles as string[]);
-                                }}
-                            />
-
-                            <div className="d-flex justify-content-end">
-                                <ButtonGroup>
-                                    <ProgressButton
-                                        title={submitTitle}
-                                        inProgressTitle={inProgressTitle}
-                                        inProgress={submitting || isCreatingUser || isUpdatingUser}
-                                        disabled={
-                                            (pristine && !hasRolesChanged) ||
-                                            submitting ||
-                                            isCreatingUser ||
-                                            isUpdatingUser ||
-                                            !valid ||
-                                            userSelector?.systemUser
-                                        }
-                                    />
-
-                                    <Button color="default" onClick={onCancel} disabled={submitting || isCreatingUser || isUpdatingUser}>
-                                        Cancel
-                                    </Button>
-                                </ButtonGroup>
+                            <div className="mt-4">
+                                <Label>Assigned User Roles</Label>
+                                <CustomTable
+                                    headers={rolesTableHeader}
+                                    data={rolesTableData}
+                                    checkedRows={userRoles}
+                                    hasCheckboxes={true}
+                                    hasAllCheckBox={false}
+                                    onCheckedRowsChanged={(roles) => {
+                                        setUserRoles(roles as string[]);
+                                    }}
+                                />
                             </div>
-                        </Widget>
-                    </BootstrapForm>
-                )}
-            </Form>
+
+                            <Container className="flex-row justify-end modal-footer" gap={4}>
+                                <Button
+                                    variant="outline"
+                                    onClick={onCancel}
+                                    disabled={isSubmitting || isCreatingUser || isUpdatingUser}
+                                    type="button"
+                                >
+                                    Cancel
+                                </Button>
+                                <ProgressButton
+                                    title={submitTitle}
+                                    inProgressTitle={inProgressTitle}
+                                    inProgress={isSubmitting || isCreatingUser || isUpdatingUser}
+                                    disabled={
+                                        (!isDirty && !hasRolesChanged) ||
+                                        isSubmitting ||
+                                        isCreatingUser ||
+                                        isUpdatingUser ||
+                                        !isValid ||
+                                        userSelector?.systemUser
+                                    }
+                                    type="submit"
+                                />
+                            </Container>
+                        </div>
+                    </Widget>
+                </form>
+            </FormProvider>
 
             <Dialog
                 isOpen={certUploadDialog}

@@ -3,6 +3,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import eslint from 'vite-plugin-eslint';
 import istanbul from 'vite-plugin-istanbul';
+import tailwindcss from '@tailwindcss/vite';
 
 async function loadProxyConfig() {
     try {
@@ -15,6 +16,9 @@ async function loadProxyConfig() {
 export default defineConfig(async () => {
     const proxyConfig = await loadProxyConfig();
     return {
+        define: {
+            __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+        },
         server: {
             open: true,
             proxy: proxyConfig,
@@ -38,7 +42,7 @@ export default defineConfig(async () => {
                 scss: {
                     includePaths: [path.resolve(__dirname, 'src')],
                     quietDeps: true,
-                    silenceDeprecations: ['mixed-decls', 'import', 'global-builtin', 'color-functions'],
+                    silenceDeprecations: ['import', 'global-builtin', 'color-functions'],
                 },
             },
         },
@@ -48,11 +52,11 @@ export default defineConfig(async () => {
                 failOnWarning: true,
             }),
             istanbul({
-                cypress: true, // enable during Cypress runs
                 requireEnv: false, // or set via env var
                 include: ['src/**/*'],
-                exclude: ['cypress/**/*', 'node_modules/**/*'],
+                exclude: ['node_modules/**/*'],
             }),
+            tailwindcss(),
         ],
     };
 });

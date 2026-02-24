@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
-import { Container, Table } from 'reactstrap';
+import { Link } from 'react-router';
 
 import { actions, selectors } from 'ducks/acme-profiles';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import ForceDeleteErrorTable from 'components/ForceDeleteErrorTable';
+import Container from 'components/Container';
 import Dialog from 'components/Dialog';
+import AcmeProfileForm from '../form';
 import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
@@ -14,7 +17,6 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 
 export default function AdministratorsList() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const checkedRows = useSelector(selectors.checkedRows);
     const acmeProfiles = useSelector(selectors.acmeProfiles);
@@ -28,11 +30,14 @@ export default function AdministratorsList() {
     const isBulkEnabling = useSelector(selectors.isBulkEnabling);
     const isBulkDisabling = useSelector(selectors.isBulkDisabling);
     const isBulkForceDeleting = useSelector(selectors.isBulkForceDeleting);
+    const isCreating = useSelector(selectors.isCreating);
 
     const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isBulkEnabling || isBulkDisabling || isBulkForceDeleting;
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [confirmForceDelete, setConfirmForceDelete] = useState<boolean>(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+    const [editingAcmeProfileId, setEditingAcmeProfileId] = useState<string | undefined>(undefined);
 
     const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
@@ -47,9 +52,27 @@ export default function AdministratorsList() {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
     }, [bulkDeleteErrorMessages]);
 
+    useRunOnFinished(isCreating, () => {
+        setIsAddModalOpen(false);
+        getFreshData();
+    });
+    useRunOnFinished(isUpdating, () => {
+        setEditingAcmeProfileId(undefined);
+        getFreshData();
+    });
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingAcmeProfileId(undefined);
+    }, []);
+
     const onAddClick = useCallback(() => {
-        navigate(`./add`);
-    }, [navigate]);
+        handleOpenAddModal();
+    }, [handleOpenAddModal]);
 
     const onEnableClick = useCallback(() => {
         dispatch(actions.bulkEnableAcmeProfiles({ uuids: checkedRows }));
@@ -82,9 +105,7 @@ export default function AdministratorsList() {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => {
-                    onAddClick();
-                },
+                onClick: handleOpenAddModal,
             },
             {
                 icon: 'trash',
@@ -111,78 +132,53 @@ export default function AdministratorsList() {
                 },
             },
         ],
-        [checkedRows, onAddClick, onEnableClick, onDisableClick],
+        [checkedRows, handleOpenAddModal, onEnableClick, onDisableClick],
     );
 
-    const forceDeleteBody = useMemo(
-        () => (
-            <div>
-                <div>Failed to delete {checkedRows.length > 1 ? 'ACME Profiles' : 'an ACME Profile'}. Please find the details below:</div>
-
-                <Table className="table-hover" size="sm">
-                    <thead>
-                        <tr>
-                            <th>
-                                <b>Name</b>
-                            </th>
-                            <th>
-                                <b>Dependencies</b>
-                            </th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {bulkDeleteErrorMessages?.map((message) => (
-                            <tr>
-                                <td>{message.name}</td>
-                                <td>{message.message}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </Table>
-            </div>
-        ),
-        [bulkDeleteErrorMessages, checkedRows.length],
+    const forceDeleteBody = (
+        <ForceDeleteErrorTable
+            items={bulkDeleteErrorMessages}
+            entityNameSingular="an ACME Profile"
+            entityNamePlural="ACME Profiles"
+            itemsCount={checkedRows.length}
+        />
     );
 
-    const acmeProfilesTableHeader: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'name',
-                content: 'Name',
-                sortable: true,
-                sort: 'asc',
-                width: '10%',
-            },
-            {
-                id: 'description',
-                content: 'Description',
-                sortable: true,
-                width: '10%',
-            },
-            {
-                id: 'raProfileName',
-                content: 'RA Profile Name',
-                sortable: true,
-                width: '10%',
-                align: 'center',
-            },
-            {
-                id: 'directoryUrl',
-                content: 'Directory URL',
-                sortable: true,
-                width: 'auto',
-            },
-            {
-                id: 'status',
-                content: 'Status',
-                align: 'center',
-                sortable: true,
-                width: '7%',
-            },
-        ],
-        [],
-    );
+    const acmeProfilesTableHeader: TableHeader[] = [
+        {
+            id: 'name',
+            content: 'Name',
+            sortable: true,
+            sort: 'asc',
+            width: '10%',
+        },
+        {
+            id: 'description',
+            content: 'Description',
+            sortable: true,
+            width: '10%',
+        },
+        {
+            id: 'raProfileName',
+            content: 'RA Profile Name',
+            sortable: true,
+            width: '10%',
+            align: 'center',
+        },
+        {
+            id: 'directoryUrl',
+            content: 'Directory URL',
+            sortable: true,
+            width: 'auto',
+        },
+        {
+            id: 'status',
+            content: 'Status',
+            align: 'center',
+            sortable: true,
+            width: '7%',
+        },
+    ];
 
     const acmeProfilesTableData: TableDataRow[] = useMemo(
         () =>
@@ -213,8 +209,9 @@ export default function AdministratorsList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <Container gap={4}>
             <Widget
+                dataTestId="acme-profiles-list-widget"
                 title="List of ACME Profiles"
                 busy={isBusy}
                 widgetLockName={LockWidgetNameEnum.ListOfACMEProfiles}
@@ -222,7 +219,6 @@ export default function AdministratorsList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={acmeProfilesTableHeader}
                     data={acmeProfilesTableData}
@@ -241,9 +237,10 @@ export default function AdministratorsList() {
                 } which may have associated ACME
                    Account(s). When deleted the ACME Account(s) will be revoked. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -254,8 +251,18 @@ export default function AdministratorsList() {
                 toggle={() => setConfirmForceDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
-                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
+            />
+
+            <Dialog
+                isOpen={isAddModalOpen || !!editingAcmeProfileId}
+                toggle={handleCloseAddModal}
+                caption={editingAcmeProfileId ? 'Edit ACME Profile' : 'Create ACME Profile'}
+                size="xl"
+                body={
+                    <AcmeProfileForm acmeProfileId={editingAcmeProfileId} onCancel={handleCloseAddModal} onSuccess={handleCloseAddModal} />
+                }
             />
         </Container>
     );

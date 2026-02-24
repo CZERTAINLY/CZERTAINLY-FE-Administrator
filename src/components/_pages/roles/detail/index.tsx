@@ -3,24 +3,30 @@ import Dialog from 'components/Dialog';
 
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
+import RoleForm from '../RoleForm';
+import RoleUsersForm from '../RoleUsersForm';
 
 import { actions, selectors } from 'ducks/roles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router';
-import { Badge, Container } from 'reactstrap';
+import { useParams, useNavigate } from 'react-router';
+
+import Badge from 'components/Badge';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
 import { createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
-import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { selectors as enumSelectors } from 'ducks/enums';
+import Breadcrumb from 'components/Breadcrumb';
+import Container from 'components/Container';
+import Checkbox from 'components/Checkbox';
 
 export default function UserDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
+    const navigate = useNavigate();
     const { id } = useParams();
 
     const role = useSelector(selectors.role);
@@ -28,8 +34,11 @@ export default function UserDetail() {
 
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const isFetchingPermissions = useSelector(selectors.isFetchingPermissions);
+    const isUpdating = useSelector(selectors.isUpdating);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+    const [isEditUsersModalOpen, setIsEditUsersModalOpen] = useState<boolean>(false);
 
     const memoizedRole = useMemo(() => role, [role]);
 
@@ -55,13 +64,28 @@ export default function UserDetail() {
         getFreshPermissions();
     }, [getFreshPermissions]);
 
+    useRunOnFinished(isUpdating, () => {
+        setIsEditModalOpen(false);
+        getFreshDetails();
+    });
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
+
     const onEditClick = useCallback(() => {
-        navigate(`../../roles/edit/${role?.uuid}`);
-    }, [role, navigate]);
+        if (!role) return;
+        setIsEditModalOpen(true);
+    }, [role]);
 
     const onEditRoleUsersClick = useCallback(() => {
-        navigate(`../../roles/users/${role?.uuid}`);
-    }, [navigate, role?.uuid]);
+        setIsEditUsersModalOpen(true);
+    }, []);
+
+    const handleCloseUsersModal = useCallback(() => {
+        setIsEditUsersModalOpen(false);
+        getFreshDetails();
+    }, [getFreshDetails]);
 
     const onEditRolePermissionsClick = useCallback(() => {
         navigate(`../../roles/permissions/${role?.uuid}`);
@@ -233,7 +257,6 @@ export default function UserDetail() {
                           !resource.objects || resource.objects.length === 0
                               ? undefined
                               : [
-                                    <></>,
                                     resource.objects.map((object) => <div key={object.name}>{object.name}</div>),
                                     <></>,
                                     resource.objects.map((object) => (
@@ -249,75 +272,92 @@ export default function UserDetail() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/roles"
-                text={`${getEnumLabel(resourceEnum, Resource.Roles)} Inventory`}
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: 'Roles', href: '/roles' },
+                    { label: role?.name || 'Role Details', href: '' },
+                ]}
             />
-            <Widget
-                title="Role Details"
-                busy={isFetchingDetail}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshDetails}
-                widgetLockName={LockWidgetNameEnum.RoleDetails}
-            >
-                <br />
-                <CustomTable headers={detailHeaders} data={detailData} />
-            </Widget>
+            <Container>
+                <Widget
+                    title="Role Details"
+                    busy={isFetchingDetail}
+                    widgetButtons={buttons}
+                    titleSize="large"
+                    refreshAction={getFreshDetails}
+                    widgetLockName={LockWidgetNameEnum.RoleDetails}
+                >
+                    <CustomTable headers={detailHeaders} data={detailData} />
+                </Widget>
 
-            <Widget title="Assigned Users" busy={isFetchingDetail} titleSize="large">
-                <br />
-                <CustomTable headers={usersHeaders} data={usersData} />
-            </Widget>
+                <Widget title="Assigned Users" busy={isFetchingDetail} titleSize="large">
+                    <CustomTable headers={usersHeaders} data={usersData} />
+                </Widget>
 
-            {memoizedRole && (
-                <CustomAttributeWidget
-                    resource={Resource.Roles}
-                    resourceUuid={memoizedRole.uuid}
-                    attributes={memoizedRole.customAttributes}
-                />
-            )}
-
-            <Widget
-                title="Role Permissions"
-                busy={isFetchingDetail || isFetchingPermissions}
-                titleSize="large"
-                refreshAction={role && getFreshPermissions}
-            >
-                <br />
-                {!permissions ? (
-                    <></>
-                ) : (
-                    <>
-                        <p>
-                            <input type="checkbox" checked={permissions.permissions.allowAllResources} disabled />
-                            &nbsp;&nbsp;&nbsp;All resources allowed
-                        </p>
-
-                        {permissions.permissions.resources.length === 0 ? (
-                            <></>
-                        ) : (
-                            <>
-                                <p>List of allowed resources</p>
-                                <CustomTable headers={permsHeaders} data={permsData} hasDetails={true} />
-                            </>
-                        )}
-                    </>
+                {memoizedRole && (
+                    <CustomAttributeWidget
+                        resource={Resource.Roles}
+                        resourceUuid={memoizedRole.uuid}
+                        attributes={memoizedRole.customAttributes}
+                    />
                 )}
-            </Widget>
 
+                <Widget
+                    title="Role Permissions"
+                    busy={isFetchingDetail || isFetchingPermissions}
+                    titleSize="large"
+                    refreshAction={role && getFreshPermissions}
+                >
+                    {!permissions ? (
+                        <></>
+                    ) : (
+                        <>
+                            <Checkbox
+                                checked={permissions.permissions.allowAllResources}
+                                disabled
+                                onChange={() => {}}
+                                label="All resources allowed"
+                            />
+                            {permissions.permissions.resources.length === 0 ? (
+                                <></>
+                            ) : (
+                                <>
+                                    <p className="text-sm mt-4 mb-2">List of allowed resources</p>
+                                    <CustomTable headers={permsHeaders} data={permsData} detailHeaders={permsHeaders} hasDetails />
+                                </>
+                            )}
+                        </>
+                    )}
+                </Widget>
+            </Container>
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Role"
-                body="You are about to delete an Role. Is this what you want to do?"
+                body="You are about to delete a Role. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'primary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
-        </Container>
+
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit Role"
+                size="xl"
+                body={<RoleForm roleId={role?.uuid} onCancel={handleCloseEditModal} />}
+            />
+
+            <Dialog
+                isOpen={isEditUsersModalOpen}
+                toggle={handleCloseUsersModal}
+                caption="Edit Role Users"
+                size="xl"
+                body={<RoleUsersForm roleId={role?.uuid} onCancel={handleCloseUsersModal} onSuccess={handleCloseUsersModal} />}
+            />
+        </div>
     );
 }

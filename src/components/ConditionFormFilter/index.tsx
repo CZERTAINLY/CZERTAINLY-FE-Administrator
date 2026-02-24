@@ -1,16 +1,14 @@
 import { ApiClients } from '../../api';
-import cx from 'classnames';
 import FilterWidget from 'components/FilterWidget';
 import FilterWidgetRuleAction from 'components/FilterWidgetRuleAction';
 import { ExecutionFormValues } from 'components/_pages/executions/form';
 import { EntityType, actions as filterActions } from 'ducks/filters';
-import { useEffect, useMemo } from 'react';
-import { useForm } from 'react-final-form';
+import { useCallback, useEffect, useMemo } from 'react';
+import { useFormContext } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { Resource } from 'types/openapi';
 import { filterToConditionItems } from 'utils/rules';
 import { ConditionFormValues } from '../_pages/conditions/form';
-import styles from './conditionGroupForm.module.scss';
 type FormType = 'conditionItem' | 'executionItem';
 interface ConditionGroupFormFilterProps {
     resource: Resource;
@@ -19,8 +17,8 @@ interface ConditionGroupFormFilterProps {
 }
 
 const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: ConditionGroupFormFilterProps) => {
-    const form = useForm<ConditionFormValues>();
-    const actionGroupForm = useForm<ExecutionFormValues>();
+    const form = useFormContext<ConditionFormValues>();
+    const actionGroupForm = useFormContext<ExecutionFormValues>();
 
     const dispatch = useDispatch();
 
@@ -29,48 +27,46 @@ const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: Condit
             dispatch(filterActions.setCurrentFilters({ currentFilters: [], entity: EntityType.CONDITIONS }));
         };
     }, [dispatch]);
+
+    const getAvailableFiltersApi = useCallback(
+        (apiClients: ApiClients) =>
+            apiClients.resources.listResourceRuleFilterFields({
+                resource,
+                ...(formType === 'executionItem' ? { settable: true } : {}),
+            }),
+        [resource, formType],
+    );
+
     const renderFilterWidget = useMemo(() => {
         return formType === 'executionItem' ? (
-            <div className={cx({ [styles.disabled]: resource === Resource.None })}>
+            <div>
                 <FilterWidgetRuleAction
                     entity={EntityType.ACTIONS}
-                    title={'Execution Items'}
-                    getAvailableFiltersApi={(apiClients: ApiClients) =>
-                        apiClients.resources.listResourceRuleFilterFields({
-                            resource,
-                            settable: true,
-                        })
-                    }
+                    title="Execution Items"
+                    getAvailableFiltersApi={getAvailableFiltersApi}
                     includeIgnoreAction={includeIgnoreAction}
                     onActionsUpdate={(currentActions) => {
-                        actionGroupForm.change('items', currentActions);
+                        actionGroupForm.setValue('items', currentActions);
                     }}
                 />
             </div>
         ) : (
-            <div className={cx({ [styles.disabled]: resource === Resource.None })}>
+            <div>
                 <FilterWidget
                     entity={EntityType.CONDITIONS}
                     title={'Condition Items'}
-                    getAvailableFiltersApi={(apiClients: ApiClients) =>
-                        apiClients.resources.listResourceRuleFilterFields({
-                            resource,
-                        })
-                    }
+                    getAvailableFiltersApi={getAvailableFiltersApi}
                     onFilterUpdate={(currentFilters) => {
                         const currentConditionItems = filterToConditionItems(currentFilters);
-                        form.change('items', currentConditionItems);
+                        form.setValue('items', currentConditionItems);
                     }}
+                    filterGridCols={2}
                 />
             </div>
         );
-    }, [resource, form, formType, actionGroupForm, includeIgnoreAction]);
+    }, [form, formType, actionGroupForm, includeIgnoreAction, getAvailableFiltersApi]);
 
-    return (
-        <>
-            <div>{renderFilterWidget}</div>
-        </>
-    );
+    return <div data-testid="condition-form-filter">{renderFilterWidget}</div>;
 };
 
 export default ConditionFormFilter;

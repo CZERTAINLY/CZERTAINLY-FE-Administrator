@@ -136,6 +136,7 @@ export const slice = createSlice({
                 tokenInstanceUuid: string;
                 tokenProfileEditRequest: TokenProfileEditRequestModel;
                 redirect?: string;
+                usesGlobalModal?: boolean;
             }>,
         ) => {
             state.isUpdating = true;

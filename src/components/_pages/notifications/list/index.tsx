@@ -9,10 +9,11 @@ import { TableDataRow, TableHeader } from 'components/CustomTable';
 import PagedList from 'components/PagedList/PagedList';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { useNavigate } from 'react-router';
-import { Button, Container } from 'reactstrap';
+import Button from 'components/Button';
 import { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
+import { ArrowRight } from 'lucide-react';
 
 function NotificationsList() {
     const dispatch = useDispatch();
@@ -64,22 +65,31 @@ function NotificationsList() {
                 id: notification.uuid,
                 columns: [
                     dateFormatter(notification.sentAt),
-                    <div
-                        key={notification.uuid}
-                        className={notification.readAt ? '' : 'fw-bolder'}
-                        onClick={(event) => {
-                            event.stopPropagation();
-                            if (!notification.readAt) {
-                                dispatch(actions.markAsReadNotification({ uuid: notification.uuid }));
-                            }
-                        }}
-                    >
-                        {notification.message}
+                    <div key={notification.uuid} className={notification.readAt ? '' : 'font-semibold'}>
+                        <button
+                            type="button"
+                            className="text-left w-full bg-transparent border-0 p-0 font-inherit"
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                if (!notification.readAt) {
+                                    dispatch(actions.markAsReadNotification({ uuid: notification.uuid }));
+                                }
+                            }}
+                            onKeyDown={(event) => {
+                                if (event.key === 'Enter' || event.key === ' ') {
+                                    event.stopPropagation();
+                                    if (!notification.readAt) {
+                                        dispatch(actions.markAsReadNotification({ uuid: notification.uuid }));
+                                    }
+                                }
+                            }}
+                        >
+                            {notification.message}
+                        </button>
                         {notification.targetObjectType && notification.targetObjectIdentification && (
                             <Button
-                                color="white"
-                                size="sm"
-                                className={'px-1 m-0'}
+                                color="secondary"
+                                className="ml-2 !rounded-full !p-0.5 relative top-[-1px]"
                                 onClick={() => {
                                     navigate(
                                         `/${notification.targetObjectType}/detail/${notification.targetObjectIdentification?.reduce(
@@ -88,7 +98,7 @@ function NotificationsList() {
                                     );
                                 }}
                             >
-                                <i className="fa fa-circle-arrow-right"></i>
+                                <ArrowRight size={10} strokeWidth={3} />
                             </Button>
                         )}
                     </div>,
@@ -103,27 +113,26 @@ function NotificationsList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <PagedList
-                entity={EntityType.NOTIFICATIONS}
-                onListCallback={onListCallback}
-                onDeleteCallback={(uuids) =>
-                    uuids.length > 1
-                        ? dispatch(actions.bulkDeleteNotification({ uuids }))
-                        : dispatch(actions.deleteNotification({ uuid: uuids[0] }))
-                }
-                headers={notificationsRowHeaders}
-                data={notificationsList}
-                isBusy={isBusy}
-                addHidden={true}
-                title="List of notifications"
-                entityNameSingular="a Notification"
-                entityNamePlural="Notifications"
-                pageWidgetLockName={LockWidgetNameEnum.ListOfNotifications}
-                additionalButtons={buttons}
-                hasDetails={true}
-            />
-        </Container>
+        <PagedList
+            entity={EntityType.NOTIFICATIONS}
+            onListCallback={onListCallback}
+            onDeleteCallback={(uuids) =>
+                uuids.length > 1
+                    ? dispatch(actions.bulkDeleteNotification({ uuids }))
+                    : dispatch(actions.deleteNotification({ uuid: uuids[0] }))
+            }
+            headers={notificationsRowHeaders}
+            data={notificationsList}
+            isBusy={isBusy}
+            addHidden
+            title="List of notifications"
+            entityNameSingular="a Notification"
+            entityNamePlural="Notifications"
+            pageWidgetLockName={LockWidgetNameEnum.ListOfNotifications}
+            additionalButtons={buttons}
+            hasDetails
+            columnForDetail="message"
+        />
     );
 }
 

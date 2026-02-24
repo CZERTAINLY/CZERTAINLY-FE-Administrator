@@ -1,7 +1,5 @@
-import cx from 'classnames';
 import { useCallback, useMemo } from 'react';
 import { TriggerHistoryObjectSummaryModel, TriggerHistoryObjectTriggerSummaryModel } from 'types/rules';
-import styles from './triggerHistorySummaryViewer.module.scss';
 interface TriggerHistorySummaryProps {
     triggerHistoryObjectSummary: TriggerHistoryObjectSummaryModel;
 }
@@ -11,7 +9,8 @@ import TabLayout from 'components/Layout/TabLayout';
 import Widget from 'components/Widget';
 import { actions as userInterfaceActions } from 'ducks/user-interface';
 import { useDispatch } from 'react-redux';
-import { Button } from 'reactstrap';
+import Button from 'components/Button';
+import { X, Check, Ban, Info } from 'lucide-react';
 
 const TriggerHistorySummaryViewer = ({ triggerHistoryObjectSummary }: TriggerHistorySummaryProps) => {
     const dispatch = useDispatch();
@@ -93,19 +92,31 @@ const TriggerHistorySummaryViewer = ({ triggerHistoryObjectSummary }: TriggerHis
 
     const getIcon = useMemo(() => {
         if (!triggerHistoryObjectSummary.matched) {
-            return <i className={cx('fa', 'fa-close', styles.closeIcon)} title="Not Matched" />;
+            return (
+                <span title="Not Matched">
+                    <X size={16} aria-hidden />
+                </span>
+            );
         } else if (triggerHistoryObjectSummary.matched && !triggerHistoryObjectSummary.ignored) {
-            return <i className={cx('fa', 'fa-check', styles.checkIcon)} title="Matched" />;
+            return (
+                <span title="Matched">
+                    <Check size={16} aria-hidden />
+                </span>
+            );
         } else {
-            return <i className={cx('fa', 'fa-ban', styles.banIcon)} title="Ignored" />;
+            return (
+                <span title="Ignored">
+                    <Ban size={16} aria-hidden />
+                </span>
+            );
         }
     }, [triggerHistoryObjectSummary.matched, triggerHistoryObjectSummary.ignored]);
     return (
-        <div className="d-flex justify-content-start" style={{ marginBottom: '4px' }}>
+        <div className="flex justify-start" style={{ marginBottom: '4px' }}>
             <div className="p-2">{getIcon}</div>
             {hasRecords && (
-                <Button className="btn btn-link" onClick={onIconClick}>
-                    <i className={cx('fa', 'fa-info', styles.infoIcon)} />
+                <Button variant="transparent" onClick={onIconClick}>
+                    <Info size={16} />
                 </Button>
             )}
         </div>

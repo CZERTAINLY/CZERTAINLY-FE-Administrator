@@ -3,16 +3,16 @@ import Spinner from 'components/Spinner';
 
 import { actions, selectors } from 'ducks/cryptographic-operations';
 import { useCallback, useEffect, useState } from 'react';
-import { Field, Form } from 'react-final-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { Form as BootstrapForm, Button, ButtonGroup, FormGroup, Label } from 'reactstrap';
 import { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
+import Button from 'components/Button';
 import { KeyAlgorithm } from 'types/openapi';
-
-import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import FileUpload from '../../../Input/FileUpload/FileUpload';
 import TabLayout from '../../../Layout/TabLayout';
+import Container from 'components/Container';
+import Widget from 'components/Widget';
 
 interface Props {
     tokenUuid?: string;
@@ -59,13 +59,21 @@ export default function SignVerifyData({ tokenUuid, tokenProfileUuid, keyUuid, k
         [visible, tokenUuid, dispatch],
     );
 
+    const methods = useForm({
+        mode: 'onTouched',
+        defaultValues: {},
+    });
+
+    const { handleSubmit, formState, watch } = methods;
+
     const onSubmit = useCallback(
         (values: any) => {
             if (!tokenUuid) return;
 
+            const allValues = watch();
             const attribs: AttributeRequestModel[] =
                 attributes && attributes.length > 0
-                    ? collectFormAttributes('attributes', [...(attributes ?? []), ...groupAttributesCallbackAttributes], values) || []
+                    ? collectFormAttributes('attributes', [...(attributes ?? []), ...groupAttributesCallbackAttributes], allValues) || []
                     : [];
             if (action === 'sign') {
                 dispatch(
@@ -110,6 +118,7 @@ export default function SignVerifyData({ tokenUuid, tokenProfileUuid, keyUuid, k
             tokenProfileUuid,
             fileContent,
             signatureContent,
+            watch,
         ],
     );
 
@@ -117,88 +126,67 @@ export default function SignVerifyData({ tokenUuid, tokenProfileUuid, keyUuid, k
 
     return (
         <>
-            <Form onSubmit={onSubmit} mutators={{ ...mutators() }}>
-                {({ handleSubmit, pristine, submitting, valid }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
-                        <Field name="data">
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="data">Data</Label>
-                                    <FileUpload
-                                        id="data"
-                                        editable
-                                        fileType={'data'}
-                                        onFileContentLoaded={(fileContent) => setFileContent(fileContent)}
-                                    />
-                                </FormGroup>
-                            )}
-                        </Field>
+            <FormProvider {...methods}>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    <Widget title="Data" titleSize="large">
+                        <FileUpload
+                            id="data"
+                            editable
+                            fileType={'data'}
+                            onFileContentLoaded={(fileContent) => setFileContent(fileContent)}
+                        />
+                    </Widget>
 
-                        {action === 'verify' ? (
-                            <Field name="signature">
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="signatureFileName">Signature</Label>
-                                        <FileUpload
-                                            editable
-                                            id="signature"
-                                            fileType={'signature'}
-                                            onFileContentLoaded={(fileContent) => setSignatureContent(fileContent)}
-                                        />
-                                    </FormGroup>
-                                )}
-                            </Field>
-                        ) : (
-                            <></>
-                        )}
+                    {action === 'verify' ? (
+                        <Widget title="Signature" titleSize="large">
+                            <FileUpload
+                                editable
+                                id="signature"
+                                fileType={'signature'}
+                                onFileContentLoaded={(fileContent) => setSignatureContent(fileContent)}
+                            />
+                        </Widget>
+                    ) : null}
 
-                        {!attributes || attributes.length === 0 ? (
-                            <></>
-                        ) : (
-                            <Field name="Attributes">
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <br />
-
-                                        <TabLayout
-                                            tabs={[
-                                                {
-                                                    title: 'Connector Attributes',
-                                                    content: (
-                                                        <AttributeEditor
-                                                            id="attributes"
-                                                            attributeDescriptors={attributes}
-                                                            groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                                            setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                                                        />
-                                                    ),
-                                                },
-                                            ]}
-                                        />
-                                    </FormGroup>
-                                )}
-                            </Field>
-                        )}
-
-                        <div style={{ textAlign: 'right' }}>
-                            <ButtonGroup>
-                                <Button
-                                    type="submit"
-                                    color="primary"
-                                    disabled={(action === 'verify' ? !signatureContent : false) || !fileContent || submitting || !valid}
-                                    onClick={handleSubmit}
-                                >
-                                    {action === 'sign' ? 'Sign' : 'Verify'}
-                                </Button>
-
-                                <Button type="button" color="secondary" onClick={onClose}>
-                                    Cancel
-                                </Button>
-                            </ButtonGroup>
+                    {attributes && attributes.length > 0 && (
+                        <div>
+                            <TabLayout
+                                tabs={[
+                                    {
+                                        title: 'Connector Attributes',
+                                        content: (
+                                            <AttributeEditor
+                                                id="attributes"
+                                                attributeDescriptors={attributes}
+                                                groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                                setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                            />
+                                        ),
+                                    },
+                                ]}
+                            />
                         </div>
-                    </BootstrapForm>
-                )}
-            </Form>
+                    )}
+
+                    <Container className="flex-row justify-end modal-footer" gap={4}>
+                        <Button
+                            type="submit"
+                            color="primary"
+                            disabled={
+                                (action === 'verify' ? !signatureContent : false) ||
+                                !fileContent ||
+                                formState.isSubmitting ||
+                                !formState.isValid
+                            }
+                        >
+                            {action === 'sign' ? 'Sign' : 'Verify'}
+                        </Button>
+                        <Button type="button" variant="outline" color="secondary" onClick={onClose}>
+                            Cancel
+                        </Button>
+                    </Container>
+                </form>
+            </FormProvider>
 
             <Spinner active={isFetchingAttributes} />
         </>

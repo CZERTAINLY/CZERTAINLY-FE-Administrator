@@ -1,47 +1,53 @@
 import AttributeEditor from 'components/Attributes/AttributeEditor';
-import SwitchField from 'components/Input/SwitchField';
-import TextField from 'components/Input/TextField';
 import TabLayout from 'components/Layout/TabLayout';
 import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
+import Switch from 'components/Switch';
 import { actions as connectorActions } from 'ducks/connectors';
-import { actions as userInterfaceActions } from 'ducks/user-interface';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions as discoveryActions, selectors as discoverySelectors } from 'ducks/discoveries';
 import { actions as rulesActions } from 'ducks/rules';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Field, Form } from 'react-final-form';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router';
-import Select from 'react-select';
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import Select from 'components/Select';
+import Button from 'components/Button';
+import Container from 'components/Container';
+import Label from 'components/Label';
+import Dialog from 'components/Dialog';
 import Cron from 'react-cron-generator';
+import { Clock } from 'lucide-react';
 
 import { AttributeDescriptorModel } from 'types/attributes';
 import { ConnectorResponseModel } from 'types/connectors';
 import { FunctionGroupCode, Resource } from 'types/openapi';
 
-import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { getStrongFromCronExpression } from 'utils/dateUtil';
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateQuartzCronExpression, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateQuartzCronExpression, validateRequired } from 'utils/validators';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import TriggerEditorWidget from 'components/TriggerEditorWidget';
+import TextInput from 'components/TextInput';
+
+interface DiscoveryFormProps {
+    onSuccess?: () => void;
+    onCancel?: () => void;
+}
 
 interface FormValues {
-    name: string | undefined;
+    name: string;
     triggers: string[] | undefined;
-    discoveryProvider: { value: string; label: string } | undefined;
-    storeKind: { value: string; label: string } | undefined;
+    discoveryProvider: string | undefined;
+    storeKind: string | undefined;
     jobName: string | undefined;
     cronExpression: string | undefined;
     scheduled: boolean;
     oneTime: boolean;
 }
 
-export default function DiscoveryForm() {
+export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProps) {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const discoveryProviders = useSelector(discoverySelectors.discoveryProviders);
     const discoveryProviderAttributeDescriptors = useSelector(discoverySelectors.discoveryProviderAttributeDescriptors);
@@ -55,6 +61,8 @@ export default function DiscoveryForm() {
     const [init, setInit] = useState(true);
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [discoveryProvider, setDiscoveryProvider] = useState<ConnectorResponseModel>();
+    const [cronModalOpen, setCronModalOpen] = useState(false);
+    const [originalCronExpression, setOriginalCronExpression] = useState<string | undefined>(undefined);
 
     const isBusy = useMemo(
         () =>
@@ -74,7 +82,6 @@ export default function DiscoveryForm() {
 
     useEffect(() => {
         if (init) {
-            dispatch(discoveryActions.resetState());
             setInit(false);
             dispatch(connectorActions.clearCallbackData());
             dispatch(discoveryActions.listDiscoveryProviders());
@@ -84,13 +91,13 @@ export default function DiscoveryForm() {
     }, [dispatch, init]);
 
     const onDiscoveryProviderChange = useCallback(
-        (event: { value: string }) => {
+        (providerUuid: string | undefined) => {
             dispatch(discoveryActions.clearDiscoveryProviderAttributeDescriptors());
             dispatch(connectorActions.clearCallbackData());
             setGroupAttributesCallbackAttributes([]);
 
-            if (!event.value || !discoveryProviders) return;
-            const provider = discoveryProviders.find((p) => p.uuid === event.value);
+            if (!providerUuid || !discoveryProviders) return;
+            const provider = discoveryProviders.find((p) => p.uuid === providerUuid);
 
             if (!provider) return;
             setDiscoveryProvider(provider);
@@ -99,24 +106,24 @@ export default function DiscoveryForm() {
     );
 
     const onKindChange = useCallback(
-        (event: { value: string }) => {
-            if (!event.value || !discoveryProvider) return;
+        (kind: string | undefined) => {
+            if (!kind || !discoveryProvider) return;
             dispatch(connectorActions.clearCallbackData());
             setGroupAttributesCallbackAttributes([]);
-            dispatch(discoveryActions.getDiscoveryProviderAttributesDescriptors({ uuid: discoveryProvider.uuid, kind: event.value }));
+            dispatch(discoveryActions.getDiscoveryProviderAttributesDescriptors({ uuid: discoveryProvider.uuid, kind }));
         },
         [dispatch, discoveryProvider],
     );
 
     const onSubmit = useCallback(
-        (values: FormValues, form: any) => {
+        (values: FormValues) => {
             dispatch(
                 discoveryActions.createDiscovery({
                     request: {
-                        name: values.name!,
+                        name: values.name,
                         triggers: selectedTriggers.length ? selectedTriggers : undefined,
-                        connectorUuid: values.discoveryProvider!.value,
-                        kind: values.storeKind?.value!,
+                        connectorUuid: values.discoveryProvider!,
+                        kind: values.storeKind!,
                         attributes: collectFormAttributes(
                             'discovery',
                             [...(discoveryProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
@@ -133,10 +140,6 @@ export default function DiscoveryForm() {
         },
         [dispatch, discoveryProviderAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes, selectedTriggers],
     );
-
-    const onCancel = useCallback(() => {
-        navigate(-1);
-    }, [navigate]);
 
     const optionsForDiscoveryProviders = useMemo(
         () =>
@@ -158,225 +161,327 @@ export default function DiscoveryForm() {
         [discoveryProvider],
     );
 
+    const defaultValues: FormValues = useMemo(
+        () => ({
+            name: '',
+            triggers: undefined,
+            discoveryProvider: undefined,
+            storeKind: undefined,
+            jobName: undefined,
+            cronExpression: undefined,
+            scheduled: false,
+            oneTime: false,
+        }),
+        [],
+    );
+
+    const methods = useForm<FormValues>({
+        defaultValues,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit,
+        control,
+        formState: { isDirty, isSubmitting, isValid },
+        setValue,
+        getValues,
+    } = methods;
+
+    const watchedScheduled = useWatch({
+        control,
+        name: 'scheduled',
+    });
+
+    const watchedStoreKind = useWatch({
+        control,
+        name: 'storeKind',
+    });
+
+    const watchedCronExpression = useWatch({
+        control,
+        name: 'cronExpression',
+    });
+
+    // Automatically load attributes when kind changes
+    useEffect(() => {
+        if (watchedStoreKind && discoveryProvider) {
+            onKindChange(watchedStoreKind);
+        }
+    }, [watchedStoreKind, discoveryProvider, onKindChange]);
+
+    const handleCronSelectChange = useCallback(
+        (value: string) => {
+            setValue('cronExpression', value);
+        },
+        [setValue],
+    );
+
+    const onOpenCronModal = useCallback(() => {
+        setOriginalCronExpression(watchedCronExpression);
+        setCronModalOpen(true);
+    }, [watchedCronExpression]);
+
     return (
-        <Form onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
-            {({ handleSubmit, pristine, submitting, values, valid, form }) => (
-                <BootstrapForm onSubmit={handleSubmit}>
-                    <Widget
-                        title="Schedule"
-                        widgetExtraTopNode={
-                            <div className="ms-2">
-                                <SwitchField id="scheduled" label="" />
+        <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <Widget
+                    title="Schedule"
+                    widgetExtraTopNode={
+                        <div className="flex items-start ml-2 w-full">
+                            <Controller
+                                name="scheduled"
+                                control={control}
+                                render={({ field }) => <Switch id="scheduled" checked={field.value} onChange={field.onChange} />}
+                            />
+                        </div>
+                    }
+                >
+                    {watchedScheduled && (
+                        <div className="space-y-4">
+                            <div>
+                                <Label htmlFor="jobName" required>
+                                    Job Name
+                                </Label>
+                                <Controller
+                                    name="jobName"
+                                    control={control}
+                                    rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
+                                    render={({ field, fieldState }) => (
+                                        <TextInput
+                                            {...field}
+                                            id="jobName"
+                                            placeholder="Enter Job Name"
+                                            invalid={fieldState.error && fieldState.isTouched}
+                                            error={getFieldErrorMessage(fieldState)}
+                                        />
+                                    )}
+                                />
                             </div>
-                        }
-                    >
-                        {values.scheduled && (
-                            <>
-                                <TextField
-                                    id="jobName"
-                                    label="Job Name"
-                                    validators={[validateRequired(), validateAlphaNumericWithSpecialChars()]}
-                                />
 
-                                <TextField
-                                    id="cronExpression"
-                                    label="Cron Expression"
-                                    validators={[validateRequired(), validateQuartzCronExpression(values.cronExpression)]}
-                                    description={getStrongFromCronExpression(values.cronExpression)}
-                                    inputGroupIcon={{
-                                        icon: 'fa fa-stopwatch',
-                                        onClick: () => {
-                                            dispatch(
-                                                userInterfaceActions.showGlobalModal({
-                                                    content: (
-                                                        <div>
-                                                            <div className="d-flex justify-content-center">
-                                                                <Cron
-                                                                    value={values.cronExpression}
-                                                                    onChange={(e) => {
-                                                                        dispatch(
-                                                                            userInterfaceActions.setOkButtonCallback(() => {
-                                                                                dispatch(userInterfaceActions.hideGlobalModal());
-                                                                                form.mutators.setAttribute('cronExpression', e);
-                                                                            }),
-                                                                        );
-                                                                    }}
-                                                                    showResultText={true}
-                                                                    showResultCron={true}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    ),
-                                                    showCancelButton: true,
-                                                    okButtonCallback: () => {
-                                                        dispatch(userInterfaceActions.hideGlobalModal());
-                                                    },
-                                                    showOkButton: true,
-                                                    isOpen: true,
-                                                    size: 'lg',
-                                                    title: 'Select Cron timings',
-                                                }),
-                                            );
-                                        },
-                                    }}
-                                />
-
-                                <SwitchField id="oneTime" label="One Time Only" />
-                            </>
-                        )}
-                    </Widget>
-
-                    <TriggerEditorWidget
-                        resource={Resource.Certificates}
-                        selectedTriggers={selectedTriggers}
-                        onSelectedTriggersChange={setSelectedTriggers}
-                        noteText="Triggers will be executed on newly discovered certificate when handling Certificate Discovered event"
-                    />
-
-                    <Widget title="Add discovery" busy={isBusy}>
-                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="name">Discovery Name</Label>
-
-                                    <Input
-                                        {...input}
-                                        id="name"
-                                        valid={!meta.error && meta.touched}
-                                        invalid={!!meta.error && meta.touched}
-                                        type="text"
-                                        placeholder="Enter the Discovery Name"
-                                    />
-
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        <Field name="discoveryProvider" validate={validateRequired()}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="discoveryProviderSelect">Discovery Provider</Label>
-
-                                    <Select
-                                        {...input}
-                                        inputId="discoveryProviderSelect"
-                                        maxMenuHeight={140}
-                                        menuPlacement="auto"
-                                        options={optionsForDiscoveryProviders}
-                                        placeholder="Select Discovery Provider"
-                                        onChange={(event) => {
-                                            onDiscoveryProviderChange(event);
-                                            form.mutators.clearAttributes('discovery');
-                                            form.mutators.setAttribute('storeKind', undefined);
-                                            form.mutators.setAttribute('triggers', undefined);
-                                            input.onChange(event);
-                                        }}
-                                        styles={{
-                                            control: (provided) =>
-                                                meta.touched && meta.invalid
-                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                    : { ...provided },
-                                        }}
-                                    />
-
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                        {meta.error}
+                            <Controller
+                                name="cronExpression"
+                                control={control}
+                                rules={buildValidationRules([validateRequired(), validateQuartzCronExpression(watchedCronExpression)])}
+                                render={({ field, fieldState }) => (
+                                    <div className="mb-4 space-y-4">
+                                        <TextInput
+                                            id="cronExpression"
+                                            label="Cron Expression"
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            onBlur={field.onBlur}
+                                            invalid={!!fieldState.error && fieldState.isTouched}
+                                            error={fieldState.error?.message}
+                                            required
+                                            placeholder="Enter Cron Expression"
+                                            buttonRight={
+                                                <button
+                                                    type="button"
+                                                    onClick={onOpenCronModal}
+                                                    aria-label="Open cron expression builder"
+                                                    title="Open cron expression builder"
+                                                >
+                                                    <Clock size={16} />
+                                                </button>
+                                            }
+                                        />
+                                        {getStrongFromCronExpression(watchedCronExpression) && (
+                                            <p className="mt-1 text-sm text-gray-600">
+                                                {getStrongFromCronExpression(watchedCronExpression)}
+                                            </p>
+                                        )}
                                     </div>
-                                </FormGroup>
+                                )}
+                            />
+
+                            <Controller
+                                name="oneTime"
+                                control={control}
+                                render={({ field }) => (
+                                    <Switch id="oneTime" checked={field.value} onChange={field.onChange} label="One Time Only" />
+                                )}
+                            />
+                        </div>
+                    )}
+                </Widget>
+
+                <TriggerEditorWidget
+                    resource={Resource.Certificates}
+                    selectedTriggers={selectedTriggers}
+                    onSelectedTriggersChange={setSelectedTriggers}
+                    noteText="Triggers will be executed on newly discovered certificate when handling Certificate Discovered event"
+                />
+
+                <Widget title="Add discovery" busy={isBusy}>
+                    <div className="space-y-4">
+                        <div>
+                            <Label htmlFor="name" required>
+                                Discovery Name
+                            </Label>
+                            <Controller
+                                name="name"
+                                control={control}
+                                rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        {...field}
+                                        id="name"
+                                        placeholder="Enter the Discovery Name"
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={getFieldErrorMessage(fieldState)}
+                                    />
+                                )}
+                            />
+                        </div>
+
+                        <Controller
+                            name="discoveryProvider"
+                            control={control}
+                            rules={buildValidationRules([validateRequired()])}
+                            render={({ field, fieldState }) => (
+                                <>
+                                    <Select
+                                        id="discoveryProviderSelect"
+                                        label="Discovery Provider"
+                                        value={field.value || ''}
+                                        onChange={(value) => {
+                                            const formValues = getValues();
+                                            Object.keys(formValues).forEach((key) => {
+                                                if (key.startsWith('__attributes__discovery__')) {
+                                                    (setValue as any)(key, undefined);
+                                                }
+                                            });
+                                            setValue('storeKind', undefined);
+                                            setValue('triggers', undefined);
+                                            onDiscoveryProviderChange(value as string);
+                                            field.onChange(value);
+                                        }}
+                                        options={optionsForDiscoveryProviders || []}
+                                        placeholder="Select Discovery Provider"
+                                        placement="bottom"
+                                    />
+                                    {fieldState.error && fieldState.isTouched && (
+                                        <p className="mt-1 text-sm text-red-600">
+                                            {typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'}
+                                        </p>
+                                    )}
+                                </>
                             )}
-                        </Field>
+                        />
 
-                        {discoveryProvider ? (
-                            <Field name="storeKind" validate={validateRequired()}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="storeKindSelect">Kind</Label>
-
+                        {discoveryProvider && (
+                            <Controller
+                                name="storeKind"
+                                control={control}
+                                rules={buildValidationRules([validateRequired()])}
+                                render={({ field, fieldState }) => (
+                                    <>
                                         <Select
-                                            inputId="storeKindSelect"
-                                            {...input}
-                                            maxMenuHeight={140}
-                                            menuPlacement="auto"
+                                            id="storeKindSelect"
+                                            label="Kind"
+                                            value={field.value || ''}
+                                            onChange={(value) => {
+                                                onKindChange(value as string);
+                                                field.onChange(value);
+                                            }}
                                             options={optionsForKinds}
                                             placeholder="Select Kind"
-                                            onChange={(event) => {
-                                                onKindChange(event);
-                                                input.onChange(event);
-                                            }}
-                                            styles={{
-                                                control: (provided) =>
-                                                    meta.touched && meta.invalid
-                                                        ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                        : { ...provided },
-                                            }}
+                                            placement="bottom"
                                         />
-
-                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                            Required Field
-                                        </div>
-                                    </FormGroup>
+                                        {fieldState.error && fieldState.isTouched && (
+                                            <p className="mt-1 text-sm text-red-600">Required Field</p>
+                                        )}
+                                    </>
                                 )}
-                            </Field>
-                        ) : undefined}
-
-                        <>
-                            <br />
-                            <TabLayout
-                                tabs={[
-                                    {
-                                        title: 'Connector Attributes',
-                                        content:
-                                            discoveryProvider &&
-                                            values.storeKind &&
-                                            discoveryProviderAttributeDescriptors &&
-                                            discoveryProviderAttributeDescriptors.length > 0 ? (
-                                                <AttributeEditor
-                                                    id="discovery"
-                                                    attributeDescriptors={discoveryProviderAttributeDescriptors}
-                                                    connectorUuid={discoveryProvider.uuid}
-                                                    functionGroupCode={FunctionGroupCode.DiscoveryProvider}
-                                                    kind={values.storeKind.value}
-                                                    groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                                    setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                                                />
-                                            ) : (
-                                                <></>
-                                            ),
-                                    },
-                                    {
-                                        title: 'Custom Attributes',
-                                        content: (
-                                            <AttributeEditor
-                                                id="customDiscovery"
-                                                attributeDescriptors={resourceCustomAttributes}
-                                                attributes={discoveryProvider?.customAttributes}
-                                            />
-                                        ),
-                                    },
-                                ]}
                             />
-                        </>
+                        )}
 
-                        {
-                            <div className="d-flex justify-content-end">
-                                <ButtonGroup>
-                                    <ProgressButton
-                                        title="Create"
-                                        inProgressTitle="Creating..."
-                                        inProgress={submitting}
-                                        disabled={pristine || !valid}
-                                    />
+                        <TabLayout
+                            noBorder
+                            tabs={[
+                                {
+                                    title: 'Connector Attributes',
+                                    content:
+                                        discoveryProvider &&
+                                        watchedStoreKind &&
+                                        discoveryProviderAttributeDescriptors &&
+                                        discoveryProviderAttributeDescriptors.length > 0 ? (
+                                            <AttributeEditor
+                                                id="discovery"
+                                                attributeDescriptors={discoveryProviderAttributeDescriptors}
+                                                connectorUuid={discoveryProvider.uuid}
+                                                functionGroupCode={FunctionGroupCode.DiscoveryProvider}
+                                                kind={watchedStoreKind}
+                                                groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                                setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                            />
+                                        ) : (
+                                            <></>
+                                        ),
+                                },
+                                {
+                                    title: 'Custom Attributes',
+                                    content: (
+                                        <AttributeEditor
+                                            id="customDiscovery"
+                                            attributeDescriptors={resourceCustomAttributes}
+                                            attributes={discoveryProvider?.customAttributes}
+                                        />
+                                    ),
+                                },
+                            ]}
+                        />
+                    </div>
+                </Widget>
 
-                                    <Button color="default" onClick={onCancel} disabled={submitting}>
-                                        Cancel
-                                    </Button>
-                                </ButtonGroup>
-                            </div>
-                        }
-                    </Widget>
-                </BootstrapForm>
-            )}
-        </Form>
+                <Container className="flex-row justify-end modal-footer" gap={4}>
+                    <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
+                        Cancel
+                    </Button>
+                    <ProgressButton
+                        title="Create"
+                        inProgressTitle="Creating..."
+                        inProgress={isSubmitting}
+                        disabled={!isDirty || !isValid}
+                        type="submit"
+                    />
+                </Container>
+            </form>
+
+            <Dialog
+                size="xl"
+                isOpen={cronModalOpen}
+                caption="Select CRON Expression"
+                body={
+                    <div className="preline-cron-wrapper">
+                        <Cron value={watchedCronExpression || ''} onChange={handleCronSelectChange} showResultText showResultCron />
+                    </div>
+                }
+                toggle={() => setCronModalOpen(false)}
+                buttons={[
+                    {
+                        color: 'secondary',
+                        variant: 'outline',
+                        onClick: () => {
+                            if (originalCronExpression !== undefined) {
+                                setValue('cronExpression', originalCronExpression);
+                            }
+                            setCronModalOpen(false);
+                        },
+                        body: 'Cancel',
+                    },
+                    {
+                        color: 'primary',
+                        onClick: () => {
+                            setCronModalOpen(false);
+                        },
+                        body: 'Ok',
+                    },
+                ]}
+            />
+        </FormProvider>
     );
 }

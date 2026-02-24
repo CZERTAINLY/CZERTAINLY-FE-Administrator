@@ -8,7 +8,8 @@ import { selectors as complianceProfilesSelectors, actions as complianceProfiles
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { ComplianceRuleStatus, ComplianceStatus, Resource } from 'types/openapi';
 import { useCallback, useEffect, useMemo } from 'react';
-import { Button } from 'reactstrap';
+import Button from 'components/Button';
+import { Info } from 'lucide-react';
 import { AttributeResponseModel } from 'types/attributes';
 
 type Props = {
@@ -62,14 +63,13 @@ export default function ComplianceCheckResultWidget({ widgetLockName, objectUuid
                 rule.kind || '',
                 rule.attributes?.length ? (
                     <Button
-                        className="btn btn-link"
-                        color="white"
+                        variant="transparent"
                         title="Attributes"
                         onClick={() => {
                             setSelectedAttributesInfo((rule.attributes || []) as AttributeResponseModel[]);
                         }}
                     >
-                        <i className="fa fa-info" style={{ color: 'auto' }} />
+                        <Info size={16} style={{ color: 'auto' }} />
                     </Button>
                 ) : (
                     ''
@@ -88,18 +88,15 @@ export default function ComplianceCheckResultWidget({ widgetLockName, objectUuid
             refreshAction={getFreshComplianceCheckResult}
             dataTestId="compliance-status-widget"
         >
-            <br />
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <span>Status:</span>
-                    <span>
-                        <CertificateStatus status={(complianceCheckResult?.status as ComplianceStatus) || ''} />
-                    </span>
+                    <CertificateStatus badgeSize="medium" status={(complianceCheckResult?.status as ComplianceStatus) || ''} />
                 </div>
                 {complianceCheckResult?.timestamp && (
                     <>
-                        <div style={{ width: '1px', height: '10px', backgroundColor: '#6c757d' }} />
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ width: '1px', height: '20px', backgroundColor: '#E5E7EB' }} />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                             <span>Checked:</span>
                             <span>{dateFormatter(complianceCheckResult?.timestamp || '')}</span>
                         </div>
@@ -112,7 +109,6 @@ export default function ComplianceCheckResultWidget({ widgetLockName, objectUuid
                     <span>{complianceCheckResult?.message}</span>
                 </div>
             )}
-            <br />
             <CustomTable headers={complianceHeaders} data={complianceData} hasPagination={true} />
         </Widget>
     );

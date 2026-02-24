@@ -2,7 +2,7 @@ import Spinner from 'components/Spinner';
 import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from 'ducks/utilsActuator';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button } from 'reactstrap';
+import Button from 'components/Button';
 import { transformParseCertificateResponseDtoToAsn1String } from '../../../../ducks/transform/utilsCertificate';
 import { actions as utilsCertificateActions, selectors as utilsCertificateSelectors } from '../../../../ducks/utilsCertificate';
 import {
@@ -12,7 +12,7 @@ import {
 
 import { transformParseRequestResponseDtoToCertificateResponseDetailModelToAsn1String } from 'ducks/transform/utilsCertificateRequest';
 import { ParseCertificateRequestDtoParseTypeEnum, ParseRequestRequestDtoParseTypeEnum } from '../../../../types/openapi/utils';
-import Dialog from '../../../Dialog';
+import { actions as userInterfaceActions } from 'ducks/user-interface';
 
 interface Props {
     content: string;
@@ -34,6 +34,12 @@ export default function Asn1Dialog({ content, isCSR }: Props) {
         dispatch(utilsCertificateRequestActions.reset());
     }, [dispatch]);
 
+    const onClose = useCallback(() => {
+        resetParsedData();
+        setAsn1(undefined);
+        dispatch(userInterfaceActions.hideGlobalModal());
+    }, [resetParsedData, dispatch]);
+
     useEffect(() => {
         resetParsedData();
     }, [resetParsedData]);
@@ -46,29 +52,48 @@ export default function Asn1Dialog({ content, isCSR }: Props) {
 
     useEffect(() => {
         if (parsedCertificate && !isCSR) {
-            setAsn1(transformParseCertificateResponseDtoToAsn1String(parsedCertificate));
+            const asn1String = transformParseCertificateResponseDtoToAsn1String(parsedCertificate);
+            setAsn1(asn1String);
+            if (asn1String) {
+                dispatch(
+                    userInterfaceActions.showGlobalModal({
+                        isOpen: true,
+                        size: 'xl',
+                        title: 'ASN.1 Structure',
+                        content: <pre className="text-sm overflow-x-auto text-[var(--dark-gray-color)]">{asn1String}</pre>,
+                        showCloseButton: true,
+                        cancelButtonCallback: onClose,
+                    }),
+                );
+            }
         }
-    }, [parsedCertificate, isCSR]);
+    }, [parsedCertificate, isCSR, dispatch, onClose]);
 
     useEffect(() => {
         if (parsedCertificateRequest && isCSR) {
-            setAsn1(transformParseRequestResponseDtoToCertificateResponseDetailModelToAsn1String(parsedCertificateRequest));
+            const asn1String = transformParseRequestResponseDtoToCertificateResponseDetailModelToAsn1String(parsedCertificateRequest);
+            setAsn1(asn1String);
+            if (asn1String) {
+                dispatch(
+                    userInterfaceActions.showGlobalModal({
+                        isOpen: true,
+                        size: 'xl',
+                        title: 'ASN.1 Structure',
+                        content: <pre className="text-sm overflow-x-auto text-[var(--dark-gray-color)]">{asn1String}</pre>,
+                        showCloseButton: true,
+                        cancelButtonCallback: onClose,
+                    }),
+                );
+            }
         }
-    }, [parsedCertificateRequest, isCSR]);
-
-    const onClose = useCallback(() => {
-        resetParsedData();
-        setAsn1(undefined);
-    }, [resetParsedData]);
+    }, [parsedCertificateRequest, isCSR, dispatch, onClose]);
 
     return (
         <>
             <Spinner active={isFetchingDetail || isFetchingCSRDetails} />
             <Button
-                className="btn btn-link p-0"
+                variant="transparent"
                 disabled={!health || isFetchingDetail || isFetchingCSRDetails}
-                size="sm"
-                color="primary"
                 onClick={() => {
                     if (content && health) {
                         if (!isCSR) {
@@ -89,17 +114,10 @@ export default function Asn1Dialog({ content, isCSR }: Props) {
                     }
                 }}
                 title="Show ASN.1 Structure"
+                className="text-[var(--primary-blue-color)] !p-0 hover:bg-transparent"
             >
                 Show
             </Button>
-            <Dialog
-                isOpen={!!asn1}
-                size={'lg'}
-                caption="ASN.1 Structure"
-                body={<pre>{asn1}</pre>}
-                toggle={onClose}
-                buttons={[{ color: 'primary', onClick: onClose, body: 'Close' }]}
-            />
         </>
     );
 }

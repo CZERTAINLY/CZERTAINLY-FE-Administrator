@@ -159,8 +159,8 @@ export const slice = createSlice({
 
 const selectState = createFeatureSelector<State>(slice.name);
 
-const selectWidgetLocks = createSelector(selectState, (state) => state.widgetLocks);
-const selectGlobalModal = createSelector(selectState, (state) => state.globalModal);
+const selectWidgetLocks = createSelector(selectState, (state) => state?.widgetLocks ?? []);
+const selectGlobalModal = createSelector(selectState, (state) => state?.globalModal ?? initialState.globalModal);
 const selectInitiateAttributeCallback = createSelector(selectState, (state) => state.initiateAttributeCallback);
 const selectAttributeCallbackValue = createSelector(selectState, (state) => state.attributeCallbackValue);
 const selectCallbackValue = createSelector(selectState, (state) => state.formCallbackValue);

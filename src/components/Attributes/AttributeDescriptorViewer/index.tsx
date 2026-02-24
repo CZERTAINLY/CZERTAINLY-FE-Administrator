@@ -20,26 +20,31 @@ export default function AttributeDescriptorViewer({ attributeDescriptors }: Prop
                 id: 'name',
                 content: 'Label/Name',
                 width: '20%',
+                sortable: true,
             },
             {
                 id: 'type',
                 content: 'Type',
                 width: '15%',
+                sortable: true,
             },
             {
                 id: 'required',
                 content: 'Required',
                 width: '10%',
+                sortable: true,
             },
             {
                 id: 'description',
                 content: 'Description',
                 width: '20%',
+                sortable: true,
             },
             {
                 id: 'defaultValue',
                 content: 'Default Value',
                 width: '35%',
+                sortable: true,
             },
         ],
         [],
@@ -88,11 +93,6 @@ export default function AttributeDescriptorViewer({ attributeDescriptors }: Prop
             }
 
             return [
-                <></>,
-                <></>,
-                <></>,
-                <></>,
-                <></>,
                 <CustomTable
                     headers={[
                         { id: 'name', content: 'Name' },

@@ -7,13 +7,15 @@ import { actions as connectorActions } from 'ducks/connectors';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as raProfileActions, selectors as raProfileSelectors } from 'ducks/ra-profiles';
-import { FormApi } from 'final-form';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Field, Form } from 'react-final-form';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
-import Select from 'react-select';
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import Select from 'components/Select';
+import Button from 'components/Button';
+import Container from 'components/Container';
+import TextInput from 'components/TextInput';
+import TextArea from 'components/TextArea';
 import { AttributeDescriptorModel } from 'types/attributes';
 import { CmpProfileEditRequestModel, CmpProfileRequestModel } from 'types/cmp-profiles';
 import {
@@ -24,43 +26,39 @@ import {
     Resource,
 } from 'types/openapi';
 import { RaProfileSimplifiedModel } from 'types/ra-profiles';
-import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes, mapProfileAttribute, transformAttributes } from 'utils/attributes/attributes';
-import { isObjectSame } from 'utils/common-utils';
-import { composeValidators, validateAlphaNumericWithoutAccents, validateLength, validateRequired } from 'utils/validators';
-import styles from './cmpForm.module.scss';
+import { useAreDefaultValuesSame } from 'utils/common-hooks';
+import { validateAlphaNumericWithoutAccents, validateLength, validateRequired } from 'utils/validators';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import useAttributeEditor, { buildGroups, buildOwner, buildSelectedOption } from 'utils/widget';
 import CertificateAssociationsFormWidget from 'components/CertificateAssociationsFormWidget/CertificateAssociationsFormWidget';
 import { deepEqual } from 'utils/deep-equal';
 
-interface SelectChangeValue {
-    value: string;
-    label: string;
+interface CmpProfileFormProps {
+    cmpProfileId?: string;
+    onCancel?: () => void;
+    onSuccess?: () => void;
 }
 
-interface SelectedRaProfileValue {
-    value: RaProfileSimplifiedModel;
-    label: string;
-}
-
-interface FormValues extends CmpProfileRequestModel {
-    selectedVariant?: SelectChangeValue | undefined;
-    selectedRaProfile?: SelectedRaProfileValue | undefined;
-    selectedSigningCertificate?: SelectChangeValue | undefined;
-    selectedRequestProtectionMethod?: SelectChangeValue | undefined;
-    selectedResponseProtectionMethod?: SelectChangeValue | undefined;
-    owner: { value: string; label: string } | undefined;
+interface FormValues {
+    name: string;
+    description: string;
+    variant: string;
+    requestProtectionMethod: string;
+    responseProtectionMethod: string;
+    raProfileUuid: string;
+    sharedSecret: string;
+    signingCertificateUuid: string;
+    owner: string;
     groups: { value: string; label: string }[];
     deletedAttributes: string[];
 }
-export default function CmpProfileForm() {
-    const { id } = useParams();
+export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: CmpProfileFormProps) {
+    const { id: routeId } = useParams();
+    const id = cmpProfileId || routeId;
     const dispatch = useDispatch();
 
     const editMode = useMemo(() => !!id, [id]);
-    const navigate = useNavigate();
-
-    const onCancelClick = useCallback(() => navigate(-1), [navigate]);
 
     const cmpProfile = useSelector(cmpProfileSelectors.cmpProfile);
     const cmpSigningCertificates = useSelector(cmpProfileSelectors.cmpSigningCertificates);
@@ -144,16 +142,227 @@ export default function CmpProfileForm() {
         dispatch(raProfileActions.listRaProfiles());
     }, [dispatch]);
 
-    const title = useMemo(() => (editMode ? 'Edit CMP Profile' : 'Create CMP Profile'), [editMode]);
     const isBusy = useMemo(
         () => isFetchingDetail || isCreating || isUpdating || isFetchingCmpCertificates,
         [isFetchingDetail, isCreating, isUpdating, isFetchingCmpCertificates],
     );
 
+    const previousIdRef = useRef<string | undefined>(undefined);
+
     useEffect(() => {
-        if (id) dispatch(cmpProfileActions.getCmpProfile({ uuid: id }));
-        else dispatch(cmpProfileActions.resetCmpProfile());
-    }, [id, dispatch]);
+        if (editMode && id) {
+            // Fetch if id changed or if we don't have the correct profile loaded
+            if (previousIdRef.current !== id || !cmpProfile || cmpProfile.uuid !== id) {
+                dispatch(cmpProfileActions.getCmpProfile({ uuid: id }));
+                previousIdRef.current = id;
+            }
+        } else {
+            dispatch(cmpProfileActions.resetCmpProfile());
+            previousIdRef.current = undefined;
+        }
+    }, [dispatch, editMode, id, cmpProfile]);
+
+    const defaultValues: FormValues = useMemo(() => {
+        const initialAssociatedAttributes = mapProfileAttribute(
+            cmpProfile,
+            multipleResourceCustomAttributes,
+            Resource.Certificates,
+            'certificateAssociations.customAttributes',
+            '__attributes__certificateAssociatedAttributes__',
+        );
+
+        const initialCustomAttributes = mapProfileAttribute(
+            cmpProfile,
+            multipleResourceCustomAttributes,
+            Resource.CmpProfiles,
+            'customAttributes',
+            '__attributes__customCmpProfile__',
+        );
+
+        const transformedInitialAssociatedAttributes = transformAttributes(initialAssociatedAttributes ?? []);
+        const transformedInitialCustomAttributes = transformAttributes(initialCustomAttributes ?? []);
+
+        if (!(editMode && cmpProfile)) {
+            return {
+                name: '',
+                description: '',
+                variant: '',
+                requestProtectionMethod: '',
+                responseProtectionMethod: '',
+                raProfileUuid: '',
+                sharedSecret: '',
+                signingCertificateUuid: '',
+                owner: '',
+                groups: [],
+                deletedAttributes: [],
+                ...transformedInitialAssociatedAttributes,
+                ...transformedInitialCustomAttributes,
+            };
+        }
+
+        const { raProfile, signingCertificate, requestProtectionMethod, responseProtectionMethod, variant, certificateAssociations } =
+            cmpProfile;
+
+        return {
+            name: cmpProfile?.name || '',
+            description: cmpProfile?.description || '',
+            variant: variant || '',
+            requestProtectionMethod: requestProtectionMethod || '',
+            responseProtectionMethod: responseProtectionMethod || '',
+            raProfileUuid: raProfile?.uuid || '',
+            sharedSecret: '',
+            signingCertificateUuid: signingCertificate?.uuid || '',
+            owner: buildOwner(userOptions, certificateAssociations?.ownerUuid)?.value || '',
+            groups: buildGroups(groupOptions, certificateAssociations?.groupUuids),
+            deletedAttributes: [],
+            ...transformedInitialAssociatedAttributes,
+            ...transformedInitialCustomAttributes,
+        };
+    }, [cmpProfile, multipleResourceCustomAttributes, editMode, userOptions, groupOptions]);
+
+    const methods = useForm<FormValues>({
+        defaultValues,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit,
+        control,
+        formState: { isSubmitting, isValid },
+        setValue,
+        getValues,
+        reset,
+    } = methods;
+
+    const formValues = useWatch({ control });
+    const watchedRequestProtectionMethod = useWatch({
+        control,
+        name: 'requestProtectionMethod',
+    });
+
+    const watchedResponseProtectionMethod = useWatch({
+        control,
+        name: 'responseProtectionMethod',
+    });
+
+    useEffect(() => {
+        if (watchedResponseProtectionMethod === ProtectionMethod.Signature) {
+            if (!cmpSigningCertificates || cmpSigningCertificates.length === 0) dispatch(cmpProfileActions.listCmpSigningCertificates());
+        }
+    }, [watchedResponseProtectionMethod, dispatch, cmpSigningCertificates]);
+
+    const lastResetProfileIdRef = useRef<string | undefined>(undefined);
+    const lastResetEditModeRef = useRef<boolean | undefined>(undefined);
+
+    // Reset form values when cmpProfile is loaded in edit mode
+    useEffect(() => {
+        if (
+            editMode &&
+            id &&
+            cmpProfile &&
+            cmpProfile.uuid === id &&
+            !isFetchingDetail &&
+            userOptions.length > 0 &&
+            groupOptions.length > 0
+        ) {
+            // Only reset if the profile ID changed or we haven't reset yet
+            if (lastResetProfileIdRef.current !== id || lastResetEditModeRef.current !== editMode) {
+                const initialAssociatedAttributes = mapProfileAttribute(
+                    cmpProfile,
+                    multipleResourceCustomAttributes,
+                    Resource.Certificates,
+                    'certificateAssociations.customAttributes',
+                    '__attributes__certificateAssociatedAttributes__',
+                );
+
+                const initialCustomAttributes = mapProfileAttribute(
+                    cmpProfile,
+                    multipleResourceCustomAttributes,
+                    Resource.CmpProfiles,
+                    'customAttributes',
+                    '__attributes__customCmpProfile__',
+                );
+
+                const transformedInitialAssociatedAttributes = transformAttributes(initialAssociatedAttributes ?? []);
+                const transformedInitialCustomAttributes = transformAttributes(initialCustomAttributes ?? []);
+
+                const {
+                    raProfile,
+                    signingCertificate,
+                    requestProtectionMethod,
+                    responseProtectionMethod,
+                    variant,
+                    certificateAssociations,
+                } = cmpProfile;
+
+                const newDefaultValues: FormValues = {
+                    name: cmpProfile?.name || '',
+                    description: cmpProfile?.description || '',
+                    variant: variant || '',
+                    requestProtectionMethod: requestProtectionMethod || '',
+                    responseProtectionMethod: responseProtectionMethod || '',
+                    raProfileUuid: raProfile?.uuid || '',
+                    sharedSecret: '',
+                    signingCertificateUuid: signingCertificate?.uuid || '',
+                    owner: buildOwner(userOptions, certificateAssociations?.ownerUuid)?.value || '',
+                    groups: buildGroups(groupOptions, certificateAssociations?.groupUuids),
+                    deletedAttributes: [],
+                    ...transformedInitialAssociatedAttributes,
+                    ...transformedInitialCustomAttributes,
+                };
+                reset(newDefaultValues, { keepDefaultValues: false });
+                lastResetProfileIdRef.current = id;
+                lastResetEditModeRef.current = editMode;
+            }
+        } else if (!editMode) {
+            // Reset form when switching to create mode (only if we were in edit mode before)
+            if (lastResetEditModeRef.current === true) {
+                const initialAssociatedAttributes = mapProfileAttribute(
+                    undefined,
+                    multipleResourceCustomAttributes,
+                    Resource.Certificates,
+                    'certificateAssociations.customAttributes',
+                    '__attributes__certificateAssociatedAttributes__',
+                );
+
+                const initialCustomAttributes = mapProfileAttribute(
+                    undefined,
+                    multipleResourceCustomAttributes,
+                    Resource.CmpProfiles,
+                    'customAttributes',
+                    '__attributes__customCmpProfile__',
+                );
+
+                const transformedInitialAssociatedAttributes = transformAttributes(initialAssociatedAttributes ?? []);
+                const transformedInitialCustomAttributes = transformAttributes(initialCustomAttributes ?? []);
+
+                reset(
+                    {
+                        name: '',
+                        description: '',
+                        variant: '',
+                        requestProtectionMethod: '',
+                        responseProtectionMethod: '',
+                        raProfileUuid: '',
+                        sharedSecret: '',
+                        signingCertificateUuid: '',
+                        owner: '',
+                        groups: [],
+                        deletedAttributes: [],
+                        ...transformedInitialAssociatedAttributes,
+                        ...transformedInitialCustomAttributes,
+                    },
+                    { keepDefaultValues: false },
+                );
+                lastResetProfileIdRef.current = undefined;
+                lastResetEditModeRef.current = editMode;
+            }
+        }
+    }, [editMode, cmpProfile, id, reset, isFetchingDetail, userOptions, groupOptions, multipleResourceCustomAttributes]);
+
+    const normalizeOptionalValue = (value: string | undefined): string | undefined => {
+        return value && value.trim() !== '' ? value : undefined;
+    };
 
     const onSubmit = useCallback(
         (values: FormValues) => {
@@ -163,7 +372,7 @@ export default function CmpProfileForm() {
                 values,
             );
             const certificateAssociations = {
-                ownerUuid: values.owner?.value,
+                ownerUuid: normalizeOptionalValue(values.owner),
                 groupUuids: values.groups.map((group) => group.value),
                 customAttributes: collectFormAttributes(
                     'certificateAssociatedAttributes',
@@ -174,16 +383,18 @@ export default function CmpProfileForm() {
             if (editMode && cmpProfile && cmpProfile?.uuid === id) {
                 const valuesToSubmit: CmpProfileEditRequestModel = {
                     name: values.name,
-                    description: values.description,
-                    variant: values.selectedVariant?.value as CmpProfileEditRequestDtoVariantEnum,
-                    requestProtectionMethod: values.selectedRequestProtectionMethod?.value as ProtectionMethod,
-                    responseProtectionMethod: values.selectedResponseProtectionMethod?.value as ProtectionMethod,
-                    raProfileUuid: values.selectedRaProfile?.value?.uuid,
+                    description: normalizeOptionalValue(values.description),
+                    variant: values.variant as CmpProfileEditRequestDtoVariantEnum,
+                    requestProtectionMethod: values.requestProtectionMethod as ProtectionMethod,
+                    responseProtectionMethod: values.responseProtectionMethod as ProtectionMethod,
+                    raProfileUuid: normalizeOptionalValue(values.raProfileUuid),
                     sharedSecret:
-                        values?.selectedRequestProtectionMethod?.value === ProtectionMethod.SharedSecret ? values.sharedSecret : undefined,
+                        values.requestProtectionMethod === ProtectionMethod.SharedSecret
+                            ? normalizeOptionalValue(values.sharedSecret)
+                            : undefined,
                     signingCertificateUuid:
-                        values?.selectedResponseProtectionMethod?.value === ProtectionMethod.Signature
-                            ? values.selectedSigningCertificate?.value
+                        values.responseProtectionMethod === ProtectionMethod.Signature
+                            ? normalizeOptionalValue(values.signingCertificateUuid)
                             : undefined,
 
                     issueCertificateAttributes: collectFormAttributes(
@@ -203,16 +414,18 @@ export default function CmpProfileForm() {
             } else {
                 const valuesToSubmit: CmpProfileRequestModel = {
                     name: values.name,
-                    description: values.description,
-                    variant: values.selectedVariant?.value as CmpProfileRequestDtoVariantEnum,
-                    requestProtectionMethod: values.selectedRequestProtectionMethod?.value as ProtectionMethod,
-                    responseProtectionMethod: values.selectedResponseProtectionMethod?.value as ProtectionMethod,
-                    raProfileUuid: values.selectedRaProfile?.value?.uuid,
+                    description: normalizeOptionalValue(values.description),
+                    variant: values.variant as CmpProfileRequestDtoVariantEnum,
+                    requestProtectionMethod: values.requestProtectionMethod as ProtectionMethod,
+                    responseProtectionMethod: values.responseProtectionMethod as ProtectionMethod,
+                    raProfileUuid: normalizeOptionalValue(values.raProfileUuid),
                     sharedSecret:
-                        values?.selectedRequestProtectionMethod?.value === ProtectionMethod.SharedSecret ? values.sharedSecret : undefined,
+                        values.requestProtectionMethod === ProtectionMethod.SharedSecret
+                            ? normalizeOptionalValue(values.sharedSecret)
+                            : undefined,
                     signingCertificateUuid:
-                        values?.selectedResponseProtectionMethod?.value === ProtectionMethod.Signature
-                            ? values.selectedSigningCertificate?.value
+                        values.responseProtectionMethod === ProtectionMethod.Signature
+                            ? normalizeOptionalValue(values.signingCertificateUuid)
                             : undefined,
 
                     issueCertificateAttributes: collectFormAttributes(
@@ -265,96 +478,20 @@ export default function CmpProfileForm() {
         }
     }, [dispatch, cmpProfile]);
 
-    const defaultValues: FormValues = useMemo(() => {
-        const initialAssociatedAttributes = mapProfileAttribute(
-            cmpProfile,
-            multipleResourceCustomAttributes,
-            Resource.Certificates,
-            'certificateAssociations.customAttributes',
-            '__attributes__certificateAssociatedAttributes__',
-        );
-
-        const initialCustomAttributes = mapProfileAttribute(
-            cmpProfile,
-            multipleResourceCustomAttributes,
-            Resource.CmpProfiles,
-            'customAttributes',
-            '__attributes__customCmpProfile__',
-        );
-
-        const transformedInitialAssociatedAttributes = transformAttributes(initialAssociatedAttributes ?? []);
-        const transformedInitialCustomAttributes = transformAttributes(initialCustomAttributes ?? []);
-
-        if (!(editMode && cmpProfile)) {
-            return {
-                name: '',
-                description: undefined,
-                selectedRaProfile: undefined,
-                selectedSigningCertificate: undefined,
-                selectedRequestProtectionMethod: undefined,
-                requestProtectionMethod: undefined as any,
-                selectedResponseProtectionMethod: undefined,
-                responseProtectionMethod: undefined as any,
-                customAttributes: undefined,
-                issueCertificateAttributes: undefined,
-                revokeCertificateAttributes: undefined,
-                signingCertificateUuid: undefined,
-                raProfileUuid: undefined,
-                sharedSecret: undefined,
-                selectedVariant: undefined,
-                variant: undefined as any,
-                owner: undefined,
-                groups: [],
-                deletedAttributes: [],
-                ...transformedInitialAssociatedAttributes,
-                ...transformedInitialCustomAttributes,
-            };
-        }
-
-        const { raProfile, signingCertificate, requestProtectionMethod, responseProtectionMethod, variant, certificateAssociations } =
-            cmpProfile;
-
-        return {
-            name: cmpProfile?.name || '',
-            description: cmpProfile?.description || '',
-            selectedRaProfile: buildSelectedOption(raProfile, raProfile?.name ?? ''),
-            raProfileUuid: raProfile?.uuid,
-            selectedSigningCertificate: buildSelectedOption(
-                signingCertificate?.uuid,
-                `${signingCertificate?.commonName} (${signingCertificate?.serialNumber})`,
-            ),
-            signingCertificateUuid: signingCertificate?.uuid,
-            selectedRequestProtectionMethod: buildSelectedOption(
-                requestProtectionMethod,
-                getEnumLabel(protectionMethodEnum, requestProtectionMethod),
-            ),
-            requestProtectionMethod: requestProtectionMethod || (undefined as any),
-            selectedResponseProtectionMethod: buildSelectedOption(
-                responseProtectionMethod,
-                getEnumLabel(protectionMethodEnum, responseProtectionMethod),
-            ),
-            responseProtectionMethod: responseProtectionMethod || (undefined as any),
-            sharedSecret: undefined,
-            selectedVariant: buildSelectedOption(variant, getEnumLabel(cmpCmpProfileVariantEnum, variant)),
-            variant: (variant as unknown as CmpProfileRequestDtoVariantEnum) || (undefined as any),
-            owner: buildOwner(userOptions, certificateAssociations?.ownerUuid),
-            groups: buildGroups(groupOptions, certificateAssociations?.groupUuids),
-            deletedAttributes: [],
-            ...transformedInitialAssociatedAttributes,
-            ...transformedInitialCustomAttributes,
-        };
-    }, [cmpProfile, multipleResourceCustomAttributes, editMode, protectionMethodEnum, cmpCmpProfileVariantEnum, userOptions, groupOptions]);
-
     const onRaProfileChange = useCallback(
-        (form: FormApi<FormValues>, value?: string) => {
+        (value?: string) => {
             dispatch(connectorActions.clearCallbackData());
             setIssueGroupAttributesCallbackAttributes([]);
             setRevokeGroupAttributesCallbackAttributes([]);
 
             if (!value) {
-                form.mutators.clearAttributes('issueCertificateAttributes');
-                form.mutators.clearAttributes('revokeCertificateAttributes');
-                form.change('raProfileUuid', undefined);
+                const formValues = getValues();
+                Object.keys(formValues).forEach((key) => {
+                    if (key.startsWith('__attributes__issuanceAttributes__') || key.startsWith('__attributes__revocationAttributes__')) {
+                        setValue(key as any, undefined);
+                    }
+                });
+                setValue('raProfileUuid', '');
                 return;
             }
             const selectedRaProfile = raProfilesOptions.find((raProfile) => raProfile.value.uuid === value);
@@ -374,11 +511,15 @@ export default function CmpProfileForm() {
                 );
             }
             if (cmpProfile) {
-                form.mutators.clearAttributes('issuanceAttributes');
-                form.mutators.clearAttributes('revocationAttributes');
+                const formValues = getValues();
+                Object.keys(formValues).forEach((key) => {
+                    if (key.startsWith('__attributes__issuanceAttributes__') || key.startsWith('__attributes__revocationAttributes__')) {
+                        setValue(key as any, undefined);
+                    }
+                });
             }
         },
-        [dispatch, cmpProfile, raProfilesOptions],
+        [dispatch, cmpProfile, raProfilesOptions, getValues, setValue],
     );
 
     const renderCustomAttributeEditor = useMemo(() => {
@@ -393,18 +534,15 @@ export default function CmpProfileForm() {
     }, [multipleResourceCustomAttributes, cmpProfile?.customAttributes]);
 
     const renderIssuanceAttributes = useMemo(() => {
-        // if (isBusy || !raProfileIssuanceAttrDescs) return <></>;
         if (!raProfileIssuanceAttrDescs) return <></>;
         return (
-            <FormGroup>
-                <AttributeEditor
-                    id="issuanceAttributes"
-                    attributeDescriptors={raProfileIssuanceAttrDescs}
-                    attributes={cmpProfile?.issueCertificateAttributes}
-                    groupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
-                    setGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
-                />
-            </FormGroup>
+            <AttributeEditor
+                id="issuanceAttributes"
+                attributeDescriptors={raProfileIssuanceAttrDescs}
+                attributes={cmpProfile?.issueCertificateAttributes}
+                groupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
+                setGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
+            />
         );
     }, [raProfileIssuanceAttrDescs, cmpProfile?.issueCertificateAttributes, issueGroupAttributesCallbackAttributes]);
 
@@ -417,179 +555,222 @@ export default function CmpProfileForm() {
         withRemoveAction: true,
     });
 
-    const areDefaultValuesSame = useCallback(
-        (values: FormValues) => {
-            const areValuesSame = isObjectSame(
-                values as unknown as Record<string, unknown>,
-                defaultValues as unknown as Record<string, unknown>,
-            );
+    const areDefaultValuesSame = useAreDefaultValuesSame(defaultValues as unknown as Record<string, unknown>);
 
-            return areValuesSame;
-        },
-        [defaultValues],
-    );
+    const allFormValues = useWatch({ control });
+    const isEqual = useMemo(() => deepEqual(defaultValues, allFormValues), [defaultValues, allFormValues]);
+
+    const selectedRaProfile = raProfilesOptions.find((raProfile) => raProfile.value.uuid === allFormValues?.raProfileUuid);
 
     return (
-        <Widget title={title} busy={isBusy}>
+        <>
             {!isFetchingDetail && (
-                <Form keepDirtyOnReinitialize initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
-                    {({ handleSubmit, pristine, submitting, valid, form, values }) => {
-                        const isEqual = deepEqual(defaultValues, values);
-                        return (
-                            <BootstrapForm onSubmit={handleSubmit}>
-                                <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithoutAccents())}>
-                                    {({ input, meta }) => (
-                                        <FormGroup>
-                                            <Label for="name">Name</Label>
-                                            <Input
-                                                {...input}
-                                                id="name"
-                                                type="text"
-                                                placeholder="CMP Profile Name"
-                                                valid={!meta.error && meta.touched}
-                                                invalid={!!meta.error && meta.touched}
-                                                disabled={editMode}
-                                            />
-                                            <FormFeedback>{meta.error}</FormFeedback>
-                                        </FormGroup>
+                <FormProvider {...methods}>
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                        <Widget noBorder busy={isBusy}>
+                            <div className="space-y-4">
+                                <Controller
+                                    name="name"
+                                    control={control}
+                                    rules={buildValidationRules([validateRequired(), validateAlphaNumericWithoutAccents()])}
+                                    render={({ field, fieldState }) => (
+                                        <TextInput
+                                            {...field}
+                                            id="name"
+                                            type="text"
+                                            label="Name"
+                                            required
+                                            placeholder="CMP Profile Name"
+                                            disabled={editMode}
+                                            invalid={fieldState.error && fieldState.isTouched}
+                                            error={getFieldErrorMessage(fieldState)}
+                                        />
                                     )}
-                                </Field>
+                                />
 
-                                <Field name="description" validate={composeValidators(validateLength(0, 300))}>
-                                    {({ input, meta }) => (
-                                        <FormGroup>
-                                            <Label for="description">Description</Label>
-                                            <Input {...input} id="description" type="textarea" placeholder="Enter Description" />
-                                        </FormGroup>
+                                <Controller
+                                    name="description"
+                                    control={control}
+                                    rules={buildValidationRules([validateLength(0, 300)])}
+                                    render={({ field, fieldState }) => (
+                                        <TextArea
+                                            {...field}
+                                            id="description"
+                                            label="Description"
+                                            rows={3}
+                                            placeholder="Enter Description"
+                                            invalid={fieldState.error && fieldState.isTouched}
+                                            error={getFieldErrorMessage(fieldState)}
+                                        />
                                     )}
-                                </Field>
+                                />
 
                                 <Widget title="CMP Variant Configuration">
-                                    <Field name="selectedVariant" validate={composeValidators(validateRequired())} type="radio">
-                                        {({ input, meta }) => (
-                                            <FormGroup>
-                                                {/* <Label for="selectedVariant">Variant</Label>
-                                                <Select
-                                                    {...input}
-                                                    id="selectedVariant"
-                                                    maxMenuHeight={140}
-                                                    menuPlacement="auto"
-                                                    options={cmpProfileVariantOptions}
-                                                    placeholder="Select Variant"
-                                                    isClearable={true}
-                                                />
-                                                <FormFeedback>{meta.error}</FormFeedback> */}
-                                                {cmpProfileVariantOptions.map((option, index) => {
-                                                    return (
-                                                        <FormGroup check inline key={index} className={styles.radioFormGroup}>
-                                                            <Label check>
-                                                                <Input
+                                    <div>
+                                        <label
+                                            id="variant-label"
+                                            htmlFor="variant-0"
+                                            className="block text-sm font-medium mb-2 text-gray-700 dark:text-white"
+                                        >
+                                            Variant <span className="text-red-500">*</span>
+                                        </label>
+                                        <Controller
+                                            name="variant"
+                                            control={control}
+                                            rules={buildValidationRules([validateRequired()])}
+                                            render={({ field, fieldState }) => (
+                                                <>
+                                                    <div className="flex flex-wrap gap-4" role="radiogroup" aria-labelledby="variant-label">
+                                                        {cmpProfileVariantOptions.map((option, index) => (
+                                                            <label key={index} className="flex items-center cursor-pointer">
+                                                                <input
+                                                                    id={index === 0 ? 'variant-0' : undefined}
                                                                     type="radio"
-                                                                    name="selectedVariant"
+                                                                    name="variant"
                                                                     value={option.value}
-                                                                    onChange={(event) => {
-                                                                        input.onChange({ value: option.value, label: option.label });
-                                                                    }}
-                                                                    checked={values?.selectedVariant?.value === option.value}
-                                                                    className={styles.radioFormInput}
+                                                                    checked={field.value === option.value}
+                                                                    onChange={() => field.onChange(option.value)}
+                                                                    className="shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
                                                                 />
-                                                                {option.label}
-                                                            </Label>
-                                                        </FormGroup>
-                                                    );
-                                                })}
-                                            </FormGroup>
-                                        )}
-                                    </Field>
+                                                                <span className="ml-2 text-sm text-gray-700 dark:text-neutral-400">
+                                                                    {option.label}
+                                                                </span>
+                                                            </label>
+                                                        ))}
+                                                    </div>
+                                                    {fieldState.error && fieldState.isTouched && (
+                                                        <p className="mt-1 text-sm text-red-600">
+                                                            {typeof fieldState.error === 'string'
+                                                                ? fieldState.error
+                                                                : fieldState.error?.message || 'Invalid value'}
+                                                        </p>
+                                                    )}
+                                                </>
+                                            )}
+                                        />
+                                    </div>
                                 </Widget>
                                 <Widget title="Request Configuration">
-                                    <Field name="selectedRequestProtectionMethod">
-                                        {({ input, meta }) => (
-                                            <FormGroup>
-                                                <Label for="selectedRequestProtectionMethodSelect">Requested Protection Method</Label>
-                                                <Select
-                                                    {...input}
-                                                    inputId="selectedRequestProtectionMethodSelect"
-                                                    id="selectedRequestProtectionMethod"
-                                                    maxMenuHeight={140}
-                                                    menuPlacement="auto"
-                                                    options={protectionMethodOptions}
-                                                    placeholder="Select Requested Protection Method"
-                                                    isClearable={true}
-                                                    onChange={(event) => {
-                                                        input.onChange(event);
-                                                        form.change('sharedSecret', undefined);
-                                                    }}
-                                                />
-                                            </FormGroup>
-                                        )}
-                                    </Field>
-                                    {values?.selectedRequestProtectionMethod?.value === ProtectionMethod.SharedSecret && (
-                                        <Field name="sharedSecret" validate={composeValidators(validateRequired())}>
-                                            {({ input, meta }) => (
-                                                <FormGroup>
-                                                    <Label for="sharedSecret">Shared Secret</Label>
-                                                    <Input
-                                                        {...input}
+                                    <div className="space-y-4">
+                                        <Controller
+                                            name="requestProtectionMethod"
+                                            control={control}
+                                            render={({ field, fieldState }) => (
+                                                <>
+                                                    <Select
+                                                        id="selectedRequestProtectionMethodSelect"
+                                                        label="Requested Protection Method"
+                                                        value={field.value || ''}
+                                                        onChange={(value) => {
+                                                            field.onChange(value);
+                                                            setValue('sharedSecret', '');
+                                                        }}
+                                                        options={protectionMethodOptions.map((opt) => ({
+                                                            value: opt.value,
+                                                            label: opt.label,
+                                                        }))}
+                                                        placeholder="Select Requested Protection Method"
+                                                        isClearable
+                                                        placement="bottom"
+                                                    />
+                                                    {fieldState.error && fieldState.isTouched && (
+                                                        <p className="mt-1 text-sm text-red-600">
+                                                            {typeof fieldState.error === 'string'
+                                                                ? fieldState.error
+                                                                : fieldState.error?.message || 'Invalid value'}
+                                                        </p>
+                                                    )}
+                                                </>
+                                            )}
+                                        />
+                                        {watchedRequestProtectionMethod === ProtectionMethod.SharedSecret && (
+                                            <Controller
+                                                name="sharedSecret"
+                                                control={control}
+                                                rules={buildValidationRules([validateRequired()])}
+                                                render={({ field, fieldState }) => (
+                                                    <TextInput
+                                                        {...field}
                                                         id="sharedSecret"
                                                         type="password"
+                                                        label="Shared Secret"
+                                                        required
                                                         placeholder="Shared Secret"
-                                                        valid={!meta.error && meta.touched}
-                                                        invalid={!!meta.error && meta.touched}
+                                                        invalid={fieldState.error && fieldState.isTouched}
+                                                        error={getFieldErrorMessage(fieldState)}
                                                     />
-                                                    <FormFeedback>{meta.error}</FormFeedback>
-                                                </FormGroup>
-                                            )}
-                                        </Field>
-                                    )}
+                                                )}
+                                            />
+                                        )}
+                                    </div>
                                 </Widget>
 
                                 <Widget title="Response Configuration">
-                                    <Field name="selectedResponseProtectionMethod">
-                                        {({ input, meta }) => (
-                                            <FormGroup>
-                                                <Label for="selectedResponseProtectionMethodSelect">Response Protection Method</Label>
-                                                <Select
-                                                    {...input}
-                                                    inputId="selectedResponseProtectionMethodSelect"
-                                                    id="selectedResponseProtectionMethod"
-                                                    maxMenuHeight={140}
-                                                    menuPlacement="auto"
-                                                    options={protectionMethodOptions}
-                                                    placeholder="Select Response Protection Method"
-                                                    isClearable={true}
-                                                    onChange={(event) => {
-                                                        input.onChange(event);
-                                                        form.change('selectedSigningCertificate', undefined);
-                                                        if (event?.value === ProtectionMethod.Signature) {
-                                                            if (!cmpSigningCertificates || cmpSigningCertificates.length === 0)
-                                                                dispatch(cmpProfileActions.listCmpSigningCertificates());
-                                                        }
-                                                    }}
-                                                />
-                                            </FormGroup>
-                                        )}
-                                    </Field>
-
-                                    {values?.selectedResponseProtectionMethod?.value === ProtectionMethod.Signature && (
-                                        <Field name="selectedSigningCertificate" validate={composeValidators(validateRequired())}>
-                                            {({ input, meta }) => (
-                                                <FormGroup>
-                                                    <Label for="selectedSigningCertificate">Signing Certificate</Label>
+                                    <div>
+                                        <Controller
+                                            name="responseProtectionMethod"
+                                            control={control}
+                                            render={({ field, fieldState }) => (
+                                                <>
                                                     <Select
-                                                        {...input}
-                                                        id="selectedSigningCertificate"
-                                                        maxMenuHeight={140}
-                                                        menuPlacement="auto"
-                                                        options={signingCertificateOptions}
-                                                        placeholder="Select Signing Certificate"
-                                                        isClearable={true}
+                                                        id="selectedResponseProtectionMethodSelect"
+                                                        label="Response Protection Method"
+                                                        value={field.value || ''}
+                                                        onChange={(value) => {
+                                                            field.onChange(value);
+                                                            setValue('signingCertificateUuid', '');
+                                                        }}
+                                                        options={protectionMethodOptions.map((opt) => ({
+                                                            value: opt.value,
+                                                            label: opt.label,
+                                                        }))}
+                                                        placeholder="Select Response Protection Method"
+                                                        isClearable
+                                                        placement="bottom"
                                                     />
-
-                                                    <FormFeedback>{meta.error}</FormFeedback>
-                                                </FormGroup>
+                                                    {fieldState.error && fieldState.isTouched && (
+                                                        <p className="mt-1 text-sm text-red-600">
+                                                            {typeof fieldState.error === 'string'
+                                                                ? fieldState.error
+                                                                : fieldState.error?.message || 'Invalid value'}
+                                                        </p>
+                                                    )}
+                                                </>
                                             )}
-                                        </Field>
+                                        />
+                                    </div>
+
+                                    {watchedResponseProtectionMethod === ProtectionMethod.Signature && (
+                                        <div>
+                                            <Controller
+                                                name="signingCertificateUuid"
+                                                control={control}
+                                                rules={buildValidationRules([validateRequired()])}
+                                                render={({ field, fieldState }) => (
+                                                    <>
+                                                        <Select
+                                                            id="selectedSigningCertificate"
+                                                            label="Signing Certificate"
+                                                            value={field.value || ''}
+                                                            onChange={(value) => {
+                                                                field.onChange(value);
+                                                            }}
+                                                            options={signingCertificateOptions}
+                                                            placeholder="Select Signing Certificate"
+                                                            isClearable
+                                                            placement="bottom"
+                                                        />
+                                                        {fieldState.error && fieldState.isTouched && (
+                                                            <p className="mt-1 text-sm text-red-600">
+                                                                {typeof fieldState.error === 'string'
+                                                                    ? fieldState.error
+                                                                    : fieldState.error?.message || 'Invalid value'}
+                                                            </p>
+                                                        )}
+                                                    </>
+                                                )}
+                                            />
+                                        </div>
                                     )}
                                 </Widget>
                                 <Widget
@@ -601,55 +782,52 @@ export default function CmpProfileForm() {
                                         isFetchingResourceCustomAttributes
                                     }
                                 >
-                                    <Field name="selectedRaProfile">
-                                        {({ input, meta }) => (
-                                            <FormGroup>
-                                                <Label for="selectedRaProfileSelect">Default RA Profile</Label>
-
+                                    <div className="space-y-4">
+                                        <Controller
+                                            name="raProfileUuid"
+                                            control={control}
+                                            render={({ field }) => (
                                                 <Select
-                                                    {...input}
-                                                    inputId="selectedRaProfileSelect"
-                                                    id="selectedRaProfile"
-                                                    maxMenuHeight={140}
-                                                    menuPlacement="auto"
-                                                    options={raProfilesOptions}
-                                                    placeholder="Select to change RA Profile if needed"
-                                                    isClearable={true}
-                                                    onChange={(event) => {
-                                                        input.onChange(event);
-                                                        if (event?.value) {
-                                                            onRaProfileChange(form, event.value.uuid);
-                                                        } else {
-                                                            onRaProfileChange(form, undefined);
-                                                        }
+                                                    id="selectedRaProfileSelect"
+                                                    label="Default RA Profile"
+                                                    value={field.value || ''}
+                                                    onChange={(value) => {
+                                                        field.onChange(value);
+                                                        onRaProfileChange(typeof value === 'string' ? value : value?.toString() || '');
                                                     }}
+                                                    options={raProfilesOptions.map((opt) => ({
+                                                        value: opt.value.uuid,
+                                                        label: opt.label,
+                                                    }))}
+                                                    placeholder="Select to change RA Profile if needed"
+                                                    isClearable
+                                                    placement="bottom"
                                                 />
-                                            </FormGroup>
-                                        )}
-                                    </Field>
+                                            )}
+                                        />
 
-                                    <TabLayout
-                                        tabs={[
-                                            {
-                                                title: 'Issue Attributes',
-                                                content:
-                                                    !values?.selectedRaProfile?.value ||
-                                                    !raProfileIssuanceAttrDescs ||
-                                                    raProfileIssuanceAttrDescs.length === 0 ? (
-                                                        <></>
-                                                    ) : (
-                                                        renderIssuanceAttributes
-                                                    ),
-                                            },
-                                            {
-                                                title: 'Revocation Attributes',
-                                                content:
-                                                    !values?.selectedRaProfile?.value ||
-                                                    !raProfileRevocationAttrDescs ||
-                                                    raProfileRevocationAttrDescs.length === 0 ? (
-                                                        <></>
-                                                    ) : (
-                                                        <FormGroup>
+                                        <TabLayout
+                                            noBorder
+                                            tabs={[
+                                                {
+                                                    title: 'Issue Attributes',
+                                                    content:
+                                                        !selectedRaProfile?.value ||
+                                                        !raProfileIssuanceAttrDescs ||
+                                                        raProfileIssuanceAttrDescs.length === 0 ? (
+                                                            <></>
+                                                        ) : (
+                                                            renderIssuanceAttributes
+                                                        ),
+                                                },
+                                                {
+                                                    title: 'Revocation Attributes',
+                                                    content:
+                                                        !selectedRaProfile?.value ||
+                                                        !raProfileRevocationAttrDescs ||
+                                                        raProfileRevocationAttrDescs.length === 0 ? (
+                                                            <></>
+                                                        ) : (
                                                             <AttributeEditor
                                                                 id="revocationAttributes"
                                                                 attributeDescriptors={raProfileRevocationAttrDescs}
@@ -659,16 +837,17 @@ export default function CmpProfileForm() {
                                                                     setRevokeGroupAttributesCallbackAttributes
                                                                 }
                                                             />
-                                                        </FormGroup>
-                                                    ),
-                                            },
-                                            {
-                                                title: 'Custom Attributes',
-                                                content: renderCustomAttributeEditor,
-                                            },
-                                        ]}
-                                    />
+                                                        ),
+                                                },
+                                                {
+                                                    title: 'Custom Attributes',
+                                                    content: renderCustomAttributeEditor,
+                                                },
+                                            ]}
+                                        />
+                                    </div>
                                 </Widget>
+
                                 <CertificateAssociationsFormWidget
                                     renderCustomAttributes={renderCertificateAssociatedAttributesEditor}
                                     userOptions={userOptions}
@@ -676,33 +855,31 @@ export default function CmpProfileForm() {
                                     setUserOptions={setUserOptions}
                                     setGroupOptions={setGroupOptions}
                                 />
-                                <div className="d-flex justify-content-end">
-                                    <ButtonGroup>
-                                        <ProgressButton
-                                            title={editMode ? 'Update' : 'Create'}
-                                            inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
-                                            inProgress={submitting}
-                                            disabled={
-                                                isEqual ||
-                                                submitting ||
-                                                !valid ||
-                                                isBusy ||
-                                                !values.selectedRequestProtectionMethod ||
-                                                !values.selectedResponseProtectionMethod ||
-                                                areDefaultValuesSame(values)
-                                            }
-                                        />
-
-                                        <Button color="default" onClick={onCancelClick} disabled={submitting}>
-                                            Cancel
-                                        </Button>
-                                    </ButtonGroup>
-                                </div>
-                            </BootstrapForm>
-                        );
-                    }}
-                </Form>
+                            </div>
+                            <Container className="flex-row justify-end modal-footer" gap={4}>
+                                <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
+                                    Cancel
+                                </Button>
+                                <ProgressButton
+                                    title={editMode ? 'Update' : 'Create'}
+                                    inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
+                                    inProgress={isSubmitting}
+                                    disabled={
+                                        isEqual ||
+                                        isSubmitting ||
+                                        !isValid ||
+                                        isBusy ||
+                                        !formValues.requestProtectionMethod ||
+                                        !formValues.responseProtectionMethod ||
+                                        areDefaultValuesSame(formValues)
+                                    }
+                                    type="submit"
+                                />
+                            </Container>
+                        </Widget>
+                    </form>
+                </FormProvider>
             )}
-        </Widget>
+        </>
     );
 }

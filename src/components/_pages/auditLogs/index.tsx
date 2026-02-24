@@ -9,8 +9,6 @@ import { useNavigate } from 'react-router';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Container } from 'reactstrap';
-
 import { ApiClients } from '../../../api';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import CustomTable, { TableDataRow } from 'components/CustomTable';
@@ -124,25 +122,23 @@ function AuditLogs() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <PagedList
-                entity={EntityType.AUDIT_LOG}
-                onListCallback={onListCallback}
-                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.auditLogs.getSearchableFieldInformation5(), [])}
-                addHidden={true}
-                hasCheckboxes={false}
-                additionalButtons={buttons}
-                headers={auditLogsRowHeaders}
-                data={auditLogsList}
-                hasDetails={false}
-                isBusy={isBusy}
-                title="Audit logs"
-                entityNameSingular="an Audit log"
-                entityNamePlural="Audit logs"
-                filterTitle="Audit logs Filter"
-                pageWidgetLockName={LockWidgetNameEnum.AuditLogs}
-            />
-        </Container>
+        <PagedList
+            entity={EntityType.AUDIT_LOG}
+            onListCallback={onListCallback}
+            getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.auditLogs.getSearchableFieldInformation5(), [])}
+            addHidden
+            hasCheckboxes={false}
+            additionalButtons={buttons}
+            headers={auditLogsRowHeaders}
+            data={auditLogsList}
+            hasDetails={false}
+            isBusy={isBusy}
+            title="Audit logs"
+            entityNameSingular="an Audit log"
+            entityNamePlural="Audit logs"
+            filterTitle="Audit logs Filter"
+            pageWidgetLockName={LockWidgetNameEnum.AuditLogs}
+        />
     );
 }
 

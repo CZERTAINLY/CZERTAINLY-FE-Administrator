@@ -4,10 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { actions as groupsActions, selectors as groupsSelectors } from 'ducks/certificateGroups';
 import { actions } from 'ducks/certificates';
 
-import Select from 'react-select';
+import Select from 'components/Select';
 
 import Spinner from 'components/Spinner';
-import { Button, ButtonGroup, FormGroup, Label } from 'reactstrap';
+import Button from 'components/Button';
+import Container from 'components/Container';
 
 interface Props {
     uuids: string[];
@@ -50,42 +51,36 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
 
     return (
         <>
-            <FormGroup>
-                <Label for="groupSelect">Groups</Label>
-
+            <div className="mb-4">
                 <Select
                     id="group"
-                    inputId="groupSelect"
                     options={groupOptions}
-                    value={selectedGroups}
+                    value={selectedGroups || []}
                     placeholder="Select groups"
                     isMulti
-                    onChange={(event) => {
-                        const newGroups = event.length ? [...event] : [];
-                        setSelectedGroups(newGroups);
+                    label="Groups"
+                    onChange={(values) => {
+                        setSelectedGroups(values || []);
                     }}
                 />
-            </FormGroup>
-
-            <div className="d-flex justify-content-end">
-                <ButtonGroup>
-                    <Button color="danger" onClick={removeGroup} title="Remove groups from selected certificates">
-                        <span className="text-white">Remove</span>
-                    </Button>
-                    <Button
-                        color="primary"
-                        onClick={updateGroup}
-                        disabled={!selectedGroups?.length}
-                        title="Update groups for selected certificates"
-                    >
-                        Update
-                    </Button>
-
-                    <Button color="default" onClick={onCancel}>
-                        Cancel
-                    </Button>
-                </ButtonGroup>
             </div>
+
+            <Container className="flex-row justify-end modal-footer" gap={4}>
+                <Button variant="outline" onClick={onCancel} className="mr-auto">
+                    Cancel
+                </Button>
+                <Button color="danger" onClick={removeGroup} title="Remove groups from selected certificates">
+                    Remove
+                </Button>
+                <Button
+                    color="primary"
+                    onClick={updateGroup}
+                    disabled={!selectedGroups?.length}
+                    title="Update groups for selected certificates"
+                >
+                    Update
+                </Button>
+            </Container>
 
             <Spinner active={isFetchingGroups} />
         </>

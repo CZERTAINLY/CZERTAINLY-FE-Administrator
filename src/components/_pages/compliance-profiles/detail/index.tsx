@@ -9,23 +9,26 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 
-import { Badge, Button, Col, Container, Row } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import { createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { capitalize } from 'utils/common-utils';
 import TabLayout from 'components/Layout/TabLayout';
 import AttributeViewer from 'components/Attributes/AttributeViewer';
 import { AttributeResponseModel } from 'types/attributes';
+import { Info } from 'lucide-react';
 import AssignedRulesAndGroup from 'components/_pages/compliance-profiles/detail/AssignedRulesAndGroup/AssignedRulesAndGroup';
 import AvailableRulesAndGroups from 'components/_pages/compliance-profiles/detail/AvailableRulesAndGroups/AvailableRulesAndGroups';
 import { getComplianceProfileStatusColor } from 'utils/compliance-profile';
 import ProfileAssociations from 'components/_pages/compliance-profiles/detail/ProfileAssociations/ProfileAssociations';
 import { EntityType, selectors as filtersSelectors, actions as filterActions } from 'ducks/filters';
 import { renderConditionItems } from 'utils/condition-badges';
+import Badge from 'components/Badge';
+import Breadcrumb from 'components/Breadcrumb';
+import Container from 'components/Container';
+import Button from 'components/Button';
 
 export default function ComplianceProfileDetail() {
     const dispatch = useDispatch();
@@ -171,9 +174,13 @@ export default function ComplianceProfileDetail() {
                 id: 'resource',
                 columns: [
                     'Resource',
-                    <Link key={selectedEntityDetails?.uuid} to={`../../${selectedEntityDetails?.resource}`}>
-                        {getEnumLabel(resourceEnum, selectedEntityDetails?.resource) || ''}
-                    </Link>,
+                    selectedEntityDetails?.resource === Resource.CertificateRequests ? (
+                        getEnumLabel(resourceEnum, selectedEntityDetails?.resource) || ''
+                    ) : (
+                        <Link key={selectedEntityDetails?.uuid} to={`../../${selectedEntityDetails?.resource}`}>
+                            {getEnumLabel(resourceEnum, selectedEntityDetails?.resource) || ''}
+                        </Link>
+                    ),
                 ],
             },
             { id: 'format', columns: ['Format', selectedEntityDetails?.format || ''] },
@@ -245,8 +252,7 @@ export default function ComplianceProfileDetail() {
                         'Attributes',
                         rule.attributes?.length ? (
                             <Button
-                                className="btn btn-link"
-                                color="white"
+                                variant="transparent"
                                 title="Rules"
                                 onClick={() => {
                                     setGroupRuleAttributeData({
@@ -255,7 +261,7 @@ export default function ComplianceProfileDetail() {
                                     });
                                 }}
                             >
-                                <i className="fa fa-info" style={{ color: 'auto' }} />
+                                <Info size={16} style={{ color: 'auto' }} />
                             </Button>
                         ) : (
                             'No attributes'
@@ -271,11 +277,16 @@ export default function ComplianceProfileDetail() {
         });
     }, [groupRules, resourceEnum, entityDetailHeaders]);
 
-    const EntityDetailMenu = useCallback(() => {
-        return (
-            <Widget titleSize="larger" busy={selectedEntityDetails?.entityDetails?.entityType === 'group' ? isFetchingGroupRules : false}>
+    const entityDetailMenuContent = useMemo(
+        () => (
+            <Widget
+                noBorder
+                titleSize="large"
+                busy={selectedEntityDetails?.entityDetails?.entityType === 'group' ? isFetchingGroupRules : false}
+            >
                 {selectedEntityDetails?.entityDetails?.entityType === 'rule' && (
                     <TabLayout
+                        noBorder
                         tabs={[
                             {
                                 title: 'Details',
@@ -313,6 +324,7 @@ export default function ComplianceProfileDetail() {
                 )}
                 {selectedEntityDetails?.entityDetails?.entityType === 'group' && (
                     <TabLayout
+                        noBorder
                         tabs={[
                             {
                                 title: 'Details',
@@ -328,22 +340,23 @@ export default function ComplianceProfileDetail() {
                     />
                 )}
             </Widget>
-        );
-    }, [
-        selectedEntityDetails?.entityDetails?.entityType,
-        selectedEntityDetails?.conditionItems,
-        selectedEntityDetails?.attributes,
-        isFetchingGroupRules,
-        entityDetailHeaders,
-        ruleDetailData,
-        availableFilters,
-        platformEnums,
-        searchGroupEnum,
-        filterConditionOperatorEnum,
-        groupDetailData,
-        groupRulesDetailHeaders,
-        groupRulesDetailData,
-    ]);
+        ),
+        [
+            selectedEntityDetails?.entityDetails?.entityType,
+            selectedEntityDetails?.conditionItems,
+            selectedEntityDetails?.attributes,
+            isFetchingGroupRules,
+            entityDetailHeaders,
+            ruleDetailData,
+            availableFilters,
+            platformEnums,
+            searchGroupEnum,
+            filterConditionOperatorEnum,
+            groupDetailData,
+            groupRulesDetailHeaders,
+            groupRulesDetailData,
+        ],
+    );
 
     //get list of rules for group detail page
     useEffect(() => {
@@ -375,29 +388,27 @@ export default function ComplianceProfileDetail() {
     }, [profile, dispatch]);
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/complianceprofiles"
-                text={`${getEnumLabel(resourceEnum, Resource.ComplianceProfiles)} Inventory`}
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: 'Compliance Profiles', href: '/complianceprofiles' },
+                    { label: profile?.name || 'Compliance Profile Details', href: '' },
+                ]}
             />
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
-                    <Widget
-                        title="Compliance Profile Details"
-                        busy={isFetchingDetail}
-                        widgetButtons={buttons}
-                        titleSize="large"
-                        refreshAction={getFreshComplianceProfileDetails}
-                        widgetLockName={LockWidgetNameEnum.ComplianceProfileDetails}
-                        lockSize="large"
-                        dataTestId="compliance-profile-details-widget"
-                    >
-                        <CustomTable headers={detailHeaders} data={detailData} />
-                    </Widget>
-                </Col>
-
-                <Col>
+            <Container className="md:grid grid-cols-2">
+                <Widget
+                    title="Compliance Profile Details"
+                    busy={isFetchingDetail}
+                    widgetButtons={buttons}
+                    titleSize="large"
+                    refreshAction={getFreshComplianceProfileDetails}
+                    widgetLockName={LockWidgetNameEnum.ComplianceProfileDetails}
+                    lockSize="large"
+                    dataTestId="compliance-profile-details-widget"
+                >
+                    <CustomTable headers={detailHeaders} data={detailData} />
+                </Widget>
+                <Container className="flex flex-col">
                     <ProfileAssociations profile={profile} />
                     {profile && (
                         <CustomAttributeWidget
@@ -406,36 +417,32 @@ export default function ComplianceProfileDetail() {
                             attributes={profile.customAttributes}
                         />
                     )}
-                </Col>
-            </Row>
-
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
-                    <AssignedRulesAndGroup
-                        profile={profile}
-                        setSelectedEntityDetails={setSelectedEntityDetails}
-                        setIsEntityDetailMenuOpen={setIsEntityDetailMenuOpen}
-                        onReset={(resetFn) => setAssignedRulesResetFunction(() => resetFn)}
-                    />
-                </Col>
-                <Col>
-                    <AvailableRulesAndGroups
-                        profile={profile}
-                        setSelectedEntityDetails={setSelectedEntityDetails}
-                        setIsEntityDetailMenuOpen={setIsEntityDetailMenuOpen}
-                        onReset={(resetFn) => setAvailableRulesResetFunction(() => resetFn)}
-                    />
-                </Col>
-            </Row>
+                </Container>
+            </Container>
+            <Container className="md:grid grid-cols-2" marginTop>
+                <AssignedRulesAndGroup
+                    profile={profile}
+                    setSelectedEntityDetails={setSelectedEntityDetails}
+                    setIsEntityDetailMenuOpen={setIsEntityDetailMenuOpen}
+                    onReset={(resetFn) => setAssignedRulesResetFunction(() => resetFn)}
+                />
+                <AvailableRulesAndGroups
+                    profile={profile}
+                    setSelectedEntityDetails={setSelectedEntityDetails}
+                    setIsEntityDetailMenuOpen={setIsEntityDetailMenuOpen}
+                    onReset={(resetFn) => setAvailableRulesResetFunction(() => resetFn)}
+                />
+            </Container>
 
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Compliance Profile"
                 body="You are about to delete a Compliance Profile. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
                 dataTestId="delete-confirmation-dialog"
             />
@@ -444,9 +451,10 @@ export default function ComplianceProfileDetail() {
                 caption={`Initiate Compliance Check`}
                 body={'Initiate the compliance check for the Compliance Profile?'}
                 toggle={() => setComplianceCheck(false)}
+                noBorder
                 buttons={[
+                    { color: 'primary', variant: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                     { color: 'primary', onClick: onComplianceCheck, body: 'Yes' },
-                    { color: 'secondary', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
                 dataTestId="compliance-check-dialog"
             />
@@ -460,9 +468,16 @@ export default function ComplianceProfileDetail() {
                             : 'Entity Details'}
                     </p>
                 }
-                body={<EntityDetailMenu />}
+                body={entityDetailMenuContent}
                 toggle={() => setIsEntityDetailMenuOpen(false)}
-                buttons={[]}
+                buttons={[
+                    {
+                        color: 'secondary',
+                        variant: 'outline',
+                        onClick: () => setIsEntityDetailMenuOpen(false),
+                        body: 'Close',
+                    },
+                ]}
                 size="lg"
                 dataTestId="entity-detail-menu"
             />
@@ -493,11 +508,11 @@ export default function ComplianceProfileDetail() {
                 }
                 toggle={() => dispatch(actions.clearDeleteErrorMessages())}
                 buttons={[
+                    { color: 'secondary', variant: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                     { color: 'danger', onClick: onForceDeleteComplianceProfile, body: 'Force' },
-                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
                 dataTestId="delete-error-dialog"
             />
-        </Container>
+        </div>
     );
 }

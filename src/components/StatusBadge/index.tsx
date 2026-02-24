@@ -1,79 +1,58 @@
-import { Badge } from 'reactstrap';
+import Badge, { BadgeColor } from 'components/Badge';
 import { ApprovalDetailDtoStatusEnum, ApprovalDtoStatusEnum, ApprovalStepRecipientDtoStatusEnum } from 'types/openapi';
 
 interface Props {
     enabled?: boolean;
     textStatus?: ApprovalDetailDtoStatusEnum | ApprovalDtoStatusEnum | ApprovalStepRecipientDtoStatusEnum;
     style?: React.CSSProperties;
+    dataTestId?: string;
 }
 
-function StatusBadge({ enabled, style, textStatus }: Props) {
+function StatusBadge({ enabled, style, textStatus, dataTestId }: Props) {
+    const badgeProps = {
+        style,
+        dataTestId: dataTestId || 'status-badge',
+    };
+
+    const renderBadge = (color: BadgeColor, children: string) => (
+        <Badge {...badgeProps} color={color}>
+            {children}
+        </Badge>
+    );
+
     if (!textStatus) {
         switch (enabled) {
             case true:
-                return (
-                    <Badge style={style} color="success">
-                        Enabled
-                    </Badge>
-                );
-
+                return renderBadge('success', 'Enabled');
             case false:
-                return (
-                    <Badge style={style} color="danger">
-                        Disabled
-                    </Badge>
-                );
-
+                return renderBadge('danger', 'Disabled');
             default:
-                return (
-                    <Badge style={style} color="secondary">
-                        Unknown
-                    </Badge>
-                );
+                return renderBadge('secondary', 'Unknown');
         }
     }
+
     switch (textStatus) {
         case ApprovalDetailDtoStatusEnum.Approved:
         case ApprovalStepRecipientDtoStatusEnum.Approved:
         case ApprovalDtoStatusEnum.Approved:
-            return (
-                <Badge style={style} color="success">
-                    Approved
-                </Badge>
-            );
+            return renderBadge('success', 'Approved');
 
         case ApprovalDetailDtoStatusEnum.Rejected:
         case ApprovalStepRecipientDtoStatusEnum.Rejected:
         case ApprovalDtoStatusEnum.Rejected:
-            return (
-                <Badge style={style} color="danger">
-                    Rejected
-                </Badge>
-            );
+            return renderBadge('danger', 'Rejected');
 
         case ApprovalDetailDtoStatusEnum.Pending:
         case ApprovalStepRecipientDtoStatusEnum.Pending:
         case ApprovalDtoStatusEnum.Pending:
-            return (
-                <Badge style={style} color="secondary">
-                    Pending
-                </Badge>
-            );
+            return renderBadge('secondary', 'Pending');
 
         case ApprovalDtoStatusEnum.Expired:
         case ApprovalStepRecipientDtoStatusEnum.Expired:
-            return (
-                <Badge style={style} color="danger">
-                    Expired
-                </Badge>
-            );
+            return renderBadge('danger', 'Expired');
 
         default:
-            return (
-                <Badge style={style} color="secondary">
-                    Unknown
-                </Badge>
-            );
+            return renderBadge('secondary', 'Unknown');
     }
 }
 

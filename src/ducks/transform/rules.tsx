@@ -1,20 +1,19 @@
 import { ApiClients } from '../../api';
-import cx from 'classnames';
+import cn from 'classnames';
 import ConditionsItemsList from 'components/ExecutionConditionItemsList/ConditionsItemsList';
 import ExecutionsItemsList from 'components/ExecutionConditionItemsList/ExecutionsItemsList';
 import { CustomNode } from 'components/FlowChart';
-import style from 'components/FlowChart/CustomFlowNode/customFlowNode.module.scss';
 import ProgressButton from 'components/ProgressButton';
-import SwitchWidget from 'components/SwitchWidget';
+import Switch from 'components/Switch';
 import { actions as alertActions } from 'ducks/alerts';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { EntityType, actions as filterActions } from 'ducks/filters';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Select from 'react-select';
+import Select from 'components/Select';
 import { Edge, MarkerType } from 'reactflow';
-import { FormGroup, Label } from 'reactstrap';
+import Label from 'components/Label';
 import { OtherProperties } from 'types/flowchart';
 import { PlatformEnum, Resource } from 'types/openapi';
 import {
@@ -319,46 +318,46 @@ export function useTransformTriggerObjectToNodesAndEdges(
 
     const renderAddButtonContent = useMemo(() => {
         return (
-            <div className="w-100">
-                <h6 className="text-muted">Update Trigger</h6>
-                <div className="w-100" tabIndex={-1}>
-                    <FormGroup>
-                        <Label for="addnewRuleSelect">Add Rules</Label>
+            <div className="w-full">
+                <h6 className="text-gray-500">Update Trigger</h6>
+                <div className="w-full" tabIndex={-1}>
+                    <div className="mb-4">
+                        <Label htmlFor="addnewRuleSelect">Add Rules</Label>
 
-                        <div className="w-100">
+                        <div className="w-full">
                             <Select
-                                inputId="addnewRuleSelect"
+                                id="addnewRuleSelect"
                                 className="nodrag"
                                 placeholder="Add New Rule"
                                 options={rulesOptions}
-                                onChange={(event) => {
-                                    setNewRules(event?.map((e) => e));
+                                onChange={(values) => {
+                                    setNewRules(values || []);
                                 }}
                                 isMulti
                                 value={newRules}
                             />
                         </div>
-                    </FormGroup>
+                    </div>
                 </div>
 
-                <div className="w-100">
-                    <FormGroup>
-                        <Label for="raProfileSelect">Add Actions</Label>
+                <div className="w-full">
+                    <div className="mb-4">
+                        <Label htmlFor="raProfileSelect">Add Actions</Label>
 
-                        <div className="w-100">
+                        <div className="w-full">
                             <Select
-                                inputId="raProfileSelect"
+                                id="raProfileSelect"
                                 className="nodrag"
                                 placeholder="Add New Action"
                                 options={actionOptions}
                                 isMulti
                                 value={newActions}
-                                onChange={(event) => {
-                                    setNewActions(event?.map((e) => e));
+                                onChange={(values) => {
+                                    setNewActions(values || []);
                                 }}
                             />
                         </div>
-                    </FormGroup>
+                    </div>
                 </div>
                 <div className="flex">
                     <ProgressButton
@@ -407,15 +406,14 @@ export function useTransformTriggerObjectToNodesAndEdges(
 
     otherPropertiesCurrentCertificate.push({
         propertyContent: (
-            <div className={cx('d-flex align-items-center ')}>
-                <h6 className={cx('m-0', style.entityLabel)}>Ignore Trigger :</h6>
-                <div className="ms-1">
-                    <SwitchWidget
+            <div className={cn('flex items-center ')}>
+                <h6>Ignore Trigger :</h6>
+                <div className="ml-1">
+                    <Switch
+                        id="ignoreTrigger"
                         checked={triggerDetails.ignoreTrigger}
-                        onClick={() => {
-                            if (triggerDetails?.ignoreTrigger) {
-                                dispatch(alertActions.info('Please add actions from the Add Actions dropdown'));
-                            } else {
+                        onChange={(checked) => {
+                            if (checked) {
                                 dispatch(
                                     rulesActions.updateTrigger({
                                         triggerUuid: triggerDetails.uuid,
@@ -430,6 +428,8 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                         },
                                     }),
                                 );
+                            } else {
+                                dispatch(alertActions.info('Please add actions from the Add Actions dropdown'));
                             }
                         }}
                     />
@@ -590,13 +590,15 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                 {
                                     propertyName: 'Condition Items',
                                     propertyContent: (
-                                        <ConditionsItemsList
-                                            conditionName={condition.name}
-                                            conditionUuid={condition.uuid}
-                                            conditionItems={condition.items}
-                                            key={condition.uuid}
-                                            smallerBadges
-                                        />
+                                        <div className="flex flex-col gap-2">
+                                            <ConditionsItemsList
+                                                conditionName={condition.name}
+                                                conditionUuid={condition.uuid}
+                                                conditionItems={condition.items}
+                                                key={condition.uuid}
+                                                smallerBadges
+                                            />
+                                        </div>
                                     ),
                                 },
                             ],
@@ -741,14 +743,16 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                 {
                                     propertyName: 'Execution Items',
                                     propertyContent: (
-                                        <ExecutionsItemsList
-                                            executionItems={execution.items}
-                                            key={execution.uuid}
-                                            executionName={execution.name}
-                                            executionType={execution.type}
-                                            executionUuid={execution.uuid}
-                                            smallerBadges
-                                        />
+                                        <div className="flex flex-col gap-2">
+                                            <ExecutionsItemsList
+                                                executionItems={execution.items}
+                                                key={execution.uuid}
+                                                executionName={execution.name}
+                                                executionType={execution.type}
+                                                executionUuid={execution.uuid}
+                                                smallerBadges
+                                            />
+                                        </div>
                                     ),
                                 },
                             ],

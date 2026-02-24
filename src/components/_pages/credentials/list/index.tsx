@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
-import { Badge, Container } from 'reactstrap';
+import { Link } from 'react-router';
+import Badge from 'components/Badge';
 
 import { actions, selectors } from 'ducks/credentials';
 
 import Widget from 'components/Widget';
+import CredentialForm from '../form';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
@@ -14,7 +16,6 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 
 function CredentialList() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const checkedRows = useSelector(selectors.checkedRows);
     const credentials = useSelector(selectors.credentials);
@@ -22,10 +23,14 @@ function CredentialList() {
     const isFetching = useSelector(selectors.isFetchingList);
     const isDeleting = useSelector(selectors.isDeleting);
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
+    const isCreating = useSelector(selectors.isCreating);
+    const isUpdating = useSelector(selectors.isUpdating);
 
     const isBusy = isFetching || isDeleting || isBulkDeleting;
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+    const [editingCredentialId, setEditingCredentialId] = useState<string | undefined>(undefined);
 
     const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
@@ -37,9 +42,27 @@ function CredentialList() {
         getFreshData();
     }, [getFreshData]);
 
+    useRunOnFinished(isCreating, () => {
+        setIsAddModalOpen(false);
+        getFreshData();
+    });
+    useRunOnFinished(isUpdating, () => {
+        setEditingCredentialId(undefined);
+        getFreshData();
+    });
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingCredentialId(undefined);
+    }, []);
+
     const onAddClick = useCallback(() => {
-        navigate(`./add`);
-    }, [navigate]);
+        handleOpenAddModal();
+    }, [handleOpenAddModal]);
 
     const onDeleteConfirmed = useCallback(() => {
         setConfirmDelete(false);
@@ -60,9 +83,7 @@ function CredentialList() {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => {
-                    onAddClick();
-                },
+                onClick: handleOpenAddModal,
             },
             {
                 icon: 'trash',
@@ -73,7 +94,7 @@ function CredentialList() {
                 },
             },
         ],
-        [checkedRows, onAddClick],
+        [checkedRows, handleOpenAddModal],
     );
 
     const credentialRowHeaders: TableHeader[] = useMemo(
@@ -83,7 +104,7 @@ function CredentialList() {
                 sortable: true,
                 sort: 'asc',
                 id: 'adminName',
-                width: '15%',
+                width: '50%',
             },
             {
                 content: 'Kind',
@@ -96,7 +117,7 @@ function CredentialList() {
                 content: 'Credential Provider',
                 sortable: true,
                 id: 'credentialProviderName',
-                width: '25%',
+                width: '30%',
                 align: 'center',
             },
         ],
@@ -124,7 +145,7 @@ function CredentialList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
                 title="Credential Store"
                 busy={isBusy}
@@ -133,8 +154,6 @@ function CredentialList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
-
                 <CustomTable
                     headers={credentialRowHeaders}
                     data={credentialsData}
@@ -147,15 +166,24 @@ function CredentialList() {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete ${checkedRows.length > 1 ? 'Credentials' : 'a Connector'}`}
+                caption={`Delete ${checkedRows.length > 1 ? 'Credentials' : 'a Credential'}`}
                 body={`You are about to delete ${checkedRows.length > 1 ? 'Credentials' : 'a Credential'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
-        </Container>
+
+            <Dialog
+                isOpen={isAddModalOpen || !!editingCredentialId}
+                toggle={handleCloseAddModal}
+                caption={editingCredentialId ? 'Edit Credential' : 'Create Credential'}
+                size="xl"
+                body={<CredentialForm credentialId={editingCredentialId} onCancel={handleCloseAddModal} onSuccess={handleCloseAddModal} />}
+            />
+        </>
     );
 }
 

@@ -9,22 +9,22 @@ import { actions as keyActions, selectors as keySelectors } from 'ducks/cryptogr
 import { actions as cryptographyOperationActions, selectors as cryptographyOperationSelectors } from 'ducks/cryptographic-operations';
 import { actions as tokenProfileActions, selectors as tokenProfileSelectors } from 'ducks/token-profiles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Field, Form } from 'react-final-form';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import Select, { SingleValue } from 'react-select';
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Label } from 'reactstrap';
+import Select from 'components/Select';
+import Button from 'components/Button';
 import { AttributeDescriptorModel } from 'types/attributes';
 import { CertificateDetailResponseModel } from 'types/certificate';
 import { CryptographicKeyPairResponseModel } from 'types/cryptographic-keys';
 import { CertificateRequestFormat, KeyType } from 'types/openapi';
-import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
+import { buildValidationRules } from 'utils/validators-helper';
+import { validateRequired } from 'utils/validators';
 
 import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from 'ducks/utilsActuator';
 import { ParseRequestRequestDtoParseTypeEnum } from 'types/openapi/utils';
-import { validateRequired } from 'utils/validators';
 import { transformParseRequestResponseDtoToCertificateResponseDetailModel } from '../../../../ducks/transform/utilsCertificateRequest';
 import {
     actions as utilsCertificateRequestActions,
@@ -33,17 +33,18 @@ import {
 import CertificateAttributes from '../../../CertificateAttributes';
 import FileUpload from '../../../Input/FileUpload/FileUpload';
 import TabLayout from 'components/Layout/TabLayout';
-import SwitchField from 'components/Input/SwitchField';
+import Switch from 'components/Switch';
 import { isObjectSame } from 'utils/common-utils';
+import Container from 'components/Container';
 
 interface FormValues {
     pkcs10: File | null;
-    uploadCsr?: SingleValue<{ label: string; value: boolean }> | null;
+    uploadCsr?: boolean;
     includeAltKey?: boolean;
-    tokenProfile?: SingleValue<{ label: string; value: string }> | null;
-    altTokenProfile?: SingleValue<{ label: string; value: string }> | null;
-    key?: SingleValue<{ label: string; value: CryptographicKeyPairResponseModel }> | null;
-    altKey?: SingleValue<{ label: string; value: CryptographicKeyPairResponseModel }> | null;
+    tokenProfile?: string;
+    altTokenProfile?: string;
+    key?: CryptographicKeyPairResponseModel;
+    altKey?: CryptographicKeyPairResponseModel;
 }
 
 interface props {
@@ -100,18 +101,13 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
     }, [dispatch, certificate?.key?.tokenProfileUuid, certificate?.key]);
 
     const submitCallback = useCallback(
-        (values: FormValues) => {
+        (values: FormValues, allValues: any) => {
             if (!certificate) return;
             if (!certificate.raProfile) return;
-            if (!values.uploadCsr?.value && !values.tokenProfile) return;
-            if (!values.uploadCsr?.value && !values.key) return;
+            if (!values.uploadCsr && !values.tokenProfile) return;
+            if (!values.uploadCsr && !values.key) return;
             if (!certificate.raProfile.authorityInstanceUuid) return;
-            if (
-                !values.uploadCsr?.value &&
-                values.key?.value.uuid === certificate.key?.uuid &&
-                values.altKey?.value.uuid === certificate.altKey?.uuid
-            )
-                return;
+            if (!values.uploadCsr && values.key?.uuid === certificate.key?.uuid && values.altKey?.uuid === certificate.altKey?.uuid) return;
 
             dispatch(
                 certificateActions.rekeyCertificate({
@@ -121,17 +117,17 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                     rekey: {
                         request: fileContent ? fileContent : undefined,
                         format: CertificateRequestFormat.Pkcs10,
-                        signatureAttributes: collectFormAttributes('signatureAttributes', signatureAttributeDescriptors, values),
-                        keyUuid: values.key?.value.uuid || '',
-                        tokenProfileUuid: values.tokenProfile?.value || '',
+                        signatureAttributes: collectFormAttributes('signatureAttributes', signatureAttributeDescriptors, allValues),
+                        keyUuid: values.key?.uuid || '',
+                        tokenProfileUuid: values.tokenProfile || '',
                         ...(values.includeAltKey
                             ? {
-                                  altKeyUuid: values.altKey?.value.uuid,
-                                  altTokenProfileUuid: values.altTokenProfile?.value,
+                                  altKeyUuid: values.altKey?.uuid,
+                                  altTokenProfileUuid: values.altTokenProfile,
                                   altSignatureAttributes: collectFormAttributes(
                                       'altSignatureAttributes',
                                       altSignatureAttributeDescriptors,
-                                      values,
+                                      allValues,
                                   ),
                               }
                             : {}),
@@ -144,27 +140,27 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
     );
 
     const onTokenProfileChange = useCallback(
-        (event: SingleValue<{ label: string; value: string }>, type: 'alt' | 'normal') => {
-            if (!event) return;
-            dispatch(keyActions.listCryptographicKeyPairs({ tokenProfileUuid: event.value, store: type }));
+        (tokenProfileUuid: string | undefined, type: 'alt' | 'normal') => {
+            if (!tokenProfileUuid) return;
+            dispatch(keyActions.listCryptographicKeyPairs({ tokenProfileUuid, store: type }));
         },
         [dispatch],
     );
 
     const onKeyChange = useCallback(
-        (event: SingleValue<{ label: string; value: CryptographicKeyPairResponseModel }>, type: 'alt' | 'normal') => {
-            if (!event) return;
-            if (!event.value.tokenProfileUuid) return;
-            if (!event.value.tokenInstanceUuid) return;
-            if (event.value.items.filter((e) => e.type === KeyType.Private).length === 0) return;
+        (key: CryptographicKeyPairResponseModel | undefined, type: 'alt' | 'normal') => {
+            if (!key) return;
+            if (!key.tokenProfileUuid) return;
+            if (!key.tokenInstanceUuid) return;
+            if (key.items.filter((e) => e.type === KeyType.Private).length === 0) return;
             dispatch(cryptographyOperationActions.clearSignatureAttributeDescriptors(type));
             dispatch(
                 cryptographyOperationActions.listSignatureAttributeDescriptors({
-                    uuid: event.value.uuid,
-                    tokenProfileUuid: event.value.tokenProfileUuid,
-                    tokenInstanceUuid: event.value.tokenInstanceUuid,
-                    keyItemUuid: event.value.items.filter((e) => e.type === KeyType.Private)[0].uuid,
-                    algorithm: event.value.items.filter((e) => e.type === KeyType.Private)[0].keyAlgorithm,
+                    uuid: key.uuid,
+                    tokenProfileUuid: key.tokenProfileUuid,
+                    tokenInstanceUuid: key.tokenInstanceUuid,
+                    keyItemUuid: key.items.filter((e) => e.type === KeyType.Private)[0].uuid,
+                    algorithm: key.items.filter((e) => e.type === KeyType.Private)[0].keyAlgorithm,
                     store: type,
                 }),
             );
@@ -185,7 +181,7 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
         () =>
             keys.map((key) => ({
                 label: key.name,
-                value: key,
+                value: key.uuid,
             })),
         [keys],
     );
@@ -194,7 +190,7 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
         () =>
             altKeys.map((key) => ({
                 label: key.name,
-                value: key,
+                value: key.uuid,
             })),
         [altKeys],
     );
@@ -203,33 +199,20 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
         () => ({
             pkcs10: null,
             includeAltKey: !!certificate?.altKey,
-            key: certificate?.key
-                ? {
-                      label: certificate.key.name,
-                      value: certificate.key,
-                  }
-                : null,
-            tokenProfile: certificate?.key?.tokenProfileUuid
-                ? {
-                      label: certificate.key.tokenProfileName ?? '',
-                      value: certificate.key.tokenProfileUuid ?? '',
-                  }
-                : null,
-            altKey: certificate?.altKey
-                ? {
-                      label: certificate.altKey.name,
-                      value: certificate.altKey,
-                  }
-                : null,
-            altTokenProfile: certificate?.altKey?.tokenProfileUuid
-                ? {
-                      label: certificate.altKey.tokenProfileName ?? '',
-                      value: certificate.altKey.tokenProfileUuid ?? '',
-                  }
-                : null,
+            key: certificate?.key || undefined,
+            tokenProfile: certificate?.key?.tokenProfileUuid || undefined,
+            altKey: certificate?.altKey || undefined,
+            altTokenProfile: certificate?.altKey?.tokenProfileUuid || undefined,
         }),
-        [certificate?.key, certificate?.altKey],
+        [certificate],
     );
+
+    const methods = useForm<FormValues>({
+        mode: 'onTouched',
+        defaultValues,
+    });
+
+    const { control, handleSubmit, formState } = methods;
 
     useEffect(() => {
         if (defaultValues.altTokenProfile) {
@@ -242,101 +225,124 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
 
     const inputOptions = useMemo(
         () => [
-            { label: 'External', value: true },
-            { label: 'Existing Key', value: false },
+            { label: 'External', value: 'true' },
+            { label: 'Existing Key', value: 'false' },
         ],
         [],
     );
 
-    const isRekeyAllowed = useCallback(
-        (values: FormValues) => {
-            const areValuesSame =
-                !isObjectSame(values.key as unknown as Record<string, unknown>, defaultValues.key as unknown as Record<string, unknown>) ||
-                !isObjectSame(
-                    values.altKey as unknown as Record<string, unknown>,
-                    defaultValues.altKey as unknown as Record<string, unknown>,
-                );
+    const keyUuidToKeyMap = useMemo(() => {
+        const map = new Map<string, CryptographicKeyPairResponseModel>();
+        keys.forEach((key) => map.set(key.uuid, key));
+        altKeys.forEach((key) => map.set(key.uuid, key));
+        return map;
+    }, [keys, altKeys]);
 
-            return areValuesSame;
-        },
-        [defaultValues],
-    );
+    const watchedValues = useWatch({ control });
+    const watchedUploadCsr = useWatch({ control, name: 'uploadCsr' });
+    const watchedKey = useWatch({ control, name: 'key' });
+    const watchedAltKey = useWatch({ control, name: 'altKey' });
+    const watchedIncludeAltKey = useWatch({ control, name: 'includeAltKey' });
 
-    const getSignatureAttributesTabs = useCallback(
-        (values: FormValues) => {
-            return !values.uploadCsr?.value
-                ? [
-                      ...(values.key?.value.uuid !== certificate?.key?.uuid
-                          ? [
-                                {
-                                    title: 'Signature Attributes',
-                                    content: (
-                                        <AttributeEditor
-                                            id="signatureAttributes"
-                                            attributeDescriptors={signatureAttributeDescriptors || []}
-                                            groupAttributesCallbackAttributes={signatureAttributesCallbackAttributes}
-                                            setGroupAttributesCallbackAttributes={setSignatureAttributesCallbackAttributes}
-                                        />
-                                    ),
-                                },
-                            ]
-                          : []),
-                      ...(values.includeAltKey && values.altKey?.value.uuid !== certificate?.altKey?.uuid
-                          ? [
-                                {
-                                    title: 'Alternative Signature Attributes',
-                                    content: (
-                                        <AttributeEditor
-                                            id="altSignatureAttributes"
-                                            attributeDescriptors={altSignatureAttributeDescriptors ?? []}
-                                            groupAttributesCallbackAttributes={altSignatureAttributesCallbackAttributes}
-                                            setGroupAttributesCallbackAttributes={setAltSignatureAttributesCallbackAttributes}
-                                        />
-                                    ),
-                                },
-                            ]
-                          : []),
-                  ]
-                : [];
-        },
-        [
-            certificate?.altKey?.uuid,
-            certificate?.key?.uuid,
-            signatureAttributeDescriptors,
-            signatureAttributesCallbackAttributes,
-            altSignatureAttributeDescriptors,
-            altSignatureAttributesCallbackAttributes,
-        ],
-    );
-    return (
-        <Form initialValues={defaultValues} onSubmit={submitCallback} mutators={{ ...mutators<FormValues>() }}>
-            {({ handleSubmit, valid, submitting, values, form }) => (
-                <BootstrapForm onSubmit={handleSubmit}>
-                    <Widget title="Rekey Certificate" busy={rekeying || isFetchingCsrAttributes || isFetchingSignatureAttributes}>
-                        <Field name="uploadCsr">
-                            {({ input, meta, onChange }) => (
-                                <FormGroup>
-                                    <Label for="uploadCsr">Key Source</Label>
-                                    <Select
-                                        {...input}
-                                        id="uploadCsr"
-                                        maxMenuHeight={140}
-                                        menuPlacement="auto"
-                                        options={inputOptions}
-                                        placeholder="Select Key Source"
-                                        onChange={(e) => {
-                                            input.onChange(e);
-                                        }}
+    const isRekeyAllowed = useCallback(() => {
+        const currentKey = watchedKey;
+        const currentAltKey = watchedAltKey;
+        const areValuesSame =
+            !isObjectSame(currentKey as unknown as Record<string, unknown>, defaultValues.key as unknown as Record<string, unknown>) ||
+            !isObjectSame(currentAltKey as unknown as Record<string, unknown>, defaultValues.altKey as unknown as Record<string, unknown>);
+
+        return areValuesSame;
+    }, [watchedKey, watchedAltKey, defaultValues]);
+
+    const getSignatureAttributesTabs = useCallback(() => {
+        return !watchedUploadCsr
+            ? [
+                  ...(watchedKey?.uuid !== certificate?.key?.uuid
+                      ? [
+                            {
+                                title: 'Signature Attributes',
+                                content: (
+                                    <AttributeEditor
+                                        id="signatureAttributes"
+                                        attributeDescriptors={signatureAttributeDescriptors || []}
+                                        groupAttributesCallbackAttributes={signatureAttributesCallbackAttributes}
+                                        setGroupAttributesCallbackAttributes={setSignatureAttributesCallbackAttributes}
                                     />
+                                ),
+                            },
+                        ]
+                      : []),
+                  ...(watchedIncludeAltKey && watchedAltKey?.uuid !== certificate?.altKey?.uuid
+                      ? [
+                            {
+                                title: 'Alternative Signature Attributes',
+                                content: (
+                                    <AttributeEditor
+                                        id="altSignatureAttributes"
+                                        attributeDescriptors={altSignatureAttributeDescriptors ?? []}
+                                        groupAttributesCallbackAttributes={altSignatureAttributesCallbackAttributes}
+                                        setGroupAttributesCallbackAttributes={setAltSignatureAttributesCallbackAttributes}
+                                    />
+                                ),
+                            },
+                        ]
+                      : []),
+              ]
+            : [];
+    }, [
+        watchedUploadCsr,
+        watchedKey?.uuid,
+        watchedAltKey?.uuid,
+        watchedIncludeAltKey,
+        certificate?.altKey?.uuid,
+        certificate?.key?.uuid,
+        signatureAttributeDescriptors,
+        signatureAttributesCallbackAttributes,
+        altSignatureAttributeDescriptors,
+        altSignatureAttributesCallbackAttributes,
+    ]);
+    const onSubmit = (values: FormValues) => {
+        const allValues = watchedValues;
+        submitCallback(values, allValues);
+    };
 
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
+    return (
+        <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)}>
+                <div className="space-y-4">
+                    <Widget noBorder busy={rekeying || isFetchingCsrAttributes || isFetchingSignatureAttributes}>
+                        <Controller
+                            name="uploadCsr"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                                <div className="mb-4">
+                                    <Select
+                                        id="uploadCsr"
+                                        options={inputOptions}
+                                        value={
+                                            field.value ? inputOptions.find((opt) => opt.value === String(field.value))?.value || '' : ''
+                                        }
+                                        onChange={(value) => {
+                                            const boolValue = value === 'true';
+                                            field.onChange(boolValue);
+                                        }}
+                                        placeholder="Select Key Source"
+                                        label="Key Source"
+                                    />
+                                    {fieldState.error && fieldState.isTouched && (
+                                        <p className="mt-1 text-sm text-red-600">
+                                            {typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'}
+                                        </p>
+                                    )}
+                                </div>
                             )}
-                        </Field>
+                        />
                     </Widget>
 
-                    <Widget title="Request Properties">
-                        {values.uploadCsr?.value && certificate?.raProfile ? (
+                    <Widget title="Request Properties" noBorder titleSize="large">
+                        {watchedUploadCsr && certificate?.raProfile ? (
                             <>
                                 <FileUpload
                                     fileType={'CSR'}
@@ -367,147 +373,179 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
 
                         <br />
 
-                        {values.uploadCsr && !values.uploadCsr?.value ? (
+                        {watchedUploadCsr !== undefined && !watchedUploadCsr ? (
                             <>
-                                <Field name="tokenProfile" validate={validateRequired()}>
-                                    {({ input, meta, onChange }) => (
-                                        <FormGroup>
-                                            <Label for="tokenProfile">Token Profile</Label>
-
+                                <Controller
+                                    name="tokenProfile"
+                                    control={control}
+                                    rules={buildValidationRules([validateRequired()])}
+                                    render={({ field, fieldState }) => (
+                                        <div className="mb-4">
                                             <Select
-                                                {...input}
                                                 id="tokenProfile"
-                                                maxMenuHeight={140}
-                                                menuPlacement="auto"
                                                 options={tokenProfileOptions}
+                                                value={field.value || ''}
+                                                onChange={(value) => {
+                                                    const uuid = value as string | undefined;
+                                                    field.onChange(uuid);
+                                                    if (uuid) {
+                                                        onTokenProfileChange(uuid, 'normal');
+                                                    }
+                                                }}
                                                 placeholder="Select Token Profile"
-                                                onChange={(e) => {
-                                                    onTokenProfileChange(e, 'normal');
-                                                    input.onChange(e);
-                                                }}
+                                                label="Token Profile"
                                             />
-
-                                            <FormFeedback>{meta.error}</FormFeedback>
-                                        </FormGroup>
+                                            {fieldState.error && fieldState.isTouched && (
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {typeof fieldState.error === 'string'
+                                                        ? fieldState.error
+                                                        : fieldState.error?.message || 'Invalid value'}
+                                                </p>
+                                            )}
+                                        </div>
                                     )}
-                                </Field>
+                                />
 
-                                <Field name="key" validate={validateRequired()}>
-                                    {({ input, meta, onChange }) => (
-                                        <FormGroup>
-                                            <Label for="keySelect">Select Key</Label>
-
+                                <Controller
+                                    name="key"
+                                    control={control}
+                                    rules={buildValidationRules([validateRequired()])}
+                                    render={({ field, fieldState }) => (
+                                        <div className="mb-4">
                                             <Select
-                                                {...input}
-                                                id="key"
-                                                inputId="keySelect"
-                                                maxMenuHeight={140}
-                                                menuPlacement="auto"
+                                                id="keySelect"
                                                 options={keyOptions}
-                                                placeholder="Select Key"
-                                                onChange={(e) => {
-                                                    onKeyChange(e, 'normal');
-                                                    input.onChange(e);
+                                                value={field.value?.uuid || ''}
+                                                onChange={(value) => {
+                                                    const uuid = value as string | undefined;
+                                                    const key = uuid ? keyUuidToKeyMap.get(uuid) : undefined;
+                                                    field.onChange(key);
+                                                    if (key) {
+                                                        onKeyChange(key, 'normal');
+                                                    }
                                                 }}
+                                                placeholder="Select Key"
+                                                label="Select Key"
                                             />
-
-                                            <FormFeedback>{meta.error}</FormFeedback>
-                                        </FormGroup>
+                                            {fieldState.error && fieldState.isTouched && (
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {typeof fieldState.error === 'string'
+                                                        ? fieldState.error
+                                                        : fieldState.error?.message || 'Invalid value'}
+                                                </p>
+                                            )}
+                                        </div>
                                     )}
-                                </Field>
+                                />
 
-                                {values.key && (
-                                    <SwitchField
-                                        id="includeAltKey"
-                                        label="Include Alternative Key"
-                                        disabled={!!defaultValues.altKey || !!defaultValues.altTokenProfile}
+                                {watchedKey && (
+                                    <Controller
+                                        name="includeAltKey"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Switch
+                                                id="includeAltKey"
+                                                label="Include Alternative Key"
+                                                checked={field.value || false}
+                                                onChange={field.onChange}
+                                                disabled={!!defaultValues.altKey || !!defaultValues.altTokenProfile}
+                                            />
+                                        )}
                                     />
                                 )}
 
-                                {values.includeAltKey && (
+                                {watchedIncludeAltKey && (
                                     <>
-                                        <Field name="altTokenProfile" validate={validateRequired()}>
-                                            {({ input, meta, onChange }) => (
-                                                <FormGroup>
-                                                    <Label for="altTokenProfileSelect">Alternative Token Profile</Label>
-
+                                        <Controller
+                                            name="altTokenProfile"
+                                            control={control}
+                                            rules={buildValidationRules([validateRequired()])}
+                                            render={({ field, fieldState }) => (
+                                                <div className="mb-4">
                                                     <Select
-                                                        {...input}
-                                                        id="altTokenProfile"
-                                                        inputId="altTokenProfileSelect"
-                                                        maxMenuHeight={140}
-                                                        menuPlacement="auto"
+                                                        id="altTokenProfileSelect"
                                                         options={tokenProfileOptions}
-                                                        placeholder="Select Alternative Token Profile"
-                                                        onChange={(e) => {
-                                                            onTokenProfileChange(e, 'alt');
-                                                            input.onChange(e);
+                                                        value={field.value || ''}
+                                                        onChange={(value) => {
+                                                            const uuid = value as string | undefined;
+                                                            field.onChange(uuid);
+                                                            if (uuid) {
+                                                                onTokenProfileChange(uuid, 'alt');
+                                                            }
                                                         }}
+                                                        placeholder="Select Alternative Token Profile"
+                                                        label="Alternative Token Profile"
                                                     />
-
-                                                    <FormFeedback>{meta.error}</FormFeedback>
-                                                </FormGroup>
+                                                    {fieldState.error && fieldState.isTouched && (
+                                                        <p className="mt-1 text-sm text-red-600">
+                                                            {typeof fieldState.error === 'string'
+                                                                ? fieldState.error
+                                                                : fieldState.error?.message || 'Invalid value'}
+                                                        </p>
+                                                    )}
+                                                </div>
                                             )}
-                                        </Field>
+                                        />
 
-                                        <Field name="altKey" validate={validateRequired()}>
-                                            {({ input, meta, onChange }) => (
-                                                <FormGroup>
-                                                    <Label for="altKeySelect">Select Alternative Key</Label>
-
+                                        <Controller
+                                            name="altKey"
+                                            control={control}
+                                            rules={buildValidationRules([validateRequired()])}
+                                            render={({ field, fieldState }) => (
+                                                <div className="mb-4">
                                                     <Select
-                                                        {...input}
-                                                        id="altKey"
-                                                        inputId="altKeySelect"
-                                                        maxMenuHeight={140}
-                                                        menuPlacement="auto"
+                                                        id="altKeySelect"
                                                         options={
-                                                            values.tokenProfile?.value === values.altTokenProfile?.value &&
+                                                            watchedValues.tokenProfile === watchedValues.altTokenProfile &&
                                                             altKeyOptions.length === 0
                                                                 ? keyOptions
                                                                 : altKeyOptions
                                                         }
-                                                        placeholder="Select Alternative Key"
-                                                        onChange={(e) => {
-                                                            onKeyChange(e, 'alt');
-                                                            input.onChange(e);
+                                                        value={field.value?.uuid || ''}
+                                                        onChange={(value) => {
+                                                            const uuid = value as string | undefined;
+                                                            const key = uuid ? keyUuidToKeyMap.get(uuid) : undefined;
+                                                            field.onChange(key);
+                                                            if (key) {
+                                                                onKeyChange(key, 'alt');
+                                                            }
                                                         }}
+                                                        label="Select Alternative Key"
+                                                        placeholder="Select Alternative Key"
                                                     />
-
-                                                    <FormFeedback>{meta.error}</FormFeedback>
-                                                </FormGroup>
+                                                    {fieldState.error && fieldState.isTouched && (
+                                                        <p className="mt-1 text-sm text-red-600">
+                                                            {typeof fieldState.error === 'string'
+                                                                ? fieldState.error
+                                                                : fieldState.error?.message || 'Invalid value'}
+                                                        </p>
+                                                    )}
+                                                </div>
                                             )}
-                                        </Field>
+                                        />
                                     </>
                                 )}
 
-                                {getSignatureAttributesTabs(values).length ? (
-                                    <TabLayout tabs={getSignatureAttributesTabs(values)} />
-                                ) : (
-                                    <></>
-                                )}
+                                {getSignatureAttributesTabs().length ? <TabLayout noBorder tabs={getSignatureAttributesTabs()} /> : <></>}
                             </>
                         ) : (
                             <></>
                         )}
 
-                        <div className="d-flex justify-content-end">
-                            <ButtonGroup>
-                                <ProgressButton
-                                    title="Rekey"
-                                    inProgressTitle="Rekeying..."
-                                    inProgress={submitting || rekeying}
-                                    disabled={!valid || !isRekeyAllowed(values)}
-                                />
-
-                                <Button color="default" onClick={onCancel} disabled={submitting}>
-                                    Cancel
-                                </Button>
-                            </ButtonGroup>
-                        </div>
+                        <Container className="flex-row justify-end modal-footer" gap={4}>
+                            <Button variant="outline" onClick={onCancel} disabled={formState.isSubmitting} type="button">
+                                Cancel
+                            </Button>
+                            <ProgressButton
+                                title="Rekey"
+                                inProgressTitle="Rekeying..."
+                                inProgress={formState.isSubmitting || rekeying}
+                                disabled={!formState.isValid || !isRekeyAllowed()}
+                            />
+                        </Container>
                     </Widget>
-                </BootstrapForm>
-            )}
-        </Form>
+                </div>
+            </form>
+        </FormProvider>
     );
 }

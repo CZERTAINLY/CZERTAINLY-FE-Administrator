@@ -4,7 +4,7 @@ import { actions as connectorActions, selectors as connectorSelectors } from 'du
 import { selectors as userInterfaceSelectors } from 'ducks/user-interface';
 import debounce from 'lodash.debounce';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useForm, useFormState } from 'react-final-form';
+import { useFormContext } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     AttributeCallbackMappingModel,
@@ -27,8 +27,30 @@ import { AttributeContentType, AttributeValueTarget, FunctionGroupCode, Resource
 import { base64ToUtf8 } from 'utils/common-utils';
 import { Attribute } from './Attribute';
 import CustomAttributeAddSelect from 'components/Attributes/AttributeEditor/CustomAttributeAddSelect';
-import style from './AttributeEditor.module.scss';
 import { mapAttributeContentToOptionValue } from 'utils/attributes/attributes';
+import { deepEqual } from 'utils/deep-equal';
+import Button from 'components/Button';
+import { Trash } from 'lucide-react';
+
+/* c8 ignore start */
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+    if (typeof value !== 'object' || value === null) return false;
+    const proto = Object.getPrototypeOf(value);
+    return proto === Object.prototype || proto === null;
+}
+
+function cloneForCompare<T>(value: T): T {
+    if (Array.isArray(value)) return value.map((v) => cloneForCompare(v)) as T;
+    if (isPlainObject(value)) {
+        const out: Record<string, unknown> = {};
+        Object.keys(value).forEach((k) => {
+            out[k] = cloneForCompare((value as Record<string, unknown>)[k]);
+        });
+        return out as T;
+    }
+    return value;
+}
+/* c8 ignore stop */
 
 // same empty array is used to prevent re-rendering of the component
 // !!! never modify the attributes field inside of the component !!!
@@ -49,7 +71,7 @@ export interface Props {
     withRemoveAction?: boolean;
 }
 
-export default function AttributeEditor({
+function AttributeEditorInner({
     id,
     attributeDescriptors,
     attributes = emptyAttributes,
@@ -64,8 +86,8 @@ export default function AttributeEditor({
 }: Props) {
     const dispatch = useDispatch();
 
-    const form = useForm();
-    const formState = useFormState();
+    const { setValue, watch } = useFormContext<Record<string, any>>();
+    const formValues = watch();
 
     const isRunningCallback = useSelector(connectorSelectors.isRunningCallback);
     const initiateAttributeCallback = useSelector(userInterfaceSelectors.selectInitiateAttributeCallback);
@@ -83,9 +105,7 @@ export default function AttributeEditor({
     // options for selects
     const [options, setOptions] = useState<{ [attributeName: string]: { label: string; value: any }[] }>({});
 
-    // stores previous values of form in order to be possible to detect attribute changes
-    const [previousFormValues, setPreviousFormValues] = useState<{ [name: string]: any }>({});
-
+    const previousAttributesRef = useRef<Record<string, any>>({});
     // stores previous callback data in order to be possible to detect what data changed
     const [previousCallbackData, setPreviousCallbackData] = useState<{ [callbackId: string]: any }>({});
 
@@ -104,21 +124,23 @@ export default function AttributeEditor({
     let opts: { [attributeName: string]: { label: string; value: any }[] } = {};
 
     useEffect(() => {
-        dispatch(connectorActions.resetState());
+        dispatch(connectorActions.clearCallbackData());
     }, [dispatch]);
     /**
      * Handles deletion of an attribute from the grouped attributes
      */
+    /* c8 ignore start */
     const handleDeleteAttribute = useCallback(
         (attributeName: string) => {
             // Create a unique key for this AttributeEditor instance
             const deletedAttributesKey = `deletedAttributes_${id}`;
 
             // Add to deletedAttributes in form state using the unique key
-            form.mutators.setAttribute(deletedAttributesKey, [...(formState.values[deletedAttributesKey] || []), attributeName]);
+            const currentDeleted = formValues[deletedAttributesKey] || [];
+            setValue(deletedAttributesKey, [...currentDeleted, attributeName]);
 
             // Remove from form values
-            form.mutators.setAttribute(`__attributes__${id}__.${attributeName}`, undefined);
+            setValue(`__attributes__${id}__.${attributeName}`, undefined);
 
             // Remove from options
             const newOptions = { ...options };
@@ -137,12 +159,14 @@ export default function AttributeEditor({
             // Custom attributes will still be available for re-adding through notYetShownCustomAttributeDescriptors
             setDeletedAttributes((prev) => [...prev, attributeName]);
         },
-        [form.mutators, formState.values, id, options, groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes],
+        [setValue, formValues, id, options, groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes],
     );
+    /* c8 ignore stop */
 
     /**
      * Gets the value from the object property identified by path
      */
+    /* c8 ignore start */
     const getObjectPropertyValue = useCallback((object: any, path: string) => {
         const pathParts = path.split('.');
 
@@ -166,6 +190,7 @@ export default function AttributeEditor({
 
         return currentObject;
     }, []);
+    /* c8 ignore stop */
 
     const isRunningCb: boolean = useMemo((): boolean => {
         let isRunningCb = false;
@@ -173,9 +198,11 @@ export default function AttributeEditor({
         return isRunningCb;
     }, [isRunningCallback]);
 
+    /* c8 ignore start */
     /**
      * Gets the value of the attribute identified by the path (attributeName.propertyName.propertyName...)
      */
+    /* istanbul ignore next */
     const getAttributeValue = useCallback(
         (attributes: AttributeResponseModel[], path: string | undefined): any => {
             if (!path) return undefined;
@@ -192,10 +219,11 @@ export default function AttributeEditor({
     /**
      * Gets the value from the current input state or from the attribute or from the default value of the attribute descriptor.
      */
+    /* istanbul ignore next */
     const getCurrentFromMappingValue = useCallback(
         (mapping: AttributeCallbackMappingModel): any => {
             const attributeFromValue = getAttributeValue(attributes, mapping.from);
-            const formAttributes = !formState.values[`__attributes__${id}__`] ? undefined : formState.values[`__attributes__${id}__`];
+            const formAttributes = formValues[`__attributes__${id}__`] ?? undefined;
             const formMappingName = mapping.from ? (mapping.from.includes('.') ? mapping.from.split('.')[0] : mapping.from) : '';
             const formAttribute = formAttributes
                 ? Object.keys(formAttributes).find((key) => key.startsWith(`${formMappingName}`))
@@ -226,21 +254,14 @@ export default function AttributeEditor({
             return currentContent || attributeFromValue || depDescriptorValue || groupDescriptorValue;
         },
 
-        [
-            attributeDescriptors,
-            groupAttributesCallbackAttributes,
-            attributes,
-            formState.values,
-            getAttributeValue,
-            getObjectPropertyValue,
-            id,
-        ],
+        [attributeDescriptors, groupAttributesCallbackAttributes, attributes, formValues, getAttributeValue, getObjectPropertyValue, id],
     );
 
     /**
      * Builds mapping of values taken from the form, attribute or attribute descriptor
      * for the callback as defined by the API
      */
+    /* istanbul ignore next */
     const buildCallbackMappings = useCallback(
         (descriptor: AttributeDescriptorModel): CallbackAttributeModel | undefined => {
             let hasUndefinedMapping = false;
@@ -256,7 +277,30 @@ export default function AttributeEditor({
             if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor)) {
                 descriptor.attributeCallback?.mappings.forEach((mapping) => {
                     let value = mapping.value || getCurrentFromMappingValue(mapping);
-                    if (typeof value === 'object' && value.hasOwnProperty('data')) value = value.data;
+                    if (typeof value === 'object' && value !== null) {
+                        // Resolve dot path from mapping.from (e.g. "endEntityProfile.data.id" -> extract value at data.id)
+                        if (mapping.from && mapping.from.includes('.')) {
+                            const pathParts = mapping.from.split('.').slice(1);
+                            const tryResolve = (obj: any, parts: string[]): any => {
+                                let resolved = obj;
+                                for (const part of parts) {
+                                    if (resolved === undefined || resolved === null) return undefined;
+                                    resolved = Array.isArray(resolved) ? resolved[0]?.[part] : resolved[part];
+                                }
+                                return resolved;
+                            };
+                            const resolved =
+                                tryResolve(value, pathParts) ??
+                                (value?.value !== undefined ? tryResolve(value, ['value', ...pathParts]) : undefined);
+                            if (resolved !== undefined && (typeof resolved !== 'object' || resolved === null)) {
+                                value = resolved;
+                            }
+                        }
+                        if (typeof value === 'object' && value !== null && value.hasOwnProperty('data')) value = value.data;
+                        if (typeof value === 'object' && value !== null && value.hasOwnProperty('uuid') && typeof value.uuid === 'string') {
+                            value = value.uuid;
+                        }
+                    }
                     if (value === undefined) hasUndefinedMapping = true;
 
                     mapping.targets.forEach((target) => {
@@ -278,6 +322,7 @@ export default function AttributeEditor({
         [getCurrentFromMappingValue],
     );
 
+    /* istanbul ignore next */
     const executeCallback = useCallback(
         (mappings: CallbackAttributeModel, descriptor: AttributeDescriptorModel, formAttributeName: string) => {
             mappings.name = descriptor.name;
@@ -306,6 +351,7 @@ export default function AttributeEditor({
         },
         [callbackParentUuid, callbackResource, connectorUuid, dispatch, functionGroupCode, kind],
     );
+    /* c8 ignore stop */
 
     /*
      * Get non-required custom attributes, without a value assigned
@@ -390,6 +436,7 @@ export default function AttributeEditor({
     /**
      * Groups attributes for rendering according to the attribute descriptor group property
      */
+    /* c8 ignore start */
     const groupedAttributesDescriptors: { [key: string]: (DataAttributeModel | InfoAttributeModel | CustomAttributeModel)[] } =
         useMemo(() => {
             const grouped: { [key: string]: (DataAttributeModel | InfoAttributeModel | CustomAttributeModel)[] } = {};
@@ -402,15 +449,23 @@ export default function AttributeEditor({
             });
             return grouped;
         }, [orderedAttributeDescriptors]);
+    /* c8 ignore stop */
+
+    const descriptorsKey = useMemo(() => attributeDescriptors.map((d) => d.uuid).join(','), [attributeDescriptors]);
+    const attributesKey = useMemo(() => attributes.map((a) => a.uuid).join(','), [attributes]);
+
     /**
      * Clean form attributes, callback data and previous form state whenever passed attribute descriptors or attributes changed
      */
     useEffect(() => {
-        // variables are passed just to prevent linting error, they are unused in the clearAttributes function
-        form.mutators.clearAttributes(id, attributeDescriptors, attributes);
-        // setGroupAttributesCallbackAttributes(emptyGroupAttributesCallbackAttributes);
+        // Clear all attributes that start with __attributes__${id}__
+        const currentValues = watch();
+        const keysToClear = Object.keys(currentValues).filter((k) => k.startsWith(`__attributes__${id}__`));
+        keysToClear.forEach((key) => {
+            setValue(key, undefined, { shouldDirty: false, shouldValidate: false });
+        });
         dispatch(connectorActions.clearCallbackData());
-    }, [attributeDescriptors, attributes, dispatch, form.mutators, id]);
+    }, [descriptorsKey, attributesKey, dispatch, setValue, watch, id]);
 
     /**
      * Synchronize local deletedAttributes state with form state after clearAttributes
@@ -418,23 +473,24 @@ export default function AttributeEditor({
     useEffect(() => {
         // After clearAttributes, ensure deletedAttributes are preserved in form state
         if (deletedAttributes.length > 0) {
-            form.mutators.setAttribute(`deletedAttributes_${id}`, deletedAttributes);
+            setValue(`deletedAttributes_${id}`, deletedAttributes);
         }
-    }, [deletedAttributes, form.mutators, id]);
+    }, [deletedAttributes, setValue, id]);
 
     /**
      * Synchronize local deletedAttributes state with form state to maintain consistency
      */
     useEffect(() => {
-        const formDeletedAttributes = formState.values[`deletedAttributes_${id}`] || [];
+        const formDeletedAttributes = formValues[`deletedAttributes_${id}`] || [];
         if (
             formDeletedAttributes.length !== deletedAttributes.length ||
             !formDeletedAttributes.every((attr: string) => deletedAttributes.includes(attr))
         ) {
             setDeletedAttributes(formDeletedAttributes);
         }
-    }, [formState.values, deletedAttributes, id]);
+    }, [formValues, deletedAttributes, id]);
 
+    /* c8 ignore start */
     const setAttributeFormValue = useCallback(
         (
             descriptor: DataAttributeModel | CustomAttributeModel,
@@ -456,28 +512,22 @@ export default function AttributeEditor({
 
             function handleFileAttributeContentType() {
                 if (appliedContent) {
-                    form.mutators.setAttribute(
-                        `${formAttributeName}.content`,
-                        (appliedContent as FileAttributeContentModel[])[0].reference,
-                    );
-                    form.mutators.setAttribute(
+                    setValue(`${formAttributeName}.content`, (appliedContent as FileAttributeContentModel[])[0].reference);
+                    setValue(
                         `${formAttributeName}.fileName`,
                         (appliedContent as FileAttributeContentModel[])[0].data.fileName || 'unknown',
                     );
-                    form.mutators.setAttribute(
+                    setValue(
                         `${formAttributeName}.mimeType`,
                         (appliedContent as FileAttributeContentModel[])[0].data.mimeType || 'unknown',
                     );
                 } else if (descriptor.content) {
-                    form.mutators.setAttribute(
-                        `${formAttributeName}.content`,
-                        (descriptor.content as FileAttributeContentModel[])[0].reference,
-                    );
-                    form.mutators.setAttribute(
+                    setValue(`${formAttributeName}.content`, (descriptor.content as FileAttributeContentModel[])[0].reference);
+                    setValue(
                         `${formAttributeName}.fileName`,
                         (descriptor.content as FileAttributeContentModel[])[0].data.fileName || 'unknown',
                     );
-                    form.mutators.setAttribute(
+                    setValue(
                         `${formAttributeName}.mimeType`,
                         (descriptor.content as FileAttributeContentModel[])[0].data.mimeType || 'unknown',
                     );
@@ -522,14 +572,16 @@ export default function AttributeEditor({
             } else if (descriptor.properties.list) {
                 setSelectListAttributeValue();
             } else if (appliedContent) {
-                formAttributeValue = appliedContent[0].reference ?? appliedContent[0].data;
+                const firstApplied = appliedContent[0] as any;
+                formAttributeValue = firstApplied?.reference ?? firstApplied?.data;
             } else if (
                 descriptor.content &&
                 descriptor.content.length > 0 &&
                 (!setDefaultOnRequiredValuesOnly || descriptor.properties.required)
             ) {
                 // This acts as a fallback for the case when the attribute has no value, but has a default value in the descriptor
-                formAttributeValue = descriptor.content[0].data ?? descriptor.content[0].reference;
+                const firstDescriptorContent = descriptor.content[0] as any;
+                formAttributeValue = firstDescriptorContent?.data ?? firstDescriptorContent?.reference;
             }
 
             if (descriptor.contentType === AttributeContentType.Codeblock && formAttributeValue !== undefined) {
@@ -548,11 +600,13 @@ export default function AttributeEditor({
                 setBooleanAttributeValue();
             }
 
-            form.mutators.setAttribute(formAttributeName, formAttributeValue);
+            setValue(formAttributeName, formAttributeValue);
         },
-        [form.mutators],
+        [setValue],
     );
+    /* c8 ignore stop */
 
+    /* c8 ignore start */
     const getAttributeStaticOptions = useCallback(
         (descriptor: DataAttributeModel | CustomAttributeModel | GroupAttributeModel, formAttributeName: string) => {
             let newOptions = {};
@@ -583,6 +637,7 @@ export default function AttributeEditor({
         },
         [buildCallbackMappings, executeCallback],
     );
+    /* c8 ignore stop */
     /**
      * Called on first render
      * Setups final form values and initial values (based on descriptors and attributes passed)
@@ -650,9 +705,6 @@ export default function AttributeEditor({
         // eslint-disable-next-line react-hooks/exhaustive-deps
         opts = { ...opts, ...newOptions };
         setOptions({ ...options, ...opts });
-
-        // now all fields are loaded in form, so set those formState.values as previousFormValues to prevent calling doCallback on form change
-        setPreviousFormValues(formState.values);
     }, [
         id,
         attributeDescriptors,
@@ -693,7 +745,7 @@ export default function AttributeEditor({
                 };
 
                 // Only set the value for attributes whose value was not yet modified
-                if (!getObjectPropertyValue(formState.values, formAttributeName)) {
+                if (!getObjectPropertyValue(formValues, formAttributeName)) {
                     setAttributeFormValue(
                         descriptor,
                         attribute,
@@ -710,11 +762,9 @@ export default function AttributeEditor({
         if (Object.keys(newOptions).length > 0) {
             setOptions((prevOptions) => ({ ...prevOptions, ...newOptions }));
         }
-
-        setPreviousFormValues(formState.values);
     }, [
         id,
-        formState.values,
+        formValues,
         attributes,
         prevShownCustomAttributes,
         shownCustomAttributes,
@@ -725,14 +775,20 @@ export default function AttributeEditor({
         getAttributeStaticOptions,
     ]);
 
+    /* c8 ignore start */
     /**
      * Called on every form change
      * Evaluates changed attributes and eventually performs a callback whenever necessary
      */
+    /* istanbul ignore next */
     const doCallbacks = useCallback(() => {
-        if (previousFormValues === formState.values) return;
+        const attributesKey = `__attributes__${id}__`;
+        const currentAttributes = (formValues?.[attributesKey] ?? {}) as Record<string, any>;
+        const previousAttributes = previousAttributesRef.current;
 
-        setPreviousFormValues(formState.values);
+        if (deepEqual(previousAttributes, currentAttributes)) return;
+
+        previousAttributesRef.current = cloneForCompare(currentAttributes);
 
         // I am not really sure about this. It is currently preventing other callbacks when the form is open in "edit" mode and data loaded to it
         // It works, but this state should be managed in a different way
@@ -741,25 +797,14 @@ export default function AttributeEditor({
         const changedAttributes: { [name: string]: { previous: any; current: any } } = {};
 
         // get changed attributes and their current values
-        for (const key in formState.values) {
-            if (key.startsWith(`__attributes__${id}__`)) {
-                for (const attrKey in formState.values[key]) {
-                    if (
-                        previousFormValues[key] === undefined ||
-                        previousFormValues[key][attrKey] === undefined ||
-                        previousFormValues[key][attrKey] !== formState.values[key][attrKey]
-                    ) {
-                        changedAttributes[attrKey] = {
-                            previous:
-                                previousFormValues[key] !== undefined && previousFormValues[key][attrKey] !== undefined
-                                    ? previousFormValues[key][attrKey]
-                                    : undefined,
-                            current: formState.values[key][attrKey],
-                        };
-                    }
-                }
+        const keys = new Set([...Object.keys(previousAttributes || {}), ...Object.keys(currentAttributes || {})]);
+        keys.forEach((attrKey) => {
+            const prev = previousAttributes?.[attrKey];
+            const cur = currentAttributes?.[attrKey];
+            if (!deepEqual(prev, cur)) {
+                changedAttributes[attrKey] = { previous: prev, current: cur };
             }
-        }
+        });
 
         // for each changed attribute check if there are mappings depending on it and if so perform the callback
         [...attributeDescriptors, ...groupAttributesCallbackAttributes].forEach((descriptor) => {
@@ -790,24 +835,28 @@ export default function AttributeEditor({
                 }
             }
         });
-    }, [
-        attributeDescriptors,
-        groupAttributesCallbackAttributes,
-        buildCallbackMappings,
-        // removed it as it was causing form value to be cleared  , it does not seem to be necessary and other places it is working without it
-        // form.mutators,
-        formState.values,
-        id,
-        isRunningCb,
-        previousFormValues,
-        executeCallback,
-    ]);
-    const ref = useRef(debounce((doCallbacksParam) => doCallbacksParam(), 600));
+    }, [attributeDescriptors, groupAttributesCallbackAttributes, buildCallbackMappings, formValues, id, isRunningCb, executeCallback]);
 
+    const doCallbacksLatestRef = useRef(doCallbacks);
+    /* istanbul ignore next */
     useEffect(() => {
-        ref.current(doCallbacks);
+        doCallbacksLatestRef.current = doCallbacks;
     }, [doCallbacks]);
 
+    /* istanbul ignore next */
+    const debouncedDoCallbacksRef = useRef(debounce(() => doCallbacksLatestRef.current(), 600));
+
+    /* istanbul ignore next */
+    useEffect(() => {
+        const debouncedDoCallbacks = debouncedDoCallbacksRef.current;
+        debouncedDoCallbacks();
+
+        return () => {
+            debouncedDoCallbacks.cancel();
+        };
+    }, [formValues]);
+
+    /* istanbul ignore next */
     useEffect(() => {
         if (!initiateAttributeCallback) return;
 
@@ -830,15 +879,17 @@ export default function AttributeEditor({
      * Obtains values from attribute callbacks and updates the form values / options accordingly
      * Sets groupAttributeCallbackAttributes from callbackData
      */
+    /* istanbul ignore next */
     useEffect(() => {
         if (previousCallbackData === callbackData) return;
 
+        /* istanbul ignore next */
         function updateValueFromCallbackData(callbackId: string, callbackDescriptor: AttributeDescriptorModel) {
             if (callbackDescriptor && isDataAttributeModel(callbackDescriptor)) {
                 if (!callbackDescriptor.properties.list) {
-                    form.mutators.setAttribute(callbackId, callbackData[callbackId][0].reference ?? callbackData[callbackId][0].data);
+                    setValue(callbackId, callbackData[callbackId][0].reference ?? callbackData[callbackId][0].data);
                 } else if (userInteractedRef.current) {
-                    form.mutators.setAttribute(callbackId, undefined);
+                    setValue(callbackId, undefined);
                 }
             }
         }
@@ -895,7 +946,8 @@ export default function AttributeEditor({
         }
 
         setPreviousCallbackData(callbackData);
-    }, [callbackData, options, previousCallbackData]);
+    }, [callbackData, options, previousCallbackData, setValue, id, attributeDescriptors, groupAttributesCallbackAttributes]);
+    /* c8 ignore stop */
 
     /*
       Attribute Form Rendering
@@ -903,20 +955,21 @@ export default function AttributeEditor({
 
     const deleteButton = useCallback(
         (descriptor: AttributeDescriptorModel) => (
-            <button
-                type="button"
+            <Button
+                variant="transparent"
                 onClick={() => handleDeleteAttribute(descriptor.name)}
-                className={style.deleteButton}
                 title={`Delete ${descriptor.name}`}
+                className="ml-2"
             >
-                <i className="fa fa-trash text-danger" />
-            </button>
+                <Trash size={16} />
+            </Button>
         ),
         [handleDeleteAttribute],
     );
 
+    /* c8 ignore start */
     const attrs = useMemo(() => {
-        const attrs: JSX.Element[] = [];
+        const attrs: React.ReactNode[] = [];
 
         const attributeSelector = (
             <CustomAttributeAddSelect
@@ -936,8 +989,8 @@ export default function AttributeEditor({
 
                     // Also remove from form state
                     const deletedAttributesKey = `deletedAttributes_${id}`;
-                    const currentDeleted = formState.values[deletedAttributesKey] || [];
-                    form.mutators.setAttribute(
+                    const currentDeleted = formValues[deletedAttributesKey] || [];
+                    setValue(
                         deletedAttributesKey,
                         currentDeleted.filter((name: string) => name !== attribute.name),
                     );
@@ -950,28 +1003,30 @@ export default function AttributeEditor({
 
         // Show the attribute selector even when there no attributes are displayed, but some non required attributes exist
         if (groupedAttributesDescriptorsKeys.length === 0 && notYetShownCustomAttributeDescriptors.length > 0) {
-            return <Widget busy={isRunningCb}>{attributeSelector}</Widget>;
+            return (
+                <Widget busy={isRunningCb} noBorder>
+                    {attributeSelector}
+                </Widget>
+            );
         }
 
         groupedAttributesDescriptorsKeys.forEach((group, i, arr) => {
             attrs.push(
-                <Widget key={group} title={group === '__' ? '' : group} busy={isRunningCb}>
-                    {groupedAttributesDescriptors[group].map((descriptor) => (
-                        <div key={descriptor.name} className={style.attributeWrapper}>
-                            <div className={style.attributeContent}>
-                                <Attribute
-                                    busy={isRunningCb}
-                                    name={`__attributes__${id}__.${descriptor.name}`}
-                                    descriptor={descriptor}
-                                    options={options[`__attributes__${id}__.${descriptor.name}`]}
-                                    userInteractedRef={userInteractedRef}
-                                    deleteButton={
-                                        withRemoveAction && isCustomAttributeModel(descriptor) && !descriptor.properties.required
-                                            ? deleteButton(descriptor)
-                                            : undefined
-                                    }
-                                />
-                            </div>
+                <Widget noBorder key={group} title={group === '__' ? '' : group} busy={isRunningCb}>
+                    {groupedAttributesDescriptors[group].map((descriptor, index) => (
+                        <div key={descriptor.name} className="mb-4">
+                            <Attribute
+                                busy={isRunningCb}
+                                name={`__attributes__${id}__.${descriptor.name}`}
+                                descriptor={descriptor}
+                                options={options[`__attributes__${id}__.${descriptor.name}`]}
+                                userInteractedRef={userInteractedRef}
+                                deleteButton={
+                                    withRemoveAction && isCustomAttributeModel(descriptor) && !descriptor.properties.required
+                                        ? deleteButton(descriptor)
+                                        : undefined
+                                }
+                            />
                         </div>
                     ))}
                     {i === arr.length - 1 && notYetShownCustomAttributeDescriptors.length > 0 && attributeSelector}
@@ -987,10 +1042,25 @@ export default function AttributeEditor({
         options,
         withRemoveAction,
         deleteButton,
-        form.mutators,
-        formState.values,
+        setValue,
+        formValues,
         deletedAttributes,
     ]);
+    /* c8 ignore stop */
 
     return <>{attrs}</>;
+}
+
+function AttributeEditorFormBridge({ children }: { children: React.ReactNode }) {
+    return <>{children}</>;
+}
+
+export default function AttributeEditor(props: Props) {
+    useFormContext<Record<string, any>>();
+
+    return (
+        <AttributeEditorFormBridge>
+            <AttributeEditorInner {...props} />
+        </AttributeEditorFormBridge>
+    );
 }

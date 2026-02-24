@@ -2,6 +2,7 @@ import CredentialForm from 'components/_pages/credentials/form';
 import { CustomNode, LegendItem } from 'components/FlowChart';
 import { Edge } from 'reactflow';
 import { AttributeContentType } from 'types/openapi';
+import { ModalIcon, ModalSize } from 'components/Dialog';
 
 export enum LockTypeEnum {
     GENERIC,
@@ -114,8 +115,8 @@ export interface WidgetLockErrorModel {
 
 export interface GlobalModalModel {
     title?: string;
-    size?: 'sm' | 'lg' | 'xl';
-    content: string | JSX.Element | undefined;
+    size?: ModalSize;
+    content: string | React.ReactNode | undefined;
     type?: 'success' | 'error' | 'warning' | 'info' | 'confirm' | 'question';
     isOpen: boolean;
     showCancelButton?: boolean;
@@ -124,12 +125,13 @@ export interface GlobalModalModel {
     showSubmitButton?: boolean;
     okButtonCallback?: () => void;
     cancelButtonCallback?: () => void;
+    icon?: ModalIcon;
 }
 
 export interface AddNewAttributeType {
     name: string;
     contentType: AttributeContentType;
-    content: JSX.Element;
+    content: React.ReactNode;
 }
 
 export interface ReactFlowUI {

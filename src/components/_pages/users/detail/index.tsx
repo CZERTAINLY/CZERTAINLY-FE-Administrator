@@ -5,24 +5,26 @@ import StatusBadge from 'components/StatusBadge';
 
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
+import UserForm from '../form';
 import { actions as certActions, selectors as certSelectors } from 'ducks/certificates';
 
 import { selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions, selectors } from 'ducks/users';
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router';
-import { Badge, Container } from 'reactstrap';
+import { Link, useParams } from 'react-router';
+import Badge from 'components/Badge';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import { createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import Breadcrumb from 'components/Breadcrumb';
+import Container from 'components/Container';
 
 export default function UserDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id } = useParams();
 
@@ -31,6 +33,7 @@ export default function UserDetail() {
     const isFetchingRoles = useSelector(selectors.isFetchingRoles);
     const isDisabling = useSelector(selectors.isDisabling);
     const isEnabling = useSelector(selectors.isEnabling);
+    const isUpdating = useSelector(selectors.isUpdating);
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
     const isUpdatingContent = useSelector(customAttributesSelectors.isUpdatingContent);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
@@ -38,6 +41,7 @@ export default function UserDetail() {
     const isFetchingCertificateDetail = useSelector(certSelectors.isFetchingDetail);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const getFreshUserDetails = useCallback(() => {
         if (!id) return;
@@ -60,9 +64,19 @@ export default function UserDetail() {
         getFreshCertificateDetails();
     }, [getFreshCertificateDetails, id]);
 
+    useRunOnFinished(isUpdating, () => {
+        setIsEditModalOpen(false);
+        getFreshUserDetails();
+    });
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
+
     const onEditClick = useCallback(() => {
-        navigate(`../../edit/${user?.uuid}`, { relative: 'path' });
-    }, [navigate, user]);
+        if (!user) return;
+        setIsEditModalOpen(true);
+    }, [user]);
 
     const onEnableClick = useCallback(() => {
         if (!user) return;
@@ -187,44 +201,56 @@ export default function UserDetail() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/users"
-                text={`${getEnumLabel(resourceEnum, Resource.Users)} Inventory`}
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: 'Users', href: '/users' },
+                    { label: user?.username || 'User Details', href: '' },
+                ]}
             />
-            <Widget
-                title="User Details"
-                busy={isFetchingDetail || isFetchingRoles || isEnabling || isDisabling}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshUserDetails}
-                widgetLockName={LockWidgetNameEnum.UserDetails}
-            >
-                <CustomTable headers={detailHeaders} data={detailData} />
-            </Widget>
+            <Container>
+                <Widget
+                    title="User Details"
+                    busy={isFetchingDetail || isFetchingRoles || isEnabling || isDisabling}
+                    widgetButtons={buttons}
+                    titleSize="large"
+                    refreshAction={getFreshUserDetails}
+                    widgetLockName={LockWidgetNameEnum.UserDetails}
+                >
+                    <CustomTable headers={detailHeaders} data={detailData} />
+                </Widget>
 
-            <Widget
-                title="User Certificate Details"
-                busy={isFetchingDetail || isFetchingCertificateDetail}
-                titleSize="large"
-                refreshAction={user?.certificate?.uuid ? getFreshCertificateDetails : undefined}
-            >
-                <CertificateAttributes certificate={certificate} />
-            </Widget>
+                <Widget
+                    title="User Certificate Details"
+                    busy={isFetchingDetail || isFetchingCertificateDetail}
+                    titleSize="large"
+                    refreshAction={user?.certificate?.uuid ? getFreshCertificateDetails : undefined}
+                >
+                    <CertificateAttributes certificate={certificate} />
+                </Widget>
 
-            {user && <CustomAttributeWidget resource={Resource.Users} resourceUuid={user.uuid} attributes={user.customAttributes} />}
+                {user && <CustomAttributeWidget resource={Resource.Users} resourceUuid={user.uuid} attributes={user.customAttributes} />}
+            </Container>
 
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete User"
-                body="You are about to delete an User. Is this what you want to do?"
+                body="You are about to delete a User. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
-        </Container>
+
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit User"
+                size="xl"
+                body={<UserForm userId={user?.uuid} onCancel={handleCloseEditModal} />}
+            />
+        </div>
     );
 }

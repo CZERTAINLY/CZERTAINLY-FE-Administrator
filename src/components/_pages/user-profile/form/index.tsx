@@ -1,16 +1,17 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router';
 
-import { Field, Form } from 'react-final-form';
-import { Button, ButtonGroup, Container, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
-
+import { Controller, FormProvider, useForm } from 'react-hook-form';
+import Button from 'components/Button';
+import Container from 'components/Container';
 import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
+import TextInput from 'components/TextInput';
 
 import { actions, selectors } from 'ducks/auth';
 
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateEmail, validateLength } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateEmail, validateLength } from 'utils/validators';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 
 interface FormValues {
     description: string;
@@ -19,9 +20,13 @@ interface FormValues {
     email: string;
 }
 
-export default function UserProfileForm() {
+interface UserProfileFormProps {
+    onCancel?: () => void;
+    onSuccess?: () => void;
+}
+
+export default function UserProfileForm({ onCancel, onSuccess }: UserProfileFormProps = {}) {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const profile = useSelector(selectors.profile);
 
@@ -31,6 +36,17 @@ export default function UserProfileForm() {
     useEffect(() => {
         dispatch(actions.getProfile());
     }, [dispatch]);
+
+    const wasUpdating = useRef(isUpdatingProfile);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdatingProfile) {
+            if (onSuccess) {
+                onSuccess();
+            }
+        }
+        wasUpdating.current = isUpdatingProfile;
+    }, [isUpdatingProfile, onSuccess]);
 
     const onSubmit = useCallback(
         (values: FormValues) => {
@@ -42,15 +58,12 @@ export default function UserProfileForm() {
                         lastName: values.lastName || undefined,
                         email: values.email,
                     },
+                    redirect: '/userprofile',
                 }),
             );
         },
         [dispatch],
     );
-
-    const onCancel = useCallback(() => {
-        navigate(-1);
-    }, [navigate]);
 
     const defaultValues = useMemo(
         () => ({
@@ -62,113 +75,123 @@ export default function UserProfileForm() {
         [profile?.description, profile?.email, profile?.firstName, profile?.lastName],
     );
 
+    const methods = useForm<FormValues>({
+        defaultValues,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit,
+        control,
+        formState: { isDirty, isSubmitting, isValid },
+    } = methods;
+
     return (
-        <Container className="themed-container">
-            <Widget title="Edit User Profile" busy={isFetchingProfile || isUpdatingProfile}>
-                <Form onSubmit={onSubmit} initialValues={defaultValues}>
-                    {({ handleSubmit, pristine, submitting, values, valid }) => (
-                        <BootstrapForm onSubmit={handleSubmit}>
-                            <Field name="description" validate={composeValidators(validateLength(0, 300))}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="description">Description</Label>
-
-                                        <Input
-                                            {...input}
-                                            valid={!meta.error && meta.touched}
-                                            invalid={!!meta.error && meta.touched}
-                                            type="text"
-                                            placeholder="Description"
-                                        />
-
-                                        <FormFeedback>{meta.error}</FormFeedback>
-                                    </FormGroup>
-                                )}
-                            </Field>
-
-                            <Field name="firstName" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="firstName">First Name</Label>
-
-                                        <Input
-                                            {...input}
-                                            valid={!meta.error && meta.touched}
-                                            invalid={!!meta.error && meta.touched}
-                                            type="text"
-                                            placeholder="First Name"
-                                        />
-
-                                        <FormFeedback>{meta.error}</FormFeedback>
-                                    </FormGroup>
-                                )}
-                            </Field>
-
-                            <Field name="lastName" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="lastName">Last Name</Label>
-
-                                        <Input
-                                            {...input}
-                                            valid={!meta.error && meta.touched}
-                                            invalid={!!meta.error && meta.touched}
-                                            type="text"
-                                            placeholder="Last name"
-                                        />
-
-                                        <FormFeedback>{meta.error}</FormFeedback>
-                                    </FormGroup>
-                                )}
-                            </Field>
-
-                            <Field name="email" validate={composeValidators(validateEmail())}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="email">Email</Label>
-
-                                        <Input
-                                            {...input}
-                                            valid={!meta.error && meta.touched}
-                                            invalid={!!meta.error && meta.touched}
-                                            type="text"
-                                            placeholder="Email address"
-                                        />
-
-                                        <FormFeedback>{meta.error}</FormFeedback>
-                                    </FormGroup>
-                                )}
-                            </Field>
-
-                            <div className="d-flex justify-content-end">
-                                <ButtonGroup>
-                                    <ProgressButton
-                                        title="Save"
-                                        inProgressTitle={'Saving...'}
-                                        inProgress={submitting || isFetchingProfile || isUpdatingProfile}
-                                        disabled={
-                                            pristine ||
-                                            submitting ||
-                                            isFetchingProfile ||
-                                            isUpdatingProfile ||
-                                            !valid ||
-                                            profile?.systemUser
-                                        }
+        <Container>
+            <FormProvider {...methods}>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    <Widget noBorder busy={isFetchingProfile || isUpdatingProfile}>
+                        <div className="space-y-4">
+                            <Controller
+                                name="description"
+                                control={control}
+                                rules={buildValidationRules([validateLength(0, 300)])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        value={field.value}
+                                        onChange={(value) => field.onChange(value)}
+                                        onBlur={field.onBlur}
+                                        id="description"
+                                        type="text"
+                                        placeholder="Description"
+                                        label="Description"
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={getFieldErrorMessage(fieldState)}
                                     />
-
-                                    <Button
-                                        color="default"
-                                        onClick={onCancel}
-                                        disabled={submitting || isFetchingProfile || isUpdatingProfile}
-                                    >
-                                        Cancel
-                                    </Button>
-                                </ButtonGroup>
-                            </div>
-                        </BootstrapForm>
-                    )}
-                </Form>
-            </Widget>
+                                )}
+                            />
+                            <Controller
+                                name="firstName"
+                                control={control}
+                                rules={buildValidationRules([validateAlphaNumericWithSpecialChars()])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        value={field.value}
+                                        onChange={(value) => field.onChange(value)}
+                                        onBlur={field.onBlur}
+                                        id="firstName"
+                                        type="text"
+                                        placeholder="First Name"
+                                        label="First Name"
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={getFieldErrorMessage(fieldState)}
+                                    />
+                                )}
+                            />
+                            <Controller
+                                name="lastName"
+                                control={control}
+                                rules={buildValidationRules([validateAlphaNumericWithSpecialChars()])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        value={field.value}
+                                        onChange={(value) => field.onChange(value)}
+                                        onBlur={field.onBlur}
+                                        id="lastName"
+                                        type="text"
+                                        placeholder="Last name"
+                                        label="Last Name"
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={getFieldErrorMessage(fieldState)}
+                                    />
+                                )}
+                            />
+                            <Controller
+                                name="email"
+                                control={control}
+                                rules={buildValidationRules([validateEmail()])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        value={field.value}
+                                        onChange={(value) => field.onChange(value)}
+                                        onBlur={field.onBlur}
+                                        id="email"
+                                        type="email"
+                                        placeholder="Email address"
+                                        label="Email"
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={getFieldErrorMessage(fieldState)}
+                                    />
+                                )}
+                            />
+                            <Container className="flex-row justify-end modal-footer" gap={4}>
+                                <Button
+                                    variant="outline"
+                                    onClick={onCancel}
+                                    disabled={isSubmitting || isFetchingProfile || isUpdatingProfile}
+                                    type="button"
+                                >
+                                    Cancel
+                                </Button>
+                                <ProgressButton
+                                    title="Save"
+                                    inProgressTitle={'Saving...'}
+                                    inProgress={isSubmitting || isFetchingProfile || isUpdatingProfile}
+                                    disabled={
+                                        !isDirty ||
+                                        isSubmitting ||
+                                        isFetchingProfile ||
+                                        isUpdatingProfile ||
+                                        !isValid ||
+                                        profile?.systemUser
+                                    }
+                                    type="submit"
+                                />
+                            </Container>
+                        </div>
+                    </Widget>
+                </form>
+            </FormProvider>
         </Container>
     );
 }

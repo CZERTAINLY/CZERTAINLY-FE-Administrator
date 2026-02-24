@@ -1,22 +1,25 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
-import { Badge, Container, Table } from 'reactstrap';
+import { Link } from 'react-router';
+import Container from 'components/Container';
 
 import { actions, selectors } from 'ducks/cmp-profiles';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import ForceDeleteErrorTable from 'components/ForceDeleteErrorTable';
 import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
+import CmpProfileForm from '../form';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { PlatformEnum } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
+import Badge from 'components/Badge';
 
 export default function AdministratorsList() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const checkedRows = useSelector(selectors.checkedRows);
     const cmpProfiles = useSelector(selectors.cmpProfiles);
@@ -27,6 +30,7 @@ export default function AdministratorsList() {
     const isDeleting = useSelector(selectors.isDeleting);
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
     const isUpdating = useSelector(selectors.isUpdating);
+    const isCreating = useSelector(selectors.isCreating);
     const isBulkEnabling = useSelector(selectors.isBulkEnabling);
     const isBulkDisabling = useSelector(selectors.isBulkDisabling);
     const isBulkForceDeleting = useSelector(selectors.isBulkForceDeleting);
@@ -36,6 +40,8 @@ export default function AdministratorsList() {
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [confirmForceDelete, setConfirmForceDelete] = useState<boolean>(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+    const [editingCmpProfileId, setEditingCmpProfileId] = useState<string | undefined>(undefined);
 
     const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
@@ -50,9 +56,27 @@ export default function AdministratorsList() {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
     }, [bulkDeleteErrorMessages]);
 
+    useRunOnFinished(isCreating, () => {
+        setIsAddModalOpen(false);
+        getFreshData();
+    });
+    useRunOnFinished(isUpdating, () => {
+        setEditingCmpProfileId(undefined);
+        getFreshData();
+    });
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingCmpProfileId(undefined);
+    }, []);
+
     const onAddClick = useCallback(() => {
-        navigate(`./add`);
-    }, [navigate]);
+        handleOpenAddModal();
+    }, [handleOpenAddModal]);
 
     const onEnableClick = useCallback(() => {
         dispatch(actions.bulkEnableCmpProfiles({ uuids: checkedRows }));
@@ -85,9 +109,7 @@ export default function AdministratorsList() {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => {
-                    onAddClick();
-                },
+                onClick: handleOpenAddModal,
             },
             {
                 icon: 'trash',
@@ -114,38 +136,16 @@ export default function AdministratorsList() {
                 },
             },
         ],
-        [checkedRows, onAddClick, onEnableClick, onDisableClick],
+        [checkedRows, handleOpenAddModal, onEnableClick, onDisableClick],
     );
 
-    const forceDeleteBody = useMemo(
-        () => (
-            <div>
-                <div>Failed to delete {checkedRows.length > 1 ? 'CMP Profiles' : 'an CMP Profile'}. Please find the details below:</div>
-
-                <Table className="table-hover" size="sm">
-                    <thead>
-                        <tr>
-                            <th>
-                                <b>Name</b>
-                            </th>
-                            <th>
-                                <b>Dependencies</b>
-                            </th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {bulkDeleteErrorMessages?.map((message) => (
-                            <tr>
-                                <td>{message.name}</td>
-                                <td>{message.message}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </Table>
-            </div>
-        ),
-        [bulkDeleteErrorMessages, checkedRows.length],
+    const forceDeleteBody = (
+        <ForceDeleteErrorTable
+            items={bulkDeleteErrorMessages}
+            entityNameSingular="a CMP Profile"
+            entityNamePlural="CMP Profiles"
+            itemsCount={checkedRows.length}
+        />
     );
 
     const cmpProfilesTableHeader: TableHeader[] = useMemo(
@@ -222,7 +222,7 @@ export default function AdministratorsList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <Container>
             <Widget
                 title="List of CMP Profiles"
                 busy={isBusy}
@@ -231,7 +231,6 @@ export default function AdministratorsList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={cmpProfilesTableHeader}
                     data={cmpProfilesTableData}
@@ -244,24 +243,33 @@ export default function AdministratorsList() {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete ${checkedRows.length > 1 ? 'CMP Profiles' : 'an CMP Profile'}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? 'CMP Profiles' : 'an CMP Profile'}. Is this what you want to do?`}
+                caption={`Delete ${checkedRows.length > 1 ? 'CMP Profiles' : 'a CMP Profile'}`}
+                body={`You are about to delete ${checkedRows.length > 1 ? 'CMP Profiles' : 'a CMP Profile'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
             <Dialog
                 isOpen={confirmForceDelete}
-                caption={`Force Delete ${checkedRows.length > 1 ? 'CMP Profiles' : 'an CMP Profile'}`}
+                caption={`Force Delete ${checkedRows.length > 1 ? 'CMP Profiles' : 'a CMP Profile'}`}
                 body={forceDeleteBody}
                 toggle={() => setConfirmForceDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
-                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
+            />
+
+            <Dialog
+                isOpen={isAddModalOpen || !!editingCmpProfileId}
+                toggle={handleCloseAddModal}
+                caption={editingCmpProfileId ? 'Edit CMP Profile' : 'Create CMP Profile'}
+                size="xl"
+                body={<CmpProfileForm cmpProfileId={editingCmpProfileId} onCancel={handleCloseAddModal} />}
             />
         </Container>
     );

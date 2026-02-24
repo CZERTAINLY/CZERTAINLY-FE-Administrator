@@ -1,7 +1,8 @@
 import Widget from 'components/Widget';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import Select from 'react-select';
-import { Form as BootstrapForm, Button, Col, Label, Row, ButtonGroup } from 'reactstrap';
+import Select from 'components/Select';
+import Button from 'components/Button';
+import Label from 'components/Label';
 import { ComplianceProfileDtoV2, ComplianceRuleListDto, FunctionGroupCode, PlatformEnum, Resource } from 'types/openapi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
@@ -9,6 +10,7 @@ import { actions, selectors, actions as complianceActions } from 'ducks/complian
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as connectorsActions, selectors as connectorsSelectors } from 'ducks/connectors';
 import CustomTable from 'components/CustomTable';
+import Container from 'components/Container';
 import {
     getAssignedInternalListOfGroupsAndRules,
     getAssignedProviderListOfGroupsAndRules,
@@ -23,14 +25,57 @@ import type { WidgetButtonProps } from 'components/WidgetButtons';
 import { ResourceBadges } from 'components/_pages/compliance-profiles/detail/Components/ResourceBadges';
 import Dialog from 'components/Dialog';
 import AttributeEditor from 'components/Attributes/AttributeEditor';
-import { mutators } from 'utils/attributes/attributeEditorMutators';
-import { Form } from 'react-final-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import ProgressButton from 'components/ProgressButton';
+import { Plus } from 'lucide-react';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
 import InternalRuleForm from 'components/_pages/compliance-profiles/detail/InternalRuleForm/InternalRuleForm';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { TRuleGroupType } from 'types/complianceProfiles';
+
+const AttributeEditorDialogBody = ({
+    isAssigningRule,
+    onSubmit,
+    onCancel,
+}: {
+    isAssigningRule: TRuleGroupType | null;
+    onSubmit: (values: any) => void;
+    onCancel: () => void;
+}) => {
+    const methods = useForm({
+        mode: 'onTouched',
+        defaultValues: {},
+    });
+
+    const { handleSubmit, formState } = methods;
+
+    return (
+        <div data-testid="attribute-editor-dialog">
+            <FormProvider {...methods}>
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <div className="space-y-4">
+                        <AttributeEditor
+                            id="rule-attributes"
+                            attributeDescriptors={(isAssigningRule?.attributes ?? []) as AttributeDescriptorModel[]}
+                        />
+                        <Container className="flex-row justify-end modal-footer" gap={4}>
+                            <ProgressButton
+                                title={'Add rule'}
+                                inProgressTitle={'Adding...'}
+                                inProgress={formState.isSubmitting}
+                                disabled={!formState.isDirty || formState.isSubmitting || !formState.isValid}
+                            />
+                            <Button color="secondary" onClick={onCancel} disabled={formState.isSubmitting}>
+                                Cancel
+                            </Button>
+                        </Container>
+                    </div>
+                </form>
+            </FormProvider>
+        </div>
+    );
+};
 
 interface Props {
     profile: ComplianceProfileDtoV2 | undefined;
@@ -316,88 +361,73 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                 lockSize="large"
                 dataTestId="available-rules-and-groups-widget"
             >
-                <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                    <Col style={{ width: '100%' }}>
-                        <Label for="availableRulesSource">Rules Source</Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="w-full">
+                        <Label htmlFor="availableRulesSource">Rules Source</Label>
                         <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: '10px' }}>
                             <Select
                                 id="availableRulesSource"
-                                inputId="availableRulesSource"
                                 placeholder="Select..."
-                                maxMenuHeight={140}
                                 options={rulesSourceOptions}
-                                value={rulesSourceOptions.find((opt) => opt.value === availableSelectedRulesSource) || null}
-                                menuPlacement="auto"
-                                onChange={(event) => {
+                                value={availableSelectedRulesSource || ''}
+                                onChange={(value) => {
                                     setSelectedAvailableResourceType('All');
                                     handleClearInput();
-                                    setAvailableSelectedRulesSource((event?.value as 'Internal' | 'Provider') || null);
+                                    setAvailableSelectedRulesSource((value as 'Internal' | 'Provider') || null);
                                     setSelectedAvailableProvider(null);
                                     setSelectedAvailableKind(null);
                                 }}
                                 isClearable
-                                styles={{
-                                    container: (base) => ({
-                                        ...base,
-                                        flex: 1,
-                                        width: '100%',
-                                    }),
-                                }}
                             />
 
                             {availableSelectedRulesSource === 'Internal' && (
                                 <Button
                                     data-testid="add-internal-rule-button"
-                                    className="btn btn-link"
-                                    color="white"
+                                    variant="transparent"
                                     onClick={() => setIsAddingInternalRule(true)}
                                 >
-                                    <i className="fa fa-plus" />
+                                    <Plus size={16} />
                                 </Button>
                             )}
                         </div>
-                    </Col>
-                </Row>
+                    </div>
+                </div>
                 {availableSelectedRulesSource === 'Provider' && (
-                    <Row xs="1" sm="1" md="2" lg="2" xl="2" style={{ marginTop: '10px' }}>
-                        <Col>
-                            <Label for="availableProvider">Provider</Label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2.5">
+                        <div>
+                            <Label htmlFor="availableProvider">Provider</Label>
                             <Select
                                 id="availableProvider"
-                                inputId="availableProvider"
                                 placeholder="Select..."
-                                maxMenuHeight={140}
                                 options={availableProviderOptions}
-                                value={availableProviderOptions.find((opt) => opt.value === selectedAvailableProvider) || null}
-                                menuPlacement="auto"
-                                onChange={(event) => {
+                                value={selectedAvailableProvider || ''}
+                                onChange={(value) => {
                                     setSelectedAvailableKind(null);
-                                    setSelectedAvailableProvider(event?.value || null);
+                                    setSelectedAvailableProvider((value as string) || null);
                                     handleClearInput();
                                 }}
                                 isClearable
                             />
-                        </Col>
-                        <Col>
-                            <Label for="availableKind">Kind</Label>
+                        </div>
+                        <div>
+                            <Label htmlFor="availableKind">Kind</Label>
                             <Select
                                 id="availableKind"
-                                inputId="availableKind"
                                 placeholder="Select..."
-                                maxMenuHeight={140}
                                 options={availableKindOptions}
-                                value={availableKindOptions.find((opt) => opt.value === selectedAvailableKind) || null}
-                                onChange={(event) => {
-                                    if (!event) {
+                                value={selectedAvailableKind || ''}
+                                onChange={(value) => {
+                                    if (!value) {
                                         handleClearInput();
+                                        setSelectedAvailableKind(null);
+                                        return;
                                     }
-                                    setSelectedAvailableKind(event?.value || null);
+                                    setSelectedAvailableKind(value as string);
                                 }}
-                                menuPlacement="auto"
                                 isClearable
                             />
-                        </Col>
-                    </Row>
+                        </div>
+                    </div>
                 )}
                 <ResourceBadges
                     resources={availableRulesAndGroupsResources}
@@ -418,38 +448,14 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                 isOpen={isAddingRuleHasAttribute}
                 caption="Attributes"
                 body={
-                    <div data-testid="attribute-editor-dialog">
-                        <Form onSubmit={onSubmit} mutators={{ ...mutators() }}>
-                            {({ handleSubmit, pristine, submitting, valid, form }) => (
-                                <BootstrapForm onSubmit={handleSubmit}>
-                                    <AttributeEditor
-                                        id="rule-attributes"
-                                        attributeDescriptors={(isAssigningRule?.attributes ?? []) as AttributeDescriptorModel[]}
-                                    />
-                                    <div className="d-flex justify-content-end">
-                                        <ButtonGroup>
-                                            <ProgressButton
-                                                title={'Add rule'}
-                                                inProgressTitle={'Adding...'}
-                                                inProgress={submitting}
-                                                disabled={pristine || submitting || !valid}
-                                            />
-                                            <Button
-                                                color="default"
-                                                onClick={() => {
-                                                    setIsAddingRuleHasAttribute(false);
-                                                    setIsAssigningRule(null);
-                                                }}
-                                                disabled={submitting}
-                                            >
-                                                Cancel
-                                            </Button>
-                                        </ButtonGroup>
-                                    </div>
-                                </BootstrapForm>
-                            )}
-                        </Form>
-                    </div>
+                    <AttributeEditorDialogBody
+                        isAssigningRule={isAssigningRule}
+                        onSubmit={onSubmit}
+                        onCancel={() => {
+                            setIsAddingRuleHasAttribute(false);
+                            setIsAssigningRule(null);
+                        }}
+                    />
                 }
                 toggle={() => setIsAddingRuleHasAttribute(false)}
                 buttons={[]}
@@ -457,7 +463,7 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
             />
 
             <Dialog
-                size="xl"
+                size="xxl"
                 isOpen={isAddingInternalRule}
                 caption="Create Internal Rule"
                 body={<InternalRuleForm onCancel={() => setIsAddingInternalRule(false)} />}
@@ -479,11 +485,12 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
             <Dialog
                 isOpen={deletingInternalRuleId !== null}
                 caption="Delete Internal Rule"
-                body="You are about to delete a Internal Rule. Is this what you want to do?"
+                body="You are about to delete an Internal Rule. Is this what you want to do?"
                 toggle={() => setDeletingInternalRuleId(null)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: () => deleteInternalRule(deletingInternalRuleId!), body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setDeletingInternalRuleId(null), body: 'Cancel' },
+                    { color: 'danger', onClick: () => deleteInternalRule(deletingInternalRuleId!), body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setDeletingInternalRuleId(null), body: 'Cancel' },
                 ]}
                 dataTestId="delete-internal-rule-dialog"
             />

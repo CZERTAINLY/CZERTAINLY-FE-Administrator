@@ -1,6 +1,5 @@
-import cx from 'classnames';
+import cn from 'classnames';
 
-import style from './Footer.module.scss';
 import PlatformInfoDialogButton from 'components/Layout/PlatformInfoDialogButton';
 
 interface Props {
@@ -9,22 +8,40 @@ interface Props {
 
 function Footer({ className }: Props) {
     return (
-        <footer className={cx(style.root, className)}>
-            <div className={style.container}>
-                <span>© 2018-{new Date().getFullYear()} &nbsp;CZERTAINLY s.r.o. </span>
-                <span className={style.spacer}>·</span>
-                <a href="https://docs.czertainly.com/docs" target="_blank" rel="noopener noreferrer">
+        <footer className={cn('py-4 pt-12', className)} data-testid="footer">
+            <div className="text-sm font-semibold">
+                <span>© 2018-{new Date().getFullYear()} &nbsp;Identity Lifecycle Management </span>
+                <span className="mx-2">·</span>
+                <a
+                    href="https://docs.czertainly.com/docs"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600"
+                    data-testid="footer-docs-link"
+                >
                     Documentation
                 </a>
-                <span className={style.spacer}>·</span>
-                <a href="https://czertainly.atlassian.net/servicedesk/customer/portal/1" target="_blank" rel="noopener noreferrer">
+                <span className="mx-2">·</span>
+                <a
+                    href="https://czertainly.atlassian.net/servicedesk/customer/portal/1"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600"
+                    data-testid="footer-support-link"
+                >
                     Support
                 </a>
-                <span className={style.spacer}>·</span>
-                <a href="https://www.czertainly.com" target="_blank" rel="noopener noreferrer">
+                <span className="mx-2">·</span>
+                <a
+                    href="https://www.czertainly.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600"
+                    data-testid="footer-about-link"
+                >
                     About Us
                 </a>
-                <span className={style.spacer}>·</span>
+                <span className="mx-2">·</span>
                 <PlatformInfoDialogButton />
             </div>
         </footer>

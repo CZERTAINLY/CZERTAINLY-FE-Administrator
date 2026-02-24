@@ -1,7 +1,9 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
-import { Badge, Container } from 'reactstrap';
+import { Link } from 'react-router';
+
+import Badge from 'components/Badge';
 
 import { actions, selectors } from 'ducks/ra-profiles';
 
@@ -9,12 +11,12 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
+import RaProfileForm from '../form';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
 function RaProfileList() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const checkedRows = useSelector(selectors.checkedRows);
     const raProfiles = useSelector(selectors.raProfiles);
@@ -23,6 +25,7 @@ function RaProfileList() {
     const isDeleting = useSelector(selectors.isDeleting);
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
     const isUpdating = useSelector(selectors.isUpdating);
+    const isCreating = useSelector(selectors.isCreating);
     const isEnabling = useSelector(selectors.isEnabling);
     const isBulkEnabling = useSelector(selectors.isBulkEnabling);
     const isBulkDisabling = useSelector(selectors.isBulkDisabling);
@@ -30,8 +33,10 @@ function RaProfileList() {
     const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isEnabling || isBulkEnabling || isBulkDisabling;
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
-
     const [complianceCheck, setComplianceCheck] = useState<boolean>(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+    const [editingRaProfileId, setEditingRaProfileId] = useState<string | undefined>(undefined);
+    const [editingAuthorityId, setEditingAuthorityId] = useState<string | undefined>(undefined);
 
     const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
@@ -42,9 +47,30 @@ function RaProfileList() {
         getFreshData();
     }, [getFreshData]);
 
+    useRunOnFinished(isCreating, () => {
+        setIsAddModalOpen(false);
+        setEditingAuthorityId(undefined);
+        getFreshData();
+    });
+    useRunOnFinished(isUpdating, () => {
+        setEditingRaProfileId(undefined);
+        setEditingAuthorityId(undefined);
+        getFreshData();
+    });
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingRaProfileId(undefined);
+        setEditingAuthorityId(undefined);
+    }, []);
+
     const onAddClick = useCallback(() => {
-        navigate(`./add`);
-    }, [navigate]);
+        handleOpenAddModal();
+    }, [handleOpenAddModal]);
 
     const onEnableClick = useCallback(() => {
         dispatch(actions.bulkEnableRaProfiles({ uuids: checkedRows }));
@@ -77,9 +103,7 @@ function RaProfileList() {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => {
-                    onAddClick();
-                },
+                onClick: handleOpenAddModal,
             },
             {
                 icon: 'trash',
@@ -114,7 +138,7 @@ function RaProfileList() {
                 },
             },
         ],
-        [checkedRows, onAddClick, onEnableClick, onDisableClick],
+        [checkedRows, handleOpenAddModal, onEnableClick, onDisableClick],
     );
 
     const raProfilesTableHeaders: TableHeader[] = useMemo(
@@ -124,12 +148,13 @@ function RaProfileList() {
                 content: 'Name',
                 sortable: true,
                 sort: 'asc',
-                width: '15%',
+                width: '20%',
             },
             {
                 id: 'description',
                 content: 'Description',
                 sortable: true,
+                width: '38%',
             },
             {
                 id: 'authority',
@@ -164,9 +189,7 @@ function RaProfileList() {
                 <>
                     {protocols.map((protocol) => (
                         <Fragment key={protocol}>
-                            <Badge color="secondary" searchvalue={protocol}>
-                                {protocol}
-                            </Badge>
+                            <Badge color="secondary">{protocol}</Badge>
                             &nbsp;
                         </Fragment>
                     ))}
@@ -204,7 +227,7 @@ function RaProfileList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
                 title="List of RA Profiles"
                 busy={isBusy}
@@ -213,25 +236,25 @@ function RaProfileList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={raProfilesTableHeaders}
                     data={profilesTableData}
                     onCheckedRowsChanged={setCheckedRows}
-                    canSearch={true}
-                    hasCheckboxes={true}
-                    hasPagination={true}
+                    canSearch
+                    hasCheckboxes
+                    hasPagination
                 />
             </Widget>
 
             <Dialog
                 isOpen={confirmDelete}
                 caption={`Delete RA ${checkedRows.length > 1 ? 'Profiles' : 'Profile'}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? 'a RA Profile' : 'RA profiles'}. Is this what you want to do?`}
+                body={`You are about to delete ${checkedRows.length > 1 ? 'RA profiles' : 'this RA Profile'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'primary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
 
@@ -240,12 +263,21 @@ function RaProfileList() {
                 caption={`Initiate Compliance Check`}
                 body={'Initiate the compliance check for the selected RA Profile(s)?'}
                 toggle={() => setComplianceCheck(false)}
+                noBorder
                 buttons={[
+                    { color: 'primary', variant: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                     { color: 'primary', onClick: onComplianceCheckConfirmed, body: 'Yes' },
-                    { color: 'secondary', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+
+            <Dialog
+                isOpen={isAddModalOpen || !!editingRaProfileId}
+                toggle={handleCloseAddModal}
+                caption={editingRaProfileId ? 'Edit RA Profile' : 'Create RA Profile'}
+                size="xl"
+                body={<RaProfileForm raProfileId={editingRaProfileId} authorityId={editingAuthorityId} onCancel={handleCloseAddModal} />}
+            />
+        </>
     );
 }
 

@@ -1,7 +1,7 @@
 import ConditionAndSetFieldExecutionItemsViewer from 'components/ConditionAndSetFieldExecutionItemsViewer';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
-import GoBackButton from 'components/GoBackButton';
+import Breadcrumb from 'components/Breadcrumb';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -9,8 +9,12 @@ import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rule
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
-import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
+import Button from 'components/Button';
+import Container from 'components/Container';
+import TextInput from 'components/TextInput';
 import { PlatformEnum, Resource } from 'types/openapi';
+import { Check, X } from 'lucide-react';
+import EditIcon from 'components/icons/EditIcon';
 
 const ConditionDetails = () => {
     const { id } = useParams();
@@ -119,8 +123,8 @@ const ConditionDetails = () => {
                           columns: [
                               'Description',
                               updateDescriptionEditEnable ? (
-                                  <Input
-                                      onChange={(e) => setUpdatedDescription(e.target.value)}
+                                  <TextInput
+                                      onChange={(value) => setUpdatedDescription(value)}
                                       value={updatedDescription}
                                       placeholder="Enter Description"
                                   />
@@ -129,10 +133,9 @@ const ConditionDetails = () => {
                               ),
                               <div>
                                   {updateDescriptionEditEnable ? (
-                                      <ButtonGroup>
+                                      <div className="flex gap-2">
                                           <Button
-                                              className="btn btn-link mx-auto"
-                                              size="sm"
+                                              variant="transparent"
                                               color="secondary"
                                               title="Update Description"
                                               onClick={onUpdateDescriptionConfirmed}
@@ -142,11 +145,11 @@ const ConditionDetails = () => {
                                                   updatedDescription === ''
                                               }
                                           >
-                                              <i className="fa fa-check" />
+                                              <Check size={16} />
                                           </Button>
                                           <Button
-                                              className="btn btn-link mx-auto danger"
-                                              size="sm"
+                                              variant="transparent"
+                                              color="danger"
                                               title="Cancel"
                                               onClick={() => {
                                                   setUpdateDescription(false);
@@ -154,13 +157,12 @@ const ConditionDetails = () => {
                                               }}
                                               disabled={isUpdatingGroupDetails}
                                           >
-                                              <i className="fa fa-close text-danger" />
+                                              <X size={16} />
                                           </Button>
-                                      </ButtonGroup>
+                                      </div>
                                   ) : (
                                       <Button
-                                          className="btn btn-link mx-auto"
-                                          size="sm"
+                                          variant="transparent"
                                           color="secondary"
                                           title="Update Description"
                                           onClick={() => {
@@ -168,7 +170,7 @@ const ConditionDetails = () => {
                                           }}
                                           disabled={isUpdatingGroupDetails}
                                       >
-                                          <i className="fa fa-pencil-square-o" />
+                                          <EditIcon size={16} />
                                       </Button>
                                   )}
                               </div>,
@@ -189,14 +191,15 @@ const ConditionDetails = () => {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/rules"
-                text={`${getEnumLabel(resourceTypeEnum, Resource.Conditions)} Inventory`}
+        <Container>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceTypeEnum, Resource.Conditions)} Inventory`, href: '/rules' },
+                    { label: conditionDetails?.name || 'Condition Details', href: '' },
+                ]}
             />
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
                     <Widget
                         refreshAction={getFreshDetails}
                         busy={isBusy}
@@ -206,21 +209,22 @@ const ConditionDetails = () => {
                     >
                         <CustomTable data={conditionGroupsDetailData} headers={tableHeader} />
                     </Widget>
-                </Col>
-            </Row>
-            <Row>
+                </div>
+            </div>
+            <div>
                 {conditionDetails?.resource && (
                     <ConditionAndSetFieldExecutionItemsViewer resource={conditionDetails.resource} formType="conditionItems" />
                 )}
-            </Row>
+            </div>
             <Dialog
                 isOpen={confirmDelete}
                 caption={`Delete a Condition`}
                 body={`You are about to delete a Condition. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
         </Container>

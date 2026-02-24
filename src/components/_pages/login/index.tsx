@@ -1,0 +1,87 @@
+import { useEffect } from 'react';
+import { useSearchParams } from 'react-router';
+import { useDispatch, useSelector } from 'react-redux';
+import { actions, selectors } from 'ducks/login';
+import Button from 'components/Button';
+
+export default function Login() {
+    const dispatch = useDispatch();
+    const [searchParams] = useSearchParams();
+
+    const loginMethods = useSelector(selectors.loginMethods);
+    const isLoading = useSelector(selectors.isFetching);
+    const error = useSelector(selectors.error);
+    const redirect = searchParams.get('redirect');
+
+    useEffect(() => {
+        dispatch(actions.getLoginMethods({ redirect: redirect || undefined }));
+    }, [dispatch, redirect]);
+
+    const handleLoginClick = (loginUrl: string) => {
+        const fullUrl = loginUrl.startsWith('http') ? loginUrl : `${window.location.origin}${loginUrl}`;
+        if (redirect) {
+            const separator = fullUrl.includes('?') ? '&' : '?';
+            const finalUrl = `${fullUrl}${separator}redirect=${encodeURIComponent(redirect)}`;
+            window.location.assign(finalUrl);
+        } else {
+            window.location.assign(fullUrl);
+        }
+    };
+
+    const capitalizeFirst = (str: string) => {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    };
+
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-neutral-900 px-4 py-12">
+            <main className="max-w-md w-full">
+                <div className="flex justify-center mb-8">
+                    <img src="./logo.svg" alt="CZERTAINLY Logo" className="h-13" />
+                </div>
+
+                <h1 className="text-xl font-bold mt-8 mb-9 text-center text-gray-800 dark:text-white">Login with</h1>
+
+                {(() => {
+                    if (isLoading) {
+                        return (
+                            <div className="text-center py-8">
+                                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+                                <p className="mt-4 text-gray-600 dark:text-gray-400">Loading login options...</p>
+                            </div>
+                        );
+                    }
+                    if (error) {
+                        return (
+                            <div className="text-center py-8">
+                                <p className="text-red-600 dark:text-red-400">{error}</p>
+                            </div>
+                        );
+                    }
+                    if (!loginMethods || loginMethods.length === 0) {
+                        return (
+                            <div className="text-center py-8">
+                                <p className="text-gray-600 dark:text-neutral-400">No login methods available</p>
+                            </div>
+                        );
+                    }
+                    return (
+                        <ul className="flex flex-wrap -mx-2.5 w-full">
+                            {(loginMethods || []).map((method) => (
+                                <li key={method.name} className="w-1/2 p-2.5">
+                                    <Button
+                                        onClick={() => handleLoginClick(method.loginUrl)}
+                                        variant="outline"
+                                        color="lightGray"
+                                        className="w-full capitalize !text-base font-semibold justify-center"
+                                    >
+                                        {capitalizeFirst(method.name)}
+                                    </Button>
+                                </li>
+                            ))}
+                        </ul>
+                    );
+                })()}
+            </main>
+        </div>
+    );
+}

@@ -7,19 +7,20 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/credentials';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router';
-import { Container } from 'reactstrap';
+import { Link, useParams } from 'react-router';
+import CredentialForm from '../form';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import { createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import Container from 'components/Container';
+import Breadcrumb from 'components/Breadcrumb';
 
 function CredentialDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id } = useParams();
 
@@ -27,10 +28,12 @@ function CredentialDetail() {
 
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
+    const isUpdating = useSelector(selectors.isUpdating);
 
     const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const getFreshCredentialDetails = useCallback(() => {
         if (!id) return;
@@ -42,10 +45,23 @@ function CredentialDetail() {
         getFreshCredentialDetails();
     }, [getFreshCredentialDetails, id]);
 
-    const onEditClick = useCallback(() => {
+    useRunOnFinished(isUpdating, () => {
+        setIsEditModalOpen(false);
+        getFreshCredentialDetails();
+    });
+
+    const handleOpenEditModal = useCallback(() => {
         if (!credential) return;
-        navigate(`../../credentials/edit/${credential.uuid}`);
-    }, [navigate, credential]);
+        setIsEditModalOpen(true);
+    }, [credential]);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
+
+    const onEditClick = useCallback(() => {
+        handleOpenEditModal();
+    }, [handleOpenEditModal]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!credential) return;
@@ -120,69 +136,85 @@ function CredentialDetail() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/credentials"
-                text={`${getEnumLabel(resourceEnum, Resource.Credentials)} Inventory`}
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.Credentials)} Inventory`, href: '/credentials' },
+                    { label: credential?.name || 'Credential Details', href: '' },
+                ]}
             />
-            <Widget
-                title="Credential Details"
-                busy={isFetching || isDeleting}
-                widgetButtons={widgetButtons}
-                titleSize="large"
-                refreshAction={getFreshCredentialDetails}
-                widgetLockName={LockWidgetNameEnum.CredentialDetails}
-            >
-                <br />
-
-                <CustomTable headers={detailHeaders} data={detailData} />
-            </Widget>
-
-            {credential && credential.attributes && credential.attributes.length > 0 && (
-                <Widget title="Credential Attributes" titleSize="large">
-                    <br />
-                    <AttributeViewer attributes={credential?.attributes} />
+            <Container>
+                <Widget
+                    title="Credential Details"
+                    busy={isFetching || isDeleting}
+                    widgetButtons={widgetButtons}
+                    titleSize="large"
+                    refreshAction={getFreshCredentialDetails}
+                    widgetLockName={LockWidgetNameEnum.CredentialDetails}
+                >
+                    <CustomTable headers={detailHeaders} data={detailData} />
                 </Widget>
-            )}
 
-            {credential && (
-                <CustomAttributeWidget
-                    resource={Resource.Credentials}
-                    resourceUuid={credential.uuid}
-                    attributes={credential.customAttributes}
+                {credential && credential.attributes && credential.attributes.length > 0 && (
+                    <Widget title="Credential Attributes" titleSize="large">
+                        <AttributeViewer attributes={credential?.attributes} />
+                    </Widget>
+                )}
+
+                {credential && (
+                    <CustomAttributeWidget
+                        resource={Resource.Credentials}
+                        resourceUuid={credential.uuid}
+                        attributes={credential.customAttributes}
+                    />
+                )}
+
+                <Dialog
+                    isOpen={confirmDelete}
+                    caption="Delete Credential"
+                    body="You are about to delete a Credential. Is this what you want to do?"
+                    toggle={() => setConfirmDelete(false)}
+                    icon="delete"
+                    buttons={[
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    ]}
                 />
-            )}
 
-            <Dialog
-                isOpen={confirmDelete}
-                caption="Delete Credential"
-                body="You are about to delete an Credential. Is this what you want to do?"
-                toggle={() => setConfirmDelete(false)}
-                buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                ]}
-            />
+                <Dialog
+                    isOpen={deleteErrorMessage !== ''}
+                    caption="Delete Connector"
+                    body={
+                        <>
+                            Failed to delete the Credential as the Credential has dependent objects. Please find the details below:
+                            <br />
+                            <br />
+                            {deleteErrorMessage}
+                        </>
+                    }
+                    toggle={() => dispatch(actions.clearDeleteErrorMessages())}
+                    buttons={[
+                        { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force' },
+                        {
+                            color: 'secondary',
+                            variant: 'outline',
+                            onClick: () => dispatch(actions.clearDeleteErrorMessages()),
+                            body: 'Cancel',
+                        },
+                    ]}
+                />
 
-            <Dialog
-                isOpen={deleteErrorMessage !== ''}
-                caption="Delete Connector"
-                body={
-                    <>
-                        Failed to delete the Credential as the Credential has dependent objects. Please find the details below:
-                        <br />
-                        <br />
-                        {deleteErrorMessage}
-                    </>
-                }
-                toggle={() => dispatch(actions.clearDeleteErrorMessages())}
-                buttons={[
-                    { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force' },
-                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
-                ]}
-            />
-        </Container>
+                <Dialog
+                    isOpen={isEditModalOpen}
+                    toggle={handleCloseEditModal}
+                    caption="Edit Credential"
+                    size="xl"
+                    body={
+                        <CredentialForm credentialId={credential?.uuid} onCancel={handleCloseEditModal} onSuccess={handleCloseEditModal} />
+                    }
+                />
+            </Container>
+        </div>
     );
 }
 

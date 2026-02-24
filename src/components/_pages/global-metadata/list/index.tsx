@@ -7,15 +7,14 @@ import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions, selectors } from 'ducks/globalMetadata';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
-import { Container } from 'reactstrap';
+import { Link } from 'react-router';
 import { PlatformEnum } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import ConnectorMetadataDialog from './ConnectorMetadataDialog';
+import GlobalMetadataForm from '../form';
 
 export default function GlobalMetadataList() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const checkedRows = useSelector(selectors.checkedRows);
     const globalMetadata = useSelector(selectors.globalMetadataList);
@@ -27,6 +26,8 @@ export default function GlobalMetadataList() {
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [showPromote, setShowPromote] = useState<boolean>(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+    const [editingGlobalMetadataId, setEditingGlobalMetadataId] = useState<string | undefined>(undefined);
     const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
 
     const getFreshData = useCallback(() => {
@@ -35,6 +36,16 @@ export default function GlobalMetadataList() {
     }, [dispatch]);
 
     useEffect(() => {
+        getFreshData();
+    }, [getFreshData]);
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingGlobalMetadataId(undefined);
         getFreshData();
     }, [getFreshData]);
 
@@ -52,11 +63,11 @@ export default function GlobalMetadataList() {
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
-            { icon: 'plus', disabled: false, tooltip: 'Create', onClick: () => navigate(`./add`) },
+            { icon: 'plus', disabled: false, tooltip: 'Create', onClick: handleOpenAddModal },
             { icon: 'push', disabled: false, tooltip: 'Promote', onClick: () => setShowPromote(true) },
             { icon: 'trash', disabled: checkedRows.length === 0, tooltip: 'Delete', onClick: () => setConfirmDelete(true) },
         ],
-        [checkedRows, navigate],
+        [checkedRows, handleOpenAddModal],
     );
 
     const globalMetadataTableHeaders: TableHeader[] = useMemo(
@@ -66,7 +77,7 @@ export default function GlobalMetadataList() {
                 content: 'Name',
                 sortable: true,
                 sort: 'asc',
-                width: '20%',
+                width: '40%',
             },
             {
                 id: 'contentType',
@@ -98,7 +109,7 @@ export default function GlobalMetadataList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
                 title="List of Global Metadata"
                 busy={isBusy}
@@ -107,7 +118,6 @@ export default function GlobalMetadataList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={globalMetadataTableHeaders}
                     data={globalMetadataTableData}
@@ -123,13 +133,28 @@ export default function GlobalMetadataList() {
                 caption={`Delete Global Metadata`}
                 body={`You are about to delete selected Global Metadata. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
             <ConnectorMetadataDialog show={showPromote} setShow={setShowPromote} />
-        </Container>
+
+            <Dialog
+                isOpen={isAddModalOpen || !!editingGlobalMetadataId}
+                toggle={handleCloseAddModal}
+                caption={editingGlobalMetadataId ? 'Edit Global Metadata' : 'Create Global Metadata'}
+                size="xl"
+                body={
+                    <GlobalMetadataForm
+                        globalMetadataId={editingGlobalMetadataId}
+                        onCancel={handleCloseAddModal}
+                        onSuccess={handleCloseAddModal}
+                    />
+                }
+            />
+        </>
     );
 }

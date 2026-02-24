@@ -1,6 +1,10 @@
 import debounce from 'lodash.debounce';
 import React, { useCallback, useState } from 'react';
-import { Col, FormGroup, Input, Label, Row } from 'reactstrap';
+
+import Label from 'components/Label';
+import TextInput from 'components/TextInput';
+import TextArea from 'components/TextArea';
+import Button from 'components/Button';
 
 interface Props {
     onFileContentLoaded: (fileContent: string) => void;
@@ -50,7 +54,7 @@ export default function FileUpload({ id = '', fileType = '', editable, onFileCon
     );
 
     const onFileDrop = useCallback(
-        (e: React.DragEvent<HTMLInputElement>) => {
+        (e: React.DragEvent<HTMLDivElement>) => {
             e.preventDefault();
             if (!e.dataTransfer || !e.dataTransfer.files || e.dataTransfer.files.length === 0) {
                 return;
@@ -61,11 +65,10 @@ export default function FileUpload({ id = '', fileType = '', editable, onFileCon
         [createReader],
     );
 
-    const onFileDragOver = useCallback((e: React.DragEvent<HTMLInputElement>) => e.preventDefault(), []);
+    const onFileDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => e.preventDefault(), []);
 
     const onFileInputTextChanged = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => {
-            const fileContentLatest = e.target.value;
+        (fileContentLatest: string) => {
             setFileContent(fileContentLatest);
 
             if (!fileContentLatest.length || fileContentLatest === fileContent) return;
@@ -77,66 +80,58 @@ export default function FileUpload({ id = '', fileType = '', editable, onFileCon
     );
 
     return (
-        <div
-            className="border border-light rounded mb-0"
-            style={{ padding: '1em', borderStyle: 'dashed', borderWidth: '2px' }}
-            onDrop={onFileDrop}
-            onDragOver={onFileDragOver}
-        >
-            <Row>
-                <Col>
-                    <FormGroup>
-                        <Label for={`${id}__fileUpload__fileName`}>File name</Label>
-                        <Input
-                            id={`${id}__fileUpload__fileName`}
-                            type="text"
-                            placeholder="File not selected"
-                            disabled={true}
-                            style={{ textAlign: 'center' }}
-                            value={fileName}
-                        />
-                    </FormGroup>
-                </Col>
+        <div role="region" aria-label="File upload area" onDrop={onFileDrop} onDragOver={onFileDragOver}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <TextInput
+                        id={`${id}__fileUpload__fileName`}
+                        type="text"
+                        placeholder="File not selected"
+                        disabled
+                        value={fileName}
+                        onChange={() => {}}
+                        label="File name"
+                    />
+                </div>
 
-                <Col>
-                    <FormGroup>
-                        <Label for={`${id}__fileUpload__contentType`}>Content type</Label>
-                        <Input
-                            id={`${id}__fileUpload__contentType`}
-                            type="text"
-                            placeholder="File not selected"
-                            disabled={true}
-                            style={{ textAlign: 'center' }}
-                            value={contentType}
-                        />
-                    </FormGroup>
-                </Col>
-            </Row>
+                <div>
+                    <TextInput
+                        id={`${id}__fileUpload__contentType`}
+                        type="text"
+                        placeholder="File not selected"
+                        disabled
+                        value={contentType}
+                        onChange={() => {}}
+                        label="Content type"
+                    />
+                </div>
+            </div>
 
             {showContent && (
-                <FormGroup>
-                    <Label for={`${id}__fileUpload__fileContent`}>File content</Label>
-                    <Input
+                <div className="mb-4">
+                    <TextArea
                         id={`${id}__fileUpload__fileContent`}
-                        type="textarea"
-                        rows={10}
+                        label="File content"
+                        rows={3}
                         placeholder={`Select or drag & drop ${fileType} file or paste file content in the text area.`}
-                        readOnly={!editable}
+                        disabled={!editable}
                         value={fileContent}
                         onChange={onFileInputTextChanged}
+                        className={editable ? '' : 'bg-gray-50 dark:bg-neutral-800'}
                     />
-                </FormGroup>
+                </div>
             )}
 
-            <FormGroup style={{ textAlign: 'right' }}>
-                <Label className="btn btn-default" for={`${id}__fileUpload__file`} style={{ margin: 0 }}>
-                    Select file...
-                </Label>
-                <Input id={`${id}__fileUpload__file`} type="file" style={{ display: 'none' }} onChange={onFileChanged} />
-            </FormGroup>
-
-            <div className="text-muted" style={{ textAlign: 'center', flexBasis: '100%', marginTop: '1rem' }}>
+            <div className="text-sm text-gray-500 mt-4 dark:text-neutral-400 mb-2">
                 Select or drag &amp; drop {fileType} file to drop zone or paste file content in the text area.
+            </div>
+            <div>
+                <Label htmlFor={`${id}__fileUpload__file`} className="cursor-pointer">
+                    <Button variant="transparent" color="secondary" onClick={() => {}} className="pointer-events-none">
+                        Select file...
+                    </Button>
+                </Label>
+                <input id={`${id}__fileUpload__file`} type="file" className="hidden" onChange={onFileChanged} />
             </div>
         </div>
     );

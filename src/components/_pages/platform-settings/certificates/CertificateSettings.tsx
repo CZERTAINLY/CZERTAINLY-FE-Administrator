@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { SettingsPlatformModel } from 'types/settings';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
-import SwitchWidget from 'components/SwitchWidget';
+import Switch from 'components/Switch';
 import { renderExpiringThresholdLabel, renderValidationFrequencyLabel } from 'utils/certificate-validation';
 
 type Props = {
@@ -29,7 +29,10 @@ const CertificateSettings = ({ platformSettings }: Props) => {
         const rows = [
             {
                 id: 'enabled',
-                columns: ['Validation Enabled', <SwitchWidget key="enabled" disabled checked={validation.enabled} />],
+                columns: [
+                    'Validation Enabled',
+                    <Switch key="enabled" id="validationEnabled" disabled checked={validation.enabled} onChange={() => {}} />,
+                ],
             },
         ];
         if (validation.enabled && typeof validation.frequency === 'number' && typeof validation.expiringThreshold === 'number') {

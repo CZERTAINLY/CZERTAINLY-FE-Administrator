@@ -2,44 +2,57 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 
 import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
+import cn from 'classnames';
 
 import { actions as connectorActions, selectors as connectorSelectors } from 'ducks/connectors';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Field, Form } from 'react-final-form';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
-import Select from 'react-select';
-import { Badge, Form as BootstrapForm, Button, ButtonGroup, Container, FormFeedback, FormGroup, Input, Label, Table } from 'reactstrap';
+import Select from 'components/Select';
+import Button from 'components/Button';
+import Container from 'components/Container';
+import Badge from 'components/Badge';
+import TextInput from 'components/TextInput';
 import { ConnectorResponseModel, EndpointModel } from 'types/connectors';
 import { AuthType, ConnectorStatus, PlatformEnum, Resource } from 'types/openapi';
 
 import { attributeFieldNameTransform, collectFormAttributes } from 'utils/attributes/attributes';
 
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired, validateRoutelessUrl } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateRequired, validateRoutelessUrl } from 'utils/validators';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
-import { mutators } from '../../../../utils/attributes/attributeEditorMutators';
 import AttributeEditor from '../../../Attributes/AttributeEditor';
 import TabLayout from '../../../Layout/TabLayout';
 import InventoryStatusBadge from '../ConnectorStatus';
+import Label from 'components/Label';
+
+interface ConnectorFormProps {
+    connectorId?: string;
+    onCancel?: () => void;
+    onSuccess?: () => void;
+}
 
 interface FormValues {
     uuid: string;
     name: string;
     url: string;
-    authenticationType: { value: AuthType };
+    authenticationType: string;
+    username?: string;
+    password?: string;
+    clientCert?: FileList;
 }
 
-export default function ConnectorForm() {
+export default function ConnectorForm({ connectorId, onCancel, onSuccess }: ConnectorFormProps) {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const authTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AuthType));
-    const { id } = useParams();
+    const { id: routeId } = useParams();
+    const id = connectorId || routeId;
 
     const editMode = useMemo(() => !!id, [id]);
-    const connectorWidgetTitle = useMemo(() => (editMode ? 'Edit Connector' : 'Create Connector'), [editMode]);
 
     const optionsForAuth: { label: string; value: AuthType }[] = useMemo(
         () => [
@@ -73,9 +86,6 @@ export default function ConnectorForm() {
     const [connector, setConnector] = useState<ConnectorResponseModel>();
 
     const connectorUuid = useMemo(() => connectorSelector?.uuid, [connectorSelector?.uuid]);
-    const [selectedAuthType, setSelectedAuthType] = useState<{ label: string; value: AuthType }>(
-        editMode ? optionsForAuth.find((opt) => opt.value === connector?.authType) || optionsForAuth[0] : optionsForAuth[0],
-    );
 
     const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
     const connectTitle = useMemo(() => (editMode ? 'Reconnect' : 'Connect'), [editMode]);
@@ -116,15 +126,6 @@ export default function ConnectorForm() {
         }
     }, [id, connectorUuid, connectorSelector, dispatch]);
 
-    useEffect(() => {
-        if (connector && editMode) {
-            const authOption = optionsForAuth.find((opt) => opt.value === connector.authType);
-            if (authOption) {
-                setSelectedAuthType(authOption);
-            }
-        }
-    }, [connector, editMode, optionsForAuth]);
-
     const onSubmit = useCallback(
         (values: FormValues) => {
             if (editMode) {
@@ -135,28 +136,28 @@ export default function ConnectorForm() {
                         uuid: connector?.uuid,
                         connectorUpdateRequest: {
                             url: values.url,
-                            authType: selectedAuthType.value,
+                            authType: values.authenticationType as AuthType,
                             customAttributes: collectFormAttributes('customConnector', resourceCustomAttributes, values),
                         },
-                    }),
+                    } as any),
                 );
             } else {
                 dispatch(
                     connectorActions.createConnector({
                         name: values.name,
                         url: values.url,
-                        authType: selectedAuthType.value,
+                        authType: values.authenticationType as AuthType,
                         customAttributes: collectFormAttributes('customConnector', resourceCustomAttributes, values),
-                    }),
+                    } as any),
                 );
             }
         },
-        [editMode, connector, selectedAuthType.value, dispatch, resourceCustomAttributes],
+        [editMode, connector, dispatch, resourceCustomAttributes],
     );
 
-    const onCancel = useCallback(() => {
-        navigate(-1);
-    }, [navigate]);
+    const handleCancel = useCallback(() => {
+        onCancel?.();
+    }, [onCancel]);
 
     const onConnectClick = useCallback(
         (values: FormValues) => {
@@ -165,11 +166,11 @@ export default function ConnectorForm() {
                     connectorActions.connectConnector({
                         uuid: connector!.uuid,
                         url: values.url,
-                        authType: values.authenticationType.value,
+                        authType: values.authenticationType as AuthType,
                     }),
                 );
             } else {
-                dispatch(connectorActions.connectConnector({ url: values.url, authType: values.authenticationType.value }));
+                dispatch(connectorActions.connectConnector({ url: values.url, authType: values.authenticationType as AuthType }));
             }
         },
         [connector, dispatch, editMode],
@@ -181,6 +182,20 @@ export default function ConnectorForm() {
             columns: [endpoint.name, endpoint.context, endpoint.method],
         }));
     }, []);
+
+    const connectionDetailsHeaders: TableHeader[] = useMemo(
+        () => [
+            {
+                id: 'property',
+                content: 'Property',
+            },
+            {
+                id: 'value',
+                content: 'Value',
+            },
+        ],
+        [],
+    );
 
     const endPointsHeaders: TableHeader[] = useMemo(
         () => [
@@ -204,278 +219,304 @@ export default function ConnectorForm() {
         [],
     );
 
-    const defaultValues = useMemo(
+    const defaultValues: FormValues = useMemo(
         () => ({
-            name: editMode ? connector?.name : '',
+            uuid: connector?.uuid || '',
+            name: editMode ? connector?.name || '' : '',
             url: editMode ? connector?.url || '' : '',
-            authenticationType: editMode
-                ? optionsForAuth.find((opt) => opt.value === connector?.authType) || optionsForAuth[0]
-                : optionsForAuth[0],
+            authenticationType: editMode ? connector?.authType || AuthType.None : AuthType.None,
         }),
-        [editMode, optionsForAuth, connector],
+        [editMode, connector],
+    );
+
+    const methods = useForm<FormValues>({
+        defaultValues,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit,
+        control,
+        formState: { isDirty, isSubmitting, isValid },
+        getValues,
+        reset,
+    } = methods;
+
+    const watchedAuthType = useWatch({
+        control,
+        name: 'authenticationType',
+    });
+
+    const watchedUrl = useWatch({
+        control,
+        name: 'url',
+    });
+
+    // Reset form values when connector is loaded in edit mode
+    useEffect(() => {
+        if (editMode && connector && connector.uuid === id) {
+            const newDefaultValues: FormValues = {
+                uuid: connector.uuid || '',
+                name: connector.name || '',
+                url: connector.url || '',
+                authenticationType: connector.authType || AuthType.None,
+            };
+            reset(newDefaultValues);
+        }
+    }, [editMode, connector, id, reset]);
+
+    const connectionDetailsData: TableDataRow[] = useMemo(
+        () => [
+            {
+                id: 'url',
+                columns: ['URL', watchedUrl],
+            },
+            {
+                id: 'status',
+                columns: [
+                    'Connector Status',
+                    <InventoryStatusBadge
+                        key="status"
+                        status={connectionDetails && connectionDetails.length > 0 ? ConnectorStatus.Connected : ConnectorStatus.Failed}
+                    />,
+                ],
+            },
+            {
+                id: 'functionGroups',
+                columns: [
+                    'Function Group(s)',
+                    <div key="functionGroups" className="flex flex-wrap gap-2">
+                        {connectionDetails?.map((functionGroup, index) => (
+                            <Badge key={index} color="primary">
+                                {attributeFieldNameTransform[functionGroup?.name || ''] || functionGroup?.name}
+                            </Badge>
+                        ))}
+                    </div>,
+                ],
+            },
+        ],
+        [watchedUrl, connectionDetails],
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <div>
-                <Form onSubmit={onSubmit} initialValues={defaultValues} mutators={{ ...mutators<FormValues>() }}>
-                    {({ handleSubmit, pristine, submitting, values }) => (
-                        <BootstrapForm onSubmit={handleSubmit}>
-                            <Widget title={connectorWidgetTitle} titleSize="large">
-                                <Field name="url" validate={composeValidators(validateRequired(), validateRoutelessUrl())}>
-                                    {({ input, meta }) => (
-                                        <FormGroup>
-                                            <Label for="url">URL</Label>
-                                            <Input
-                                                id="url"
-                                                {...input}
-                                                valid={!meta.error && meta.touched}
-                                                invalid={!!meta.error && meta.touched}
-                                                type="text"
-                                                placeholder="URL of the connector service"
-                                            />
-                                            <FormFeedback>{meta.error}</FormFeedback>
-                                        </FormGroup>
-                                    )}
-                                </Field>
-
-                                <Field name="authenticationType">
-                                    {({ input, meta }) => (
-                                        <FormGroup>
-                                            <Label for="authenticationTypeSelect">Authentication Type</Label>
-
-                                            <Select
-                                                {...input}
-                                                inputId="authenticationTypeSelect"
-                                                maxMenuHeight={140}
-                                                menuPlacement="auto"
-                                                options={optionsForAuth}
-                                                placeholder="Select Auth Type"
-                                                onChange={(e) => {
-                                                    input.onChange(e);
-                                                    setSelectedAuthType(e);
-                                                }}
-                                            />
-
-                                            <div
-                                                className="invalid-feedback"
-                                                style={meta.touched && meta.invalid ? { display: 'block' } : {}}
-                                            >
-                                                {meta.error}
-                                            </div>
-                                        </FormGroup>
-                                    )}
-                                </Field>
-
-                                {values.authenticationType.value === AuthType.Basic ? (
-                                    <div>
-                                        <Field name="username">
-                                            {({ input, meta }) => (
-                                                <FormGroup>
-                                                    <Label for="username">Username</Label>
-
-                                                    <Input
-                                                        id="username"
-                                                        {...input}
-                                                        valid={!meta.error && meta.touched}
-                                                        invalid={!!meta.error && meta.touched}
-                                                        type="text"
-                                                        placeholder="Username"
-                                                    />
-                                                    <FormFeedback>{meta.error}</FormFeedback>
-                                                </FormGroup>
-                                            )}
-                                        </Field>
-
-                                        <Field name="password">
-                                            {({ input, meta }) => (
-                                                <FormGroup>
-                                                    <Label for="password">Password</Label>
-
-                                                    <Input
-                                                        id="password"
-                                                        {...input}
-                                                        valid={!meta.error && meta.touched}
-                                                        invalid={!!meta.error && meta.touched}
-                                                        type="password"
-                                                        placeholder="Password"
-                                                    />
-
-                                                    <FormFeedback>{meta.error}</FormFeedback>
-                                                </FormGroup>
-                                            )}
-                                        </Field>
-                                    </div>
-                                ) : null}
-
-                                {values.authenticationType.value === AuthType.Certificate ? (
-                                    <Field name="clientCert">
-                                        {({ input, meta }) => (
-                                            <FormGroup>
-                                                <Label for="clientCert">Client Certificate</Label>
-
-                                                <Input
-                                                    id="clientCert"
-                                                    {...input}
-                                                    valid={!meta.error && meta.touched}
-                                                    invalid={!!meta.error && meta.touched}
-                                                    type="file"
-                                                    placeholder="clientCert"
-                                                />
-
-                                                <FormFeedback>{meta.error}</FormFeedback>
-                                            </FormGroup>
-                                        )}
-                                    </Field>
-                                ) : null}
-
-                                <>
-                                    <br />
-
-                                    <TabLayout
-                                        tabs={[
-                                            {
-                                                title: 'Custom Attributes',
-                                                content: (
-                                                    <AttributeEditor
-                                                        id="customConnector"
-                                                        attributeDescriptors={resourceCustomAttributes}
-                                                        attributes={connector?.customAttributes}
-                                                    />
-                                                ),
-                                            },
-                                        ]}
-                                    />
-                                </>
-
-                                <div className="d-flex justify-content-end">
-                                    <ButtonGroup>
-                                        <Button
-                                            color="primary"
-                                            onClick={() => onConnectClick(values)}
-                                            disabled={submitting || isConnecting || isReconnecting}
-                                        >
-                                            {isConnecting || isReconnecting ? connectProgressTitle : connectTitle}
-                                        </Button>
-                                    </ButtonGroup>
-                                </div>
-                            </Widget>
-
-                            {connectionDetails ? (
-                                <Widget title="Connection Details" busy={isConnecting} titleSize="large">
-                                    <Table className="table-hover" size="sm">
-                                        <tbody>
-                                            <tr>
-                                                <td>URL</td>
-                                                <td>{values.url}</td>
-                                            </tr>
-
-                                            <tr>
-                                                <td>Connector Status</td>
-                                                <td>
-                                                    <InventoryStatusBadge
-                                                        status={
-                                                            connectionDetails.length > 0
-                                                                ? ConnectorStatus.Connected
-                                                                : ConnectorStatus.Failed
-                                                        }
-                                                    />
-                                                </td>
-                                            </tr>
-
-                                            <tr>
-                                                <td>Function Group(s)</td>
-                                                <td>
-                                                    {connectionDetails.map((functionGroup) => (
-                                                        <div>
-                                                            <Badge color="primary">
-                                                                {attributeFieldNameTransform[functionGroup?.name || ''] ||
-                                                                    functionGroup?.name}
-                                                            </Badge>
-                                                            &nbsp;
-                                                        </div>
-                                                    ))}
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </Table>
-
-                                    {connectionDetails && connectionDetails.length > 0 ? (
-                                        <div>
-                                            <b>Connector Functionality Description</b>
-                                            <hr />{' '}
-                                            {connectionDetails.map((functionGroup) => (
-                                                <Widget
-                                                    key={functionGroup.name}
-                                                    title={attributeFieldNameTransform[functionGroup?.name || ''] || functionGroup?.name}
-                                                    titleSize="large"
-                                                    widgetExtraTopNode={
-                                                        <div className="fa-pull-right mt-n-xs ms-auto">
-                                                            {functionGroup.kinds.map((kinds) => (
-                                                                <>
-                                                                    &nbsp;
-                                                                    <Badge color="secondary">{kinds}</Badge>
-                                                                </>
-                                                            ))}
-                                                        </div>
-                                                    }
-                                                >
-                                                    <CustomTable
-                                                        headers={endPointsHeaders}
-                                                        data={getEndPointInfo(functionGroup?.endPoints)}
-                                                    />
-                                                </Widget>
-                                            ))}
-                                        </div>
-                                    ) : null}
-
-                                    {connectionDetails && connectionDetails.length > 0 ? (
-                                        <div>
-                                            <Field
-                                                name="name"
-                                                validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}
-                                            >
-                                                {({ input, meta }) => (
-                                                    <FormGroup>
-                                                        <Label for="name">Connector Name</Label>
-
-                                                        <Input
-                                                            id="name"
-                                                            {...input}
-                                                            valid={!meta.error && meta.touched}
-                                                            invalid={!!meta.error && meta.touched}
-                                                            type="text"
-                                                            placeholder="Connector Name"
-                                                            disabled={editMode}
-                                                        />
-
-                                                        <FormFeedback>{meta.error}</FormFeedback>
-                                                    </FormGroup>
-                                                )}
-                                            </Field>
-
-                                            <div className="d-flex justify-content-end">
-                                                <ButtonGroup>
-                                                    <Button color="default" onClick={onCancel} disabled={submitting}>
-                                                        Cancel
-                                                    </Button>
-
-                                                    <ProgressButton
-                                                        title={submitTitle}
-                                                        inProgressTitle={inProgressTitle}
-                                                        inProgress={isUpdating || isCreating}
-                                                        disabled={pristine}
-                                                    />
-                                                </ButtonGroup>
-                                            </div>
-                                        </div>
-                                    ) : null}
-                                </Widget>
-                            ) : null}
-                        </BootstrapForm>
+        <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <Controller
+                    name="url"
+                    control={control}
+                    rules={buildValidationRules([validateRequired(), validateRoutelessUrl()])}
+                    render={({ field, fieldState }) => (
+                        <TextInput
+                            {...field}
+                            id="url"
+                            type="text"
+                            label="URL"
+                            required
+                            placeholder="URL of the connector service"
+                            invalid={fieldState.error && fieldState.isTouched}
+                            error={getFieldErrorMessage(fieldState)}
+                        />
                     )}
-                </Form>
-            </div>
-        </Container>
+                />
+
+                <div>
+                    <Controller
+                        name="authenticationType"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                            <>
+                                <Select
+                                    id="authenticationTypeSelect"
+                                    label="Authentication Type"
+                                    value={field.value || AuthType.None}
+                                    onChange={(value) => {
+                                        field.onChange(value);
+                                    }}
+                                    options={optionsForAuth.map((opt) => ({ value: opt.value, label: opt.label }))}
+                                    placeholder="Select Auth Type"
+                                    placement="bottom"
+                                />
+                                {fieldState.error && fieldState.isTouched && (
+                                    <p className="mt-1 text-sm text-red-600">
+                                        {typeof fieldState.error === 'string'
+                                            ? fieldState.error
+                                            : fieldState.error?.message || 'Invalid value'}
+                                    </p>
+                                )}
+                            </>
+                        )}
+                    />
+                </div>
+
+                {watchedAuthType === AuthType.Basic && (
+                    <>
+                        <Controller
+                            name="username"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="username"
+                                    type="text"
+                                    label="Username"
+                                    placeholder="Username"
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={getFieldErrorMessage(fieldState)}
+                                />
+                            )}
+                        />
+
+                        <Controller
+                            name="password"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="password"
+                                    type="password"
+                                    label="Password"
+                                    placeholder="Password"
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={getFieldErrorMessage(fieldState)}
+                                />
+                            )}
+                        />
+                    </>
+                )}
+
+                {watchedAuthType === AuthType.Certificate && (
+                    <div>
+                        <Label htmlFor="clientCert">Client Certificate</Label>
+                        <Controller
+                            name="clientCert"
+                            control={control}
+                            render={({ field: { onChange, value, ...field }, fieldState }) => (
+                                <>
+                                    <input
+                                        {...field}
+                                        id="clientCert"
+                                        type="file"
+                                        onChange={(e) => {
+                                            onChange(e.target.files);
+                                        }}
+                                        className={cn(
+                                            'py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600',
+                                            {
+                                                'border-red-500 focus:border-red-500 focus:ring-red-500':
+                                                    fieldState.error && fieldState.isTouched,
+                                            },
+                                        )}
+                                    />
+                                    {fieldState.error && fieldState.isTouched && (
+                                        <p className="mt-1 text-sm text-red-600">
+                                            {typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'}
+                                        </p>
+                                    )}
+                                </>
+                            )}
+                        />
+                    </div>
+                )}
+
+                <TabLayout
+                    noBorder
+                    tabs={[
+                        {
+                            title: 'Custom Attributes',
+                            content: (
+                                <AttributeEditor
+                                    id="customConnector"
+                                    attributeDescriptors={resourceCustomAttributes}
+                                    attributes={connector?.customAttributes}
+                                />
+                            ),
+                        },
+                    ]}
+                />
+
+                <Container className="flex-row justify-end modal-footer !rounded-none" gap={4}>
+                    <Button
+                        variant="solid"
+                        color="primary"
+                        onClick={() => onConnectClick(getValues())}
+                        disabled={isSubmitting || isConnecting || isReconnecting || !watchedUrl || !isValid}
+                        type="button"
+                    >
+                        {isConnecting || isReconnecting ? connectProgressTitle : connectTitle}
+                    </Button>
+                </Container>
+
+                {connectionDetails && (
+                    <Widget busy={isConnecting} noBorder>
+                        <CustomTable headers={connectionDetailsHeaders} data={connectionDetailsData} />
+
+                        {connectionDetails && connectionDetails.length > 0 && (
+                            <div className="space-y-4">
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+                                        Connector Functionality Description
+                                    </h3>
+                                    <hr className="my-4 border-gray-200 dark:border-neutral-700" />
+                                    {connectionDetails.map((functionGroup) => (
+                                        <Widget
+                                            key={functionGroup.name}
+                                            title={attributeFieldNameTransform[functionGroup?.name || ''] || functionGroup?.name}
+                                            titleSize="large"
+                                            widgetExtraTopNode={
+                                                <div className="flex flex-wrap gap-2 ml-auto">
+                                                    {functionGroup.kinds.map((kinds, index) => (
+                                                        <Badge key={index} color="secondary">
+                                                            {kinds}
+                                                        </Badge>
+                                                    ))}
+                                                </div>
+                                            }
+                                        >
+                                            <CustomTable headers={endPointsHeaders} data={getEndPointInfo(functionGroup?.endPoints)} />
+                                        </Widget>
+                                    ))}
+                                </div>
+
+                                <div>
+                                    <Controller
+                                        name="name"
+                                        control={control}
+                                        rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
+                                        render={({ field, fieldState }) => (
+                                            <TextInput
+                                                {...field}
+                                                id="name"
+                                                type="text"
+                                                label="Connector Name"
+                                                required
+                                                placeholder="Connector Name"
+                                                disabled={editMode}
+                                                invalid={fieldState.error && fieldState.isTouched}
+                                                error={getFieldErrorMessage(fieldState)}
+                                            />
+                                        )}
+                                    />
+                                </div>
+                                <Container className="flex-row justify-end modal-footer" gap={4}>
+                                    <Button variant="outline" onClick={handleCancel} disabled={isSubmitting} type="button">
+                                        Cancel
+                                    </Button>
+
+                                    <ProgressButton
+                                        title={submitTitle}
+                                        inProgressTitle={inProgressTitle}
+                                        inProgress={isUpdating || isCreating}
+                                        disabled={!isDirty}
+                                        type="submit"
+                                    />
+                                </Container>
+                            </div>
+                        )}
+                    </Widget>
+                )}
+            </form>
+        </FormProvider>
     );
 }

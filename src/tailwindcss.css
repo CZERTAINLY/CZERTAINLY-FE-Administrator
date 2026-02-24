@@ -1,0 +1,266 @@
+@import 'simplebar-react/dist/simplebar.min.css';
+
+/* Local Inter variable fonts (replaces Google Fonts) */
+@font-face {
+    font-family: 'Inter';
+    src: url('./resources/fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Inter';
+    src: url('./resources/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: italic;
+    font-display: swap;
+}
+
+:root {
+    font-family: 'Inter', sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    color: #1f2937;
+
+    --primary-blue-color: #0072cf;
+    --header-height: 68px;
+    --sidebar-width: 84px;
+    --main-background-color: #f8fafc;
+    --dark-gray-color: #1f2937;
+    --tooltip-background-color: #111827;
+
+    --status-success-color: #14b8a6;
+    --status-danger-color: #ef4444;
+    --status-secondary-color: #b3b3b3;
+    --status-warning-color: #eab308;
+    --status-dark-color: var(--dark-gray-color);
+    --status-light-gray-color: var(--gray-300);
+    --status-gray-color: var(--color-gray-500);
+    --status-info-color: #2798e7;
+    --modal-footer-background-color: var(--gray-100);
+    --code-color: #be185d;
+}
+
+@import 'tailwindcss';
+
+@theme {
+    --color-blue-50: #e6f2ff;
+    --color-blue-100: #cce5ff;
+    --color-blue-200: #99ccff;
+    --color-blue-300: #66b2ff;
+    --color-blue-400: #3399ff;
+    --color-blue-500: #0085e6;
+    --color-blue-600: #0072cf;
+    --color-blue-700: #005ba6;
+    --color-blue-800: #004480;
+    --color-blue-900: #002d59;
+    --color-blue-950: #001a33;
+
+    --color-gray-100: #f5f5f5;
+    --color-gray-200: #e8e8e8;
+    --color-gray-300: #d4d4d4;
+    --color-gray-400: #c7c7c7;
+    --color-gray-500: #a8a8a8;
+    --color-gray-600: #b3b3b3;
+    --color-gray-700: #8c8c8c;
+    --color-gray-800: #666666;
+    --color-gray-900: #404040;
+}
+
+/* (optional) explicit sources */
+/* stylelint-disable-next-line at-rule-no-unknown */
+@source "../src/**/*.{ts,tsx,js,jsx,html}";
+
+/* Light mode by default, dark mode with .dark class */
+/* stylelint-disable-next-line at-rule-no-unknown */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Preline UI */
+/* stylelint-disable-next-line at-rule-no-unknown */
+@source "../node_modules/preline/dist/*.js";
+@import '../node_modules/preline/variants.css';
+
+/* Plugins */
+/* stylelint-disable-next-line at-rule-no-unknown */
+@plugin "@tailwindcss/forms";
+
+button {
+    cursor: pointer;
+}
+
+table a {
+    color: var(--primary-blue-color);
+    font-weight: 600;
+}
+
+table .preline-badge {
+    font-size: 10px;
+}
+
+.modal-footer {
+    background-color: var(--modal-footer-background-color);
+    width: calc(100% + 4rem);
+    margin-left: -2rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-bottom: 1rem;
+    padding-top: 1rem;
+    border-radius: 0 0 1rem 1rem;
+    @apply border-t border-gray-200;
+}
+
+.text-one-row-ellipsis {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.apexcharts-custom-tooltip {
+    border: none !important;
+    outline: none !important;
+    padding: 0 !important;
+}
+
+.react-flow__controls {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.react-flow__controls-button {
+    border: 1px solid var(--color-gray-500);
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-gray-500);
+    transition: all 0.2s ease;
+    box-shadow: none;
+}
+
+.react-flow__controls-button:not(:last-child) {
+    border-bottom: none !important;
+}
+.react-flow__controls-button:hover {
+    @apply bg-gray-100;
+}
+
+.react-flow__controls-button:active {
+    @apply !bg-gray-100;
+}
+
+.react-flow__controls-button svg {
+    stroke-width: 1.5;
+    fill: currentColor;
+    max-width: 16px;
+    max-height: 16px;
+}
+/* .react-flow__controls-interactive {
+    position: relative;
+}
+.react-flow__controls-interactive:after {
+    content: '';
+    display: block;
+    width: 16px;
+    height: 16px;
+    background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.6667 7.33331H3.33333C2.59695 7.33331 2 7.93027 2 8.66665V13.3333C2 14.0697 2.59695 14.6666 3.33333 14.6666H12.6667C13.403 14.6666 14 14.0697 14 13.3333V8.66665C14 7.93027 13.403 7.33331 12.6667 7.33331Z' stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M4.66666 7.33331V4.66665C4.66583 3.84001 4.97218 3.04256 5.52624 2.42909C6.0803 1.81563 6.84254 1.42992 7.66499 1.34684C8.48744 1.26376 9.31142 1.48925 9.97697 1.97952C10.6425 2.4698 11.1022 3.18988 11.2667 3.99998' stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    fill: currentColor;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.react-flow__controls-interactive svg {
+    display: none;
+} */
+
+.preline-cron-wrapper {
+    @apply space-y-4;
+}
+
+.preline-cron-wrapper .cron_builder {
+    @apply max-w-none border-none p-0 m-0 bg-transparent;
+}
+.preline-cron-wrapper .nav-tabs {
+    margin: -10px;
+}
+
+.preline-cron-wrapper .nav-link {
+    background: transparent;
+    padding: 10px;
+    color: var(--dark-gray-color) !important;
+    @apply font-medium !rounded-lg border-none;
+}
+.preline-cron-wrapper .nav-link:hover {
+    @apply bg-gray-100;
+}
+
+.preline-cron-wrapper .nav-link.active {
+    @apply !bg-gray-100;
+}
+
+.preline-cron-wrapper .cron_builder_bordering {
+    @apply border-none p-0 mx-0 my-4 bg-transparent;
+}
+.preline-cron-wrapper .cron_builder_bordering .well {
+    color: var(--dark-gray-color);
+    @apply bg-transparent shadow-none rounded-lg font-semibold border-gray-200;
+}
+.preline-cron-wrapper .cron_builder_bordering .tab-content {
+    @apply p-0 m-0 bg-transparent;
+}
+.preline-cron-wrapper .cron_builder_bordering .text_align_left {
+    line-height: 2.5;
+}
+.preline-cron-wrapper .cron_builder_bordering input:not([type='radio']),
+.preline-cron-wrapper .cron_builder_bordering input:not([type='checkbox']) {
+    min-height: unset;
+    @apply py-2.5 sm:py-3 px-4 border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600;
+}
+.preline-cron-wrapper .cron_builder_bordering input[type='radio'],
+.preline-cron-wrapper .cron_builder_bordering input[type='checkbox'] {
+    font-size: 0;
+    @apply p-2 rounded-full cursor-pointer;
+}
+.preline-cron-wrapper .cron_builder_bordering select {
+    color: var(--dark-gray-color);
+    @apply py-2.5 sm:py-3 px-4 border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600;
+}
+.preline-cron-wrapper .cron-builder-bg {
+    @apply rounded-lg p-3 text-white font-semibold m-0 bg-gray-500;
+}
+.preline-cron-wrapper .cron-builder-bg:not(:last-child) {
+    @apply mb-4;
+}
+
+.server-content {
+    color: var(--dark-gray-color);
+}
+.server-content ul {
+    list-style-type: disc;
+    padding: 10px 0 10px 20px;
+}
+.server-content ol {
+    list-style-type: decimal;
+    padding-left: 20px;
+}
+.server-content li {
+    margin-bottom: 5px;
+}
+.server-content p {
+    margin-bottom: 5px;
+}
+.server-content code {
+    color: var(--code-color);
+    font-family: inherit;
+    font-weight: 600;
+}

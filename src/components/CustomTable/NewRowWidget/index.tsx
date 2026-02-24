@@ -1,8 +1,7 @@
-import cx from 'classnames';
 import { useEffect, useState } from 'react';
-import Select from 'react-select';
-import { Button, ButtonGroup } from 'reactstrap';
-import styles from './NewRowWidget.module.scss';
+import Select from 'components/Select';
+import Button from 'components/Button';
+import { Plus } from 'lucide-react';
 interface SelectChangeValue {
     value: string;
     label: string;
@@ -27,36 +26,34 @@ const NewRowWidget = ({ newItemsList, isBusy, onAddClick, immediateAdd, selectHi
     }, [immediateAdd, selectedItems, onAddClick]);
 
     return (
-        <div className="d-flex">
-            <div className="w-100">
+        <div className="flex gap-1">
+            <div className="grow">
                 <Select
-                    onChange={(event) => {
-                        setSelectedItems(event.map((e) => e));
+                    onChange={(values) => {
+                        setSelectedItems(values || []);
                     }}
                     isMulti
                     value={selectedItems}
                     options={newItemsList}
                     placeholder={selectHint || 'Select items to add'}
+                    id="newRowWidgetSelect"
                 />
             </div>
-            <div>
-                {selectedItems?.length && !immediateAdd ? (
-                    <ButtonGroup>
-                        <Button
-                            disabled={isBusy}
-                            className={cx('btn btn-link ms-1', styles.addButton)}
-                            size="sm"
-                            color="secondary"
-                            onClick={() => {
-                                onAddClick(selectedItems);
-                                setSelectedItems([]);
-                            }}
-                        >
-                            <i className="fa fa-plus" />
-                        </Button>
-                    </ButtonGroup>
-                ) : null}
-            </div>
+            {selectedItems?.length && !immediateAdd ? (
+                <div className="flex">
+                    <Button
+                        disabled={isBusy}
+                        variant="transparent"
+                        color="secondary"
+                        onClick={() => {
+                            onAddClick(selectedItems);
+                            setSelectedItems([]);
+                        }}
+                    >
+                        <Plus />
+                    </Button>
+                </div>
+            ) : null}
         </div>
     );
 };

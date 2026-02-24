@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { actions as alertActions } from 'ducks/alerts';
+import { isObjectSame } from 'utils/common-utils';
 
 interface WindowSizes {
     width: number;
@@ -66,13 +66,30 @@ export const useCopyToClipboard = () => {
             successMessage: string = 'Content was copied to clipboard',
             errorMessage: string = 'Failed to copy content to clipboard',
         ) => {
-            navigator.clipboard
-                .writeText(text)
-                .then(() => dispatch(alertActions.success(successMessage)))
-                .catch(() => dispatch(alertActions.error(errorMessage)));
+            import('ducks/alerts').then(({ actions: alertActions }) => {
+                navigator.clipboard
+                    .writeText(text)
+                    .then(() => dispatch(alertActions.success(successMessage)))
+                    .catch(() => dispatch(alertActions.error(errorMessage)));
+            });
         },
         [dispatch],
     );
 
     return copyToClipboard;
 };
+
+export function useRunOnFinished(flag: boolean, callback?: () => void) {
+    const wasTrue = useRef(flag);
+
+    useEffect(() => {
+        if (wasTrue.current && !flag) {
+            callback?.();
+        }
+        wasTrue.current = flag;
+    }, [flag, callback]);
+}
+
+export function useAreDefaultValuesSame(defaultValues: Record<string, unknown>) {
+    return useCallback((values: Record<string, unknown>) => isObjectSame(values, defaultValues), [defaultValues]);
+}

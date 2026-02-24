@@ -10,28 +10,23 @@ import { actions, selectors } from 'ducks/cryptographic-keys';
 
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router';
-import Select from 'react-select';
+import { Link, useParams } from 'react-router';
+import Select from 'components/Select';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { Col, Container, Label, Row } from 'reactstrap';
 import { KeyCompromiseReason, KeyState, KeyType, PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import CryptographicKeyItem from './CryptographicKeyItem';
 import { createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
-
-export const keyWithoutTokenInstanceActionNotes = {
-    delete: 'Note that no token instance is associated with the Key. The key record will be removed from the platform, but will not be deleted in external key storage service.',
-    destroy:
-        'Note that no token instance is associated with the Key. The key will be marked as destroyed, but will not be destroyed in external key storage service.',
-};
+import Breadcrumb from 'components/Breadcrumb';
+import Container from 'components/Container';
+import { keyWithoutTokenInstanceActionNotes } from './constants';
+import CryptographicKeyForm from '../form';
 
 export default function CryptographicKeyDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id, keyItemUuid } = useParams();
     const relativePath = '../..' + (keyItemUuid ? '/..' : '');
@@ -52,6 +47,8 @@ export default function CryptographicKeyDetail() {
     const [confirmCompromise, setConfirmCompromise] = useState<boolean>(false);
 
     const [confirmDestroy, setConfirmDestroy] = useState<boolean>(false);
+
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const [compromiseReason, setCompromiseReason] = useState<KeyCompromiseReason>();
     const keyCompromiseReasonEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyCompromiseReason));
@@ -75,8 +72,13 @@ export default function CryptographicKeyDetail() {
 
     const onEditClick = useCallback(() => {
         if (!cryptographicKey) return;
-        navigate(`${relativePath}/edit/${cryptographicKey.uuid}`, { relative: 'path' });
-    }, [navigate, cryptographicKey, relativePath]);
+        setIsEditModalOpen(true);
+    }, [cryptographicKey]);
+
+    const handleEditSuccess = useCallback(() => {
+        setIsEditModalOpen(false);
+        getFreshCryptographicKeyDetails();
+    }, [getFreshCryptographicKeyDetails]);
 
     const onEnableClick = useCallback(() => {
         if (!cryptographicKey) return;
@@ -338,17 +340,11 @@ export default function CryptographicKeyDetail() {
             (a, b) => Object.values(KeyType).indexOf(a.type) - Object.values(KeyType).indexOf(b.type),
         );
 
-        const keyTab = keyItems.findIndex((item) => item.uuid === keyItemUuid);
-        setSelectedTab(keyTab < 0 ? 0 : keyTab);
-
         const tabs = keyItems.map((item, i) => ({
-            title: (
-                <div className="d-flex p-2 px-3" onClick={() => setSelectedTab(i)}>
-                    {getEnumLabel(keyTypeEnum, item.type)}
-                </div>
-            ),
+            title: getEnumLabel(keyTypeEnum, item.type),
+            onClick: () => setSelectedTab(i),
             content: (
-                <Widget busy={isBusy || isFetchingHistory}>
+                <Widget busy={isBusy || isFetchingHistory} noBorder>
                     <CryptographicKeyItem
                         key={item.uuid}
                         keyItem={item}
@@ -361,36 +357,41 @@ export default function CryptographicKeyDetail() {
             ),
         }));
         return { tabs };
-    }, [cryptographicKey, isBusy, isFetchingHistory, keyTypeEnum, keyItemUuid]);
+    }, [cryptographicKey, isBusy, isFetchingHistory, keyTypeEnum]);
+
+    useEffect(() => {
+        if (cryptographicKey?.items) {
+            const keyItems = [...cryptographicKey.items].sort(
+                (a, b) => Object.values(KeyType).indexOf(a.type) - Object.values(KeyType).indexOf(b.type),
+            );
+            const keyTab = keyItems.findIndex((item) => item.uuid === keyItemUuid);
+            setSelectedTab(keyTab < 0 ? 0 : keyTab);
+        }
+    }, [cryptographicKey, keyItemUuid]);
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/keys"
-                text={`${getEnumLabel(resourceEnum, Resource.Keys)} Inventory`}
+        <>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.Keys)} Inventory`, href: '/keys' },
+                    { label: cryptographicKey?.name || 'Key Details' },
+                ]}
             />
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
-                    <Widget
-                        title="Key Details"
-                        busy={isBusy}
-                        widgetButtons={buttons}
-                        titleSize="large"
-                        refreshAction={getFreshCryptographicKeyDetails}
-                        widgetLockName={LockWidgetNameEnum.keyDetails}
-                        lockSize="large"
-                    >
-                        <br />
-
-                        <CustomTable headers={detailHeaders} data={detailData} />
-                    </Widget>
-                </Col>
-
-                <Col>
-                    <Widget title="Attributes" busy={isBusy} titleSize="large">
-                        <br />
-                        <Label>Key Attributes</Label>
+            <Container className="md:flex-row">
+                <Widget
+                    title="Key Details"
+                    busy={isBusy}
+                    widgetButtons={buttons}
+                    titleSize="large"
+                    refreshAction={getFreshCryptographicKeyDetails}
+                    widgetLockName={LockWidgetNameEnum.keyDetails}
+                    lockSize="large"
+                    className="w-full md:w-1/2"
+                >
+                    <CustomTable headers={detailHeaders} data={detailData} />
+                </Widget>
+                <Container className="w-full md:w-1/2">
+                    <Widget title="Key Attributes" busy={isBusy} titleSize="large">
                         <AttributeViewer attributes={cryptographicKey?.attributes} />
                     </Widget>
 
@@ -401,17 +402,18 @@ export default function CryptographicKeyDetail() {
                             attributes={cryptographicKey.customAttributes}
                         />
                     )}
-                </Col>
-            </Row>
-            {itemTabs.tabs.length > 0 && <TabLayout tabs={itemTabs.tabs} selectedTab={selectedTab} />}
-            <Widget title="Key Associations" busy={isBusy} titleSize="large">
-                <br />
-
-                <CustomTable headers={associationHeaders} data={associationBody} />
-            </Widget>
+                </Container>
+            </Container>
+            <Container marginTop>
+                {itemTabs.tabs.length > 0 && <TabLayout tabs={itemTabs.tabs} selectedTab={selectedTab} />}
+                <Widget title="Key Associations" busy={isBusy} titleSize="large">
+                    <CustomTable headers={associationHeaders} data={associationBody} />
+                </Widget>
+            </Container>
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Key"
+                size="lg"
                 body={
                     <div>
                         <p>You are about to delete the Key. Is this what you want to do?</p>
@@ -419,32 +421,35 @@ export default function CryptographicKeyDetail() {
                     </div>
                 }
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
             <Dialog
                 isOpen={confirmCompromise}
                 caption={`Compromise Key`}
+                size="md"
+                noBorder
                 body={
                     <div>
-                        <p>You are about to mark the Key as compromised. Is this what you want to do?</p>
-                        <p>
+                        <p className="text-center">You are about to mark the Key as compromised. Is this what you want to do?</p>
+                        <p className="mt-2 mb-4 text-center">
                             <b>Warning:</b> This action cannot be undone.
                         </p>
                         <Select
-                            name="compromiseReason"
                             id="compromiseReason"
                             options={optionForCompromise}
-                            onChange={(e) => setCompromiseReason(e?.value)}
+                            value={compromiseReason || ''}
+                            onChange={(value) => setCompromiseReason(value as KeyCompromiseReason)}
                         />
                     </div>
                 }
                 toggle={() => setConfirmCompromise(false)}
                 buttons={[
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
                     { color: 'danger', onClick: onCompromise, body: 'Yes' },
-                    { color: 'secondary', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
                 ]}
             />
             <Dialog
@@ -457,11 +462,26 @@ export default function CryptographicKeyDetail() {
                     </div>
                 }
                 toggle={() => setConfirmDestroy(false)}
+                icon="destroy"
                 buttons={[
-                    { color: 'danger', onClick: onDestroy, body: 'Yes, Destroy' },
-                    { color: 'secondary', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDestroy, body: 'Destroy' },
                 ]}
             />
-        </Container>
+            <Dialog
+                isOpen={isEditModalOpen}
+                caption="Edit Key"
+                body={
+                    <CryptographicKeyForm
+                        keyId={cryptographicKey?.uuid}
+                        onSuccess={handleEditSuccess}
+                        onCancel={() => setIsEditModalOpen(false)}
+                    />
+                }
+                toggle={() => setIsEditModalOpen(false)}
+                size="xl"
+                buttons={[]}
+            />
+        </>
     );
 }

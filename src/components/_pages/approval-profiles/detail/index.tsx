@@ -1,30 +1,33 @@
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
-import GoBackButton from 'components/GoBackButton';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as profileApprovalActions, selectors as profileApprovalSelectors } from 'ducks/approval-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router';
-import { Col, Container, Row } from 'reactstrap';
+import { Link, useParams } from 'react-router';
+import ApprovalProfileForm from '../form';
 import { ApproverType, ProfileApprovalStepModel } from 'types/approval-profiles';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import Breadcrumb from 'components/Breadcrumb';
+import Container from 'components/Container';
 
 const ApprovalProfileDetails = () => {
     const dispatch = useDispatch();
     const { id, version } = useParams();
-    const navigate = useNavigate();
 
     const profileApprovalDetail = useSelector(profileApprovalSelectors.profileApprovalDetail);
     const isFetchingDetail = useSelector(profileApprovalSelectors.isFetchingDetail);
     const deleteErrorMessage = useSelector(profileApprovalSelectors.deleteErrorMessage);
     const isDeleting = useSelector(profileApprovalSelectors.isDeleting);
+    const isUpdating = useSelector(profileApprovalSelectors.isUpdating);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
     const isBusy = useMemo(() => isFetchingDetail || isDeleting, [isFetchingDetail, isDeleting]);
 
     const getFreshData = useCallback(() => {
@@ -44,10 +47,23 @@ const ApprovalProfileDetails = () => {
         setConfirmDelete(false);
     }, [profileApprovalDetail, dispatch]);
 
-    const onEditClick = useCallback(() => {
+    useRunOnFinished(isUpdating, () => {
+        setIsEditModalOpen(false);
+        getFreshData();
+    });
+
+    const handleOpenEditModal = useCallback(() => {
         if (!profileApprovalDetail) return;
-        navigate(`/approvalprofiles/edit/${profileApprovalDetail.uuid}`);
-    }, [profileApprovalDetail, navigate]);
+        setIsEditModalOpen(true);
+    }, [profileApprovalDetail]);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
+
+    const onEditClick = useCallback(() => {
+        handleOpenEditModal();
+    }, [handleOpenEditModal]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -177,41 +193,38 @@ const ApprovalProfileDetails = () => {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/approvalprofiles"
-                text={`${getEnumLabel(resourceEnum, Resource.ApprovalProfiles)} Inventory`}
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.ApprovalProfiles)} Inventory`, href: '/approvalprofiles' },
+                    { label: profileApprovalDetail?.name || 'Approval Profile Details', href: '' },
+                ]}
             />
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
-                    <Widget
-                        title="Approval Profile Details"
-                        busy={isBusy}
-                        titleSize="large"
-                        widgetButtons={buttons}
-                        refreshAction={getFreshData}
-                        widgetLockName={LockWidgetNameEnum.ApprovalProfileDetails}
-                    >
-                        <CustomTable headers={detailHeaders} data={detailData} />
-                    </Widget>
-                </Col>
-                <Col>
-                    <Widget title="Approval Profile Steps" busy={isBusy} widgetLockName={LockWidgetNameEnum.ApprovalProfileDetails}>
-                        <CustomTable headers={stepsHeaders} data={stepsRows} />
-                    </Widget>
-                </Col>
-            </Row>
-
+            <Container className="md:grid grid-cols-2 items-start">
+                <Widget
+                    title="Approval Profile Details"
+                    busy={isBusy}
+                    titleSize="large"
+                    widgetButtons={buttons}
+                    refreshAction={getFreshData}
+                    widgetLockName={LockWidgetNameEnum.ApprovalProfileDetails}
+                >
+                    <CustomTable headers={detailHeaders} data={detailData} />
+                </Widget>
+                <Widget title="Approval Profile Steps" busy={isBusy} widgetLockName={LockWidgetNameEnum.ApprovalProfileDetails}>
+                    <CustomTable headers={stepsHeaders} data={stepsRows} />
+                </Widget>
+            </Container>
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Approval Profile"
                 body="You are about to delete Approval Profile which may have associated Approval
                   Account(s). When deleted the Approval Account(s) will be revoked."
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -228,10 +241,29 @@ const ApprovalProfileDetails = () => {
                 }
                 toggle={() => dispatch(profileApprovalActions.clearDeleteErrorMessages())}
                 buttons={[
-                    { color: 'secondary', onClick: () => dispatch(profileApprovalActions.clearDeleteErrorMessages()), body: 'Cancel' },
+                    {
+                        color: 'secondary',
+                        variant: 'outline',
+                        onClick: () => dispatch(profileApprovalActions.clearDeleteErrorMessages()),
+                        body: 'Cancel',
+                    },
                 ]}
             />
-        </Container>
+
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit Approval Profile"
+                size="xl"
+                body={
+                    <ApprovalProfileForm
+                        approvalProfileId={profileApprovalDetail?.uuid}
+                        onCancel={handleCloseEditModal}
+                        onSuccess={handleCloseEditModal}
+                    />
+                }
+            />
+        </div>
     );
 };
 

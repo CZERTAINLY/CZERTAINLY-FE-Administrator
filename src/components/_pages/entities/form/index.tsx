@@ -1,41 +1,50 @@
 import AttributeEditor from 'components/Attributes/AttributeEditor';
 import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
+import TextInput from 'components/TextInput';
 
 import { actions as alertActions } from 'ducks/alerts';
 import { actions as connectorActions } from 'ducks/connectors';
 import { actions as entityActions, selectors as entitySelectors } from 'ducks/entities';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 
-import { Field, Form } from 'react-final-form';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
-import Select from 'react-select';
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import Select from 'components/Select';
+import Button from 'components/Button';
+import Container from 'components/Container';
 import { AttributeDescriptorModel } from 'types/attributes';
 import { ConnectorResponseModel } from 'types/connectors';
 import { EntityResponseModel } from 'types/entities';
 import { FunctionGroupCode, Resource } from 'types/openapi';
 
-import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import TabLayout from '../../../Layout/TabLayout';
 
-interface FormValues {
-    name: string | undefined;
-    entityProvider: { value: string; label: string } | undefined;
-    storeKind: { value: string; label: string } | undefined;
+interface EntityFormProps {
+    entityId?: string;
+    onCancel?: () => void;
+    onSuccess?: () => void;
 }
 
-export default function EntityForm() {
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+interface FormValues {
+    name: string;
+    entityProvider: string;
+    storeKind: string;
+}
 
-    const { id } = useParams();
+export default function EntityForm({ entityId, onCancel, onSuccess }: EntityFormProps) {
+    const dispatch = useDispatch();
+
+    const { id: routeId } = useParams();
+    const id = entityId || routeId;
 
     const editMode = useMemo(() => !!id, [id]);
 
@@ -75,17 +84,24 @@ export default function EntityForm() {
     );
 
     useEffect(() => {
-        dispatch(entityActions.resetState());
         dispatch(connectorActions.clearCallbackData());
         dispatch(entityActions.listEntityProviders());
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Entities));
     }, [dispatch]);
 
+    const previousIdRef = useRef<string | undefined>(undefined);
+
     useEffect(() => {
         if (editMode && id) {
-            dispatch(entityActions.getEntityDetail({ uuid: id }));
+            // Fetch if id changed or if we don't have the correct entity loaded
+            if (previousIdRef.current !== id || !entitySelector || entitySelector.uuid !== id) {
+                dispatch(entityActions.getEntityDetail({ uuid: id }));
+                previousIdRef.current = id;
+            }
+        } else {
+            previousIdRef.current = undefined;
         }
-    }, [dispatch, editMode, id]);
+    }, [dispatch, editMode, id, entitySelector]);
 
     useEffect(() => {
         if (editMode && entitySelector?.uuid === id) {
@@ -117,13 +133,13 @@ export default function EntityForm() {
     }, [entityProvider, dispatch, editMode, id, entitySelector, entityProviders, isFetchingEntityProviders]);
 
     const onEntityProviderChange = useCallback(
-        (event: { value: string }) => {
+        (value: string) => {
             dispatch(entityActions.clearEntityProviderAttributeDescriptors());
             dispatch(connectorActions.clearCallbackData());
             setGroupAttributesCallbackAttributes([]);
 
-            if (!event.value || !entityProviders) return;
-            const provider = entityProviders.find((p) => p.uuid === event.value);
+            if (!value || !entityProviders) return;
+            const provider = entityProviders.find((p) => p.uuid === value);
 
             if (!provider) return;
             setEntityProvider(provider);
@@ -132,17 +148,64 @@ export default function EntityForm() {
     );
 
     const onKindChange = useCallback(
-        (event: { value: string }) => {
-            if (!event.value || !entityProvider) return;
+        (value: string) => {
+            if (!value || !entityProvider) return;
             dispatch(connectorActions.clearCallbackData());
             setGroupAttributesCallbackAttributes([]);
-            dispatch(entityActions.getEntityProviderAttributesDescriptors({ uuid: entityProvider.uuid, kind: event.value }));
+            dispatch(entityActions.getEntityProviderAttributesDescriptors({ uuid: entityProvider.uuid, kind: value }));
         },
         [dispatch, entityProvider],
     );
 
+    const defaultValues: FormValues = useMemo(
+        () => ({
+            name: editMode ? entity?.name || '' : '',
+            entityProvider: editMode ? entity?.connectorUuid || '' : '',
+            storeKind: editMode ? entity?.kind || '' : '',
+        }),
+        [editMode, entity],
+    );
+
+    const methods = useForm<FormValues>({
+        defaultValues,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit,
+        control,
+        formState: { isDirty, isSubmitting, isValid },
+        setValue,
+        getValues,
+        reset,
+    } = methods;
+
+    const watchedStoreKind = useWatch({
+        control,
+        name: 'storeKind',
+    });
+
+    // Reset form values when entity is loaded in edit mode
+    useEffect(() => {
+        if (editMode && id && entity && entity.uuid === id && !isFetchingEntityDetail) {
+            const newDefaultValues: FormValues = {
+                name: entity.name || '',
+                entityProvider: entity.connectorUuid || '',
+                storeKind: entity.kind || '',
+            };
+            reset(newDefaultValues, { keepDefaultValues: false });
+        } else if (!editMode) {
+            // Reset form when switching to create mode
+            reset({
+                name: '',
+                entityProvider: '',
+                storeKind: '',
+            });
+        }
+    }, [editMode, entity, id, reset, isFetchingEntityDetail]);
+
     const onSubmit = useCallback(
-        (values: FormValues, form: any) => {
+        (values: FormValues) => {
             if (editMode) {
                 dispatch(
                     entityActions.updateEntity({
@@ -158,9 +221,9 @@ export default function EntityForm() {
             } else {
                 dispatch(
                     entityActions.addEntity({
-                        name: values.name!,
-                        connectorUuid: values.entityProvider!.value,
-                        kind: values.storeKind?.value!,
+                        name: values.name,
+                        connectorUuid: values.entityProvider,
+                        kind: values.storeKind,
                         attributes: collectFormAttributes(
                             'entity',
                             [...(entityProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
@@ -173,10 +236,6 @@ export default function EntityForm() {
         },
         [editMode, dispatch, id, entityProviderAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes],
     );
-
-    const onCancel = useCallback(() => {
-        navigate(-1);
-    }, [navigate]);
 
     const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
 
@@ -202,204 +261,168 @@ export default function EntityForm() {
         [entityProvider],
     );
 
-    const defaultValues: FormValues = useMemo(() => {
-        const entityProvider = entity?.connectorUuid ? { value: entity.connectorUuid!, label: entity.connectorName! } : undefined;
-
-        return {
-            name: editMode ? entity?.name || undefined : undefined,
-            entityProvider: editMode ? entityProvider : undefined,
-            storeKind: editMode ? (entity ? { value: entity.kind, label: entity.kind } : undefined) : undefined,
-        };
-    }, [editMode, entity]);
-
-    const title = useMemo(() => (editMode ? 'Edit Entity' : 'Create Entity'), [editMode]);
-
     const renderCustomAttributesEditor = useMemo(() => {
         if (isBusy) return <></>;
         return <AttributeEditor id="customEntity" attributeDescriptors={resourceCustomAttributes} attributes={entity?.customAttributes} />;
     }, [isBusy, entity, resourceCustomAttributes]);
 
+    useRunOnFinished(isCreating, onSuccess);
+    useRunOnFinished(isUpdating, onSuccess);
+
     return (
-        <Widget title={title} busy={isBusy}>
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
-                {({ handleSubmit, pristine, submitting, values, valid, form }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
-                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="name">Entity Name</Label>
-
-                                    <Input
-                                        id="name"
-                                        {...input}
-                                        valid={!meta.error && meta.touched}
-                                        invalid={!!meta.error && meta.touched}
-                                        type="text"
-                                        placeholder="Enter the Entity Name"
-                                        disabled={editMode}
-                                    />
-
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
+        <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <Widget noBorder busy={isBusy}>
+                    <div className="space-y-4">
+                        <Controller
+                            name="name"
+                            control={control}
+                            rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    value={field.value}
+                                    onChange={(value) => field.onChange(value)}
+                                    onBlur={field.onBlur}
+                                    id="name"
+                                    type="text"
+                                    placeholder="Enter the Entity Name"
+                                    disabled={editMode}
+                                    label="Entity Name"
+                                    required
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={getFieldErrorMessage(fieldState)}
+                                />
                             )}
-                        </Field>
+                        />
 
                         {!editMode ? (
-                            <Field name="entityProvider" validate={validateRequired()}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="entityProviderSelect">Entity Provider</Label>
-
-                                        <Select
-                                            {...input}
-                                            inputId="entityProviderSelect"
-                                            maxMenuHeight={140}
-                                            menuPlacement="auto"
-                                            options={optionsForEntityProviders}
-                                            placeholder="Select Entity Provider"
-                                            onChange={(event) => {
-                                                onEntityProviderChange(event);
-                                                form.mutators.clearAttributes('entity');
-                                                form.mutators.setAttribute('storeKind', undefined);
-                                                input.onChange(event);
-                                            }}
-                                            styles={{
-                                                control: (provided) =>
-                                                    meta.touched && meta.invalid
-                                                        ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                        : { ...provided },
-                                            }}
-                                        />
-
-                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                            {meta.error}
-                                        </div>
-                                    </FormGroup>
-                                )}
-                            </Field>
+                            <div>
+                                <Controller
+                                    name="entityProvider"
+                                    control={control}
+                                    rules={buildValidationRules([validateRequired()])}
+                                    render={({ field, fieldState }) => (
+                                        <>
+                                            <Select
+                                                id="entityProviderSelect"
+                                                label="Entity Provider"
+                                                value={field.value || ''}
+                                                onChange={(value) => {
+                                                    onEntityProviderChange(value as string);
+                                                    const formValues = getValues();
+                                                    Object.keys(formValues).forEach((key) => {
+                                                        if (key.startsWith('__attributes__entity__')) {
+                                                            setValue(key as any, undefined);
+                                                        }
+                                                    });
+                                                    setValue('storeKind' as any, undefined);
+                                                    field.onChange(value);
+                                                }}
+                                                options={optionsForEntityProviders || []}
+                                                placeholder="Select Entity Provider"
+                                                placement="bottom"
+                                            />
+                                            {fieldState.error && fieldState.isTouched && (
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {typeof fieldState.error === 'string'
+                                                        ? fieldState.error
+                                                        : fieldState.error?.message || 'Invalid value'}
+                                                </p>
+                                            )}
+                                        </>
+                                    )}
+                                />
+                            </div>
                         ) : (
-                            <Field name="entityProvider" format={(value) => (value ? value.label : '')} validate={validateRequired()}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="entityProvider">Entity Provider</Label>
-
-                                        <Input
-                                            {...input}
-                                            valid={!meta.error && meta.touched}
-                                            invalid={!!meta.error && meta.touched}
-                                            type="text"
-                                            placeholder="Entity Provider Name"
-                                            disabled={editMode}
-                                        />
-                                    </FormGroup>
-                                )}
-                            </Field>
+                            <TextInput
+                                id="entityProvider"
+                                type="text"
+                                label="Entity Provider"
+                                value={entity?.connectorName || ''}
+                                disabled={true}
+                                onChange={() => {}}
+                            />
                         )}
 
                         {!editMode && optionsForKinds?.length ? (
-                            <Field name="storeKind" validate={validateRequired()}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="storeKindSelect">Kind</Label>
-
-                                        <Select
-                                            inputId="storeKindSelect"
-                                            {...input}
-                                            maxMenuHeight={140}
-                                            menuPlacement="auto"
-                                            options={optionsForKinds}
-                                            placeholder="Select Kind"
-                                            onChange={(event) => {
-                                                onKindChange(event);
-                                                input.onChange(event);
-                                            }}
-                                            styles={{
-                                                control: (provided) =>
-                                                    meta.touched && meta.invalid
-                                                        ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                        : { ...provided },
-                                            }}
-                                        />
-
-                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                            Required Field
-                                        </div>
-                                    </FormGroup>
-                                )}
-                            </Field>
+                            <div>
+                                <Controller
+                                    name="storeKind"
+                                    control={control}
+                                    rules={buildValidationRules([validateRequired()])}
+                                    render={({ field, fieldState }) => (
+                                        <>
+                                            <Select
+                                                id="storeKindSelect"
+                                                label="Kind"
+                                                value={field.value || ''}
+                                                onChange={(value) => {
+                                                    onKindChange(value as string);
+                                                    field.onChange(value);
+                                                }}
+                                                options={optionsForKinds || []}
+                                                placeholder="Select Kind"
+                                                placement="bottom"
+                                            />
+                                            {fieldState.error && fieldState.isTouched && (
+                                                <p className="mt-1 text-sm text-red-600">Required Field</p>
+                                            )}
+                                        </>
+                                    )}
+                                />
+                            </div>
                         ) : null}
 
                         {editMode && entity?.kind ? (
-                            <Field name="storeKind" format={(value) => (value ? value.label : '')}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="storeKind">Kind</Label>
-
-                                        <Input
-                                            {...input}
-                                            valid={!meta.error && meta.touched}
-                                            invalid={!!meta.error && meta.touched}
-                                            type="text"
-                                            placeholder="Entity Kind"
-                                            disabled={editMode}
-                                        />
-                                    </FormGroup>
-                                )}
-                            </Field>
+                            <TextInput id="storeKind" type="text" label="Kind" value={entity.kind} disabled onChange={() => {}} />
                         ) : null}
 
-                        <>
-                            <br />
-                            <TabLayout
-                                tabs={[
-                                    {
-                                        title: 'Connector Attributes',
-                                        content:
-                                            entityProvider &&
-                                            values.storeKind &&
-                                            entityProviderAttributeDescriptors &&
-                                            entityProviderAttributeDescriptors.length > 0 ? (
-                                                <AttributeEditor
-                                                    id="entity"
-                                                    attributeDescriptors={entityProviderAttributeDescriptors}
-                                                    attributes={entity?.attributes}
-                                                    connectorUuid={entityProvider.uuid}
-                                                    functionGroupCode={FunctionGroupCode.EntityProvider}
-                                                    kind={values.storeKind.value}
-                                                    groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                                    setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                                                />
-                                            ) : (
-                                                <></>
-                                            ),
-                                    },
-                                    {
-                                        title: 'Custom Attributes',
-                                        content: renderCustomAttributesEditor,
-                                    },
-                                ]}
+                        <TabLayout
+                            noBorder
+                            tabs={[
+                                {
+                                    title: 'Connector Attributes',
+                                    content:
+                                        entityProvider &&
+                                        watchedStoreKind &&
+                                        entityProviderAttributeDescriptors &&
+                                        entityProviderAttributeDescriptors.length > 0 ? (
+                                            <AttributeEditor
+                                                id="entity"
+                                                attributeDescriptors={entityProviderAttributeDescriptors}
+                                                attributes={entity?.attributes}
+                                                connectorUuid={entityProvider.uuid}
+                                                functionGroupCode={FunctionGroupCode.EntityProvider}
+                                                kind={watchedStoreKind}
+                                                groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                                setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                            />
+                                        ) : (
+                                            <></>
+                                        ),
+                                },
+                                {
+                                    title: 'Custom Attributes',
+                                    content: renderCustomAttributesEditor,
+                                },
+                            ]}
+                        />
+
+                        <Container className="flex-row justify-end modal-footer" gap={4}>
+                            <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
+                                Cancel
+                            </Button>
+                            <ProgressButton
+                                title={submitTitle}
+                                inProgressTitle={inProgressTitle}
+                                inProgress={isSubmitting}
+                                disabled={(editMode ? !isDirty : false) || !isValid}
+                                type="submit"
                             />
-                        </>
-
-                        {
-                            <div className="d-flex justify-content-end">
-                                <ButtonGroup>
-                                    <ProgressButton
-                                        title={submitTitle}
-                                        inProgressTitle={inProgressTitle}
-                                        inProgress={submitting}
-                                        disabled={(editMode ? pristine : false) || !valid}
-                                    />
-
-                                    <Button color="default" onClick={onCancel} disabled={submitting}>
-                                        Cancel
-                                    </Button>
-                                </ButtonGroup>
-                            </div>
-                        }
-                    </BootstrapForm>
-                )}
-            </Form>
-        </Widget>
+                        </Container>
+                    </div>
+                </Widget>
+            </form>
+        </FormProvider>
     );
 }

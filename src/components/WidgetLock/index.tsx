@@ -1,25 +1,14 @@
-import cx from 'classnames';
-import {
-    Button,
-    Card,
-    CardBody,
-    CardText,
-    CardTitle,
-    Col,
-    Container,
-    PopoverBody,
-    PopoverHeader,
-    Row,
-    UncontrolledPopover,
-} from 'reactstrap';
+import cn from 'classnames';
+import Container from 'components/Container';
 import { LockTypeEnum } from 'types/user-interface';
-import styles from './WidgetLock.module.scss';
+import { Info, TriangleAlert, Home, Lock, Wifi, Database, Server } from 'lucide-react';
 interface Props {
     size?: 'small' | 'normal' | 'large';
     lockTitle?: string;
     lockText?: string;
     lockDetails?: string;
     lockType?: LockTypeEnum;
+    dataTestId?: string;
 }
 
 // TODO: Add a refresh button
@@ -29,65 +18,75 @@ const WidgetLock = ({
     lockText = 'There was some issue please try again later',
     lockType = LockTypeEnum.GENERIC,
     lockDetails,
+    dataTestId,
 }: Props) => {
-    const iconClasses = cx(
-        `fa ${styles.lockWidgetIcon}`,
-        { [styles.normal]: size === 'normal' },
-        { [styles.small]: size === 'small' },
-        { [styles.large]: size === 'large' },
-        { 'fa-triangle-exclamation': lockType === LockTypeEnum.GENERIC },
-        { 'fa-house-laptop': lockType === LockTypeEnum.CLIENT },
-        { 'fa-lock': lockType === LockTypeEnum.PERMISSION },
-        { 'fa-wifi': lockType === LockTypeEnum.NETWORK },
-        { 'fa-database': lockType === LockTypeEnum.SERVICE_ERROR },
-        { 'fa-server': lockType === LockTypeEnum.SERVER_ERROR },
-    );
+    const getIcon = () => {
+        let iconSize = 48;
+        if (size === 'small') iconSize = 24;
+        else if (size === 'normal') iconSize = 32;
+
+        switch (lockType) {
+            case LockTypeEnum.GENERIC:
+                return <TriangleAlert size={iconSize} />;
+            case LockTypeEnum.CLIENT:
+                return <Home size={iconSize} />;
+            case LockTypeEnum.PERMISSION:
+                return <Lock size={iconSize} />;
+            case LockTypeEnum.NETWORK:
+                return <Wifi size={iconSize} />;
+            case LockTypeEnum.SERVICE_ERROR:
+                return <Database size={iconSize} />;
+            case LockTypeEnum.SERVER_ERROR:
+                return <Server size={iconSize} />;
+            default:
+                return <TriangleAlert size={iconSize} />;
+        }
+    };
 
     const renderPopOver = () => {
         return (
-            <div>
-                <Button id="PopoverFocus" type="button" className={styles.popOverTrigger} color="link">
-                    <i className="fa fa-circle-info ms-1" id="UncontrolledTooltip" />
-                </Button>
-                <UncontrolledPopover placement="right" target="PopoverFocus" trigger="focus">
-                    <PopoverHeader className={cx('text-center', styles.popOverHeaderTitle)}>{lockTitle}</PopoverHeader>
-                    <PopoverBody className={cx('text-center')}>{lockDetails}</PopoverBody>
-                </UncontrolledPopover>
+            <div className="hs-tooltip inline-block">
+                <button
+                    type="button"
+                    className="hs-tooltip-toggle inline-flex items-center gap-x-2 text-sm text-gray-500 hover:text-gray-800 dark:text-neutral-400 dark:hover:text-neutral-200"
+                >
+                    <Info size={16} className="ml-1" />
+                </button>
+                <div
+                    className="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 invisible transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded shadow-sm dark:bg-neutral-700"
+                    role="tooltip"
+                >
+                    <div className="text-center font-semibold mb-1">{lockTitle}</div>
+                    <div className="text-center">{lockDetails}</div>
+                </div>
             </div>
         );
     };
 
-    const getMainColWidthLg = () =>
-        size === 'small' ? { offset: 2, size: 5 } : size === 'normal' ? { offset: 3, size: 6 } : { offset: 0, size: 12 };
+    const getMainColWidthLg = () => {
+        if (size === 'small') return 'md:col-start-3 md:col-span-5';
+        if (size === 'normal') return 'md:col-start-4 md:col-span-6';
+        return 'md:col-span-12';
+    };
 
     return (
-        <Container fluid>
-            <Row>
-                <Col xs={12} lg={getMainColWidthLg()} className="text-center">
-                    <Card className={styles.grayOut}>
-                        <CardBody>
-                            <Row>
-                                <Col xs={12} xl={{ offset: 1, size: 3 }}>
-                                    <i className={iconClasses} />
-                                </Col>
-                                <Col xs={12} xl={{ offset: 0, size: 8 }}>
-                                    <CardTitle
-                                        className={cx(
-                                            'd-flex justify-content-center align-content-center align-items-center',
-                                            styles.cardTitle,
-                                        )}
-                                        tag="h5"
-                                    >
-                                        {lockTitle}
-                                        {lockDetails && renderPopOver()}
-                                    </CardTitle>
-                                    <CardText className={styles.cardText}>{lockText}</CardText>
-                                </Col>
-                            </Row>
-                        </CardBody>
-                    </Card>
-                </Col>
-            </Row>
+        <Container>
+            <div className="grid grid-cols-12" data-testid={dataTestId || 'widget-lock'}>
+                <div className={`col-span-12 ${getMainColWidthLg()} text-center`}>
+                    <div className={cn('bg-gray-100 dark:bg-gray-800 rounded-lg p-6')}>
+                        <div className="grid grid-cols-12 gap-4">
+                            <div className="col-span-12 xl:col-start-2 xl:col-span-3 flex items-center justify-center">{getIcon()}</div>
+                            <div className="col-span-12 xl:col-span-8">
+                                <h5 className={cn('flex justify-center items-center gap-2')}>
+                                    {lockTitle}
+                                    {lockDetails && renderPopOver()}
+                                </h5>
+                                <p>{lockText}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </Container>
     );
 };

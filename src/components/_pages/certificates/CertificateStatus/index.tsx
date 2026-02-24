@@ -1,4 +1,3 @@
-import { Badge } from 'reactstrap';
 import {
     CertificateEventHistoryDtoStatusEnum,
     CertificateState,
@@ -9,6 +8,7 @@ import {
 } from 'types/openapi';
 import { getCertificateStatusColor, useGetStatusText } from 'utils/certificate';
 import { capitalize } from 'utils/common-utils';
+import Badge from 'components/Badge';
 
 interface Props {
     status:
@@ -19,18 +19,24 @@ interface Props {
         | ComplianceRuleStatus
         | CertificateSubjectType;
     asIcon?: boolean;
+    badgeSize?: 'small' | 'medium' | 'large';
 }
 
-function CertificateStatus({ status, asIcon = false }: Props) {
+function CertificateStatus({ status, badgeSize = 'small', asIcon = false }: Props) {
     const getStatusText = useGetStatusText();
 
     const color = getCertificateStatusColor(status);
     const text = getStatusText(status);
 
     return asIcon ? (
-        <i title={capitalize(text)} className={`fa fa-circle`} style={{ color: color }} />
+        <span
+            title={capitalize(text)}
+            className="w-3 h-3 rounded-full inline-block"
+            style={{ backgroundColor: color }}
+            data-testid="certificate-status"
+        />
     ) : (
-        <Badge color={color} style={{ background: color }}>
+        <Badge size={badgeSize} style={{ backgroundColor: color }} dataTestId="certificate-status">
             {capitalize(text)}
         </Badge>
     );

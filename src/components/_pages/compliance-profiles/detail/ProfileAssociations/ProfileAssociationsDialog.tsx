@@ -1,11 +1,10 @@
 import Dialog from 'components/Dialog';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ComplianceProfileDtoV2, PlatformEnum, Resource, ResourceObjectDto } from 'types/openapi';
-import { Button, ButtonGroup, Form as BootstrapForm, FormGroup, Label } from 'reactstrap';
-import { Field, Form } from 'react-final-form';
-import Select from 'react-select';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
+import Select from 'components/Select';
 import { useDispatch, useSelector } from 'react-redux';
-import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { buildValidationRules } from 'utils/validators-helper';
 import { validateRequired } from 'utils/validators';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as resourceActions, selectors as resourceSelectors } from 'ducks/resource';
@@ -13,7 +12,8 @@ import { actions as raActions, selectors as raSelectors } from 'ducks/ra-profile
 import { actions as tokenProfileActions, selectors as tokenProfileSelectors } from 'ducks/token-profiles';
 import { actions } from 'ducks/compliance-profiles';
 import { makeOptions } from 'utils/compliance-profile';
-import { TestableControl, TestableMenu } from 'utils/HOC/withDataTestId';
+import Button from 'components/Button';
+import cn from 'classnames';
 
 type Props = {
     isOpen: boolean;
@@ -66,12 +66,13 @@ export default function ProfileAssociationsDialog({ isOpen, onClose, profile, as
     const onSubmit = useCallback(
         (values: any) => {
             if (!profile || !selectedResource) return;
+            const selectedValue = values[selectedResource];
             dispatch(
                 actions.associateComplianceProfile({
                     uuid: profile.uuid,
                     resource: values.resource,
-                    associationObjectUuid: values[selectedResource].value.uuid,
-                    associationObjectName: values[selectedResource].value.name,
+                    associationObjectUuid: selectedValue?.uuid || '',
+                    associationObjectName: selectedValue?.name || '',
                 }),
             );
             onCancel();
@@ -87,114 +88,158 @@ export default function ProfileAssociationsDialog({ isOpen, onClose, profile, as
         return makeOptions(tokenProfiles, associationsOfComplianceProfile);
     }, [associationsOfComplianceProfile, tokenProfiles]);
 
-    const getControlStyles = (meta: any) => ({
-        control: (provided: any) =>
-            meta.touched && meta.invalid
-                ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                : { ...provided },
+    const methods = useForm({
+        mode: 'onTouched',
+        defaultValues: {
+            resource: undefined as Resource | undefined,
+            raProfiles: undefined as { uuid: string; name: string } | undefined,
+            tokenProfiles: undefined as { uuid: string; name: string } | undefined,
+        },
     });
 
-    const handleResourceChange =
-        (setSelectedResource: (value: Resource | null) => void, input: any) => (event: { value?: Resource } | null) => {
-            const value = event?.value ?? null;
-            setSelectedResource(value);
-            input.onChange(value);
-        };
+    const { control, handleSubmit, setValue, formState } = methods;
+    const watchedResource = useWatch({ control, name: 'resource' });
+
+    useEffect(() => {
+        setSelectedResource(watchedResource || null);
+    }, [watchedResource, setSelectedResource]);
+
+    const handleFormSubmit = useCallback(
+        (values: any) => {
+            if (!profile || !selectedResource) return;
+            const selectedValue = values[selectedResource];
+            onSubmit({
+                resource: values.resource,
+                [selectedResource]: selectedValue,
+            });
+        },
+        [profile, selectedResource, onSubmit],
+    );
 
     const dialogBody = useMemo(
         () => (
             <div data-testid="add-profile-association-dialog">
-                <Form onSubmit={onSubmit} mutators={{ ...mutators() }}>
-                    {({ handleSubmit, pristine, submitting, valid }) => (
-                        <BootstrapForm onSubmit={handleSubmit}>
-                            <Field name="resource" validate={validateRequired()}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="resource-select">Select the resource of association </Label>
-
-                                        <Select
-                                            data-testid="resource-select"
-                                            {...input}
-                                            maxMenuHeight={140}
-                                            menuPlacement="auto"
-                                            options={optionsForResources}
-                                            value={
-                                                selectedResource
-                                                    ? { value: selectedResource, label: getEnumLabel(resourceEnum, selectedResource) }
-                                                    : null
-                                            }
-                                            onChange={handleResourceChange(setSelectedResource, input)}
-                                            placeholder="Select the resource to be associated"
-                                            styles={getControlStyles(meta)}
-                                            components={{
-                                                Menu: TestableMenu('associate-profile-resource-select-menu'),
-                                                Control: TestableControl('associate-profile-resource-select-control'),
-                                            }}
-                                        />
-                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                            Required Field
-                                        </div>
-                                    </FormGroup>
-                                )}
-                            </Field>
-                            {selectedResource && (
-                                <Field name={selectedResource} validate={validateRequired()}>
-                                    {({ input, meta }) => (
-                                        <FormGroup>
-                                            <>
-                                                <Label for="resource-profiles-select">
-                                                    Select {getEnumLabel(resourceEnum, selectedResource)}
-                                                </Label>
-
-                                                <Select
-                                                    {...input}
-                                                    maxMenuHeight={140}
-                                                    menuPlacement="auto"
-                                                    options={
-                                                        selectedResource === 'raProfiles' ? optionsForRaProfiles : optionsForTokenProfiles
-                                                    }
-                                                    placeholder={`Select ${getEnumLabel(resourceEnum, selectedResource)} to be associated`}
-                                                    styles={getControlStyles(meta)}
-                                                    components={{
-                                                        Menu: TestableMenu('associate-profile-resource-profiles-select-menu'),
-                                                        Control: TestableControl('associate-profile-resource-profiles-select-control'),
-                                                    }}
-                                                />
-
-                                                <div
-                                                    className="invalid-feedback"
-                                                    style={meta.touched && meta.invalid ? { display: 'block' } : {}}
-                                                >
-                                                    Required Field
-                                                </div>
-                                            </>
-                                        </FormGroup>
-                                    )}
-                                </Field>
-                            )}
-
-                            <div style={{ textAlign: 'right' }}>
-                                <ButtonGroup>
-                                    <Button
-                                        type="submit"
-                                        color="primary"
-                                        disabled={pristine || submitting || !valid}
-                                        onClick={handleSubmit}
+                <FormProvider {...methods}>
+                    <form onSubmit={handleSubmit(handleFormSubmit)}>
+                        <Controller
+                            name="resource"
+                            control={control}
+                            rules={buildValidationRules([validateRequired()])}
+                            render={({ field, fieldState }) => (
+                                <div className="mb-4">
+                                    <label
+                                        htmlFor="resource-select"
+                                        className="block text-sm font-medium mb-2 text-gray-700 dark:text-white"
                                     >
-                                        Associate
-                                    </Button>
+                                        Select the resource of association
+                                    </label>
+                                    <Select
+                                        id="resource-select"
+                                        data-testid="resource-select"
+                                        options={optionsForResources}
+                                        value={field.value ? (field.value as string) : ''}
+                                        onChange={(value) => {
+                                            const resource = value as Resource | undefined;
+                                            field.onChange(resource);
+                                            setSelectedResource(resource || null);
+                                            setValue('raProfiles' as any, undefined);
+                                            setValue('tokenProfiles' as any, undefined);
+                                        }}
+                                        placeholder="Select the resource to be associated"
+                                        className={cn({
+                                            'border-red-500': fieldState.error && fieldState.isTouched,
+                                        })}
+                                    />
+                                    {fieldState.error && fieldState.isTouched && (
+                                        <p className="mt-1 text-sm text-red-600">
+                                            {typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Required Field'}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+                        />
+                        {selectedResource && (
+                            <Controller
+                                name={selectedResource as 'raProfiles' | 'tokenProfiles'}
+                                control={control}
+                                rules={buildValidationRules([validateRequired()])}
+                                render={({ field, fieldState }) => {
+                                    const options = selectedResource === 'raProfiles' ? optionsForRaProfiles : optionsForTokenProfiles;
+                                    const selectOptions = options.map((opt) => ({
+                                        value: opt.value.uuid,
+                                        label: opt.label,
+                                    }));
+                                    const fieldValue = field.value as { uuid: string; name: string } | undefined;
+                                    const onProfileSelect = (value: unknown) => {
+                                        const uuid = value as string | undefined;
+                                        const option = options.find((opt) => opt.value.uuid === uuid);
+                                        field.onChange(option?.value);
+                                    };
+                                    return (
+                                        <div className="mb-4">
+                                            <label
+                                                htmlFor="resource-profiles-select"
+                                                className="block text-sm font-medium mb-2 text-gray-700 dark:text-white"
+                                            >
+                                                Select {getEnumLabel(resourceEnum, selectedResource)}
+                                            </label>
+                                            <Select
+                                                id="resource-profiles-select"
+                                                options={selectOptions}
+                                                value={fieldValue?.uuid || ''}
+                                                onChange={onProfileSelect}
+                                                placeholder={`Select ${getEnumLabel(resourceEnum, selectedResource)} to be associated`}
+                                                className={cn({
+                                                    'border-red-500': fieldState.error && fieldState.isTouched,
+                                                })}
+                                            />
+                                            {fieldState.error && fieldState.isTouched && (
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {typeof fieldState.error === 'string'
+                                                        ? fieldState.error
+                                                        : fieldState.error?.message || 'Required Field'}
+                                                </p>
+                                            )}
+                                        </div>
+                                    );
+                                }}
+                            />
+                        )}
 
-                                    <Button type="button" color="secondary" disabled={submitting} onClick={onCancel}>
-                                        Cancel
-                                    </Button>
-                                </ButtonGroup>
-                            </div>
-                        </BootstrapForm>
-                    )}
-                </Form>
+                        <div className="flex justify-center gap-4">
+                            <Button
+                                type="submit"
+                                color="primary"
+                                disabled={formState.isSubmitting || !formState.isValid}
+                                onClick={handleSubmit(handleFormSubmit)}
+                            >
+                                Associate
+                            </Button>
+
+                            <Button color="secondary" variant="outline" disabled={formState.isSubmitting} onClick={onCancel} type="button">
+                                Cancel
+                            </Button>
+                        </div>
+                    </form>
+                </FormProvider>
             </div>
         ),
-        [onSubmit, selectedResource, onCancel, optionsForResources, resourceEnum, optionsForRaProfiles, optionsForTokenProfiles],
+        [
+            methods,
+            control,
+            handleSubmit,
+            handleFormSubmit,
+            setValue,
+            formState,
+            selectedResource,
+            onCancel,
+            optionsForResources,
+            resourceEnum,
+            optionsForRaProfiles,
+            optionsForTokenProfiles,
+        ],
     );
 
     return <Dialog isOpen={isOpen} caption="Associate Profile" body={dialogBody} toggle={onCancel} buttons={[]} />;

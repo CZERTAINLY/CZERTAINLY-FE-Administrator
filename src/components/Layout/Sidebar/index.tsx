@@ -1,10 +1,32 @@
-import LinksGroup from './LinksGroup';
-import style from './Sidebar.module.scss';
 import { Resource } from 'types/openapi';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { NavLink, useLocation } from 'react-router';
+import { useLocalStorage } from 'usehooks-ts';
+import cn from 'classnames';
+import {
+    Award,
+    ChevronDown,
+    HomeIcon,
+    KeyRound,
+    SearchCheck,
+    Link,
+    CircleUser,
+    Users,
+    Table,
+    ListChecks,
+    CircleCheckBig,
+    Calendar,
+    Settings,
+    FileJson2,
+    Split,
+    ArrowRightToLine,
+} from 'lucide-react';
+import Button from 'components/Button';
+import SimpleBar from 'simplebar-react';
 
 type MenuItemMapping = {
     _key: string;
+    icon?: React.ReactNode;
     header: string;
     requiredResources?: Resource[];
 } & (
@@ -23,20 +45,64 @@ type MenuItemMapping = {
       }
 );
 
+function SidebarSubmenuItem({ child, index, totalCount }: { child: { name: string; link: string }; index: number; totalCount: number }) {
+    return (
+        <li className={cn({ 'mb-2': index === totalCount - 1 })}>
+            <NavLink
+                to={child.link}
+                className={({ isActive }) =>
+                    cn(
+                        'font-medium text-sm block px-4 ml-8 py-2 no-underline hover:bg-gray-200 rounded-lg h-[38px] items-center',
+                        isActive && 'text-blue-600',
+                    )
+                }
+            >
+                {child.name}
+            </NavLink>
+        </li>
+    );
+}
+
 const menuItemMappings: MenuItemMapping[] = [
     {
         _key: '/dashboard',
+        icon: <HomeIcon size={16} strokeWidth={1.5} />,
         header: 'Dashboard',
         headerLink: '/dashboard',
         requiredResources: [Resource.Certificates, Resource.RaProfiles, Resource.Discoveries, Resource.Groups],
     },
-    { _key: '/certificates', header: 'Certificates', headerLink: '/certificates', requiredResources: [Resource.Certificates] },
-    { _key: '/keys', header: 'Keys', headerLink: '/keys', requiredResources: [Resource.Keys] },
-    { _key: '/discovery', header: 'Discoveries', headerLink: '/discoveries', requiredResources: [Resource.Discoveries] },
-    { _key: '/connectors', header: 'Connectors', headerLink: '/connectors', requiredResources: [Resource.Connectors] },
+    {
+        _key: '/certificates',
+        icon: <Award size={16} strokeWidth={1.5} />,
+        header: 'Certificates',
+        headerLink: '/certificates',
+        requiredResources: [Resource.Certificates],
+    },
+    {
+        _key: '/keys',
+        icon: <KeyRound size={16} strokeWidth={1.5} />,
+        header: 'Keys',
+        headerLink: '/keys',
+        requiredResources: [Resource.Keys],
+    },
+    {
+        _key: '/discovery',
+        icon: <SearchCheck size={16} strokeWidth={1.5} />,
+        header: 'Discoveries',
+        headerLink: '/discoveries',
+        requiredResources: [Resource.Discoveries],
+    },
+    {
+        _key: '/connectors',
+        icon: <Link size={16} strokeWidth={1.5} />,
+        header: 'Connectors',
+        headerLink: '/connectors',
+        requiredResources: [Resource.Connectors],
+    },
 
     {
         _key: 'accessControl',
+        icon: <CircleUser size={16} strokeWidth={1.5} />,
         header: 'Access Control',
         children: [
             { _key: '/users', name: 'Users', link: '/users', requiredResources: [Resource.Users] },
@@ -45,6 +111,7 @@ const menuItemMappings: MenuItemMapping[] = [
     },
     {
         _key: 'profiles',
+        icon: <Users size={16} strokeWidth={1.5} />,
         header: 'Profiles',
         children: [
             {
@@ -76,6 +143,7 @@ const menuItemMappings: MenuItemMapping[] = [
 
     {
         _key: 'inventory',
+        icon: <Table size={16} strokeWidth={1.5} />,
         header: 'Inventory',
         children: [
             { _key: '/credentials', name: 'Credentials', link: '/credentials', requiredResources: [Resource.Credentials] },
@@ -89,6 +157,7 @@ const menuItemMappings: MenuItemMapping[] = [
 
     {
         _key: 'protocols',
+        icon: <ListChecks size={16} strokeWidth={1.5} />,
         header: 'Protocols',
         children: [
             {
@@ -105,6 +174,7 @@ const menuItemMappings: MenuItemMapping[] = [
 
     {
         _key: 'approvals',
+        icon: <CircleCheckBig size={16} strokeWidth={1.5} />,
         header: 'Approvals',
         children: [
             {
@@ -122,10 +192,17 @@ const menuItemMappings: MenuItemMapping[] = [
         ],
     },
 
-    { _key: '/jobs', header: 'Scheduler', headerLink: '/jobs', requiredResources: [Resource.Jobs] },
+    {
+        _key: '/jobs',
+        icon: <Calendar size={16} strokeWidth={1.5} />,
+        header: 'Scheduler',
+        headerLink: '/jobs',
+        requiredResources: [Resource.Jobs],
+    },
 
     {
         _key: 'settings',
+        icon: <Settings size={16} strokeWidth={1.5} />,
         header: 'Settings',
         children: [
             { _key: '/settings', name: 'Platform', link: '/settings', requiredResources: [Resource.Settings] },
@@ -153,9 +230,16 @@ const menuItemMappings: MenuItemMapping[] = [
         ],
     },
 
-    { _key: '/auditlogs', header: 'Audit Logs', headerLink: '/auditlogs', requiredResources: [Resource.AuditLogs] },
+    {
+        _key: '/auditlogs',
+        icon: <FileJson2 size={16} strokeWidth={1.5} />,
+        header: 'Audit Logs',
+        headerLink: '/auditlogs',
+        requiredResources: [Resource.AuditLogs],
+    },
     {
         _key: 'workflows',
+        icon: <Split size={16} strokeWidth={1.5} />,
         header: 'Workflows',
         children: [
             // { _key: '/conditions', name: 'Conditions', link: '/conditions' },
@@ -216,19 +300,166 @@ type Props = {
     allowedResources?: Resource[];
 };
 export default function Sidebar({ allowedResources }: Props) {
+    const [defaultMenuSize, setDefaultMenuSize] = useLocalStorage<'small' | 'large'>('menu-size', 'small');
+    const [menuSize, setMenuSize] = useState<'small' | 'large' | 'flying'>(defaultMenuSize);
+    const location = useLocation();
+
     const allowedMenuItems = useMemo(() => getAllowedMenuItems(allowedResources), [allowedResources]);
+    const [openMenuItems, setOpenMenuItems] = useState<string[]>([]);
+
+    const activeSectionKey = useMemo(() => {
+        const pathname = location.pathname;
+        const item = allowedMenuItems.find(
+            (m): m is MenuItemMapping & { children: Array<{ link: string }> } =>
+                'children' in m && m.children.some((c) => c.link === pathname),
+        );
+        return item ? item._key : null;
+    }, [location.pathname, allowedMenuItems]);
+
+    useEffect(() => {
+        if (menuSize === 'flying') return;
+        document.documentElement.style.setProperty('--sidebar-width', menuSize === 'small' ? '84px' : '260px');
+    }, [menuSize]);
+
+    useEffect(() => {
+        if (menuSize === 'large' && activeSectionKey) {
+            setOpenMenuItems((prev) => (prev.includes(activeSectionKey) ? prev : [...prev, activeSectionKey]));
+        }
+    }, [menuSize, activeSectionKey]);
+
+    function toggleMenuSize() {
+        const newMenuSize = menuSize === 'small' ? 'large' : 'small';
+        setMenuSize(newMenuSize);
+        setOpenMenuItems(newMenuSize === 'large' && activeSectionKey ? [activeSectionKey] : []);
+        setDefaultMenuSize(newMenuSize);
+    }
 
     function renderMenuItem(mapping: MenuItemMapping) {
         if ('children' in mapping) {
-            return <LinksGroup key={mapping._key} header={mapping.header} childrenLinks={mapping.children} />;
+            const childrenKeys = mapping.children.map((child) => child.link);
+            const activePage = location.pathname;
+            const isChildActive = childrenKeys.some((child) => child === activePage);
+            const isActive = openMenuItems.includes(mapping._key);
+            return (
+                <li key={mapping.header} className={cn('flex justify-center', { 'flex-col': menuSize != 'small' })}>
+                    <Button
+                        variant="transparent"
+                        className={cn('!px-4 !py-2 border-none justify-between h-[38px]', {
+                            'flex w-full items-center': menuSize != 'small',
+                        })}
+                        onClick={() => {
+                            if (menuSize === 'small') {
+                                setMenuSize('flying');
+                            }
+                            setOpenMenuItems((prev) => (isActive ? prev.filter((item) => item !== mapping._key) : [...prev, mapping._key]));
+                        }}
+                        aria-expanded={isActive}
+                        aria-controls={mapping._key}
+                    >
+                        <div className={cn('flex items-center gap-x-2', { 'text-blue-600': isChildActive })}>
+                            {mapping.icon}
+                            <span className={cn('text-sm', { 'sr-only': menuSize === 'small' })}>{mapping.header}</span>
+                        </div>
+                        {menuSize != 'small' && <ChevronDown strokeWidth={1.5} size={16} className={cn({ isActive: 'rotate-180' })} />}
+                    </Button>
+                    <ul
+                        className={cn(
+                            `transition-[max-height] duration-300 ease-in-out overflow-hidden relative before:content-[''] before:absolute before:left-6 before:top-0 before:h-full before:w-0.5 before:bg-gray-200`,
+                            { 'w-0': !isActive },
+                        )}
+                        style={{ maxHeight: isActive ? `${38 * mapping.children.length}px` : 0 }}
+                        id={mapping._key}
+                    >
+                        {mapping.children.map((child, index) => (
+                            <SidebarSubmenuItem key={child.name} child={child} index={index} totalCount={mapping.children.length} />
+                        ))}
+                    </ul>
+                </li>
+            );
         }
-        return <LinksGroup key={mapping._key} header={mapping.header} headerLink={mapping.headerLink} />;
+        return (
+            <li key={mapping._key} className="flex justify-center">
+                <NavLink
+                    to={mapping.headerLink}
+                    onClick={() => {
+                        if (menuSize === 'flying') {
+                            setMenuSize('small');
+                            setOpenMenuItems([]);
+                        }
+                    }}
+                    className={({ isActive }) =>
+                        cn('font-medium flex px-4 py-2 no-underline hover:bg-gray-200 rounded-lg h-[38px] items-center dark:text-white', {
+                            'text-blue-600': isActive,
+                            'w-full gap-x-2': menuSize !== 'small',
+                        })
+                    }
+                >
+                    {mapping.icon}
+                    <span className={cn('text-sm font-medium', { 'sr-only': menuSize === 'small' })}>{mapping.header}</span>
+                </NavLink>
+            </li>
+        );
     }
     return (
-        <nav className={style.root}>
-            <div className={style.nav}>
-                <ul>{allowedMenuItems.map((item) => renderMenuItem(item))}</ul>
-            </div>
-        </nav>
+        <>
+            {menuSize === 'flying' && (
+                <div
+                    role="region"
+                    aria-label="Sidebar menu"
+                    className={cn(
+                        'fixed top-[var(--header-height)] left-0 h-[calc(100vh-var(--header-height))] bg-white shadow-lg w-[260px] z-50',
+                        {},
+                    )}
+                    onMouseLeave={() => {
+                        setMenuSize('small');
+                        setOpenMenuItems([]);
+                    }}
+                    data-testid="sidebar-flying"
+                >
+                    <SimpleBar
+                        forceVisible="y"
+                        style={{
+                            height: '100%',
+                            width: '100%',
+                        }}
+                    >
+                        <nav className="p-4">
+                            <ul className="list-none m-0 flex flex-col gap-y-1">{allowedMenuItems.map((item) => renderMenuItem(item))}</ul>
+                        </nav>
+                    </SimpleBar>
+                </div>
+            )}
+            <SimpleBar
+                forceVisible="y"
+                style={{
+                    height: 'calc(100vh - var(--header-height))',
+                    width: 'var(--sidebar-width)',
+                    position: 'sticky',
+                    top: 'var(--header-height)',
+                    zIndex: 10,
+                }}
+                data-testid="sidebar-sticky"
+            >
+                <div className="p-4 w-full h-full dark:bg-neutral-900">
+                    <nav className="pb-4">
+                        <ul className="list-none m-0 flex flex-col gap-y-1">{allowedMenuItems.map((item) => renderMenuItem(item))}</ul>
+                    </nav>
+
+                    <hr className="border-gray-200" />
+                    <div className="flex justify-center pt-4">
+                        <Button
+                            variant="transparent"
+                            className={cn('inline-flex px-4 py-2 border-none', {
+                                'w-full gap-x-2': menuSize !== 'small',
+                            })}
+                            onClick={() => toggleMenuSize()}
+                        >
+                            <ArrowRightToLine strokeWidth={1} size={24} className={cn(menuSize === 'large' && 'rotate-180')} />
+                            <span className={cn({ 'sr-only': menuSize === 'small' })}>Collapse</span>
+                        </Button>
+                    </div>
+                </div>
+            </SimpleBar>
+        </>
     );
 }

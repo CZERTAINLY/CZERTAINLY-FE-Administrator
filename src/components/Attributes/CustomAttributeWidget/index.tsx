@@ -1,24 +1,24 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Field, Form } from 'react-final-form';
+import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import Select from 'react-select';
-import { Form as BootstrapForm, Col, FormText, Row } from 'reactstrap';
+import Select from 'components/Select';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../ducks/customAttributes';
-import { AttributeResponseModel, BaseAttributeContentModel, CustomAttributeModel } from '../../../types/attributes';
+import { AttributeResponseModel, BaseAttributeContentModel } from '../../../types/attributes';
 import { Resource } from '../../../types/openapi';
 import ContentValueField from '../../Input/DynamicContent/ContentValueField';
 import Widget from '../../Widget';
 import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from '../AttributeViewer';
-import style from './customAttributeWidget.module.scss';
+import Container from 'components/Container';
 
 export type Props = {
     resource: Resource;
     resourceUuid: string;
     attributes: AttributeResponseModel[] | undefined;
+    className?: string;
 };
 
-export default function CustomAttributeWidget({ resource, resourceUuid, attributes }: Props) {
+export default function CustomAttributeWidget({ resource, resourceUuid, attributes, className }: Props) {
     const dispatch = useDispatch();
     const [isAttributeContentLoaded, setIsAttributeContentLoaded] = useState<boolean>(false);
 
@@ -30,9 +30,7 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
     const isUpdatingContent = useSelector(customAttributesSelectors.isUpdatingContent);
 
-    const [attribute, setAttribute] = useState<CustomAttributeModel>();
-
-    const prevAttributesRef = useRef<AttributeResponseModel[] | undefined>();
+    const prevAttributesRef = useRef<AttributeResponseModel[] | undefined>(undefined);
 
     useEffect(() => {
         if (prevAttributesRef.current !== attributes) {
@@ -82,16 +80,35 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
         dispatch(customAttributesActions.listResourceCustomAttributes(resource));
     }, [dispatch, resource]);
 
+    const [selectedAttributeUuid, setSelectedAttributeUuid] = useState<string>('');
+
+    const methods = useForm<any>({
+        defaultValues: {
+            selectCustomAttribute: '',
+        },
+    });
+
+    const { control, reset } = methods;
+
     const loadedAttributes = useMemo(() => resourceCustomAttributesContents ?? attributes, [resourceCustomAttributesContents, attributes]);
+
+    const availableAttributes = useMemo(
+        () => resourceCustomAttributes.filter((r) => !loadedAttributes?.find((a) => a.uuid === r.uuid)),
+        [resourceCustomAttributes, loadedAttributes],
+    );
+
+    const selectedAttribute = useMemo(
+        () => availableAttributes.find((attr) => attr.uuid === selectedAttributeUuid),
+        [availableAttributes, selectedAttributeUuid],
+    );
+
     const options = useMemo(
         () =>
-            resourceCustomAttributes
-                .filter((r) => !loadedAttributes?.find((a) => a.uuid === r.uuid))
-                .map((r) => ({
-                    label: r.properties.label,
-                    value: r,
-                })),
-        [resourceCustomAttributes, loadedAttributes],
+            availableAttributes.map((r) => ({
+                label: r.properties.label,
+                value: r.uuid,
+            })),
+        [availableAttributes],
     );
 
     return (
@@ -101,6 +118,7 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
             busy={isFetchingResourceCustomAttributes || isUpdatingContent}
             titleSize="large"
             widgetLockName={LockWidgetNameEnum.CustomAttributeWidget}
+            className={className}
         >
             <AttributeViewer
                 attributes={loadedAttributes}
@@ -110,50 +128,45 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
                 onRemove={removeCustomAttribute}
             />
             {options && options.length > 0 && (
-                <Form onSubmit={() => {}}>
-                    {({ form }) => (
-                        <BootstrapForm>
-                            <h6>
-                                <b>Add custom attribute</b>
-                            </h6>
-                            <Row>
-                                <Col xs="6" sm="6" md="6" lg="6" xl="6">
-                                    <Field key={'selectCustomAttribute'} name={'selectCustomAttribute'}>
-                                        {({ input }) => (
-                                            <Select
-                                                {...input}
-                                                inputId="selectCustomAttribute"
-                                                options={options}
-                                                placeholder={`Add...`}
-                                                isClearable={true}
-                                                onChange={(v) => {
-                                                    input.onChange(v);
-                                                    setAttribute(v?.value ?? undefined);
-                                                }}
-                                            />
-                                        )}
-                                    </Field>
-                                </Col>
-                                <Col xs="6" sm="6" md="6" lg="6" xl="6">
-                                    {attribute && (
-                                        <div>
-                                            <ContentValueField
-                                                id={resourceUuid}
-                                                descriptor={attribute}
-                                                onSubmit={(uuid, content) => {
-                                                    form.change('selectCustomAttribute', undefined);
-                                                    setAttribute(undefined);
-                                                    addCustomAttribute(uuid, content);
-                                                }}
-                                            />
-                                            <FormText className={style.formatTextStyle}>{attribute.description}</FormText>
-                                        </div>
+                <div className="mt-4">
+                    <div className="mb-2">Add custom attribute</div>
+                    <FormProvider {...methods}>
+                        <form onSubmit={(e) => e.preventDefault()}>
+                            <Container className="md:grid md:grid-cols-2 !gap-4">
+                                <Controller
+                                    name="selectCustomAttribute"
+                                    control={control}
+                                    render={({ field }: { field: any }) => (
+                                        <Select
+                                            id="selectCustomAttribute"
+                                            options={options}
+                                            placeholder="Add..."
+                                            value={field.value}
+                                            onChange={(value) => {
+                                                field.onChange(value);
+                                                setSelectedAttributeUuid(value as string);
+                                            }}
+                                        />
                                     )}
-                                </Col>
-                            </Row>
-                        </BootstrapForm>
-                    )}
-                </Form>
+                                />
+                                {selectedAttribute && (
+                                    <div>
+                                        <ContentValueField
+                                            id={resourceUuid}
+                                            descriptor={selectedAttribute}
+                                            onSubmit={(uuid, content) => {
+                                                reset({ selectCustomAttribute: '' });
+                                                setSelectedAttributeUuid('');
+                                                addCustomAttribute(uuid, content);
+                                            }}
+                                        />
+                                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">{selectedAttribute.description}</p>
+                                    </div>
+                                )}
+                            </Container>
+                        </form>
+                    </FormProvider>
+                </div>
             )}
         </Widget>
     );

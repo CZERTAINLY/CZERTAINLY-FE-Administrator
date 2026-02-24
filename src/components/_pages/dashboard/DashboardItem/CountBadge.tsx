@@ -1,5 +1,4 @@
 import Widget from 'components/Widget';
-import { Col, Row } from 'reactstrap';
 
 interface Props {
     //TODO: Add a null type to data which should also be sent from the backend then we can use widget lock for this component
@@ -11,13 +10,16 @@ interface Props {
 
 function CountBadge({ data, title, link, extraComponent }: Props) {
     return (
-        <Widget titleLink={link} title={title} titleBoldness="bold">
-            <Row className={`flex-column justify-content-between mt-3 gx-0`}>
-                <Col sm={8} className={'d-flex align-items-center'}>
-                    <h3 className={'fw-semi-bold mb-0'}>{data}</h3>
-                </Col>
-                <Col className={'mt-3'}>{extraComponent}</Col>
-            </Row>
+        <Widget
+            titleLink={link}
+            title={title}
+            className="h-full"
+            titleColor="var(--primary-blue-color)"
+            titleBoldness="semi-bold"
+            titleSize="large"
+        >
+            <div className="text-3xl !text-[var(--dark-gray-color)]">{data}</div>
+            {extraComponent && <div className="mt-4">{extraComponent}</div>}
         </Widget>
     );
 }

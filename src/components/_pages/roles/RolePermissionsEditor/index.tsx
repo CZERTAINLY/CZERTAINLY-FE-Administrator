@@ -1,17 +1,18 @@
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 
 import Dialog from 'components/Dialog';
-import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import Checkbox from 'components/Checkbox';
+import Button from 'components/Button';
+import SimpleBar from 'simplebar-react';
+import { Plus, Trash2, Check, X } from 'lucide-react';
 
 import { actions as authActions, selectors as authSelectors } from 'ducks/auth';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Input } from 'reactstrap';
 import { AuthResourceModel } from 'types/auth';
 import { ObjectPermissionsResponseModel, ResourcePermissionsResponseModel, SubjectPermissionsModel } from 'types/roles';
-
-import style from './style.module.scss';
+import cn from 'classnames';
+import Container from 'components/Container';
 
 interface Props {
     submitButtonsGroup: React.ReactNode;
@@ -194,64 +195,112 @@ function RolePermissionsEditor({
 
     const resourceList = useMemo(
         () =>
-            resources?.map((resource) => (
-                <button key={resource.uuid} data-selected={currentResource === resource} onClick={() => onResourceSelected(resource)}>
-                    {resource.displayName}
-                    <br />
-                    <sup>{getPermissions(resource)}</sup>
-                </button>
-            )),
+            resources?.map((resource) => {
+                const isSelected = currentResource?.uuid === resource.uuid;
+                const permissionText = getPermissions(resource);
+
+                return (
+                    <button
+                        key={resource.uuid}
+                        onClick={() => onResourceSelected(resource)}
+                        className={cn(
+                            'w-full text-left px-3 py-2 rounded-lg transition-colors',
+                            'hover:bg-gray-50 dark:hover:bg-neutral-800',
+                            {
+                                'bg-gray-100 border border-gray-300 dark:bg-neutral-800 dark:border-neutral-700': isSelected,
+                                'border border-gray-200 dark:border-neutral-700': !isSelected,
+                            },
+                        )}
+                    >
+                        <div className="font-medium text-sm text-[var(--dark-gray-color)] dark:text-neutral-200">
+                            {resource.displayName}
+                        </div>
+                        <div className="text-xs text-[var(--dark-gray-color)] dark:text-neutral-400 mt-1">{permissionText}</div>
+                    </button>
+                );
+            }),
         [currentResource, getPermissions, onResourceSelected, resources],
     );
+
+    const allowAllResources = permissions?.allowAllResources || false;
 
     const permissionsList = useMemo(
         () =>
             !currentResource ? (
-                <></>
+                <div className="flex items-center justify-center h-64 text-gray-500 dark:text-neutral-400">
+                    Select a resource from the left to configure permissions
+                </div>
             ) : (
-                <Widget title="Resource Action Permissions" busy={isBusy} className={style.permissionsWidget}>
-                    <label className={style.allPermissions} htmlFor="allPermissions">
-                        <input
-                            id="allPermissions"
-                            type="checkbox"
-                            checked={permissions?.resources.find((r) => r.name === currentResource.name)?.allowAllActions || false}
-                            disabled={disabled || permissions.allowAllResources}
-                            onChange={(e) => allowAllActions(currentResource, e.target.checked)}
-                        />
-                        &nbsp;&nbsp;&nbsp;Allow All Permissions
-                    </label>
+                <div>
+                    <div className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg p-6">
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Resource Action Permissions</h3>
 
-                    <div className={style.action}>
-                        {currentResource.actions.map((action) => (
-                            <label key={action.uuid}>
-                                <input
-                                    type="checkbox"
+                        <div className="space-y-4">
+                            <div className={cn('flex items-center', { 'opacity-50': allowAllResources })}>
+                                <Checkbox
+                                    id="allPermissions"
                                     checked={
+                                        allowAllResources ||
+                                        permissions?.resources.find((r) => r.name === currentResource.name)?.allowAllActions ||
+                                        false
+                                    }
+                                    disabled={disabled || permissions.allowAllResources}
+                                    onChange={(checked) => allowAllActions(currentResource, checked)}
+                                    label="Allow All Permissions"
+                                />
+                            </div>
+
+                            <Container className="flex-row flex-wrap" gap={4}>
+                                {currentResource.actions.map((action) => {
+                                    const allowAllActions =
+                                        permissions?.resources.find((r) => r.name === currentResource.name)?.allowAllActions || false;
+                                    const isChecked =
+                                        allowAllResources ||
+                                        allowAllActions ||
                                         permissions?.resources
                                             .find((r) => r.name === currentResource.name)
-                                            ?.actions.includes(action.name) || false
-                                    }
-                                    disabled={
+                                            ?.actions.includes(action.name) ||
+                                        false;
+                                    const isDisabled =
                                         disabled ||
-                                        permissions?.allowAllResources ||
-                                        permissions?.resources.find((r) => r.name === currentResource.name)?.allowAllActions
-                                    }
-                                    onChange={(e) => allowAction(currentResource, action.name, e.target.checked)}
-                                />
-                                &nbsp;&nbsp;&nbsp;{action.displayName}
-                            </label>
-                        ))}
+                                        allowAllResources ||
+                                        permissions?.resources.find((r) => r.name === currentResource.name)?.allowAllActions ||
+                                        false;
+
+                                    return (
+                                        <label
+                                            htmlFor={`action-${action.uuid}`}
+                                            key={action.uuid}
+                                            className={cn(
+                                                'flex items-center border border-gray-200 dark:border-neutral-700 px-4 py-3 rounded-lg w-1/2 md:w-[calc(25%-12px)] cursor-pointer',
+                                                {
+                                                    'opacity-50': isDisabled,
+                                                },
+                                            )}
+                                        >
+                                            <Checkbox
+                                                id={`action-${action.uuid}`}
+                                                checked={isChecked}
+                                                disabled={isDisabled}
+                                                onChange={(checked) => allowAction(currentResource, action.name, checked)}
+                                                label={action.displayName}
+                                            />
+                                        </label>
+                                    );
+                                })}
+                            </Container>
+                        </div>
                     </div>
-                </Widget>
+                </div>
             ),
-        [allowAction, allowAllActions, currentResource, disabled, isBusy, permissions.allowAllResources, permissions?.resources],
+        [allowAction, allowAllActions, allowAllResources, currentResource, disabled, permissions],
     );
 
     const objectHeaders: TableHeader[] = useMemo(
         () => [
             {
                 id: 'objectName',
-                content: 'Name',
+                content: 'NAME',
                 sortable: true,
                 sort: 'asc',
                 align: 'left',
@@ -261,7 +310,7 @@ function RolePermissionsEditor({
                 (action) =>
                     ({
                         id: action.name,
-                        content: action.displayName,
+                        content: action.displayName.toUpperCase(),
                         sortable: false,
                         align: 'center',
                         width: '5em',
@@ -272,29 +321,26 @@ function RolePermissionsEditor({
     );
 
     const getObjectRowActions = useCallback(
-        (object: ObjectPermissionsResponseModel): JSX.Element[] =>
+        (object: ObjectPermissionsResponseModel): React.ReactNode[] =>
             currentResource?.actions.map((action) => (
-                <label
-                    htmlFor={`${object.uuid}_${action.name}`}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                    }}
-                    // Add onKeyDown handler to satisfy typescript:S1082 SQ Quality Check.
-                    onKeyDown={() => {}}
+                <button
+                    key={`${object.uuid}_${action.name}`}
+                    type="button"
+                    aria-label="Permission action"
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex justify-center bg-transparent border-0 p-0 cursor-pointer"
                 >
-                    <Input
-                        key={`${object.uuid}_${action.name}`}
+                    <Checkbox
                         id={`${object.uuid}_${action.name}`}
-                        type="switch"
                         checked={object.allow.includes(action.name)}
                         disabled={disabled}
-                        onChange={(e) =>
-                            setOLP(currentResource.uuid, object.uuid, object.name, action.name, e.target.checked ? 'allow' : 'deny')
+                        onChange={(checked) =>
+                            setOLP(currentResource.uuid, object.uuid, object.name, action.name, checked ? 'allow' : 'deny')
                         }
                     />
-                </label>
+                </button>
             )) || [],
-        [currentResource?.actions, currentResource?.uuid, disabled, setOLP],
+        [currentResource, disabled, setOLP],
     );
 
     const objectRows: TableDataRow[] = useMemo(
@@ -304,7 +350,7 @@ function RolePermissionsEditor({
                 ?.objects?.map((object) => ({
                     id: object.uuid,
                     columns: [
-                        <span key="name" style={{ whiteSpace: 'nowrap' }}>
+                        <span key="name" className="font-medium text-gray-900 dark:text-white whitespace-nowrap">
                             {object.name}
                         </span>,
                         ...getObjectRowActions(object),
@@ -411,43 +457,6 @@ function RolePermissionsEditor({
         setObjectListDialog(false);
     }, [clonePerms, currentResource, objects, objectsToAdd, onPermissionsChanged]);
 
-    const buttons: WidgetButtonProps[] = useMemo(() => {
-        return [
-            {
-                icon: 'plus',
-                disabled: false,
-                tooltip: 'Add object',
-                onClick: () => {
-                    onAddClick();
-                },
-            },
-            {
-                icon: 'trash',
-                disabled: selectedObjects.length === 0,
-                tooltip: 'Remove objects',
-                onClick: () => {
-                    onRemoveClick();
-                },
-            },
-            {
-                icon: 'check',
-                disabled: selectedObjects.length === 0,
-                tooltip: 'Allow all actions',
-                onClick: () => {
-                    onAllowAllClick();
-                },
-            },
-            {
-                icon: 'times',
-                disabled: selectedObjects.length === 0,
-                tooltip: 'Deny all actions',
-                onClick: () => {
-                    onDenyAllClick();
-                },
-            },
-        ];
-    }, [onAddClick, onAllowAllClick, onDenyAllClick, onRemoveClick, selectedObjects.length]);
-
     const objectsToSelect: TableHeader[] = useMemo(
         () => [
             {
@@ -469,80 +478,122 @@ function RolePermissionsEditor({
                 )
                 .map((object) => ({
                     id: object.uuid,
-
-                    columns: [<span style={{ whiteSpace: 'nowrap' }}>{object.name}</span>],
+                    columns: [
+                        <span key={object.uuid} className="whitespace-nowrap">
+                            {object.name}
+                        </span>,
+                    ],
                 })) || [],
         [currentResource, objects, permissions],
     );
 
     return (
-        <>
-            <label htmlFor="allResources">
-                <input
-                    id="allResources"
-                    type="checkbox"
-                    checked={permissions?.allowAllResources || false}
-                    disabled={disabled}
-                    onChange={(e) => {
-                        if (onPermissionsChanged && permissions)
-                            onPermissionsChanged({ ...permissions, allowAllResources: e.target.checked });
-                    }}
-                />
-                &nbsp;&nbsp;&nbsp;Allow All Actions for All Resources
-            </label>
-            <div className={style.container}>
-                <div className={style.resources}>{resourceList}</div>
-                <div className={style.permissions}>
-                    <div className={style.permissionsInner}>
-                        {permissionsList}
-                        {!currentResource?.objectAccess ? (
-                            <></>
-                        ) : (
-                            <Widget
-                                title="Object Action Permissions"
-                                busy={isFetchingObjects}
-                                widgetButtons={buttons}
-                                className={style.permissionsWidget}
-                            >
-                                <br />
+        <div className="space-y-4">
+            <Checkbox
+                id="allResources"
+                checked={allowAllResources}
+                disabled={disabled}
+                onChange={(checked) => {
+                    if (onPermissionsChanged && permissions) onPermissionsChanged({ ...permissions, allowAllResources: checked });
+                }}
+                label="Allow All Actions for All Resources"
+            />
 
-                                <CustomTable
-                                    hasCheckboxes={true}
-                                    headers={objectHeaders}
-                                    data={objectRows}
-                                    onCheckedRowsChanged={(rows) => setSelectedObjects(rows as string[])}
-                                />
-                            </Widget>
-                        )}
-                    </div>
+            <div className="flex gap-4">
+                <div className="w-46 flex-shrink-0">
+                    <SimpleBar forceVisible="y" style={{ maxHeight: 'calc(100vh - 420px)' }}>
+                        <div className="space-y-2">{resourceList}</div>
+                    </SimpleBar>
+                </div>
 
-                    {resources !== undefined && <div className="d-flex justify-content-end">{submitButtonsGroup}</div>}
+                <div className="flex-1 min-w-0">
+                    {permissionsList}
+
+                    {currentResource?.objectAccess && (
+                        <div className="mt-4 bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg">
+                            <div className="px-3 py-3 border-b border-gray-200 dark:border-neutral-700 flex items-center justify-between">
+                                <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Object Action Permissions</h3>
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        variant="transparent"
+                                        onClick={onAddClick}
+                                        disabled={disabled}
+                                        title="Add object"
+                                        className="!p-2"
+                                    >
+                                        <Plus size={16} />
+                                    </Button>
+                                    <Button
+                                        variant="transparent"
+                                        color="danger"
+                                        onClick={onRemoveClick}
+                                        disabled={selectedObjects.length === 0 || disabled}
+                                        title="Remove objects"
+                                        className="!p-2"
+                                    >
+                                        <Trash2 size={16} />
+                                    </Button>
+                                    <Button
+                                        variant="transparent"
+                                        onClick={onAllowAllClick}
+                                        disabled={selectedObjects.length === 0 || disabled}
+                                        title="Allow all actions"
+                                        className="!p-2"
+                                    >
+                                        <Check size={16} />
+                                    </Button>
+                                    <Button
+                                        variant="transparent"
+                                        color="danger"
+                                        onClick={onDenyAllClick}
+                                        disabled={selectedObjects.length === 0 || disabled}
+                                        title="Deny all actions"
+                                        className="!p-2"
+                                    >
+                                        <X size={16} />
+                                    </Button>
+                                </div>
+                            </div>
+                            <div className="p-6">
+                                {isFetchingObjects ? (
+                                    <div className="flex items-center justify-center py-8">
+                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                                    </div>
+                                ) : (
+                                    <CustomTable
+                                        headers={objectHeaders}
+                                        data={objectRows}
+                                        hasCheckboxes={true}
+                                        checkedRows={selectedObjects}
+                                        onCheckedRowsChanged={(rows) => setSelectedObjects(rows as string[])}
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
+
             <Dialog
                 isOpen={objectListDialog}
                 caption="Edit Object Level Permissions"
                 body={
-                    <div>
-                        Select objects to add:
-                        <br />
-                        <br />
-                        <CustomTable
-                            hasCheckboxes={true}
-                            headers={objectsToSelect}
-                            data={objectsToSelectRows}
-                            onCheckedRowsChanged={(rows) => setObjectsToAdd(rows as string[])}
-                        />
-                    </div>
+                    <CustomTable
+                        hasCheckboxes
+                        headers={objectsToSelect}
+                        data={objectsToSelectRows}
+                        onCheckedRowsChanged={(rows) => setObjectsToAdd(rows as string[])}
+                    />
                 }
                 toggle={() => setObjectListDialog(false)}
                 size="lg"
                 buttons={[
-                    { disabled: objectsToAdd.length === 0, color: 'primary', onClick: () => addSelectedObjects(), body: 'Ok' },
-                    { color: 'secondary', onClick: () => setObjectListDialog(false), body: 'Close' },
+                    { variant: 'outline', color: 'primary', onClick: () => setObjectListDialog(false), body: 'Close' },
+                    { disabled: objectsToAdd.length === 0, color: 'primary', onClick: () => addSelectedObjects(), body: 'Save' },
                 ]}
             />
-        </>
+            {resources !== undefined && submitButtonsGroup}
+        </div>
     );
 }
 

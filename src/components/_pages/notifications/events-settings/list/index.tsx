@@ -6,7 +6,7 @@ import { actions as settingsActions, selectors as settingsSelectors } from 'duck
 import { actions as resourceActions, selectors as resourceSelectors } from 'ducks/resource';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import Select from 'react-select';
+import Select from 'components/Select';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import { PlatformEnum, Resource } from 'types/openapi';
@@ -54,20 +54,21 @@ const EventsList = () => {
                 custom: (
                     <div className="mx-1">
                         <Select
+                            id="eventsResourceSelect"
                             isClearable
-                            maxMenuHeight={140}
-                            menuPlacement="auto"
                             options={resourceOptionsWithEvents}
                             placeholder="Select Resource"
-                            onChange={(event) => {
-                                setSelectedResource(event?.value as Resource);
+                            minWidth={180}
+                            value={selectedResource || ''}
+                            onChange={(value) => {
+                                setSelectedResource(value as Resource);
                             }}
                         />
                     </div>
                 ),
             },
         ],
-        [resourceOptionsWithEvents],
+        [resourceOptionsWithEvents, selectedResource],
     );
     const headers: TableHeader[] = useMemo(
         () => [
@@ -120,7 +121,7 @@ const EventsList = () => {
         <Widget
             title="List of Events"
             refreshAction={getEvents}
-            titleSize="larger"
+            titleSize="large"
             widgetButtons={buttons}
             widgetLockName={LockWidgetNameEnum.EventSettings}
             lockSize="large"

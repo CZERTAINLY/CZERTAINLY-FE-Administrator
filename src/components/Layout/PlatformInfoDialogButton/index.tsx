@@ -4,8 +4,10 @@ import Spinner from 'components/Spinner';
 import { actions, selectors } from 'ducks/info';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button } from 'reactstrap';
 import { useCopyToClipboard } from 'utils/common-hooks';
+import Button from 'components/Button';
+import { Copy } from 'lucide-react';
+import packageJson from '../../../../package.json';
 
 const PlatformInfoDialogLink = () => {
     const dispatch = useDispatch();
@@ -35,6 +37,14 @@ const PlatformInfoDialogLink = () => {
         [],
     );
 
+    const buildTimeFormatted =
+        typeof __BUILD_TIME__ !== 'undefined'
+            ? new Date(__BUILD_TIME__).toLocaleString(undefined, {
+                  dateStyle: 'medium',
+                  timeStyle: 'short',
+              })
+            : '—';
+
     const data: TableDataRow[] = useMemo(
         () =>
             !platformInfo
@@ -48,24 +58,30 @@ const PlatformInfoDialogLink = () => {
                           id: 'db',
                           columns: [platformInfo.db.system, platformInfo.db.version],
                       },
+                      {
+                          id: 'frontend',
+                          columns: ['Frontend', packageJson.version],
+                      },
+                      {
+                          id: 'deployed',
+                          columns: ['Last deployed', buildTimeFormatted],
+                      },
                   ],
-        [platformInfo],
+        [platformInfo, buildTimeFormatted],
     );
 
     const content = useMemo(() => {
         if (!platformInfo) return;
-        const copyText = `${platformInfo.app.name}: ${platformInfo.app.version}\n${platformInfo.db.system}: ${platformInfo.db.version}`;
+        const copyText = `Frontend (${packageJson.name}): ${packageJson.version}\n${platformInfo.app.name}: ${platformInfo.app.version}\n${platformInfo.db.system}: ${platformInfo.db.version}\nLast deployed: ${buildTimeFormatted}`;
         return (
             <div>
                 <CustomTable data={data} headers={headers} />
-                <br />
                 <div>
                     Click to copy:{' '}
                     <Button
-                        className="btn btn-link py-0 px-1 ms-2"
-                        color="white"
+                        className="mt-2"
+                        variant="transparent"
                         title="Version Info"
-                        key="copy"
                         onClick={() =>
                             copyToClipboard(
                                 copyText,
@@ -74,29 +90,38 @@ const PlatformInfoDialogLink = () => {
                             )
                         }
                     >
-                        <i className="fa fa-copy" style={{ color: 'auto' }} />
+                        <Copy size={16} />
                     </Button>
                 </div>
             </div>
         );
-    }, [platformInfo, copyToClipboard, data, headers]);
+    }, [platformInfo, copyToClipboard, data, headers, buildTimeFormatted]);
 
     return (
         <>
-            <a
-                href="#"
-                onClick={(e) => {
-                    e.preventDefault();
-                    setIsOpen(true);
-                }}
+            <button
+                type="button"
+                className="text-blue-600 bg-transparent border-0 p-0 cursor-pointer font-inherit"
+                data-testid="footer-version-info-link"
+                onClick={() => setIsOpen(true)}
             >
                 Version Info
-            </a>
+            </button>
             <Dialog
                 isOpen={isOpen}
                 caption="Platform versions info"
                 toggle={() => setIsOpen(false)}
                 body={isFetching ? <Spinner active /> : content}
+                size="lg"
+                icon="info"
+                buttons={[
+                    {
+                        color: 'secondary',
+                        body: 'Close',
+                        variant: 'outline',
+                        onClick: () => setIsOpen(false),
+                    },
+                ]}
             />
         </>
     );

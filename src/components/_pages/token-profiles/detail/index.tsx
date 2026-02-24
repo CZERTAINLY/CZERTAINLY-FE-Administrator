@@ -9,21 +9,23 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } from 'ducks/token-profiles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router';
-import Select from 'react-select';
-
+import { Link, useParams } from 'react-router';
+import TokenProfileForm from '../form';
+import KeyUsageSelect from '../../cryptographic-keys/KeyUsageSelect';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { Badge, Col, Container, Label, Row } from 'reactstrap';
+import Label from 'components/Label';
+import Badge from 'components/Badge';
 import { KeyUsage, PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import { createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
+import Breadcrumb from 'components/Breadcrumb';
+import Container from 'components/Container';
 
 export default function TokenProfileDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id, tokenId } = useParams();
 
@@ -31,12 +33,14 @@ export default function TokenProfileDetail() {
 
     const isFetchingProfile = useSelector(tokenProfilesSelectors.isFetchingDetail);
     const isUpdatingKeyUsage = useSelector(tokenProfilesSelectors.isUpdatingKeyUsage);
+    const isUpdating = useSelector(tokenProfilesSelectors.isUpdating);
 
     const isDeleting = useSelector(tokenProfilesSelectors.isDeleting);
     const isEnabling = useSelector(tokenProfilesSelectors.isEnabling);
     const isDisabling = useSelector(tokenProfilesSelectors.isDisabling);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const [keyUsageUpdate, setKeyUsageUpdate] = useState<boolean>(false);
 
@@ -57,10 +61,19 @@ export default function TokenProfileDetail() {
         getFreshTokenProfileDetails();
     }, [getFreshTokenProfileDetails, id, tokenId]);
 
+    useRunOnFinished(isUpdating, () => {
+        setIsEditModalOpen(false);
+        getFreshTokenProfileDetails();
+    });
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
+
     const onEditClick = useCallback(() => {
         if (!tokenProfile) return;
-        navigate(`../../../edit/${tokenProfile.tokenInstanceUuid}/${tokenProfile?.uuid}`, { relative: 'path' });
-    }, [navigate, tokenProfile]);
+        setIsEditModalOpen(true);
+    }, [tokenProfile]);
 
     const onEnableClick = useCallback(() => {
         if (!tokenProfile) return;
@@ -83,17 +96,6 @@ export default function TokenProfileDetail() {
         );
         setConfirmDelete(false);
     }, [dispatch, tokenProfile]);
-
-    const keyUsageOptions = () => {
-        let options: { value: KeyUsage; label: string }[] = [];
-        for (let key in KeyUsage) {
-            options.push({
-                value: KeyUsage[key as keyof typeof KeyUsage],
-                label: getEnumLabel(keyUsageEnum, KeyUsage[key as keyof typeof KeyUsage]),
-            });
-        }
-        return options;
-    };
 
     const existingUsages = () => {
         if (!tokenProfile) return [];
@@ -205,24 +207,6 @@ export default function TokenProfileDetail() {
         [tokenProfile],
     );
 
-    const keyUsageBody = (
-        <div>
-            <div className="form-group">
-                <label className="form-label">Key Usage</label>
-                <Select
-                    isMulti={true}
-                    id="field"
-                    options={keyUsageOptions()}
-                    onChange={(e) => {
-                        setKeyUsages(e.map((item) => item.value));
-                    }}
-                    defaultValue={existingUsages()}
-                    isClearable={true}
-                />
-            </div>
-        </div>
-    );
-
     const onUpdateKeyUsageConfirmed = useCallback(() => {
         dispatch(
             tokenProfilesActions.updateKeyUsage({
@@ -238,32 +222,28 @@ export default function TokenProfileDetail() {
     }, [dispatch, tokenProfile, keyUsages]);
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/tokenprofiles"
-                text={`${getEnumLabel(resourceEnum, Resource.TokenProfiles)} Inventory`}
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: 'Token Profiles', href: '/tokenprofiles' },
+                    { label: tokenProfile?.name || 'Token Profile Details', href: '' },
+                ]}
             />
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
-                    <Widget
-                        title="Token Profile Details"
-                        busy={isBusy}
-                        widgetButtons={buttons}
-                        titleSize="large"
-                        refreshAction={getFreshTokenProfileDetails}
-                        widgetLockName={LockWidgetNameEnum.TokenProfileDetails}
-                        lockSize="large"
-                    >
-                        <br />
-
-                        <CustomTable headers={detailHeaders} data={detailData} />
-                    </Widget>
-                </Col>
-
-                <Col>
+            <Container className="md:flex-row">
+                <Widget
+                    title="Token Profile Details"
+                    busy={isBusy}
+                    widgetButtons={buttons}
+                    titleSize="large"
+                    refreshAction={getFreshTokenProfileDetails}
+                    widgetLockName={LockWidgetNameEnum.TokenProfileDetails}
+                    lockSize="large"
+                    className="w-full md:w-1/2"
+                >
+                    <CustomTable headers={detailHeaders} data={detailData} />
+                </Widget>
+                <Container className="w-full md:w-1/2 flex flex-col">
                     <Widget title="Attributes" busy={isBusy} titleSize="large">
-                        <br />
                         <Label>Token Profile Attributes</Label>
                         <AttributeViewer attributes={tokenProfile?.attributes} />
                     </Widget>
@@ -275,34 +255,45 @@ export default function TokenProfileDetail() {
                             attributes={tokenProfile.customAttributes}
                         />
                     )}
-                </Col>
-            </Row>
-
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col></Col>
-            </Row>
-
+                </Container>
+            </Container>
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Token Profile"
                 body="You are about to delete Token Profile. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
 
             <Dialog
                 isOpen={keyUsageUpdate}
-                caption={`Update Key Usage`}
-                body={keyUsageBody}
+                caption="Update Key Usage"
+                body={<KeyUsageSelect value={keyUsages} onChange={setKeyUsages} keyUsageEnum={keyUsageEnum} />}
                 toggle={() => setKeyUsageUpdate(false)}
+                size="md"
                 buttons={[
+                    { color: 'secondary', variant: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
                     { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
-                    { color: 'secondary', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit Token Profile"
+                size="xl"
+                body={
+                    <TokenProfileForm
+                        tokenProfileId={tokenProfile?.uuid}
+                        tokenId={tokenProfile?.tokenInstanceUuid || tokenId}
+                        onCancel={handleCloseEditModal}
+                    />
+                }
+            />
+        </div>
     );
 }

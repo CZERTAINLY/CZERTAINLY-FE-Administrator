@@ -3,13 +3,16 @@ import Dialog from 'components/Dialog';
 
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
+import RoleForm from '../RoleForm';
+import RoleUsersForm from '../RoleUsersForm';
 
 import { actions, selectors } from 'ducks/roles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Badge, Container } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
+import Badge from 'components/Badge';
 
 export default function RolesList() {
     const dispatch = useDispatch();
@@ -21,10 +24,15 @@ export default function RolesList() {
     const isFetching = useSelector(selectors.isFetchingList);
     const isDeleting = useSelector(selectors.isDeleting);
     const isUpdating = useSelector(selectors.isUpdating);
+    const isCreating = useSelector(selectors.isCreating);
 
     const isBusy = isFetching || isDeleting || isUpdating;
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+    const [editingRoleId, setEditingRoleId] = useState<string | undefined>(undefined);
+    const [isEditUsersModalOpen, setIsEditUsersModalOpen] = useState<boolean>(false);
+    const [selectedRoleId, setSelectedRoleId] = useState<string | undefined>(undefined);
 
     const getFreshData = useCallback(() => {
         dispatch(actions.setRolesListCheckedRows({ checkedRows: [] }));
@@ -35,14 +43,39 @@ export default function RolesList() {
         getFreshData();
     }, [getFreshData]);
 
+    useRunOnFinished(isCreating, () => {
+        setIsAddModalOpen(false);
+        getFreshData();
+    });
+    useRunOnFinished(isUpdating, () => {
+        setEditingRoleId(undefined);
+        getFreshData();
+    });
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingRoleId(undefined);
+    }, []);
+
     const onAddClick = useCallback(() => {
-        navigate(`./add`);
-    }, [navigate]);
+        handleOpenAddModal();
+    }, [handleOpenAddModal]);
 
     const onEditRoleUsersClick = useCallback(() => {
         if (checkedRows.length !== 1) return;
-        navigate(`./users/${checkedRows[0]}`);
-    }, [checkedRows, navigate]);
+        setSelectedRoleId(checkedRows[0]);
+        setIsEditUsersModalOpen(true);
+    }, [checkedRows]);
+
+    const handleCloseUsersModal = useCallback(() => {
+        setIsEditUsersModalOpen(false);
+        setSelectedRoleId(undefined);
+        getFreshData();
+    }, [getFreshData]);
 
     const onEditRolePermissionsClick = useCallback(() => {
         if (checkedRows.length !== 1) return;
@@ -75,9 +108,7 @@ export default function RolesList() {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => {
-                    onAddClick();
-                },
+                onClick: handleOpenAddModal,
             },
             {
                 icon: 'trash',
@@ -104,7 +135,7 @@ export default function RolesList() {
                 },
             },
         ],
-        [checkedRows.length, isSystemRoleSelected, onAddClick, onEditRolePermissionsClick, onEditRoleUsersClick],
+        [checkedRows.length, isSystemRoleSelected, handleOpenAddModal, onEditRolePermissionsClick, onEditRoleUsersClick],
     );
 
     const rolesTableHeader: TableHeader[] = useMemo(
@@ -163,7 +194,7 @@ export default function RolesList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <div>
             <Widget
                 title="List of Roles"
                 busy={isBusy}
@@ -172,7 +203,6 @@ export default function RolesList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={rolesTableHeader}
                     data={rolesTableData}
@@ -185,14 +215,31 @@ export default function RolesList() {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete ${checkedRows.length > 1 ? 'Roles' : 'an Role'}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? 'Roles' : 'an Role'}. Is this what you want to do?`}
+                caption={`Delete ${checkedRows.length > 1 ? 'Roles' : 'a Role'}`}
+                body={`You are about to delete ${checkedRows.length > 1 ? 'Roles' : 'a Role'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+
+            <Dialog
+                isOpen={isAddModalOpen || !!editingRoleId}
+                toggle={handleCloseAddModal}
+                caption={editingRoleId ? 'Edit Role' : 'Create Role'}
+                size="xl"
+                body={<RoleForm roleId={editingRoleId} onCancel={handleCloseAddModal} />}
+            />
+
+            <Dialog
+                isOpen={isEditUsersModalOpen}
+                toggle={handleCloseUsersModal}
+                caption="Edit Role Users"
+                size="xl"
+                body={<RoleUsersForm roleId={selectedRoleId} onCancel={handleCloseUsersModal} onSuccess={handleCloseUsersModal} />}
+            />
+        </div>
     );
 }

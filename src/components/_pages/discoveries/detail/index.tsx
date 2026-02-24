@@ -12,7 +12,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 
-import { Col, Container, Label, Row } from 'reactstrap';
+import Label from 'components/Label';
 
 import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
 import TabLayout from 'components/Layout/TabLayout';
@@ -22,7 +22,8 @@ import { dateFormatter, durationFormatter } from 'utils/dateUtil';
 import DiscoveryStatus from '../DiscoveryStatus';
 import DiscoveryCertificates from './DiscoveryCertificates';
 import { createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
+import Breadcrumb from 'components/Breadcrumb';
+import Container from 'components/Container';
 
 export default function DiscoveryDetail() {
     const dispatch = useDispatch();
@@ -228,96 +229,82 @@ export default function DiscoveryDetail() {
           ];
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/discoveries"
-                text={`${getEnumLabel(resourceEnum, Resource.Discoveries)} Inventory`}
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.Discoveries)} Inventory`, href: '/discoveries' },
+                    { label: discovery?.name || 'Discovery Details' },
+                ]}
             />
             <TabLayout
                 tabs={[
                     {
                         title: 'Details',
                         content: (
-                            <Widget>
-                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                                    <Col>
-                                        <Widget
-                                            title="Certificate Discovery Details"
-                                            busy={isBusy}
-                                            widgetButtons={buttons}
-                                            titleSize="large"
-                                            refreshAction={getFreshDiscoveryDetails}
-                                            widgetLockName={LockWidgetNameEnum.DiscoveryDetails}
-                                        >
-                                            <br />
+                            <div>
+                                <Container className="md:flex-row items-start">
+                                    <Widget
+                                        title="Discovery Details"
+                                        busy={isBusy}
+                                        widgetButtons={buttons}
+                                        titleSize="large"
+                                        refreshAction={getFreshDiscoveryDetails}
+                                        widgetLockName={LockWidgetNameEnum.DiscoveryDetails}
+                                        className="w-full md:w-1/2"
+                                    >
+                                        <CustomTable headers={detailHeaders} data={detailData} />
+                                    </Widget>
 
-                                            <CustomTable headers={detailHeaders} data={detailData} />
-                                        </Widget>
-                                    </Col>
+                                    <Widget title="Metadata" titleSize="large" className="w-full md:w-1/2">
+                                        <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={discovery?.metadata} />
+                                    </Widget>
+                                </Container>
 
-                                    <Col>
-                                        <Widget title="Metadata" titleSize="large">
-                                            <br />
-                                            <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={discovery?.metadata} />
-                                        </Widget>
-                                    </Col>
-                                </Row>
-
-                                <Row>
-                                    <Col md={triggerHistorySummary?.associationObjectUuid !== id ? '12' : '8'}>
-                                        <Widget
-                                            title="Assigned Triggers"
-                                            busy={isBusy}
-                                            titleSize="large"
-                                            widgetLockName={LockWidgetNameEnum.DiscoveryDetails}
-                                        >
-                                            <CustomTable headers={triggerHeaders} data={triggerTableData} />
-                                        </Widget>
-                                    </Col>
+                                <Container marginTop>
+                                    <Widget
+                                        title="Assigned Triggers"
+                                        busy={isBusy}
+                                        titleSize="large"
+                                        widgetLockName={LockWidgetNameEnum.DiscoveryDetails}
+                                    >
+                                        <CustomTable headers={triggerHeaders} data={triggerTableData} />
+                                    </Widget>
 
                                     {triggerHistorySummary?.associationObjectUuid === id && (
-                                        <Col md="4">
-                                            <Widget
-                                                title="Triggers summary"
-                                                titleSize="large"
-                                                busy={isFetchingTriggerSummary}
-                                                refreshAction={getFreshTriggerHistorySummary}
-                                            >
-                                                <CustomTable headers={detailHeaders} data={triggersSummary} />
-                                            </Widget>
-                                        </Col>
+                                        <Widget
+                                            title="Triggers summary"
+                                            titleSize="large"
+                                            busy={isFetchingTriggerSummary}
+                                            refreshAction={getFreshTriggerHistorySummary}
+                                        >
+                                            <CustomTable headers={detailHeaders} data={triggersSummary} />
+                                        </Widget>
                                     )}
-                                </Row>
-                                {discovery?.uuid && (
-                                    <DiscoveryCertificates id={discovery.uuid} triggerHistorySummary={triggerHistorySummary} />
-                                )}
-                            </Widget>
+                                    {discovery?.uuid && (
+                                        <DiscoveryCertificates id={discovery.uuid} triggerHistorySummary={triggerHistorySummary} />
+                                    )}
+                                </Container>
+                            </div>
                         ),
                     },
                     {
                         title: 'Attributes',
                         content: (
-                            <Widget>
-                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                                    <Col>
-                                        <Widget title="Attributes" titleSize="large">
-                                            <br />
-                                            <Label>Discovery Attributes</Label>
-                                            <AttributeViewer attributes={discovery?.attributes} />
-                                        </Widget>
-                                    </Col>
-                                    <Col>
-                                        {discovery && (
-                                            <CustomAttributeWidget
-                                                resource={Resource.Discoveries}
-                                                resourceUuid={discovery.uuid}
-                                                attributes={discovery.customAttributes}
-                                            />
-                                        )}
-                                    </Col>
-                                </Row>
-                            </Widget>
+                            <Container className="md:flex-row items-start">
+                                <Widget title="Attributes" titleSize="large" className="w-full md:w-1/2">
+                                    <br />
+                                    <Label>Discovery Attributes</Label>
+                                    <AttributeViewer attributes={discovery?.attributes} />
+                                </Widget>
+                                {discovery && (
+                                    <CustomAttributeWidget
+                                        resource={Resource.Discoveries}
+                                        resourceUuid={discovery.uuid}
+                                        attributes={discovery.customAttributes}
+                                        className="w-full md:w-1/2"
+                                    />
+                                )}
+                            </Container>
                         ),
                     },
                 ]}
@@ -327,11 +314,13 @@ export default function DiscoveryDetail() {
                 caption="Delete Certification Discovery"
                 body="You are about to delete Discovery. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
+                size="md"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
-        </Container>
+        </div>
     );
 }

@@ -1,10 +1,12 @@
-import TextField from 'components/Input/TextField';
+import TextInput from 'components/TextInput';
 import ProgressButton from 'components/ProgressButton';
+import Button from 'components/Button';
+import Container from 'components/Container';
 import { actions, selectors } from 'ducks/settings';
 
-import { Form as BootstrapForm, Button, ButtonGroup } from 'reactstrap';
-import { useCallback, useEffect, useMemo } from 'react';
-import { Form } from 'react-final-form';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { getFieldErrorMessage } from 'utils/validators-helper';
 import { useDispatch, useSelector } from 'react-redux';
 import { SettingsPlatformModel } from 'types/settings';
 import { useNavigate } from 'react-router';
@@ -48,7 +50,16 @@ class DebouncingHealthValidation {
     };
 }
 
-const UtilsSettingsForm = () => {
+type FormValues = {
+    utilsServiceUrl?: string;
+};
+
+interface UtilsSettingsFormProps {
+    onCancel?: () => void;
+    onSuccess?: () => void;
+}
+
+const UtilsSettingsForm = ({ onCancel, onSuccess }: UtilsSettingsFormProps = {}) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -60,13 +71,28 @@ const UtilsSettingsForm = () => {
 
     const emptySettings = useMemo(() => ({ utils: {} }), []);
 
-    const onSubmit = useCallback(
-        (values: SettingsPlatformModel) => {
-            const requestSettings = values.utils ? values : emptySettings;
-            dispatch(actions.updatePlatformSettings(requestSettings));
-        },
-        [dispatch, emptySettings],
-    );
+    const defaultValues = useMemo(() => {
+        return {
+            utilsServiceUrl: platformSettings?.utils?.utilsServiceUrl || '',
+        };
+    }, [platformSettings?.utils?.utilsServiceUrl]);
+
+    const methods = useForm<FormValues>({
+        defaultValues,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit,
+        control,
+        formState: { isDirty, isSubmitting, isValid },
+        reset,
+    } = methods;
+
+    // Reset form when platformSettings change
+    useEffect(() => {
+        reset(defaultValues);
+    }, [defaultValues, reset]);
 
     useEffect(() => {
         if (!platformSettings) {
@@ -74,38 +100,76 @@ const UtilsSettingsForm = () => {
         }
     }, [dispatch, platformSettings]);
 
-    const debouncingHealthValidation = new DebouncingHealthValidation();
+    const debouncingHealthValidation = useMemo(() => new DebouncingHealthValidation(), []);
+
+    const onSubmit = useCallback(
+        (values: FormValues) => {
+            const requestSettings: SettingsPlatformModel = values.utilsServiceUrl
+                ? {
+                      utils: {
+                          utilsServiceUrl: values.utilsServiceUrl,
+                      },
+                  }
+                : emptySettings;
+            dispatch(actions.updatePlatformSettings(requestSettings));
+        },
+        [dispatch, emptySettings],
+    );
+
+    const wasUpdating = useRef(isUpdatingPlatform);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdatingPlatform) {
+            if (onSuccess) {
+                onSuccess();
+            }
+        }
+        wasUpdating.current = isUpdatingPlatform;
+    }, [isUpdatingPlatform, onSuccess]);
 
     return (
-        <div style={{ paddingTop: '1.5em', paddingBottom: '1.5em' }}>
-            <Form<SettingsPlatformModel> initialValues={platformSettings ?? emptySettings} onSubmit={onSubmit}>
-                {({ handleSubmit, pristine, submitting, valid }) => {
-                    return (
-                        <BootstrapForm onSubmit={handleSubmit}>
-                            <TextField
-                                label={'Utils Service URL'}
-                                id={'utils.utilsServiceUrl'}
-                                validators={[validateUrl, debouncingHealthValidation.validateHealth]}
-                            />
+        <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <Controller
+                    name="utilsServiceUrl"
+                    control={control}
+                    rules={{
+                        validate: async (value) => {
+                            const urlError = validateUrl(value);
+                            if (urlError) return urlError;
+                            if (value) {
+                                return await debouncingHealthValidation.validateHealth(value);
+                            }
+                            return undefined;
+                        },
+                    }}
+                    render={({ field, fieldState }) => (
+                        <TextInput
+                            {...field}
+                            id="utilsServiceUrl"
+                            type="text"
+                            label="Utils Service URL"
+                            placeholder="Utils Service URL"
+                            invalid={fieldState.error && fieldState.isTouched}
+                            error={getFieldErrorMessage(fieldState)}
+                        />
+                    )}
+                />
 
-                            <div className="d-flex justify-content-end">
-                                <ButtonGroup>
-                                    <ProgressButton
-                                        title={'Save'}
-                                        inProgressTitle={'Saving...'}
-                                        inProgress={submitting}
-                                        disabled={pristine || submitting || !valid || isBusy}
-                                    />
-                                    <Button color="default" onClick={() => navigate(-1)} disabled={submitting}>
-                                        Cancel
-                                    </Button>
-                                </ButtonGroup>
-                            </div>
-                        </BootstrapForm>
-                    );
-                }}
-            </Form>
-        </div>
+                <Container className="flex-row justify-end modal-footer" gap={4}>
+                    <Button variant="outline" onClick={onCancel} disabled={isSubmitting || isBusy} type="button">
+                        Cancel
+                    </Button>
+                    <ProgressButton
+                        title={'Save'}
+                        inProgressTitle={'Saving...'}
+                        inProgress={isSubmitting || isBusy}
+                        disabled={!isDirty || isSubmitting || !isValid || isBusy}
+                        type="submit"
+                    />
+                </Container>
+            </form>
+        </FormProvider>
     );
 };
 
