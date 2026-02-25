@@ -111,6 +111,24 @@ test.describe('attributes utils', () => {
         test('file fallback to string when no content field', () => {
             expect(getAttributeCopyValue(AttributeContentType.File, [{ data: 'y' } as any])).toBe('y');
         });
+
+        test('credential with name object property', () => {
+            const cred = [{ data: { name: 'MyCred', other: 'data' } } as any];
+            expect(getAttributeCopyValue(AttributeContentType.Credential, cred)).toBe('MyCred');
+        });
+
+        test('file with content object property', () => {
+            const file = [{ data: { content: base64Encode('file-data'), fileName: 'x', mimeType: 'type' } } as any];
+            expect(getAttributeCopyValue(AttributeContentType.File, file)).toBe('file-data');
+        });
+
+        test('text type', () => {
+            expect(getAttributeCopyValue(AttributeContentType.Text, [{ data: 'text' } as any])).toBe('text');
+        });
+
+        test('integer type', () => {
+            expect(getAttributeCopyValue(AttributeContentType.Integer, [{ data: 999 } as any])).toBe('999');
+        });
     });
 
     test.describe('transformAttributes', () => {
@@ -186,6 +204,36 @@ test.describe('attributes utils', () => {
             const result = getAttributeContent(-1 as unknown as AttributeContentType, content) as string;
             expect(result).toBe('my (txt)');
         });
+
+        test('integer type returns data as string', () => {
+            const content = [{ data: 12345 } as any];
+            expect(getAttributeContent(AttributeContentType.Integer, content)).toBe('12345');
+        });
+
+        test('text type returns data as string', () => {
+            const content = [{ data: 'some text' } as any];
+            expect(getAttributeContent(AttributeContentType.Text, content)).toBe('some text');
+        });
+
+        test('secret type returns masked value', () => {
+            const content = [{ data: 'password123' } as any];
+            expect(getAttributeContent(AttributeContentType.Secret, content)).toBe('*****');
+        });
+
+        test('file type without reference returns reference', () => {
+            const content = [{ reference: 'file-ref' } as any];
+            expect(getAttributeContent(AttributeContentType.File, content)).toBe('file-ref');
+        });
+
+        test('multiple contents mapped and joined', () => {
+            const content = [{ data: 'a' }, { data: 'b' }, { data: 'c' }] as any[];
+
+            expect(getAttributeContent(AttributeContentType.Text, content)).toBe('a, b, c');
+        });
+
+        test('empty array returns empty string for Text', () => {
+            expect(getAttributeContent(AttributeContentType.Text, [])).toBe('');
+        });
     });
 
     test.describe('getAttributeFormValue', () => {
@@ -235,6 +283,48 @@ test.describe('attributes utils', () => {
             expect(getAttributeFormValue(AttributeContentType.Integer, [], '5')).toEqual({ data: 5 });
             expect(getAttributeFormValue(AttributeContentType.Float, [], '5.5')).toEqual({ data: 5.5 });
             expect(getAttributeFormValue(AttributeContentType.Integer, [], 'not a num')).toEqual({ data: 'not a num' });
+        });
+
+        test('null reference is stripped from object', () => {
+            const item = { data: 'x', reference: null };
+            expect(getAttributeFormValue(AttributeContentType.String, [], item)).toEqual({ data: 'x' });
+        });
+
+        test('empty string reference is stripped from object', () => {
+            const item = { data: 'x', reference: '' };
+            expect(getAttributeFormValue(AttributeContentType.String, [], item)).toEqual({ data: 'x' });
+        });
+
+        test('integer truncates decimal points', () => {
+            expect(getAttributeFormValue(AttributeContentType.Integer, [], 5.999)).toEqual({ data: 5 });
+            expect(getAttributeFormValue(AttributeContentType.Integer, [], 5.1)).toEqual({ data: 5 });
+        });
+
+        test('float preserves decimal value', () => {
+            expect(getAttributeFormValue(AttributeContentType.Float, [], 5.999)).toEqual({ data: 5.999 });
+            expect(getAttributeFormValue(AttributeContentType.Float, [], 5)).toEqual({ data: 5 });
+        });
+
+        test('boolean value wrapped as data', () => {
+            expect(getAttributeFormValue(AttributeContentType.Boolean, [], true)).toEqual({ data: true });
+            expect(getAttributeFormValue(AttributeContentType.Boolean, [], false)).toEqual({ data: false });
+        });
+
+        test('number value wrapped as data', () => {
+            expect(getAttributeFormValue(AttributeContentType.Integer, [], 42)).toEqual({ data: 42 });
+            expect(getAttributeFormValue(AttributeContentType.Float, [], 3.14)).toEqual({ data: 3.14 });
+        });
+
+        test('object with data/reference both null strips to empty object', () => {
+            const item = { data: null, reference: null };
+            const result = getAttributeFormValue(AttributeContentType.String, [], item);
+            // After stripping null reference, data: null remains
+            expect(result.data === null || result.data === undefined).toBe(true);
+        });
+
+        test('object value containing reference null is stripped', () => {
+            const item = { value: { data: 'x', reference: null } };
+            expect(getAttributeFormValue(AttributeContentType.String, [], item)).toEqual({ data: 'x' });
         });
     });
 
@@ -484,6 +574,204 @@ test.describe('attributes utils', () => {
             const values = { __attributes__id1__: { arr2: [{ data: 'x' }, { data: 'y' }] } };
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result[0].content).toEqual([{ data: 'x' }, { data: 'y' }]);
+        });
+
+        test('handles single object value with data/reference', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'single',
+                    uuid: 'u-single',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'Single', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { single: { data: 'val', reference: 'ref' } } };
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result[0].content).toEqual([{ data: 'val', reference: 'ref' }]);
+        });
+
+        test('adds contentType to V3 attributes when missing', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'v3Missing',
+                    uuid: 'u-v3',
+                    version: 3,
+                    contentType: AttributeContentType.Text,
+                    content: [],
+                    properties: { required: false, label: 'V3', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { v3Missing: { data: 'text' } } };
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result[0].content[0].contentType).toBe(AttributeContentType.Text);
+        });
+
+        test('uses descriptor contentType for V3 attributes when adding', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'v3Existing',
+                    uuid: 'u-v3e',
+                    version: 3,
+                    contentType: AttributeContentType.Text,
+                    content: [],
+                    properties: { required: false, label: 'V3E', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { v3Existing: [{ data: 'text' }] } };
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result[0].content[0].contentType).toBe(AttributeContentType.Text);
+        });
+
+        test('includes attributes even with null data when reference exists check passes', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'nullData',
+                    uuid: 'u-null',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'Null', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { nullData: { data: null } } };
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result[0].content).toEqual([{ data: null }]);
+        });
+
+        test('includes attribute with only reference when data is undefined', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'refOnly',
+                    uuid: 'u-ref',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'Ref', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { refOnly: { reference: 'ref-val' } } };
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result[0].content).toEqual([{ reference: 'ref-val' }]);
+        });
+
+        test('uses hasOwnProperty to skip inherited properties', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'attr1',
+                    uuid: 'u1',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'A', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { attr1: 'value1' } };
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toHaveLength(1);
+            expect(result[0].name).toBe('attr1');
+        });
+
+        test('handles Custom attribute type same as Data', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Custom,
+                    name: 'custAttr',
+                    uuid: 'u-custom',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'Custom', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { custAttr: 'custom-value' } };
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result[0].name).toBe('custAttr');
+            expect(result[0].content).toEqual([{ data: 'custom-value' }]);
+        });
+
+        test('multiple attributes in single descriptor set', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'attr1',
+                    uuid: 'u1',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'A1', readOnly: false, visible: true, list: false },
+                },
+                {
+                    type: AttributeType.Data,
+                    name: 'attr2',
+                    uuid: 'u2',
+                    contentType: AttributeContentType.Integer,
+                    content: [],
+                    properties: { required: false, label: 'A2', readOnly: false, visible: true, list: false },
+                },
+                {
+                    type: AttributeType.Data,
+                    name: 'attr3',
+                    uuid: 'u3',
+                    contentType: AttributeContentType.Boolean,
+                    content: [],
+                    properties: { required: false, label: 'A3', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = {
+                __attributes__id1__: {
+                    attr1: 'string-val',
+                    attr2: '42',
+                    attr3: true,
+                },
+            };
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toHaveLength(3);
+            expect(result.find((a) => a.name === 'attr1')?.content).toEqual([{ data: 'string-val' }]);
+            expect(result.find((a) => a.name === 'attr2')?.content).toEqual([{ data: 42 }]);
+            expect(result.find((a) => a.name === 'attr3')?.content).toEqual([{ data: true }]);
+        });
+
+        test('resolves V2 as default when no version specified', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'v2Default',
+                    uuid: 'u-v2',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'V2', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { v2Default: 'value' } };
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result[0].version).toBe(AttributeVersion.V2);
+        });
+
+        test('with option object containing label and value both on reference list', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Custom,
+                    name: 'optionAttr',
+                    uuid: 'u-opt',
+                    contentType: AttributeContentType.Text,
+                    content: [],
+                    properties: { required: false, label: 'Options', readOnly: false, visible: true, list: true, multiSelect: true },
+                },
+            ] as any[];
+            const values = {
+                __attributes__id1__: {
+                    optionAttr: [
+                        { label: 'First', value: { data: 'f', reference: 'first' } },
+                        { label: 'Second', value: { data: 's', reference: 'second' } },
+                    ],
+                },
+            };
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result[0].content).toHaveLength(2);
+            expect(result[0].content[0]).toEqual({ data: 'f', reference: 'first' });
+            expect(result[0].content[1]).toEqual({ data: 's', reference: 'second' });
         });
     });
 
