@@ -99,6 +99,18 @@ test.describe('attributes utils', () => {
             expect(typeof result).toBe('string');
             expect(typeof result === 'string' && result.length).toBeGreaterThan(0);
         });
+
+        test('codeblock fallback when data not object', () => {
+            expect(getAttributeCopyValue(AttributeContentType.Codeblock, [{ data: 'plain' } as any])).toBe('plain');
+        });
+
+        test('credential fallback to string when no name field', () => {
+            expect(getAttributeCopyValue(AttributeContentType.Credential, [{ data: 'x' } as any])).toBe('x');
+        });
+
+        test('file fallback to string when no content field', () => {
+            expect(getAttributeCopyValue(AttributeContentType.File, [{ data: 'y' } as any])).toBe('y');
+        });
     });
 
     test.describe('transformAttributes', () => {
@@ -116,6 +128,13 @@ test.describe('attributes utils', () => {
                 { formAttributeName: 'obj.y', formAttributeValue: 2 },
             ];
             expect(transformAttributes(data)).toEqual({ obj: { x: 1, y: 2 } });
+        });
+        test('nested multiple dots uses only last segment grouping', () => {
+            const data = [
+                { formAttributeName: 'a.b.c', formAttributeValue: 3 },
+                { formAttributeName: 'a.b.d', formAttributeValue: 4 },
+            ];
+            expect(transformAttributes(data)).toEqual({ 'a.b': { c: 3, d: 4 } });
         });
     });
 
@@ -153,6 +172,19 @@ test.describe('attributes utils', () => {
             expect(element).toBeDefined();
             expect(element.props).toBeDefined();
             expect(element.props.content).toEqual(content[0]);
+        });
+
+        test('unknown contentType uses checkFileNameAndMimeType fallback', () => {
+            const content = [{ data: { fileName: 'fn', mimeType: 'mt' } } as any];
+            // cast to invalid enum value to trigger default branch
+            const result = getAttributeContent(-1 as unknown as AttributeContentType, content) as string;
+            expect(result).toBe('fn (mt)');
+        });
+
+        test('file data with no reference still returns filename/mimetype', () => {
+            const content = [{ data: { fileName: 'my', mimeType: 'txt' } } as any];
+            const result = getAttributeContent(-1 as unknown as AttributeContentType, content) as string;
+            expect(result).toBe('my (txt)');
         });
     });
 
@@ -194,6 +226,11 @@ test.describe('attributes utils', () => {
             expect(getAttributeFormValue(AttributeContentType.String, [], 'foo')).toEqual({ data: 'foo' });
         });
 
+        test('object with value primitive is normalized', () => {
+            const item = { value: 'bar' };
+            expect(getAttributeFormValue(AttributeContentType.String, [], item)).toEqual({ data: 'bar' });
+        });
+
         test('numeric strings on integer/float types are converted', () => {
             expect(getAttributeFormValue(AttributeContentType.Integer, [], '5')).toEqual({ data: 5 });
             expect(getAttributeFormValue(AttributeContentType.Float, [], '5.5')).toEqual({ data: 5.5 });
@@ -211,6 +248,11 @@ test.describe('attributes utils', () => {
         });
         test('defaults to Javascript when no language anywhere', () => {
             expect(getCodeBlockLanguage(undefined, undefined)).toBe(ProgrammingLanguageEnum.Javascript);
+        });
+
+        test('descriptor content with empty language falls back to Javascript', () => {
+            const descriptorContent = [{ data: {} } as any];
+            expect(getCodeBlockLanguage(undefined, descriptorContent)).toBe(ProgrammingLanguageEnum.Javascript);
         });
     });
 
@@ -369,6 +411,80 @@ test.describe('attributes utils', () => {
             expect(result[0].version).toBe(AttributeVersion.V3);
             expect(result[0].content).toEqual([{ data: 't1', contentType: AttributeContentType.Text }]);
         });
+
+        test('schemaVersion property takes precedence', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'svAttr',
+                    uuid: 'u-sv',
+                    schemaVersion: AttributeVersion.V3,
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'SV', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { svAttr: 'value' } };
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result[0].version).toBe(AttributeVersion.V3);
+        });
+
+        test('handles attribute key with colon by splitting', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'myAttr',
+                    uuid: 'u-col',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'Col', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { 'myAttr:ignored': 'foo' } };
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toHaveLength(1);
+            expect(result[0].name).toBe('myAttr');
+            expect(result[0].content[0].data).toBe('foo');
+        });
+
+        test('skips when descriptor not found or value undefined', () => {
+            const descriptors = [{ name: 'a', uuid: 'u', contentType: AttributeContentType.String, content: [], properties: {} } as any];
+            const values = { __attributes__id1__: { other: 'x', a: undefined } };
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toEqual([]);
+        });
+
+        test('supports array values by mapping each item', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'arr',
+                    uuid: 'u-arr',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'Arr', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { arr: ['a', 'b'] } };
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result[0].content).toEqual([{ data: 'a' }, { data: 'b' }]);
+        });
+
+        test('supports array of objects values', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'arr2',
+                    uuid: 'u-arr2',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'Arr2', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { arr2: [{ data: 'x' }, { data: 'y' }] } };
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result[0].content).toEqual([{ data: 'x' }, { data: 'y' }]);
+        });
     });
 
     test.describe('mapAttributeContentToOptionValue', () => {
@@ -382,6 +498,17 @@ test.describe('attributes utils', () => {
             const result = mapAttributeContentToOptionValue(content, descriptor);
             expect(result.label).toBe('Display Label');
             expect(result.value).toBe(content);
+        });
+        test('formats dates and datetimes when no reference', () => {
+            const dateContent = { data: '2024-02-02', reference: undefined } as any;
+            const descriptorDate = { contentType: AttributeContentType.Date, content: [], properties: {} } as any;
+            const r1 = mapAttributeContentToOptionValue(dateContent, descriptorDate);
+            expect(r1.label).toContain('2024');
+
+            const datetimeContent = { data: '2024-02-02T12:00:00', reference: undefined } as any;
+            const descriptorDatetime = { contentType: AttributeContentType.Datetime, content: [], properties: {} } as any;
+            const r2 = mapAttributeContentToOptionValue(datetimeContent, descriptorDatetime);
+            expect(r2.label).toContain('2024');
         });
         test('returns label from data when no reference', () => {
             const content = { data: 'plain', reference: undefined } as any;
@@ -422,6 +549,56 @@ test.describe('attributes utils', () => {
             expect(result.formAttributeName).toBe('profile.x');
             expect(result.formAttributeValue).toBe('Set');
         });
+
+        test('select list (list without multi) uses first content', () => {
+            const descriptor = {
+                type: AttributeType.Data,
+                contentType: AttributeContentType.String,
+                content: [{ data: 'foo' }],
+                properties: { list: true, multiSelect: false },
+            } as any;
+            const result = testAttributeSetFunction(descriptor, undefined, 'name', false, true);
+            expect(typeof result.formAttributeValue).toBe('object');
+            expect(result.formAttributeValue).toMatchObject({ label: 'foo', value: { data: 'foo' } });
+        });
+
+        test('boolean attribute uses data or default depending on required flag', () => {
+            const descriptor = {
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Boolean,
+                content: [{ data: true }],
+                properties: { list: false, required: true },
+            } as any;
+            // no attribute value
+            let result = testAttributeSetFunction(descriptor, undefined, 'b', false, false);
+            expect(result.formAttributeValue).toBe(true);
+
+            // attribute value present
+            const attr = { content: [{ data: false }] } as any;
+            result = testAttributeSetFunction(descriptor, attr, 'b', false, false);
+            expect(result.formAttributeValue).toBe(false);
+        });
+
+        test('fallback to descriptor default when no appliedContent and allowed by flags', () => {
+            const descriptor = {
+                type: AttributeType.Data,
+                contentType: AttributeContentType.String,
+                content: [{ data: 'def' }],
+                properties: { list: false, required: false },
+            } as any;
+            const result = testAttributeSetFunction(descriptor, undefined, 'x', false, false);
+            expect(result.formAttributeValue).toBe('def');
+        });
+
+        test('codeblock descriptors convert base64 code when present', () => {
+            const descriptor = {
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Codeblock,
+                content: [{ data: { code: base64Encode('hi'), language: ProgrammingLanguageEnum.Python } }],
+            } as any;
+            const result = testAttributeSetFunction(descriptor, undefined, 'cb', false, true);
+            expect(result.formAttributeValue).toEqual({ code: 'hi', language: ProgrammingLanguageEnum.Python });
+        });
     });
 
     test.describe('mapProfileAttribute', () => {
@@ -443,6 +620,20 @@ test.describe('attributes utils', () => {
             const result = mapProfileAttribute(profile, multipleResourceCustomAttributes, 'resource', 'section.attributes', 'form');
             expect(result).toHaveLength(1);
             expect(result[0].formAttributeName).toBe('form.custom1');
+        });
+        test('filters out profile attributes with no matching custom attribute', () => {
+            const customAttr = {
+                type: AttributeType.Custom,
+                name: 'other',
+                uuid: 'other-uuid',
+                contentType: AttributeContentType.String,
+                content: [],
+                properties: {},
+            } as any;
+            const profile = { section: { attributes: [{ uuid: 'cu1', name: 'custom1' }] } };
+            const multipleResourceCustomAttributes = { resource: [customAttr] };
+            const result = mapProfileAttribute(profile, multipleResourceCustomAttributes, 'resource', 'section.attributes', 'form');
+            expect(result).toHaveLength(0);
         });
         test('filters out when uuid does not match', () => {
             const customAttr = {
