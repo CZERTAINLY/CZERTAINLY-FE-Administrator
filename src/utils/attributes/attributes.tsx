@@ -12,6 +12,7 @@ import {
 } from 'types/attributes';
 import {
     AttributeContentType,
+    AttributeVersion,
     CodeBlockAttributeContentV2,
     FileAttributeContentData,
     ProgrammingLanguageEnum,
@@ -116,11 +117,26 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
     return content.map((content) => mapping(content) ?? checkFileNameAndMimeType(content)).join(', ');
 };
 
-const getAttributeFormValue = (
+export const getAttributeFormValue = (
     contentType: AttributeContentType,
     descriptorContent: BaseAttributeContentModel[] | undefined,
     item: any,
 ) => {
+    const normalizeContentItem = (value: any) => {
+        if (!value || typeof value !== 'object') return value;
+
+        const normalized: Record<string, unknown> = {};
+
+        if ('data' in value) {
+            normalized.data = normalizePrimitiveAttributeValue(value.data);
+        }
+        if ('reference' in value && value.reference !== null && value.reference !== '') {
+            normalized.reference = value.reference;
+        }
+
+        return normalized;
+    };
+
     const normalizePrimitiveAttributeValue = (value: unknown) => {
         if (value === undefined || value === null || value === '') return value;
 
@@ -145,19 +161,11 @@ const getAttributeFormValue = (
         return { data: { secret: item } } as SecretAttributeContentV2;
     }
     if (item && typeof item === 'object' && ('data' in item || 'reference' in item)) {
-        if ('data' in item) {
-            return { ...item, data: normalizePrimitiveAttributeValue(item.data) };
-        }
-
-        return item;
+        return normalizeContentItem(item);
     }
     if (item && typeof item === 'object' && 'value' in item) {
         if (item.value && typeof item.value === 'object' && ('data' in item.value || 'reference' in item.value)) {
-            if ('data' in item.value) {
-                return { ...item.value, data: normalizePrimitiveAttributeValue(item.value.data) };
-            }
-
-            return item.value;
+            return normalizeContentItem(item.value);
         }
         return { data: normalizePrimitiveAttributeValue(item.value) };
     }
@@ -199,6 +207,19 @@ export function collectFormAttributes(
     const deletedAttributes = values[`deletedAttributes_${id}`] || [];
 
     const attrs: AttributeRequestModel[] = [];
+    const resolveAttributeVersion = (descriptor: DataAttributeModel | CustomAttributeModel): AttributeVersion => {
+        const schemaVersion = (descriptor as any).schemaVersion;
+        if (schemaVersion === AttributeVersion.V2 || schemaVersion === AttributeVersion.V3) {
+            return schemaVersion;
+        }
+
+        const version = (descriptor as any).version;
+        if (version === AttributeVersion.V3 || version === '3' || version === 3) {
+            return AttributeVersion.V3;
+        }
+
+        return AttributeVersion.V2;
+    };
 
     for (const attribute in attributes) {
         if (!attributes.hasOwnProperty(attribute)) continue;
@@ -219,19 +240,28 @@ export function collectFormAttributes(
         let content: any;
 
         if (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
+            const attributeVersion = resolveAttributeVersion(descriptor);
+
             if (Array.isArray(attributes[attribute])) {
                 content = attributes[attribute].map((i: any) => getAttributeFormValue(descriptor.contentType, descriptor.content, i));
             } else {
                 content = getAttributeFormValue(descriptor.contentType, descriptor.content, attributes[attribute]);
             }
 
-            if (typeof content.data !== 'undefined' || Array.isArray(content)) {
+            if (typeof content.data !== 'undefined' || typeof content.reference !== 'undefined' || Array.isArray(content)) {
+                const normalizedContent = (Array.isArray(content) ? content : [content]).map((item) => {
+                    if (attributeVersion === AttributeVersion.V3 && item && typeof item === 'object' && !('contentType' in item)) {
+                        return { ...item, contentType: descriptor.contentType };
+                    }
+                    return item;
+                });
+
                 const attr: AttributeRequestModel = {
                     name: attributeName,
-                    content: Array.isArray(content) ? content : [content],
+                    content: normalizedContent,
                     contentType: descriptor.contentType,
                     uuid: descriptor.uuid,
-                    version: descriptor.version,
+                    version: attributeVersion,
                 };
 
                 attrs.push(attr);
