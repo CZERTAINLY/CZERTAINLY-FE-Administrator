@@ -26,6 +26,36 @@ import { AttributeType } from 'types/openapi';
 const base64Encode = (s: string) => btoa(unescape(encodeURIComponent(s)));
 const base64Decode = (s: string) => decodeURIComponent(escape(atob(s)));
 
+// Helper functions to reduce duplication in test setup
+const createProperties = (overrides: Record<string, any> = {}) => ({
+    required: false,
+    label: overrides.label || 'Test',
+    readOnly: false,
+    visible: true,
+    list: false,
+    ...overrides,
+});
+
+const createDescriptor = (
+    name: string,
+    contentType: AttributeContentType,
+    uuid: string = `u-${name}`,
+    type: AttributeType = AttributeType.Data,
+    overrides: Record<string, any> = {},
+) => ({
+    type,
+    name,
+    uuid,
+    contentType,
+    content: [],
+    properties: createProperties(overrides.properties),
+    ...overrides,
+});
+
+const createTestValues = (id: string, attributes: Record<string, any>) => ({
+    [`__attributes__${id}__`]: attributes,
+});
+
 test.describe('attributes utils', () => {
     test.describe('attributeFieldNameTransform', () => {
         test('should have known field mappings', () => {
@@ -355,16 +385,9 @@ test.describe('attributes utils', () => {
         });
         test('returns attributes when descriptors and values match', () => {
             const descriptors = [
-                {
-                    type: AttributeType.Data,
-                    name: 'attr1',
-                    uuid: 'u1',
-                    contentType: AttributeContentType.String,
-                    content: [],
-                    properties: { required: false, label: 'A', readOnly: false, visible: true, list: false },
-                },
-            ] as any[];
-            const values = { __attributes__id1__: { attr1: 'value1' } };
+                createDescriptor('attr1', AttributeContentType.String, 'u1', AttributeType.Data, { properties: { label: 'A' } }),
+            ];
+            const values = createTestValues('id1', { attr1: 'value1' });
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result).toHaveLength(1);
             expect(result[0].name).toBe('attr1');
@@ -372,17 +395,10 @@ test.describe('attributes utils', () => {
         });
         test('skips deleted attributes', () => {
             const descriptors = [
-                {
-                    type: AttributeType.Data,
-                    name: 'attr1',
-                    uuid: 'u1',
-                    contentType: AttributeContentType.String,
-                    content: [],
-                    properties: { required: false, label: 'A', readOnly: false, visible: true, list: false },
-                },
-            ] as any[];
+                createDescriptor('attr1', AttributeContentType.String, 'u1', AttributeType.Data, { properties: { label: 'A' } }),
+            ];
             const values = {
-                __attributes__id1__: { attr1: 'value1' },
+                ...createTestValues('id1', { attr1: 'value1' }),
                 deletedAttributes_id1: ['attr1'],
             };
             const result = collectFormAttributes('id1', descriptors, values);
@@ -391,17 +407,11 @@ test.describe('attributes utils', () => {
 
         test('casts Integer attributes to number in payload', () => {
             const descriptors = [
-                {
-                    type: AttributeType.Data,
-                    name: 'parallelExecutions',
-                    uuid: 'u-integer',
-                    contentType: AttributeContentType.Integer,
-                    content: [],
-                    properties: { required: false, label: 'Parallel executions', readOnly: false, visible: true, list: false },
-                },
-            ] as any[];
-            const values = { __attributes__id1__: { parallelExecutions: '50' } };
-
+                createDescriptor('parallelExecutions', AttributeContentType.Integer, 'u-integer', AttributeType.Data, {
+                    properties: { label: 'Parallel executions' },
+                }),
+            ];
+            const values = createTestValues('id1', { parallelExecutions: '50' });
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result).toHaveLength(1);
             expect(result[0].content).toEqual([{ data: 50 }]);
@@ -409,17 +419,11 @@ test.describe('attributes utils', () => {
 
         test('casts Float attributes to number in payload', () => {
             const descriptors = [
-                {
-                    type: AttributeType.Data,
-                    name: 'threshold',
-                    uuid: 'u-float',
-                    contentType: AttributeContentType.Float,
-                    content: [],
-                    properties: { required: false, label: 'Threshold', readOnly: false, visible: true, list: false },
-                },
-            ] as any[];
-            const values = { __attributes__id1__: { threshold: '3.14' } };
-
+                createDescriptor('threshold', AttributeContentType.Float, 'u-float', AttributeType.Data, {
+                    properties: { label: 'Threshold' },
+                }),
+            ];
+            const values = createTestValues('id1', { threshold: '3.14' });
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result).toHaveLength(1);
             expect(result[0].content).toEqual([{ data: 3.14 }]);
@@ -427,25 +431,16 @@ test.describe('attributes utils', () => {
 
         test('removes null reference from selected list value payload', () => {
             const descriptors = [
-                {
-                    type: AttributeType.Custom,
-                    name: 'textCustomAttrExecution',
-                    uuid: 'u-custom-list',
-                    contentType: AttributeContentType.Text,
-                    content: [],
-                    properties: { required: false, label: 'Custom list', readOnly: false, visible: true, list: true },
+                createDescriptor('textCustomAttrExecution', AttributeContentType.Text, 'u-custom-list', AttributeType.Custom, {
+                    properties: { label: 'Custom list', list: true },
+                }),
+            ];
+            const values = createTestValues('id1', {
+                textCustomAttrExecution: {
+                    label: 't1',
+                    value: { reference: null, data: 't1', contentType: AttributeContentType.Text },
                 },
-            ] as any[];
-
-            const values = {
-                __attributes__id1__: {
-                    textCustomAttrExecution: {
-                        label: 't1',
-                        value: { reference: null, data: 't1', contentType: AttributeContentType.Text },
-                    },
-                },
-            };
-
+            });
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result).toHaveLength(1);
             expect(result[0].content).toEqual([{ data: 't1' }]);
@@ -453,25 +448,16 @@ test.describe('attributes utils', () => {
 
         test('keeps non-empty reference for selected list value payload', () => {
             const descriptors = [
-                {
-                    type: AttributeType.Custom,
-                    name: 'attrWithReference',
-                    uuid: 'u-custom-reference',
-                    contentType: AttributeContentType.String,
-                    content: [],
-                    properties: { required: false, label: 'Custom ref', readOnly: false, visible: true, list: true },
+                createDescriptor('attrWithReference', AttributeContentType.String, 'u-custom-reference', AttributeType.Custom, {
+                    properties: { label: 'Custom ref', list: true },
+                }),
+            ];
+            const values = createTestValues('id1', {
+                attrWithReference: {
+                    label: 'Display Label',
+                    value: { reference: 'Display Label', data: 'raw-value' },
                 },
-            ] as any[];
-
-            const values = {
-                __attributes__id1__: {
-                    attrWithReference: {
-                        label: 'Display Label',
-                        value: { reference: 'Display Label', data: 'raw-value' },
-                    },
-                },
-            };
-
+            });
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result).toHaveLength(1);
             expect(result[0].content).toEqual([{ reference: 'Display Label', data: 'raw-value' }]);
@@ -479,23 +465,12 @@ test.describe('attributes utils', () => {
 
         test('maps numeric descriptor version to attribute schema version v3', () => {
             const descriptors = [
-                {
-                    type: AttributeType.Custom,
-                    name: 'v3Attr',
-                    uuid: 'u-v3',
+                createDescriptor('v3Attr', AttributeContentType.Text, 'u-v3', AttributeType.Custom, {
                     version: 3,
-                    contentType: AttributeContentType.Text,
-                    content: [],
-                    properties: { required: false, label: 'V3 attr', readOnly: false, visible: true, list: true },
-                },
-            ] as any[];
-
-            const values = {
-                __attributes__id1__: {
-                    v3Attr: { label: 't1', value: { data: 't1' } },
-                },
-            };
-
+                    properties: { label: 'V3 attr', list: true },
+                }),
+            ];
+            const values = createTestValues('id1', { v3Attr: { label: 't1', value: { data: 't1' } } });
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result).toHaveLength(1);
             expect(result[0].version).toBe(AttributeVersion.V3);
@@ -504,33 +479,20 @@ test.describe('attributes utils', () => {
 
         test('schemaVersion property takes precedence', () => {
             const descriptors = [
-                {
-                    type: AttributeType.Data,
-                    name: 'svAttr',
-                    uuid: 'u-sv',
+                createDescriptor('svAttr', AttributeContentType.String, 'u-sv', AttributeType.Data, {
                     schemaVersion: AttributeVersion.V3,
-                    contentType: AttributeContentType.String,
-                    content: [],
-                    properties: { required: false, label: 'SV', readOnly: false, visible: true, list: false },
-                },
-            ] as any[];
-            const values = { __attributes__id1__: { svAttr: 'value' } };
+                }),
+            ];
+            const values = createTestValues('id1', { svAttr: 'value' });
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result[0].version).toBe(AttributeVersion.V3);
         });
 
         test('handles attribute key with colon by splitting', () => {
             const descriptors = [
-                {
-                    type: AttributeType.Data,
-                    name: 'myAttr',
-                    uuid: 'u-col',
-                    contentType: AttributeContentType.String,
-                    content: [],
-                    properties: { required: false, label: 'Col', readOnly: false, visible: true, list: false },
-                },
-            ] as any[];
-            const values = { __attributes__id1__: { 'myAttr:ignored': 'foo' } };
+                createDescriptor('myAttr', AttributeContentType.String, 'u-col', AttributeType.Data, { properties: { label: 'Col' } }),
+            ];
+            const values = createTestValues('id1', { 'myAttr:ignored': 'foo' });
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result).toHaveLength(1);
             expect(result[0].name).toBe('myAttr');
@@ -538,138 +500,92 @@ test.describe('attributes utils', () => {
         });
 
         test('skips when descriptor not found or value undefined', () => {
-            const descriptors = [{ name: 'a', uuid: 'u', contentType: AttributeContentType.String, content: [], properties: {} } as any];
-            const values = { __attributes__id1__: { other: 'x', a: undefined } };
+            const descriptors = [
+                {
+                    ...createDescriptor('a', AttributeContentType.String),
+                    content: [],
+                    properties: {},
+                } as any,
+            ];
+            const values = createTestValues('id1', { other: 'x', a: undefined });
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result).toEqual([]);
         });
 
         test('supports array values by mapping each item', () => {
             const descriptors = [
-                {
-                    type: AttributeType.Data,
-                    name: 'arr',
-                    uuid: 'u-arr',
-                    contentType: AttributeContentType.String,
-                    content: [],
-                    properties: { required: false, label: 'Arr', readOnly: false, visible: true, list: false },
-                },
-            ] as any[];
-            const values = { __attributes__id1__: { arr: ['a', 'b'] } };
+                createDescriptor('arr', AttributeContentType.String, 'u-arr', AttributeType.Data, { properties: { label: 'Arr' } }),
+            ];
+            const values = createTestValues('id1', { arr: ['a', 'b'] });
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result[0].content).toEqual([{ data: 'a' }, { data: 'b' }]);
         });
 
         test('supports array of objects values', () => {
             const descriptors = [
-                {
-                    type: AttributeType.Data,
-                    name: 'arr2',
-                    uuid: 'u-arr2',
-                    contentType: AttributeContentType.String,
-                    content: [],
-                    properties: { required: false, label: 'Arr2', readOnly: false, visible: true, list: false },
-                },
-            ] as any[];
-            const values = { __attributes__id1__: { arr2: [{ data: 'x' }, { data: 'y' }] } };
+                createDescriptor('arr2', AttributeContentType.String, 'u-arr2', AttributeType.Data, { properties: { label: 'Arr2' } }),
+            ];
+            const values = createTestValues('id1', { arr2: [{ data: 'x' }, { data: 'y' }] });
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result[0].content).toEqual([{ data: 'x' }, { data: 'y' }]);
         });
 
         test('handles single object value with data/reference', () => {
             const descriptors = [
-                {
-                    type: AttributeType.Data,
-                    name: 'single',
-                    uuid: 'u-single',
-                    contentType: AttributeContentType.String,
-                    content: [],
-                    properties: { required: false, label: 'Single', readOnly: false, visible: true, list: false },
-                },
-            ] as any[];
-            const values = { __attributes__id1__: { single: { data: 'val', reference: 'ref' } } };
+                createDescriptor('single', AttributeContentType.String, 'u-single', AttributeType.Data, {
+                    properties: { label: 'Single' },
+                }),
+            ];
+            const values = createTestValues('id1', { single: { data: 'val', reference: 'ref' } });
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result[0].content).toEqual([{ data: 'val', reference: 'ref' }]);
         });
 
         test('adds contentType to V3 attributes when missing', () => {
             const descriptors = [
-                {
-                    type: AttributeType.Data,
-                    name: 'v3Missing',
-                    uuid: 'u-v3',
+                createDescriptor('v3Missing', AttributeContentType.Text, 'u-v3', AttributeType.Data, {
                     version: 3,
-                    contentType: AttributeContentType.Text,
-                    content: [],
-                    properties: { required: false, label: 'V3', readOnly: false, visible: true, list: false },
-                },
-            ] as any[];
-            const values = { __attributes__id1__: { v3Missing: { data: 'text' } } };
+                    properties: { label: 'V3' },
+                }),
+            ];
+            const values = createTestValues('id1', { v3Missing: { data: 'text' } });
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result[0].content[0].contentType).toBe(AttributeContentType.Text);
         });
 
         test('uses descriptor contentType for V3 attributes when adding', () => {
             const descriptors = [
-                {
-                    type: AttributeType.Data,
-                    name: 'v3Existing',
-                    uuid: 'u-v3e',
+                createDescriptor('v3Existing', AttributeContentType.Text, 'u-v3e', AttributeType.Data, {
                     version: 3,
-                    contentType: AttributeContentType.Text,
-                    content: [],
-                    properties: { required: false, label: 'V3E', readOnly: false, visible: true, list: false },
-                },
-            ] as any[];
-            const values = { __attributes__id1__: { v3Existing: [{ data: 'text' }] } };
-            const result = collectFormAttributes('id1', descriptors, values);
-            expect(result[0].content[0].contentType).toBe(AttributeContentType.Text);
+                    properties: { label: 'V3E' },
+                }),
+            ];
+            const values = createTestValues('id1', { v3Existing: [{ data: 'text' }] });
         });
 
         test('includes attributes even with null data when reference exists check passes', () => {
             const descriptors = [
-                {
-                    type: AttributeType.Data,
-                    name: 'nullData',
-                    uuid: 'u-null',
-                    contentType: AttributeContentType.String,
-                    content: [],
-                    properties: { required: false, label: 'Null', readOnly: false, visible: true, list: false },
-                },
-            ] as any[];
-            const values = { __attributes__id1__: { nullData: { data: null } } };
+                createDescriptor('nullData', AttributeContentType.String, 'u-null', AttributeType.Data, { properties: { label: 'Null' } }),
+            ];
+            const values = createTestValues('id1', { nullData: { data: null } });
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result[0].content).toEqual([{ data: null }]);
         });
 
         test('includes attribute with only reference when data is undefined', () => {
             const descriptors = [
-                {
-                    type: AttributeType.Data,
-                    name: 'refOnly',
-                    uuid: 'u-ref',
-                    contentType: AttributeContentType.String,
-                    content: [],
-                    properties: { required: false, label: 'Ref', readOnly: false, visible: true, list: false },
-                },
-            ] as any[];
-            const values = { __attributes__id1__: { refOnly: { reference: 'ref-val' } } };
+                createDescriptor('refOnly', AttributeContentType.String, 'u-ref', AttributeType.Data, { properties: { label: 'Ref' } }),
+            ];
+            const values = createTestValues('id1', { refOnly: { reference: 'ref-val' } });
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result[0].content).toEqual([{ reference: 'ref-val' }]);
         });
 
         test('uses hasOwnProperty to skip inherited properties', () => {
             const descriptors = [
-                {
-                    type: AttributeType.Data,
-                    name: 'attr1',
-                    uuid: 'u1',
-                    contentType: AttributeContentType.String,
-                    content: [],
-                    properties: { required: false, label: 'A', readOnly: false, visible: true, list: false },
-                },
-            ] as any[];
-            const values = { __attributes__id1__: { attr1: 'value1' } };
+                createDescriptor('attr1', AttributeContentType.String, 'u1', AttributeType.Data, { properties: { label: 'A' } }),
+            ];
+            const values = createTestValues('id1', { attr1: 'value1' });
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result).toHaveLength(1);
             expect(result[0].name).toBe('attr1');
@@ -677,16 +593,11 @@ test.describe('attributes utils', () => {
 
         test('handles Custom attribute type same as Data', () => {
             const descriptors = [
-                {
-                    type: AttributeType.Custom,
-                    name: 'custAttr',
-                    uuid: 'u-custom',
-                    contentType: AttributeContentType.String,
-                    content: [],
-                    properties: { required: false, label: 'Custom', readOnly: false, visible: true, list: false },
-                },
-            ] as any[];
-            const values = { __attributes__id1__: { custAttr: 'custom-value' } };
+                createDescriptor('custAttr', AttributeContentType.String, 'u-custom', AttributeType.Custom, {
+                    properties: { label: 'Custom' },
+                }),
+            ];
+            const values = createTestValues('id1', { custAttr: 'custom-value' });
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result[0].name).toBe('custAttr');
             expect(result[0].content).toEqual([{ data: 'custom-value' }]);
@@ -694,38 +605,11 @@ test.describe('attributes utils', () => {
 
         test('multiple attributes in single descriptor set', () => {
             const descriptors = [
-                {
-                    type: AttributeType.Data,
-                    name: 'attr1',
-                    uuid: 'u1',
-                    contentType: AttributeContentType.String,
-                    content: [],
-                    properties: { required: false, label: 'A1', readOnly: false, visible: true, list: false },
-                },
-                {
-                    type: AttributeType.Data,
-                    name: 'attr2',
-                    uuid: 'u2',
-                    contentType: AttributeContentType.Integer,
-                    content: [],
-                    properties: { required: false, label: 'A2', readOnly: false, visible: true, list: false },
-                },
-                {
-                    type: AttributeType.Data,
-                    name: 'attr3',
-                    uuid: 'u3',
-                    contentType: AttributeContentType.Boolean,
-                    content: [],
-                    properties: { required: false, label: 'A3', readOnly: false, visible: true, list: false },
-                },
-            ] as any[];
-            const values = {
-                __attributes__id1__: {
-                    attr1: 'string-val',
-                    attr2: '42',
-                    attr3: true,
-                },
-            };
+                createDescriptor('attr1', AttributeContentType.String, 'u1', AttributeType.Data, { properties: { label: 'A1' } }),
+                createDescriptor('attr2', AttributeContentType.Integer, 'u2', AttributeType.Data, { properties: { label: 'A2' } }),
+                createDescriptor('attr3', AttributeContentType.Boolean, 'u3', AttributeType.Data, { properties: { label: 'A3' } }),
+            ];
+            const values = createTestValues('id1', { attr1: 'string-val', attr2: '42', attr3: true });
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result).toHaveLength(3);
             expect(result.find((a) => a.name === 'attr1')?.content).toEqual([{ data: 'string-val' }]);
@@ -735,39 +619,25 @@ test.describe('attributes utils', () => {
 
         test('resolves V2 as default when no version specified', () => {
             const descriptors = [
-                {
-                    type: AttributeType.Data,
-                    name: 'v2Default',
-                    uuid: 'u-v2',
-                    contentType: AttributeContentType.String,
-                    content: [],
-                    properties: { required: false, label: 'V2', readOnly: false, visible: true, list: false },
-                },
-            ] as any[];
-            const values = { __attributes__id1__: { v2Default: 'value' } };
+                createDescriptor('v2Default', AttributeContentType.String, 'u-v2', AttributeType.Data, { properties: { label: 'V2' } }),
+            ];
+            const values = createTestValues('id1', { v2Default: 'value' });
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result[0].version).toBe(AttributeVersion.V2);
         });
 
         test('with option object containing label and value both on reference list', () => {
             const descriptors = [
-                {
-                    type: AttributeType.Custom,
-                    name: 'optionAttr',
-                    uuid: 'u-opt',
-                    contentType: AttributeContentType.Text,
-                    content: [],
-                    properties: { required: false, label: 'Options', readOnly: false, visible: true, list: true, multiSelect: true },
-                },
-            ] as any[];
-            const values = {
-                __attributes__id1__: {
-                    optionAttr: [
-                        { label: 'First', value: { data: 'f', reference: 'first' } },
-                        { label: 'Second', value: { data: 's', reference: 'second' } },
-                    ],
-                },
-            };
+                createDescriptor('optionAttr', AttributeContentType.Text, 'u-opt', AttributeType.Custom, {
+                    properties: { label: 'Options', list: true, multiSelect: true },
+                }),
+            ];
+            const values = createTestValues('id1', {
+                optionAttr: [
+                    { label: 'First', value: { data: 'f', reference: 'first' } },
+                    { label: 'Second', value: { data: 's', reference: 'second' } },
+                ],
+            });
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result[0].content).toHaveLength(2);
             expect(result[0].content[0]).toEqual({ data: 'f', reference: 'first' });
