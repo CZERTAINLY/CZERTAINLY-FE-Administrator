@@ -1,18 +1,30 @@
+import React from 'react';
 import { test, expect } from '../../../playwright/ct-test';
 import {
     getAttributeCopyValue,
     attributeFieldNameTransform,
     transformAttributes,
+    getAttributeContent,
+    getAttributeFormValue,
     getCodeBlockLanguage,
     collectFormAttributes,
     mapAttributeContentToOptionValue,
     testAttributeSetFunction,
     mapProfileAttribute,
 } from './attributes';
-import { AttributeContentType, AttributeVersion, ProgrammingLanguageEnum } from 'types/openapi';
+import { getDatetimeFormValue, getDateFormValue } from './attributeFormValues';
+
+import {
+    AttributeContentType,
+    AttributeVersion,
+    ProgrammingLanguageEnum,
+    CodeBlockAttributeContentV2,
+    SecretAttributeContentV2,
+} from 'types/openapi';
 import { AttributeType } from 'types/openapi';
 
 const base64Encode = (s: string) => btoa(unescape(encodeURIComponent(s)));
+const base64Decode = (s: string) => decodeURIComponent(escape(atob(s)));
 
 test.describe('attributes utils', () => {
     test.describe('attributeFieldNameTransform', () => {
@@ -85,7 +97,7 @@ test.describe('attributes utils', () => {
             const content = [{ data: '2024-01-15T10:00:00' } as any];
             const result = getAttributeCopyValue(AttributeContentType.Datetime, content);
             expect(typeof result).toBe('string');
-            expect(result!.length).toBeGreaterThan(0);
+            expect(typeof result === 'string' && result.length).toBeGreaterThan(0);
         });
     });
 
@@ -104,6 +116,88 @@ test.describe('attributes utils', () => {
                 { formAttributeName: 'obj.y', formAttributeValue: 2 },
             ];
             expect(transformAttributes(data)).toEqual({ obj: { x: 1, y: 2 } });
+        });
+    });
+
+    test.describe('getAttributeContent', () => {
+        test('returns not set when content undefined', () => {
+            expect(getAttributeContent(AttributeContentType.String, undefined)).toBe('Not set');
+        });
+
+        test('boolean content is stringified', () => {
+            expect(getAttributeContent(AttributeContentType.Boolean, [{ data: false } as any])).toBe('false');
+            expect(getAttributeContent(AttributeContentType.Boolean, [{ data: true } as any])).toBe('true');
+        });
+
+        test('credential/contentType returns reference', () => {
+            const content = [{ data: 'x', reference: 'ref' } as any];
+            expect(getAttributeContent(AttributeContentType.Credential, content)).toBe('ref');
+        });
+
+        test('file content returns reference even if data object provided', () => {
+            const content = [{ data: { fileName: 'a', mimeType: 'b' }, reference: 'theRef' } as any];
+            expect(getAttributeContent(AttributeContentType.File, content)).toBe('theRef');
+        });
+
+        test('datetime content is formatted', () => {
+            const content = [{ data: '2021-12-25T12:00:00' } as any];
+            const result = getAttributeContent(AttributeContentType.Datetime, content);
+            expect(typeof result).toBe('string');
+            expect(typeof result === 'string' && result.length).toBeGreaterThan(0);
+        });
+
+        test('codeblock returns element with expected props', () => {
+            const content = [{ data: { code: base64Encode('alert(1)'), language: ProgrammingLanguageEnum.Javascript } } as any];
+            const element = getAttributeContent(AttributeContentType.Codeblock, content) as any;
+            // element may not be recognized by isValidElement in CT environment
+            expect(element).toBeDefined();
+            expect(element.props).toBeDefined();
+            expect(element.props.content).toEqual(content[0]);
+        });
+    });
+
+    test.describe('getAttributeFormValue', () => {
+        test('datetime and date delegates to helper functions', () => {
+            expect(getAttributeFormValue(AttributeContentType.Datetime, [], '2025-01-01T00:00')).toStrictEqual(
+                getDatetimeFormValue('2025-01-01T00:00'),
+            );
+            expect(getAttributeFormValue(AttributeContentType.Date, [], '2025-01-01')).toStrictEqual(getDateFormValue('2025-01-01'));
+        });
+
+        test('codeblock encodes code and determines language', () => {
+            const descriptorContent = [{ data: { language: ProgrammingLanguageEnum.Python } } as any];
+            const result = getAttributeFormValue(AttributeContentType.Codeblock, descriptorContent, {
+                code: 'print("hi")',
+                language: undefined,
+            }) as CodeBlockAttributeContentV2;
+            expect(typeof result.data.code).toBe('string');
+            expect(base64Decode(result.data.code)).toBe('print("hi")');
+            expect(result.data.language).toBe(ProgrammingLanguageEnum.Python);
+        });
+
+        test('secret returns object with secret property', () => {
+            const result = getAttributeFormValue(AttributeContentType.Secret, [], 'hunter2') as SecretAttributeContentV2;
+            expect(result.data.secret).toBe('hunter2');
+        });
+
+        test('object item with data/reference returns trimmed structure', () => {
+            const item = { data: 'x', reference: 'r' };
+            expect(getAttributeFormValue(AttributeContentType.String, [], item)).toEqual(item);
+        });
+
+        test('object value containing data/reference is normalized', () => {
+            const item = { value: { data: 'x', reference: 'r' } };
+            expect(getAttributeFormValue(AttributeContentType.String, [], item)).toEqual({ data: 'x', reference: 'r' });
+        });
+
+        test('primitive value is wrapped as data', () => {
+            expect(getAttributeFormValue(AttributeContentType.String, [], 'foo')).toEqual({ data: 'foo' });
+        });
+
+        test('numeric strings on integer/float types are converted', () => {
+            expect(getAttributeFormValue(AttributeContentType.Integer, [], '5')).toEqual({ data: 5 });
+            expect(getAttributeFormValue(AttributeContentType.Float, [], '5.5')).toEqual({ data: 5.5 });
+            expect(getAttributeFormValue(AttributeContentType.Integer, [], 'not a num')).toEqual({ data: 'not a num' });
         });
     });
 

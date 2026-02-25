@@ -117,7 +117,7 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
     return content.map((content) => mapping(content) ?? checkFileNameAndMimeType(content)).join(', ');
 };
 
-const getAttributeFormValue = (
+export const getAttributeFormValue = (
     contentType: AttributeContentType,
     descriptorContent: BaseAttributeContentModel[] | undefined,
     item: any,
