@@ -9,7 +9,7 @@ import {
     testAttributeSetFunction,
     mapProfileAttribute,
 } from './attributes';
-import { AttributeContentType, ProgrammingLanguageEnum } from 'types/openapi';
+import { AttributeContentType, AttributeVersion, ProgrammingLanguageEnum } from 'types/openapi';
 import { AttributeType } from 'types/openapi';
 
 const base64Encode = (s: string) => btoa(unescape(encodeURIComponent(s)));
@@ -197,6 +197,83 @@ test.describe('attributes utils', () => {
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result).toHaveLength(1);
             expect(result[0].content).toEqual([{ data: 3.14 }]);
+        });
+
+        test('removes null reference from selected list value payload', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Custom,
+                    name: 'textCustomAttrExecution',
+                    uuid: 'u-custom-list',
+                    contentType: AttributeContentType.Text,
+                    content: [],
+                    properties: { required: false, label: 'Custom list', readOnly: false, visible: true, list: true },
+                },
+            ] as any[];
+
+            const values = {
+                __attributes__id1__: {
+                    textCustomAttrExecution: {
+                        label: 't1',
+                        value: { reference: null, data: 't1', contentType: AttributeContentType.Text },
+                    },
+                },
+            };
+
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toHaveLength(1);
+            expect(result[0].content).toEqual([{ data: 't1' }]);
+        });
+
+        test('keeps non-empty reference for selected list value payload', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Custom,
+                    name: 'attrWithReference',
+                    uuid: 'u-custom-reference',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'Custom ref', readOnly: false, visible: true, list: true },
+                },
+            ] as any[];
+
+            const values = {
+                __attributes__id1__: {
+                    attrWithReference: {
+                        label: 'Display Label',
+                        value: { reference: 'Display Label', data: 'raw-value' },
+                    },
+                },
+            };
+
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toHaveLength(1);
+            expect(result[0].content).toEqual([{ reference: 'Display Label', data: 'raw-value' }]);
+        });
+
+        test('maps numeric descriptor version to attribute schema version v3', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Custom,
+                    name: 'v3Attr',
+                    uuid: 'u-v3',
+                    version: 3,
+                    contentType: AttributeContentType.Text,
+                    content: [],
+                    properties: { required: false, label: 'V3 attr', readOnly: false, visible: true, list: true },
+                },
+            ] as any[];
+
+            const values = {
+                __attributes__id1__: {
+                    v3Attr: { label: 't1', value: { data: 't1' } },
+                },
+            };
+
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toHaveLength(1);
+            expect(result[0].version).toBe(AttributeVersion.V3);
+            expect(result[0].content).toEqual([{ data: 't1', contentType: AttributeContentType.Text }]);
         });
     });
 
