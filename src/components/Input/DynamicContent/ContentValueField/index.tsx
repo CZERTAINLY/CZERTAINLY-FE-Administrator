@@ -20,24 +20,19 @@ import { parseListValueByContentType } from 'components/Attributes/AttributeEdit
 
 function getValueFieldError(fieldState: { error?: { message?: string }; isTouched: boolean; invalid: boolean }) {
     if (!fieldState.isTouched || !fieldState.invalid) return undefined;
-    return typeof fieldState.error === 'string' ? fieldState.error : fieldState.error?.message || 'Invalid value';
+    return typeof fieldState.error === 'string' ? fieldState.error : (fieldState.error?.message ?? 'Invalid value');
 }
 
-function ValueFieldInput({
-    descriptor,
-    id,
-    field,
-    fieldState,
-    fieldStepValue,
-    options,
-}: {
+type ValueFieldInputProps = {
     descriptor: CustomAttributeModel;
     id?: string;
     field: { value: any; onChange: (v: any) => void; onBlur: () => void };
     fieldState: { isTouched: boolean; invalid: boolean; error?: { message?: string } };
     fieldStepValue: number | undefined;
     options: { label: string; value: string }[];
-}) {
+};
+
+function ValueFieldInput({ descriptor, id, field, fieldState, fieldStepValue, options }: ValueFieldInputProps) {
     const [showAddCustom, setShowAddCustom] = useState(false);
 
     const inputType = ContentFieldConfiguration[descriptor.contentType].type;
@@ -50,7 +45,7 @@ function ValueFieldInput({
     );
 
     if (descriptor.properties.list) {
-        const isExtensible = true || descriptor.properties.extensibleList === true;
+        const isExtensible = descriptor.properties.extensibleList === true;
 
         const handleListChange = (v: any) => {
             if (descriptor.properties.multiSelect) {
@@ -61,23 +56,24 @@ function ValueFieldInput({
                 field.onChange(parsed.length > 0 ? parsed : undefined);
             } else {
                 const parsed = parseListValueByContentType(descriptor.contentType, v);
-                field.onChange(parsed !== undefined ? parsed : '');
+                field.onChange(parsed ?? '');
             }
         };
 
-        const listValue =
-            descriptor.properties.multiSelect && Array.isArray(field.value)
-                ? field.value.map((v: string | number | boolean) => ({ value: v, label: String(v) }))
-                : field.value;
+        let listValue: { value: string | number | boolean; label: string }[] | string | number | boolean;
+        if (descriptor.properties.multiSelect && Array.isArray(field.value)) {
+            listValue = field.value.map((v: string | number | boolean) => ({ value: v, label: String(v) }));
+        } else {
+            listValue = field.value;
+        }
 
         const base = options;
-        const currentValues = descriptor.properties.multiSelect
-            ? Array.isArray(field.value)
-                ? field.value
-                : []
-            : field.value != null && field.value !== ''
-              ? [field.value]
-              : [];
+        let currentValues: (string | number | boolean)[];
+        if (descriptor.properties.multiSelect) {
+            currentValues = Array.isArray(field.value) ? field.value : [];
+        } else {
+            currentValues = field.value != null && field.value !== '' ? [field.value] : [];
+        }
         const seen = new Set(base.map((o: { value: string }) => String(o.value)));
         const extra = currentValues
             .filter((v: string | number | boolean) => !seen.has(String(v)))
@@ -101,19 +97,17 @@ function ValueFieldInput({
                         />
                     </div>
                     {isExtensible && !descriptor.properties.readOnly && (
-                        <>
-                            <Button
-                                type="button"
-                                variant="transparent"
-                                className="text-blue-600"
-                                onClick={() => setShowAddCustom(true)}
-                                data-testid={`${descriptor.name}-add-custom`}
-                                disabled={showAddCustom}
-                            >
-                                <Plus size={14} className="mr-1" />
-                                Add custom
-                            </Button>
-                        </>
+                        <Button
+                            type="button"
+                            variant="transparent"
+                            className="text-blue-600"
+                            onClick={() => setShowAddCustom(true)}
+                            data-testid={`${descriptor.name}-add-custom`}
+                            disabled={showAddCustom}
+                        >
+                            <Plus size={14} className="mr-1" />
+                            Add custom
+                        </Button>
                     )}
                 </Container>
                 <AddCustomValuePanel

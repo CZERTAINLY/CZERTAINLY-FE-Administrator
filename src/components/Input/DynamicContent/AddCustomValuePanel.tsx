@@ -37,13 +37,13 @@ export function AddCustomValuePanel({
     const config = ContentFieldConfiguration[contentType];
     const inputType = config?.type ?? 'text';
     const fieldStepValue = getStepValue(inputType);
+    const isBooleanContentType = contentType === AttributeContentType.Boolean;
 
     const handleAdd = () => {
         const val = customValue;
-        const isValid =
-            contentType === AttributeContentType.Boolean ||
-            (typeof val === 'number' && !Number.isNaN(val)) ||
-            (val !== '' && val !== undefined && val !== null);
+        const isValidNumber = typeof val === 'number' && !Number.isNaN(val);
+        const isValidNonEmpty = val !== '' && val !== undefined && val !== null;
+        const isValid = isBooleanContentType || isValidNumber || isValidNonEmpty;
         if (!isValid) return;
         const parsed = parseValue(val);
         if (multiSelect) {
@@ -52,19 +52,18 @@ export function AddCustomValuePanel({
         } else {
             onFieldChange(parsed);
         }
-        setCustomValue(contentType === AttributeContentType.Boolean ? false : '');
+        setCustomValue(isBooleanContentType ? false : '');
         onClose();
     };
 
     const handleCancel = () => {
-        setCustomValue(contentType === AttributeContentType.Boolean ? false : '');
+        setCustomValue(isBooleanContentType ? false : '');
         onClose();
     };
 
-    const canAdd =
-        contentType === AttributeContentType.Boolean ||
-        (typeof customValue === 'number' && !Number.isNaN(customValue)) ||
-        (customValue !== '' && customValue !== undefined && String(customValue).trim() !== '');
+    const isValidNumber = typeof customValue === 'number' && !Number.isNaN(customValue);
+    const hasNonEmptyString = customValue !== '' && customValue !== undefined && String(customValue).trim() !== '';
+    const canAdd = isBooleanContentType || isValidNumber || hasNonEmptyString;
 
     return (
         <div

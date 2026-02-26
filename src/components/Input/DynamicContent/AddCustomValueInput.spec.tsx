@@ -79,4 +79,52 @@ test.describe('AddCustomValueInput', () => {
         const input = page.locator('input[type="time"]');
         await expect(input).toBeVisible();
     });
+
+    test('number input parses integer values via onChange', async ({ mount, page }) => {
+        let lastValue: unknown = undefined;
+        await mount(
+            <AddCustomValueInput
+                {...defaultProps}
+                id="num-parse-int"
+                inputType="number"
+                contentType={AttributeContentType.Integer}
+                fieldStepValue={1}
+                onChange={(v) => {
+                    lastValue = v;
+                }}
+            />,
+        );
+        const input = page.getByRole('spinbutton');
+        await input.fill('42');
+
+        await expect
+            .poll(() => lastValue, {
+                message: 'onChange should receive parsed integer',
+            })
+            .toBe(42);
+    });
+
+    test('number input parses float values via onChange', async ({ mount, page }) => {
+        let lastValue: unknown = undefined;
+        await mount(
+            <AddCustomValueInput
+                {...defaultProps}
+                id="num-parse-float"
+                inputType="number"
+                contentType={AttributeContentType.Float}
+                fieldStepValue={0.1}
+                onChange={(v) => {
+                    lastValue = v;
+                }}
+            />,
+        );
+        const input = page.getByRole('spinbutton');
+        await input.fill('3.14');
+
+        await expect
+            .poll(() => lastValue, {
+                message: 'onChange should receive parsed float',
+            })
+            .toBeCloseTo(3.14);
+    });
 });

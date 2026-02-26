@@ -42,13 +42,12 @@ export function AttributeFieldSelect({
                 const invalidClass = fieldState.isTouched && fieldState.invalid ? 'border-red-500' : '';
 
                 const baseOptions = options;
-                const currentValues = descriptor.properties.multiSelect
-                    ? Array.isArray(field.value)
-                        ? field.value
-                        : []
-                    : field.value != null && field.value !== ''
-                      ? [field.value]
-                      : [];
+                let currentValues: any[];
+                if (descriptor.properties.multiSelect) {
+                    currentValues = Array.isArray(field.value) ? field.value : [];
+                } else {
+                    currentValues = field.value != null && field.value !== '' ? [field.value] : [];
+                }
                 const seen = new Set(baseOptions.map((o: { value: any }) => String(o.value)));
                 const extra =
                     descriptor.properties.extensibleList === true

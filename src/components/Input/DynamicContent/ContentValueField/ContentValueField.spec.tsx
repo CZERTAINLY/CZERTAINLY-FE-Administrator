@@ -11,6 +11,7 @@ const readOnlyTextProps = {
     readOnly: true,
     list: false,
     multiSelect: false,
+    extensibleList: false,
 };
 const requiredTextProps = {
     label: 'Test',
@@ -19,6 +20,7 @@ const requiredTextProps = {
     readOnly: false,
     list: false,
     multiSelect: false,
+    extensibleList: false,
 };
 
 function buildListDescriptor({
@@ -42,7 +44,8 @@ function buildListDescriptor({
             readOnly: false,
             list: true,
             multiSelect,
-        },
+            extensibleList: false,
+        } as any,
         content,
     });
 }
@@ -348,6 +351,25 @@ test.describe('ContentValueField', () => {
         await page.getByTestId('save-button').click();
         expect(submitted).toHaveLength(1);
         expect((submitted[0] as { data: string }).data).toBe('14:30:00');
+    });
+
+    test('list with extensibleList renders Add custom button', async ({ mount, page }) => {
+        const descriptor = buildDescriptor({
+            name: 'extList',
+            contentType: AttributeContentType.String,
+            properties: {
+                label: 'Extensible List',
+                visible: true,
+                required: false,
+                readOnly: false,
+                list: true,
+                multiSelect: false,
+                extensibleList: true,
+            } as any,
+        });
+
+        await mount(<ContentValueFieldTestWrapper descriptor={descriptor} />);
+        await expect(page.getByTestId('extList-add-custom')).toBeVisible();
     });
 
     test('number zero is valid content', async ({ mount, page }) => {

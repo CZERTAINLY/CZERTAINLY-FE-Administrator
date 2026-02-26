@@ -35,15 +35,22 @@ export function AddCustomValueInput({
     }
     if (inputType === 'number') {
         const isInt = contentType === AttributeContentType.Integer;
+        const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            const raw = e.target.value;
+            if (raw === '') {
+                onChange('');
+                return;
+            }
+            const parsed = isInt ? Number.parseInt(raw, 10) : Number.parseFloat(raw);
+            onChange(Number.isNaN(parsed) ? 0 : parsed);
+        };
         return (
             <input
                 type="number"
                 step={fieldStepValue}
                 className={inputClassName}
                 value={value === '' ? '' : Number(value)}
-                onChange={(e) =>
-                    onChange(e.target.value === '' ? '' : isInt ? parseInt(e.target.value, 10) || 0 : parseFloat(e.target.value) || 0)
-                }
+                onChange={handleNumberChange}
                 disabled={readOnly}
             />
         );

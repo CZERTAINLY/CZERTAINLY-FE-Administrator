@@ -128,213 +128,206 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
     useRunOnFinished(isUpdating, onSuccess);
 
     return (
-        <>
-            <FormProvider {...methods}>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                    <Widget noBorder busy={isBusy}>
-                        <div className="space-y-4">
-                            <Controller
-                                name="name"
-                                control={control}
-                                rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
-                                render={({ field, fieldState }) => (
-                                    <TextInput
-                                        {...field}
-                                        id="name"
-                                        type="text"
-                                        label="Name"
-                                        required
-                                        disabled={editMode}
-                                        invalid={fieldState.error && fieldState.isTouched}
-                                        error={getFieldErrorMessage(fieldState)}
-                                    />
-                                )}
-                            />
-
-                            <Controller
-                                name="label"
-                                control={control}
-                                rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
-                                render={({ field, fieldState }) => (
-                                    <TextInput
-                                        {...field}
-                                        id="label"
-                                        type="text"
-                                        label="Label"
-                                        required
-                                        invalid={fieldState.error && fieldState.isTouched}
-                                        error={getFieldErrorMessage(fieldState)}
-                                    />
-                                )}
-                            />
-
-                            <Controller
-                                name="description"
-                                control={control}
-                                rules={buildValidationRules([validateLength(0, 300)])}
-                                render={({ field, fieldState }) => (
-                                    <TextInput
-                                        {...field}
-                                        id="description"
-                                        label="Description"
-                                        invalid={fieldState.error && fieldState.isTouched}
-                                        error={getFieldErrorMessage(fieldState)}
-                                    />
-                                )}
-                            />
-
-                            <Controller
-                                name="group"
-                                control={control}
-                                rules={buildValidationRules([validateAlphaNumericWithSpecialChars()])}
-                                render={({ field, fieldState }) => (
-                                    <TextInput
-                                        {...field}
-                                        id="group"
-                                        type="text"
-                                        label="Group"
-                                        invalid={fieldState.error && fieldState.isTouched}
-                                        error={getFieldErrorMessage(fieldState)}
-                                    />
-                                )}
-                            />
-
-                            <Controller
-                                name="resources"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        id="resourcesSelect"
-                                        label="Resources"
-                                        isMulti
-                                        value={field.value || []}
-                                        onChange={(value) => {
-                                            field.onChange(value);
-                                        }}
-                                        options={resources.map((r) => ({ label: getEnumLabel(resourceEnum, r), value: r }))}
-                                        placeholder="Resources"
-                                        isClearable
-                                    />
-                                )}
-                            />
-
-                            <Widget title="Properties" noBorder>
-                                <Container className="flex-row items-center" gap={4}>
-                                    <Controller
-                                        name="required"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Checkbox
-                                                id="required"
-                                                checked={field.value ?? false}
-                                                onChange={field.onChange}
-                                                label="Required"
-                                            />
-                                        )}
-                                    />
-                                    <div className="h-6 w-[1px] bg-gray-200" />
-                                    <Controller
-                                        name="readOnly"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Checkbox
-                                                id="readOnly"
-                                                checked={field.value ?? false}
-                                                onChange={field.onChange}
-                                                label="Read Only"
-                                            />
-                                        )}
-                                    />
-                                    <div className="h-6 w-[1px] bg-gray-200" />
-                                    <Controller
-                                        name="list"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Checkbox
-                                                id="list"
-                                                checked={field.value ?? false}
-                                                onChange={(checked) => {
-                                                    field.onChange(checked);
-                                                    if (!checked) {
-                                                        setValue('multiSelect', false);
-                                                        setValue('extensibleList', false);
-                                                    }
-                                                }}
-                                                label="List"
-                                            />
-                                        )}
-                                    />
-
-                                    {watchedList && (
-                                        <>
-                                            <Controller
-                                                name="multiSelect"
-                                                control={control}
-                                                render={({ field }) => (
-                                                    <Checkbox
-                                                        id="multiSelect"
-                                                        checked={field.value ?? false}
-                                                        onChange={field.onChange}
-                                                        label="Multi Select"
-                                                        disabled={!watchedList}
-                                                    />
-                                                )}
-                                            />
-                                            <Controller
-                                                name="extensibleList"
-                                                control={control}
-                                                render={({ field }) => (
-                                                    <Checkbox
-                                                        id="extensibleList"
-                                                        checked={field.value ?? false}
-                                                        onChange={field.onChange}
-                                                        label="Extensible List"
-                                                        disabled={!watchedList}
-                                                    />
-                                                )}
-                                            />
-                                        </>
-                                    )}
-                                </Container>
-                            </Widget>
-
-                            <Controller
-                                name="protectionLevel"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        id="protectionLevel"
-                                        label="Protection Level"
-                                        value={field.value ?? ''}
-                                        onChange={(value) => field.onChange(value || undefined)}
-                                        options={Object.values(ProtectionLevel).map((v: ProtectionLevel) => ({
-                                            label: getEnumLabel(protectionLevelEnum, v),
-                                            value: v,
-                                        }))}
-                                        placeholder="None"
-                                        isClearable
-                                    />
-                                )}
-                            />
-
-                            <DynamicContent editable={!editMode} isList={!!watchedList} />
-
-                            <Container className="flex-row justify-end modal-footer" gap={4}>
-                                <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
-                                    Cancel
-                                </Button>
-                                <ProgressButton
-                                    title={editMode ? 'Update' : 'Create'}
-                                    inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
-                                    inProgress={isSubmitting}
-                                    disabled={isSubmitting || !isValid || areDefaultValuesSame(formValues as FormValues)}
-                                    type="submit"
+        <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <Widget noBorder busy={isBusy}>
+                    <div className="space-y-4">
+                        <Controller
+                            name="name"
+                            control={control}
+                            rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="name"
+                                    type="text"
+                                    label="Name"
+                                    required
+                                    disabled={editMode}
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={getFieldErrorMessage(fieldState)}
                                 />
+                            )}
+                        />
+
+                        <Controller
+                            name="label"
+                            control={control}
+                            rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="label"
+                                    type="text"
+                                    label="Label"
+                                    required
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={getFieldErrorMessage(fieldState)}
+                                />
+                            )}
+                        />
+
+                        <Controller
+                            name="description"
+                            control={control}
+                            rules={buildValidationRules([validateLength(0, 300)])}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="description"
+                                    label="Description"
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={getFieldErrorMessage(fieldState)}
+                                />
+                            )}
+                        />
+
+                        <Controller
+                            name="group"
+                            control={control}
+                            rules={buildValidationRules([validateAlphaNumericWithSpecialChars()])}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="group"
+                                    type="text"
+                                    label="Group"
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={getFieldErrorMessage(fieldState)}
+                                />
+                            )}
+                        />
+
+                        <Controller
+                            name="resources"
+                            control={control}
+                            render={({ field }) => (
+                                <Select
+                                    id="resourcesSelect"
+                                    label="Resources"
+                                    isMulti
+                                    value={field.value || []}
+                                    onChange={(value) => {
+                                        field.onChange(value);
+                                    }}
+                                    options={resources.map((r) => ({ label: getEnumLabel(resourceEnum, r), value: r }))}
+                                    placeholder="Resources"
+                                    isClearable
+                                />
+                            )}
+                        />
+
+                        <Widget title="Properties" noBorder>
+                            <Container className="flex-row items-center" gap={4}>
+                                <Controller
+                                    name="required"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Checkbox id="required" checked={field.value ?? false} onChange={field.onChange} label="Required" />
+                                    )}
+                                />
+                                <div className="h-6 w-[1px] bg-gray-200" />
+                                <Controller
+                                    name="readOnly"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Checkbox
+                                            id="readOnly"
+                                            checked={field.value ?? false}
+                                            onChange={field.onChange}
+                                            label="Read Only"
+                                        />
+                                    )}
+                                />
+                                <div className="h-6 w-[1px] bg-gray-200" />
+                                <Controller
+                                    name="list"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Checkbox
+                                            id="list"
+                                            checked={field.value ?? false}
+                                            onChange={(checked) => {
+                                                field.onChange(checked);
+                                                if (!checked) {
+                                                    setValue('multiSelect', false);
+                                                    setValue('extensibleList', false);
+                                                }
+                                            }}
+                                            label="List"
+                                        />
+                                    )}
+                                />
+
+                                {watchedList && (
+                                    <>
+                                        <Controller
+                                            name="multiSelect"
+                                            control={control}
+                                            render={({ field }) => (
+                                                <Checkbox
+                                                    id="multiSelect"
+                                                    checked={field.value ?? false}
+                                                    onChange={field.onChange}
+                                                    label="Multi Select"
+                                                    disabled={!watchedList}
+                                                />
+                                            )}
+                                        />
+                                        <Controller
+                                            name="extensibleList"
+                                            control={control}
+                                            render={({ field }) => (
+                                                <Checkbox
+                                                    id="extensibleList"
+                                                    checked={field.value ?? false}
+                                                    onChange={field.onChange}
+                                                    label="Extensible List"
+                                                    disabled={!watchedList}
+                                                />
+                                            )}
+                                        />
+                                    </>
+                                )}
                             </Container>
-                        </div>
-                    </Widget>
-                </form>
-            </FormProvider>
-        </>
+                        </Widget>
+
+                        <Controller
+                            name="protectionLevel"
+                            control={control}
+                            render={({ field }) => (
+                                <Select
+                                    id="protectionLevel"
+                                    label="Protection Level"
+                                    value={field.value ?? ''}
+                                    onChange={(value) => field.onChange(value || undefined)}
+                                    options={Object.values(ProtectionLevel).map((v: ProtectionLevel) => ({
+                                        label: getEnumLabel(protectionLevelEnum, v),
+                                        value: v,
+                                    }))}
+                                    placeholder="None"
+                                    isClearable
+                                />
+                            )}
+                        />
+
+                        <DynamicContent editable={!editMode} isList={!!watchedList} />
+
+                        <Container className="flex-row justify-end modal-footer" gap={4}>
+                            <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
+                                Cancel
+                            </Button>
+                            <ProgressButton
+                                title={editMode ? 'Update' : 'Create'}
+                                inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
+                                inProgress={isSubmitting}
+                                disabled={isSubmitting || !isValid || areDefaultValuesSame(formValues as FormValues)}
+                                type="submit"
+                            />
+                        </Container>
+                    </div>
+                </Widget>
+            </form>
+        </FormProvider>
     );
 }

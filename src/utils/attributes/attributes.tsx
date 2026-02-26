@@ -236,12 +236,14 @@ export function collectFormAttributes(
                 const existing = existingAttributes?.find((a) => a.name === attributeName);
                 const existingVersion = (existing as { version?: AttributeVersion })?.version;
                 const descriptorVersion = (descriptor as unknown as { version?: AttributeVersion }).version;
-                const version: AttributeVersion =
-                    existingVersion === AttributeVersion.V3 || existingVersion === AttributeVersion.V2
-                        ? existingVersion
-                        : descriptorVersion === AttributeVersion.V3
-                          ? AttributeVersion.V3
-                          : AttributeVersion.V2;
+                let version: AttributeVersion;
+                if (existingVersion === AttributeVersion.V3 || existingVersion === AttributeVersion.V2) {
+                    version = existingVersion;
+                } else if (descriptorVersion === AttributeVersion.V3) {
+                    version = AttributeVersion.V3;
+                } else {
+                    version = AttributeVersion.V2;
+                }
 
                 if (version === AttributeVersion.V3) {
                     const finalContent = contentArray.map((item: { data: unknown }) => ({

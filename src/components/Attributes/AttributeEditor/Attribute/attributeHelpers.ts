@@ -11,9 +11,9 @@ export function parseListValueByContentType(
     if (str === '') return undefined;
     switch (contentType) {
         case AttributeContentType.Integer:
-            return parseInt(str, 10);
+            return Number.parseInt(str, 10);
         case AttributeContentType.Float:
-            return parseFloat(str);
+            return Number.parseFloat(str);
         case AttributeContentType.Boolean:
             return str === 'true' || str === '1';
         case AttributeContentType.String:

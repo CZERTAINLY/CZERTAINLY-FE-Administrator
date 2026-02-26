@@ -6,6 +6,7 @@ import {
     getFormTypeFromAttributeContentType,
     buildAttributeValidators,
     getUpdatedOptionsForEditSelect,
+    parseListValueByContentType,
 } from './attributeHelpers';
 import AttributeHelpersCoverageRunner from './AttributeHelpersCoverageRunner';
 import { AttributeContentType, AttributeConstraintType } from 'types/openapi';
@@ -227,6 +228,41 @@ test.describe('attributeHelpers', () => {
             const result = getUpdatedOptionsForEditSelect([{ label: 'A', value: { id: 1 } }], opts);
             expect(result).toHaveLength(1);
             expect(result![0].label).toBe('B');
+        });
+    });
+
+    test.describe('parseListValueByContentType', () => {
+        test('returns undefined for empty-like values', () => {
+            expect(parseListValueByContentType(AttributeContentType.String, '')).toBeUndefined();
+            expect(parseListValueByContentType(AttributeContentType.String, undefined)).toBeUndefined();
+            expect(parseListValueByContentType(AttributeContentType.String, null as unknown as string)).toBeUndefined();
+        });
+
+        test('Integer parses string and option objects', () => {
+            expect(parseListValueByContentType(AttributeContentType.Integer, '42')).toBe(42);
+            expect(
+                parseListValueByContentType(AttributeContentType.Integer, {
+                    value: 7,
+                    label: 'Seven',
+                }),
+            ).toBe(7);
+        });
+
+        test('Float parses string', () => {
+            expect(parseListValueByContentType(AttributeContentType.Float, '3.14')).toBeCloseTo(3.14);
+        });
+
+        test('Boolean parses common true/false strings', () => {
+            expect(parseListValueByContentType(AttributeContentType.Boolean, 'true')).toBe(true);
+            expect(parseListValueByContentType(AttributeContentType.Boolean, '1')).toBe(true);
+            expect(parseListValueByContentType(AttributeContentType.Boolean, 'false')).toBe(false);
+            expect(parseListValueByContentType(AttributeContentType.Boolean, '0')).toBe(false);
+        });
+
+        test('String/Text/Date variants return trimmed string', () => {
+            expect(parseListValueByContentType(AttributeContentType.String, ' hello ')).toBe('hello');
+            expect(parseListValueByContentType(AttributeContentType.Text, ' body ')).toBe('body');
+            expect(parseListValueByContentType(AttributeContentType.Date, '2024-01-01')).toBe('2024-01-01');
         });
     });
 

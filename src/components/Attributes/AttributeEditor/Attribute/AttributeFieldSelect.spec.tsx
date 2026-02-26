@@ -2,7 +2,7 @@ import React from 'react';
 import { test, expect } from '../../../../../playwright/ct-test';
 import { AttributeFieldSelectTestWrapper } from './AttributeFieldSelectTestWrapper';
 import type { DataAttributeModel } from 'types/attributes';
-import { AttributeContentType } from 'types/openapi';
+import { AttributeContentType, AttributeType } from 'types/openapi';
 
 const defaultProperties = {
     label: 'Test Select',
@@ -11,16 +11,17 @@ const defaultProperties = {
     visible: true,
     list: false,
     multiSelect: false,
+    extensibleList: false,
 };
 
 function minimalDescriptor(overrides: Partial<DataAttributeModel> = {}): DataAttributeModel {
     return {
-        type: 'Data',
+        type: AttributeType.Data,
         name: 'testSelect',
         contentType: AttributeContentType.String,
-        properties: defaultProperties,
+        properties: defaultProperties as any,
         ...overrides,
-    };
+    } as DataAttributeModel;
 }
 
 test.describe('AttributeFieldSelect', () => {
@@ -160,5 +161,23 @@ test.describe('AttributeFieldSelect', () => {
         await page.getByTestId('select-testSelectSelect').click();
         await expect(page.locator('.hs-select-option-row', { hasText: 'Option A' })).toBeVisible();
         await expect(page.locator('.hs-select-option-row', { hasText: '+' })).toBeVisible();
+    });
+
+    test('extensible list adds extra option for current value not in options', async ({ mount, page }) => {
+        const descriptor = minimalDescriptor({
+            properties: { ...defaultProperties, list: true, extensibleList: true, label: 'Extensible' },
+        } as any);
+        await mount(
+            <AttributeFieldSelectTestWrapper
+                name="testSelect"
+                descriptor={descriptor}
+                options={[{ label: 'Known', value: 'known' }]}
+                defaultValues={{ testSelect: 'extra' }}
+            />,
+        );
+
+        await page.getByTestId('select-testSelectSelect').click();
+        await expect(page.locator('.hs-select-option-row', { hasText: 'Known' })).toBeVisible();
+        await expect(page.locator('.hs-select-option-row', { hasText: 'extra' })).toBeVisible();
     });
 });

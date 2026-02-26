@@ -5,6 +5,7 @@ import {
     getFormTypeFromAttributeContentType,
     buildAttributeValidators,
     getUpdatedOptionsForEditSelect,
+    parseListValueByContentType,
 } from './attributeHelpers';
 import { AttributeContentType, AttributeConstraintType } from 'types/openapi';
 
@@ -71,6 +72,16 @@ export default function AttributeHelpersCoverageRunner() {
             ],
         );
         getUpdatedOptionsForEditSelect([], undefined);
+
+        // Exercise parseListValueByContentType for coverage
+        parseListValueByContentType(AttributeContentType.Integer, '42');
+        parseListValueByContentType(AttributeContentType.Integer, { value: 42, label: 'forty-two' });
+        parseListValueByContentType(AttributeContentType.Float, '3.14');
+        parseListValueByContentType(AttributeContentType.Boolean, 'true');
+        parseListValueByContentType(AttributeContentType.Boolean, '0');
+        parseListValueByContentType(AttributeContentType.String, ' hello ');
+        parseListValueByContentType(AttributeContentType.Text, '');
+        parseListValueByContentType(AttributeContentType.String, undefined);
     }, []);
 
     return <div data-testid="attribute-helpers-coverage-done" />;

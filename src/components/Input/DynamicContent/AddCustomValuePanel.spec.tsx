@@ -134,7 +134,7 @@ test.describe('AddCustomValuePanel', () => {
                 readOnly={false}
                 fieldValue={undefined}
                 onFieldChange={() => {}}
-                parseValue={(raw) => (typeof raw === 'string' ? parseInt(raw, 10) : raw)}
+                parseValue={(raw) => (typeof raw === 'string' ? Number.parseInt(raw, 10) : raw)}
             />,
         );
         const input = page.getByRole('textbox');
