@@ -47,7 +47,14 @@ export function AddCustomValuePanel({
         if (!isValid) return;
         const parsed = parseValue(val);
         if (multiSelect) {
-            const current = Array.isArray(fieldValue) ? fieldValue : fieldValue != null ? [fieldValue] : [];
+            let current: any[];
+            if (Array.isArray(fieldValue)) {
+                current = fieldValue;
+            } else if (fieldValue != null) {
+                current = [fieldValue];
+            } else {
+                current = [];
+            }
             onFieldChange([...current, parsed]);
         } else {
             onFieldChange(parsed);

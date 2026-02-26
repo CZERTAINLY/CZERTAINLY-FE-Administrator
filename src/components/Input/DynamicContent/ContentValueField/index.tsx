@@ -32,9 +32,96 @@ type ValueFieldInputProps = {
     options: { label: string; value: string }[];
 };
 
-function ValueFieldInput({ descriptor, id, field, fieldState, fieldStepValue, options }: ValueFieldInputProps) {
-    const [showAddCustom, setShowAddCustom] = useState(false);
+function normalizeDateValue(value: string | undefined): string | undefined {
+    if (!value) return undefined;
+    return value.includes('T') ? value : value.replace(' ', 'T');
+}
 
+function ListValueField({ descriptor, field, options, inputClassName }: ValueFieldInputProps & { inputClassName: string }) {
+    const [showAddCustom, setShowAddCustom] = useState(false);
+    const isExtensible = descriptor.properties.extensibleList === true;
+    const multiSelect = descriptor.properties.multiSelect;
+
+    const handleListChange = (v: any) => {
+        if (multiSelect) {
+            const arr = Array.isArray(v) ? v : [];
+            const parsed = arr
+                .map((item) => parseListValueByContentType(descriptor.contentType, item?.value ?? item))
+                .filter((x) => x !== undefined);
+            field.onChange(parsed.length > 0 ? parsed : undefined);
+        } else {
+            const parsed = parseListValueByContentType(descriptor.contentType, v);
+            field.onChange(parsed ?? '');
+        }
+    };
+
+    const listValue =
+        multiSelect && Array.isArray(field.value)
+            ? field.value.map((v: string | number | boolean) => ({ value: v, label: String(v) }))
+            : field.value;
+
+    const currentValues = multiSelect
+        ? Array.isArray(field.value)
+            ? field.value
+            : []
+        : field.value != null && field.value !== ''
+          ? [field.value]
+          : [];
+    const seen = new Set(options.map((o: { value: string }) => String(o.value)));
+    const extra = currentValues
+        .filter((v: string | number | boolean) => !seen.has(String(v)))
+        .map((v: string | number | boolean) => ({ label: String(v), value: v }));
+    const extendedOptions = [...options, ...extra];
+    const { value: _omitValue, ...selectFieldProps } = field;
+
+    return (
+        <div className="flex flex-col gap-2 w-full">
+            <Container className="flex-row" gap={2}>
+                <div className="grow">
+                    <Select
+                        {...({
+                            ...selectFieldProps,
+                            value: listValue,
+                            onChange: handleListChange,
+                            id: descriptor.name,
+                            options: extendedOptions,
+                            isMulti: multiSelect,
+                            disabled: descriptor.properties.readOnly || showAddCustom,
+                            isClearable: !descriptor.properties.required,
+                            dropdownScope: 'window',
+                        } as React.ComponentProps<typeof Select>)}
+                    />
+                </div>
+                {isExtensible && !descriptor.properties.readOnly && (
+                    <Button
+                        type="button"
+                        variant="transparent"
+                        className="text-blue-600"
+                        onClick={() => setShowAddCustom(true)}
+                        data-testid={`${descriptor.name}-add-custom`}
+                        disabled={showAddCustom}
+                    >
+                        <Plus size={14} className="mr-1" />
+                        Add custom
+                    </Button>
+                )}
+            </Container>
+            <AddCustomValuePanel
+                open={showAddCustom}
+                onClose={() => setShowAddCustom(false)}
+                idPrefix={descriptor.name}
+                contentType={descriptor.contentType}
+                multiSelect={multiSelect}
+                readOnly={descriptor.properties.readOnly}
+                fieldValue={field.value}
+                onFieldChange={field.onChange}
+                inputClassName={inputClassName}
+            />
+        </div>
+    );
+}
+
+function ValueFieldInput({ descriptor, id, field, fieldState, fieldStepValue, options }: ValueFieldInputProps) {
     const inputType = ContentFieldConfiguration[descriptor.contentType].type;
     const displayValue = descriptor.contentType === AttributeContentType.Datetime ? getFormattedDateTime(field.value) : field.value;
     const error = getValueFieldError(fieldState);
@@ -45,96 +132,23 @@ function ValueFieldInput({ descriptor, id, field, fieldState, fieldStepValue, op
     );
 
     if (descriptor.properties.list) {
-        const isExtensible = descriptor.properties.extensibleList === true;
-
-        const handleListChange = (v: any) => {
-            if (descriptor.properties.multiSelect) {
-                const arr = Array.isArray(v) ? v : [];
-                const parsed = arr
-                    .map((item) => parseListValueByContentType(descriptor.contentType, item?.value ?? item))
-                    .filter((x) => x !== undefined);
-                field.onChange(parsed.length > 0 ? parsed : undefined);
-            } else {
-                const parsed = parseListValueByContentType(descriptor.contentType, v);
-                field.onChange(parsed ?? '');
-            }
-        };
-
-        let listValue: { value: string | number | boolean; label: string }[] | string | number | boolean;
-        if (descriptor.properties.multiSelect && Array.isArray(field.value)) {
-            listValue = field.value.map((v: string | number | boolean) => ({ value: v, label: String(v) }));
-        } else {
-            listValue = field.value;
-        }
-
-        const base = options;
-        let currentValues: (string | number | boolean)[];
-        if (descriptor.properties.multiSelect) {
-            currentValues = Array.isArray(field.value) ? field.value : [];
-        } else {
-            currentValues = field.value != null && field.value !== '' ? [field.value] : [];
-        }
-        const seen = new Set(base.map((o: { value: string }) => String(o.value)));
-        const extra = currentValues
-            .filter((v: string | number | boolean) => !seen.has(String(v)))
-            .map((v: string | number | boolean) => ({ label: String(v), value: v }));
-        const extendedOptions = [...base, ...extra];
-
         return (
-            <div className="flex flex-col gap-2 w-full">
-                <Container className="flex-row" gap={2}>
-                    <div className="grow">
-                        <Select
-                            {...field}
-                            value={listValue}
-                            onChange={handleListChange}
-                            id={descriptor.name}
-                            options={extendedOptions as { label: string; value: string | number | object }[]}
-                            isMulti={descriptor.properties.multiSelect}
-                            disabled={descriptor.properties.readOnly || showAddCustom}
-                            isClearable={!descriptor.properties.required}
-                            dropdownScope="window"
-                        />
-                    </div>
-                    {isExtensible && !descriptor.properties.readOnly && (
-                        <Button
-                            type="button"
-                            variant="transparent"
-                            className="text-blue-600"
-                            onClick={() => setShowAddCustom(true)}
-                            data-testid={`${descriptor.name}-add-custom`}
-                            disabled={showAddCustom}
-                        >
-                            <Plus size={14} className="mr-1" />
-                            Add custom
-                        </Button>
-                    )}
-                </Container>
-                <AddCustomValuePanel
-                    open={showAddCustom}
-                    onClose={() => setShowAddCustom(false)}
-                    idPrefix={descriptor.name}
-                    contentType={descriptor.contentType}
-                    multiSelect={descriptor.properties.multiSelect}
-                    readOnly={descriptor.properties.readOnly}
-                    fieldValue={field.value}
-                    onFieldChange={field.onChange}
-                    inputClassName={inputClassName}
-                />
-            </div>
+            <ListValueField
+                descriptor={descriptor}
+                id={id}
+                field={field}
+                fieldState={fieldState}
+                fieldStepValue={fieldStepValue}
+                options={options}
+                inputClassName={inputClassName}
+            />
         );
     }
     if (inputType === 'datetime-local') {
-        let dateValue: string | undefined;
-        if (field.value) {
-            dateValue = field.value.includes('T') ? field.value : field.value.replace(' ', 'T');
-        } else {
-            dateValue = undefined;
-        }
         return (
             <DatePicker
                 id={descriptor.name}
-                value={dateValue}
+                value={normalizeDateValue(field.value)}
                 onChange={(value) => field.onChange(value)}
                 onBlur={field.onBlur}
                 disabled={descriptor.properties.readOnly}
