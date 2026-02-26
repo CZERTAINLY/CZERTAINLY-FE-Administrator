@@ -1,5 +1,30 @@
 import type { CustomAttributeModel, DataAttributeModel } from 'types/attributes';
 import { AttributeConstraintType, AttributeContentType, RangeAttributeConstraintData } from 'types/openapi';
+
+export function parseListValueByContentType(
+    contentType: AttributeContentType,
+    raw: string | number | boolean | { value: string | number; label: string } | undefined,
+): string | number | boolean | undefined {
+    if (raw === undefined || raw === null || raw === '') return undefined;
+    const val = typeof raw === 'object' && raw !== null && 'value' in raw ? raw.value : raw;
+    const str = String(val).trim();
+    if (str === '') return undefined;
+    switch (contentType) {
+        case AttributeContentType.Integer:
+            return parseInt(str, 10);
+        case AttributeContentType.Float:
+            return parseFloat(str);
+        case AttributeContentType.Boolean:
+            return str === 'true' || str === '1';
+        case AttributeContentType.String:
+        case AttributeContentType.Text:
+        case AttributeContentType.Date:
+        case AttributeContentType.Time:
+        case AttributeContentType.Datetime:
+        default:
+            return str;
+    }
+}
 import { isCustomAttributeModel, isDataAttributeModel } from 'types/attributes';
 import type { RegexpAttributeConstraintModel } from 'types/attributes';
 import { getFormattedDateTime } from 'utils/dateUtil';

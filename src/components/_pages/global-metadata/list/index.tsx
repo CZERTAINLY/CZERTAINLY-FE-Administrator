@@ -77,7 +77,13 @@ export default function GlobalMetadataList() {
                 content: 'Name',
                 sortable: true,
                 sort: 'asc',
-                width: '40%',
+                width: '35%',
+            },
+            {
+                id: 'version',
+                content: 'Version',
+                sortable: true,
+                width: '5%',
             },
             {
                 id: 'contentType',
@@ -101,6 +107,7 @@ export default function GlobalMetadataList() {
                 id: metadata.uuid,
                 columns: [
                     <Link to={`./detail/${metadata.uuid}`}>{metadata.name}</Link>,
+                    metadata.version || '',
                     getEnumLabel(attributeContentTypeEnum, metadata.contentType),
                     metadata.description,
                 ],

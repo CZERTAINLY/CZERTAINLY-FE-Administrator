@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { getStepValue } from 'utils/common-utils';
 import { getFormattedDateTime } from 'utils/dateUtil';
@@ -13,6 +13,10 @@ import DatePicker from 'components/DatePicker';
 import Container from 'components/Container';
 import cn from 'classnames';
 import Switch from 'components/Switch';
+import Button from 'components/Button';
+import { Plus } from 'lucide-react';
+import { AddCustomValuePanel } from '../AddCustomValuePanel';
+import { parseListValueByContentType } from 'components/Attributes/AttributeEditor/Attribute/attributeHelpers';
 
 function getValueFieldError(fieldState: { error?: { message?: string }; isTouched: boolean; invalid: boolean }) {
     if (!fieldState.isTouched || !fieldState.invalid) return undefined;
@@ -34,6 +38,8 @@ function ValueFieldInput({
     fieldStepValue: number | undefined;
     options: { label: string; value: string }[];
 }) {
+    const [showAddCustom, setShowAddCustom] = useState(false);
+
     const inputType = ContentFieldConfiguration[descriptor.contentType].type;
     const displayValue = descriptor.contentType === AttributeContentType.Datetime ? getFormattedDateTime(field.value) : field.value;
     const error = getValueFieldError(fieldState);
@@ -44,16 +50,84 @@ function ValueFieldInput({
     );
 
     if (descriptor.properties.list) {
+        const isExtensible = true || descriptor.properties.extensibleList === true;
+
+        const handleListChange = (v: any) => {
+            if (descriptor.properties.multiSelect) {
+                const arr = Array.isArray(v) ? v : [];
+                const parsed = arr
+                    .map((item) => parseListValueByContentType(descriptor.contentType, item?.value ?? item))
+                    .filter((x) => x !== undefined);
+                field.onChange(parsed.length > 0 ? parsed : undefined);
+            } else {
+                const parsed = parseListValueByContentType(descriptor.contentType, v);
+                field.onChange(parsed !== undefined ? parsed : '');
+            }
+        };
+
+        const listValue =
+            descriptor.properties.multiSelect && Array.isArray(field.value)
+                ? field.value.map((v: string | number | boolean) => ({ value: v, label: String(v) }))
+                : field.value;
+
+        const base = options;
+        const currentValues = descriptor.properties.multiSelect
+            ? Array.isArray(field.value)
+                ? field.value
+                : []
+            : field.value != null && field.value !== ''
+              ? [field.value]
+              : [];
+        const seen = new Set(base.map((o: { value: string }) => String(o.value)));
+        const extra = currentValues
+            .filter((v: string | number | boolean) => !seen.has(String(v)))
+            .map((v: string | number | boolean) => ({ label: String(v), value: v }));
+        const extendedOptions = [...base, ...extra];
+
         return (
-            <Select
-                {...field}
-                id={descriptor.name}
-                options={options}
-                isMulti={descriptor.properties.multiSelect}
-                disabled={descriptor.properties.readOnly}
-                isClearable={!descriptor.properties.required}
-                dropdownScope="window"
-            />
+            <div className="flex flex-col gap-2 w-full">
+                <Container className="flex-row" gap={2}>
+                    <div className="grow">
+                        <Select
+                            {...field}
+                            value={listValue}
+                            onChange={handleListChange}
+                            id={descriptor.name}
+                            options={extendedOptions as { label: string; value: string | number | object }[]}
+                            isMulti={descriptor.properties.multiSelect}
+                            disabled={descriptor.properties.readOnly || showAddCustom}
+                            isClearable={!descriptor.properties.required}
+                            dropdownScope="window"
+                        />
+                    </div>
+                    {isExtensible && !descriptor.properties.readOnly && (
+                        <>
+                            <Button
+                                type="button"
+                                variant="transparent"
+                                className="text-blue-600"
+                                onClick={() => setShowAddCustom(true)}
+                                data-testid={`${descriptor.name}-add-custom`}
+                                disabled={showAddCustom}
+                            >
+                                <Plus size={14} className="mr-1" />
+                                Add custom
+                            </Button>
+                        </>
+                    )}
+                </Container>
+                <AddCustomValuePanel
+                    open={showAddCustom}
+                    onClose={() => setShowAddCustom(false)}
+                    idPrefix={descriptor.name}
+                    contentType={descriptor.contentType}
+                    multiSelect={descriptor.properties.multiSelect}
+                    readOnly={descriptor.properties.readOnly}
+                    fieldValue={field.value}
+                    onFieldChange={field.onChange}
+                    inputClassName={inputClassName}
+                />
+            </div>
         );
     }
     if (inputType === 'datetime-local') {
@@ -221,13 +295,14 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
             return undefined;
         }
         if (descriptor.properties.list) {
+            const dataFrom = (v: any) => (v != null && typeof v === 'object' && 'value' in v ? v.value : v);
             if (descriptor.properties.multiSelect) {
-                return input.value.map((v: any) => transformObjectContent(descriptor.contentType, { data: v.value }));
+                return (input.value || []).map((v: any) => transformObjectContent(descriptor.contentType, { data: dataFrom(v) }));
             } else {
                 if (Array.isArray(input.value)) {
-                    return input.value.map((v: any) => transformObjectContent(descriptor.contentType, { data: v.value }));
+                    return input.value.map((v: any) => transformObjectContent(descriptor.contentType, { data: dataFrom(v) }));
                 } else {
-                    return [transformObjectContent(descriptor.contentType, { data: input.value })];
+                    return [transformObjectContent(descriptor.contentType, { data: dataFrom(input.value) })];
                 }
             }
         }

@@ -155,7 +155,9 @@ export function Attribute({
                     options={options}
                     busy={busy}
                     deleteButton={deleteButton}
-                    addNewAttributeValue={addNewAttributeValue ? { label: '+', value: '__add_new__' } : undefined}
+                    addNewAttributeValue={
+                        descriptor.properties.extensibleList && addNewAttributeValue ? { label: '+', value: '__add_new__' } : undefined
+                    }
                     onSelectChangeMulti={handleSelectChangeMulti}
                     onSelectChangeSingle={handleSelectChangeSingle}
                 />

@@ -75,6 +75,10 @@ export default function GlobalMetadataDetail() {
                           columns: ['UUID', globalMetadata.uuid],
                       },
                       {
+                          id: 'version',
+                          columns: ['Version', globalMetadata.version || ''],
+                      },
+                      {
                           id: 'name',
                           columns: ['Name', globalMetadata.name],
                       },

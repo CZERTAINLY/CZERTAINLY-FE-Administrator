@@ -118,6 +118,12 @@ export default function AttributeViewer({
                     width: '20%',
                 },
                 {
+                    id: 'version',
+                    content: 'Ver',
+                    sortable: true,
+                    width: '5%',
+                },
+                {
                     id: 'contentType',
                     content: 'Content Type',
                     sortable: true,
@@ -205,32 +211,51 @@ export default function AttributeViewer({
     );
 
     const getAttributesTableData = useCallback(
-        (attribute: AttributeResponseModel | MetadataItemModel, resource?: Resource): TableDataRow => ({
-            id: attribute.uuid || attribute.name,
-            columns: [
-                attribute.label || attribute.name || '',
-                getEnumLabel(contentTypeEnum, attribute.contentType),
-                <>
-                    {getContent(attribute.contentType, attribute.content)}
-                    {resource && renderSourceObjectsButton(attribute, resource)}
-                </>,
-                <WidgetButtons
-                    key="copy"
-                    buttons={[
-                        {
-                            id: 'copy',
-                            icon: 'copy',
-                            disabled: AttributeContentType.Secret === attribute.contentType,
-                            onClick: () => {
-                                onCopyContentClick(attribute);
+        (attribute: AttributeResponseModel | MetadataItemModel, resource?: Resource): TableDataRow => {
+            const renderContentCell = () => {
+                if (attribute.contentType === AttributeContentType.Resource && attribute.content?.[0]) {
+                    const first = attribute.content[0] as any;
+                    const data = first?.data as { uuid?: string; name?: string; resource?: Resource } | undefined;
+                    if (data?.uuid && data.resource) {
+                        return (
+                            <Link onClick={() => dispatch(userInterfaceActions.resetState())} to={`/${data.resource}/detail/${data.uuid}`}>
+                                {data.name || data.uuid}
+                            </Link>
+                        );
+                    }
+                }
+
+                return getContent(attribute.contentType, attribute.content);
+            };
+
+            return {
+                id: attribute.uuid || attribute.name,
+                columns: [
+                    attribute.label || attribute.name || '',
+                    attribute.version || '',
+                    getEnumLabel(contentTypeEnum, attribute.contentType) || attribute.contentType,
+                    <>
+                        {renderContentCell()}
+                        {resource && renderSourceObjectsButton(attribute, resource)}
+                    </>,
+                    <WidgetButtons
+                        key="copy"
+                        buttons={[
+                            {
+                                id: 'copy',
+                                icon: 'copy',
+                                disabled: AttributeContentType.Secret === attribute.contentType,
+                                onClick: () => {
+                                    onCopyContentClick(attribute);
+                                },
+                                tooltip: 'Copy to clipboard',
                             },
-                            tooltip: 'Copy to clipboard',
-                        },
-                    ]}
-                />,
-            ],
-        }),
-        [getContent, contentTypeEnum, renderSourceObjectsButton, onCopyContentClick],
+                        ]}
+                    />,
+                ],
+            };
+        },
+        [contentTypeEnum, dispatch, getContent, onCopyContentClick, renderSourceObjectsButton],
     );
 
     const getMetadataTableData = useCallback(
@@ -310,7 +335,8 @@ export default function AttributeViewer({
                         id: a.uuid || '',
                         columns: [
                             a.label || '',
-                            getEnumLabel(contentTypeEnum, a.contentType),
+                            a.version || '',
+                            getEnumLabel(contentTypeEnum, a.contentType) || a.contentType,
                             onSubmit && descriptor && editingAttributesNames.find((n) => n === a.name) ? (
                                 <AttributeEditForm
                                     descriptor={descriptor}

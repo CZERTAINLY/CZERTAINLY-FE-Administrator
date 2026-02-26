@@ -15,7 +15,7 @@ import Container from 'components/Container';
 import Checkbox from 'components/Checkbox';
 import TextInput from 'components/TextInput';
 import { CustomAttributeCreateRequestModel, CustomAttributeUpdateRequestModel } from 'types/customAttributes';
-import { AttributeContentType, PlatformEnum } from 'types/openapi';
+import { AttributeContentType, PlatformEnum, ProtectionLevel } from 'types/openapi';
 import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 
@@ -39,6 +39,7 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
     const isCreating = useSelector(selectors.isCreating);
     const isUpdating = useSelector(selectors.isUpdating);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const protectionLevelEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ProtectionLevel));
 
     const isBusy = useMemo(
         () => isFetchingDetail || isCreating || isUpdating || isFetchingResources,
@@ -47,6 +48,7 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
 
     type FormValues = Omit<CustomAttributeCreateRequestModel, 'resources'> & {
         resources?: Array<{ label: string; value: string }>;
+        extensibleList?: boolean;
     };
     const defaultValuesCreate: FormValues = useMemo(
         () => ({
@@ -62,6 +64,8 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
             readOnly: false,
             resources: [],
             content: undefined,
+            protectionLevel: undefined,
+            extensibleList: false,
         }),
         [],
     );
@@ -90,7 +94,6 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
 
     const formValues = useWatch({ control });
     const watchedList = useWatch({ control, name: 'list' });
-
     const defaultValuesToCompare = useMemo(
         () => (editMode ? defaultValuesUpdate : defaultValuesCreate),
         [editMode, defaultValuesUpdate, defaultValuesCreate],
@@ -196,71 +199,120 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
                                 )}
                             />
 
-                            <div>
-                                <Controller
-                                    name="resources"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Select
-                                            id="resourcesSelect"
-                                            label="Resources"
-                                            isMulti
-                                            value={field.value || []}
-                                            onChange={(value) => {
-                                                field.onChange(value);
-                                            }}
-                                            options={resources.map((r) => ({ label: getEnumLabel(resourceEnum, r), value: r }))}
-                                            placeholder="Resources"
-                                            isClearable
-                                        />
-                                    )}
-                                />
-                            </div>
-
                             <Controller
-                                name="required"
+                                name="resources"
                                 control={control}
                                 render={({ field }) => (
-                                    <Checkbox id="required" checked={field.value ?? false} onChange={field.onChange} label="Required" />
-                                )}
-                            />
-
-                            <Controller
-                                name="readOnly"
-                                control={control}
-                                render={({ field }) => (
-                                    <Checkbox id="readOnly" checked={field.value ?? false} onChange={field.onChange} label="Read Only" />
-                                )}
-                            />
-
-                            <Controller
-                                name="list"
-                                control={control}
-                                render={({ field }) => (
-                                    <Checkbox
-                                        id="list"
-                                        checked={field.value ?? false}
-                                        onChange={(checked) => {
-                                            field.onChange(checked);
-                                            if (!checked) {
-                                                setValue('multiSelect', false);
-                                            }
+                                    <Select
+                                        id="resourcesSelect"
+                                        label="Resources"
+                                        isMulti
+                                        value={field.value || []}
+                                        onChange={(value) => {
+                                            field.onChange(value);
                                         }}
-                                        label="List"
+                                        options={resources.map((r) => ({ label: getEnumLabel(resourceEnum, r), value: r }))}
+                                        placeholder="Resources"
+                                        isClearable
                                     />
                                 )}
                             />
 
+                            <Widget title="Properties" noBorder>
+                                <Container className="flex-row items-center" gap={4}>
+                                    <Controller
+                                        name="required"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Checkbox
+                                                id="required"
+                                                checked={field.value ?? false}
+                                                onChange={field.onChange}
+                                                label="Required"
+                                            />
+                                        )}
+                                    />
+                                    <div className="h-6 w-[1px] bg-gray-200" />
+                                    <Controller
+                                        name="readOnly"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Checkbox
+                                                id="readOnly"
+                                                checked={field.value ?? false}
+                                                onChange={field.onChange}
+                                                label="Read Only"
+                                            />
+                                        )}
+                                    />
+                                    <div className="h-6 w-[1px] bg-gray-200" />
+                                    <Controller
+                                        name="list"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Checkbox
+                                                id="list"
+                                                checked={field.value ?? false}
+                                                onChange={(checked) => {
+                                                    field.onChange(checked);
+                                                    if (!checked) {
+                                                        setValue('multiSelect', false);
+                                                        setValue('extensibleList', false);
+                                                    }
+                                                }}
+                                                label="List"
+                                            />
+                                        )}
+                                    />
+
+                                    {watchedList && (
+                                        <>
+                                            <Controller
+                                                name="multiSelect"
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <Checkbox
+                                                        id="multiSelect"
+                                                        checked={field.value ?? false}
+                                                        onChange={field.onChange}
+                                                        label="Multi Select"
+                                                        disabled={!watchedList}
+                                                    />
+                                                )}
+                                            />
+                                            <Controller
+                                                name="extensibleList"
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <Checkbox
+                                                        id="extensibleList"
+                                                        checked={field.value ?? false}
+                                                        onChange={field.onChange}
+                                                        label="Extensible List"
+                                                        disabled={!watchedList}
+                                                    />
+                                                )}
+                                            />
+                                        </>
+                                    )}
+                                </Container>
+                            </Widget>
+
                             <Controller
-                                name="multiSelect"
+                                name="protectionLevel"
                                 control={control}
                                 render={({ field }) => (
-                                    <Checkbox
-                                        id="multiSelect"
-                                        checked={field.value ?? false}
-                                        onChange={field.onChange}
-                                        label="Multi Select"
-                                        disabled={!watchedList}
+                                    <Select
+                                        id="protectionLevel"
+                                        label="Protection Level"
+                                        value={field.value ?? ''}
+                                        onChange={(value) => field.onChange(value || undefined)}
+                                        options={Object.values(ProtectionLevel).map((v: ProtectionLevel) => ({
+                                            label: getEnumLabel(protectionLevelEnum, v),
+                                            value: v,
+                                        }))}
+                                        placeholder="None"
+                                        isClearable
                                     />
                                 )}
                             />

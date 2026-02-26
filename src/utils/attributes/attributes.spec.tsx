@@ -9,8 +9,7 @@ import {
     testAttributeSetFunction,
     mapProfileAttribute,
 } from './attributes';
-import { AttributeContentType, ProgrammingLanguageEnum } from 'types/openapi';
-import { AttributeType } from 'types/openapi';
+import { AttributeContentType, AttributeType, AttributeVersion, ProgrammingLanguageEnum } from 'types/openapi';
 
 const base64Encode = (s: string) => btoa(unescape(encodeURIComponent(s)));
 
@@ -143,6 +142,43 @@ test.describe('attributes utils', () => {
             expect(result).toHaveLength(1);
             expect(result[0].name).toBe('attr1');
             expect(result[0].content).toEqual([{ data: 'value1' }]);
+            expect(result[0].version).toBe(AttributeVersion.V2);
+        });
+        test('uses V3 content shape with contentType when existing attribute has version V3', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'attr1',
+                    uuid: 'u1',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'A', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { attr1: 'value1' } };
+            const existingAttributes = [{ name: 'attr1', version: AttributeVersion.V3 }] as any[];
+            const result = collectFormAttributes('id1', descriptors, values, existingAttributes);
+            expect(result).toHaveLength(1);
+            expect(result[0].version).toBe(AttributeVersion.V3);
+            expect(result[0].content).toEqual([{ data: 'value1', contentType: AttributeContentType.String }]);
+        });
+        test('uses V3 when descriptor has version V3 and no existing attribute', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'attr1',
+                    uuid: 'u1',
+                    version: AttributeVersion.V3,
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'A', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { attr1: 'value1' } };
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toHaveLength(1);
+            expect(result[0].version).toBe(AttributeVersion.V3);
+            expect(result[0].content).toEqual([{ data: 'value1', contentType: AttributeContentType.String }]);
         });
         test('skips deleted attributes', () => {
             const descriptors = [
