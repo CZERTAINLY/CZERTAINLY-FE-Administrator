@@ -50,6 +50,7 @@ export type IconName =
     | 'pencil'
     | 'history'
     | 'cross-circle'
+    | 'cross'
     | 'upload'
     | 'download'
     | 'group'
@@ -87,6 +88,7 @@ export interface WidgetButtonProps {
     disabled: boolean;
     custom?: React.ReactNode;
     onClick: (event: React.MouseEvent) => void;
+    className?: string;
 }
 
 interface Props {
@@ -106,6 +108,7 @@ const getIcon = (icon: IconName, size: number = 20): React.ReactNode => {
         pencil: EditIcon,
         history: History,
         'cross-circle': XCircle,
+        cross: X,
         upload: Upload,
         download: ArrowDownToLine,
         group: Users,
@@ -155,7 +158,13 @@ function WidgetButtons({ buttons, justify = 'center', className }: Props) {
         return button.custom ? (
             <span key={key}>{button.custom}</span>
         ) : (
-            <Button variant="transparent" data-testid={`${button.id}-button`} title={button.tooltip} {...btnProps}>
+            <Button
+                variant="transparent"
+                className={button.className}
+                data-testid={`${button.id}-button`}
+                title={button.tooltip}
+                {...btnProps}
+            >
                 {getIcon(button.icon)}
                 {toolTip}
             </Button>

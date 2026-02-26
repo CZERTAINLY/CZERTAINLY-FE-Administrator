@@ -4,6 +4,7 @@ import { AttributeContentType } from 'types/openapi';
 import { getStepValue } from 'utils/common-utils';
 import { ContentFieldConfiguration } from './contentFieldConfiguration';
 import { AddCustomValueInput } from './AddCustomValueInput';
+import { Check, X } from 'lucide-react';
 
 type Props = {
     open: boolean;
@@ -73,10 +74,7 @@ export function AddCustomValuePanel({
     const canAdd = isBooleanContentType || isValidNumber || hasNonEmptyString;
 
     return (
-        <div
-            data-testid={`${idPrefix}-add-custom-panel`}
-            className="flex flex-wrap items-center gap-2 p-2 border border-gray-200 rounded-lg mt-2 dark:border-neutral-700"
-        >
+        <div data-testid={`${idPrefix}-add-custom-panel`} className="flex flex-wrap items-center gap-2 mt-2">
             <div className="min-w-[120px] flex-1">
                 <AddCustomValueInput
                     id={`${idPrefix}-custom`}
@@ -90,11 +88,17 @@ export function AddCustomValuePanel({
                 />
             </div>
             <div className="flex gap-1">
-                <Button type="button" variant="outline" onClick={handleCancel}>
-                    Cancel
+                <Button
+                    type="button"
+                    variant="transparent"
+                    onClick={handleAdd}
+                    disabled={!canAdd}
+                    data-testid={`${idPrefix}-add-custom-value`}
+                >
+                    <Check size={16} />
                 </Button>
-                <Button type="button" onClick={handleAdd} disabled={!canAdd} data-testid={`${idPrefix}-add-custom-value`}>
-                    Add
+                <Button type="button" variant="transparent" onClick={handleCancel} data-testid={`${idPrefix}-cancel-custom-value`}>
+                    <X size={16} />
                 </Button>
             </div>
         </div>

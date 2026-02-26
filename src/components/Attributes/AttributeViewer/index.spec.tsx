@@ -130,8 +130,8 @@ test.describe('AttributeViewer', () => {
         );
         await component.getByTestId('edit-button').click();
         await component.locator('form').first().dispatchEvent('submit');
-        await expect(component.getByTestId('save-button')).toBeVisible();
-        await component.getByTestId('save-button').click();
+        await expect(component.getByTestId('save-custom-value')).toBeVisible();
+        await component.getByTestId('save-custom-value').click();
         await expect.poll(() => wasSubmitted).toBeTruthy();
     });
 

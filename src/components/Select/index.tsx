@@ -13,6 +13,7 @@ interface BaseProps {
         value: string | number | object;
         label: string;
         disabled?: boolean;
+        className?: string;
     }[];
     className?: string;
     placeholder?: string;
@@ -267,6 +268,17 @@ function Select({
                 const tooltipContentEl = row.querySelector?.('[data-tooltip-content]');
                 if (titleEl instanceof HTMLElement && tooltipContentEl instanceof HTMLElement && titleEl.textContent) {
                     tooltipContentEl.textContent = titleEl.textContent.trim();
+                }
+                const dataValue = row.getAttribute('data-value');
+                const opt = options?.find((o) => getOptionValueString(o.value) === dataValue);
+                if (opt?.className && row instanceof HTMLElement) {
+                    const classes = opt.className.trim().split(/\s+/).filter(Boolean);
+                    classes.forEach((c) => row.classList.add(c));
+                    const content = row.querySelector('.min-w-0, [data-title]');
+                    if (content instanceof HTMLElement) {
+                        content.classList.remove('text-[var(--dark-gray-color)]');
+                        classes.forEach((c) => content.classList.add(c));
+                    }
                 }
             });
             root.querySelectorAll?.('[data-tag-value]').forEach((tagEl) => {

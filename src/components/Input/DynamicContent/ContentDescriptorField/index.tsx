@@ -27,7 +27,7 @@ function DescriptorInputControl({
     field: { value: any; onChange: (v: any) => void; onBlur: () => void };
     fieldState: { error?: { message?: string } | string; isTouched: boolean };
 }) {
-    const inputType = ContentFieldConfiguration[contentType]?.type;
+    const inputType = ContentFieldConfiguration[contentType].type;
     const error = getFieldErrorMessage(fieldState);
     const invalid = fieldState.error && fieldState.isTouched;
     const inputClassName = cn(
@@ -71,7 +71,7 @@ function DescriptorInputControl({
                 step={fieldStepValue}
                 placeholder="Default Content"
                 value={field.value || ''}
-                className={inputClassName}
+                className={`${inputClassName} text-[var(--dark-gray-color)]`}
             />
         );
     }
@@ -154,7 +154,7 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
                                         justify="start"
                                         buttons={[
                                             {
-                                                icon: 'trash',
+                                                icon: 'cross',
                                                 disabled: readOnly && contentValues?.length === 1,
                                                 tooltip: 'Remove',
                                                 onClick: () => {

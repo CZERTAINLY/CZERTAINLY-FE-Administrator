@@ -136,7 +136,7 @@ export default function CustomAttributeDetail() {
                           columns: ['UUID', customAttribute.uuid],
                       },
                       {
-                          id: 'Version',
+                          id: 'version',
                           columns: ['Version', customAttribute.version || ''],
                       },
                       {

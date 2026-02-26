@@ -3,6 +3,9 @@ import { AddCustomValuePanel } from './AddCustomValuePanel';
 import { AttributeContentType } from 'types/openapi';
 
 test.describe('AddCustomValuePanel', () => {
+    const addButtonTestId = 'test-add-custom-value';
+    const cancelButtonTestId = 'test-cancel-custom-value';
+
     test('renders nothing when open is false', async ({ mount, page }) => {
         await mount(
             <AddCustomValuePanel
@@ -15,8 +18,8 @@ test.describe('AddCustomValuePanel', () => {
                 onFieldChange={() => {}}
             />,
         );
-        await expect(page.getByRole('button', { name: 'Add' })).not.toBeVisible();
-        await expect(page.getByRole('button', { name: 'Cancel' })).not.toBeVisible();
+        await expect(page.getByTestId(addButtonTestId)).not.toBeVisible();
+        await expect(page.getByTestId(cancelButtonTestId)).not.toBeVisible();
     });
 
     test('renders panel with input and buttons when open is true', async ({ mount, page }) => {
@@ -32,8 +35,8 @@ test.describe('AddCustomValuePanel', () => {
             />,
         );
         await expect(page.locator('#test-custom')).toBeVisible();
-        await expect(page.getByRole('button', { name: 'Cancel' })).toBeVisible();
-        await expect(page.getByRole('button', { name: 'Add' })).toBeVisible();
+        await expect(page.getByTestId(cancelButtonTestId)).toBeVisible();
+        await expect(page.getByTestId(addButtonTestId)).toBeVisible();
     });
 
     test('Add button is disabled when text input is empty', async ({ mount, page }) => {
@@ -48,7 +51,7 @@ test.describe('AddCustomValuePanel', () => {
                 onFieldChange={() => {}}
             />,
         );
-        const addButton = page.getByRole('button', { name: 'Add' });
+        const addButton = page.getByTestId(addButtonTestId);
         await expect(addButton).toBeDisabled();
     });
 
@@ -67,7 +70,7 @@ test.describe('AddCustomValuePanel', () => {
                 onFieldChange={() => {}}
             />,
         );
-        await page.getByRole('button', { name: 'Cancel' }).click();
+        await page.getByTestId(cancelButtonTestId).click();
         expect(closed).toBe(true);
     });
 
@@ -92,7 +95,7 @@ test.describe('AddCustomValuePanel', () => {
         const input = page.getByRole('textbox');
         await input.focus(); // TextInput removes readonly on focus (anti-autofill)
         await input.fill('custom value');
-        const addButton = page.getByRole('button', { name: 'Add' });
+        const addButton = page.getByTestId(addButtonTestId);
         await expect(addButton).toBeEnabled({ timeout: 5000 });
         await addButton.click();
         expect(receivedValue).toBe('custom value');
@@ -118,7 +121,7 @@ test.describe('AddCustomValuePanel', () => {
         const input = page.getByRole('textbox');
         await input.focus();
         await input.fill('new item');
-        const addButton = page.getByRole('button', { name: 'Add' });
+        const addButton = page.getByTestId(addButtonTestId);
         await expect(addButton).toBeEnabled({ timeout: 5000 });
         await addButton.click();
         expect(receivedValue).toEqual(['existing', 'new item']);
@@ -140,7 +143,7 @@ test.describe('AddCustomValuePanel', () => {
         const input = page.getByRole('textbox');
         await input.focus();
         await input.fill('42');
-        const addButton = page.getByRole('button', { name: 'Add' });
+        const addButton = page.getByTestId(addButtonTestId);
         await expect(addButton).toBeEnabled({ timeout: 5000 });
     });
 });

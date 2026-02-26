@@ -32,10 +32,12 @@ function AttributeEditForm({
     descriptor,
     initialContent,
     onSubmit,
+    onCancel,
 }: {
     descriptor: CustomAttributeModel;
     initialContent?: BaseAttributeContentModel[];
     onSubmit: (uuid: string, content: BaseAttributeContentModel[]) => void;
+    onCancel: () => void;
 }) {
     const methods = ReactHookForm.useForm<any>({
         defaultValues: {},
@@ -44,7 +46,13 @@ function AttributeEditForm({
     return (
         <ReactHookForm.FormProvider {...methods}>
             <form onSubmit={(e) => e.preventDefault()}>
-                <ContentValueField id={descriptor.name} descriptor={descriptor} initialContent={initialContent} onSubmit={onSubmit} />
+                <ContentValueField
+                    id={descriptor.name}
+                    descriptor={descriptor}
+                    initialContent={initialContent}
+                    onSubmit={onSubmit}
+                    onCancel={onCancel}
+                />
             </form>
         </ReactHookForm.FormProvider>
     );
@@ -344,6 +352,9 @@ export default function AttributeViewer({
                                     onSubmit={(uuid, content) => {
                                         setEditingAttributesNames(editingAttributesNames.filter((n) => n !== descriptor.name));
                                         onSubmit(uuid, content);
+                                    }}
+                                    onCancel={() => {
+                                        setEditingAttributesNames(editingAttributesNames.filter((n) => n !== descriptor.name));
                                     }}
                                 />
                             ) : (

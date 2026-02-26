@@ -9,7 +9,6 @@ import {
     testAttributeSetFunction,
     mapProfileAttribute,
 } from './attributes';
-import AttributesCoverageRunner from './AttributesCoverageRunner';
 import { AttributeContentType, AttributeType, AttributeVersion, ProgrammingLanguageEnum } from 'types/openapi';
 
 const base64Encode = (s: string) => btoa(unescape(encodeURIComponent(s)));

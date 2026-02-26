@@ -94,6 +94,7 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
 
     const formValues = useWatch({ control });
     const watchedList = useWatch({ control, name: 'list' });
+    const watchedContentType = useWatch({ control, name: 'contentType' });
     const defaultValuesToCompare = useMemo(
         () => (editMode ? defaultValuesUpdate : defaultValuesCreate),
         [editMode, defaultValuesUpdate, defaultValuesCreate],
@@ -126,6 +127,12 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
 
     useRunOnFinished(isCreating, onSuccess);
     useRunOnFinished(isUpdating, onSuccess);
+
+    useEffect(() => {
+        if (watchedContentType === AttributeContentType.Boolean) {
+            setValue('extensibleList', false);
+        }
+    }, [watchedContentType, setValue]);
 
     return (
         <FormProvider {...methods}>
@@ -283,7 +290,7 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
                                                     checked={field.value ?? false}
                                                     onChange={field.onChange}
                                                     label="Extensible List"
-                                                    disabled={!watchedList}
+                                                    disabled={!watchedList || watchedContentType === AttributeContentType.Boolean}
                                                 />
                                             )}
                                         />
