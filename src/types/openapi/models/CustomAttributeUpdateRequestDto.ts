@@ -88,6 +88,12 @@ export interface CustomAttributeUpdateRequestDto {
      * @memberof CustomAttributeUpdateRequestDto
      */
     resources?: Array<Resource>;
+    /**
+     * Boolean determining if a list Attribute can have values other than predefined options
+     * @type {boolean}
+     * @memberof CustomAttributeUpdateRequestDto
+     */
+    extensibleList?: boolean;
 }
 
 

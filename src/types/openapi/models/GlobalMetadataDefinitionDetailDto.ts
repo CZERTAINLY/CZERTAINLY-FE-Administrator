@@ -14,6 +14,7 @@
 import type {
     AttributeContentType,
     AttributeType,
+    AttributeVersion,
     ProtectionLevel,
 } from './';
 
@@ -58,6 +59,12 @@ export interface GlobalMetadataDefinitionDetailDto {
      * @memberof GlobalMetadataDefinitionDetailDto
      */
     protectionLevel?: ProtectionLevel;
+    /**
+     * Version of the attribute
+     * @type {AttributeVersion}
+     * @memberof GlobalMetadataDefinitionDetailDto
+     */
+    version?: AttributeVersion;
     /**
      * Type of the Attribute
      * @type {AttributeType}

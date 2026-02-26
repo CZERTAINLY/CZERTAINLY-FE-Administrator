@@ -13,6 +13,7 @@
 
 import type {
     AttributeContentType,
+    AttributeVersion,
     ProtectionLevel,
 } from './';
 
@@ -57,6 +58,12 @@ export interface AttributeDefinitionDto {
      * @memberof AttributeDefinitionDto
      */
     protectionLevel?: ProtectionLevel;
+    /**
+     * Version of the attribute
+     * @type {AttributeVersion}
+     * @memberof AttributeDefinitionDto
+     */
+    version?: AttributeVersion;
 }
 
 

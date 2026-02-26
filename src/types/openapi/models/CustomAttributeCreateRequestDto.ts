@@ -84,6 +84,12 @@ export interface CustomAttributeCreateRequestDto {
      */
     multiSelect?: boolean;
     /**
+     * Boolean determining if a list Attribute can have values other than predefined options
+     * @type {boolean}
+     * @memberof CustomAttributeCreateRequestDto
+     */
+    extensibleList?: boolean;
+    /**
      * Predefined content for the attribute if needed. The content of the Attribute must satisfy the type
      * @type {Array<AttributeContent>}
      * @memberof CustomAttributeCreateRequestDto

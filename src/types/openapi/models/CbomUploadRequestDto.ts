@@ -11,10 +11,6 @@
  * Do not edit the class manually.
  */
 
-import type {
-    RequestAttribute,
-} from './';
-
 /**
  * @export
  * @interface CbomUploadRequestDto
@@ -26,10 +22,4 @@ export interface CbomUploadRequestDto {
      * @memberof CbomUploadRequestDto
      */
     content: { [key: string]: any; };
-    /**
-     * Custom attributes
-     * @type {Array<RequestAttribute>}
-     * @memberof CbomUploadRequestDto
-     */
-    customAttributes?: Array<RequestAttribute>;
 }

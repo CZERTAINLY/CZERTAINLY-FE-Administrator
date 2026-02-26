@@ -13,6 +13,7 @@
 
 import type {
     AttributeContentType,
+    AttributeVersion,
     ProtectionLevel,
     Resource,
 } from './';
@@ -58,6 +59,12 @@ export interface CustomAttributeDefinitionDto {
      * @memberof CustomAttributeDefinitionDto
      */
     protectionLevel?: ProtectionLevel;
+    /**
+     * Version of the attribute
+     * @type {AttributeVersion}
+     * @memberof CustomAttributeDefinitionDto
+     */
+    version?: AttributeVersion;
     /**
      * List of resources for custom attribute
      * @type {Array<Resource>}

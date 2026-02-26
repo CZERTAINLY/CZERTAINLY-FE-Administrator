@@ -36,10 +36,10 @@ export interface CbomDto {
     serialNumber: string;
     /**
      * CBOM version
-     * @type {string}
+     * @type {number}
      * @memberof CbomDto
      */
-    version: string;
+    version: number;
     /**
      * CBOM spec version
      * @type {string}

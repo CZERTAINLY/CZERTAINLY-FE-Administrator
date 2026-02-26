@@ -15,6 +15,7 @@ import type {
     AttributeContent,
     AttributeContentType,
     AttributeType,
+    AttributeVersion,
     ProtectionLevel,
     Resource,
 } from './';
@@ -60,6 +61,12 @@ export interface CustomAttributeDefinitionDetailDto {
      * @memberof CustomAttributeDefinitionDetailDto
      */
     protectionLevel?: ProtectionLevel;
+    /**
+     * Version of the attribute
+     * @type {AttributeVersion}
+     * @memberof CustomAttributeDefinitionDetailDto
+     */
+    version?: AttributeVersion;
     /**
      * Type of the Attribute
      * @type {AttributeType}
@@ -120,6 +127,12 @@ export interface CustomAttributeDefinitionDetailDto {
      * @memberof CustomAttributeDefinitionDetailDto
      */
     resources?: Array<Resource>;
+    /**
+     * Boolean determining if a list Attribute can have values other than predefined options
+     * @type {boolean}
+     * @memberof CustomAttributeDefinitionDetailDto
+     */
+    extensibleList?: boolean;
 }
 
 
