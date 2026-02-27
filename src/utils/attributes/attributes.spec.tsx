@@ -1,6 +1,7 @@
 import { test, expect } from '../../../playwright/ct-test';
 import {
     getAttributeCopyValue,
+    getAttributeContent,
     attributeFieldNameTransform,
     transformAttributes,
     getCodeBlockLanguage,
@@ -85,6 +86,22 @@ test.describe('attributes utils', () => {
             const result = getAttributeCopyValue(AttributeContentType.Datetime, content);
             expect(typeof result).toBe('string');
             expect(result!.length).toBeGreaterThan(0);
+        });
+    });
+
+    test.describe('getAttributeContent', () => {
+        test('returns Not set when content is undefined', () => {
+            expect(getAttributeContent(AttributeContentType.String, undefined)).toBe('Not set');
+        });
+
+        test('returns file name and mime type for File content', () => {
+            const result = getAttributeContent(AttributeContentType.File, [{ data: { fileName: 'a.txt', mimeType: 'text/plain' } } as any]);
+            expect(result).toBe('a.txt (text/plain)');
+        });
+
+        test('returns masked value for Secret content', () => {
+            const result = getAttributeContent(AttributeContentType.Secret, [{ data: 'top-secret' } as any]);
+            expect(result).toBe('*****');
         });
     });
 
@@ -286,6 +303,17 @@ test.describe('attributes utils', () => {
             const result = testAttributeSetFunction(descriptor, attribute, 'profile.x', false, false);
             expect(result.formAttributeName).toBe('profile.x');
             expect(result.formAttributeValue).toBe('Set');
+        });
+
+        test('for required Boolean without value sets false', () => {
+            const descriptor = {
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Boolean,
+                content: [],
+                properties: { list: false, multiSelect: false, required: true, label: 'Flag', readOnly: false, visible: true },
+            } as any;
+            const result = testAttributeSetFunction(descriptor, undefined, 'form.flag', true, false);
+            expect(result.formAttributeValue).toBe(false);
         });
     });
 

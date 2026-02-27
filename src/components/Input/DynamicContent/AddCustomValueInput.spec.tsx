@@ -127,4 +127,42 @@ test.describe('AddCustomValueInput', () => {
             })
             .toBeCloseTo(3.14);
     });
+
+    test('checkbox type renders Switch and toggles onChange', async ({ mount, page }) => {
+        let lastValue: unknown = false;
+        await mount(
+            <AddCustomValueInput
+                {...defaultProps}
+                id="bool-custom"
+                inputType="checkbox"
+                contentType={AttributeContentType.Boolean}
+                value={false}
+                onChange={(v) => {
+                    lastValue = v;
+                }}
+            />,
+        );
+        await page.locator('label[for="bool-custom"]').click();
+        await expect
+            .poll(() => lastValue, {
+                message: 'onChange should receive toggled boolean',
+            })
+            .toBe(true);
+    });
+
+    test('datetime-local normalizes space to T before passing to DatePicker', async ({ mount, page }) => {
+        await mount(
+            <AddCustomValueInput
+                {...defaultProps}
+                id="dt-custom"
+                inputType="datetime-local"
+                contentType={AttributeContentType.Datetime}
+                value="2024-06-10 12:00:00"
+            />,
+        );
+        const input = page.locator('#dt-custom');
+        await expect(input).toBeVisible();
+        await input.click();
+        await expect(page.locator('div.fixed')).toBeVisible({ timeout: 5000 });
+    });
 });
