@@ -102,7 +102,7 @@ test.describe('AddCustomValuePanel', () => {
         expect(closed).toBe(true);
     });
 
-    test('multiSelect: Add appends to current field value', async ({ mount, page }) => {
+    async function mountMultiSelectAndAdd(mount: any, page: any, fieldValue: any, typedValue: string): Promise<any> {
         let receivedValue: any = undefined;
         await mount(
             <AddCustomValuePanel
@@ -112,7 +112,7 @@ test.describe('AddCustomValuePanel', () => {
                 contentType={AttributeContentType.String}
                 multiSelect={true}
                 readOnly={false}
-                fieldValue={['existing']}
+                fieldValue={fieldValue}
                 onFieldChange={(v) => {
                     receivedValue = v;
                 }}
@@ -120,60 +120,25 @@ test.describe('AddCustomValuePanel', () => {
         );
         const input = page.getByRole('textbox');
         await input.focus();
-        await input.fill('new item');
+        await input.fill(typedValue);
         const addButton = page.getByTestId(addButtonTestId);
         await expect(addButton).toBeEnabled({ timeout: 5000 });
         await addButton.click();
+        return receivedValue;
+    }
+
+    test('multiSelect: Add appends to current field value', async ({ mount, page }) => {
+        const receivedValue = await mountMultiSelectAndAdd(mount, page, ['existing'], 'new item');
         expect(receivedValue).toEqual(['existing', 'new item']);
     });
 
     test('multiSelect: when fieldValue is single value, Add wraps it into array', async ({ mount, page }) => {
-        let receivedValue: any = undefined;
-        await mount(
-            <AddCustomValuePanel
-                open={true}
-                onClose={() => {}}
-                idPrefix="test"
-                contentType={AttributeContentType.String}
-                multiSelect={true}
-                readOnly={false}
-                fieldValue="single"
-                onFieldChange={(v) => {
-                    receivedValue = v;
-                }}
-            />,
-        );
-        const input = page.getByRole('textbox');
-        await input.focus();
-        await input.fill('new');
-        const addButton = page.getByTestId(addButtonTestId);
-        await expect(addButton).toBeEnabled({ timeout: 5000 });
-        await addButton.click();
+        const receivedValue = await mountMultiSelectAndAdd(mount, page, 'single', 'new');
         expect(receivedValue).toEqual(['single', 'new']);
     });
 
     test('multiSelect: when fieldValue is null, Add starts from empty array', async ({ mount, page }) => {
-        let receivedValue: any = undefined;
-        await mount(
-            <AddCustomValuePanel
-                open={true}
-                onClose={() => {}}
-                idPrefix="test"
-                contentType={AttributeContentType.String}
-                multiSelect={true}
-                readOnly={false}
-                fieldValue={null}
-                onFieldChange={(v) => {
-                    receivedValue = v;
-                }}
-            />,
-        );
-        const input = page.getByRole('textbox');
-        await input.focus();
-        await input.fill('item');
-        const addButton = page.getByTestId(addButtonTestId);
-        await expect(addButton).toBeEnabled({ timeout: 5000 });
-        await addButton.click();
+        const receivedValue = await mountMultiSelectAndAdd(mount, page, null, 'item');
         expect(receivedValue).toEqual(['item']);
     });
 
