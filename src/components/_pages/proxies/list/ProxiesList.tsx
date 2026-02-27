@@ -8,10 +8,12 @@ import Select from 'components/Select';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import ProxyStatusBadge from '../ProxyStatusBadge';
+import { ProxyForm } from '../form/ProxyForm';
 import { actions, selectors } from 'ducks/proxies';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { ProxyStatus } from 'types/openapi';
 import { PROXY_STATUS_OPTIONS } from 'utils/proxy';
+import { useRunOnFinished } from 'utils/common-hooks';
 
 export default function ProxiesList() {
     const dispatch = useDispatch();
@@ -21,10 +23,11 @@ export default function ProxiesList() {
 
     const isFetching = useSelector(selectors.isFetchingList);
     const isDeleting = useSelector(selectors.isDeleting);
-
+    const isCreating = useSelector(selectors.isCreating);
     const isBusy = isFetching || isDeleting;
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
     const [filterStatus, setFilterStatus] = useState<ProxyStatus | undefined>(undefined);
 
     const getFreshData = useCallback(() => {
@@ -35,6 +38,19 @@ export default function ProxiesList() {
     useEffect(() => {
         getFreshData();
     }, [getFreshData]);
+
+    useRunOnFinished(isCreating, () => {
+        setIsAddModalOpen(false);
+        getFreshData();
+    });
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+    }, []);
 
     const setCheckedRows = useCallback(
         (rows: (string | number)[]) => {
@@ -74,6 +90,12 @@ export default function ProxiesList() {
                 ),
             },
             {
+                icon: 'plus',
+                disabled: false,
+                tooltip: 'Create',
+                onClick: handleOpenAddModal,
+            },
+            {
                 icon: 'trash',
                 disabled: checkedRows.length === 0,
                 tooltip: 'Delete',
@@ -82,7 +104,7 @@ export default function ProxiesList() {
                 },
             },
         ],
-        [checkedRows, filterStatus],
+        [checkedRows, filterStatus, handleOpenAddModal],
     );
 
     const proxiesRowHeaders: TableHeader[] = useMemo(
@@ -165,6 +187,15 @@ export default function ProxiesList() {
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
+            />
+
+            <Dialog
+                isOpen={isAddModalOpen}
+                toggle={handleCloseAddModal}
+                caption="Create Proxy"
+                size="xl"
+                body={<ProxyForm onCancel={handleCloseAddModal} onSuccess={handleCloseAddModal} />}
+                noBorder
             />
         </div>
     );
