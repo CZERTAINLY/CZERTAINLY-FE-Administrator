@@ -40,11 +40,9 @@ export function getProxyStatusColor(status: ProxyStatus): string {
  * @returns Formatted status label
  */
 export function formatProxyStatus(status: ProxyStatus): string {
-    // Insert space before uppercase letters and convert to lowercase.
     const spaced = status
         .replace(/([A-Z])/g, ' $1')
         .toLowerCase()
         .trim();
-    // Capitalize the first letter.
     return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
