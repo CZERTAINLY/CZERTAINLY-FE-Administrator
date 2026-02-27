@@ -30,8 +30,8 @@ import ComplianceProfilesList from './_pages/compliance-profiles/list';
 import ConnectorDetail from './_pages/connectors/detail';
 import ConnectorsList from './_pages/connectors/list';
 
-import ProxyDetail from './_pages/proxies/detail';
-import ProxiesList from './_pages/proxies/list/ProxiesList';
+import { ProxyDetail } from './_pages/proxies/detail/ProxyDetail';
+import { ProxiesList } from './_pages/proxies/list/ProxiesList';
 
 import ApprovalProfileDetails from './_pages/approval-profiles/detail';
 import ApprovalProfiles from './_pages/approval-profiles/list';
