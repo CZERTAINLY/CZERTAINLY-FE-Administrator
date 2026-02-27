@@ -5,6 +5,7 @@ import { Link } from 'react-router';
 import Badge from 'components/Badge';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
+import Select from 'components/Select';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/proxies';
@@ -50,8 +51,39 @@ export default function ProxiesList() {
         });
     }, [dispatch, checkedRows]);
 
+    const proxyStatusFilterOptions = useMemo(
+        () => [
+            { value: ProxyStatus.Initialized, label: 'Initialized' },
+            { value: ProxyStatus.Provisioning, label: 'Provisioning' },
+            { value: ProxyStatus.Failed, label: 'Failed' },
+            { value: ProxyStatus.WaitingForInstallation, label: 'Waiting For Installation' },
+            { value: ProxyStatus.Connected, label: 'Connected' },
+            { value: ProxyStatus.Disconnected, label: 'Disconnected' },
+        ],
+        [],
+    );
+
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
+            {
+                icon: 'search',
+                disabled: false,
+                tooltip: 'Filter by Status',
+                onClick: () => {},
+                custom: (
+                    <Select
+                        placeholder="Filter by Status"
+                        minWidth={200}
+                        id="proxyStatus"
+                        options={proxyStatusFilterOptions}
+                        value={filterStatus || 'Filter by Status'}
+                        onChange={(value) => {
+                            setFilterStatus(value as ProxyStatus | undefined);
+                        }}
+                        isClearable
+                    />
+                ),
+            },
             {
                 icon: 'trash',
                 disabled: checkedRows.length === 0,
@@ -61,7 +93,7 @@ export default function ProxiesList() {
                 },
             },
         ],
-        [checkedRows],
+        [checkedRows, filterStatus, proxyStatusFilterOptions],
     );
 
     const getProxyStatusColor = useCallback((status: ProxyStatus): string => {
@@ -154,7 +186,6 @@ export default function ProxiesList() {
                     onCheckedRowsChanged={setCheckedRows}
                     hasCheckboxes={true}
                     hasPagination={true}
-                    canSearch={true}
                 />
             </Widget>
 
