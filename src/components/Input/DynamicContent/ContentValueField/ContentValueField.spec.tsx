@@ -126,7 +126,7 @@ test.describe('ContentValueField', () => {
             />,
         );
         await expect(page.getByTestId('switch-testAttr')).toBeVisible();
-        await page.getByRole('checkbox').click();
+        await page.locator('label[for="testAttr"]').first().click();
         await expect(page.getByTestId('save-custom-value')).toBeEnabled();
         await page.getByTestId('save-custom-value').click();
         expect(submitted).toEqual([{ data: true }]);
@@ -394,7 +394,9 @@ test.describe('ContentValueField', () => {
 
         await mount(<ContentValueFieldTestWrapper descriptor={descriptor} />);
         await page.getByTestId('select-extList').click();
-        await expect(page.getByRole('button', { name: '+ Add custom' })).toBeVisible();
+        const dropdown = page.locator('.hs-select-dropdown').last();
+        const addCustomOption = dropdown.locator('.hs-tooltip-toggle').filter({ hasText: '+ Add custom' });
+        await expect(addCustomOption).toHaveCount(1);
     });
 
     test('number zero is valid content', async ({ mount, page }) => {
