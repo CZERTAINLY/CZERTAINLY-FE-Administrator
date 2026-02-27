@@ -20,6 +20,7 @@ import {
     FileJson2,
     Split,
     ArrowRightToLine,
+    Network,
 } from 'lucide-react';
 import Button from 'components/Button';
 import SimpleBar from 'simplebar-react';
@@ -98,6 +99,14 @@ const menuItemMappings: MenuItemMapping[] = [
         header: 'Connectors',
         headerLink: '/connectors',
         requiredResources: [Resource.Connectors],
+    },
+
+    {
+        _key: '/proxies',
+        icon: <Network size={16} strokeWidth={1.5} />,
+        header: 'Proxies',
+        headerLink: '/proxies',
+        requiredResources: [Resource.Proxies],
     },
 
     {
