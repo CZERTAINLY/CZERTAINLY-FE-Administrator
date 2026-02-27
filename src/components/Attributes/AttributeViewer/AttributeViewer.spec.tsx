@@ -68,4 +68,18 @@ test.describe('AttributeViewer', () => {
         await expect(page.getByText('My Connector')).toBeVisible();
         await expect(page.getByText('Connectors')).toBeVisible();
     });
+
+    test('ATTRIBUTE_EDIT viewer handles undefined attributes gracefully', async ({ mount, page }) => {
+        await mount(
+            <AttributeViewerMountHarness
+                viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE_EDIT}
+                // attributes intentionally undefined to cover guard path in getAttributesEditTableData
+                attributes={undefined as any}
+                descriptors={[]}
+            />,
+        );
+
+        await expect(page.getByText('Name')).toBeVisible();
+        await expect(page.getByText('Content Type')).toBeVisible();
+    });
 });

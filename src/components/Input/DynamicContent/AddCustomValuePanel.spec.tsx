@@ -127,6 +127,56 @@ test.describe('AddCustomValuePanel', () => {
         expect(receivedValue).toEqual(['existing', 'new item']);
     });
 
+    test('multiSelect: when fieldValue is single value, Add wraps it into array', async ({ mount, page }) => {
+        let receivedValue: any = undefined;
+        await mount(
+            <AddCustomValuePanel
+                open={true}
+                onClose={() => {}}
+                idPrefix="test"
+                contentType={AttributeContentType.String}
+                multiSelect={true}
+                readOnly={false}
+                fieldValue="single"
+                onFieldChange={(v) => {
+                    receivedValue = v;
+                }}
+            />,
+        );
+        const input = page.getByRole('textbox');
+        await input.focus();
+        await input.fill('new');
+        const addButton = page.getByTestId(addButtonTestId);
+        await expect(addButton).toBeEnabled({ timeout: 5000 });
+        await addButton.click();
+        expect(receivedValue).toEqual(['single', 'new']);
+    });
+
+    test('multiSelect: when fieldValue is null, Add starts from empty array', async ({ mount, page }) => {
+        let receivedValue: any = undefined;
+        await mount(
+            <AddCustomValuePanel
+                open={true}
+                onClose={() => {}}
+                idPrefix="test"
+                contentType={AttributeContentType.String}
+                multiSelect={true}
+                readOnly={false}
+                fieldValue={null}
+                onFieldChange={(v) => {
+                    receivedValue = v;
+                }}
+            />,
+        );
+        const input = page.getByRole('textbox');
+        await input.focus();
+        await input.fill('item');
+        const addButton = page.getByTestId(addButtonTestId);
+        await expect(addButton).toBeEnabled({ timeout: 5000 });
+        await addButton.click();
+        expect(receivedValue).toEqual(['item']);
+    });
+
     test('with parseValue, panel updates state and Add is enabled when input has value', async ({ mount, page }) => {
         await mount(
             <AddCustomValuePanel

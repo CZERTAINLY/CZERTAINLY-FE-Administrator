@@ -14,12 +14,41 @@ test.describe('CustomAttributeWidget', () => {
         await expect(component.getByText('Add custom attribute')).toBeVisible();
         await expect(component.getByTestId('select-selectCustomAttribute-input')).toBeAttached();
     });
-
-    test.skip('selecting attribute shows description and content field (dropdown option not stable in CT)', async ({ mount, page }) => {
+    test('selecting attribute shows description and content editor', async ({ mount, page }) => {
         const component = await mount(<CustomAttributeWidgetMountHarness attributes={[]} />);
-        await component.getByRole('button', { name: /add/i }).click();
-        await page.getByRole('option', { name: 'Test Attribute' }).click();
+
+        await component.getByTestId('select-selectCustomAttribute').click();
+        await page.locator('.hs-select-option-row', { hasText: 'Test Attribute' }).click();
+
         await expect(component.getByText('Test description')).toBeVisible();
+        await expect(component.getByTestId('cancel-custom-value')).toBeVisible();
+        await expect(component.getByTestId('save-custom-value')).toBeVisible();
+    });
+
+    test('onSubmit resets selection and hides editor', async ({ mount, page }) => {
+        const component = await mount(<CustomAttributeWidgetMountHarness attributes={[]} />);
+
+        await component.getByTestId('select-selectCustomAttribute').click();
+        await page.locator('.hs-select-option-row', { hasText: 'Test Attribute' }).click();
+        await expect(component.getByText('Test description')).toBeVisible();
+
+        const input = page.locator('#testAttr');
+        await input.focus();
+        await input.fill('value');
+        await expect(component.getByTestId('save-custom-value')).toBeEnabled();
+        await component.getByTestId('save-custom-value').click();
+
+        await expect(component.getByText('Test description')).not.toBeVisible();
+    });
+
+    test('onCancel resets selection and hides editor', async ({ mount, page }) => {
+        const component = await mount(<CustomAttributeWidgetMountHarness attributes={[]} />);
+
+        await component.getByTestId('select-selectCustomAttribute').click();
+        await page.locator('.hs-select-option-row', { hasText: 'Test Attribute' }).click();
+        await expect(component.getByText('Test description')).toBeVisible();
+        await component.getByTestId('cancel-custom-value').click();
+        await expect(component.getByText('Test description')).not.toBeVisible();
     });
 
     test('does not show Add custom attribute when no available attributes', async ({ mount }) => {
