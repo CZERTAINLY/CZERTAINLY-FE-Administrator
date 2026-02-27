@@ -15,7 +15,7 @@ import { ProxyStatus } from 'types/openapi';
 import { PROXY_STATUS_OPTIONS } from 'utils/proxy';
 import { useRunOnFinished } from 'utils/common-hooks';
 
-export default function ProxiesList() {
+export const ProxiesList = () => {
     const dispatch = useDispatch();
 
     const checkedRows = useSelector(selectors.checkedRows);
@@ -199,4 +199,4 @@ export default function ProxiesList() {
             />
         </div>
     );
-}
+};
