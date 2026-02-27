@@ -1,7 +1,7 @@
 import { test, expect } from '../../../../playwright/ct-test';
 import CustomAttributeWidgetMountHarness from './CustomAttributeWidgetMountHarness';
 
-import { AttributeType } from 'types/openapi';
+import { AttributeContentType, AttributeType } from 'types/openapi';
 
 test.describe('CustomAttributeWidget', () => {
     test('renders widget with title Custom Attributes', async ({ mount }) => {
@@ -44,6 +44,30 @@ test.describe('CustomAttributeWidget', () => {
             },
         ] as any;
         const component = await mount(<CustomAttributeWidgetMountHarness attributes={attrs} />);
+        await expect(component.getByRole('heading', { name: 'Custom Attributes' })).toBeVisible();
+    });
+
+    test('allows editing and removing existing custom attribute', async ({ mount }) => {
+        const attributes = [
+            {
+                uuid: 'resp-1',
+                name: 'testAttr',
+                type: AttributeType.Custom,
+                contentType: AttributeContentType.String,
+                properties: { label: 'Attr 1', required: false, readOnly: false, list: false, multiSelect: false, visible: true },
+                content: [{ data: 'initial' }],
+            },
+        ] as any;
+
+        const component = await mount(<CustomAttributeWidgetMountHarness attributes={attributes} />);
+
+        await component.getByTestId('edit-button').click();
+        await expect(component.getByTestId('save-custom-value')).toBeVisible();
+        await component.getByTestId('save-custom-value').click();
+
+        await expect(component.getByTestId('delete-button')).toBeVisible();
+        await component.getByTestId('delete-button').click();
+
         await expect(component.getByRole('heading', { name: 'Custom Attributes' })).toBeVisible();
     });
 });

@@ -146,4 +146,26 @@ test.describe('AddCustomValuePanel', () => {
         const addButton = page.getByTestId(addButtonTestId);
         await expect(addButton).toBeEnabled({ timeout: 5000 });
     });
+
+    test('boolean content type allows adding value without manual input', async ({ mount, page }) => {
+        let receivedValue: any = 'initial';
+        await mount(
+            <AddCustomValuePanel
+                open={true}
+                onClose={() => {}}
+                idPrefix="test"
+                contentType={AttributeContentType.Boolean}
+                readOnly={false}
+                fieldValue={undefined}
+                onFieldChange={(v) => {
+                    receivedValue = v;
+                }}
+            />,
+        );
+
+        const addButton = page.getByTestId(addButtonTestId);
+        await expect(addButton).toBeEnabled({ timeout: 5000 });
+        await addButton.click();
+        expect(receivedValue).toBe('');
+    });
 });

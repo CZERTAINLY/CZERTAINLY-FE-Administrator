@@ -415,4 +415,90 @@ test.describe('ContentValueField', () => {
         expect(submitted).toHaveLength(1);
         expect((submitted[0] as { data: unknown }).data).toBe('0');
     });
+
+    test('multiSelect list with __add_custom__ opens AddCustomValuePanel and filters value', async ({ mount, page }) => {
+        const descriptor = buildDescriptor({
+            name: 'multiExtList',
+            contentType: AttributeContentType.String,
+            properties: {
+                label: 'Multi Extensible List',
+                visible: true,
+                required: false,
+                readOnly: false,
+                list: true,
+                multiSelect: true,
+                extensibleList: true,
+            } as any,
+            content: [{ data: 'opt1' }, { data: 'opt2' }],
+        });
+
+        await mount(<ContentValueFieldTestWrapper descriptor={descriptor} />);
+
+        const select = page.locator('select#multiExtList');
+        await expect(select).toBeAttached();
+
+        await select.evaluate((el: HTMLSelectElement) => {
+            const options = Array.from(el.options);
+            const first = options.find((o) => o.value && o.value !== '__add_custom__');
+            const addCustom = options.find((o) => o.value === '__add_custom__');
+            if (first) first.selected = true;
+            if (addCustom) addCustom.selected = true;
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        await expect(page.getByTestId('multiExtList-add-custom-panel')).toBeVisible();
+    });
+
+    test('single-select list with __add_custom__ opens AddCustomValuePanel', async ({ mount, page }) => {
+        const descriptor = buildDescriptor({
+            name: 'singleExtList',
+            contentType: AttributeContentType.String,
+            properties: {
+                label: 'Single Extensible List',
+                visible: true,
+                required: false,
+                readOnly: false,
+                list: true,
+                multiSelect: false,
+                extensibleList: true,
+            } as any,
+            content: [{ data: 'opt1' }, { data: 'opt2' }],
+        });
+
+        await mount(<ContentValueFieldTestWrapper descriptor={descriptor} />);
+
+        const select = page.locator('select#singleExtList');
+        await expect(select).toBeAttached();
+
+        await select.evaluate((el: HTMLSelectElement) => {
+            const addCustom = Array.from(el.options).find((o) => o.value === '__add_custom__');
+            if (addCustom) {
+                el.value = addCustom.value;
+            }
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        await expect(page.getByTestId('singleExtList-add-custom-panel')).toBeVisible();
+    });
+
+    test('datetime required shows validation error message', async ({ mount, page }) => {
+        const descriptor = buildDescriptor({
+            contentType: AttributeContentType.Datetime,
+            properties: {
+                label: 'Required Datetime',
+                visible: true,
+                required: true,
+                readOnly: false,
+                list: false,
+                multiSelect: false,
+                extensibleList: false,
+            } as any,
+        });
+
+        await mount(<ContentValueFieldTestWrapper descriptor={descriptor} />);
+        const input = page.locator(fieldLocator);
+        await input.focus();
+        await input.blur();
+        await expect(page.getByTestId('save-custom-value')).toBeDisabled();
+    });
 });

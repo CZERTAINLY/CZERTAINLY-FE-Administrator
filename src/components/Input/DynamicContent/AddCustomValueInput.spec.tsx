@@ -128,6 +128,32 @@ test.describe('AddCustomValueInput', () => {
             .toBeCloseTo(3.14);
     });
 
+    test('number input passes empty string when cleared', async ({ mount, page }) => {
+        let lastValue: unknown = 'initial';
+        await mount(
+            <AddCustomValueInput
+                {...defaultProps}
+                id="num-empty"
+                inputType="number"
+                contentType={AttributeContentType.Integer}
+                fieldStepValue={1}
+                value={0}
+                onChange={(v) => {
+                    lastValue = v;
+                }}
+            />,
+        );
+        const input = page.getByRole('spinbutton');
+        await input.fill('42');
+        await input.fill('');
+
+        await expect
+            .poll(() => lastValue, {
+                message: 'onChange should receive empty string when cleared',
+            })
+            .toBe('');
+    });
+
     test('checkbox type renders Switch and toggles onChange', async ({ mount, page }) => {
         let lastValue: unknown = false;
         await mount(
