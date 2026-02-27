@@ -29,6 +29,7 @@ import {
     InternalNotificationApi,
     LocationManagementApi,
     NotificationProfileInventoryApi,
+    ProxyManagementApi,
     RAProfileManagementApi,
     ResourceManagementApi,
     RoleManagementApi,
@@ -65,6 +66,7 @@ export interface ApiClients {
     raProfiles: RAProfileManagementApi;
     credentials: CredentialManagementApi;
     connectors: ConnectorManagementApi;
+    proxies: ProxyManagementApi;
     callback: CallbackApi;
     statisticsDashboard: StatisticsDashboardApi;
     authorities: AuthorityManagementApi;
@@ -120,6 +122,7 @@ export const backendClient: ApiClients = {
     locations: new LocationManagementApi(configuration),
     notificationProfiles: new NotificationProfileInventoryApi(configuration),
     connectors: new ConnectorManagementApi(configuration),
+    proxies: new ProxyManagementApi(configuration),
     callback: new CallbackApi(configuration),
     statisticsDashboard: new StatisticsDashboardApi(configuration),
     acmeAccounts: new ACMEAccountManagementApi(configuration),
