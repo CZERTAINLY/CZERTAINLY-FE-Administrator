@@ -30,6 +30,9 @@ import ComplianceProfilesList from './_pages/compliance-profiles/list';
 import ConnectorDetail from './_pages/connectors/detail';
 import ConnectorsList from './_pages/connectors/list';
 
+import ProxyDetail from './_pages/proxies/detail';
+import ProxiesList from './_pages/proxies/list';
+
 import ApprovalProfileDetails from './_pages/approval-profiles/detail';
 import ApprovalProfiles from './_pages/approval-profiles/list';
 
@@ -154,6 +157,13 @@ export default function AppRouter() {
                         element={<Navigate to={`/${Resource.Connectors.toLowerCase()}`} />}
                     />
                     <Route path={`/${Resource.Connectors.toLowerCase()}/detail/:id`} element={<ConnectorDetail />} />
+
+                    <Route path={`/${Resource.Proxies.toLowerCase()}`} element={<ProxiesList />} />
+                    <Route
+                        path={`/${Resource.Proxies.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.Proxies.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.Proxies.toLowerCase()}/detail/:id`} element={<ProxyDetail />} />
 
                     <Route path={`/${Resource.Discoveries.toLowerCase()}`} element={<DiscoveriesList />} />
                     <Route

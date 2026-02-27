@@ -1,3 +1,5 @@
+import { from } from 'rxjs';
+
 export * from './AccountStatus';
 export * from './AcmeAccountListResponseDto';
 export * from './AcmeAccountResponseDto';
@@ -310,6 +312,12 @@ export * from './ProtocolCertificateAssociationsDto';
 export * from './ProtocolCertificateAssociationsRequestDto';
 export * from './ProviderComplianceRulesDto';
 export * from './ProviderComplianceRulesRequestDto';
+export * from './ProxyDto';
+export * from './ProxyInstallInstructionsDto';
+export * from './ProxyListDto';
+export * from './ProxyRequestDto';
+export * from './ProxyStatus';
+export * from './ProxyUpdateRequestDto';
 export * from './PushToLocationRequestDto';
 export * from './RaProfileAcmeDetailResponseDto';
 export * from './RaProfileAssociationRequestDto';
