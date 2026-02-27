@@ -2,15 +2,16 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
-import Badge from 'components/Badge';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Select from 'components/Select';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
+import ProxyStatusBadge from '../ProxyStatusBadge';
 import { actions, selectors } from 'ducks/proxies';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { ProxyStatus } from 'types/openapi';
+import { PROXY_STATUS_OPTIONS } from 'utils/proxy';
 
 export default function ProxiesList() {
     const dispatch = useDispatch();
@@ -51,18 +52,6 @@ export default function ProxiesList() {
         });
     }, [dispatch, checkedRows]);
 
-    const proxyStatusFilterOptions = useMemo(
-        () => [
-            { value: ProxyStatus.Initialized, label: 'Initialized' },
-            { value: ProxyStatus.Provisioning, label: 'Provisioning' },
-            { value: ProxyStatus.Failed, label: 'Failed' },
-            { value: ProxyStatus.WaitingForInstallation, label: 'Waiting For Installation' },
-            { value: ProxyStatus.Connected, label: 'Connected' },
-            { value: ProxyStatus.Disconnected, label: 'Disconnected' },
-        ],
-        [],
-    );
-
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
@@ -75,7 +64,7 @@ export default function ProxiesList() {
                         placeholder="Filter by Status"
                         minWidth={200}
                         id="proxyStatus"
-                        options={proxyStatusFilterOptions}
+                        options={PROXY_STATUS_OPTIONS}
                         value={filterStatus || 'Filter by Status'}
                         onChange={(value) => {
                             setFilterStatus(value as ProxyStatus | undefined);
@@ -93,26 +82,8 @@ export default function ProxiesList() {
                 },
             },
         ],
-        [checkedRows, filterStatus, proxyStatusFilterOptions],
+        [checkedRows, filterStatus],
     );
-
-    const getProxyStatusColor = useCallback((status: ProxyStatus): string => {
-        switch (status) {
-            case ProxyStatus.Connected:
-                return 'var(--status-success-color)';
-            case ProxyStatus.Disconnected:
-                return 'var(--status-dark-color)';
-            case ProxyStatus.Failed:
-                return 'var(--status-danger-color)';
-            case ProxyStatus.WaitingForInstallation:
-                return 'var(--status-warning-color)';
-            case ProxyStatus.Provisioning:
-                return 'var(--status-gray-color)';
-            case ProxyStatus.Initialized:
-            default:
-                return 'var(--status-gray-color)';
-        }
-    }, []);
 
     const proxiesRowHeaders: TableHeader[] = useMemo(
         () => [
@@ -147,26 +118,21 @@ export default function ProxiesList() {
 
     const proxiesList: TableDataRow[] = useMemo(
         () =>
-            proxies.map((proxy) => {
-                const statusColor = getProxyStatusColor(proxy.status);
-                const statusLabel = proxy.status.charAt(0).toUpperCase() + proxy.status.slice(1);
+            proxies.map((proxy) => ({
+                id: proxy.uuid,
+                columns: [
+                    <span style={{ whiteSpace: 'nowrap' }}>
+                        <Link to={`./detail/${proxy.uuid}`}>{proxy.name}</Link>
+                    </span>,
 
-                return {
-                    id: proxy.uuid,
-                    columns: [
-                        <span style={{ whiteSpace: 'nowrap' }}>
-                            <Link to={`./detail/${proxy.uuid}`}>{proxy.name}</Link>
-                        </span>,
+                    <span style={{ whiteSpace: 'nowrap' }}>{proxy.description || '-'}</span>,
 
-                        <span style={{ whiteSpace: 'nowrap' }}>{proxy.description || '-'}</span>,
+                    <ProxyStatusBadge status={proxy.status} />,
 
-                        <Badge style={{ backgroundColor: statusColor }}>{statusLabel}</Badge>,
-
-                        <span style={{ whiteSpace: 'nowrap' }}>{proxy.lastActivity || '-'}</span>,
-                    ],
-                };
-            }),
-        [proxies, getProxyStatusColor],
+                    <span style={{ whiteSpace: 'nowrap' }}>{proxy.lastActivity || '-'}</span>,
+                ],
+            })),
+        [proxies],
     );
 
     return (
