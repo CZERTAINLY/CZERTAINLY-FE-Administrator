@@ -16,9 +16,7 @@ import type { AjaxResponse } from 'rxjs/ajax';
 import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
 import type { OperationOpts, HttpHeaders } from '../runtime';
 import type {
-    AuthenticationServiceExceptionDto,
     BaseAttributeDto,
-    ErrorMessageDto,
     RequestAttribute,
     TokenInstanceDetailDto,
     TokenInstanceDto,

@@ -1,5 +1,9 @@
 import type { CustomAttributeModel, DataAttributeModel } from 'types/attributes';
 import { AttributeConstraintType, AttributeContentType, RangeAttributeConstraintData } from 'types/openapi';
+import { isCustomAttributeModel, isDataAttributeModel } from 'types/attributes';
+import type { RegexpAttributeConstraintModel } from 'types/attributes';
+import { getFormattedDateTime } from 'utils/dateUtil';
+import { composeValidators, validateFloat, validateInteger, validatePattern, validateRequired } from 'utils/validators';
 
 export function parseListValueByContentType(
     contentType: AttributeContentType,
@@ -11,9 +15,11 @@ export function parseListValueByContentType(
     if (str === '') return undefined;
     switch (contentType) {
         case AttributeContentType.Integer:
-            return Number.parseInt(str, 10);
+            const intVal = Number.parseInt(str, 10);
+            return Number.isNaN(intVal) ? undefined : intVal;
         case AttributeContentType.Float:
-            return Number.parseFloat(str);
+            const floatVal = Number.parseFloat(str);
+            return Number.isNaN(floatVal) ? undefined : floatVal;
         case AttributeContentType.Boolean:
             return str === 'true' || str === '1';
         case AttributeContentType.String:
@@ -25,10 +31,6 @@ export function parseListValueByContentType(
             return str;
     }
 }
-import { isCustomAttributeModel, isDataAttributeModel } from 'types/attributes';
-import type { RegexpAttributeConstraintModel } from 'types/attributes';
-import { getFormattedDateTime } from 'utils/dateUtil';
-import { composeValidators, validateFloat, validateInteger, validatePattern, validateRequired } from 'utils/validators';
 
 export function transformInputValueForDescriptor(value: any, descriptor: DataAttributeModel | CustomAttributeModel): any {
     if (descriptor.contentType === AttributeContentType.Datetime) {
