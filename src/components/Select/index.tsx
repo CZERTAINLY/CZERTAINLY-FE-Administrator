@@ -269,7 +269,7 @@ function Select({
                 if (titleEl instanceof HTMLElement && tooltipContentEl instanceof HTMLElement && titleEl.textContent) {
                     tooltipContentEl.textContent = titleEl.textContent.trim();
                 }
-                const dataValue = row.getAttribute('data-value');
+                const dataValue = (row as HTMLElement).dataset.value;
                 const opt = options?.find((o) => getOptionValueString(o.value) === dataValue);
                 if (opt?.className && row instanceof HTMLElement) {
                     const classes = opt.className.trim().split(/\s+/).filter(Boolean);

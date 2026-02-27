@@ -14,12 +14,14 @@ export function parseListValueByContentType(
     const str = String(val).trim();
     if (str === '') return undefined;
     switch (contentType) {
-        case AttributeContentType.Integer:
+        case AttributeContentType.Integer: {
             const intVal = Number.parseInt(str, 10);
             return Number.isNaN(intVal) ? undefined : intVal;
-        case AttributeContentType.Float:
+        }
+        case AttributeContentType.Float: {
             const floatVal = Number.parseFloat(str);
             return Number.isNaN(floatVal) ? undefined : floatVal;
+        }
         case AttributeContentType.Boolean:
             return str === 'true' || str === '1';
         case AttributeContentType.String:

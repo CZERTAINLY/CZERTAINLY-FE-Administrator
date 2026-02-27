@@ -220,14 +220,20 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
 
     const options = useMemo(
         () =>
-            descriptor.content?.map((a) => ({
-                label: a.reference
-                    ? a.reference
-                    : descriptor.contentType === AttributeContentType.Datetime
-                      ? getFormattedDateTime(a.data.toString())
-                      : a.data.toString(),
-                value: a.data.toString(),
-            })),
+            descriptor.content?.map((a) => {
+                let label: string;
+                if (a.reference) {
+                    label = a.reference;
+                } else if (descriptor.contentType === AttributeContentType.Datetime) {
+                    label = getFormattedDateTime(a.data.toString());
+                } else {
+                    label = a.data.toString();
+                }
+                return {
+                    label,
+                    value: a.data.toString(),
+                };
+            }),
         [descriptor],
     );
 
