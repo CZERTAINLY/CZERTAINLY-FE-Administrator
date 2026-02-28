@@ -1,6 +1,7 @@
 import { test, expect } from '../../../playwright/ct-test';
 import {
     getAttributeCopyValue,
+    getAttributeContent,
     attributeFieldNameTransform,
     transformAttributes,
     getCodeBlockLanguage,
@@ -9,8 +10,7 @@ import {
     testAttributeSetFunction,
     mapProfileAttribute,
 } from './attributes';
-import { AttributeContentType, ProgrammingLanguageEnum } from 'types/openapi';
-import { AttributeType } from 'types/openapi';
+import { AttributeContentType, AttributeType, AttributeVersion, ProgrammingLanguageEnum } from 'types/openapi';
 
 const base64Encode = (s: string) => btoa(unescape(encodeURIComponent(s)));
 
@@ -87,6 +87,74 @@ test.describe('attributes utils', () => {
             expect(typeof result).toBe('string');
             expect(result!.length).toBeGreaterThan(0);
         });
+
+        test('should fallback to toString when Codeblock data has no code', () => {
+            const content = [{ data: 'raw-code' } as any];
+            expect(getAttributeCopyValue(AttributeContentType.Codeblock, content)).toBe('raw-code');
+        });
+
+        test('should fallback to toString for Credential when name is missing', () => {
+            const content = [{ data: 123 } as any];
+            expect(getAttributeCopyValue(AttributeContentType.Credential, content)).toBe('123');
+        });
+
+        test('should fallback to toString for File when content is missing', () => {
+            const content = [{ data: 10 } as any];
+            expect(getAttributeCopyValue(AttributeContentType.File, content)).toBe('10');
+        });
+    });
+
+    test.describe('getAttributeContent', () => {
+        test('returns Not set when content is undefined', () => {
+            expect(getAttributeContent(AttributeContentType.String, undefined)).toBe('Not set');
+        });
+
+        test('returns file name and mime type for File content', () => {
+            const result = getAttributeContent(AttributeContentType.File, [{ data: { fileName: 'a.txt', mimeType: 'text/plain' } } as any]);
+            expect(result).toBe('a.txt (text/plain)');
+        });
+
+        test('returns masked value for Secret content', () => {
+            const result = getAttributeContent(AttributeContentType.Secret, [{ data: 'top-secret' } as any]);
+            expect(result).toBe('*****');
+        });
+
+        test('returns string representation for Boolean content', () => {
+            const resultTrue = getAttributeContent(AttributeContentType.Boolean, [{ data: true } as any]);
+            const resultFalse = getAttributeContent(AttributeContentType.Boolean, [{ data: false } as any]);
+            expect(resultTrue).toBe('true');
+            expect(resultFalse).toBe('false');
+        });
+
+        test('returns reference for Credential, Object and File when reference is present', () => {
+            const baseContent = { data: 'ignored', reference: 'Ref' } as any;
+            expect(getAttributeContent(AttributeContentType.Credential, [baseContent])).toBe('Ref');
+            expect(getAttributeContent(AttributeContentType.Object, [baseContent])).toBe('Ref');
+            expect(getAttributeContent(AttributeContentType.File, [baseContent])).toBe('Ref');
+        });
+
+        test('returns primitive value for numeric and text content types', () => {
+            expect(getAttributeContent(AttributeContentType.Float, [{ data: 1.23 } as any])).toBe('1.23');
+            expect(getAttributeContent(AttributeContentType.Integer, [{ data: 42 } as any])).toBe('42');
+            expect(getAttributeContent(AttributeContentType.String, [{ data: 'hello' } as any])).toBe('hello');
+            expect(getAttributeContent(AttributeContentType.Text, [{ data: 'lorem' } as any])).toBe('lorem');
+        });
+
+        test('returns raw value for Time and Date', () => {
+            expect(getAttributeContent(AttributeContentType.Time, [{ data: '10:00' } as any])).toBe('10:00');
+            expect(getAttributeContent(AttributeContentType.Date, [{ data: '2024-01-01' } as any])).toBe('2024-01-01');
+        });
+
+        test('formats Datetime via getFormattedDateTime in getAttributeContent', () => {
+            const result = getAttributeContent(AttributeContentType.Datetime, [{ data: '2024-01-15T10:00:00' } as any]);
+            expect(typeof result).toBe('string');
+            expect((result as string).length).toBeGreaterThan(0);
+        });
+
+        test('returns Unknown data type when File data is not FileAttributeContentData', () => {
+            const result = getAttributeContent(AttributeContentType.File, [{ data: 'not-a-file-object' } as any]);
+            expect(result).toBe('Unknown data type');
+        });
     });
 
     test.describe('transformAttributes', () => {
@@ -143,6 +211,43 @@ test.describe('attributes utils', () => {
             expect(result).toHaveLength(1);
             expect(result[0].name).toBe('attr1');
             expect(result[0].content).toEqual([{ data: 'value1' }]);
+            expect(result[0].version).toBe(AttributeVersion.V2);
+        });
+        test('uses V3 content shape with contentType when existing attribute has version V3', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'attr1',
+                    uuid: 'u1',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'A', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { attr1: 'value1' } };
+            const existingAttributes = [{ name: 'attr1', version: AttributeVersion.V3 }] as any[];
+            const result = collectFormAttributes('id1', descriptors, values, existingAttributes);
+            expect(result).toHaveLength(1);
+            expect(result[0].version).toBe(AttributeVersion.V3);
+            expect(result[0].content).toEqual([{ data: 'value1', contentType: AttributeContentType.String }]);
+        });
+        test('uses V3 when descriptor has version V3 and no existing attribute', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'attr1',
+                    uuid: 'u1',
+                    version: AttributeVersion.V3,
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'A', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { attr1: 'value1' } };
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toHaveLength(1);
+            expect(result[0].version).toBe(AttributeVersion.V3);
+            expect(result[0].content).toEqual([{ data: 'value1', contentType: AttributeContentType.String }]);
         });
         test('skips deleted attributes', () => {
             const descriptors = [
@@ -198,6 +303,127 @@ test.describe('attributes utils', () => {
             expect(result).toHaveLength(1);
             expect(result[0].content).toEqual([{ data: 3.14 }]);
         });
+
+        test('uses getDatetimeFormValue for Datetime contentType', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'runAt',
+                    uuid: 'u-datetime',
+                    contentType: AttributeContentType.Datetime,
+                    content: [],
+                    properties: { required: false, label: 'Run at', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { runAt: '2024-01-01T00:00:00.000Z' } };
+
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toHaveLength(1);
+            expect(result[0].content).toHaveLength(1);
+            expect(result[0].content[0].data).toBeDefined();
+            expect(typeof result[0].content[0].data).toBe('string');
+        });
+
+        test('uses getDateFormValue for Date contentType', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'validTo',
+                    uuid: 'u-date',
+                    contentType: AttributeContentType.Date,
+                    content: [],
+                    properties: { required: false, label: 'Valid to', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { validTo: '2024-01-10' } };
+
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toHaveLength(1);
+            expect(result[0].content[0].data).toBeDefined();
+            expect(typeof result[0].content[0].data).toBe('string');
+        });
+
+        test('builds Codeblock content with base64 encoded code and language', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'script',
+                    uuid: 'u-code',
+                    contentType: AttributeContentType.Codeblock,
+                    content: [{ data: { language: ProgrammingLanguageEnum.Python } }],
+                    properties: { required: false, label: 'Script', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = {
+                __attributes__id1__: {
+                    script: {
+                        code: 'print(1)',
+                        language: ProgrammingLanguageEnum.Python,
+                    },
+                },
+            };
+
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toHaveLength(1);
+            const contentItem = result[0].content[0] as any;
+            expect(typeof contentItem.data.code).toBe('string');
+            expect(contentItem.data.code).toBe(base64Encode('print(1)'));
+            expect(contentItem.data.language).toBe(ProgrammingLanguageEnum.Python);
+        });
+
+        test('builds Secret content with secret field', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'password',
+                    uuid: 'u-secret',
+                    contentType: AttributeContentType.Secret,
+                    content: [],
+                    properties: { required: false, label: 'Password', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { password: 's3cr3t' } };
+
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toHaveLength(1);
+            expect(result[0].content[0].data).toEqual({ secret: 's3cr3t' });
+        });
+
+        test('normalizes numeric value when passed as object with data', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'retries',
+                    uuid: 'u-retries',
+                    contentType: AttributeContentType.Integer,
+                    content: [],
+                    properties: { required: false, label: 'Retries', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { retries: { data: '5' } } };
+
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toHaveLength(1);
+            expect(result[0].content[0].data).toBe(5);
+        });
+
+        test('handles item with value wrapper object', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'tag',
+                    uuid: 'u-tag',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'Tag', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { tag: { value: 'blue' } } };
+
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toHaveLength(1);
+            expect(result[0].content[0].data).toBe('blue');
+        });
     });
 
     test.describe('mapAttributeContentToOptionValue', () => {
@@ -250,6 +476,17 @@ test.describe('attributes utils', () => {
             const result = testAttributeSetFunction(descriptor, attribute, 'profile.x', false, false);
             expect(result.formAttributeName).toBe('profile.x');
             expect(result.formAttributeValue).toBe('Set');
+        });
+
+        test('for required Boolean without value sets false', () => {
+            const descriptor = {
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Boolean,
+                content: [],
+                properties: { list: false, multiSelect: false, required: true, label: 'Flag', readOnly: false, visible: true },
+            } as any;
+            const result = testAttributeSetFunction(descriptor, undefined, 'form.flag', true, false);
+            expect(result.formAttributeValue).toBe(false);
         });
     });
 

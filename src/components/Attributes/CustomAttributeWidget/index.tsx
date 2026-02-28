@@ -9,7 +9,6 @@ import { Resource } from '../../../types/openapi';
 import ContentValueField from '../../Input/DynamicContent/ContentValueField';
 import Widget from '../../Widget';
 import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from '../AttributeViewer';
-import Container from 'components/Container';
 
 export type Props = {
     resource: Resource;
@@ -132,7 +131,7 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
                     <div className="mb-2">Add custom attribute</div>
                     <FormProvider {...methods}>
                         <form onSubmit={(e) => e.preventDefault()}>
-                            <Container className="md:grid md:grid-cols-2 !gap-4">
+                            <div className="space-y-4">
                                 <Controller
                                     name="selectCustomAttribute"
                                     control={control}
@@ -159,11 +158,15 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
                                                 setSelectedAttributeUuid('');
                                                 addCustomAttribute(uuid, content);
                                             }}
+                                            onCancel={() => {
+                                                reset({ selectCustomAttribute: '' });
+                                                setSelectedAttributeUuid('');
+                                            }}
                                         />
                                         <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">{selectedAttribute.description}</p>
                                     </div>
                                 )}
-                            </Container>
+                            </div>
                         </form>
                     </FormProvider>
                 </div>

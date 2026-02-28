@@ -1,9 +1,14 @@
 import {
     AttributeDescriptorModel,
     AttributeRequestModel,
+    AttributeRequestModelV2,
+    AttributeRequestModelV3,
     AttributeResponseModel,
+    BaseAttributeContentDtoV2,
+    BaseAttributeContentDtoV3,
     BaseAttributeContentModel,
     CodeBlockAttributeContentDataModel,
+    CodeBlockAttributeContentDtoV2,
     CodeBlockAttributeContentModel,
     CustomAttributeModel,
     DataAttributeModel,
@@ -12,7 +17,7 @@ import {
 } from 'types/attributes';
 import {
     AttributeContentType,
-    CodeBlockAttributeContentV2,
+    AttributeVersion,
     FileAttributeContentData,
     ProgrammingLanguageEnum,
     SecretAttributeContentV2,
@@ -139,7 +144,7 @@ const getAttributeFormValue = (
     if (contentType === AttributeContentType.Date) return getDateFormValue(item);
     if (contentType === AttributeContentType.Codeblock) {
         const language = getCodeBlockLanguage(item?.language, descriptorContent);
-        return { data: { code: utf8ToBase64(item.code), language } } as CodeBlockAttributeContentV2;
+        return { data: { code: utf8ToBase64(item.code), language } } as CodeBlockAttributeContentDtoV2;
     }
     if (contentType === AttributeContentType.Secret) {
         return { data: { secret: item } } as SecretAttributeContentV2;
@@ -192,6 +197,7 @@ export function collectFormAttributes(
     id: string,
     descriptors: AttributeDescriptorModel[] | undefined,
     values: Record<string, any>,
+    existingAttributes?: Array<AttributeResponseModel | { name: string; version?: AttributeVersion }>,
 ): AttributeRequestModel[] {
     if (!descriptors || !values[`__attributes__${id}__`]) return [];
 
@@ -226,15 +232,43 @@ export function collectFormAttributes(
             }
 
             if (typeof content.data !== 'undefined' || Array.isArray(content)) {
-                const attr: AttributeRequestModel = {
-                    name: attributeName,
-                    content: Array.isArray(content) ? content : [content],
-                    contentType: descriptor.contentType,
-                    uuid: descriptor.uuid,
-                    version: descriptor.version,
-                };
+                const contentArray = Array.isArray(content) ? content : [content];
+                const existing = existingAttributes?.find((a) => a.name === attributeName);
+                const existingVersion = (existing as { version?: AttributeVersion })?.version;
+                const descriptorVersion = (descriptor as unknown as { version?: AttributeVersion }).version;
+                let version: AttributeVersion;
+                if (existingVersion === AttributeVersion.V3 || existingVersion === AttributeVersion.V2) {
+                    version = existingVersion;
+                } else if (descriptorVersion === AttributeVersion.V3) {
+                    version = AttributeVersion.V3;
+                } else {
+                    version = AttributeVersion.V2;
+                }
 
-                attrs.push(attr);
+                if (version === AttributeVersion.V3) {
+                    const finalContent = contentArray.map((item: { data: unknown }) => ({
+                        ...item,
+                        contentType: descriptor.contentType,
+                    })) as BaseAttributeContentDtoV3[];
+                    const attr: AttributeRequestModelV3 = {
+                        name: attributeName,
+                        content: finalContent,
+                        contentType: descriptor.contentType,
+                        uuid: descriptor.uuid,
+                        version,
+                    };
+                    attrs.push(attr);
+                } else {
+                    const finalContent = contentArray as BaseAttributeContentDtoV2[];
+                    const attr: AttributeRequestModelV2 = {
+                        name: attributeName,
+                        content: finalContent,
+                        contentType: descriptor.contentType,
+                        uuid: descriptor.uuid,
+                        version,
+                    };
+                    attrs.push(attr);
+                }
             }
         }
     }

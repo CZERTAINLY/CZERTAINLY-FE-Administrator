@@ -1,5 +1,5 @@
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import { AttributeDescriptorModel, AttributeResponseModel, isDataAttributeModel } from 'types/attributes';
 import { getAttributeContent } from 'utils/attributes/attributes';
 
@@ -21,10 +21,16 @@ export default function ComplianceRuleAttributeViewer({ attributes, descriptorAt
                 width: '20%',
             },
             {
+                id: 'version',
+                content: 'Ver',
+                sortable: true,
+                width: '5%',
+            },
+            {
                 id: 'value',
                 content: 'Value',
                 sortable: true,
-                width: '80%',
+                width: '75%',
             },
         ],
         [],
@@ -33,11 +39,11 @@ export default function ComplianceRuleAttributeViewer({ attributes, descriptorAt
     const tableData: TableDataRow[] = useMemo(() => {
         const attributeRows = attributes?.map((attribute) => ({
             id: attribute.uuid || attribute.name,
-            columns: [attribute.name || '', getContent(attribute.contentType, attribute.content)],
+            columns: [attribute.name || '', attribute.version || '', getContent(attribute.contentType, attribute.content)],
         }));
         const descriptorRows = descriptorAttributes?.filter(isDataAttributeModel).map((attribute) => ({
             id: attribute.uuid || attribute.name,
-            columns: [attribute.name || '', getContent(attribute.contentType, attribute.content)],
+            columns: [attribute.name || '', attribute.version || '', getContent(attribute.contentType, attribute.content)],
         }));
         return [...(attributeRows ?? []), ...(descriptorRows ?? [])];
     }, [attributes, descriptorAttributes, getContent]);

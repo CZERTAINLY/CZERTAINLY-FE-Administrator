@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { getStepValue } from 'utils/common-utils';
 import { getFormattedDateTime } from 'utils/dateUtil';
@@ -13,27 +13,126 @@ import DatePicker from 'components/DatePicker';
 import Container from 'components/Container';
 import cn from 'classnames';
 import Switch from 'components/Switch';
+import { AddCustomValuePanel } from '../AddCustomValuePanel';
+
+const ADD_CUSTOM_OPTION_VALUE = '__add_custom__';
+import { parseListValueByContentType } from 'components/Attributes/AttributeEditor/Attribute/attributeHelpers';
+import Button from 'components/Button';
 
 function getValueFieldError(fieldState: { error?: { message?: string }; isTouched: boolean; invalid: boolean }) {
     if (!fieldState.isTouched || !fieldState.invalid) return undefined;
-    return typeof fieldState.error === 'string' ? fieldState.error : fieldState.error?.message || 'Invalid value';
+    return typeof fieldState.error === 'string' ? fieldState.error : (fieldState.error?.message ?? 'Invalid value');
 }
 
-function ValueFieldInput({
-    descriptor,
-    id,
-    field,
-    fieldState,
-    fieldStepValue,
-    options,
-}: {
+type ValueFieldInputProps = {
     descriptor: CustomAttributeModel;
     id?: string;
     field: { value: any; onChange: (v: any) => void; onBlur: () => void };
     fieldState: { isTouched: boolean; invalid: boolean; error?: { message?: string } };
     fieldStepValue: number | undefined;
     options: { label: string; value: string }[];
-}) {
+    onCancel?: () => void;
+};
+
+function normalizeDateValue(value: string | undefined): string | undefined {
+    if (!value) return undefined;
+    return value.includes('T') ? value : value.replace(' ', 'T');
+}
+
+function ListValueField({ descriptor, field, options, inputClassName }: ValueFieldInputProps & { inputClassName: string }) {
+    const [showAddCustom, setShowAddCustom] = useState(false);
+    const isExtensible = descriptor.properties.extensibleList === true;
+    const multiSelect = descriptor.properties.multiSelect;
+
+    const handleListChange = (v: any) => {
+        if (multiSelect) {
+            const arr = Array.isArray(v) ? v : [];
+            const hasAddCustom = arr.some((item: any) => (item?.value ?? item) === ADD_CUSTOM_OPTION_VALUE);
+            if (hasAddCustom) {
+                setShowAddCustom(true);
+                const withoutAddCustom = arr
+                    .map((item) => parseListValueByContentType(descriptor.contentType, item?.value ?? item))
+                    .filter((x) => x !== undefined && x !== ADD_CUSTOM_OPTION_VALUE);
+                field.onChange(withoutAddCustom.length > 0 ? withoutAddCustom : undefined);
+                return;
+            }
+            const parsed = arr
+                .map((item) => parseListValueByContentType(descriptor.contentType, item?.value ?? item))
+                .filter((x) => x !== undefined);
+            field.onChange(parsed.length > 0 ? parsed : undefined);
+        } else {
+            const raw = typeof v === 'object' && v !== null && 'value' in v ? v.value : v;
+            if (raw === ADD_CUSTOM_OPTION_VALUE) {
+                setShowAddCustom(true);
+                return;
+            }
+            const parsed = parseListValueByContentType(descriptor.contentType, v);
+            field.onChange(parsed ?? '');
+        }
+    };
+
+    const formatListLabel = (v: string | number | boolean) =>
+        descriptor.contentType === AttributeContentType.Datetime ? getFormattedDateTime(String(v)) : String(v);
+
+    const listValue =
+        multiSelect && Array.isArray(field.value)
+            ? field.value.map((v: string | number | boolean) => ({ value: v, label: formatListLabel(v) }))
+            : field.value;
+
+    const currentValues = multiSelect
+        ? Array.isArray(field.value)
+            ? field.value
+            : []
+        : field.value != null && field.value !== ''
+          ? [field.value]
+          : [];
+    const seen = new Set(options.map((o: { value: string }) => String(o.value)));
+    const extra = currentValues
+        .filter((v: string | number | boolean) => !seen.has(String(v)))
+        .map((v: string | number | boolean) => ({ label: formatListLabel(v), value: v }));
+    const addCustomOption =
+        isExtensible && !descriptor.properties.readOnly
+            ? [{ label: '+ Add custom', value: ADD_CUSTOM_OPTION_VALUE, className: 'text-blue-600 dark:text-blue-400' }]
+            : [];
+    const extendedOptions = [...options, ...extra, ...addCustomOption];
+    const { value: _omitValue, ...selectFieldProps } = field;
+
+    return (
+        <div className="flex flex-col gap-2 w-full">
+            <Container className="flex-row" gap={2}>
+                <div className="grow">
+                    <Select
+                        {...({
+                            ...selectFieldProps,
+                            value: listValue,
+                            onChange: handleListChange,
+                            id: descriptor.name,
+                            options: extendedOptions,
+                            isMulti: multiSelect,
+                            disabled: descriptor.properties.readOnly || showAddCustom,
+                            isClearable: !descriptor.properties.required,
+                            dropdownScope: 'window',
+                            className: 'grow',
+                        } as React.ComponentProps<typeof Select>)}
+                    />
+                </div>
+            </Container>
+            <AddCustomValuePanel
+                open={showAddCustom}
+                onClose={() => setShowAddCustom(false)}
+                idPrefix={descriptor.name}
+                contentType={descriptor.contentType}
+                multiSelect={multiSelect}
+                readOnly={descriptor.properties.readOnly}
+                fieldValue={field.value}
+                onFieldChange={field.onChange}
+                inputClassName={inputClassName}
+            />
+        </div>
+    );
+}
+
+function ValueFieldInput({ descriptor, id, field, fieldState, fieldStepValue, options }: ValueFieldInputProps) {
     const inputType = ContentFieldConfiguration[descriptor.contentType].type;
     const displayValue = descriptor.contentType === AttributeContentType.Datetime ? getFormattedDateTime(field.value) : field.value;
     const error = getValueFieldError(fieldState);
@@ -45,72 +144,67 @@ function ValueFieldInput({
 
     if (descriptor.properties.list) {
         return (
-            <Select
-                {...field}
-                id={descriptor.name}
+            <ListValueField
+                descriptor={descriptor}
+                id={id}
+                field={field}
+                fieldState={fieldState}
+                fieldStepValue={fieldStepValue}
                 options={options}
-                isMulti={descriptor.properties.multiSelect}
-                disabled={descriptor.properties.readOnly}
-                isClearable={!descriptor.properties.required}
-                dropdownScope="window"
+                inputClassName={inputClassName}
             />
         );
     }
-    if (inputType === 'datetime-local') {
-        let dateValue: string | undefined;
-        if (field.value) {
-            dateValue = field.value.includes('T') ? field.value : field.value.replace(' ', 'T');
-        } else {
-            dateValue = undefined;
-        }
-        return (
-            <DatePicker
-                id={descriptor.name}
-                value={dateValue}
-                onChange={(value) => field.onChange(value)}
-                onBlur={field.onBlur}
-                disabled={descriptor.properties.readOnly}
-                invalid={invalid}
-                error={error}
-                required={descriptor.properties.required}
-                timePicker
-            />
-        );
+
+    switch (inputType) {
+        case 'datetime-local':
+            return (
+                <DatePicker
+                    id={descriptor.name}
+                    value={normalizeDateValue(field.value)}
+                    onChange={(value) => field.onChange(value)}
+                    onBlur={field.onBlur}
+                    disabled={descriptor.properties.readOnly}
+                    invalid={invalid}
+                    error={error}
+                    required={descriptor.properties.required}
+                    timePicker
+                />
+            );
+        case 'number':
+            return (
+                <input
+                    {...field}
+                    disabled={descriptor.properties.readOnly}
+                    type={inputType}
+                    id={descriptor.name}
+                    step={fieldStepValue}
+                    value={displayValue || ''}
+                    className={inputClassName}
+                />
+            );
+        case 'checkbox':
+            return (
+                <Switch
+                    id={id || descriptor.name || 'checkbox'}
+                    checked={field.value}
+                    onChange={(checked) => field.onChange(checked)}
+                    disabled={descriptor.properties.readOnly}
+                />
+            );
+        default:
+            return (
+                <TextInput
+                    id={descriptor.name}
+                    type={inputType as 'text' | 'textarea' | 'number' | 'email' | 'password' | 'date' | 'time'}
+                    disabled={descriptor.properties.readOnly}
+                    value={displayValue || ''}
+                    onChange={(value) => field.onChange(value)}
+                    invalid={invalid}
+                    error={fieldState.isTouched && fieldState.invalid ? fieldState.error?.message : undefined}
+                />
+            );
     }
-    if (inputType === 'number') {
-        return (
-            <input
-                {...field}
-                disabled={descriptor.properties.readOnly}
-                type={inputType}
-                id={descriptor.name}
-                step={fieldStepValue}
-                value={displayValue || ''}
-                className={inputClassName}
-            />
-        );
-    }
-    if (inputType === 'checkbox') {
-        return (
-            <Switch
-                id={id || descriptor.name || 'checkbox'}
-                checked={field.value}
-                onChange={(checked) => field.onChange(checked)}
-                disabled={descriptor.properties.readOnly}
-            />
-        );
-    }
-    return (
-        <TextInput
-            id={descriptor.name}
-            type={inputType as 'text' | 'textarea' | 'number' | 'email' | 'password' | 'date' | 'time'}
-            disabled={descriptor.properties.readOnly}
-            value={displayValue || ''}
-            onChange={(value) => field.onChange(value)}
-            invalid={invalid}
-            error={fieldState.isTouched && fieldState.invalid ? fieldState.error?.message : undefined}
-        />
-    );
 }
 
 type Props = {
@@ -118,49 +212,42 @@ type Props = {
     descriptor: CustomAttributeModel;
     initialContent?: BaseAttributeContentModel[];
     onSubmit: (attributeUuid: string, content: BaseAttributeContentModel[]) => void;
+    onCancel?: () => void;
 };
 
-export default function ContentValueField({ id, descriptor, initialContent, onSubmit }: Props) {
+export default function ContentValueField({ id, descriptor, initialContent, onSubmit, onCancel }: Props) {
     const { control, setValue } = useFormContext();
 
     const options = useMemo(
         () =>
-            descriptor.content?.map((a) => ({
-                label: a.reference
-                    ? a.reference
-                    : descriptor.contentType === AttributeContentType.Datetime
-                      ? getFormattedDateTime(a.data.toString())
-                      : a.data.toString(),
-                value: a.data.toString(),
-            })),
+            descriptor.content?.map((a) => {
+                let label: string;
+                if (a.reference) {
+                    label = a.reference;
+                } else if (descriptor.contentType === AttributeContentType.Datetime) {
+                    label = getFormattedDateTime(a.data.toString());
+                } else {
+                    label = a.data.toString();
+                }
+                return {
+                    label,
+                    value: a.data.toString(),
+                };
+            }),
         [descriptor],
     );
 
     useEffect(() => {
-        const initialValue =
-            initialContent && initialContent.length > 0
-                ? descriptor.properties.list
-                    ? descriptor.properties.multiSelect
-                        ? options?.filter((o) =>
-                              initialContent.find((i) => {
-                                  if (descriptor.contentType === AttributeContentType.Datetime) {
-                                      return getFormattedDateTime(i.data.toString()) === getFormattedDateTime(o.value.toString());
-                                  } else {
-                                      return i.data === o.value;
-                                  }
-                              }),
-                          )
-                        : options?.find((o) => {
-                              if (descriptor.contentType === AttributeContentType.Datetime) {
-                                  return (
-                                      getFormattedDateTime(initialContent[0].data.toString()) === getFormattedDateTime(o.value.toString())
-                                  );
-                              } else {
-                                  return initialContent[0].data === o.value;
-                              }
-                          })?.value
-                    : initialContent[0].data
-                : undefined;
+        let initialValue: unknown;
+        if (initialContent && initialContent.length > 0) {
+            if (descriptor.properties.list) {
+                initialValue = descriptor.properties.multiSelect ? initialContent.map((i) => i.data) : initialContent[0].data;
+            } else {
+                initialValue = initialContent[0].data;
+            }
+        } else {
+            initialValue = undefined;
+        }
 
         const descriptorValue = !descriptor.properties.list
             ? descriptor.content && descriptor.content.length > 0
@@ -169,7 +256,7 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
             : undefined;
 
         setValue(descriptor.name, initialValue ?? descriptorValue ?? ContentFieldConfiguration[descriptor.contentType].initial);
-    }, [descriptor, setValue, initialContent, options]);
+    }, [descriptor, setValue, initialContent]);
 
     const fieldStepValue = useMemo(() => {
         const stepValue = getStepValue(descriptor.contentType);
@@ -221,13 +308,14 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
             return undefined;
         }
         if (descriptor.properties.list) {
+            const dataFrom = (v: any) => (v != null && typeof v === 'object' && 'value' in v ? v.value : v);
             if (descriptor.properties.multiSelect) {
-                return input.value.map((v: any) => transformObjectContent(descriptor.contentType, { data: v.value }));
+                return (input.value || []).map((v: any) => transformObjectContent(descriptor.contentType, { data: dataFrom(v) }));
             } else {
                 if (Array.isArray(input.value)) {
-                    return input.value.map((v: any) => transformObjectContent(descriptor.contentType, { data: v.value }));
+                    return input.value.map((v: any) => transformObjectContent(descriptor.contentType, { data: dataFrom(v) }));
                 } else {
-                    return [transformObjectContent(descriptor.contentType, { data: input.value })];
+                    return [transformObjectContent(descriptor.contentType, { data: dataFrom(input.value) })];
                 }
             }
         }
@@ -276,19 +364,19 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
 
                 return (
                     <>
-                        <Container className={cn('flex-row !gap-0 items-center', { 'justify-center': inputType !== 'checkbox' })}>
-                            <div className={cn({ grow: inputType !== 'checkbox' })}>{inputComponent}</div>
-                            <WidgetButtons
-                                buttons={[
-                                    {
-                                        id: 'save',
-                                        icon: 'plus',
-                                        disabled: !inputContent || fieldState.invalid,
-                                        tooltip: 'Save',
-                                        onClick: () => beforeOnSubmit(descriptor.uuid, inputContent),
-                                    },
-                                ]}
-                            />
+                        <div className={cn({ grow: inputType !== 'checkbox' })}>{inputComponent}</div>
+                        <Container className="flex-row justify-end mt-4" gap={2}>
+                            <Button type="button" variant="outline" onClick={() => onCancel?.()} data-testid="cancel-custom-value">
+                                Cancel
+                            </Button>
+                            <Button
+                                type="button"
+                                onClick={() => beforeOnSubmit(descriptor.uuid, inputContent)}
+                                disabled={!inputContent || fieldState.invalid}
+                                data-testid="save-custom-value"
+                            >
+                                Save
+                            </Button>
                         </Container>
                         {feedbackComponent}
                     </>

@@ -8,6 +8,7 @@ import ContentDescriptorField from './ContentDescriptorField';
 import Label from 'components/Label';
 import Select from 'components/Select';
 import { ContentFieldConfiguration } from './contentFieldConfiguration';
+import Widget from 'components/Widget';
 
 export { ContentFieldConfiguration };
 
@@ -33,7 +34,7 @@ export default function DynamicContent({ editable, isList }: Props) {
     const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
 
     return (
-        <>
+        <Widget noBorder className="!bg-gray-50 !dark:bg-neutral-800 !p-4 !rounded-none !border-none">
             <div className="mb-4">
                 <Label htmlFor="contentType" required>
                     Content Type
@@ -69,6 +70,6 @@ export default function DynamicContent({ editable, isList }: Props) {
             </div>
 
             <ContentDescriptorField isList={isList} contentType={contentTypeValue} />
-        </>
+        </Widget>
     );
 }
