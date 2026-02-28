@@ -23,8 +23,9 @@ export const ProxiesList = () => {
 
     const isFetching = useSelector(selectors.isFetchingList);
     const isDeleting = useSelector(selectors.isDeleting);
+    const isBulkDeleting = useSelector(selectors.isBulkDeleting);
     const isCreating = useSelector(selectors.isCreating);
-    const isBusy = isFetching || isDeleting;
+    const isBusy = isFetching || isDeleting || isBulkDeleting;
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
@@ -62,10 +63,7 @@ export const ProxiesList = () => {
     const onDeleteConfirmed = useCallback(() => {
         setConfirmDelete(false);
         dispatch(actions.clearDeleteErrorMessages());
-        // Delete each selected proxy sequentially
-        checkedRows.forEach((uuid) => {
-            dispatch(actions.deleteProxy({ uuid }));
-        });
+        dispatch(actions.bulkDeleteProxies({ uuids: checkedRows }));
     }, [dispatch, checkedRows]);
 
     const buttons: WidgetButtonProps[] = useMemo(
@@ -81,7 +79,7 @@ export const ProxiesList = () => {
                         minWidth={200}
                         id="proxyStatus"
                         options={PROXY_STATUS_OPTIONS}
-                        value={filterStatus || 'Filter by Status'}
+                        value={filterStatus ?? ''}
                         onChange={(value) => {
                             setFilterStatus(value as ProxyStatus | undefined);
                         }}

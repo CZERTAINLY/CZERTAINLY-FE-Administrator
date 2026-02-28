@@ -1,5 +1,5 @@
 import { AppEpic } from 'ducks';
-import { of } from 'rxjs';
+import { of, forkJoin } from 'rxjs';
 import { catchError, filter, switchMap, mergeMap } from 'rxjs/operators';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { extractError } from 'utils/net';
@@ -15,8 +15,6 @@ import {
     transformProxyResponseDtoToModel,
     transformProxyUpdateRequestModelToDto,
 } from './transform/proxies';
-
-import { store } from '../App';
 
 const listProxies: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -144,4 +142,27 @@ const deleteProxy: AppEpic = (action$, state, deps) => {
     );
 };
 
-export default [listProxies, getProxyDetail, createProxy, updateProxy, deleteProxy];
+const bulkDeleteProxies: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkDeleteProxies.match),
+        mergeMap((action) =>
+            forkJoin(action.payload.uuids.map((uuid) => deps.apiClients.proxies.deleteProxy({ uuid }))).pipe(
+                mergeMap(() =>
+                    of(
+                        slice.actions.bulkDeleteProxiesSuccess({ uuids: action.payload.uuids }),
+                        alertActions.success('Proxies successfully deleted'),
+                    ),
+                ),
+
+                catchError((error) =>
+                    of(
+                        slice.actions.bulkDeleteProxiesFailure({ error: extractError(error, 'Failed to delete proxies') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to delete proxies' }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+export default [listProxies, getProxyDetail, createProxy, updateProxy, deleteProxy, bulkDeleteProxies];

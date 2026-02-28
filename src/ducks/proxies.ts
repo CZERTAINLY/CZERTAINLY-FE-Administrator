@@ -16,6 +16,7 @@ export type State = {
     isFetchingDetail: boolean;
     isCreating: boolean;
     isDeleting: boolean;
+    isBulkDeleting: boolean;
     isUpdating: boolean;
 };
 
@@ -30,6 +31,7 @@ export const initialState: State = {
     isFetchingDetail: false,
     isCreating: false,
     isDeleting: false,
+    isBulkDeleting: false,
     isUpdating: false,
 };
 
@@ -145,6 +147,21 @@ export const slice = createSlice({
             state.isDeleting = false;
             state.deleteErrorMessage = action.payload.error;
         },
+
+        bulkDeleteProxies: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkDeleting = true;
+            state.checkedRows = [];
+        },
+
+        bulkDeleteProxiesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkDeleting = false;
+            state.proxies = state.proxies.filter((proxy) => !action.payload.uuids.includes(proxy.uuid));
+        },
+
+        bulkDeleteProxiesFailure: (state, action: PayloadAction<{ error: string }>) => {
+            state.isBulkDeleting = false;
+            state.deleteErrorMessage = action.payload.error;
+        },
     },
 });
 
@@ -157,6 +174,7 @@ const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isCreating = createSelector(state, (state) => state.isCreating);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
+const isBulkDeleting = createSelector(state, (state) => state.isBulkDeleting);
 const isUpdating = createSelector(state, (state) => state.isUpdating);
 
 export const selectors = {
@@ -169,6 +187,7 @@ export const selectors = {
     isFetchingDetail,
     isCreating,
     isDeleting,
+    isBulkDeleting,
     isUpdating,
 };
 
