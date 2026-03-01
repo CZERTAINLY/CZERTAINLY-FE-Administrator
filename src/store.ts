@@ -6,6 +6,7 @@ import { backendClient } from './api';
 import { AppState, epics } from './ducks';
 import { initialState } from './ducks/initial-state';
 import { reducers } from './ducks/reducers';
+import { startAlertsTicker } from './ducks/alerts-ticker';
 
 export default function configure() {
     const epicMiddleware = createEpicMiddleware<AnyAction, AnyAction, AppState>({
@@ -26,6 +27,7 @@ export default function configure() {
     epicMiddleware.run(epics);
 
     store.dispatch({ type: '@@app/INIT' });
+    startAlertsTicker(store);
 
     return store;
 }

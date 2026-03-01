@@ -16,7 +16,7 @@ import {
     transformProxyUpdateRequestModelToDto,
 } from './transform/proxies';
 
-const listProxies: AppEpic = (action$, state, deps) => {
+export const listProxies: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.listProxies.match),
         switchMap((action) =>
@@ -38,7 +38,7 @@ const listProxies: AppEpic = (action$, state, deps) => {
     );
 };
 
-const getProxyDetail: AppEpic = (action$, state, deps) => {
+export const getProxyDetail: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.getProxyDetail.match),
         switchMap((action) =>
@@ -60,7 +60,7 @@ const getProxyDetail: AppEpic = (action$, state, deps) => {
     );
 };
 
-const createProxy: AppEpic = (action$, state, deps) => {
+export const createProxy: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.createProxy.match),
         switchMap((action) =>
@@ -93,7 +93,7 @@ const createProxy: AppEpic = (action$, state, deps) => {
     );
 };
 
-const updateProxy: AppEpic = (action$, state, deps) => {
+export const updateProxy: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.updateProxy.match),
         switchMap((action) =>
@@ -118,7 +118,7 @@ const updateProxy: AppEpic = (action$, state, deps) => {
     );
 };
 
-const deleteProxy: AppEpic = (action$, state, deps) => {
+export const deleteProxy: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.deleteProxy.match),
         switchMap((action) =>
@@ -142,7 +142,7 @@ const deleteProxy: AppEpic = (action$, state, deps) => {
     );
 };
 
-const bulkDeleteProxies: AppEpic = (action$, state, deps) => {
+export const bulkDeleteProxies: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.bulkDeleteProxies.match),
         mergeMap((action) =>
