@@ -101,12 +101,7 @@ test.describe('CustomAttributeWidget', () => {
             },
         ] as any;
 
-        const component = await mount(
-            <CustomAttributeWidgetMountHarness 
-                attributes={attributes} 
-                availableAttributes={[descriptor]}
-            />
-        );
+        const component = await mount(<CustomAttributeWidgetMountHarness attributes={attributes} availableAttributes={[descriptor]} />);
 
         await expect(component.getByRole('heading', { name: 'Custom Attributes' })).toBeVisible();
         await expect(component.getByText('Test Attribute')).toBeVisible();
@@ -130,7 +125,7 @@ test.describe('CustomAttributeWidget', () => {
             el.removeAttribute('readonly');
             el.focus();
         });
-        
+
         // Now fill the input
         await input.fill('updated value');
 
