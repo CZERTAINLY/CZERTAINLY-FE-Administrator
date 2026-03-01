@@ -10,6 +10,10 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # Continue running other browser jobs even if one fails
+      matrix:
+        browser: [chromium, firefox, webkit]  # Creates 3 parallel jobs
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -18,12 +22,15 @@ jobs:
       - name: Install dependencies
         run: npm ci --ignore-scripts
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        # Only install the browser needed for this job (faster)
+        run: npx playwright install --with-deps ${{ matrix.browser }}
       - name: Run Playwright tests
-        run: npx playwright test
+        # Run only the project matching this browser
+        run: npx playwright test -c playwright.config.ts --project=${{ matrix.browser }}
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report
+          # Unique artifact name per browser to avoid conflicts
+          name: playwright-report-${{ matrix.browser }}
           path: playwright-report/
           retention-days: 30

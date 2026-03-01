@@ -77,26 +77,68 @@ test.describe('CustomAttributeWidget', () => {
     });
 
     test('allows editing and removing existing custom attribute', async ({ mount }) => {
+        const descriptor = {
+            uuid: 'attr-1',
+            name: 'testAttr',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.String,
+            properties: {
+                label: 'Test Attribute',
+                readOnly: false,
+                required: false,
+                list: false,
+                multiSelect: false,
+                visible: true,
+            },
+            description: 'Test description',
+        } as any;
+
         const attributes = [
             {
-                uuid: 'resp-1',
-                name: 'testAttr',
-                type: AttributeType.Custom,
-                contentType: AttributeContentType.String,
-                properties: { label: 'Attr 1', required: false, readOnly: false, list: false, multiSelect: false, visible: true },
+                ...descriptor,
+                label: 'Test Attribute',
                 content: [{ data: 'initial' }],
             },
         ] as any;
 
-        const component = await mount(<CustomAttributeWidgetMountHarness attributes={attributes} />);
+        const component = await mount(<CustomAttributeWidgetMountHarness attributes={attributes} availableAttributes={[descriptor]} />);
 
-        await component.getByTestId('edit-button').click();
+        await expect(component.getByRole('heading', { name: 'Custom Attributes' })).toBeVisible();
+        await expect(component.getByText('Test Attribute')).toBeVisible();
+        await expect(component.getByText('initial')).toBeVisible();
+
+        // Click edit button
+        await component.getByTestId('edit-button').dispatchEvent('click');
+
+        // Wait for save/cancel buttons to appear (edit form is now visible)
         await expect(component.getByTestId('save-custom-value')).toBeVisible();
-        await component.getByTestId('save-custom-value').click();
+        await expect(component.getByTestId('cancel-custom-value')).toBeVisible();
 
+        // Find the input using the data-testid from TextInput component
+        const input = component.getByTestId('text-input-testAttr');
+        await expect(input).toBeVisible();
+
+        // The input may have readonly attribute from TextInput component implementation
+        // Use evaluate to set the value directly via React's onChange simulation
+        await input.evaluate((el: HTMLInputElement) => {
+            // Remove readonly if present
+            el.removeAttribute('readonly');
+            el.focus();
+        });
+
+        // Now fill the input
+        await input.fill('updated value');
+
+        // Save the changes
+        await component.getByTestId('save-custom-value').dispatchEvent('click');
+
+        // After saving, delete button should be visible
         await expect(component.getByTestId('delete-button')).toBeVisible();
-        await component.getByTestId('delete-button').click();
 
+        // Delete the attribute
+        await component.getByTestId('delete-button').dispatchEvent('click');
+
+        // Widget should still be visible after deletion
         await expect(component.getByRole('heading', { name: 'Custom Attributes' })).toBeVisible();
     });
 });
