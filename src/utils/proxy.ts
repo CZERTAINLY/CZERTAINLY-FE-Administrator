@@ -1,14 +1,22 @@
 import { ProxyStatus } from 'types/openapi';
 
-// Status filter options for the proxy list
-export const PROXY_STATUS_OPTIONS = [
-    { value: ProxyStatus.Initialized, label: 'Initialized' },
-    { value: ProxyStatus.Provisioning, label: 'Provisioning' },
-    { value: ProxyStatus.Failed, label: 'Failed' },
-    { value: ProxyStatus.WaitingForInstallation, label: 'Waiting For Installation' },
-    { value: ProxyStatus.Connected, label: 'Connected' },
-    { value: ProxyStatus.Disconnected, label: 'Disconnected' },
-];
+const PROXY_STATUS_LABELS: Record<ProxyStatus, string> = {
+    [ProxyStatus.Initialized]: 'Initialized',
+    [ProxyStatus.Provisioning]: 'Provisioning',
+    [ProxyStatus.Failed]: 'Failed',
+    [ProxyStatus.WaitingForInstallation]: 'Waiting for installation',
+    [ProxyStatus.Connected]: 'Connected',
+    [ProxyStatus.Disconnected]: 'Disconnected',
+};
+
+export const PROXY_STATUS_OPTIONS = Object.entries(PROXY_STATUS_LABELS).map(([value, label]) => ({
+    value: value as ProxyStatus,
+    label,
+}));
+
+export function getProxyStatus(status: ProxyStatus): string {
+    return PROXY_STATUS_LABELS[status] || status;
+}
 
 /**
  * Maps proxy status to CSS color variable
@@ -31,18 +39,4 @@ export function getProxyStatusColor(status: ProxyStatus): string {
         default:
             return 'var(--status-gray-color)';
     }
-}
-
-/**
- * Formats proxy status for display.
- * Converts camelCase status to Title Case (e.g., "waitingForInstallation" -> "Waiting for installation")
- * @param status The proxy status
- * @returns Formatted status label
- */
-export function formatProxyStatus(status: ProxyStatus): string {
-    const spaced = status
-        .replace(/([A-Z])/g, ' $1')
-        .toLowerCase()
-        .trim();
-    return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
