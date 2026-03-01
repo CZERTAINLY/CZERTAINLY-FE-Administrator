@@ -2,7 +2,7 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Spinner from 'components/Spinner';
 import { actions, selectors } from 'ducks/info';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useCopyToClipboard } from 'utils/common-hooks';
 import Button from 'components/Button';
@@ -49,13 +49,12 @@ const PlatformInfoDialogLink = () => {
               })
             : '—';
 
-    const coreBuildTimeFormatted =
-        typeof platformInfo?.build?.timestamp !== 'undefined'
-            ? new Date(platformInfo?.build?.timestamp).toLocaleString(undefined, {
-                  dateStyle: 'medium',
-                  timeStyle: 'short',
-              })
-            : '—';
+    const coreBuildTimeFormatted = platformInfo?.build?.timestamp
+        ? new Date(platformInfo?.build?.timestamp).toLocaleString(undefined, {
+              dateStyle: 'medium',
+              timeStyle: 'short',
+          })
+        : '—';
 
     const data: TableDataRow[] = useMemo(
         () =>
