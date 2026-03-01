@@ -20,6 +20,7 @@ import groupsEpics from './certificateGroups-epics';
 import certificatesEpics from './certificates-epics';
 import complianceProfilesEpics from './compliance-profiles-epics';
 import connectorsEpics from './connectors-epic';
+import proxiesEpics from './proxies-epic';
 import credentialsEpics from './credentials-epics';
 import cryptographicKeyEpics from './cryptographic-keys-epics';
 import cryptographicOperationsEpics from './cryptographic-operations-epics';
@@ -68,6 +69,7 @@ export const epics = combineEpics(
     ...dashboardEpics,
     ...groupsEpics,
     ...connectorsEpics,
+    ...proxiesEpics,
     ...discoveriesEpics,
     ...usersEpics,
     ...rolesEpics,

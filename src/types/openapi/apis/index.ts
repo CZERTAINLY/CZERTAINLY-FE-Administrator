@@ -33,6 +33,7 @@ export * from './InternalNotificationApi';
 export * from './LocalOperationsApi';
 export * from './LocationManagementApi';
 export * from './NotificationProfileInventoryApi';
+export * from './ProxyManagementApi';
 export * from './RAProfileManagementApi';
 export * from './ResourceManagementApi';
 export * from './RoleManagementApi';

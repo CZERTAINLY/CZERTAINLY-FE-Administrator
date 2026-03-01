@@ -96,6 +96,8 @@ export enum LockWidgetNameEnum {
     EventSettings,
     ComplianceProfileAssociations,
     ListOfAvailableRulesAndGroups,
+    ProxyStore,
+    ProxyDetails,
 }
 
 export interface WidgetLockModel {
