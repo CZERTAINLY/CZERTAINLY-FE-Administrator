@@ -95,7 +95,7 @@ jobs:
           echo "LCOV generated: $(wc -l coverage/lcov.info | awk '{print $1}') lines"
 
       - name: Sonar Scan
-        uses: SonarSource/sonarqube-scan-action@v4
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN:  ${{ secrets.SONAR_TOKEN }}
