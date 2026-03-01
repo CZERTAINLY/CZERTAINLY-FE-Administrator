@@ -48,7 +48,7 @@ export interface GetProxyRequest {
     uuid: string;
 }
 
-export interface ListProxysRequest {
+export interface ListProxiesRequest {
     status?: ProxyStatus;
 }
 
@@ -143,9 +143,9 @@ export class ProxyManagementApi extends BaseAPI {
     /**
      * List Proxies by Function Group and Kind
      */
-    listProxys({ status }: ListProxysRequest): Observable<Array<ProxyListDto>>
-    listProxys({ status }: ListProxysRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<ProxyListDto>>>
-    listProxys({ status }: ListProxysRequest, opts?: OperationOpts): Observable<Array<ProxyListDto> | AjaxResponse<Array<ProxyListDto>>> {
+    listProxies({ status }: ListProxiesRequest): Observable<Array<ProxyListDto>>
+    listProxies({ status }: ListProxiesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<ProxyListDto>>>
+    listProxies({ status }: ListProxiesRequest, opts?: OperationOpts): Observable<Array<ProxyListDto> | AjaxResponse<Array<ProxyListDto>>> {
 
         const query: HttpQuery = {};
 

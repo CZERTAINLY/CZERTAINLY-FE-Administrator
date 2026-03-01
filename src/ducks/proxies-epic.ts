@@ -20,7 +20,7 @@ const listProxies: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.listProxies.match),
         switchMap((action) =>
-            deps.apiClients.proxies.listProxys({ status: action.payload?.status }).pipe(
+            deps.apiClients.proxies.listProxies({ status: action.payload?.status }).pipe(
                 mergeMap((list) =>
                     of(
                         slice.actions.listProxiesSuccess({

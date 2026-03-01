@@ -1,6 +1,6 @@
 import Badge from 'components/Badge';
 import { ProxyStatus } from 'types/openapi';
-import { getProxyStatusColor, formatProxyStatus } from 'utils/proxy';
+import { getProxyStatusColor, getProxyStatus } from 'utils/proxy';
 
 interface ProxyStatusBadgeProps {
     status: ProxyStatus;
@@ -12,7 +12,7 @@ interface ProxyStatusBadgeProps {
  */
 export default function ProxyStatusBadge({ status }: ProxyStatusBadgeProps) {
     const statusColor = getProxyStatusColor(status);
-    const statusLabel = formatProxyStatus(status);
+    const statusLabel = getProxyStatus(status);
 
     return <Badge style={{ backgroundColor: statusColor }}>{statusLabel}</Badge>;
 }
