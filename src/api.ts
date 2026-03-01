@@ -50,9 +50,9 @@ import {
     CertificationRequestUtilsAPIApi,
     Configuration as ConfigurationUtils,
 } from 'types/openapi/utils';
-import { OIDUtilsAPIApi } from 'types/openapi/utils';
+import { OIDUtilsAPIApi } from './types/openapi/utils';
 
-const apiUrl = typeof window !== 'undefined' ? window?.__ENV__?.API_URL || '/api' : '/api';
+const apiUrl = (window as any).__ENV__?.API_URL || '/api';
 const configuration = new Configuration({ basePath: apiUrl });
 
 export interface ApiClients {

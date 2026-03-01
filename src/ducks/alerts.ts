@@ -1,4 +1,6 @@
+import { store } from '../App';
 import { createSelector } from 'reselect';
+import { MessageModel } from 'types/alerts';
 import { createFeatureSelector } from 'utils/ducks';
 import { alertsSlice, State } from './alert-slice';
 
@@ -12,5 +14,19 @@ export const selectors = {
 };
 
 export const actions = alertsSlice.actions;
+
+setInterval(() => {
+    const alerts = store.getState().alerts;
+    if (!alerts?.messages?.length) return;
+    alerts.messages.forEach((message: MessageModel) => {
+        if (Date.now() - message.time > 17000) {
+            store.dispatch(actions.hide(message.id));
+        }
+
+        if (Date.now() - message.time > 20000) {
+            store.dispatch(actions.dismiss(message.id));
+        }
+    });
+}, 1000);
 
 export default alertsSlice.reducer;
