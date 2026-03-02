@@ -12,6 +12,7 @@ interface BaseProps {
     options?: {
         value: string | number | object;
         label: string;
+        description?: string;
         disabled?: boolean;
     }[];
     className?: string;
@@ -29,6 +30,7 @@ interface BaseProps {
     dropdownWidth?: number;
     dataTestId?: string;
     colorizeVersionLabel?: boolean;
+    showOptionDescriptionInDropdown?: boolean;
 }
 
 interface SingleSelectProps extends BaseProps {
@@ -131,6 +133,7 @@ function Select({
     dropdownWidth,
     dataTestId,
     colorizeVersionLabel = false,
+    showOptionDescriptionInDropdown = false,
 }: Props) {
     const selectRef = useRef<HTMLSelectElement>(null);
     const previousOptionsRef = useRef<string>('');
@@ -276,11 +279,6 @@ function Select({
                 element.innerHTML = `<span class="text-[var(--primary-blue-color)] pointer-events-none">${versionPart}</span> <span class="text-[var(--dark-gray-color)] pointer-events-none">${suffixPart}</span>`;
             };
 
-            root.querySelectorAll?.('[data-title]').forEach((titleEl) => {
-                if (!(titleEl instanceof HTMLElement)) return;
-                applyTextColorMarkup(titleEl);
-            });
-
             const toggleButton = root.querySelector?.('button[aria-expanded]');
             if (toggleButton instanceof HTMLElement) {
                 toggleButton.querySelectorAll?.('span').forEach((spanEl) => {
@@ -288,6 +286,26 @@ function Select({
                     applyTextColorMarkup(spanEl);
                 });
             }
+        };
+
+        const applyDropdownOptionDescriptions = (dropdown: Element | null) => {
+            if (!showOptionDescriptionInDropdown || !dropdown) return;
+
+            dropdown.querySelectorAll?.('.hs-select-option-row').forEach((row) => {
+                const titleEl = row.querySelector?.('[data-title]');
+                if (!(titleEl instanceof HTMLElement)) return;
+
+                const titleText = titleEl.textContent?.trim();
+                if (!titleText) return;
+
+                const option = options.find((opt) => opt.label.trim() === titleText);
+                const description = option?.description?.trim();
+                if (!description) return;
+
+                titleEl.classList.remove('truncate');
+                titleEl.classList.add('whitespace-normal');
+                titleEl.innerHTML = `<span class="block leading-5">${escapeHtml(titleText)}</span><span class="block text-xs text-gray-500 leading-4">${escapeHtml(description)}</span>`;
+            });
         };
 
         const setTitlesAndTooltips = () => {
@@ -299,14 +317,16 @@ function Select({
             // Try to get dropdown from HSSelect instance (works also when dropdownScope === 'window')
             const hsInstance = (window as any).HSSelect?.getInstance?.(select);
             const dropdown: Element | null = (hsInstance && hsInstance.dropdown) || root.querySelector?.('.hs-select-dropdown');
-            if (dropdown) {
-                applyVersionLabelColor(dropdown);
-            }
+            applyDropdownOptionDescriptions(dropdown);
+
             dropdown?.querySelectorAll?.('.hs-select-option-row').forEach((row) => {
                 const titleEl = row.querySelector?.('[data-title]');
                 const tooltipContentEl = row.querySelector?.('[data-tooltip-content]');
                 if (titleEl instanceof HTMLElement && tooltipContentEl instanceof HTMLElement && titleEl.textContent) {
-                    tooltipContentEl.textContent = titleEl.textContent.trim();
+                    const titleText = titleEl.querySelector('span')?.textContent?.trim() || titleEl.textContent.trim();
+                    const option = options.find((opt) => opt.label.trim() === titleText);
+                    const description = option?.description?.trim();
+                    tooltipContentEl.textContent = description ? `${titleText} ${description}` : titleText;
                 }
             });
             root.querySelectorAll?.('[data-tag-value]').forEach((tagEl) => {
@@ -325,7 +345,7 @@ function Select({
         observer.observe(select.parentNode, { childList: true, subtree: true });
         requestAnimationFrame(() => setTitlesAndTooltips());
         return () => observer.disconnect();
-    }, [options, isMulti, id, colorizeVersionLabel]);
+    }, [options, isMulti, id, colorizeVersionLabel, showOptionDescriptionInDropdown]);
 
     const hasOptions = options && options.length > 0;
 

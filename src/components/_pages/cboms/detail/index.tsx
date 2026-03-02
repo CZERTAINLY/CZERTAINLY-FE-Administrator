@@ -7,6 +7,7 @@ import Breadcrumb from 'components/Breadcrumb';
 import Container from 'components/Container';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
+import JsonViewer from 'components/JsonViewer';
 import Select from 'components/Select';
 import DonutChart from 'components/_pages/dashboard/DashboardItem/DonutChart';
 import Spinner from 'components/Spinner';
@@ -16,6 +17,7 @@ import { EntityType } from 'ducks/filters';
 import { actions, selectors } from 'ducks/cbom';
 import { actions as alertActions } from 'ducks/alerts';
 import { DashboardDict } from 'types/statisticsDashboard';
+import { dateFormatter } from 'utils/dateUtil';
 import { getDonutChartColorsByRandomNumberOfOptions } from 'utils/dashboard';
 
 type CbomComponent = {
@@ -49,6 +51,8 @@ type LocationModalState = {
     location: string;
     rawJson: string;
 };
+
+const VERSION_HISTORY_OPTION_VALUE = '__CBOM_VIEW_VERSION_HISTORY__';
 
 const toArray = <T,>(v: T | T[] | undefined | null): T[] => (v == null ? [] : Array.isArray(v) ? v : [v]);
 
@@ -138,12 +142,17 @@ export default function CbomDetail() {
     const isFetching = useSelector(selectors.selectIsFetchingDetail);
     const isFetchingVersions = useSelector(selectors.selectIsFetchingVersions);
     const [locationModalData, setLocationModalData] = useState<LocationModalState>();
+    const [selectedVersionUuid, setSelectedVersionUuid] = useState(id);
 
     const getFreshCbomDetail = useCallback(() => {
-        if (!id) return;
+        if (!selectedVersionUuid || selectedVersionUuid === VERSION_HISTORY_OPTION_VALUE) return;
         dispatch(actions.clearCbomDetail());
-        dispatch(actions.getCbomDetail({ uuid: id }));
-    }, [dispatch, id]);
+        dispatch(actions.getCbomDetail({ uuid: selectedVersionUuid }));
+    }, [dispatch, selectedVersionUuid]);
+
+    useEffect(() => {
+        setSelectedVersionUuid(id);
+    }, [id]);
 
     useEffect(() => {
         getFreshCbomDetail();
@@ -331,25 +340,6 @@ export default function CbomDetail() {
         [],
     );
 
-    const componentRows: TableDataRow[] = useMemo(
-        () =>
-            components.map((c, i: number) => ({
-                id: c?.bomRef ?? c?.['bom-ref'] ?? i,
-                columns: [
-                    c?.name ?? c?.['bom-ref'] ?? '-',
-                    c?.evidence?.occurrences
-                        ?.map((o) => o.location)
-                        .filter(Boolean)
-                        .join(', ') || '-',
-                    toDisplayName(c?.cryptoProperties?.assetType ?? c?.type, ASSET_TYPE_LABELS),
-                    toArray(c?.cryptoProperties?.algorithmProperties?.primitive)
-                        .map((p) => toDisplayName(p, PRIMITIVE_LABELS))
-                        .join(', ') || '-',
-                ],
-            })),
-        [components],
-    );
-
     const handleLocationClick = useCallback((assetName: string, location: string, locationData: unknown) => {
         setLocationModalData({
             asset: assetName,
@@ -357,6 +347,52 @@ export default function CbomDetail() {
             rawJson: JSON.stringify(locationData ?? { location }, null, 2),
         });
     }, []);
+
+    const componentRows: TableDataRow[] = useMemo(
+        () =>
+            components.map((c, i: number) => {
+                const assetName = c?.name ?? c?.['bom-ref'] ?? '-';
+                const occurrences = toArray(c?.evidence?.occurrences);
+
+                const locationsColumn =
+                    occurrences.length > 0 ? (
+                        <div className="flex flex-col gap-1">
+                            {occurrences.map((occurrence, index) => {
+                                const location = occurrence?.location || '-';
+                                const key = `${String(assetName)}-${location}-${index}`;
+
+                                return (
+                                    <Button
+                                        key={key}
+                                        variant="transparent"
+                                        color="secondary"
+                                        type="button"
+                                        className="!p-0 !border-0 !inline text-blue-600 hover:!bg-transparent hover:underline focus:!bg-transparent w-fit"
+                                        onClick={() => handleLocationClick(String(assetName), location, occurrence)}
+                                    >
+                                        {location}
+                                    </Button>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        '-'
+                    );
+
+                return {
+                    id: c?.bomRef ?? c?.['bom-ref'] ?? i,
+                    columns: [
+                        assetName,
+                        locationsColumn,
+                        toDisplayName(c?.cryptoProperties?.assetType ?? c?.type, ASSET_TYPE_LABELS),
+                        toArray(c?.cryptoProperties?.algorithmProperties?.primitive)
+                            .map((p) => toDisplayName(p, PRIMITIVE_LABELS))
+                            .join(', ') || '-',
+                    ],
+                };
+            }),
+        [components, handleLocationClick],
+    );
 
     const handleCloseLocationModal = useCallback(() => {
         setLocationModalData(undefined);
@@ -378,7 +414,7 @@ export default function CbomDetail() {
         const latestVersionNumber = cbomVersions.length ? Math.max(...cbomVersions.map((version) => version.version)) : undefined;
         const originalVersionNumber = cbomVersions.length ? Math.min(...cbomVersions.map((version) => version.version)) : undefined;
 
-        return [...cbomVersions]
+        const versionOptions = [...cbomVersions]
             .sort((a, b) => b.version - a.version)
             .map((version) => {
                 const suffix =
@@ -387,15 +423,37 @@ export default function CbomDetail() {
                 return {
                     value: version.uuid,
                     label: `Version ${version.version}${suffix}`,
+                    description: dateFormatter(version.timestamp || version.createdAt),
                 };
             });
+
+        return [
+            ...versionOptions,
+            {
+                value: VERSION_HISTORY_OPTION_VALUE,
+                label: 'View Version History',
+                description: `${cbomVersions.length} versions`,
+            },
+        ];
     }, [cbomVersions]);
 
     const handleVersionSelect = useCallback(
         (value: string | number | object | { value: string | number | object; label: string }) => {
-            const selectedVersionUuid = typeof value === 'string' ? value : '';
-            if (!selectedVersionUuid || !id) return;
-            navigate(`/cboms/detail/${id}/versions/${selectedVersionUuid}`);
+            const selectedValue =
+                typeof value === 'string' || typeof value === 'number'
+                    ? String(value)
+                    : typeof value === 'object' && value !== null && 'value' in value
+                      ? String(value.value)
+                      : '';
+
+            if (!selectedValue || !id) return;
+
+            if (selectedValue === VERSION_HISTORY_OPTION_VALUE) {
+                navigate(`/cboms/detail/${id}/versions`);
+                return;
+            }
+
+            setSelectedVersionUuid(selectedValue);
         },
         [navigate, id],
     );
@@ -458,11 +516,12 @@ export default function CbomDetail() {
                         <Select
                             id="cbom-version-history-select"
                             placeholder="Select version"
-                            value={id}
+                            value={selectedVersionUuid}
                             onChange={handleVersionSelect}
                             options={versionSelectOptions}
                             disabled={isFetchingVersions || versionSelectOptions.length === 0}
                             colorizeVersionLabel
+                            showOptionDescriptionInDropdown
                         />
                     </div>
                 }
@@ -603,44 +662,7 @@ export default function CbomDetail() {
                                                 <Download size={18} aria-hidden="true" />
                                             </Button>
                                         </div>
-                                        <textarea
-                                            className="raw-json-textarea"
-                                            readOnly
-                                            value={rawJsonText}
-                                            style={{
-                                                width: '100%',
-                                                height: '900px',
-                                                backgroundColor: '#0B1220',
-                                                color: '#E5E7EB',
-                                                borderRadius: '8px',
-                                                padding: '12px',
-                                                paddingTop: '44px',
-                                                fontFamily: 'monospace',
-                                                fontSize: '12px',
-                                            }}
-                                        />
-                                        <style>{`
-                                            .raw-json-textarea {
-                                                scrollbar-width: thin;
-                                                scrollbar-color: #4b5563 #111827;
-                                            }
-                                            .raw-json-textarea::-webkit-scrollbar {
-                                                width: 12px;
-                                                height: 12px;
-                                            }
-                                            .raw-json-textarea::-webkit-scrollbar-track {
-                                                background: #111827;
-                                                border-radius: 9999px;
-                                            }
-                                            .raw-json-textarea::-webkit-scrollbar-thumb {
-                                                background: linear-gradient(180deg, #6b7280, #4b5563);
-                                                border-radius: 9999px;
-                                                border: 2px solid #111827;
-                                            }
-                                            .raw-json-textarea::-webkit-scrollbar-thumb:hover {
-                                                background: linear-gradient(180deg, #9ca3af, #6b7280);
-                                            }
-                                        `}</style>
+                                        <JsonViewer value={rawJsonText} height={900} paddingTop={44} />
                                     </div>
                                 </Widget>
                             </Container>
@@ -668,23 +690,7 @@ export default function CbomDetail() {
                             </div>
                         </div>
 
-                        <textarea
-                            readOnly
-                            className="location-json-textarea"
-                            value={locationModalData?.rawJson ?? ''}
-                            style={{
-                                width: '100%',
-                                height: '278px',
-                                backgroundColor: '#0B1220',
-                                color: '#E5E7EB',
-                                borderRadius: '8px',
-                                padding: '12px',
-                                fontFamily: 'monospace',
-                                fontSize: '12px',
-                                resize: 'none',
-                                overflow: 'auto',
-                            }}
-                        />
+                        <JsonViewer value={locationModalData?.rawJson ?? ''} height={278} />
 
                         <div className="flex items-center justify-between pt-2">
                             <Button type="button" color="primary" onClick={handleCopyLocationExcerpt}>
@@ -700,29 +706,6 @@ export default function CbomDetail() {
                                 Close
                             </Button>
                         </div>
-
-                        <style>{`
-                            .location-json-textarea {
-                                scrollbar-width: thin;
-                                scrollbar-color: #4b5563 #111827;
-                            }
-                            .location-json-textarea::-webkit-scrollbar {
-                                width: 12px;
-                                height: 12px;
-                            }
-                            .location-json-textarea::-webkit-scrollbar-track {
-                                background: #111827;
-                                border-radius: 9999px;
-                            }
-                            .location-json-textarea::-webkit-scrollbar-thumb {
-                                background: linear-gradient(180deg, #6b7280, #4b5563);
-                                border-radius: 9999px;
-                                border: 2px solid #111827;
-                            }
-                            .location-json-textarea::-webkit-scrollbar-thumb:hover {
-                                background: linear-gradient(180deg, #9ca3af, #6b7280);
-                            }
-                        `}</style>
                     </div>
                 }
             />
