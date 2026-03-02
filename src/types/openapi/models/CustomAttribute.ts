@@ -12,6 +12,11 @@
  */
 
 import type {
+    AttributeContentType,
+    AttributeType,
+    AttributeVersion,
+    BaseAttributeContentDtoV3,
+    CustomAttributeProperties,
     CustomAttributeV2,
     CustomAttributeV3,
 } from './';
