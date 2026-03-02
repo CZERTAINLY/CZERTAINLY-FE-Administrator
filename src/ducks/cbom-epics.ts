@@ -1,8 +1,8 @@
-import { AppEpic } from 'ducks';
+import type { AppEpic } from 'ducks';
 import { of } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 import { extractError } from 'utils/net';
-import { actions as alertActions } from './alerts';
+import { alertsSlice } from './alert-slice';
 import { actions as appRedirectActions } from './app-redirect';
 import { slice } from './cbom';
 import {
@@ -121,7 +121,7 @@ const uploadCbom: AppEpic = (action$, state, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.uploadCbomFailure({ error: extractError(err, 'Failed to upload CBOM') }),
-                        alertActions.error(extractError(err, 'Failed to upload CBOM')),
+                        alertsSlice.actions.error(extractError(err, 'Failed to upload CBOM')),
                     ),
                 ),
             ),

@@ -88,18 +88,6 @@ export default function CbomUploadDialog({ onCancel, onUpload, okButtonTitle = '
                 <div className="space-y-4">
                     <FileUpload id="cbom-upload" fileType="CBOM" editable showFileInfo={false} onFileContentLoaded={onFileContentLoaded} />
 
-                    <div>
-                        <label htmlFor="cbom-preview" className="block text-sm font-medium text-gray-700">
-                            Preview
-                        </label>
-                        <textarea
-                            id="cbom-preview"
-                            readOnly
-                            value={fileContent ? fileContent.slice(0, 2000) : ''}
-                            className="w-full mt-1 p-2 border rounded h-40"
-                        />
-                    </div>
-
                     <Container className="flex-row justify-end modal-footer" gap={4}>
                         <Button variant="outline" onClick={onCancel} disabled={formState.isSubmitting || isUploading} type="button">
                             Cancel
