@@ -152,6 +152,7 @@ const menuItemMappings: MenuItemMapping[] = [
             { _key: '/groups', name: 'Groups', link: '/groups', requiredResources: [Resource.Groups] },
             { _key: '/entities', name: 'Entities', link: '/entities', requiredResources: [Resource.Entities] },
             { _key: '/locations', name: 'Locations', link: '/locations', requiredResources: [Resource.Locations] },
+            { _key: '/cboms', name: 'CBOM', link: '/cboms', requiredResources: [Resource.Cboms] },
         ],
     },
 

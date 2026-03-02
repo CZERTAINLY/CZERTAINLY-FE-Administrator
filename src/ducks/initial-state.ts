@@ -50,6 +50,7 @@ import { initialState as initialUtilsCertificateRequestState, slice as utilsCert
 import { initialState as initialUtilsOidState, slice as utilsOidSlice } from './utilsOid';
 import { initialState as initialOidsState, slice as oidsSlice } from './oids';
 import { initialState as initialInfoState, slice as infoSlice } from './info';
+import { initialState as initialCbomState, slice as cbomSlice } from './cbom';
 
 export const initialState = {
     [alertsSlice.name]: initialAlertsState,
@@ -96,4 +97,5 @@ export const initialState = {
     [utilsActuatorSlice.name]: initialUtilsActuatorState,
     [oidsSlice.name]: initialOidsState,
     [infoSlice.name]: initialInfoState,
+    [cbomSlice.name]: initialCbomState,
 };
