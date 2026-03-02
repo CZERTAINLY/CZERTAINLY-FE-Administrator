@@ -1,8 +1,8 @@
-import { test, expect } from '../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import { getInputStringFromIso8601String, getIso8601StringFromInputString } from './duration';
 
-test.describe('duration', () => {
-    test.describe('getInputStringFromIso8601String', () => {
+describe('duration', () => {
+    describe('getInputStringFromIso8601String', () => {
         test('should parse PT1H to 1h', () => {
             expect(getInputStringFromIso8601String('PT1H')).toBe('1h');
         });
@@ -31,7 +31,7 @@ test.describe('duration', () => {
         });
     });
 
-    test.describe('getIso8601StringFromInputString', () => {
+    describe('getIso8601StringFromInputString', () => {
         test('should convert 1h to PT1H', () => {
             expect(getIso8601StringFromInputString('1h')).toBe('PT1H');
         });

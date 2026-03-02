@@ -1,4 +1,4 @@
-import { test, expect } from '../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import { AjaxError } from 'rxjs/ajax';
 import { extractError, getLockWidgetObject } from './net';
 import { LockTypeEnum } from 'types/user-interface';
@@ -19,8 +19,8 @@ function createMockAjaxError(overrides: { status?: number; response?: any; messa
     return err;
 }
 
-test.describe('net utils', () => {
-    test.describe('extractError', () => {
+describe('net utils', () => {
+    describe('extractError', () => {
         test('should return headline when err is null/undefined', () => {
             expect(extractError(null as any, 'Failed')).toBe('Failed');
             expect(extractError(undefined as any, 'Failed')).toBe('Failed');
@@ -53,7 +53,7 @@ test.describe('net utils', () => {
         });
     });
 
-    test.describe('getLockWidgetObject', () => {
+    describe('getLockWidgetObject', () => {
         test('should return custom lock for error with code and message', () => {
             const err = createMockAjaxError({
                 status: 401,

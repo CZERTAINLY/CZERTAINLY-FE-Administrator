@@ -1,8 +1,8 @@
-import { test, expect } from '../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import reducer, { actions, initialState } from './user-interface';
 import { LockWidgetNameEnum, LockTypeEnum } from 'types/user-interface';
 
-test.describe('user-interface slice', () => {
+describe('user-interface slice', () => {
     test('initial state', () => {
         expect(reducer(undefined, { type: 'unknown' })).toEqual(initialState);
     });

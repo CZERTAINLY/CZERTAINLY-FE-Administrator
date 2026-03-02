@@ -72,27 +72,6 @@ const getCronTimes = (cronExpression: string | undefined) => {
     return undefined;
 };
 
-export const getCronExpression = (cronExpression: string | undefined) => {
-    const times = getCronTimes(cronExpression);
-    return times ? (
-        <>
-            Next five executions:
-            <ul>
-                {times.map((t) => (
-                    <li key={t.toString()}>{dateFormatter(t)}</li>
-                ))}
-            </ul>
-        </>
-    ) : (
-        ''
-    );
-};
-
-export const getCronExpressionString = (cronExpression: string | undefined) => {
-    const times = getCronTimes(cronExpression);
-    return times ? `Next five executions:\n${times.map((t, i) => (i > 0 ? '\n' : '') + dateFormatter(t)).join('')}` : '';
-};
-
 export const getStrongFromCronExpression = (cronExpression: string | undefined) => {
     if (cronExpression) {
         try {

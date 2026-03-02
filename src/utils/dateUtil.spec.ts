@@ -1,4 +1,4 @@
-import { test, expect } from '../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import {
     dateFormatter,
     timeFormatter,
@@ -12,8 +12,8 @@ import {
 } from './dateUtil';
 import { AttributeContentType, FilterFieldType, FilterConditionOperator } from 'types/openapi';
 
-test.describe('dateUtil', () => {
-    test.describe('dateFormatter', () => {
+describe('dateUtil', () => {
+    describe('dateFormatter', () => {
         test('should format date string', () => {
             const result = dateFormatter('2024-01-15T10:30:45');
             expect(result).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/);
@@ -33,7 +33,7 @@ test.describe('dateUtil', () => {
         });
     });
 
-    test.describe('timeFormatter', () => {
+    describe('timeFormatter', () => {
         test('should format milliseconds as time', () => {
             const oneHour = 60 * 60 * 1000;
             const result = timeFormatter(oneHour);
@@ -47,7 +47,7 @@ test.describe('dateUtil', () => {
         });
     });
 
-    test.describe('durationFormatter', () => {
+    describe('durationFormatter', () => {
         test('should return empty string for null/undefined startDate', () => {
             expect(durationFormatter(null, null)).toBe('');
             expect(durationFormatter(undefined, undefined)).toBe('');
@@ -61,7 +61,7 @@ test.describe('dateUtil', () => {
         });
     });
 
-    test.describe('getFormattedDate', () => {
+    describe('getFormattedDate', () => {
         test('should format date string as YYYY-MM-DD', () => {
             expect(getFormattedDate('2024-03-15T12:00:00')).toMatch(/^\d{4}-\d{2}-\d{2}$/);
         });
@@ -71,7 +71,7 @@ test.describe('dateUtil', () => {
         });
     });
 
-    test.describe('getFormattedDateTime', () => {
+    describe('getFormattedDateTime', () => {
         test('should format date string with time', () => {
             const result = getFormattedDateTime('2024-03-15T14:30:45');
             expect(result).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/);
@@ -82,14 +82,14 @@ test.describe('dateUtil', () => {
         });
     });
 
-    test.describe('getDateInString', () => {
+    describe('getDateInString', () => {
         test('should return date with offset in ISO string', () => {
             const result = getDateInString(0);
             expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T/);
         });
     });
 
-    test.describe('checkIfFieldAttributeTypeIsDate', () => {
+    describe('checkIfFieldAttributeTypeIsDate', () => {
         test('should return true for Date type', () => {
             expect(checkIfFieldAttributeTypeIsDate({ attributeContentType: AttributeContentType.Date } as any)).toBe(true);
         });
@@ -103,7 +103,7 @@ test.describe('dateUtil', () => {
         });
     });
 
-    test.describe('checkIfFieldTypeIsDate', () => {
+    describe('checkIfFieldTypeIsDate', () => {
         test('should return true for Date', () => {
             expect(checkIfFieldTypeIsDate(FilterFieldType.Date)).toBe(true);
         });
@@ -117,7 +117,7 @@ test.describe('dateUtil', () => {
         });
     });
 
-    test.describe('checkIfFieldOperatorIsInterval', () => {
+    describe('checkIfFieldOperatorIsInterval', () => {
         test('should return true for InNext', () => {
             expect(checkIfFieldOperatorIsInterval(FilterConditionOperator.InNext)).toBe(true);
         });

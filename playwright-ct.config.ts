@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 
 export default defineConfig({
     testDir: './src',
-    testMatch: ['**/*.spec.tsx', '**/*.spec.ts'],
+    testMatch: ['src/components/**/*.spec.tsx', 'src/utils/**/*.spec.tsx'],
     use: {
         ctPort: 3100,
         ctViteConfig: {
@@ -82,21 +82,8 @@ export default defineConfig({
                     return fp;
                 },
                 coverage: {
-                    outputDir: './coverage',
-                    reports: [['lcovonly', { file: 'lcov.info' }], 'text-summary'],
-                    sourceFilter: (p: string) => {
-                        if (!p) return false;
-
-                        p = p.replaceAll('\\', '/');
-
-                        if (p.startsWith('localhost-')) return false;
-                        if (p.includes('/assets/') || p.includes('assets/')) return false;
-                        if (p.endsWith('.css')) return false;
-                        if (p.includes('node_modules')) return false;
-                        if (p.includes('/_pages/')) return false;
-
-                        return /^src\/.*\.(ts|tsx|js|jsx)$/.test(p);
-                    },
+                    outputDir: './coverage-playwright',
+                    reports: ['lcovonly', 'text-summary'],
                 },
             },
         ],

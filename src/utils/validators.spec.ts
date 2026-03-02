@@ -1,4 +1,4 @@
-import { test, expect } from '../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import {
     validateRequired,
     validatePattern,
@@ -21,8 +21,8 @@ import {
     validatePostgresPosixRegex,
 } from './validators';
 
-test.describe('validators', () => {
-    test.describe('validateRequired', () => {
+describe('validators', () => {
+    describe('validateRequired', () => {
         test('should return undefined for non-empty value', () => {
             expect(validateRequired()('test')).toBeUndefined();
             expect(validateRequired()(123)).toBeUndefined();
@@ -42,7 +42,7 @@ test.describe('validators', () => {
         });
     });
 
-    test.describe('validatePattern', () => {
+    describe('validatePattern', () => {
         test('should return undefined when value matches pattern', () => {
             const validator = validatePattern(/^[a-z]+$/);
             expect(validator('abc')).toBeUndefined();
@@ -65,7 +65,7 @@ test.describe('validators', () => {
         });
     });
 
-    test.describe('validateInteger', () => {
+    describe('validateInteger', () => {
         test('should accept valid integers', () => {
             expect(validateInteger()('123')).toBeUndefined();
             expect(validateInteger()('-456')).toBeUndefined();
@@ -78,7 +78,7 @@ test.describe('validators', () => {
         });
     });
 
-    test.describe('validatePositiveInteger', () => {
+    describe('validatePositiveInteger', () => {
         test('should accept positive integers', () => {
             expect(validatePositiveInteger()('123')).toBeUndefined();
             expect(validatePositiveInteger()('0')).toBeUndefined();
@@ -90,7 +90,7 @@ test.describe('validators', () => {
         });
     });
 
-    test.describe('validateNonZeroInteger', () => {
+    describe('validateNonZeroInteger', () => {
         test('should accept non-zero integers', () => {
             expect(validateNonZeroInteger()('123')).toBeUndefined();
             expect(validateNonZeroInteger()('-5')).toBeUndefined();
@@ -102,7 +102,7 @@ test.describe('validators', () => {
         });
     });
 
-    test.describe('validateDuration', () => {
+    describe('validateDuration', () => {
         test('should accept valid duration strings', () => {
             expect(validateDuration()('1d')).toBeUndefined();
             expect(validateDuration()('2h 30m')).toBeUndefined();
@@ -126,7 +126,7 @@ test.describe('validators', () => {
         });
     });
 
-    test.describe('validateFloat', () => {
+    describe('validateFloat', () => {
         test('should accept valid floats', () => {
             expect(validateFloat()('123.45')).toBeUndefined();
             expect(validateFloat()('-0.5')).toBeUndefined();
@@ -138,7 +138,7 @@ test.describe('validators', () => {
         });
     });
 
-    test.describe('validateEmail', () => {
+    describe('validateEmail', () => {
         test('should accept valid emails', () => {
             expect(validateEmail()('test@example.com')).toBeUndefined();
             expect(validateEmail()('user.name@domain.co')).toBeUndefined();
@@ -150,7 +150,7 @@ test.describe('validators', () => {
         });
     });
 
-    test.describe('validateLength', () => {
+    describe('validateLength', () => {
         test('should accept value within range', () => {
             const validator = validateLength(2, 5);
             expect(validator('ab')).toBeUndefined();
@@ -168,7 +168,7 @@ test.describe('validators', () => {
         });
     });
 
-    test.describe('composeValidators', () => {
+    describe('composeValidators', () => {
         test('should return first error from validators', () => {
             const validator = composeValidators(validateRequired(), validateEmail());
             expect(validator('')).toBe('Required Field');
@@ -182,7 +182,7 @@ test.describe('validators', () => {
         });
     });
 
-    test.describe('validateRoutelessUrl', () => {
+    describe('validateRoutelessUrl', () => {
         test('should accept valid urls', () => {
             expect(validateRoutelessUrl()('localhost:8443')).toBeUndefined();
             expect(validateRoutelessUrl()('https://example.com')).toBeUndefined();
@@ -193,7 +193,7 @@ test.describe('validators', () => {
         });
     });
 
-    test.describe('validateUrlWithRoute', () => {
+    describe('validateUrlWithRoute', () => {
         test('should accept empty value', () => {
             expect(validateUrlWithRoute('')).toBeUndefined();
         });
@@ -207,7 +207,7 @@ test.describe('validators', () => {
         });
     });
 
-    test.describe('validateAlphaNumericWithSpecialChars', () => {
+    describe('validateAlphaNumericWithSpecialChars', () => {
         test('should accept valid strings with spaces and separators', () => {
             expect(validateAlphaNumericWithSpecialChars()('John Doe')).toBeUndefined();
             expect(validateAlphaNumericWithSpecialChars()(`O\'Brien`)).toBeUndefined();
@@ -218,7 +218,7 @@ test.describe('validators', () => {
         });
     });
 
-    test.describe('validateCustomIp', () => {
+    describe('validateCustomIp', () => {
         test('should accept valid IP', () => {
             expect(validateCustomIp('192.168.1.1')).toBeUndefined();
             expect(validateCustomIp('255.255.255.255')).toBeUndefined();
@@ -230,7 +230,7 @@ test.describe('validators', () => {
         });
     });
 
-    test.describe('validateAlphaNumericWithoutAccents', () => {
+    describe('validateAlphaNumericWithoutAccents', () => {
         test('should accept alphanumeric with allowed chars', () => {
             expect(validateAlphaNumericWithoutAccents()('abc123')).toBeUndefined();
             expect(validateAlphaNumericWithoutAccents()('test_id-1.value')).toBeUndefined();
@@ -241,7 +241,7 @@ test.describe('validators', () => {
         });
     });
 
-    test.describe('validateOid', () => {
+    describe('validateOid', () => {
         test('should accept valid OID', () => {
             expect(validateOid()('1.2.3.4')).toBeUndefined();
         });
@@ -251,7 +251,7 @@ test.describe('validators', () => {
         });
     });
 
-    test.describe('validateOidCode', () => {
+    describe('validateOidCode', () => {
         test('should accept valid OID code', () => {
             expect(validateOidCode()('MyOID')).toBeUndefined();
             expect(validateOidCode()('OID-123')).toBeUndefined();
@@ -262,7 +262,7 @@ test.describe('validators', () => {
         });
     });
 
-    test.describe('validateQuartzCronExpression', () => {
+    describe('validateQuartzCronExpression', () => {
         test('should accept empty value', () => {
             const validator = validateQuartzCronExpression(undefined);
             expect(validator('')).toBeUndefined();
@@ -277,7 +277,7 @@ test.describe('validators', () => {
         });
     });
 
-    test.describe('validatePostgresPosixRegex', () => {
+    describe('validatePostgresPosixRegex', () => {
         test('returns empty string for empty value', () => {
             expect(validatePostgresPosixRegex('')).toBe('');
         });

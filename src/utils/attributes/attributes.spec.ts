@@ -1,4 +1,4 @@
-import { test, expect } from '../../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import {
     getAttributeCopyValue,
     getAttributeContent,
@@ -14,8 +14,8 @@ import { AttributeContentType, AttributeType, AttributeVersion, ProgrammingLangu
 
 const base64Encode = (s: string) => btoa(unescape(encodeURIComponent(s)));
 
-test.describe('attributes utils', () => {
-    test.describe('attributeFieldNameTransform', () => {
+describe('attributes utils', () => {
+    describe('attributeFieldNameTransform', () => {
         test('should have known field mappings', () => {
             expect(attributeFieldNameTransform.name).toBe('Name');
             expect(attributeFieldNameTransform.credentialProvider).toBe('Credential Provider');
@@ -26,7 +26,7 @@ test.describe('attributes utils', () => {
         });
     });
 
-    test.describe('getAttributeCopyValue', () => {
+    describe('getAttributeCopyValue', () => {
         test('should return undefined for empty content', () => {
             expect(getAttributeCopyValue(AttributeContentType.String, undefined)).toBeUndefined();
         });
@@ -104,7 +104,7 @@ test.describe('attributes utils', () => {
         });
     });
 
-    test.describe('getAttributeContent', () => {
+    describe('getAttributeContent', () => {
         test('returns Not set when content is undefined', () => {
             expect(getAttributeContent(AttributeContentType.String, undefined)).toBe('Not set');
         });
@@ -157,7 +157,7 @@ test.describe('attributes utils', () => {
         });
     });
 
-    test.describe('transformAttributes', () => {
+    describe('transformAttributes', () => {
         test('flattens form attributes without dot into single key', () => {
             const data = [{ formAttributeName: 'name', formAttributeValue: 'v1' }];
             expect(transformAttributes(data)).toEqual({ name: 'v1' });
@@ -175,7 +175,7 @@ test.describe('attributes utils', () => {
         });
     });
 
-    test.describe('getCodeBlockLanguage', () => {
+    describe('getCodeBlockLanguage', () => {
         test('returns form input language when set', () => {
             expect(getCodeBlockLanguage(ProgrammingLanguageEnum.Python, undefined)).toBe(ProgrammingLanguageEnum.Python);
         });
@@ -188,7 +188,7 @@ test.describe('attributes utils', () => {
         });
     });
 
-    test.describe('collectFormAttributes', () => {
+    describe('collectFormAttributes', () => {
         test('returns empty array when no descriptors', () => {
             expect(collectFormAttributes('id1', undefined, {})).toEqual([]);
         });
@@ -426,7 +426,7 @@ test.describe('attributes utils', () => {
         });
     });
 
-    test.describe('mapAttributeContentToOptionValue', () => {
+    describe('mapAttributeContentToOptionValue', () => {
         test('returns label from reference when present', () => {
             const content = { data: 'x', reference: 'Display Label' } as any;
             const descriptor = {
@@ -451,7 +451,7 @@ test.describe('attributes utils', () => {
         });
     });
 
-    test.describe('testAttributeSetFunction', () => {
+    describe('testAttributeSetFunction', () => {
         test('returns formAttributeName and formAttributeValue for list+multiSelect when using descriptor default', () => {
             const descriptor = {
                 type: AttributeType.Data,
@@ -490,7 +490,7 @@ test.describe('attributes utils', () => {
         });
     });
 
-    test.describe('mapProfileAttribute', () => {
+    describe('mapProfileAttribute', () => {
         test('returns empty array when profile path is undefined', () => {
             const result = mapProfileAttribute(undefined, {}, 'resource', 'path.to.attrs', 'form');
             expect(result).toEqual([]);
