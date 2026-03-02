@@ -67,9 +67,42 @@ const UtilsSettings = ({ platformSettings }: Props) => {
                               ),
                           ],
                       },
+                      {
+                          id: 'cbomRepositoryUrl',
+                          columns: [
+                              'CBOM Repository URL',
+                              platformSettings.utils?.cbomRepositoryUrl ? (
+                                  <div className="flex items-center gap-1">
+                                      {platformSettings.utils.cbomRepositoryUrl}&nbsp;
+                                      {health ? (
+                                          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                              <path
+                                                  d="M9.99996 18.3333C14.6025 18.3333 18.3333 14.6025 18.3333 9.99999C18.3333 5.39749 14.6025 1.66666 9.99996 1.66666C5.39746 1.66666 1.66663 5.39749 1.66663 9.99999C1.66663 14.6025 5.39746 18.3333 9.99996 18.3333Z"
+                                                  fill="#15803D"
+                                              />
+                                              <path
+                                                  d="M7.5 10L9.16667 11.6667L12.5 8.33334"
+                                                  stroke="white"
+                                                  strokeLinecap="round"
+                                                  strokeLinejoin="round"
+                                              />
+                                          </svg>
+                                      ) : (
+                                          <AlertCircle size={16} style={{ color: 'red' }} aria-hidden="true" />
+                                      )}
+                                  </div>
+                              ) : (
+                                  'n/a'
+                              ),
+                          ],
+                      },
                   ],
         [platformSettings, health],
     );
+
+    useEffect(() => {
+        console.debug('UtilsSettings: computed table data', data);
+    }, [data]);
 
     return (
         <div style={{ paddingTop: '1.5em', paddingBottom: '1.5em' }}>
