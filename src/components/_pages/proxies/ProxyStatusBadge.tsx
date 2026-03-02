@@ -10,9 +10,9 @@ interface ProxyStatusBadgeProps {
  * Badge component for displaying proxy status
  * Maps status to appropriate color and formatted label
  */
-export default function ProxyStatusBadge({ status }: ProxyStatusBadgeProps) {
+export const ProxyStatusBadge = ({ status }: ProxyStatusBadgeProps) => {
     const statusColor = getProxyStatusColor(status);
     const statusLabel = getProxyStatus(status);
 
     return <Badge style={{ backgroundColor: statusColor }}>{statusLabel}</Badge>;
-}
+};

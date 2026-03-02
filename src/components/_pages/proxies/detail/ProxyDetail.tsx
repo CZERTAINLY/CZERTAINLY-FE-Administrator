@@ -3,19 +3,20 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import { Check, X } from 'lucide-react';
 
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
-import Dialog from 'components/Dialog';
 import Breadcrumb from 'components/Breadcrumb';
-import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
 import Button from 'components/Button';
 import Container from 'components/Container';
-import TextInput from 'components/TextInput';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
 import EditIcon from 'components/icons/EditIcon';
+import { InstallationInstructions } from 'components/InstallationInstructions/InstallationInstructions';
+import TextInput from 'components/TextInput';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as proxiesActions, selectors as proxiesSelectors } from 'ducks/proxies';
 import { getEnumLabel, selectors as enumSelectors } from 'ducks/enums';
 import { PlatformEnum, Resource } from 'types/openapi';
-import ProxyStatusBadge from '../ProxyStatusBadge';
+import { ProxyStatusBadge } from '../ProxyStatusBadge';
 
 export const ProxyDetail = () => {
     const { id } = useParams();
@@ -184,20 +185,18 @@ export const ProxyDetail = () => {
     ]);
 
     return (
-        <Container>
+        <div>
             <Breadcrumb
                 items={[
                     { label: `${getEnumLabel(resourceEnum, Resource.Proxies)} Inventory`, href: '/proxies' },
                     { label: proxyDetails?.name || 'Proxy Details', href: '' },
                 ]}
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <Widget refreshAction={getFreshDetails} busy={isBusy} title="Proxy Details" titleSize="large" widgetButtons={buttons}>
-                        <CustomTable data={proxyDetailData} headers={tableHeader} />
-                    </Widget>
-                </div>
-            </div>
+            <Container>
+                <Widget refreshAction={getFreshDetails} busy={isBusy} title="Proxy Details" titleSize="large" widgetButtons={buttons}>
+                    <CustomTable data={proxyDetailData} headers={tableHeader} />
+                </Widget>
+            </Container>
             <Dialog
                 isOpen={confirmDelete}
                 caption={`Delete a Proxy`}
@@ -209,6 +208,6 @@ export const ProxyDetail = () => {
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </div>
     );
 };

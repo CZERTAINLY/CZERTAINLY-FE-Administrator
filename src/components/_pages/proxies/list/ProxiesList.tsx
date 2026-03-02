@@ -7,13 +7,13 @@ import Dialog from 'components/Dialog';
 import Select from 'components/Select';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
-import ProxyStatusBadge from '../ProxyStatusBadge';
-import { ProxyForm } from '../form/ProxyForm';
 import { actions, selectors } from 'ducks/proxies';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { ProxyStatus } from 'types/openapi';
 import { PROXY_STATUS_OPTIONS } from 'utils/proxy';
 import { useRunOnFinished } from 'utils/common-hooks';
+import { ProxyStatusBadge } from '../ProxyStatusBadge';
+import { ProxyForm } from '../form/ProxyForm';
 
 export const ProxiesList = () => {
     const dispatch = useDispatch();

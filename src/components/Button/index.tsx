@@ -91,6 +91,7 @@ function Button({
             onClick={onClick}
             disabled={disabled}
             data-testid={dataTestId}
+            title={title}
         >
             {children}
         </button>
