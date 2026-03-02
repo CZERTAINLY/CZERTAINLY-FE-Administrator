@@ -6,10 +6,10 @@ import {
     AuditLogApi,
     AuthenticationManagementApi,
     AuthorityManagementApi,
+    CBOMManagementApi,
     CMPProfileManagementApi,
     CallbackApi,
     CertificateInventoryApi,
-    CertificateKeyGroupApi,
     ClientOperationsV2Api,
     ComplianceManagementV2Api,
     ComplianceProfileManagementV2Api,
@@ -68,6 +68,7 @@ export interface ApiClients {
     callback: CallbackApi;
     statisticsDashboard: StatisticsDashboardApi;
     authorities: AuthorityManagementApi;
+    cbomManagement: CBOMManagementApi;
     entities: EntityManagementApi;
     resources: ResourceManagementApi;
     locations: LocationManagementApi;
@@ -77,7 +78,6 @@ export interface ApiClients {
     acmeProfiles: ACMEProfileManagementApi;
     scepProfiles: SCEPProfileManagementApi;
     cmpProfiles: CMPProfileManagementApi;
-    certificateGroups: CertificateKeyGroupApi;
     clientOperations: ClientOperationsV2Api;
     discoveries: DiscoveryManagementApi;
     complianceProfile: ComplianceProfileManagementV2Api;
@@ -115,6 +115,7 @@ export const backendClient: ApiClients = {
     raProfiles: new RAProfileManagementApi(configuration),
     credentials: new CredentialManagementApi(configuration),
     authorities: new AuthorityManagementApi(configuration),
+    cbomManagement: new CBOMManagementApi(configuration),
     entities: new EntityManagementApi(configuration),
     resources: new ResourceManagementApi(configuration),
     locations: new LocationManagementApi(configuration),
@@ -126,7 +127,6 @@ export const backendClient: ApiClients = {
     acmeProfiles: new ACMEProfileManagementApi(configuration),
     scepProfiles: new SCEPProfileManagementApi(configuration),
     cmpProfiles: new CMPProfileManagementApi(configuration),
-    certificateGroups: new CertificateKeyGroupApi(configuration),
     clientOperations: new ClientOperationsV2Api(configuration),
     discoveries: new DiscoveryManagementApi(configuration),
     complianceProfile: new ComplianceProfileManagementV2Api(configuration),

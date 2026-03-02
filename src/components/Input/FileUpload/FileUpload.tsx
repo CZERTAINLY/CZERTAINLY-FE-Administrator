@@ -11,10 +11,18 @@ interface Props {
     id?: string;
     fileType?: string;
     showContent?: boolean;
+    showFileInfo?: boolean;
     editable?: boolean;
 }
 
-export default function FileUpload({ id = '', fileType = '', editable, onFileContentLoaded, showContent = true }: Props) {
+export default function FileUpload({
+    id = '',
+    fileType = '',
+    editable,
+    onFileContentLoaded,
+    showContent = true,
+    showFileInfo = true,
+}: Props) {
     const [fileContent, setFileContent] = useState('');
     const [fileName, setFileName] = useState('');
     const [contentType, setContentType] = useState('');
@@ -81,31 +89,33 @@ export default function FileUpload({ id = '', fileType = '', editable, onFileCon
 
     return (
         <div role="region" aria-label="File upload area" onDrop={onFileDrop} onDragOver={onFileDragOver}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <TextInput
-                        id={`${id}__fileUpload__fileName`}
-                        type="text"
-                        placeholder="File not selected"
-                        disabled
-                        value={fileName}
-                        onChange={() => {}}
-                        label="File name"
-                    />
-                </div>
+            {showFileInfo && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <TextInput
+                            id={`${id}__fileUpload__fileName`}
+                            type="text"
+                            placeholder="File not selected"
+                            disabled
+                            value={fileName}
+                            onChange={() => {}}
+                            label="File name"
+                        />
+                    </div>
 
-                <div>
-                    <TextInput
-                        id={`${id}__fileUpload__contentType`}
-                        type="text"
-                        placeholder="File not selected"
-                        disabled
-                        value={contentType}
-                        onChange={() => {}}
-                        label="Content type"
-                    />
+                    <div>
+                        <TextInput
+                            id={`${id}__fileUpload__contentType`}
+                            type="text"
+                            placeholder="File not selected"
+                            disabled
+                            value={contentType}
+                            onChange={() => {}}
+                            label="Content type"
+                        />
+                    </div>
                 </div>
-            </div>
+            )}
 
             {showContent && (
                 <div className="mb-4">

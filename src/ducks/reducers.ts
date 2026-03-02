@@ -52,6 +52,8 @@ import { slice as utilsCertificateRequestSlice } from './utilsCertificateRequest
 import { slice as utilsOidSlice } from './utilsOid';
 import { slice as oidsSlice } from './oids';
 import { slice as loginSlice } from './login';
+import { slice as cbomSlice } from './cbom';
+import { slice as cbomSlice } from './cbom';
 
 export const reducers = combineReducers({
     [alertsSlice.name]: alertsSlice.reducer,
@@ -101,4 +103,5 @@ export const reducers = combineReducers({
     [utilsActuatorSlice.name]: utilsActuatorSlice.reducer,
     [oidsSlice.name]: oidsSlice.reducer,
     [loginSlice.name]: loginSlice.reducer,
+    [cbomSlice.name]: cbomSlice.reducer,
 });

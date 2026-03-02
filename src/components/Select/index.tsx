@@ -28,6 +28,7 @@ interface BaseProps {
     dropdownScope?: 'window';
     dropdownWidth?: number;
     dataTestId?: string;
+    colorizeVersionLabel?: boolean;
 }
 
 interface SingleSelectProps extends BaseProps {
@@ -129,6 +130,7 @@ function Select({
     dropdownScope,
     dropdownWidth,
     dataTestId,
+    colorizeVersionLabel = false,
 }: Props) {
     const selectRef = useRef<HTMLSelectElement>(null);
     const previousOptionsRef = useRef<string>('');
@@ -255,13 +257,51 @@ function Select({
         const select = selectRef.current;
         if (!select?.parentNode) return;
 
+        const escapeHtml = (text: string) =>
+            text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+        const applyVersionLabelColor = (root: Element) => {
+            if (!colorizeVersionLabel) return;
+
+            const applyTextColorMarkup = (element: HTMLElement) => {
+                const text = element.textContent?.trim();
+                if (!text) return;
+
+                const match = text.match(/^(Version\s+\d+)(\s+\((Latest|Original)\))$/);
+                if (!match) return;
+
+                const versionPart = escapeHtml(match[1]);
+                const suffixPart = escapeHtml(match[2].trim());
+
+                element.innerHTML = `<span class="text-[var(--primary-blue-color)] pointer-events-none">${versionPart}</span> <span class="text-[var(--dark-gray-color)] pointer-events-none">${suffixPart}</span>`;
+            };
+
+            root.querySelectorAll?.('[data-title]').forEach((titleEl) => {
+                if (!(titleEl instanceof HTMLElement)) return;
+                applyTextColorMarkup(titleEl);
+            });
+
+            const toggleButton = root.querySelector?.('button[aria-expanded]');
+            if (toggleButton instanceof HTMLElement) {
+                toggleButton.querySelectorAll?.('span').forEach((spanEl) => {
+                    if (!(spanEl instanceof HTMLElement)) return;
+                    applyTextColorMarkup(spanEl);
+                });
+            }
+        };
+
         const setTitlesAndTooltips = () => {
             const container = select.closest('[data-testid]')?.parentElement ?? select.parentNode;
             const root = container as Element;
 
+            applyVersionLabelColor(root);
+
             // Try to get dropdown from HSSelect instance (works also when dropdownScope === 'window')
             const hsInstance = (window as any).HSSelect?.getInstance?.(select);
             const dropdown: Element | null = (hsInstance && hsInstance.dropdown) || root.querySelector?.('.hs-select-dropdown');
+            if (dropdown) {
+                applyVersionLabelColor(dropdown);
+            }
             dropdown?.querySelectorAll?.('.hs-select-option-row').forEach((row) => {
                 const titleEl = row.querySelector?.('[data-title]');
                 const tooltipContentEl = row.querySelector?.('[data-tooltip-content]');
@@ -285,7 +325,7 @@ function Select({
         observer.observe(select.parentNode, { childList: true, subtree: true });
         requestAnimationFrame(() => setTitlesAndTooltips());
         return () => observer.disconnect();
-    }, [options, isMulti, id]);
+    }, [options, isMulti, id, colorizeVersionLabel]);
 
     const hasOptions = options && options.length > 0;
 

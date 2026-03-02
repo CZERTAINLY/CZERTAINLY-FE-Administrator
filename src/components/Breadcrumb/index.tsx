@@ -1,5 +1,6 @@
 import cn from 'classnames';
 import { Link } from 'react-router';
+import React from 'react';
 
 interface Props {
     items: {
@@ -7,9 +8,10 @@ interface Props {
         href?: string;
     }[];
     title?: string;
+    rightContent?: React.ReactNode;
 }
 
-function Breadcrumb({ items, title: titleProp }: Props) {
+function Breadcrumb({ items, title: titleProp, rightContent }: Props) {
     const title = titleProp || items[items.length - 1]?.label || '';
     return (
         <div className="mb-4 md:mb-8">
@@ -38,7 +40,12 @@ function Breadcrumb({ items, title: titleProp }: Props) {
                     </li>
                 ))}
             </ol>
-            {title && <h1 className="text-2xl font-semibold mt-4 md:mt-8">{title}</h1>}
+            {(title || rightContent) && (
+                <div className="mt-4 md:mt-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    {title && <h1 className="text-2xl font-semibold">{title}</h1>}
+                    {rightContent}
+                </div>
+            )}
         </div>
     );
 }

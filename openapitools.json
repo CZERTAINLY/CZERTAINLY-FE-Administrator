@@ -22,7 +22,7 @@
             },
             "typescript-rxjs-remote": {
                 "generatorName": "typescript-rxjs",
-                "inputSpec": "https://api.czertainly.com/main/doc-openapi-czertainly-core.yaml",
+                "inputSpec": "https://api.otilm.com/main/doc-openapi-ilm-core.yaml",
                 "output": "./src/types/openapi",
                 "typeMappings": {
                     "set": "Array",
