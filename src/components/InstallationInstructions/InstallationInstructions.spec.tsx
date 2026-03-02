@@ -146,11 +146,11 @@ test.describe('InstallationInstructions', () => {
         await expect(component.getByText('first line')).toBeVisible();
         await expect(component.getByText('third line')).toBeVisible();
 
-        // Check that 3 divs are rendered. The empty line should still render a div, but it will be empty.
+        // Check that 3 divs are rendered. The empty line should render with a non-breaking space.
         await expect(component.getByTestId('instruction-line-0')).toBeVisible();
         await expect(component.getByTestId('instruction-line-2')).toBeVisible();
         const emptyLine = component.getByTestId('instruction-line-1');
-        await expect(emptyLine).toBeAttached();
-        await expect(emptyLine).toHaveText('');
+        await expect(emptyLine).toBeVisible();
+        await expect(emptyLine).toHaveText('\u00A0');
     });
 });

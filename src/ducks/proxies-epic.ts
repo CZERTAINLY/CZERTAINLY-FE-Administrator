@@ -165,4 +165,27 @@ const bulkDeleteProxies: AppEpic = (action$, state, deps) => {
     );
 };
 
-export default [listProxies, getProxyDetail, createProxy, updateProxy, deleteProxy, bulkDeleteProxies];
+const getProxyInstructions: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getProxyInstructions.match),
+        switchMap((action) =>
+            deps.apiClients.proxies.getInstallationInstructions({ uuid: action.payload.uuid }).pipe(
+                mergeMap((instructions) =>
+                    of(
+                        slice.actions.getProxyInstructionsSuccess({
+                            instructions: instructions.installationInstructions || '',
+                        }),
+                    ),
+                ),
+                catchError((error) =>
+                    of(
+                        slice.actions.getProxyInstructionsFailure(),
+                        alertActions.error(extractError(error, 'Failed to get proxy installation instructions')),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+export default [listProxies, getProxyDetail, getProxyInstructions, createProxy, updateProxy, deleteProxy, bulkDeleteProxies];

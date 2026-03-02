@@ -9,11 +9,13 @@ export type State = {
 
     proxy?: ProxyResponseModel;
     proxies: ProxyListModel[];
+    proxyInstructions?: string;
 
     deleteErrorMessage: string;
 
     isFetchingList: boolean;
     isFetchingDetail: boolean;
+    isFetchingInstructions: boolean;
     isCreating: boolean;
     isDeleting: boolean;
     isBulkDeleting: boolean;
@@ -24,11 +26,13 @@ export const initialState: State = {
     checkedRows: [],
 
     proxies: [],
+    proxyInstructions: undefined,
 
     deleteErrorMessage: '',
 
     isFetchingList: false,
     isFetchingDetail: false,
+    isFetchingInstructions: false,
     isCreating: false,
     isDeleting: false,
     isBulkDeleting: false,
@@ -90,6 +94,20 @@ export const slice = createSlice({
 
         getProxyDetailFailure: (state, action: PayloadAction<void>) => {
             state.isFetchingDetail = false;
+        },
+
+        getProxyInstructions: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.proxyInstructions = undefined;
+            state.isFetchingInstructions = true;
+        },
+
+        getProxyInstructionsSuccess: (state, action: PayloadAction<{ instructions: string }>) => {
+            state.isFetchingInstructions = false;
+            state.proxyInstructions = action.payload.instructions;
+        },
+
+        getProxyInstructionsFailure: (state, action: PayloadAction<void>) => {
+            state.isFetchingInstructions = false;
         },
 
         createProxy: (state, action: PayloadAction<ProxyRequestModel>) => {
@@ -170,8 +188,10 @@ const checkedRows = createSelector(state, (state) => state.checkedRows);
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
 const proxy = createSelector(state, (state) => state.proxy);
 const proxies = createSelector(state, (state) => state.proxies);
+const proxyInstructions = createSelector(state, (state) => state.proxyInstructions);
 const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
+const isFetchingInstructions = createSelector(state, (state) => state.isFetchingInstructions);
 const isCreating = createSelector(state, (state) => state.isCreating);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isBulkDeleting = createSelector(state, (state) => state.isBulkDeleting);
@@ -183,8 +203,10 @@ export const selectors = {
     deleteErrorMessage,
     proxy,
     proxies,
+    proxyInstructions,
     isFetchingList,
     isFetchingDetail,
+    isFetchingInstructions,
     isCreating,
     isDeleting,
     isBulkDeleting,

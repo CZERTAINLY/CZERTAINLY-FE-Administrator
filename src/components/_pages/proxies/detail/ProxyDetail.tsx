@@ -23,7 +23,9 @@ export const ProxyDetail = () => {
     const dispatch = useDispatch();
 
     const proxyDetails = useSelector(proxiesSelectors.proxy);
+    const proxyInstructions = useSelector(proxiesSelectors.proxyInstructions);
     const isFetchingProxy = useSelector(proxiesSelectors.isFetchingDetail);
+    const isFetchingInstructions = useSelector(proxiesSelectors.isFetchingInstructions);
     const isUpdatingProxy = useSelector(proxiesSelectors.isUpdating);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
 
@@ -33,6 +35,16 @@ export const ProxyDetail = () => {
 
     const isBusy = useMemo(() => isFetchingProxy || isUpdatingProxy, [isFetchingProxy, isUpdatingProxy]);
 
+    const installationInstructions = useMemo(() => {
+        if (isFetchingInstructions) {
+            return 'Loading installation instructions...';
+        }
+        if (proxyInstructions && proxyInstructions.trim().length > 0) {
+            return proxyInstructions;
+        }
+        return 'No installation instructions available.';
+    }, [isFetchingInstructions, proxyInstructions]);
+
     useEffect(() => {
         if (!proxyDetails || proxyDetails.uuid !== id) return;
         setUpdatedDescription(proxyDetails.description || '');
@@ -41,6 +53,7 @@ export const ProxyDetail = () => {
     const getFreshDetails = useCallback(() => {
         if (!id) return;
         dispatch(proxiesActions.getProxyDetail({ uuid: id }));
+        dispatch(proxiesActions.getProxyInstructions({ uuid: id }));
     }, [id, dispatch]);
 
     useEffect(() => {
@@ -196,6 +209,7 @@ export const ProxyDetail = () => {
                 <Widget refreshAction={getFreshDetails} busy={isBusy} title="Proxy Details" titleSize="large" widgetButtons={buttons}>
                     <CustomTable data={proxyDetailData} headers={tableHeader} />
                 </Widget>
+                <InstallationInstructions title={'Installation instructions'} instructions={installationInstructions} />
             </Container>
             <Dialog
                 isOpen={confirmDelete}
