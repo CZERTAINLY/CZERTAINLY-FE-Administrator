@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
 import { firstValueFrom } from 'rxjs';
 import WidgetButtons, { WidgetButtonProps } from 'components/WidgetButtons';
 import Dialog from 'components/Dialog';
@@ -36,7 +36,6 @@ function CbomsList() {
         [],
     );
 
-    const navigate = useNavigate();
     const copyToClipboard = useCopyToClipboard();
     const [isUploadOpen, setIsUploadOpen] = useState(false);
     const additionalButtons: WidgetButtonProps[] = useMemo(
@@ -140,8 +139,6 @@ function CbomsList() {
         setIsUploadOpen(false);
         onList({ itemsPerPage: 10, pageNumber: 1, filters: [] });
     });
-
-    console.log({ cboms, rows });
 
     return (
         <>

@@ -17,14 +17,12 @@ import { dateFormatter } from 'utils/dateUtil';
 
 export default function CbomVersionsHistory() {
     const dispatch = useDispatch();
-    const { id = '', versionId = '' } = useParams();
+    const { id = '' } = useParams();
 
     const detail = useSelector(selectors.selectCbomDetail);
     const versions = useSelector(selectors.selectCbomVersions);
     const isFetchingDetail = useSelector(selectors.selectIsFetchingDetail);
     const isFetchingVersions = useSelector(selectors.selectIsFetchingVersions);
-
-    console.log({ detail });
 
     const copyToClipboard = useCopyToClipboard();
 

@@ -132,6 +132,57 @@ const toCellValue = (value: unknown): string | number => {
     return JSON.stringify(value);
 };
 
+type HandleLocationClick = (assetName: string, location: string, locationData: unknown) => void;
+
+const buildComponentRows = (
+    components: CbomComponent[],
+    handleLocationClick: HandleLocationClick,
+    view: 'assets' | 'overview',
+): TableDataRow[] =>
+    components.map((c, i: number) => {
+        const assetName = c?.name ?? c?.['bom-ref'] ?? '-';
+        const occurrences = toArray(c?.evidence?.occurrences);
+
+        const locationsColumn =
+            occurrences.length > 0 ? (
+                <div className="flex flex-col gap-1">
+                    {occurrences.map((occurrence, index) => {
+                        const location = occurrence?.location || '-';
+                        const key = `${String(assetName)}-${location}-${index}`;
+
+                        return (
+                            <Button
+                                key={key}
+                                variant="transparent"
+                                color="secondary"
+                                type="button"
+                                className="!p-0 !border-0 !inline text-blue-600 hover:!bg-transparent hover:underline focus:!bg-transparent w-fit"
+                                onClick={() => handleLocationClick(String(assetName), location, occurrence)}
+                            >
+                                {location}
+                            </Button>
+                        );
+                    })}
+                </div>
+            ) : (
+                '-'
+            );
+
+        const assetType = toDisplayName(c?.cryptoProperties?.assetType ?? c?.type, ASSET_TYPE_LABELS);
+        const primitive =
+            toArray(c?.cryptoProperties?.algorithmProperties?.primitive)
+                .map((p) => toDisplayName(p, PRIMITIVE_LABELS))
+                .join(', ') || '-';
+
+        return {
+            id: c?.bomRef ?? c?.['bom-ref'] ?? (view === 'overview' ? `overview-${i}` : i),
+            columns:
+                view === 'overview'
+                    ? [assetName, assetType, primitive, locationsColumn]
+                    : [assetName, locationsColumn, assetType, primitive],
+        };
+    });
+
 export default function CbomDetail() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -162,12 +213,6 @@ export default function CbomDetail() {
         if (!id) return;
         dispatch(actions.listCbomVersions({ uuid: id }));
     }, [dispatch, id]);
-
-    useEffect(() => {
-        if (detail) {
-            console.log('CBOM detail payload:', detail);
-        }
-    }, [detail]);
 
     const components = useMemo(() => {
         const content = detail?.content;
@@ -349,48 +394,7 @@ export default function CbomDetail() {
     }, []);
 
     const componentRows: TableDataRow[] = useMemo(
-        () =>
-            components.map((c, i: number) => {
-                const assetName = c?.name ?? c?.['bom-ref'] ?? '-';
-                const occurrences = toArray(c?.evidence?.occurrences);
-
-                const locationsColumn =
-                    occurrences.length > 0 ? (
-                        <div className="flex flex-col gap-1">
-                            {occurrences.map((occurrence, index) => {
-                                const location = occurrence?.location || '-';
-                                const key = `${String(assetName)}-${location}-${index}`;
-
-                                return (
-                                    <Button
-                                        key={key}
-                                        variant="transparent"
-                                        color="secondary"
-                                        type="button"
-                                        className="!p-0 !border-0 !inline text-blue-600 hover:!bg-transparent hover:underline focus:!bg-transparent w-fit"
-                                        onClick={() => handleLocationClick(String(assetName), location, occurrence)}
-                                    >
-                                        {location}
-                                    </Button>
-                                );
-                            })}
-                        </div>
-                    ) : (
-                        '-'
-                    );
-
-                return {
-                    id: c?.bomRef ?? c?.['bom-ref'] ?? i,
-                    columns: [
-                        assetName,
-                        locationsColumn,
-                        toDisplayName(c?.cryptoProperties?.assetType ?? c?.type, ASSET_TYPE_LABELS),
-                        toArray(c?.cryptoProperties?.algorithmProperties?.primitive)
-                            .map((p) => toDisplayName(p, PRIMITIVE_LABELS))
-                            .join(', ') || '-',
-                    ],
-                };
-            }),
+        () => buildComponentRows(components, handleLocationClick, 'assets'),
         [components, handleLocationClick],
     );
 
@@ -459,48 +463,7 @@ export default function CbomDetail() {
     );
 
     const overviewComponentRows: TableDataRow[] = useMemo(
-        () =>
-            components.map((c, i: number) => {
-                const assetName = c?.name ?? c?.['bom-ref'] ?? '-';
-                const occurrences = toArray(c?.evidence?.occurrences);
-
-                const locationsColumn =
-                    occurrences.length > 0 ? (
-                        <div className="flex flex-col gap-1">
-                            {occurrences.map((occurrence, index) => {
-                                const location = occurrence?.location || '-';
-                                const key = `${String(assetName)}-${location}-${index}`;
-
-                                return (
-                                    <Button
-                                        key={key}
-                                        variant="transparent"
-                                        color="secondary"
-                                        type="button"
-                                        className="!p-0 !border-0 !inline text-blue-600 hover:!bg-transparent hover:underline focus:!bg-transparent w-fit"
-                                        onClick={() => handleLocationClick(String(assetName), location, occurrence)}
-                                    >
-                                        {location}
-                                    </Button>
-                                );
-                            })}
-                        </div>
-                    ) : (
-                        '-'
-                    );
-
-                return {
-                    id: c?.bomRef ?? c?.['bom-ref'] ?? `overview-${i}`,
-                    columns: [
-                        assetName,
-                        toDisplayName(c?.cryptoProperties?.assetType ?? c?.type, ASSET_TYPE_LABELS),
-                        toArray(c?.cryptoProperties?.algorithmProperties?.primitive)
-                            .map((p) => toDisplayName(p, PRIMITIVE_LABELS))
-                            .join(', ') || '-',
-                        locationsColumn,
-                    ],
-                };
-            }),
+        () => buildComponentRows(components, handleLocationClick, 'overview'),
         [components, handleLocationClick],
     );
 

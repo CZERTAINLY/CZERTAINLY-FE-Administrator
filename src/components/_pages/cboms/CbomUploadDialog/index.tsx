@@ -63,19 +63,18 @@ export default function CbomUploadDialog({ onCancel, onUpload, okButtonTitle = '
             if (!validateCbomContent(parsed)) return;
         } catch (e) {
             // try YAML
-            import('js-yaml')
-                .then((yaml) => {
-                    try {
-                        parsed = yaml.load(fileContent);
-                        if (!validateCbomContent(parsed)) return;
-                        onUpload({ content: parsed });
-                    } catch (err) {
-                        dispatch(alertActions.error('Failed to parse CBOM file (not valid JSON or YAML)'));
-                    }
-                })
-                .catch(() => {
-                    dispatch(alertActions.error('Failed to parse CBOM file (not valid JSON)'));
-                });
+            try {
+                const yaml = await import('js-yaml');
+                try {
+                    parsed = yaml.load(fileContent);
+                    if (!validateCbomContent(parsed)) return;
+                    onUpload({ content: parsed });
+                } catch (err) {
+                    dispatch(alertActions.error('Failed to parse CBOM file (not valid JSON or YAML)'));
+                }
+            } catch {
+                dispatch(alertActions.error('Failed to parse CBOM file (not valid JSON)'));
+            }
             return;
         }
 
