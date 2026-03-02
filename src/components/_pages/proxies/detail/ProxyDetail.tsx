@@ -32,6 +32,7 @@ export const ProxyDetail = () => {
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
     const [updatedDescription, setUpdatedDescription] = useState('');
+    const [showInstallationInstructions, setShowInstallationInstructions] = useState(false);
 
     const isBusy = useMemo(() => isFetchingProxy || isUpdatingProxy, [isFetchingProxy, isUpdatingProxy]);
 
@@ -53,12 +54,23 @@ export const ProxyDetail = () => {
     const getFreshDetails = useCallback(() => {
         if (!id) return;
         dispatch(proxiesActions.getProxyDetail({ uuid: id }));
+        setShowInstallationInstructions(false);
+    }, [id, dispatch]);
+
+    const fetchInstallationInstructions = useCallback(() => {
+        if (!id) return;
         dispatch(proxiesActions.getProxyInstructions({ uuid: id }));
     }, [id, dispatch]);
 
     useEffect(() => {
         getFreshDetails();
     }, [getFreshDetails]);
+
+    useEffect(() => {
+        if (showInstallationInstructions) {
+            fetchInstallationInstructions();
+        }
+    }, [showInstallationInstructions, fetchInstallationInstructions]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!id) return;
@@ -84,29 +96,26 @@ export const ProxyDetail = () => {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
+                key: 'installation-instructions',
+                icon: 'key',
+                disabled: false,
+                onClick: () => setShowInstallationInstructions(!showInstallationInstructions),
+            },
+            {
+                key: 'delete',
                 icon: 'trash',
                 disabled: false,
                 onClick: () => setConfirmDelete(true),
             },
         ],
-        [],
+        [showInstallationInstructions],
     );
 
     const tableHeader: TableHeader[] = useMemo(
         () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-            {
-                id: 'actions',
-                content: 'Actions',
-                align: 'center',
-            },
+            { id: 'property', content: 'Property' },
+            { id: 'value', content: 'Value' },
+            { id: 'actions', content: 'Actions', align: 'center' },
         ],
         [],
     );
@@ -209,7 +218,9 @@ export const ProxyDetail = () => {
                 <Widget refreshAction={getFreshDetails} busy={isBusy} title="Proxy Details" titleSize="large" widgetButtons={buttons}>
                     <CustomTable data={proxyDetailData} headers={tableHeader} />
                 </Widget>
-                <InstallationInstructions title={'Installation instructions'} instructions={installationInstructions} />
+                {showInstallationInstructions && (
+                    <InstallationInstructions title={'Installation instructions'} instructions={installationInstructions} />
+                )}
             </Container>
             <Dialog
                 isOpen={confirmDelete}

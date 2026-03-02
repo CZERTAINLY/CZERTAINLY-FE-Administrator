@@ -69,6 +69,7 @@ export const ProxiesList = () => {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
+                key: 'filter',
                 icon: 'search',
                 disabled: false,
                 tooltip: 'Filter by Status',
@@ -88,12 +89,14 @@ export const ProxiesList = () => {
                 ),
             },
             {
+                key: 'create',
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
                 onClick: handleOpenAddModal,
             },
             {
+                key: 'delete',
                 icon: 'trash',
                 disabled: checkedRows.length === 0,
                 tooltip: 'Delete',
