@@ -41,7 +41,7 @@ export default function ConnectionDetailsV2({ connectInfo, errorMessage }: Props
     );
 
     const v2PrimaryInfo = v2ConnectInfo[0] as any;
-    const v2Connector = v2PrimaryInfo?.connector as any;
+    const v2Connector = v2PrimaryInfo?.connector;
 
     const v2ConnectionDetailsData: TableDataRow[] = useMemo(() => {
         if (!v2Connector) return [];

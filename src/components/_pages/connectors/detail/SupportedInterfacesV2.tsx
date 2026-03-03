@@ -32,7 +32,7 @@ export default function SupportedInterfacesV2({ interfaces, isBusy }: Props) {
             columns: [
                 toTitleCase(String(iface.code)),
                 iface.version,
-                iface.features && iface.features.length ? (
+                iface.features?.length ? (
                     <div key={iface.code} className="flex flex-wrap gap-2">
                         {iface.features.map((feature: string) => (
                             <Badge key={feature} color="secondary">

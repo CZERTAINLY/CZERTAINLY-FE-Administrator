@@ -15,7 +15,7 @@ import PagedList from 'components/PagedList/PagedList';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { inventoryStatus } from 'utils/connector';
-import { EntityType, selectors as filterSelectors } from 'ducks/filters';
+import { EntityType } from 'ducks/filters';
 import { selectors as pagingSelectors } from 'ducks/paging';
 import { ApiClients } from '../../../../api';
 import { SearchRequestModel } from 'types/certificate';

@@ -81,8 +81,8 @@ export default function ConnectionDetailsV1({ url, connectionDetails, errorMessa
                 columns: [
                     'Function Group(s)',
                     <div key="functionGroups" className="flex flex-wrap gap-2">
-                        {functionGroups.map((functionGroup, index) => (
-                            <Badge key={index} color="primary">
+                        {functionGroups.map((functionGroup) => (
+                            <Badge key={functionGroup.name} color="primary">
                                 {attributeFieldNameTransform[functionGroup?.name || ''] || functionGroup?.name}
                             </Badge>
                         ))}

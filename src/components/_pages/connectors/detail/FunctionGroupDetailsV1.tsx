@@ -8,8 +8,7 @@ import AttributeDescriptorViewer from 'components/Attributes/AttributeDescriptor
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { FunctionGroupModel } from 'types/connectors';
 import { useSelector } from 'react-redux';
-import { selectors as enumSelectors } from 'ducks/enums';
-import { getEnumLabel } from 'ducks/enums';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { PlatformEnum } from 'types/openapi';
 import { attributeFieldNameTransform } from 'utils/attributes/attributes';
 
