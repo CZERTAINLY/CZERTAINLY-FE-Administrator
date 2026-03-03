@@ -47,6 +47,7 @@ import { slice as tokenProfileSlice } from './token-profiles';
 import { slice as tokenSlice } from './tokens';
 import { slice as usersSlice } from './users';
 import { slice as utilsActuatorSlice } from './utilsActuator';
+import { slice as cbomActuatorSlice } from './cbomActuator';
 import { slice as utilsCertificateSlice } from './utilsCertificate';
 import { slice as utilsCertificateRequestSlice } from './utilsCertificateRequest';
 import { slice as utilsOidSlice } from './utilsOid';
@@ -100,6 +101,7 @@ export const reducers = combineReducers({
     [utilsCertificateSlice.name]: utilsCertificateSlice.reducer,
     [utilsCertificateRequestSlice.name]: utilsCertificateRequestSlice.reducer,
     [utilsActuatorSlice.name]: utilsActuatorSlice.reducer,
+    [cbomActuatorSlice.name]: cbomActuatorSlice.reducer,
     [oidsSlice.name]: oidsSlice.reducer,
     [loginSlice.name]: loginSlice.reducer,
     [cbomSlice.name]: cbomSlice.reducer,

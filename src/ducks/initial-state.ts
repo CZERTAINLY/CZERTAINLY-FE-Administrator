@@ -45,6 +45,7 @@ import { initialState as initialTokenProfileAttributesState, slice as tokenProfi
 import { initialState as initialTokenAttributesState, slice as tokenSlice } from './tokens';
 import { initialState as initialUsersState, slice as usersSlice } from './users';
 import { initialState as initialUtilsActuatorState, slice as utilsActuatorSlice } from './utilsActuator';
+import { initialState as initialCbomActuatorState, slice as cbomActuatorSlice } from './cbomActuator';
 import { initialState as initialUtilsCertificateState, slice as utilsCertificateSlice } from './utilsCertificate';
 import { initialState as initialUtilsCertificateRequestState, slice as utilsCertificateRequestSlice } from './utilsCertificateRequest';
 import { initialState as initialUtilsOidState, slice as utilsOidSlice } from './utilsOid';
@@ -95,6 +96,7 @@ export const initialState = {
     [utilsCertificateSlice.name]: initialUtilsCertificateState,
     [utilsCertificateRequestSlice.name]: initialUtilsCertificateRequestState,
     [utilsActuatorSlice.name]: initialUtilsActuatorState,
+    [cbomActuatorSlice.name]: initialCbomActuatorState,
     [oidsSlice.name]: initialOidsState,
     [infoSlice.name]: initialInfoState,
     [cbomSlice.name]: initialCbomState,

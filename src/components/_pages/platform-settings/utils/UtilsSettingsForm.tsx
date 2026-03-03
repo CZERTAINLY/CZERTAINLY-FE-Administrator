@@ -18,13 +18,21 @@ const validateUrl = (url?: string): string | undefined => {
     return 'Please enter valid URL.';
 };
 
-const validateHealthUrl = async (url?: string): Promise<string | undefined> => {
+const normalizeUrl = (url: string): string => url.replace(/\/+$/, '');
+
+const buildCbomHealthPath = (url: string): string => {
+    const baseUrl = normalizeUrl(url);
+    return baseUrl.endsWith('/api') ? '/v1/health' : '/api/v1/health';
+};
+
+const validateHealthUrl = async (url: string | undefined, path: string, error: string): Promise<string | undefined> => {
     if (!url) {
         return undefined;
     }
-    const error = 'Please enter reachable and valid Utils Service URL (with /health endpoint).';
     try {
-        const result = await fetch(url + '/health');
+        const healthUrl = `${normalizeUrl(url)}${path}`;
+        console.log('form validation - fetching health:', healthUrl);
+        const result = await fetch(healthUrl);
         const json = await result.json();
         return result.status === 200 && json.status === 'UP' ? undefined : error;
     } catch {
@@ -34,12 +42,12 @@ const validateHealthUrl = async (url?: string): Promise<string | undefined> => {
 
 class DebouncingHealthValidation {
     clearTimeout = () => {};
-    validateHealth = (url?: string) => {
+    validateHealth = (url: string | undefined, path: string, error: string) => {
         return new Promise<string | undefined>((resolve) => {
             this.clearTimeout();
 
             const timerId = setTimeout(() => {
-                resolve(validateHealthUrl(url));
+                resolve(validateHealthUrl(url, path, error));
             }, 600);
 
             this.clearTimeout = () => {
@@ -52,6 +60,7 @@ class DebouncingHealthValidation {
 
 type FormValues = {
     utilsServiceUrl?: string;
+    cbomRepositoryUrl?: string;
 };
 
 interface UtilsSettingsFormProps {
@@ -74,8 +83,9 @@ const UtilsSettingsForm = ({ onCancel, onSuccess }: UtilsSettingsFormProps = {})
     const defaultValues = useMemo(() => {
         return {
             utilsServiceUrl: platformSettings?.utils?.utilsServiceUrl || '',
+            cbomRepositoryUrl: platformSettings?.utils?.cbomRepositoryUrl || '',
         };
-    }, [platformSettings?.utils?.utilsServiceUrl]);
+    }, [platformSettings?.utils?.utilsServiceUrl, platformSettings?.utils?.cbomRepositoryUrl]);
 
     const methods = useForm<FormValues>({
         defaultValues,
@@ -100,17 +110,20 @@ const UtilsSettingsForm = ({ onCancel, onSuccess }: UtilsSettingsFormProps = {})
         }
     }, [dispatch, platformSettings]);
 
-    const debouncingHealthValidation = useMemo(() => new DebouncingHealthValidation(), []);
+    const debouncingUtilsHealthValidation = useMemo(() => new DebouncingHealthValidation(), []);
+    const debouncingCbomHealthValidation = useMemo(() => new DebouncingHealthValidation(), []);
 
     const onSubmit = useCallback(
         (values: FormValues) => {
-            const requestSettings: SettingsPlatformModel = values.utilsServiceUrl
-                ? {
-                      utils: {
-                          utilsServiceUrl: values.utilsServiceUrl,
-                      },
-                  }
-                : emptySettings;
+            const requestSettings: SettingsPlatformModel =
+                values.utilsServiceUrl || values.cbomRepositoryUrl
+                    ? {
+                          utils: {
+                              utilsServiceUrl: values.utilsServiceUrl,
+                              cbomRepositoryUrl: values.cbomRepositoryUrl,
+                          },
+                      }
+                    : emptySettings;
             dispatch(actions.updatePlatformSettings(requestSettings));
         },
         [dispatch, emptySettings],
@@ -138,7 +151,11 @@ const UtilsSettingsForm = ({ onCancel, onSuccess }: UtilsSettingsFormProps = {})
                             const urlError = validateUrl(value);
                             if (urlError) return urlError;
                             if (value) {
-                                return await debouncingHealthValidation.validateHealth(value);
+                                return await debouncingUtilsHealthValidation.validateHealth(
+                                    value,
+                                    '/health',
+                                    'Please enter reachable and valid Utils Service URL (with /health endpoint).',
+                                );
                             }
                             return undefined;
                         },
@@ -150,6 +167,37 @@ const UtilsSettingsForm = ({ onCancel, onSuccess }: UtilsSettingsFormProps = {})
                             type="text"
                             label="Utils Service URL"
                             placeholder="Utils Service URL"
+                            invalid={fieldState.error && fieldState.isTouched}
+                            error={getFieldErrorMessage(fieldState)}
+                        />
+                    )}
+                />
+
+                <Controller
+                    name="cbomRepositoryUrl"
+                    control={control}
+                    rules={{
+                        validate: async (value) => {
+                            const urlError = validateUrl(value);
+                            if (urlError) return urlError;
+                            if (value) {
+                                const cbomHealthPath = buildCbomHealthPath(value);
+                                return await debouncingCbomHealthValidation.validateHealth(
+                                    value,
+                                    cbomHealthPath,
+                                    'Please enter reachable and valid CBOM Repository URL (with /api/v1/health endpoint).',
+                                );
+                            }
+                            return undefined;
+                        },
+                    }}
+                    render={({ field, fieldState }) => (
+                        <TextInput
+                            {...field}
+                            id="cbomRepositoryUrl"
+                            type="text"
+                            label="CBOM Repository URL"
+                            placeholder="CBOM Repository URL"
                             invalid={fieldState.error && fieldState.isTouched}
                             error={getFieldErrorMessage(fieldState)}
                         />
