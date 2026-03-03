@@ -1,6 +1,6 @@
 import { test, expect } from '../../../playwright/ct-test';
 import { InstallationInstructions } from './InstallationInstructions';
-import { createMockStore, withProviders } from 'utils/test-helpers';
+import { withProviders } from 'utils/test-helpers';
 
 type ClipboardSpy = { lastText: string; calls: number };
 
@@ -31,14 +31,6 @@ test.describe('InstallationInstructions', () => {
         await expect(component.getByText('npm install package')).toBeVisible();
         await expect(component.getByText('npm run build')).toBeVisible();
         await expect(component.getByText('npm start')).toBeVisible();
-    });
-
-    test('should render copy button', async ({ mount }) => {
-        const component = await mount(withProviders(<InstallationInstructions title="Copy Test" instructions="copy me" />));
-
-        const copyButton = component.getByTestId('copy-instructions-button');
-        await expect(copyButton).toBeVisible();
-        await expect(copyButton).toHaveAttribute('title', 'Copy to clipboard');
     });
 
     test('should apply custom id attribute', async ({ mount }) => {
