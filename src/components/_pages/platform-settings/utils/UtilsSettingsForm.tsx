@@ -9,7 +9,6 @@ import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { getFieldErrorMessage } from 'utils/validators-helper';
 import { useDispatch, useSelector } from 'react-redux';
 import { SettingsPlatformModel } from 'types/settings';
-import { useNavigate } from 'react-router';
 
 const validateUrl = (url?: string): string | undefined => {
     if (!url || /^https?:\/\/[a-zA-Z0-9\-.]+(:\d+?)?(\/[a-zA-Z0-9\-.]*)*/g.test(url)) {
@@ -18,7 +17,13 @@ const validateUrl = (url?: string): string | undefined => {
     return 'Please enter valid URL.';
 };
 
-const normalizeUrl = (url: string): string => url.replace(/\/+$/, '');
+const normalizeUrl = (url: string): string => {
+    let endIndex = url.length;
+    while (endIndex > 0 && url.charCodeAt(endIndex - 1) === 47) {
+        endIndex -= 1;
+    }
+    return endIndex === url.length ? url : url.slice(0, endIndex);
+};
 
 const buildCbomHealthPath = (url: string): string => {
     const baseUrl = normalizeUrl(url);
@@ -31,7 +36,6 @@ const validateHealthUrl = async (url: string | undefined, path: string, error: s
     }
     try {
         const healthUrl = `${normalizeUrl(url)}${path}`;
-        console.log('form validation - fetching health:', healthUrl);
         const result = await fetch(healthUrl);
         const json = await result.json();
         return result.status === 200 && json.status === 'UP' ? undefined : error;
@@ -70,7 +74,6 @@ interface UtilsSettingsFormProps {
 
 const UtilsSettingsForm = ({ onCancel, onSuccess }: UtilsSettingsFormProps = {}) => {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const platformSettings = useSelector(selectors.platformSettings);
     const isFetchingPlatform = useSelector(selectors.isFetchingPlatform);

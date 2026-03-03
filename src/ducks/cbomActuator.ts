@@ -36,8 +36,10 @@ export const slice = createSlice({
 
 const state = createFeatureSelector<State>(slice.name);
 
-const health = createSelector(state, (state: State) => state.health);
-const isFetching = createSelector(state, (state: State) => state.isFetching);
+const createStateSelector = <T>(selector: (state: State) => T) => createSelector(state, selector);
+
+const health = createStateSelector((state: State) => state.health);
+const isFetching = createStateSelector((state: State) => state.isFetching);
 
 export const selectors = {
     state,

@@ -4,94 +4,84 @@ import { take, toArray } from 'rxjs/operators';
 import cbomActuatorEpics from './cbomActuator-epics';
 import { actions } from './cbomActuator';
 
+const runHealthEpic = async (url: string | undefined) => {
+    const output$ = (cbomActuatorEpics[0] as any)(of(actions.health(url)), of({}) as any, {} as any);
+    return ((await firstValueFrom(output$.pipe(take(1), toArray()))) as any[])[0];
+};
+
+const withMockedFetch = async (fetchMock: typeof fetch, run: () => Promise<void>) => {
+    const originalFetch = globalThis.fetch;
+    (globalThis as any).fetch = fetchMock;
+
+    try {
+        await run();
+    } finally {
+        (globalThis as any).fetch = originalFetch;
+    }
+};
+
 test.describe('cbomActuator epics', () => {
     test('returns healthFailure when cbom url is missing', async () => {
-        const output$ = (cbomActuatorEpics[0] as any)(of(actions.health(undefined)), of({}) as any, {} as any);
-        const emitted = (await firstValueFrom(output$.pipe(take(1), toArray()))) as any[];
-
-        expect(emitted).toEqual([actions.healthFailure({ error: 'CBOM URL not provided.' })]);
+        const emitted = await runHealthEpic(undefined);
+        expect(emitted).toEqual(actions.healthFailure({ error: 'CBOM URL not provided.' }));
     });
 
     test('uses /v1/health when url ends with /api', async () => {
-        const fetchMock = async (url: string) => {
-            expect(url).toBe('https://cbom-repo.otilm.com/api/v1/health');
-            return {
-                status: 200,
-                json: async () => ({ status: 'UP' }),
-            } as any;
-        };
-
-        const originalFetch = globalThis.fetch;
-        (globalThis as any).fetch = fetchMock;
-
-        try {
-            const output$ = (cbomActuatorEpics[0] as any)(of(actions.health('https://cbom-repo.otilm.com/api/')), of({}) as any, {} as any);
-            const emitted = (await firstValueFrom(output$.pipe(take(1), toArray()))) as any[];
-
-            expect(emitted).toEqual([actions.healthSuccess({ status: 'UP' })]);
-        } finally {
-            (globalThis as any).fetch = originalFetch;
-        }
+        await withMockedFetch(
+            (async (url: string) => {
+                expect(url).toBe('https://cbom-repo.otilm.com/api/v1/health');
+                return {
+                    status: 200,
+                    json: async () => ({ status: 'UP' }),
+                } as any;
+            }) as any,
+            async () => {
+                const emitted = await runHealthEpic('https://cbom-repo.otilm.com/api/');
+                expect(emitted).toEqual(actions.healthSuccess({ status: 'UP' }));
+            },
+        );
     });
 
     test('uses /api/v1/health when url does not end with /api', async () => {
-        const fetchMock = async (url: string) => {
-            expect(url).toBe('https://cbom-repo.otilm.com/api/v1/health');
-            return {
-                status: 200,
-                json: async () => ({ status: 'UP' }),
-            } as any;
-        };
-
-        const originalFetch = globalThis.fetch;
-        (globalThis as any).fetch = fetchMock;
-
-        try {
-            const output$ = (cbomActuatorEpics[0] as any)(of(actions.health('https://cbom-repo.otilm.com')), of({}) as any, {} as any);
-            const emitted = (await firstValueFrom(output$.pipe(take(1), toArray()))) as any[];
-
-            expect(emitted).toEqual([actions.healthSuccess({ status: 'UP' })]);
-        } finally {
-            (globalThis as any).fetch = originalFetch;
-        }
+        await withMockedFetch(
+            (async (url: string) => {
+                expect(url).toBe('https://cbom-repo.otilm.com/api/v1/health');
+                return {
+                    status: 200,
+                    json: async () => ({ status: 'UP' }),
+                } as any;
+            }) as any,
+            async () => {
+                const emitted = await runHealthEpic('https://cbom-repo.otilm.com');
+                expect(emitted).toEqual(actions.healthSuccess({ status: 'UP' }));
+            },
+        );
     });
 
     test('returns healthFailure when response is not UP', async () => {
-        const fetchMock = async () => {
-            return {
-                status: 200,
-                json: async () => ({ status: 'DOWN' }),
-            } as any;
-        };
-
-        const originalFetch = globalThis.fetch;
-        (globalThis as any).fetch = fetchMock;
-
-        try {
-            const output$ = (cbomActuatorEpics[0] as any)(of(actions.health('https://cbom-repo.otilm.com')), of({}) as any, {} as any);
-            const emitted = (await firstValueFrom(output$.pipe(take(1), toArray()))) as any[];
-
-            expect(emitted).toEqual([actions.healthFailure({ error: 'Failed to get CBOM health status.' })]);
-        } finally {
-            (globalThis as any).fetch = originalFetch;
-        }
+        await withMockedFetch(
+            (async () => {
+                return {
+                    status: 200,
+                    json: async () => ({ status: 'DOWN' }),
+                } as any;
+            }) as any,
+            async () => {
+                const emitted = await runHealthEpic('https://cbom-repo.otilm.com');
+                expect(emitted).toEqual(actions.healthFailure({ error: 'Failed to get CBOM health status.' }));
+            },
+        );
     });
 
     test('returns healthFailure when fetch throws', async () => {
-        const fetchMock = async () => {
-            throw new Error('network down');
-        };
-
-        const originalFetch = globalThis.fetch;
-        (globalThis as any).fetch = fetchMock;
-
-        try {
-            const output$ = (cbomActuatorEpics[0] as any)(of(actions.health('https://cbom-repo.otilm.com')), of({}) as any, {} as any);
-            const emitted = (await firstValueFrom(output$.pipe(take(1), toArray()))) as any[];
-
-            expect(emitted).toEqual([actions.healthFailure({ error: 'Failed to get CBOM health.. network down' })]);
-        } finally {
-            (globalThis as any).fetch = originalFetch;
-        }
+        await withMockedFetch(
+            (async () => {
+                throw new Error('network down');
+            }) as any,
+            async () => {
+                const emitted = await runHealthEpic('https://cbom-repo.otilm.com');
+                expect(emitted).toEqual(actions.healthFailure({ error: 'Failed to get CBOM health.. network down' }));
+            },
+        );
     });
 });

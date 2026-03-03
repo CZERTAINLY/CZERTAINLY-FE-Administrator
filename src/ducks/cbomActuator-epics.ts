@@ -5,7 +5,13 @@ import { catchError, filter, map, switchMap } from 'rxjs/operators';
 import { slice } from './cbomActuator';
 import { extractError } from 'utils/net';
 
-const normalizeUrl = (url: string): string => url.replace(/\/+$/g, '');
+const normalizeUrl = (url: string): string => {
+    let endIndex = url.length;
+    while (endIndex > 0 && url.charCodeAt(endIndex - 1) === 47) {
+        endIndex -= 1;
+    }
+    return endIndex === url.length ? url : url.slice(0, endIndex);
+};
 
 const buildCbomHealthUrl = (url: string): string => {
     const baseUrl = normalizeUrl(url);
