@@ -188,7 +188,7 @@ const UtilsSettingsForm = ({ onCancel, onSuccess }: UtilsSettingsFormProps = {})
                                 return await debouncingCbomHealthValidation.validateHealth(
                                     value,
                                     cbomHealthPath,
-                                    'Please enter reachable and valid CBOM Repository URL (with /api/v1/health endpoint).',
+                                    'Please enter reachable and valid CBOM Repository base URL (with /api/v1/health endpoint).',
                                 );
                             }
                             return undefined;

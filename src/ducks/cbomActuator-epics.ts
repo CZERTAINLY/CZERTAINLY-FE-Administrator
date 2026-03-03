@@ -28,7 +28,6 @@ const health: AppEpic = (action$, state$, deps) => {
             }
             try {
                 const fullUrl = buildCbomHealthUrl(url);
-                console.log('cbomActuator epic - fetching CBOM health:', fullUrl);
                 return from(fetch(fullUrl, { credentials: 'same-origin' })).pipe(
                     switchMap((response) =>
                         from(response.json()).pipe(
