@@ -103,20 +103,11 @@ export default function ConnectorForm({ connectorId, onCancel, onSuccess }: Conn
         }
     }, [id, connectorUuid, isFetching, dispatch]);
 
-    const connectUuid = connectorSelector?.uuid;
-    const connectUrl = connectorSelector?.url;
-    const connectAuthType = connectorSelector?.authType;
     useEffect(() => {
-        if (id && connectorUuid === id && !isFetching && connectUuid && connectUrl !== undefined && connectAuthType !== undefined) {
-            dispatch(
-                connectorActions.connectConnector({
-                    uuid: connectUuid,
-                    url: connectUrl,
-                    authType: connectAuthType,
-                }),
-            );
+        if (id && connectorUuid === id && !isFetching) {
+            dispatch(connectorActions.reconnectConnector({ uuid: id }));
         }
-    }, [id, connectorUuid, isFetching, connectUuid, connectUrl, connectAuthType, dispatch]);
+    }, [id, connectorUuid, isFetching, dispatch]);
 
     useEffect(() => {
         if (id && connectorUuid === id && connectorSelector) {
@@ -445,37 +436,49 @@ export default function ConnectorForm({ connectorId, onCancel, onSuccess }: Conn
                 {hasConnectInfo && (
                     <Widget busy={isConnecting} noBorder>
                         <Widget title="Connection Detected" titleSize="large">
-                            <TabLayout
-                                noBorder
-                                selectedTab={selectedVersion === ConnectorVersion.V2 ? 0 : 1}
-                                onTabChange={(tab) =>
-                                    setValue('version', tab === 0 ? ConnectorVersion.V2 : ConnectorVersion.V1, {
-                                        shouldDirty: true,
-                                        shouldValidate: true,
-                                    })
-                                }
-                                tabs={[
-                                    {
-                                        title: 'v2',
-                                        content: (
-                                            <ConnectionDetailsV2
-                                                connectInfo={connectionDetails}
-                                                errorMessage={selectedVersionErrorMessage}
-                                            />
-                                        ),
-                                    },
-                                    {
-                                        title: 'v1',
-                                        content: (
-                                            <ConnectionDetailsV1
-                                                url={watchedUrl}
-                                                connectionDetails={connectionDetails}
-                                                errorMessage={selectedVersionErrorMessage}
-                                            />
-                                        ),
-                                    },
-                                ]}
-                            />
+                            {editMode ? (
+                                connector?.version === ConnectorVersion.V1 ? (
+                                    <ConnectionDetailsV1
+                                        url={watchedUrl}
+                                        connectionDetails={connectionDetails}
+                                        errorMessage={selectedVersionErrorMessage}
+                                    />
+                                ) : (
+                                    <ConnectionDetailsV2 connectInfo={connectionDetails} errorMessage={selectedVersionErrorMessage} />
+                                )
+                            ) : (
+                                <TabLayout
+                                    noBorder
+                                    selectedTab={selectedVersion === ConnectorVersion.V2 ? 0 : 1}
+                                    onTabChange={(tab) =>
+                                        setValue('version', tab === 0 ? ConnectorVersion.V2 : ConnectorVersion.V1, {
+                                            shouldDirty: true,
+                                            shouldValidate: true,
+                                        })
+                                    }
+                                    tabs={[
+                                        {
+                                            title: 'v2',
+                                            content: (
+                                                <ConnectionDetailsV2
+                                                    connectInfo={connectionDetails}
+                                                    errorMessage={selectedVersionErrorMessage}
+                                                />
+                                            ),
+                                        },
+                                        {
+                                            title: 'v1',
+                                            content: (
+                                                <ConnectionDetailsV1
+                                                    url={watchedUrl}
+                                                    connectionDetails={connectionDetails}
+                                                    errorMessage={selectedVersionErrorMessage}
+                                                />
+                                            ),
+                                        },
+                                    ]}
+                                />
+                            )}
                         </Widget>
                         {hasSuccessfulSelectedVersion && (
                             <div className="space-y-4 mt-4">
