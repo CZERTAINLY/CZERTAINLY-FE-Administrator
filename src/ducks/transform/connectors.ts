@@ -12,6 +12,7 @@ import {
     FunctionGroupDto,
     FunctionGroupModel,
 } from 'types/connectors';
+import { ConnectInfoDto, ConnectorDetailDtoV2, ConnectorDtoV2 } from 'types/openapi';
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from './attributes';
 
 export function transformBulkActionDtoToModel(error: BulkActionDto): BulkActionModel {
@@ -28,6 +29,41 @@ export function transformFunctionGroupDtoToModel(functionGroup: FunctionGroupDto
         kinds: functionGroup.kinds ?? [],
         endPoints: functionGroup.endPoints.map((endpoint) => transformEndpointDtoToModel(endpoint)),
     };
+}
+
+export function transformConnectorDetailV2ToModel(connector: ConnectorDetailDtoV2): ConnectorResponseModel {
+    return {
+        uuid: connector.uuid,
+        name: connector.name,
+        url: connector.url,
+        status: connector.status,
+        version: connector.version,
+        authType: connector.authType,
+        functionGroups: connector.functionGroups.map(transformFunctionGroupDtoToModel),
+        authAttributes: connector.authAttributes?.map((attr) => transformAttributeResponseDtoToModel(attr)),
+        customAttributes: connector.customAttributes?.map(transformAttributeResponseDtoToModel),
+    } as ConnectorResponseModel;
+}
+
+export function transformConnectorDtoV2ToModel(connector: ConnectorDtoV2): ConnectorResponseModel {
+    return {
+        uuid: connector.uuid,
+        name: connector.name,
+        url: connector.url,
+        status: connector.status,
+        version: connector.version,
+        functionGroups: [],
+    } as unknown as ConnectorResponseModel;
+}
+
+export function transformConnectInfoDtoToFunctionGroups(info: ConnectInfoDto): FunctionGroupModel[] {
+    const anyInfo = info as any;
+    if (Array.isArray(anyInfo.functionGroups)) {
+        // V1 shape
+        return anyInfo.functionGroups.map((fg: FunctionGroupDto) => transformFunctionGroupDtoToModel(fg));
+    }
+    // V2 shape does not expose function groups directly
+    return [];
 }
 
 export function transformConnectorResponseDtoToModel(connector: ConnectorResponseDto): ConnectorResponseModel {
