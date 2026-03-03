@@ -45,4 +45,26 @@ test.describe('FileUpload', () => {
         const fileInput = component.locator('input[type="file"]');
         await expect(fileInput).toHaveAttribute('id', 'test-file-upload__fileUpload__file');
     });
+
+    test('should hide file info fields when showFileInfo is false', async ({ mount }) => {
+        const component = await mount(
+            <div>
+                <FileUpload onFileContentLoaded={() => {}} showFileInfo={false} />
+            </div>,
+        );
+
+        await expect(component.getByText('File name')).toHaveCount(0);
+        await expect(component.getByText('Content type')).toHaveCount(0);
+    });
+
+    test('should enable textarea when editable is true', async ({ mount }) => {
+        const component = await mount(
+            <div>
+                <FileUpload onFileContentLoaded={() => {}} showContent={true} editable={true} fileType="json" />
+            </div>,
+        );
+
+        await expect(component.locator('textarea')).not.toBeDisabled();
+        await expect(component.getByText('Select or drag & drop json file')).toBeVisible();
+    });
 });
