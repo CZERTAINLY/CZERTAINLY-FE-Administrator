@@ -14,6 +14,10 @@
 import type {
     ConnectInfoV1,
     ConnectInfoV2,
+    ConnectorInfo,
+    ConnectorInterfaceInfo,
+    ConnectorVersion,
+    FunctionGroupDto,
 } from './';
 
 /**

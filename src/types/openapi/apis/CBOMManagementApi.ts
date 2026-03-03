@@ -64,9 +64,9 @@ export class CBOMManagementApi extends BaseAPI {
     /**
      * Get Cbom searchable fields information
      */
-    getSearchableFieldInformation5(): Observable<Array<SearchFieldDataByGroupDto>>
-    getSearchableFieldInformation5(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
-    getSearchableFieldInformation5(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
+    getSearchableFieldInformation8(): Observable<Array<SearchFieldDataByGroupDto>>
+    getSearchableFieldInformation8(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
+    getSearchableFieldInformation8(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
         return this.request<Array<SearchFieldDataByGroupDto>>({
             url: '/v1/cboms/search',
             method: 'GET',

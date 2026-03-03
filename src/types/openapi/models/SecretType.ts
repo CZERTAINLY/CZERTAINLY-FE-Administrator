@@ -16,18 +16,14 @@
  * @export
  * @enum {string}
  */
-export enum Module {
-    Approvals = 'approvals',
-    Auth = 'auth',
-    Certificates = 'certificates',
-    Keys = 'keys',
-    Compliance = 'compliance',
-    Core = 'core',
-    Discovery = 'discovery',
-    Entities = 'entities',
-    Protocols = 'protocols',
-    Scheduler = 'scheduler',
-    Secrets = 'secrets',
-    Workflows = 'workflows'
+export enum SecretType {
+    BasicAuth = 'basicAuth',
+    ApiKey = 'apiKey',
+    JwtToken = 'jwtToken',
+    PrivateKey = 'privateKey',
+    SecretKey = 'secretKey',
+    KeyStore = 'keyStore',
+    KeyValue = 'keyValue',
+    Generic = 'generic'
 }
 
