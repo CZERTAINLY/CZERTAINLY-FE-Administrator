@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
 import { Check, X } from 'lucide-react';
 
 import Breadcrumb from 'components/Breadcrumb';
@@ -15,8 +15,10 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as proxiesActions, selectors as proxiesSelectors } from 'ducks/proxies';
 import { getEnumLabel, selectors as enumSelectors } from 'ducks/enums';
-import { PlatformEnum, Resource } from 'types/openapi';
+import { PlatformEnum, ProxyStatus, Resource } from 'types/openapi';
+import ConnectorStatusBadge from '../../connectors/ConnectorStatus';
 import { ProxyStatusBadge } from '../ProxyStatusBadge';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 export const ProxyDetail = () => {
     const { id } = useParams();
@@ -206,6 +208,35 @@ export const ProxyDetail = () => {
         isFetchingProxy,
     ]);
 
+    const showManagedConnectors = useMemo(() => {
+        return proxyDetails?.status === ProxyStatus.Connected || proxyDetails?.status === ProxyStatus.Disconnected;
+    }, [proxyDetails?.status]);
+
+    const managedConnectorsTableHeaders: TableHeader[] = useMemo(
+        () => [
+            { id: 'name', content: 'Name', sortable: true, sort: 'asc' },
+            { id: 'proxy', content: 'Proxy', sortable: true },
+            { id: 'url', content: 'URL', sortable: true },
+            { id: 'status', content: 'Status', sortable: true },
+        ],
+        [],
+    );
+
+    const managedConnectorsData: TableDataRow[] = useMemo(() => {
+        if (!proxyDetails?.connectors || !showManagedConnectors) {
+            return [];
+        }
+        return proxyDetails.connectors.map((connector) => ({
+            id: connector.uuid,
+            columns: [
+                <Link to={`../connectors/detail/${connector.uuid}`}>{connector.name}</Link>,
+                <Link to={`../proxies/detail/${proxyDetails.uuid}`}>{proxyDetails.name}</Link>,
+                connector.url,
+                <ConnectorStatusBadge status={connector.status} />,
+            ],
+        }));
+    }, [proxyDetails, showManagedConnectors]);
+
     return (
         <div>
             <Breadcrumb
@@ -215,12 +246,34 @@ export const ProxyDetail = () => {
                 ]}
             />
             <Container>
-                <Widget refreshAction={getFreshDetails} busy={isBusy} title="Proxy Details" titleSize="large" widgetButtons={buttons}>
+                <Widget
+                    refreshAction={getFreshDetails}
+                    busy={isBusy}
+                    title="Details"
+                    titleSize="large"
+                    widgetButtons={buttons}
+                    widgetLockName={LockWidgetNameEnum.ProxyDetails}
+                >
                     <CustomTable data={proxyDetailData} headers={tableHeader} />
+                    {showManagedConnectors && (
+                        <Widget title="Managed Connectors" titleSize="large" busy={isBusy} noBorder={true} className="mt-6">
+                            <CustomTable headers={managedConnectorsTableHeaders} data={managedConnectorsData} />
+                        </Widget>
+                    )}
+                    {showInstallationInstructions && (
+                        <Widget
+                            title="Install proxy in your environment"
+                            titleSize="large"
+                            busy={isBusy}
+                            noBorder={true}
+                            className="mt-6"
+                            refreshAction={fetchInstallationInstructions}
+                        >
+                            <div className={'text-gray-500 mb-3'}>Run the Helm command below in the customer Kubernetes cluster.</div>
+                            <InstallationInstructions title={'Installation instructions'} instructions={installationInstructions} />
+                        </Widget>
+                    )}
                 </Widget>
-                {showInstallationInstructions && (
-                    <InstallationInstructions title={'Installation instructions'} instructions={installationInstructions} />
-                )}
             </Container>
             <Dialog
                 isOpen={confirmDelete}
