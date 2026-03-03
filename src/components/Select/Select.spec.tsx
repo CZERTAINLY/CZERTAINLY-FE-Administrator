@@ -684,4 +684,21 @@ test.describe('Select', () => {
         await page.getByTestId('set-second').click();
         await expect.poll(async () => page.evaluate(() => (window as any).__hsState)).toMatchObject({ close: 1, destroy: 2, autoInit: 2 });
     });
+
+    test('should accept option descriptions for dropdown rendering', async ({ mount }) => {
+        const options = [
+            { value: 'v1', label: 'Version 1 (Original)', description: '2026-01-01 10:20:30' },
+            { value: 'v2', label: 'Version 2 (Latest)', description: '2026-02-02 10:20:30' },
+        ];
+
+        const component = await mount(
+            <div>
+                <Select id="test-select" value="v2" onChange={() => {}} options={options} showOptionDescriptionInDropdown />
+            </div>,
+        );
+
+        const select = component.locator('select');
+        await expect(select.locator('option[value="v1"]')).toHaveText('Version 1 (Original)');
+        await expect(select.locator('option[value="v2"]')).toHaveText('Version 2 (Latest)');
+    });
 });

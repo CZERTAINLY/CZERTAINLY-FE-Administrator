@@ -1,0 +1,105 @@
+import { useCallback, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { FormProvider, useForm } from 'react-hook-form';
+import FileUpload from 'components/Input/FileUpload/FileUpload';
+import Container from 'components/Container';
+import Button from 'components/Button';
+import ProgressButton from 'components/ProgressButton';
+import { actions as alertActions } from 'ducks/alerts';
+import { selectors as cbomSelectors } from 'ducks/cbom';
+
+interface Props {
+    onCancel: () => void;
+    onUpload: (data: { content: any }) => void;
+    okButtonTitle?: string;
+}
+
+interface FormValues {}
+
+export default function CbomUploadDialog({ onCancel, onUpload, okButtonTitle = 'Upload' }: Props) {
+    const dispatch = useDispatch();
+    const [fileContent, setFileContent] = useState<string>('');
+
+    const isUploading = useSelector(cbomSelectors.selectIsUploading);
+    const methods = useForm<FormValues>({
+        mode: 'onTouched',
+        defaultValues: {},
+    });
+    const { handleSubmit, formState } = methods;
+
+    const validateCbomContent = useCallback(
+        (parsedContent: any): boolean => {
+            if (!parsedContent || typeof parsedContent !== 'object') {
+                dispatch(alertActions.error('Invalid CBOM content'));
+                return false;
+            }
+
+            if (!parsedContent.metadata || typeof parsedContent.metadata !== 'object') {
+                dispatch(alertActions.error('Failed to upload CBOM: metadata must be present'));
+                return false;
+            }
+
+            return true;
+        },
+        [dispatch],
+    );
+
+    const onFileContentLoaded = useCallback((base64Content: string) => {
+        try {
+            // base64 -> string
+            const decoded = atob(base64Content);
+            setFileContent(decoded);
+        } catch (err) {
+            // fallback: keep raw
+            setFileContent(base64Content);
+        }
+    }, []);
+
+    const onSubmit = useCallback(async () => {
+        if (!fileContent) return;
+        let parsed: any;
+        try {
+            parsed = JSON.parse(fileContent);
+            if (!validateCbomContent(parsed)) return;
+        } catch (e) {
+            // try YAML
+            try {
+                const yaml = await import('js-yaml');
+                try {
+                    parsed = yaml.load(fileContent);
+                    if (!validateCbomContent(parsed)) return;
+                    onUpload({ content: parsed });
+                } catch (err) {
+                    dispatch(alertActions.error('Failed to parse CBOM file (not valid JSON or YAML)'));
+                }
+            } catch {
+                dispatch(alertActions.error('Failed to parse CBOM file (not valid JSON)'));
+            }
+            return;
+        }
+
+        onUpload({ content: parsed });
+    }, [fileContent, onUpload, dispatch, validateCbomContent]);
+
+    return (
+        <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)}>
+                <div className="space-y-4">
+                    <FileUpload id="cbom-upload" fileType="CBOM" editable showFileInfo={false} onFileContentLoaded={onFileContentLoaded} />
+
+                    <Container className="flex-row justify-end modal-footer" gap={4}>
+                        <Button variant="outline" onClick={onCancel} disabled={formState.isSubmitting || isUploading} type="button">
+                            Cancel
+                        </Button>
+                        <ProgressButton
+                            title={okButtonTitle}
+                            inProgressTitle={okButtonTitle}
+                            inProgress={formState.isSubmitting || isUploading}
+                            disabled={!fileContent}
+                        />
+                    </Container>
+                </div>
+            </form>
+        </FormProvider>
+    );
+}

@@ -74,4 +74,19 @@ test.describe('Breadcrumb', () => {
         const firstItem = component.getByRole('link', { name: 'First' }).locator('..');
         await expect(firstItem).toHaveClass(/text-gray-700|text-neutral-600/);
     });
+
+    test('should render custom title and right content', async ({ mount }) => {
+        const component = await mount(
+            <MemoryRouter>
+                <Breadcrumb
+                    items={[{ label: 'Home', href: '/' }, { label: 'Detail' }]}
+                    title="Custom Title"
+                    rightContent={<button type="button">History Select</button>}
+                />
+            </MemoryRouter>,
+        );
+
+        await expect(component.getByRole('heading', { name: 'Custom Title' })).toBeVisible();
+        await expect(component.getByRole('button', { name: 'History Select' })).toBeVisible();
+    });
 });
