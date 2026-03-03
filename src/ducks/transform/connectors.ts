@@ -39,6 +39,7 @@ export function transformConnectorDetailV2ToModel(connector: ConnectorDetailDtoV
         status: connector.status,
         version: connector.version,
         authType: connector.authType,
+        interfaces: connector.interfaces,
         functionGroups: connector.functionGroups.map(transformFunctionGroupDtoToModel),
         authAttributes: connector.authAttributes?.map((attr) => transformAttributeResponseDtoToModel(attr)),
         customAttributes: connector.customAttributes?.map(transformAttributeResponseDtoToModel),
