@@ -118,6 +118,18 @@ const getConnectorDetail: AppEpic = (action$, state, deps) => {
     );
 };
 
+const getConnectorInfoV2: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getConnectorInfoV2.match),
+        switchMap((action) =>
+            deps.apiClients.connectorsV2.getInfoV2({ uuid: action.payload.uuid }).pipe(
+                map((info) => slice.actions.getConnectorInfoV2Success({ info })),
+                catchError(() => of(slice.actions.getConnectorInfoV2Failure())),
+            ),
+        ),
+    );
+};
+
 const getConnectorAttributesDescriptors: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.getConnectorAttributesDescriptors.match),
@@ -526,6 +538,7 @@ const epics = [
     deleteConnector,
     bulkDeleteConnectors,
     connectConnector,
+    getConnectorInfoV2,
     reconnectConnector,
     bulkReconnectConnectors,
     authorizeConnector,

@@ -25,6 +25,7 @@ export type State = {
     connectorAttributes?: AttributeDescriptorCollectionModel;
     connectorConnectionDetails?: FunctionGroupModel[];
     connectInfo?: any[];
+    connectorInfoV2?: any;
     connectors: ConnectorResponseModel[];
 
     callbackData: { [key: string]: any };
@@ -150,6 +151,7 @@ export const slice = createSlice({
             state.connectorHealth = undefined;
             state.connectorConnectionDetails = undefined;
             state.connectInfo = undefined;
+            state.connectorInfoV2 = undefined;
             state.isFetchingDetail = true;
         },
 
@@ -170,6 +172,16 @@ export const slice = createSlice({
         getConnectorDetailFailure: (state, action: PayloadAction<void>) => {
             state.isFetchingDetail = false;
         },
+
+        getConnectorInfoV2: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.connectorInfoV2 = undefined;
+        },
+
+        getConnectorInfoV2Success: (state, action: PayloadAction<{ info: any }>) => {
+            state.connectorInfoV2 = action.payload.info;
+        },
+
+        getConnectorInfoV2Failure: (state, action: PayloadAction<void>) => {},
 
         getConnectorAttributesDescriptors: (
             state,
@@ -491,6 +503,7 @@ const connectorHealth = createSelector(state, (state) => state.connectorHealth);
 const connectorAttributes = createSelector(state, (state) => state.connectorAttributes);
 const connectorConnectionDetails = createSelector(state, (state) => state.connectorConnectionDetails);
 const connectorConnectInfo = createSelector(state, (state) => state.connectInfo);
+const connectorInfoV2 = createSelector(state, (state) => state.connectorInfoV2);
 const callbackData = createSelector(state, (state) => state.callbackData);
 
 const connectors = createSelector(state, (state) => state.connectors);
@@ -526,6 +539,7 @@ export const selectors = {
     connectorAttributes,
     connectorConnectionDetails,
     connectorConnectInfo,
+    connectorInfoV2,
     connectors,
     callbackData,
 

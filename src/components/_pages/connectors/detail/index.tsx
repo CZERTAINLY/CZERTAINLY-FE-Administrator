@@ -38,6 +38,7 @@ export default function ConnectorDetail() {
     const connector = useSelector(selectors.connector);
     const health = useSelector(selectors.connectorHealth);
     const attributes = useSelector(selectors.connectorAttributes);
+    const connectorInfoV2 = useSelector(selectors.connectorInfoV2);
 
     const isFetchingAllAttributes = useSelector(selectors.isFetchingAllAttributes);
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
@@ -79,7 +80,10 @@ export default function ConnectorDetail() {
         getFreshConnectorDetails();
         getFreshConnectorHealth();
         getFreshConnectorAttributesDesc();
-    }, [id, getFreshConnectorDetails, getFreshConnectorHealth, getFreshConnectorAttributesDesc]);
+        if (id) {
+            dispatch(actions.getConnectorInfoV2({ uuid: id }));
+        }
+    }, [id, getFreshConnectorDetails, getFreshConnectorHealth, getFreshConnectorAttributesDesc, dispatch]);
 
     useEffect(() => {
         if (!connector || connector.functionGroups.length === 0) {
@@ -246,10 +250,10 @@ export default function ConnectorDetail() {
     }, [connector, authTypeEnum]);
 
     const connectorInfoData: TableDataRow[] = useMemo(() => {
-        if (!connector) return [];
+        if (!connector || connector.version !== ConnectorVersion.V2 || !connectorInfoV2) return [];
 
-        const description = (connector as any)?.description ?? '';
-        const metadata = (connector as any)?.metadata as Record<string, unknown> | undefined;
+        const description = connectorInfoV2.description ?? '';
+        const metadata = connectorInfoV2.metadata as Record<string, unknown> | undefined;
         const metadataString = metadata
             ? Object.entries(metadata)
                   .map(([key, value]) => `${key}:${String(value)}`)
@@ -259,15 +263,15 @@ export default function ConnectorDetail() {
         const rows: TableDataRow[] = [
             {
                 id: 'name',
-                columns: ['Name', connector.name],
+                columns: ['Name', connectorInfoV2.name],
             },
             {
                 id: 'id',
-                columns: ['ID', connector.uuid],
+                columns: ['ID', connectorInfoV2.id],
             },
             {
                 id: 'versionInfo',
-                columns: ['Version', connector.version ?? ''],
+                columns: ['Version', connectorInfoV2.version ?? ''],
             },
         ];
 
@@ -286,7 +290,7 @@ export default function ConnectorDetail() {
         }
 
         return rows;
-    }, [connector]);
+    }, [connector, connectorInfoV2]);
 
     const renderStatusBadge = useCallback((status?: HealthStatus) => {
         if (!status) return <Badge color="transparent">Unknown</Badge>;
@@ -397,11 +401,12 @@ export default function ConnectorDetail() {
                     )}
                 </Container>
 
-                <Container className="grid gap-6 xl:grid-cols-2">
-                    <Widget title="Connector Info" busy={isFetchingDetail} titleSize="large">
-                        <CustomTable headers={attributesHeaders} data={connectorInfoData} />
-                    </Widget>
-
+                <Container className={connector?.version === ConnectorVersion.V2 ? 'grid gap-6 xl:grid-cols-2' : 'grid gap-6'}>
+                    {connector?.version === ConnectorVersion.V2 && connectorInfoData.length > 0 && (
+                        <Widget title="Connector Info" busy={isFetchingDetail} titleSize="large">
+                            <CustomTable headers={attributesHeaders} data={connectorInfoData} />
+                        </Widget>
+                    )}
                     <Widget
                         title="Connector Health"
                         busy={isFetchingHealth}
