@@ -5,7 +5,6 @@ on:
 
 permissions:
   contents: read
-  actions: write
 
 jobs:
   build:
@@ -43,21 +42,3 @@ jobs:
           path: pr-context.json
           retention-days: 1
           if-no-files-found: error
-
-      - name: Dispatch Sonar workflow
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'sonar.yml',
-              ref: '${{ github.event.pull_request.head.ref }}',
-              inputs: {
-                pr_number:  '${{ github.event.pull_request.number }}',
-                head_sha:   '${{ github.event.pull_request.head.sha }}',
-                head_repo:  '${{ github.event.pull_request.head.repo.full_name }}',
-                head_branch:'${{ github.event.pull_request.head.ref }}',
-                base_ref:   '${{ github.event.pull_request.base.ref }}'
-              }
-            });
