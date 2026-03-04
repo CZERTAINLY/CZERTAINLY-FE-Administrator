@@ -111,7 +111,7 @@ export const getDateInString = (daysOffset: number) => {
 };
 
 export function getFormattedDateTime(dateString: string): string {
-    if (isNaN(Date.parse(dateString))) {
+    if (Number.isNaN(Date.parse(dateString))) {
         return dateString;
     }
 
@@ -124,7 +124,7 @@ export function getFormattedDateTime(dateString: string): string {
 }
 
 export function getFormattedDate(dateString: string): string {
-    if (isNaN(Date.parse(dateString))) {
+    if (Number.isNaN(Date.parse(dateString))) {
         return dateString;
     }
 
