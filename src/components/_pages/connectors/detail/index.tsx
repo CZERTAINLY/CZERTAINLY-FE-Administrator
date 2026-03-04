@@ -28,6 +28,19 @@ import Breadcrumb from 'components/Breadcrumb';
 import Container from 'components/Container';
 import { CircleCheck, CircleAlert, CircleHelp } from 'lucide-react';
 
+function getHealthStatusIcon(status: string): { Icon: typeof CircleCheck; className: string } {
+    if (status === HealthStatus.Up) {
+        return { Icon: CircleCheck, className: 'text-[var(--status-success-color)]' };
+    }
+    if (status === HealthStatus.Down || status === HealthStatus.OutOfService) {
+        return { Icon: CircleAlert, className: 'text-[var(--status-danger-color)]' };
+    }
+    if (status === HealthStatus.Degraded) {
+        return { Icon: CircleAlert, className: 'text-[var(--status-warning-color)]' };
+    }
+    return { Icon: CircleHelp, className: 'text-[var(--status-light-gray-color)]' };
+}
+
 export default function ConnectorDetail() {
     const dispatch = useDispatch();
 
@@ -355,17 +368,10 @@ export default function ConnectorDetail() {
     }, [health, renderStatusBadge]);
 
     const healthStatus = health?.status?.toUpperCase?.() ?? HealthStatus.Unknown;
+    const { Icon: HealthIcon, className: healthIconClassName } = getHealthStatusIcon(healthStatus);
     const healthButtonsNode = (
         <div>
-            {healthStatus === HealthStatus.Up ? (
-                <CircleCheck size={24} strokeWidth={3} className="text-[var(--status-success-color)]" />
-            ) : healthStatus === HealthStatus.Down || healthStatus === HealthStatus.OutOfService ? (
-                <CircleAlert size={24} strokeWidth={3} className="text-[var(--status-danger-color)]" />
-            ) : healthStatus === HealthStatus.Degraded ? (
-                <CircleAlert size={24} strokeWidth={3} className="text-[var(--status-warning-color)]" />
-            ) : (
-                <CircleHelp size={24} strokeWidth={3} className="text-[var(--status-light-gray-color)]" />
-            )}
+            <HealthIcon size={24} strokeWidth={3} className={healthIconClassName} />
         </div>
     );
 

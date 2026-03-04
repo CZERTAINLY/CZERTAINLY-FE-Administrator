@@ -146,11 +146,12 @@ describe('attribute transform helpers', () => {
         } as any;
 
         const model = transformAttributeDescriptorCollectionDtoToModel(collection);
+        const kind1 = model.group1?.kind1;
 
-        expect(model.group1!.kind1).toHaveLength(1);
-        expect(model.group1!.kind1[0]).not.toBe(desc);
-        expect(model.group1!.kind1[0].content).toEqual(desc.content);
-        expect(model.group1!.kind1[0].content).not.toBe(desc.content);
+        expect(kind1).toHaveLength(1);
+        expect(kind1?.[0]).not.toBe(desc);
+        expect(kind1?.[0].content).toEqual(desc.content);
+        expect(kind1?.[0].content).not.toBe(desc.content);
     });
 
     test('transformAttributeMappingDtoToModel and transformAttributeMappingModelToDto are symmetric', () => {

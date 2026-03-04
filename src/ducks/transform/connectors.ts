@@ -12,8 +12,7 @@ import {
     FunctionGroupDto,
     FunctionGroupModel,
 } from 'types/connectors';
-import { ConnectInfoDto, ConnectorDetailDtoV2, ConnectorDtoV2 } from 'types/openapi';
-import { AuthType } from 'types/openapi';
+import { AuthType, ConnectInfoDto, ConnectorDetailDtoV2, ConnectorDtoV2 } from 'types/openapi';
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from './attributes';
 
 export function transformBulkActionDtoToModel(error: BulkActionDto): BulkActionModel {

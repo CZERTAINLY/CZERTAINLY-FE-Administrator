@@ -286,12 +286,12 @@ describe('connectors slice', () => {
             actions.getConnectorAttributesDescriptors({ uuid: 'c-1', functionGroup: 'group' as any, kind: 'kind' }),
         );
         expect(next.isFetchingAttributes).toBe(true);
-        expect(next.connectorAttributes!.group!.kind).toBeUndefined();
+        expect(next.connectorAttributes?.group?.kind).toBeUndefined();
 
         const attrs = [{ uuid: 'a-1' } as any];
         next = reducer(next, actions.getConnectorAttributeDescriptorsSuccess({ functionGroup: 'group', kind: 'kind', attributes: attrs }));
         expect(next.isFetchingAllAttributes).toBe(false);
-        expect(next.connectorAttributes!.group!.kind).toEqual(attrs);
+        expect(next.connectorAttributes?.group?.kind).toEqual(attrs);
 
         next = reducer({ ...next, isFetchingAllAttributes: true }, actions.getConnectorAttributesDescriptorsFailure());
         expect(next.isFetchingAllAttributes).toBe(false);

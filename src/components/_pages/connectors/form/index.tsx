@@ -234,8 +234,8 @@ export default function ConnectorForm({ connectorId, onCancel, onSuccess }: Conn
     );
 
     const selectedVersionErrorMessage = useMemo(() => {
-        const info = selectedVersionInfo as any;
-        const raw = info?.errorMessage as string | undefined;
+        const info = selectedVersionInfo as { errorMessage?: string; connectorUuid?: string } | undefined;
+        const raw = info?.errorMessage;
 
         let message: string | undefined;
 
@@ -442,49 +442,52 @@ export default function ConnectorForm({ connectorId, onCancel, onSuccess }: Conn
                 {hasConnectInfo && (
                     <Widget busy={isConnecting} noBorder>
                         <Widget title="Connection Detected" titleSize="large">
-                            {editMode ? (
-                                connector?.version === ConnectorVersion.V1 ? (
-                                    <ConnectionDetailsV1
-                                        url={watchedUrl}
-                                        connectionDetails={connectionDetails}
-                                        errorMessage={selectedVersionErrorMessage}
+                            {(() => {
+                                if (editMode) {
+                                    return connector?.version === ConnectorVersion.V1 ? (
+                                        <ConnectionDetailsV1
+                                            url={watchedUrl}
+                                            connectionDetails={connectionDetails}
+                                            errorMessage={selectedVersionErrorMessage}
+                                        />
+                                    ) : (
+                                        <ConnectionDetailsV2 connectInfo={connectionDetails} errorMessage={selectedVersionErrorMessage} />
+                                    );
+                                }
+                                return (
+                                    <TabLayout
+                                        noBorder
+                                        selectedTab={selectedVersion === ConnectorVersion.V2 ? 0 : 1}
+                                        onTabChange={(tab) =>
+                                            setValue('version', tab === 0 ? ConnectorVersion.V2 : ConnectorVersion.V1, {
+                                                shouldDirty: true,
+                                                shouldValidate: true,
+                                            })
+                                        }
+                                        tabs={[
+                                            {
+                                                title: 'v2',
+                                                content: (
+                                                    <ConnectionDetailsV2
+                                                        connectInfo={connectionDetails}
+                                                        errorMessage={selectedVersionErrorMessage}
+                                                    />
+                                                ),
+                                            },
+                                            {
+                                                title: 'v1',
+                                                content: (
+                                                    <ConnectionDetailsV1
+                                                        url={watchedUrl}
+                                                        connectionDetails={connectionDetails}
+                                                        errorMessage={selectedVersionErrorMessage}
+                                                    />
+                                                ),
+                                            },
+                                        ]}
                                     />
-                                ) : (
-                                    <ConnectionDetailsV2 connectInfo={connectionDetails} errorMessage={selectedVersionErrorMessage} />
-                                )
-                            ) : (
-                                <TabLayout
-                                    noBorder
-                                    selectedTab={selectedVersion === ConnectorVersion.V2 ? 0 : 1}
-                                    onTabChange={(tab) =>
-                                        setValue('version', tab === 0 ? ConnectorVersion.V2 : ConnectorVersion.V1, {
-                                            shouldDirty: true,
-                                            shouldValidate: true,
-                                        })
-                                    }
-                                    tabs={[
-                                        {
-                                            title: 'v2',
-                                            content: (
-                                                <ConnectionDetailsV2
-                                                    connectInfo={connectionDetails}
-                                                    errorMessage={selectedVersionErrorMessage}
-                                                />
-                                            ),
-                                        },
-                                        {
-                                            title: 'v1',
-                                            content: (
-                                                <ConnectionDetailsV1
-                                                    url={watchedUrl}
-                                                    connectionDetails={connectionDetails}
-                                                    errorMessage={selectedVersionErrorMessage}
-                                                />
-                                            ),
-                                        },
-                                    ]}
-                                />
-                            )}
+                                );
+                            })()}
                         </Widget>
                         {hasSuccessfulSelectedVersion && (
                             <div className="space-y-4 mt-4">

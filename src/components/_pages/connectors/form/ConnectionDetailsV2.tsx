@@ -40,7 +40,7 @@ export default function ConnectionDetailsV2({ connectInfo, errorMessage }: Props
         [connectInfo],
     );
 
-    const v2PrimaryInfo = v2ConnectInfo[0] as any;
+    const v2PrimaryInfo = v2ConnectInfo[0];
     const v2Connector = v2PrimaryInfo?.connector;
 
     const v2ConnectionDetailsData: TableDataRow[] = useMemo(() => {
@@ -110,7 +110,7 @@ export default function ConnectionDetailsV2({ connectInfo, errorMessage }: Props
             columns: [
                 toTitleCase(String(iface.code)),
                 iface.version,
-                iface.features && iface.features.length ? (
+                iface.features?.length ? (
                     <div key={iface.code} className="flex flex-wrap gap-2">
                         {iface.features.map((feature: string) => (
                             <Badge key={feature} color="secondary">

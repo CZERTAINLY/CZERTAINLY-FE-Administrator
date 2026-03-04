@@ -182,15 +182,21 @@ export default function ConnectorList() {
                 return {
                     id: connector.uuid,
                     columns: [
-                        <span style={{ whiteSpace: 'nowrap' }}>
+                        <span key="name" style={{ whiteSpace: 'nowrap' }}>
                             <Link to={`./detail/${connector.uuid}`}>{connector.name}</Link>
                         </span>,
-                        <span style={{ whiteSpace: 'nowrap' }}>{connector.version || '-'}</span>,
-                        <span style={{ whiteSpace: 'nowrap' }}>coming soon</span>,
-
-                        <span style={{ whiteSpace: 'nowrap' }}>{connector.url}</span>,
-
-                        <Badge style={{ backgroundColor: connectorStatus[1] }}>{connectorStatus[0]}</Badge>,
+                        <span key="version" style={{ whiteSpace: 'nowrap' }}>
+                            {connector.version || '-'}
+                        </span>,
+                        <span key="status" style={{ whiteSpace: 'nowrap' }}>
+                            coming soon
+                        </span>,
+                        <span key="url" style={{ whiteSpace: 'nowrap' }}>
+                            {connector.url}
+                        </span>,
+                        <Badge key="badge" style={{ backgroundColor: connectorStatus[1] }}>
+                            {connectorStatus[0]}
+                        </Badge>,
                     ],
                 };
             }),
