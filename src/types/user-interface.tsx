@@ -96,6 +96,9 @@ export enum LockWidgetNameEnum {
     EventSettings,
     ComplianceProfileAssociations,
     ListOfAvailableRulesAndGroups,
+    ListOfCboms,
+    CbomDetail,
+    CbomVersions,
 }
 
 export interface WidgetLockModel {

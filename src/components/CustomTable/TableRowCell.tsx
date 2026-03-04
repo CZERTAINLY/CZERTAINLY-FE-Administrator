@@ -33,7 +33,7 @@ export function TableRowCell({ column, index, row, tblHeaders, hasDetails = fals
                     {column}
                 </Button>
             ) : (
-                <div>{column ? column : <></>}</div>
+                <div>{column ?? <></>}</div>
             )}
         </td>
     );
