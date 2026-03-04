@@ -1,4 +1,4 @@
-import { test, expect } from '../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import { firstValueFrom, of } from 'rxjs';
 import { take, toArray } from 'rxjs/operators';
 import cbomActuatorEpics from './cbomActuator-epics';
@@ -20,7 +20,7 @@ const withMockedFetch = async (fetchMock: typeof fetch, run: () => Promise<void>
     }
 };
 
-test.describe('cbomActuator epics', () => {
+describe('cbomActuator epics', () => {
     test('returns healthFailure when cbom url is missing', async () => {
         const emitted = await runHealthEpic(undefined);
         expect(emitted).toEqual(actions.healthFailure({ error: 'CBOM URL not provided.' }));

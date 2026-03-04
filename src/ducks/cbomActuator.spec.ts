@@ -1,7 +1,7 @@
-import { test, expect } from '../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import reducer, { actions, initialState, selectors } from './cbomActuator';
 
-test.describe('cbomActuator slice', () => {
+describe('cbomActuator slice', () => {
     test('returns initial state for unknown action', () => {
         expect(reducer(undefined, { type: 'unknown' })).toEqual(initialState);
     });
@@ -61,7 +61,7 @@ test.describe('cbomActuator slice', () => {
     });
 });
 
-test.describe('cbomActuator selectors', () => {
+describe('cbomActuator selectors', () => {
     test('returns health and isFetching from state', () => {
         const rootState = {
             cbomActuator: {

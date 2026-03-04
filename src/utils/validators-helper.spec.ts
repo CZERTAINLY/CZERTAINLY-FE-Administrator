@@ -1,8 +1,8 @@
-import { test, expect } from '../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import { buildValidationRules, getFieldErrorMessage } from './validators-helper';
 import { validateRequired, validateEmail } from './validators';
 
-test.describe('getFieldErrorMessage', () => {
+describe('getFieldErrorMessage', () => {
     test('returns undefined when no error', () => {
         expect(getFieldErrorMessage({})).toBeUndefined();
         expect(getFieldErrorMessage({ error: 'x', isTouched: false })).toBeUndefined();
@@ -23,7 +23,7 @@ test.describe('getFieldErrorMessage', () => {
     });
 });
 
-test.describe('validators-helper', () => {
+describe('validators-helper', () => {
     test('should build validation rules with composed validators', () => {
         const rules = buildValidationRules([validateRequired(), validateEmail()]);
 
