@@ -346,6 +346,95 @@ describe('connectors epics', () => {
         expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to delete connector' }));
     });
 
+    test('getConnectorAttributesDescriptors success emits getConnectorAttributeDescriptorsSuccess', async () => {
+        const attrs = [{ uuid: 'a-1' }] as any[];
+        const deps = createDeps({
+            connectors: {
+                getAttributes: ({ uuid, functionGroup, kind }: { uuid: any; functionGroup: any; kind: any }) => {
+                    expect(uuid).toBe('conn-1');
+                    expect(functionGroup).toBe('FG');
+                    expect(kind).toBe('kind');
+                    return of(attrs);
+                },
+            } as any,
+        });
+
+        const epic = connectorsEpics[3] as any;
+        const output$ = epic(
+            of(slice.actions.getConnectorAttributesDescriptors({ uuid: 'conn-1', functionGroup: 'FG' as any, kind: 'kind' })),
+            of({}) as any,
+            deps as any,
+        );
+        const emitted = (await firstValueFrom(output$.pipe(take(1), toArray()))) as any[];
+
+        expect(emitted[0]).toEqual(
+            slice.actions.getConnectorAttributeDescriptorsSuccess({
+                functionGroup: 'FG',
+                kind: 'kind',
+                attributes: attrs,
+            }),
+        );
+    });
+
+    test('getConnectorAttributesDescriptors failure emits getConnectorAttributesDescriptorsFailure and fetchError', async () => {
+        const err = new Error('attrs failed');
+        const deps = createDeps({
+            connectors: {
+                getAttributes: () => throwError(() => err),
+            } as any,
+        });
+
+        const epic = connectorsEpics[3] as any;
+        const output$ = epic(
+            of(slice.actions.getConnectorAttributesDescriptors({ uuid: 'conn-1', functionGroup: 'FG' as any, kind: 'kind' })),
+            of({}) as any,
+            deps as any,
+        );
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+
+        expect(emitted[0]).toEqual(slice.actions.getConnectorAttributesDescriptorsFailure());
+        expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to get connector attributes' }));
+    });
+
+    test('getConnectorAllAttributesDescriptors success emits getConnectorAllAttributesDescriptorsSuccess', async () => {
+        const descColl = { group: { kind: [{ uuid: 'a-1' }] } } as any;
+        const deps = createDeps({
+            connectors: {
+                getAttributesAll: ({ uuid }: { uuid: any }) => {
+                    expect(uuid).toBe('conn-1');
+                    return of(descColl);
+                },
+            } as any,
+        });
+
+        const epic = connectorsEpics[4] as any;
+        const output$ = epic(of(slice.actions.getConnectorAllAttributesDescriptors({ uuid: 'conn-1' })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(1), toArray()))) as any[];
+
+        expect(emitted[0]).toEqual(
+            slice.actions.getConnectorAllAttributesDescriptorsSuccess({
+                attributeDescriptorCollection: descColl,
+            }),
+        );
+    });
+
+    test('getConnectorAllAttributesDescriptors failure emits getAllConnectorAllAttributesDescriptorsFailure and insertWidgetLock', async () => {
+        const err = new Error('all attrs failed');
+        const deps = createDeps({
+            connectors: {
+                getAttributesAll: () => throwError(() => err),
+            } as any,
+        });
+
+        const epic = connectorsEpics[4] as any;
+        const output$ = epic(of(slice.actions.getConnectorAllAttributesDescriptors({ uuid: 'conn-1' })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+
+        expect(emitted[0]).toEqual(slice.actions.getAllConnectorAllAttributesDescriptorsFailure());
+        expect(emitted[1].type).toBe(userInterfaceActions.insertWidgetLock.type);
+        expect(emitted[1].payload.widgetName).toBe(LockWidgetNameEnum.ConnectorAttributes);
+    });
+
     test('callbackConnector success emits callbackSuccess', async () => {
         const data = { result: 'ok' } as any;
 

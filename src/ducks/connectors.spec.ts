@@ -177,6 +177,59 @@ describe('connectors slice', () => {
         next = reducer({ ...next, isAuthorizing: true }, actions.authorizeConnectorFailure());
         expect(next.isAuthorizing).toBe(false);
     });
+
+    test('attribute descriptors reducers update connectorAttributes and flags', () => {
+        let next = reducer(
+            { ...initialState, connectorAttributes: { group: { kind: [{ uuid: 'old' } as any] } } as any },
+            actions.getConnectorAttributesDescriptors({ uuid: 'c-1', functionGroup: 'group' as any, kind: 'kind' }),
+        );
+        expect(next.isFetchingAttributes).toBe(true);
+        expect(next.connectorAttributes!.group!.kind).toBeUndefined();
+
+        const attrs = [{ uuid: 'a-1' } as any];
+        next = reducer(next, actions.getConnectorAttributeDescriptorsSuccess({ functionGroup: 'group', kind: 'kind', attributes: attrs }));
+        expect(next.isFetchingAllAttributes).toBe(false);
+        expect(next.connectorAttributes!.group!.kind).toEqual(attrs);
+
+        next = reducer({ ...next, isFetchingAllAttributes: true }, actions.getConnectorAttributesDescriptorsFailure());
+        expect(next.isFetchingAllAttributes).toBe(false);
+    });
+
+    test('getConnectorAllAttributesDescriptors reducers replace connectorAttributes', () => {
+        let next = reducer(
+            { ...initialState, connectorAttributes: { old: {} } as any },
+            actions.getConnectorAllAttributesDescriptors({ uuid: 'c-1' }),
+        );
+        expect(next.isFetchingAllAttributes).toBe(true);
+        expect(next.connectorAttributes).toBeUndefined();
+
+        const collection = { group: { kind: [{ uuid: 'a-1' } as any] } } as any;
+        next = reducer(next, actions.getConnectorAllAttributesDescriptorsSuccess({ attributeDescriptorCollection: collection }));
+        expect(next.isFetchingAllAttributes).toBe(false);
+        expect(next.connectorAttributes).toEqual(collection);
+
+        next = reducer({ ...next, isFetchingAllAttributes: true }, actions.getAllConnectorAllAttributesDescriptorsFailure());
+        expect(next.isFetchingAllAttributes).toBe(false);
+    });
+
+    test('callbackResource and clear helpers update callbackData and isRunningCallback', () => {
+        let next = reducer(
+            { ...initialState, callbackData: { cb: { old: true } }, isRunningCallback: {} } as any,
+            actions.callbackResource({
+                callbackId: 'cb',
+                callbackResource: { uuid: 'x', functionGroup: 'fg', kind: 'kind', requestAttributeCallback: {} as any } as any,
+            }),
+        );
+        expect(next.callbackData.cb).toBeUndefined();
+        expect(next.isRunningCallback.cb).toBe(true);
+
+        next = reducer(next, actions.callbackSuccess({ callbackId: 'cb', data: { ok: true } }));
+        expect(next.callbackData.cb).toEqual({ ok: true });
+        expect(next.isRunningCallback.cb).toBe(false);
+
+        next = reducer(next, actions.callbackFailure({ callbackId: 'cb' }));
+        expect(next.isRunningCallback.cb).toBe(false);
+    });
 });
 
 describe('connectors selectors', () => {
