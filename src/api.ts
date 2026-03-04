@@ -6,6 +6,7 @@ import {
     AuditLogApi,
     AuthenticationManagementApi,
     AuthorityManagementApi,
+    CBOMManagementApi,
     CMPProfileManagementApi,
     CallbackApi,
     CertificateInventoryApi,
@@ -68,6 +69,7 @@ export interface ApiClients {
     callback: CallbackApi;
     statisticsDashboard: StatisticsDashboardApi;
     authorities: AuthorityManagementApi;
+    cbomManagement: CBOMManagementApi;
     entities: EntityManagementApi;
     resources: ResourceManagementApi;
     locations: LocationManagementApi;
@@ -115,6 +117,7 @@ export const backendClient: ApiClients = {
     raProfiles: new RAProfileManagementApi(configuration),
     credentials: new CredentialManagementApi(configuration),
     authorities: new AuthorityManagementApi(configuration),
+    cbomManagement: new CBOMManagementApi(configuration),
     entities: new EntityManagementApi(configuration),
     resources: new ResourceManagementApi(configuration),
     locations: new LocationManagementApi(configuration),

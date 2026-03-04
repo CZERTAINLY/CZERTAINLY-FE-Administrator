@@ -86,13 +86,13 @@ jobs:
           # Playwright deps
           npx playwright install --with-deps
 
-          # Run tests on Chromium WITH coverage (only chromium contributes to lcov)
-          # If your coverage is enabled differently, adjust/remove COVERAGE=1
-          COVERAGE=1 npx playwright test -c playwright-ct.config.ts --project=chromium
+          npm run test:cov
 
           # Sanity check
-          test -f coverage/lcov.info
-          echo "LCOV generated: $(wc -l coverage/lcov.info | awk '{print $1}') lines"
+          test -f coverage-playwright/lcov.info
+          echo "Playwright LCOV generated: $(wc -l coverage-playwright/lcov.info | awk '{print $1}') lines"
+          test -f coverage-vitest/lcov.info
+          echo "Vitest LCOV generated: $(wc -l coverage-vitest/lcov.info | awk '{print $1}') lines"
 
       - name: Sonar Scan
         uses: SonarSource/sonarqube-scan-action@v4
@@ -105,7 +105,6 @@ jobs:
             -Dsonar.pullrequest.key=${{ env.PR_NUMBER }}
             -Dsonar.pullrequest.branch=${{ env.PR_BRANCH }}
             -Dsonar.pullrequest.base=${{ env.BASE_BRANCH }}
-            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
 
       - name: Finalize GitHub Check
         if: always()

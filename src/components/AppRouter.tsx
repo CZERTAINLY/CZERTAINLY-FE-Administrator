@@ -119,6 +119,10 @@ import CustomOIDList from 'components/_pages/custom-oid/list';
 import CustomOIDDetail from 'components/_pages/custom-oid/detail';
 import Login from './_pages/login';
 
+import CbomsList from './_pages/cboms/list';
+import CbomDetail from 'components/_pages/cboms/detail';
+import CbomVersionsHistory from 'components/_pages/cboms/versions';
+
 export default function AppRouter() {
     const profile = useSelector(selectors.profile);
 
@@ -314,6 +318,9 @@ export default function AppRouter() {
                     <Route path={`/approvals`} element={<ApprovalsList />} />
                     <Route path={'/custom-oids'} element={<CustomOIDList />} />
                     <Route path={'/custom-oids/detail/:id'} element={<CustomOIDDetail />} />
+                    <Route path={`/${Resource.Cboms.toLowerCase()}`} element={<CbomsList />} />
+                    <Route path={`/${Resource.Cboms.toLowerCase()}/detail/:id`} element={<CbomDetail />} />
+                    <Route path={`/${Resource.Cboms.toLowerCase()}/detail/:id/versions/:versionId?`} element={<CbomVersionsHistory />} />
                 </Route>
 
                 {/*

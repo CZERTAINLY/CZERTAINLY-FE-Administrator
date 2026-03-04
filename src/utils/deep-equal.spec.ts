@@ -1,7 +1,7 @@
-import { test, expect } from '../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import { deepEqual } from './deep-equal';
 
-test.describe('deepEqual', () => {
+describe('deepEqual', () => {
     test('should return true for identical primitive values', () => {
         expect(deepEqual(1, 1)).toBe(true);
         expect(deepEqual('a', 'a')).toBe(true);
