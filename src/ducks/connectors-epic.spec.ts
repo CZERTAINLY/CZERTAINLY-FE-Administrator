@@ -228,6 +228,192 @@ describe('connectors epics', () => {
         expect(emitted[0].payload.health.status).toBe('Up');
     });
 
+    test('getConnectorHealth failure emits getConnectorHealthFailure', async () => {
+        const deps = createDeps({
+            connectorsV2: {
+                checkHealthV2: () => throwError(() => new Error('health failed')),
+            } as any,
+        });
+        const epic = connectorsEpics[5] as any;
+        const output$ = epic(of(slice.actions.getConnectorHealth({ uuid: 'conn-1' })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(1), toArray()))) as any[];
+        expect(emitted[0]).toEqual(slice.actions.getConnectorHealthFailure());
+    });
+
+    test('getConnectorInfoV2 success emits getConnectorInfoV2Success', async () => {
+        const info = { uuid: 'conn-1', version: 'V2' } as any;
+        const deps = createDeps({
+            connectorsV2: {
+                getInfoV2: ({ uuid }: { uuid: any }) => {
+                    expect(uuid).toBe('conn-1');
+                    return of(info);
+                },
+            } as any,
+        });
+        const epic = connectorsEpics[11] as any;
+        const output$ = epic(of(slice.actions.getConnectorInfoV2({ uuid: 'conn-1' })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(1), toArray()))) as any[];
+        expect(emitted[0]).toEqual(slice.actions.getConnectorInfoV2Success({ info }));
+    });
+
+    test('getConnectorInfoV2 failure emits getConnectorInfoV2Failure', async () => {
+        const deps = createDeps({
+            connectorsV2: {
+                getInfoV2: () => throwError(() => new Error('info failed')),
+            } as any,
+        });
+        const epic = connectorsEpics[11] as any;
+        const output$ = epic(of(slice.actions.getConnectorInfoV2({ uuid: 'conn-1' })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(1), toArray()))) as any[];
+        expect(emitted[0]).toEqual(slice.actions.getConnectorInfoV2Failure());
+    });
+
+    test('getConnectorAttributesDescriptors success emits getConnectorAttributeDescriptorsSuccess', async () => {
+        const attrs = [{ uuid: 'a-1', name: 'Attr' }] as any[];
+        const deps = createDeps({
+            connectors: {
+                getAttributes: ({ uuid, functionGroup, kind }: { uuid: any; functionGroup: any; kind: any }) => {
+                    expect(uuid).toBe('conn-1');
+                    expect(functionGroup).toBe('FG');
+                    expect(kind).toBe('kind');
+                    return of(attrs);
+                },
+            } as any,
+        });
+        const epic = connectorsEpics[3] as any;
+        const output$ = epic(
+            of(slice.actions.getConnectorAttributesDescriptors({ uuid: 'conn-1', functionGroup: 'FG' as any, kind: 'kind' })),
+            of({}) as any,
+            deps as any,
+        );
+        const emitted = (await firstValueFrom(output$.pipe(take(1), toArray()))) as any[];
+        expect(emitted[0].type).toBe(slice.actions.getConnectorAttributeDescriptorsSuccess.type);
+        expect(emitted[0].payload.functionGroup).toBe('FG');
+        expect(emitted[0].payload.kind).toBe('kind');
+        expect(emitted[0].payload.attributes).toHaveLength(1);
+    });
+
+    test('getConnectorAttributesDescriptors failure emits failure and fetchError', async () => {
+        const err = new Error('attrs failed');
+        const deps = createDeps({
+            connectors: {
+                getAttributes: () => throwError(() => err),
+            } as any,
+        });
+        const epic = connectorsEpics[3] as any;
+        const output$ = epic(
+            of(slice.actions.getConnectorAttributesDescriptors({ uuid: 'conn-1', functionGroup: 'FG' as any, kind: 'kind' })),
+            of({}) as any,
+            deps as any,
+        );
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+        expect(emitted[0]).toEqual(slice.actions.getConnectorAttributesDescriptorsFailure());
+        expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to get connector attributes' }));
+    });
+
+    test('getConnectorAllAttributesDescriptors success emits getConnectorAllAttributesDescriptorsSuccess', async () => {
+        const collection = { group: { kind: [] } } as any;
+        const deps = createDeps({
+            connectors: {
+                getAttributesAll: ({ uuid }: { uuid: any }) => {
+                    expect(uuid).toBe('conn-1');
+                    return of(collection);
+                },
+            } as any,
+        });
+        const epic = connectorsEpics[4] as any;
+        const output$ = epic(of(slice.actions.getConnectorAllAttributesDescriptors({ uuid: 'conn-1' })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(1), toArray()))) as any[];
+        expect(emitted[0].type).toBe(slice.actions.getConnectorAllAttributesDescriptorsSuccess.type);
+        expect(emitted[0].payload.attributeDescriptorCollection).toEqual(collection);
+    });
+
+    test('getConnectorAllAttributesDescriptors failure emits failure and insertWidgetLock', async () => {
+        const err = new Error('all attrs failed');
+        const deps = createDeps({
+            connectors: {
+                getAttributesAll: () => throwError(() => err),
+            } as any,
+        });
+        const epic = connectorsEpics[4] as any;
+        const output$ = epic(of(slice.actions.getConnectorAllAttributesDescriptors({ uuid: 'conn-1' })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+        expect(emitted[0]).toEqual(slice.actions.getAllConnectorAllAttributesDescriptorsFailure());
+        expect(emitted[1].type).toBe(userInterfaceActions.insertWidgetLock.type);
+    });
+
+    test('connectConnector success emits connectConnectorSuccess with connection details', async () => {
+        const connection = [{ functionGroupCode: 'FG', kinds: [], endPoints: [] }] as any[];
+        const deps = createDeps({
+            connectorsV2: {
+                connectV2: ({ connectRequestDto }: { connectRequestDto: any }) => {
+                    expect(connectRequestDto).toBeDefined();
+                    return of(connection);
+                },
+            } as any,
+        });
+        const epic = connectorsEpics[10] as any;
+        const output$ = epic(of(slice.actions.connectConnector({ uuid: 'conn-1', authAttributes: [] } as any)), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(1), toArray()))) as any[];
+        expect(emitted[0].type).toBe(slice.actions.connectConnectorSuccess.type);
+        expect(emitted[0].payload.connectInfo).toEqual(connection);
+    });
+
+    test('reconnectConnector success emits reconnectConnectorSuccess and getConnectorHealth', async () => {
+        const connection = { functionGroupCode: 'FG' } as any;
+        const deps = createDeps({
+            connectorsV2: {
+                reconnectV2: ({ uuid }: { uuid: any }) => {
+                    expect(uuid).toBe('conn-1');
+                    return of(connection);
+                },
+            } as any,
+        });
+        const epic = connectorsEpics[12] as any;
+        const output$ = epic(of(slice.actions.reconnectConnector({ uuid: 'conn-1' })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+        expect(emitted[0].type).toBe(slice.actions.reconnectConnectorSuccess.type);
+        expect(emitted[0].payload.uuid).toBe('conn-1');
+        expect(emitted[1]).toEqual(slice.actions.getConnectorHealth({ uuid: 'conn-1' }));
+    });
+
+    test('authorizeConnector success emits authorizeConnectorSuccess and getConnectorDetail and getConnectorHealth', async () => {
+        const deps = createDeps({
+            connectorsV2: {
+                approveV2: ({ uuid }: { uuid: any }) => {
+                    expect(uuid).toBe('conn-1');
+                    return of(null);
+                },
+            } as any,
+        });
+        const epic = connectorsEpics[14] as any;
+        const output$ = epic(of(slice.actions.authorizeConnector({ uuid: 'conn-1' })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(3), toArray()))) as any[];
+        expect(emitted[0].type).toBe(slice.actions.authorizeConnectorSuccess.type);
+        expect(emitted[1]).toEqual(slice.actions.getConnectorDetail({ uuid: 'conn-1' }));
+        expect(emitted[2]).toEqual(slice.actions.getConnectorHealth({ uuid: 'conn-1' }));
+    });
+
+    test('bulkForceDeleteConnectors success with successRedirect emits success and redirect', async () => {
+        const deps = createDeps({
+            connectors: {
+                forceDeleteConnector: ({ requestBody }: { requestBody: any }) => {
+                    expect(requestBody).toEqual(['c-1', 'c-2']);
+                    return of(null);
+                },
+            } as any,
+        });
+        const epic = connectorsEpics[16] as any;
+        const output$ = epic(
+            of(slice.actions.bulkForceDeleteConnectors({ uuids: ['c-1', 'c-2'], successRedirect: '/connectors' })),
+            of({}) as any,
+            deps as any,
+        );
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+        expect(emitted[0].type).toBe(slice.actions.bulkForceDeleteConnectorsSuccess.type);
+        expect(emitted[1]).toEqual(appRedirectActions.redirect({ url: '/connectors' }));
+    });
+
     test('createConnector success emits createConnectorSuccess and redirect', async () => {
         const created = {
             uuid: 'created-1',
@@ -310,6 +496,57 @@ describe('connectors epics', () => {
         expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to delete connector' }));
     });
 
+    test('updateConnector success emits updateConnectorSuccess and redirect', async () => {
+        const updated = {
+            uuid: 'conn-1',
+            name: 'Updated',
+            url: 'https://example.com',
+            status: 'Connected',
+            version: 'V2',
+            authType: 'None',
+            interfaces: [],
+            functionGroups: [],
+            authAttributes: [],
+            customAttributes: [],
+        } as any;
+        const deps = createDeps({
+            connectorsV2: {
+                editConnectorV2: ({ uuid, connectorUpdateRequestDtoV2 }: { uuid: any; connectorUpdateRequestDtoV2: any }) => {
+                    expect(uuid).toBe('conn-1');
+                    expect(connectorUpdateRequestDtoV2).toBeDefined();
+                    return of(updated);
+                },
+            } as any,
+        });
+        const epic = connectorsEpics[7] as any;
+        const output$ = epic(
+            of(slice.actions.updateConnector({ uuid: 'conn-1', connectorUpdateRequest: { name: 'Updated' } as any })),
+            of({}) as any,
+            deps as any,
+        );
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+        expect(emitted[0].type).toBe(slice.actions.updateConnectorSuccess.type);
+        expect(emitted[1]).toEqual(appRedirectActions.redirect({ url: '../../connectors/detail/conn-1' }));
+    });
+
+    test('updateConnector failure emits updateConnectorFailure and fetchError', async () => {
+        const err = new Error('update failed');
+        const deps = createDeps({
+            connectorsV2: {
+                editConnectorV2: () => throwError(() => err),
+            } as any,
+        });
+        const epic = connectorsEpics[7] as any;
+        const output$ = epic(
+            of(slice.actions.updateConnector({ uuid: 'conn-1', connectorUpdateRequest: {} as any })),
+            of({}) as any,
+            deps as any,
+        );
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+        expect(emitted[0]).toEqual(slice.actions.updateConnectorFailure());
+        expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to update connector' }));
+    });
+
     test('bulkDeleteConnectors success emits bulkDeleteConnectorsSuccess and success alert', async () => {
         const errors = [{ code: 'E', message: 'x' }] as any[];
 
@@ -344,6 +581,211 @@ describe('connectors epics', () => {
 
         expect(emitted[0]).toEqual(slice.actions.bulkDeleteConnectorsFailure());
         expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to delete connector' }));
+    });
+
+    test('connectConnector success emits connectConnectorSuccess with connectionDetails and connectInfo', async () => {
+        const connection = [{ functionGroups: [{ functionGroupCode: 'FG', kinds: [], endPoints: [] }] }] as any[];
+        const deps = createDeps({
+            connectorsV2: {
+                connectV2: ({ connectRequestDto }: { connectRequestDto: any }) => {
+                    expect(connectRequestDto).toBeDefined();
+                    return of(connection);
+                },
+            } as any,
+        });
+        const epic = connectorsEpics[10] as any;
+        const output$ = epic(
+            of(slice.actions.connectConnector({ uuid: 'conn-1', functionGroup: 'FG' as any, kind: 'kind', authAttributes: [] } as any)),
+            of({}) as any,
+            deps as any,
+        );
+        const emitted = (await firstValueFrom(output$.pipe(take(1), toArray()))) as any[];
+        expect(emitted[0].type).toBe(slice.actions.connectConnectorSuccess.type);
+        expect(emitted[0].payload.connectionDetails).toBeDefined();
+        expect(emitted[0].payload.connectInfo).toEqual(connection);
+    });
+
+    test('connectConnector failure emits connectConnectorFailure and fetchError', async () => {
+        const err = new Error('connect failed');
+        const deps = createDeps({
+            connectorsV2: {
+                connectV2: () => throwError(() => err),
+            } as any,
+        });
+        const epic = connectorsEpics[10] as any;
+        const output$ = epic(of(slice.actions.connectConnector({ uuid: 'conn-1' } as any)), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+        expect(emitted[0]).toEqual(slice.actions.connectConnectorFailure());
+        expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to connect to connector' }));
+    });
+
+    test('reconnectConnector success emits reconnectConnectorSuccess and getConnectorHealth', async () => {
+        const connection = { functionGroups: [{ functionGroupCode: 'FG', kinds: [], endPoints: [] }] } as any;
+        const deps = createDeps({
+            connectorsV2: {
+                reconnectV2: ({ uuid }: { uuid: any }) => {
+                    expect(uuid).toBe('conn-1');
+                    return of(connection);
+                },
+            } as any,
+        });
+        const epic = connectorsEpics[12] as any;
+        const output$ = epic(of(slice.actions.reconnectConnector({ uuid: 'conn-1' })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+        expect(emitted[0].type).toBe(slice.actions.reconnectConnectorSuccess.type);
+        expect(emitted[0].payload.uuid).toBe('conn-1');
+        expect(emitted[1]).toEqual(slice.actions.getConnectorHealth({ uuid: 'conn-1' }));
+    });
+
+    test('reconnectConnector failure emits reconnectConnectorFailure and fetchError', async () => {
+        const err = new Error('reconnect failed');
+        const deps = createDeps({
+            connectorsV2: {
+                reconnectV2: () => throwError(() => err),
+            } as any,
+        });
+        const epic = connectorsEpics[12] as any;
+        const output$ = epic(of(slice.actions.reconnectConnector({ uuid: 'conn-1' })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+        expect(emitted[0]).toEqual(slice.actions.reconnectConnectorFailure());
+        expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to reconnect to connector' }));
+    });
+
+    test('bulkReconnectConnectors success emits bulkReconnectConnectorsSuccess', async () => {
+        const deps = createDeps({
+            connectorsV2: {
+                bulkReconnectV2: ({ requestBody }: { requestBody: any }) => {
+                    expect(requestBody).toEqual(['c-1', 'c-2']);
+                    return of(null);
+                },
+            } as any,
+        });
+        const epic = connectorsEpics[13] as any;
+        const output$ = epic(of(slice.actions.bulkReconnectConnectors({ uuids: ['c-1', 'c-2'] })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(1), toArray()))) as any[];
+        expect(emitted[0]).toEqual(slice.actions.bulkReconnectConnectorsSuccess({ uuids: ['c-1', 'c-2'] }));
+    });
+
+    test('bulkReconnectConnectors failure emits bulkReconnectConnectorsFailure and fetchError', async () => {
+        const err = new Error('bulk reconnect failed');
+        const deps = createDeps({
+            connectorsV2: {
+                bulkReconnectV2: () => throwError(() => err),
+            } as any,
+        });
+        const epic = connectorsEpics[13] as any;
+        const output$ = epic(of(slice.actions.bulkReconnectConnectors({ uuids: ['c-1', 'c-2'] })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+        expect(emitted[0]).toEqual(slice.actions.bulkReconnectConnectorsFailure());
+        expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to bulk reconnect to connectors' }));
+    });
+
+    test('authorizeConnector success emits authorizeConnectorSuccess, getConnectorDetail and getConnectorHealth', async () => {
+        const deps = createDeps({
+            connectorsV2: {
+                approveV2: ({ uuid }: { uuid: any }) => {
+                    expect(uuid).toBe('conn-1');
+                    return of(null);
+                },
+            } as any,
+        });
+        const epic = connectorsEpics[14] as any;
+        const output$ = epic(of(slice.actions.authorizeConnector({ uuid: 'conn-1' })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(3), toArray()))) as any[];
+        expect(emitted[0]).toEqual(slice.actions.authorizeConnectorSuccess({ uuid: 'conn-1' }));
+        expect(emitted[1]).toEqual(slice.actions.getConnectorDetail({ uuid: 'conn-1' }));
+        expect(emitted[2]).toEqual(slice.actions.getConnectorHealth({ uuid: 'conn-1' }));
+    });
+
+    test('authorizeConnector failure emits authorizeConnectorFailure and fetchError', async () => {
+        const err = new Error('authorize failed');
+        const deps = createDeps({
+            connectorsV2: {
+                approveV2: () => throwError(() => err),
+            } as any,
+        });
+        const epic = connectorsEpics[14] as any;
+        const output$ = epic(of(slice.actions.authorizeConnector({ uuid: 'conn-1' })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+        expect(emitted[0]).toEqual(slice.actions.authorizeConnectorFailure());
+        expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to authorize connector' }));
+    });
+
+    test('bulkAuthorizeConnectors success emits bulkAuthorizeConnectorsSuccess and listConnectors', async () => {
+        const deps = createDeps({
+            connectorsV2: {
+                bulkApproveV2: ({ requestBody }: { requestBody: any }) => {
+                    expect(requestBody).toEqual(['c-1', 'c-2']);
+                    return of(null);
+                },
+            } as any,
+        });
+        const epic = connectorsEpics[15] as any;
+        const output$ = epic(of(slice.actions.bulkAuthorizeConnectors({ uuids: ['c-1', 'c-2'] })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+        expect(emitted[0]).toEqual(slice.actions.bulkAuthorizeConnectorsSuccess({ uuids: ['c-1', 'c-2'] }));
+        expect(emitted[1]).toEqual(slice.actions.listConnectors({ itemsPerPage: 1000, pageNumber: 1, filters: [] }));
+    });
+
+    test('bulkAuthorizeConnectors failure emits bulkAuthorizeConnectorsFailure and fetchError', async () => {
+        const err = new Error('bulk authorize failed');
+        const deps = createDeps({
+            connectorsV2: {
+                bulkApproveV2: () => throwError(() => err),
+            } as any,
+        });
+        const epic = connectorsEpics[15] as any;
+        const output$ = epic(of(slice.actions.bulkAuthorizeConnectors({ uuids: ['c-1', 'c-2'] })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+        expect(emitted[0]).toEqual(slice.actions.bulkAuthorizeConnectorsFailure());
+        expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to bulk authorize connectors' }));
+    });
+
+    test('bulkForceDeleteConnectors success with successRedirect emits success and redirect', async () => {
+        const deps = createDeps({
+            connectors: {
+                forceDeleteConnector: ({ requestBody }: { requestBody: any }) => {
+                    expect(requestBody).toEqual(['c-1', 'c-2']);
+                    return of(null);
+                },
+            } as any,
+        });
+        const epic = connectorsEpics[16] as any;
+        const output$ = epic(
+            of(slice.actions.bulkForceDeleteConnectors({ uuids: ['c-1', 'c-2'], successRedirect: '/connectors' })),
+            of({}) as any,
+            deps as any,
+        );
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+        expect(emitted[0].type).toBe(slice.actions.bulkForceDeleteConnectorsSuccess.type);
+        expect(emitted[0].payload.successRedirect).toBe('/connectors');
+        expect(emitted[1]).toEqual(appRedirectActions.redirect({ url: '/connectors' }));
+    });
+
+    test('bulkForceDeleteConnectors success without successRedirect emits success only', async () => {
+        const deps = createDeps({
+            connectors: {
+                forceDeleteConnector: () => of(null),
+            } as any,
+        });
+        const epic = connectorsEpics[16] as any;
+        const output$ = epic(of(slice.actions.bulkForceDeleteConnectors({ uuids: ['c-1', 'c-2'] })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(1), toArray()))) as any[];
+        expect(emitted[0]).toEqual(slice.actions.bulkForceDeleteConnectorsSuccess({ uuids: ['c-1', 'c-2'] }));
+    });
+
+    test('bulkForceDeleteConnectors failure emits bulkForceDeleteConnectorsFailure and fetchError', async () => {
+        const err = new Error('force delete failed');
+        const deps = createDeps({
+            connectors: {
+                forceDeleteConnector: () => throwError(() => err),
+            } as any,
+        });
+        const epic = connectorsEpics[16] as any;
+        const output$ = epic(of(slice.actions.bulkForceDeleteConnectors({ uuids: ['c-1', 'c-2'] })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+        expect(emitted[0]).toEqual(slice.actions.bulkForceDeleteConnectorsFailure());
+        expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to force delete connectors' }));
     });
 
     test('getConnectorAttributesDescriptors success emits getConnectorAttributeDescriptorsSuccess', async () => {
@@ -477,5 +919,30 @@ describe('connectors epics', () => {
 
         expect(emitted[0]).toEqual(slice.actions.callbackFailure({ callbackId: 'cb-1' }));
         expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Connector callback failure' }));
+    });
+
+    test('callbackResource success emits callbackSuccess', async () => {
+        const data = { result: 'ok' } as any;
+        const deps = createDeps({
+            callback: {
+                resourceCallback: ({ requestAttributeCallback }: { requestAttributeCallback: any }) => {
+                    expect(requestAttributeCallback).toBeDefined();
+                    return of(data);
+                },
+            } as any,
+        });
+        const epic = connectorsEpics[18] as any;
+        const action = slice.actions.callbackResource({
+            callbackId: 'res-cb-1',
+            callbackResource: {
+                uuid: 'c-1',
+                functionGroup: 'FG',
+                kind: 'kind',
+                requestAttributeCallback: { mappings: [] },
+            } as any,
+        });
+        const output$ = epic(of(action), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(1), toArray()))) as any[];
+        expect(emitted[0]).toEqual(slice.actions.callbackSuccess({ callbackId: 'res-cb-1', data }));
     });
 });

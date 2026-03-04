@@ -8,6 +8,38 @@ describe('connectors slice', () => {
         expect(reducer(undefined, { type: 'unknown' })).toEqual(initialState);
     });
 
+    test('setCheckedRows updates checkedRows', () => {
+        const next = reducer({ ...initialState, checkedRows: [] }, actions.setCheckedRows({ checkedRows: ['c-1', 'c-2'] }));
+        expect(next.checkedRows).toEqual(['c-1', 'c-2']);
+    });
+
+    test('clearDeleteErrorMessages clears delete error state', () => {
+        const next = reducer(
+            { ...initialState, deleteErrorMessage: 'err', bulkDeleteErrorMessages: [{ code: 'E', message: 'x' }] as any },
+            actions.clearDeleteErrorMessages(),
+        );
+        expect(next.deleteErrorMessage).toBe('');
+        expect(next.bulkDeleteErrorMessages).toEqual([]);
+    });
+
+    test('clearConnectionDetails clears connection details and connectInfo', () => {
+        const next = reducer(
+            {
+                ...initialState,
+                connectorConnectionDetails: [{ code: 'FG' }] as any,
+                connectInfo: [{ foo: 'bar' }],
+            },
+            actions.clearConnectionDetails(),
+        );
+        expect(next.connectorConnectionDetails).toBeUndefined();
+        expect(next.connectInfo).toBeUndefined();
+    });
+
+    test('clearCallbackData resets callbackData', () => {
+        const next = reducer({ ...initialState, callbackData: { cb1: { x: 1 }, cb2: { y: 2 } } }, actions.clearCallbackData());
+        expect(next.callbackData).toEqual({});
+    });
+
     test('resetState restores initial values and clears unknown keys', () => {
         const dirtyState = {
             ...initialState,
@@ -79,6 +111,39 @@ describe('connectors slice', () => {
         expect(next.isFetchingDetail).toBe(false);
     });
 
+    test('getConnectorDetailSuccess updates existing connector in list when found, pushes when not', () => {
+        const detail = { uuid: 'c-1', name: 'Updated Detail' } as any;
+        const existingList = [{ uuid: 'c-1', name: 'Old' } as any, { uuid: 'c-2' } as any];
+
+        let next = reducer(
+            { ...initialState, connectors: existingList, isFetchingDetail: true },
+            actions.getConnectorDetailSuccess({ connector: detail }),
+        );
+        expect(next.connector).toEqual(detail);
+        expect(next.connectors).toHaveLength(2);
+        expect(next.connectors.find((c) => c.uuid === 'c-1')).toEqual(detail);
+
+        const newDetail = { uuid: 'c-3', name: 'New' } as any;
+        next = reducer(next, actions.getConnectorDetailSuccess({ connector: newDetail }));
+        expect(next.connectors).toHaveLength(3);
+        expect(next.connectors.find((c) => c.uuid === 'c-3')).toEqual(newDetail);
+    });
+
+    test('getConnectorInfoV2 and getConnectorInfoV2Success update connectorInfoV2', () => {
+        let next = reducer({ ...initialState, connectorInfoV2: { old: true } }, actions.getConnectorInfoV2({ uuid: 'c-1' }));
+        expect(next.connectorInfoV2).toBeUndefined();
+
+        const info = { version: 'V2', interfaces: [] };
+        next = reducer(next, actions.getConnectorInfoV2Success({ info }));
+        expect(next.connectorInfoV2).toEqual(info);
+    });
+
+    test('getConnectorInfoV2Failure is no-op', () => {
+        const prev = { ...initialState, connectorInfoV2: { x: 1 } } as any;
+        const next = reducer(prev, actions.getConnectorInfoV2Failure());
+        expect(next.connectorInfoV2).toEqual({ x: 1 });
+    });
+
     test('getConnectorHealth / success / failure updates health and flags', () => {
         let next = reducer({ ...initialState, connectorHealth: { status: 'Old' } as any }, actions.getConnectorHealth({ uuid: 'c-1' }));
         expect(next.connectorHealth).toBeUndefined();
@@ -106,6 +171,25 @@ describe('connectors slice', () => {
 
         next = reducer({ ...next, isCreating: true }, actions.createConnectorFailure());
         expect(next.isCreating).toBe(false);
+    });
+
+    test('updateConnectorSuccess updates list by index or push, and current connector when uuid matches', () => {
+        const updated = { uuid: 'c-1', name: 'Updated' } as any;
+        const listWithMatch = [{ uuid: 'c-1', name: 'Old' } as any, { uuid: 'c-2' } as any];
+
+        let next = reducer(
+            { ...initialState, connectors: listWithMatch, connector: { uuid: 'c-1', name: 'Old' } as any, isUpdating: true },
+            actions.updateConnectorSuccess({ connector: updated }),
+        );
+        expect(next.isUpdating).toBe(false);
+        expect(next.connectors.find((c) => c.uuid === 'c-1')).toEqual(updated);
+        expect(next.connector).toEqual(updated);
+
+        const newConnector = { uuid: 'c-3', name: 'New' } as any;
+        next = reducer({ ...next, connector: newConnector }, actions.updateConnectorSuccess({ connector: newConnector }));
+        expect(next.connectors).toHaveLength(3);
+        expect(next.connectors.find((c) => c.uuid === 'c-3')).toEqual(newConnector);
+        expect(next.connector).toEqual(newConnector);
     });
 
     test('deleteConnector / success / failure updates list, detail and error message', () => {
@@ -156,6 +240,24 @@ describe('connectors slice', () => {
         expect(next.connectors).toHaveLength(1);
         expect(next.connectors[0].uuid).toBe('c-3');
 
+        // When current connector is in deleted uuids, clear connector and related state
+        const withCurrentConnector = {
+            ...initialState,
+            connectors: [{ uuid: 'c-1' } as any, { uuid: 'c-2' } as any],
+            connector: { uuid: 'c-1' } as any,
+            connectorHealth: {} as any,
+            connectorAttributes: {} as any,
+            connectorConnectionDetails: [] as any,
+            connectInfo: [],
+        };
+        next = reducer(withCurrentConnector, actions.bulkDeleteConnectorsSuccess({ uuids: ['c-1'], errors: [] }));
+        expect(next.connectors).toHaveLength(1);
+        expect(next.connector).toBeUndefined();
+        expect(next.connectorHealth).toBeUndefined();
+        expect(next.connectorAttributes).toBeUndefined();
+        expect(next.connectorConnectionDetails).toBeUndefined();
+        expect(next.connectInfo).toBeUndefined();
+
         next = reducer({ ...next, isBulkDeleting: true }, actions.bulkDeleteConnectorsFailure());
         expect(next.isBulkDeleting).toBe(false);
     });
@@ -195,6 +297,16 @@ describe('connectors slice', () => {
         expect(next.isFetchingAllAttributes).toBe(false);
     });
 
+    test('getConnectorAttributesDescriptors when functionGroup/kind missing does not delete', () => {
+        const attrs = { otherGroup: { otherKind: [] } } as any;
+        const next = reducer(
+            { ...initialState, connectorAttributes: attrs },
+            actions.getConnectorAttributesDescriptors({ uuid: 'c-1', functionGroup: 'missingGroup' as any, kind: 'missingKind' }),
+        );
+        expect(next.isFetchingAttributes).toBe(true);
+        expect(next.connectorAttributes).toEqual(attrs);
+    });
+
     test('getConnectorAllAttributesDescriptors reducers replace connectorAttributes', () => {
         let next = reducer(
             { ...initialState, connectorAttributes: { old: {} } as any },
@@ -210,6 +322,90 @@ describe('connectors slice', () => {
 
         next = reducer({ ...next, isFetchingAllAttributes: true }, actions.getAllConnectorAllAttributesDescriptorsFailure());
         expect(next.isFetchingAllAttributes).toBe(false);
+    });
+
+    test('connectConnector / success / failure updates connection details and flags', () => {
+        let next = reducer(
+            { ...initialState, connectorConnectionDetails: [{ code: 'Old' }] as any, connectInfo: [{}] },
+            actions.connectConnector({ uuid: 'c-1' } as any),
+        );
+        expect(next.connectorConnectionDetails).toEqual([]);
+        expect(next.connectInfo).toBeUndefined();
+        expect(next.isConnecting).toBe(true);
+
+        const details = [{ code: 'FG' }] as any[];
+        next = reducer(next, actions.connectConnectorSuccess({ connectionDetails: details, connectInfo: [{}] }));
+        expect(next.isConnecting).toBe(false);
+        expect(next.connectorConnectionDetails).toEqual(details);
+        expect(next.connectInfo).toEqual([{}]);
+
+        next = reducer({ ...next, isConnecting: true }, actions.connectConnectorFailure());
+        expect(next.isConnecting).toBe(false);
+    });
+
+    test('reconnectConnector / success / failure updates connection details and connector functionGroups', () => {
+        let next = reducer(
+            {
+                ...initialState,
+                connectorConnectionDetails: [{ code: 'Old' }] as any,
+                connectInfo: [{}],
+                connector: { uuid: 'c-1', functionGroups: [] } as any,
+            },
+            actions.reconnectConnector({ uuid: 'c-1' }),
+        );
+        expect(next.connectorConnectionDetails).toBeUndefined();
+        expect(next.connectInfo).toBeUndefined();
+        expect(next.isReconnecting).toBe(true);
+
+        const fgs = [{ code: 'FG' }] as any[];
+        next = reducer(next, actions.reconnectConnectorSuccess({ uuid: 'c-1', functionGroups: fgs, connectInfo: [{}] }));
+        expect(next.isReconnecting).toBe(false);
+        expect(next.connectorConnectionDetails).toEqual(fgs);
+        expect(next.connector!.functionGroups).toEqual(fgs);
+
+        next = reducer({ ...next, isReconnecting: true }, actions.reconnectConnectorFailure());
+        expect(next.isReconnecting).toBe(false);
+    });
+
+    test('bulkReconnectConnectors / success / failure updates flag', () => {
+        let next = reducer(initialState, actions.bulkReconnectConnectors({ uuids: ['c-1', 'c-2'] }));
+        expect(next.isBulkReconnecting).toBe(true);
+
+        next = reducer(next, actions.bulkReconnectConnectorsSuccess({ uuids: ['c-1', 'c-2'] }));
+        expect(next.isBulkReconnecting).toBe(false);
+
+        next = reducer({ ...next, isBulkReconnecting: true }, actions.bulkReconnectConnectorsFailure());
+        expect(next.isBulkReconnecting).toBe(false);
+    });
+
+    test('bulkForceDeleteConnectors / success / failure removes connectors and clears detail when in uuids', () => {
+        const connectors = [{ uuid: 'c-1' } as any, { uuid: 'c-2' } as any];
+        let next = reducer(
+            { ...initialState, connectors, connector: { uuid: 'c-1' } as any, connectorHealth: {} as any },
+            actions.bulkForceDeleteConnectors({ uuids: ['c-1', 'c-2'] }),
+        );
+        expect(next.isBulkForceDeleting).toBe(true);
+
+        next = reducer(next, actions.bulkForceDeleteConnectorsSuccess({ uuids: ['c-1', 'c-2'] }));
+        expect(next.isBulkForceDeleting).toBe(false);
+        expect(next.connectors).toEqual([]);
+        expect(next.connector).toBeUndefined();
+        expect(next.connectorHealth).toBeUndefined();
+
+        next = reducer({ ...next, isBulkForceDeleting: true }, actions.bulkForceDeleteConnectorsFailure());
+        expect(next.isBulkForceDeleting).toBe(false);
+    });
+
+    test('callbackConnector sets isRunningCallback and clears existing callbackData', () => {
+        const next = reducer(
+            { ...initialState, callbackData: { cb1: { old: true } } },
+            actions.callbackConnector({
+                callbackId: 'cb1',
+                callbackConnector: { uuid: 'x', functionGroup: 'fg', kind: 'k', requestAttributeCallback: { mappings: [] } } as any,
+            }),
+        );
+        expect(next.callbackData.cb1).toBeUndefined();
+        expect(next.isRunningCallback.cb1).toBe(true);
     });
 
     test('callbackResource and clear helpers update callbackData and isRunningCallback', () => {

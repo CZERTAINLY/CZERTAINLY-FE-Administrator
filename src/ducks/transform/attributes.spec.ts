@@ -51,6 +51,23 @@ describe('attribute transform helpers', () => {
         expect(model.content).toBeUndefined();
     });
 
+    test('transformAttributeResponseDtoToModel with V2 and undefined content sets content undefined', () => {
+        const dto = {
+            uuid: 'a-v2',
+            name: 'Attr',
+            label: 'Attr',
+            type: 'String',
+            contentType: 'String',
+            version: 'V2',
+            content: undefined,
+        } as any;
+
+        const model = transformAttributeResponseDtoToModel(dto);
+
+        expect(model.uuid).toBe('a-v2');
+        expect(model.content).toBeUndefined();
+    });
+
     test('transformAttributeRequestModelToDto clones content deeply', () => {
         const content = [{ data: 'y' }] as any[];
         const model = {
@@ -107,6 +124,19 @@ describe('attribute transform helpers', () => {
         expect(model.content).not.toBe(content);
     });
 
+    test('transformAttributeDescriptorDtoToModel with undefined content sets content undefined', () => {
+        const dto = {
+            uuid: 'd-2',
+            name: 'DescNoContent',
+            content: undefined,
+        } as any;
+
+        const model = transformAttributeDescriptorDtoToModel(dto);
+
+        expect(model.uuid).toBe('d-2');
+        expect(model.content).toBeUndefined();
+    });
+
     test('transformAttributeDescriptorCollectionDtoToModel maps each descriptor with cloning', () => {
         const desc = { uuid: 'd-1', name: 'Desc', content: [{ a: 1 }] } as any;
         const collection = {
@@ -153,6 +183,19 @@ describe('attribute transform helpers', () => {
         expect(model.parts!.db.description).toBe('db ok');
     });
 
+    test('transformHealthDtoToModel with no parts returns undefined parts', () => {
+        const dto = {
+            status: HealthStatus.Down,
+            description: 'no parts',
+        } as any;
+
+        const model = transformHealthDtoToModel(dto);
+
+        expect(model.status).toBe(HealthStatus.Down);
+        expect(model.description).toBe('no parts');
+        expect(model.parts).toBeUndefined();
+    });
+
     test('transformHealthInfoToModel maps components into parts with description from details', () => {
         const healthInfo = {
             status: HealthStatus.Down,
@@ -177,6 +220,32 @@ describe('attribute transform helpers', () => {
         expect(model.parts!.db.status).toBe(HealthStatus.Down);
         expect(model.parts!.db.description).toContain('error: connection');
         expect(model.parts!.db.description).toContain('code: 500');
+    });
+
+    test('transformHealthInfoToModel with no components returns undefined parts', () => {
+        const healthInfo = { status: HealthStatus.Up } as any;
+
+        const model = transformHealthInfoToModel(healthInfo);
+
+        expect(model.status).toBe(HealthStatus.Up);
+        expect(model.parts).toBeUndefined();
+    });
+
+    test('transformHealthInfoToModel uses Unknown when component status is null', () => {
+        const healthInfo = {
+            status: HealthStatus.Up,
+            components: {
+                sub: {
+                    status: undefined,
+                    details: {},
+                },
+            },
+        } as any;
+
+        const model = transformHealthInfoToModel(healthInfo);
+
+        expect(model.parts!.sub.status).toBe(HealthStatus.Unknown);
+        expect(model.parts!.sub.description).toBeUndefined();
     });
 
     test('transformCallbackAttributeModelToDto returns shallow clone', () => {
