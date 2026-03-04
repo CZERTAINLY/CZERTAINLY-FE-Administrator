@@ -57,21 +57,6 @@ export function dateFormatter(date: any): string {
     }
 }
 
-const getCronTimes = (cronExpression: string | undefined) => {
-    if (cronExpression) {
-        try {
-            const times = [];
-            const expression = CronExpressionParser.parse(cronExpression ?? '');
-            for (let i = 0; i < 5; i++) {
-                const value = expression.next();
-                times.push(value.toDate());
-            }
-            return times;
-        } catch (err) {}
-    }
-    return undefined;
-};
-
 export const getStrongFromCronExpression = (cronExpression: string | undefined) => {
     if (cronExpression) {
         try {
