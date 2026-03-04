@@ -5,6 +5,8 @@ import {
     durationFormatter,
     getFormattedDate,
     getFormattedDateTime,
+    getFormattedUtc,
+    getFormattedDateByType,
     getDateInString,
     checkIfFieldAttributeTypeIsDate,
     checkIfFieldTypeIsDate,
@@ -128,6 +130,96 @@ describe('dateUtil', () => {
 
         test('should return undefined for Equals', () => {
             expect(checkIfFieldOperatorIsInterval(FilterConditionOperator.Equals)).toBeUndefined();
+        });
+    });
+
+    describe('getFormattedUtc', () => {
+        test('should format datetime type to ISO string', () => {
+            const result = getFormattedUtc('datetime' as AttributeContentType, '2024-03-15T14:30:45');
+            expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/);
+        });
+
+        test('should format date type to YYYY-MM-DD', () => {
+            const result = getFormattedUtc('date' as AttributeContentType, '2024-03-15T14:30:45');
+            expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+        });
+
+        test('should format time with HH:mm to HH:mm:ss', () => {
+            const result = getFormattedUtc('time' as AttributeContentType, '14:30');
+            expect(result).toBe('14:30:00');
+        });
+
+        test('should format time with HH to HH:mm:ss', () => {
+            const result = getFormattedUtc('time' as AttributeContentType, '14');
+            expect(result).toBe('14:00:00');
+        });
+
+        test('should return time unchanged if already HH:mm:ss', () => {
+            const result = getFormattedUtc('time' as AttributeContentType, '14:30:45');
+            expect(result).toBe('14:30:45');
+        });
+
+        test('should return original string for unknown type', () => {
+            const result = getFormattedUtc('string' as AttributeContentType, 'some-value');
+            expect(result).toBe('some-value');
+        });
+
+        test('should handle FilterFieldType.Datetime', () => {
+            const result = getFormattedUtc(FilterFieldType.Datetime, '2024-06-20T10:00:00');
+            expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/);
+        });
+
+        test('should handle FilterFieldType.Date', () => {
+            const result = getFormattedUtc(FilterFieldType.Date, '2024-06-20T10:00:00');
+            expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+        });
+    });
+
+    describe('getFormattedDateByType', () => {
+        test('should format time type correctly', () => {
+            const result = getFormattedDateByType('9:5:3', 'time' as AttributeContentType);
+            expect(result).toBe('09:05:03');
+        });
+
+        test('should format time with leading zeros', () => {
+            const result = getFormattedDateByType('14:30:45', 'time' as AttributeContentType);
+            expect(result).toBe('14:30:45');
+        });
+
+        test('should format datetime type to ISO format without milliseconds', () => {
+            const result = getFormattedDateByType('2024-03-15T14:30:45Z', 'datetime' as AttributeContentType);
+            expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/);
+        });
+
+        test('should format date type to YYYY-MM-DD', () => {
+            const result = getFormattedDateByType('2024-03-15T14:30:45Z', 'date' as AttributeContentType);
+            expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+        });
+
+        test('should return original string for unknown type', () => {
+            const result = getFormattedDateByType('some-value', 'string' as AttributeContentType);
+            expect(result).toBe('some-value');
+        });
+
+        test('should use UTC values for datetime formatting', () => {
+            // Use a known UTC time
+            const result = getFormattedDateByType('2024-12-25T12:30:45Z', 'datetime' as AttributeContentType);
+            expect(result).toBe('2024-12-25T12:30:45');
+        });
+
+        test('should use UTC values for date formatting', () => {
+            const result = getFormattedDateByType('2024-12-25T00:00:00Z', 'date' as AttributeContentType);
+            expect(result).toBe('2024-12-25');
+        });
+
+        test('should pad single digit date components', () => {
+            const result = getFormattedDateByType('2024-01-05T09:05:03Z', 'datetime' as AttributeContentType);
+            expect(result).toBe('2024-01-05T09:05:03');
+        });
+
+        test('should handle date at month boundary', () => {
+            const result = getFormattedDateByType('2024-02-29T23:59:59Z', 'date' as AttributeContentType);
+            expect(result).toBe('2024-02-29');
         });
     });
 });
