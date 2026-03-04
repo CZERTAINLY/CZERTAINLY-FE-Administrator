@@ -13,6 +13,7 @@ import {
     FunctionGroupModel,
 } from 'types/connectors';
 import { ConnectInfoDto, ConnectorDetailDtoV2, ConnectorDtoV2 } from 'types/openapi';
+import { AuthType } from 'types/openapi';
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from './attributes';
 
 export function transformBulkActionDtoToModel(error: BulkActionDto): BulkActionModel {
@@ -52,9 +53,12 @@ export function transformConnectorDtoV2ToModel(connector: ConnectorDtoV2): Conne
         name: connector.name,
         url: connector.url,
         status: connector.status,
-        version: connector.version,
+        authType: AuthType.None,
         functionGroups: [],
-    } as unknown as ConnectorResponseModel;
+        authAttributes: [],
+        customAttributes: [],
+        version: connector.version,
+    };
 }
 
 export function transformConnectInfoDtoToFunctionGroups(info: ConnectInfoDto): FunctionGroupModel[] {

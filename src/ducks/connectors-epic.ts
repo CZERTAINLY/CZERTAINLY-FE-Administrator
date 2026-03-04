@@ -16,7 +16,7 @@ import {
     transformAttributeDescriptorDtoToModel,
     transformAttributeRequestModelToDto,
     transformCallbackAttributeModelToDto,
-    transformHealthDtoToModel,
+    transformHealthInfoToModel,
 } from './transform/attributes';
 
 import {
@@ -67,31 +67,22 @@ const listConnectorsMerge: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.listConnectorsMerge.match),
         mergeMap((action) =>
-            deps.apiClients.connectorsV2
-                .listConnectorsV2({
-                    searchRequestDto: {
-                        itemsPerPage: 1000,
-                        pageNumber: 1,
-                        filters: [],
-                    },
-                })
-                .pipe(
-                    mergeMap((page) =>
-                        of(
-                            slice.actions.listConnectorsMergeSuccess({
-                                connectorList: page.items.map(transformConnectorDtoV2ToModel),
-                            }),
-                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ConnectorStore),
-                        ),
-                    ),
-
-                    catchError((error) =>
-                        of(
-                            slice.actions.listConnectorsMergeFailure(),
-                            userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorStore),
-                        ),
+            deps.apiClients.connectors.listConnectors({ functionGroup: action.payload.functionGroup }).pipe(
+                mergeMap((list) =>
+                    of(
+                        slice.actions.listConnectorsMergeSuccess({
+                            connectorList: list.map(transformConnectorResponseDtoToModel),
+                        }),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ConnectorStore),
                     ),
                 ),
+                catchError((error) =>
+                    of(
+                        slice.actions.listConnectorsMergeFailure(),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorStore),
+                    ),
+                ),
+            ),
         ),
     );
 };
@@ -189,8 +180,11 @@ const getConnectorHealth: AppEpic = (action$, state, deps) => {
         filter(slice.actions.getConnectorHealth.match),
         switchMap((action) =>
             deps.apiClients.connectorsV2.checkHealthV2({ uuid: action.payload.uuid }).pipe(
-                map((health) => slice.actions.getConnectorHealthSuccess({ health: transformHealthDtoToModel(health) })),
-
+                map((healthInfo) =>
+                    slice.actions.getConnectorHealthSuccess({
+                        health: transformHealthInfoToModel(healthInfo as any),
+                    }),
+                ),
                 catchError((error) => of(slice.actions.getConnectorHealthFailure())),
             ),
         ),

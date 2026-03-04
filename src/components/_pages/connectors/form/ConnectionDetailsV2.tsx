@@ -106,7 +106,7 @@ export default function ConnectionDetailsV2({ connectInfo, errorMessage }: Props
         };
 
         return v2PrimaryInfo.interfaces.map((iface: any) => ({
-            id: iface.code,
+            id: `${iface.code}-${iface.version}`,
             columns: [
                 toTitleCase(String(iface.code)),
                 iface.version,

@@ -185,7 +185,7 @@ export default function ConnectorList() {
                         <span style={{ whiteSpace: 'nowrap' }}>
                             <Link to={`./detail/${connector.uuid}`}>{connector.name}</Link>
                         </span>,
-                        <span style={{ whiteSpace: 'nowrap' }}>{(connector as any).version}</span>,
+                        <span style={{ whiteSpace: 'nowrap' }}>{connector.version || '-'}</span>,
                         <span style={{ whiteSpace: 'nowrap' }}>coming soon</span>,
 
                         <span style={{ whiteSpace: 'nowrap' }}>{connector.url}</span>,

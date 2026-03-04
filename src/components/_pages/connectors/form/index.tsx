@@ -131,12 +131,6 @@ export default function ConnectorForm({ connectorId, onCancel, onSuccess }: Conn
         (values: FormValues) => {
             if (editMode) {
                 if (!connector) return;
-                console.log({
-                    url: values.url,
-                    authType: values.authenticationType as AuthType,
-                    customAttributes: collectFormAttributes('customConnector', resourceCustomAttributes, values),
-                    version: values.version,
-                });
                 dispatch(
                     connectorActions.updateConnector({
                         uuid: connector?.uuid,
@@ -144,7 +138,6 @@ export default function ConnectorForm({ connectorId, onCancel, onSuccess }: Conn
                             url: values.url,
                             authType: values.authenticationType as AuthType,
                             customAttributes: collectFormAttributes('customConnector', resourceCustomAttributes, values),
-                            version: values.version,
                         },
                     } as any),
                 );

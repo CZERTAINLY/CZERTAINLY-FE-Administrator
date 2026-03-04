@@ -28,7 +28,7 @@ export default function SupportedInterfacesV2({ interfaces, isBusy }: Props) {
         };
 
         return {
-            id: iface.code,
+            id: `${iface.code}-${iface.version}`,
             columns: [
                 toTitleCase(String(iface.code)),
                 iface.version,
