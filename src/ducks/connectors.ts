@@ -51,6 +51,20 @@ export type State = {
     isRunningCallback: { [key: string]: boolean };
 };
 
+function removeConnectorsByUuids(state: State, uuids: string[]) {
+    uuids.forEach((uuid) => {
+        const index = state.connectors.findIndex((connector) => connector.uuid === uuid);
+        if (index >= 0) state.connectors.splice(index, 1);
+    });
+    if (state.connector && uuids.includes(state.connector.uuid)) {
+        state.connector = undefined;
+        state.connectorHealth = undefined;
+        state.connectorAttributes = undefined;
+        state.connectorConnectionDetails = undefined;
+        state.connectInfo = undefined;
+    }
+}
+
 export const initialState: State = {
     checkedRows: [],
 
@@ -338,18 +352,7 @@ export const slice = createSlice({
                 return;
             }
 
-            action.payload.uuids.forEach((uuid) => {
-                const index = state.connectors.findIndex((connector) => connector.uuid === uuid);
-                if (index >= 0) state.connectors.splice(index, 1);
-            });
-
-            if (state.connector && action.payload.uuids.includes(state.connector.uuid)) {
-                state.connector = undefined;
-                state.connectorHealth = undefined;
-                state.connectorAttributes = undefined;
-                state.connectorConnectionDetails = undefined;
-                state.connectInfo = undefined;
-            }
+            removeConnectorsByUuids(state, action.payload.uuids);
         },
 
         bulkDeleteConnectorsFailure: (state, action: PayloadAction<void>) => {
@@ -362,19 +365,7 @@ export const slice = createSlice({
 
         bulkForceDeleteConnectorsSuccess: (state, action: PayloadAction<{ uuids: string[]; successRedirect?: string }>) => {
             state.isBulkForceDeleting = false;
-
-            action.payload.uuids.forEach((uuid) => {
-                const index = state.connectors.findIndex((connector) => connector.uuid === uuid);
-                if (index >= 0) state.connectors.splice(index, 1);
-            });
-
-            if (state.connector && action.payload.uuids.includes(state.connector.uuid)) {
-                state.connector = undefined;
-                state.connectorHealth = undefined;
-                state.connectorAttributes = undefined;
-                state.connectorConnectionDetails = undefined;
-                state.connectInfo = undefined;
-            }
+            removeConnectorsByUuids(state, action.payload.uuids);
         },
 
         bulkForceDeleteConnectorsFailure: (state, action: PayloadAction<void>) => {
