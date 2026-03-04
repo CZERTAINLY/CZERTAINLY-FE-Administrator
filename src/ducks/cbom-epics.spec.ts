@@ -1,4 +1,4 @@
-import { test, expect } from '../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import { firstValueFrom, of, throwError } from 'rxjs';
 import { take, toArray } from 'rxjs/operators';
 import cbomEpics from './cbom-epics';
@@ -35,7 +35,7 @@ function createDeps(overrides: Partial<EpicDeps['apiClients']['cbomManagement']>
     };
 }
 
-test.describe('cbom epics', () => {
+describe('cbom epics', () => {
     test('listCboms success emits listCbomsSuccess and removeWidgetLock', async () => {
         const searchRequest = { pageNumber: 1, itemsPerPage: 10, filters: [] } as any;
         const response = { items: [{ uuid: 'cbom-1' }], totalItems: 1, pageNumber: 1, itemsPerPage: 10, totalPages: 1 } as any;

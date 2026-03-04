@@ -1,4 +1,4 @@
-import { test, expect } from '../../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import {
     transformCbomDetailDtoToModel,
     transformCbomDtoToModel,
@@ -8,7 +8,7 @@ import {
     transformSearchRequestModelToDto,
 } from './cbom';
 
-test.describe('cbom transform helpers', () => {
+describe('cbom transform helpers', () => {
     test('transformCbomDtoToModel returns shallow clone', () => {
         const input = { uuid: 'cbom-1', serialNumber: 'urn:cbom:1', metadata: { source: 'lens' } } as any;
         const result = transformCbomDtoToModel(input);
