@@ -26,6 +26,7 @@ function CbomsList() {
         () => [
             { content: 'Serial number', sortable: true, id: 'serial' },
             { content: 'Ver.', sortable: true, id: 'version', align: 'center' },
+            { content: 'Source', sortable: true, id: 'source' },
             { content: 'Alg.', sortable: true, id: 'algorithm', align: 'center' },
             { content: 'Certs', sortable: true, id: 'certificates', align: 'center' },
             { content: 'Proto.', sortable: true, id: 'protocol', align: 'center' },
@@ -96,6 +97,7 @@ function CbomsList() {
                         {c.serialNumber}
                     </Link>,
                     c.version,
+                    c.source || '-',
                     c.algorithms,
                     c.certificates,
                     c.protocols,
