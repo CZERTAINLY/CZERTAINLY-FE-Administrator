@@ -241,17 +241,30 @@ export default function ConnectorForm({ connectorId, onCancel, onSuccess }: Conn
     );
 
     const selectedVersionErrorMessage = useMemo(() => {
-        const raw = (selectedVersionInfo as any)?.errorMessage as string | undefined;
-        if (!raw) return undefined;
+        const info = selectedVersionInfo as any;
+        const raw = info?.errorMessage as string | undefined;
 
-        try {
-            const parsed = JSON.parse(raw);
-            if (parsed?.message) return parsed.message as string;
-            return raw;
-        } catch {
-            return raw;
+        let message: string | undefined;
+
+        if (raw) {
+            try {
+                const parsed = JSON.parse(raw);
+                if (parsed?.message) {
+                    message = parsed.message as string;
+                } else {
+                    message = raw;
+                }
+            } catch {
+                message = raw;
+            }
         }
-    }, [selectedVersionInfo]);
+
+        if (!editMode && selectedVersion === ConnectorVersion.V2 && info?.connectorUuid) {
+            message = message || 'Connector with this URL and version is already added.';
+        }
+
+        return message;
+    }, [selectedVersionInfo, editMode, selectedVersion]);
 
     const hasSuccessfulSelectedVersion = useMemo(
         () => !!selectedVersionInfo && !selectedVersionErrorMessage,
