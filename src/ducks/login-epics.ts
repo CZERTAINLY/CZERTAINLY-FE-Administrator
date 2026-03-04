@@ -3,52 +3,53 @@ import { catchError, filter, switchMap } from 'rxjs/operators';
 import { AppEpic } from 'ducks';
 import * as slice from './login';
 
-function fetchLoginMethods(
+async function fetchLoginMethods(
     apiUrl: string,
     redirectParam: string,
 ): Promise<{ loginMethods?: Array<{ name: string; loginUrl: string }>; redirectUrl?: string }> {
     const url = `${apiUrl}/login?redirect=${encodeURIComponent(redirectParam)}`;
-    const base = apiUrl.startsWith('http')
-        ? apiUrl.replace(/\/$/, '')
-        : `${window.location.origin}${apiUrl.startsWith('/') ? apiUrl : `/${apiUrl}`}`.replace(/\/$/, '');
-    const oauthRedirectUrl = `${base}/oauth2/authorization/internal?redirect=${encodeURIComponent(redirectParam)}`;
 
-    return fetch(url, { method: 'GET', redirect: 'manual', credentials: 'same-origin' }).then((response) => {
-        if (response.type === 'opaqueredirect' || response.status === 0) {
-            return { redirectUrl: oauthRedirectUrl };
-        }
-        if (response.status === 302) {
-            const location = response.headers.get('Location');
-            if (!location) throw new Error('302 without Location');
-            let redirectUrl: string;
-            if (location.startsWith('http')) {
-                redirectUrl = location;
-            } else if (location.startsWith('/')) {
-                redirectUrl = `${window.location.origin}${location}`;
-            } else {
-                redirectUrl = `${base}/${location}`;
+    const response = await fetch(url, { method: 'GET', credentials: 'same-origin' });
+    if (response.ok) {
+        return response.text().then((text) => {
+            try {
+                return parseLoginMethods(text, apiUrl, redirectParam);
+            } catch {
+                throw new Error('Failed to parse login methods');
             }
-            return { redirectUrl };
-        }
-        if (response.ok) {
-            return response.text().then((text) => {
-                try {
-                    const data = JSON.parse(text);
-                    return { loginMethods: Array.isArray(data) ? data : (data?.loginMethods ?? []) };
-                } catch {
-                    return { redirectUrl: oauthRedirectUrl };
-                }
-            });
-        }
-        throw new Error(response.statusText || 'Failed to load login methods');
-    });
+        });
+    }
+    throw new Error(response.statusText || 'Failed to load login methods');
 }
+
+const parseLoginMethods = (text: string, apiUrl: string, redirectParam: string) => {
+    const loginMethods = JSON.parse(text);
+
+    if (loginMethods.length === 1) {
+        const loginUrl = loginMethods[0].loginUrl;
+        let redirectUrl;
+        if (loginUrl.startsWith('http')) {
+            redirectUrl = loginUrl;
+        } else if (loginUrl.startsWith('/')) {
+            redirectUrl = `${window.location.origin}${loginUrl}`;
+        } else {
+            const base = apiUrl.startsWith('http')
+                ? apiUrl.replace(/\/$/, '')
+                : `${window.location.origin}${apiUrl.startsWith('/') ? apiUrl : `/${apiUrl}`}`.replace(/\/$/, '');
+            redirectUrl = `${base}/${loginUrl}`;
+        }
+
+        return { redirectUrl: `${redirectUrl}?redirect=${encodeURIComponent(redirectParam)}` };
+    }
+
+    return { loginMethods };
+};
 
 const getLoginMethods: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.getLoginMethods.match),
         switchMap((action) => {
-            const apiUrl = (window as any).__ENV__?.API_URL || '/api';
+            const apiUrl = window.__ENV__?.API_URL || '/api';
             const redirectParam = action.payload.redirect || 'dashboard';
             return from(fetchLoginMethods(apiUrl, redirectParam)).pipe(
                 switchMap((result) => {
