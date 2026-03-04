@@ -481,6 +481,8 @@ export default function CbomDetail() {
                                             redirect="../cboms"
                                             showValuesInLegend
                                             interactiveLegend={false}
+                                            showCenterLabel
+                                            chartSize="full"
                                         />
                                     )}
                                     {Object.keys(algorithmsByNameChartData).length > 0 && (
@@ -495,6 +497,8 @@ export default function CbomDetail() {
                                             redirect="../cboms"
                                             showValuesInLegend
                                             interactiveLegend={false}
+                                            showCenterLabel
+                                            chartSize="full"
                                         />
                                     )}
                                     {Object.keys(cryptoFunctionsChartData).length > 0 && (
@@ -509,6 +513,8 @@ export default function CbomDetail() {
                                             redirect="../cboms"
                                             showValuesInLegend
                                             interactiveLegend={false}
+                                            showCenterLabel
+                                            chartSize="full"
                                         />
                                     )}
                                     {Object.keys(cryptoPrimitivesChartData).length > 0 && (
@@ -523,6 +529,8 @@ export default function CbomDetail() {
                                             redirect="../cboms"
                                             showValuesInLegend
                                             interactiveLegend={false}
+                                            showCenterLabel
+                                            chartSize="full"
                                         />
                                     )}
                                     {Object.keys(relatedMaterialTypesChartData).length > 0 && (
@@ -537,6 +545,8 @@ export default function CbomDetail() {
                                             redirect="../cboms"
                                             showValuesInLegend
                                             interactiveLegend={false}
+                                            showCenterLabel
+                                            chartSize="full"
                                         />
                                     )}
                                 </div>

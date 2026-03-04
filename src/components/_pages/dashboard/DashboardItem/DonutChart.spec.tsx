@@ -17,6 +17,8 @@ test.describe('DonutChart', () => {
         await expect(component.getByRole('heading', { name: 'Certificates by status' })).toBeVisible();
         await expect(component.getByText('Issued')).toBeVisible();
         await expect(component.getByText('Revoked')).toBeVisible();
+        await expect(component.getByText('Total')).toBeVisible();
+        await expect(component.getByText('12')).toBeVisible();
     });
 
     test('should render with empty data', async ({ mount }) => {
@@ -40,6 +42,7 @@ test.describe('DonutChart', () => {
 
         await expect(component.getByRole('button', { name: 'Issued 10' })).toBeVisible();
         await expect(component.getByRole('button', { name: 'Revoked 2' })).toBeVisible();
+        await expect(component.getByText('Issued')).toHaveAttribute('title', 'Issued');
     });
 
     test('should render non-clickable legend style when interactiveLegend is false', async ({ mount }) => {
@@ -55,5 +58,40 @@ test.describe('DonutChart', () => {
         );
 
         await expect(component.getByRole('button', { name: 'Issued' })).toHaveClass(/cursor-default/);
+    });
+
+    test('should support fixed size and hidden center label via props', async ({ mount }) => {
+        const component = await mount(
+            <DonutChartWithStore
+                title="Fixed chart"
+                data={{ [CertificateState.Issued]: 10, [CertificateState.Revoked]: 2 }}
+                entity={EntityType.CERTIFICATE}
+                redirect="/certificates"
+                onSetFilter={() => []}
+                chartSize="fixed"
+                showCenterLabel={false}
+                showValuesInLegend
+            />,
+        );
+
+        await expect(component.getByRole('heading', { name: 'Fixed chart' })).toBeVisible();
+        await expect(component.getByText('Total')).toHaveCount(0);
+        await expect(component.getByRole('button', { name: 'Issued 10' })).toBeVisible();
+    });
+
+    test('should shrink chart on small screens in full mode by default', async ({ mount }) => {
+        const component = await mount(
+            <DonutChartWithStore
+                title="Responsive chart"
+                data={{ [CertificateState.Issued]: 10, [CertificateState.Revoked]: 2 }}
+                entity={EntityType.CERTIFICATE}
+                redirect="/certificates"
+                onSetFilter={() => []}
+                chartSize="full"
+            />,
+        );
+
+        await expect(component.getByTestId('donut-chart-container')).toHaveClass(/max-w-\[200px\]/);
+        await expect(component.getByTestId('donut-chart-container')).toHaveClass(/w-full/);
     });
 });
