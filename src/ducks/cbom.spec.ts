@@ -1,8 +1,8 @@
-import { test, expect } from '../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import reducer, { actions, initialState, selectors } from './cbom';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
-test.describe('cbom slice', () => {
+describe('cbom slice', () => {
     test('returns initial state for unknown action', () => {
         expect(reducer(undefined, { type: 'unknown' })).toEqual(initialState);
     });
@@ -112,7 +112,7 @@ test.describe('cbom slice', () => {
     });
 });
 
-test.describe('cbom selectors', () => {
+describe('cbom selectors', () => {
     test('selectCbomList falls back to empty array', () => {
         const state = { cbom: initialState } as any;
         expect(selectors.selectCbomList(state)).toEqual([]);

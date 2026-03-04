@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 
-const input = 'coverage/lcov.info';
+const input = 'coverage-playwright/lcov.info';
 
 const raw = fs.readFileSync(input, 'utf8');
 const records = raw.split('end_of_record\n');

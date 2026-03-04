@@ -35,4 +35,6 @@ src/setupProxy.cjs
 
 # Coverage
 /coverage/
+/coverage-playwright/
+/coverage-vitest/
 /monocart-report/

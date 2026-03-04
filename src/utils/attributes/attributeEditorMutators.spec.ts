@@ -1,8 +1,8 @@
-import { test, expect } from '../../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import { mutators } from './attributeEditorMutators';
 
-test.describe('attributeEditorMutators', () => {
-    test.describe('setAttribute', () => {
+describe('attributeEditorMutators', () => {
+    describe('setAttribute', () => {
         test('changes value at key via changeValue', () => {
             const mutator = mutators().setAttribute;
             let capturedUpdater: ((prev: any) => any) | null = null;
@@ -17,7 +17,7 @@ test.describe('attributeEditorMutators', () => {
         });
     });
 
-    test.describe('clearAttributes', () => {
+    describe('clearAttributes', () => {
         test('clears keys in formState.values that start with __attributes__', () => {
             const mutator = mutators().clearAttributes;
             const state = {

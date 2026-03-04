@@ -1,4 +1,4 @@
-import { test, expect } from '../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import {
     removeNullValues,
     capitalize,
@@ -11,8 +11,8 @@ import {
 } from './common-utils';
 import { AttributeContentType, FilterFieldType } from 'types/openapi';
 
-test.describe('common-utils', () => {
-    test.describe('removeNullValues', () => {
+describe('common-utils', () => {
+    describe('removeNullValues', () => {
         test('should return null for null/undefined', () => {
             expect(removeNullValues(null)).toBeNull();
             expect(removeNullValues(undefined)).toBeNull();
@@ -36,7 +36,7 @@ test.describe('common-utils', () => {
         });
     });
 
-    test.describe('capitalize', () => {
+    describe('capitalize', () => {
         test('should capitalize first letter', () => {
             expect(capitalize('hello')).toBe('Hello');
         });
@@ -50,7 +50,7 @@ test.describe('common-utils', () => {
         });
     });
 
-    test.describe('getStepValue', () => {
+    describe('getStepValue', () => {
         test('should return 1 for datetime types', () => {
             expect(getStepValue('datetime')).toBe(1);
             expect(getStepValue('time')).toBe(1);
@@ -63,7 +63,7 @@ test.describe('common-utils', () => {
         });
     });
 
-    test.describe('isObjectSame', () => {
+    describe('isObjectSame', () => {
         test('should return true for same reference', () => {
             const obj = { a: 1 };
             expect(isObjectSame(obj, obj)).toBe(true);
@@ -84,7 +84,7 @@ test.describe('common-utils', () => {
         });
     });
 
-    test.describe('utf8ToBase64 and base64ToUtf8', () => {
+    describe('utf8ToBase64 and base64ToUtf8', () => {
         test('should encode and decode roundtrip', () => {
             const original = 'Hello, World!';
             const encoded = utf8ToBase64(original);
@@ -99,7 +99,7 @@ test.describe('common-utils', () => {
         });
     });
 
-    test.describe('getFormTypeFromAttributeContentType', () => {
+    describe('getFormTypeFromAttributeContentType', () => {
         test('should map Boolean to checkbox', () => {
             expect(getFormTypeFromAttributeContentType(AttributeContentType.Boolean)).toBe('checkbox');
         });
@@ -127,7 +127,7 @@ test.describe('common-utils', () => {
         });
     });
 
-    test.describe('getFormTypeFromFilterFieldType', () => {
+    describe('getFormTypeFromFilterFieldType', () => {
         test('should map Date to date', () => {
             expect(getFormTypeFromFilterFieldType(FilterFieldType.Date)).toBe('date');
         });
