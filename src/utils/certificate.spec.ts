@@ -1,4 +1,4 @@
-import { test, expect } from '../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import {
     CertificateEventHistoryDtoStatusEnum,
     CertificateState,
@@ -8,8 +8,8 @@ import {
 } from 'types/openapi';
 import { formatPEM, getCertificateStatusColor } from './certificate';
 
-test.describe('certificate utils', () => {
-    test.describe('formatPEM', () => {
+describe('certificate utils', () => {
+    describe('formatPEM', () => {
         test('should format short PEM string', () => {
             const result = formatPEM('short');
             expect(result).toContain('-----BEGIN CERTIFICATE-----');
@@ -32,7 +32,7 @@ test.describe('certificate utils', () => {
         });
     });
 
-    test.describe('getCertificateStatusColor', () => {
+    describe('getCertificateStatusColor', () => {
         test('should return correct colors for CertificateState', () => {
             expect(getCertificateStatusColor(CertificateState.Issued)).toBe('#14B8A6');
             expect(getCertificateStatusColor(CertificateState.Revoked)).toBe('#632828');

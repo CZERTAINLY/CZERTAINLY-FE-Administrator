@@ -57,42 +57,6 @@ export function dateFormatter(date: any): string {
     }
 }
 
-const getCronTimes = (cronExpression: string | undefined) => {
-    if (cronExpression) {
-        try {
-            const times = [];
-            const expression = CronExpressionParser.parse(cronExpression ?? '');
-            for (let i = 0; i < 5; i++) {
-                const value = expression.next();
-                times.push(value.toDate());
-            }
-            return times;
-        } catch (err) {}
-    }
-    return undefined;
-};
-
-export const getCronExpression = (cronExpression: string | undefined) => {
-    const times = getCronTimes(cronExpression);
-    return times ? (
-        <>
-            Next five executions:
-            <ul>
-                {times.map((t) => (
-                    <li key={t.toString()}>{dateFormatter(t)}</li>
-                ))}
-            </ul>
-        </>
-    ) : (
-        ''
-    );
-};
-
-export const getCronExpressionString = (cronExpression: string | undefined) => {
-    const times = getCronTimes(cronExpression);
-    return times ? `Next five executions:\n${times.map((t, i) => (i > 0 ? '\n' : '') + dateFormatter(t)).join('')}` : '';
-};
-
 export const getStrongFromCronExpression = (cronExpression: string | undefined) => {
     if (cronExpression) {
         try {
@@ -132,7 +96,7 @@ export const getDateInString = (daysOffset: number) => {
 };
 
 export function getFormattedDateTime(dateString: string): string {
-    if (isNaN(Date.parse(dateString))) {
+    if (Number.isNaN(Date.parse(dateString))) {
         return dateString;
     }
 
@@ -145,7 +109,7 @@ export function getFormattedDateTime(dateString: string): string {
 }
 
 export function getFormattedDate(dateString: string): string {
-    if (isNaN(Date.parse(dateString))) {
+    if (Number.isNaN(Date.parse(dateString))) {
         return dateString;
     }
 

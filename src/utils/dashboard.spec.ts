@@ -1,4 +1,4 @@
-import { test, expect } from '../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import {
     getDefaultColors,
     getValues,
@@ -6,8 +6,8 @@ import {
     getDonutChartColorsByRandomNumberOfOptions,
 } from './dashboard';
 
-test.describe('dashboard utils', () => {
-    test.describe('getDefaultColors', () => {
+describe('dashboard utils', () => {
+    describe('getDefaultColors', () => {
         test('should return array of 5 hex colors', () => {
             const colors = getDefaultColors();
             expect(colors).toHaveLength(5);
@@ -15,7 +15,7 @@ test.describe('dashboard utils', () => {
         });
     });
 
-    test.describe('getValues', () => {
+    describe('getValues', () => {
         test('should extract values from DashboardDict', () => {
             const data = { Active: 10, Expired: 5, Pending: 3 };
             expect(getValues(data)).toEqual([10, 5, 3]);
@@ -26,7 +26,7 @@ test.describe('dashboard utils', () => {
         });
     });
 
-    test.describe('getCertificateDonutChartColorsByDaysOfExpiration', () => {
+    describe('getCertificateDonutChartColorsByDaysOfExpiration', () => {
         test('should return undefined for undefined input', () => {
             expect(getCertificateDonutChartColorsByDaysOfExpiration(undefined)).toBeUndefined();
         });
@@ -41,7 +41,7 @@ test.describe('dashboard utils', () => {
         });
     });
 
-    test.describe('getDonutChartColorsByRandomNumberOfOptions', () => {
+    describe('getDonutChartColorsByRandomNumberOfOptions', () => {
         test('should return n colors when n <= base colors length', () => {
             const result = getDonutChartColorsByRandomNumberOfOptions(3);
             expect(result.colors).toHaveLength(3);

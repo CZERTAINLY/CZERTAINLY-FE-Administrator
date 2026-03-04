@@ -1,8 +1,8 @@
-import { test, expect } from '../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import { createFeatureSelector } from './ducks';
 
-test.describe('ducks utils', () => {
-    test.describe('createFeatureSelector', () => {
+describe('ducks utils', () => {
+    describe('createFeatureSelector', () => {
         test('should return feature state for given state', () => {
             const selector = createFeatureSelector<{ count: number }>('counter');
             const state = { counter: { count: 42 }, other: { data: 'x' } };
