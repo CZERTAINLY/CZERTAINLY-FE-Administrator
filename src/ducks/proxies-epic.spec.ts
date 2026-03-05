@@ -10,7 +10,15 @@ import { actions as appRedirectActions } from './app-redirect';
 import { actions as proxiesActions } from './proxies';
 import { actions as userInterfaceActions } from './user-interface';
 import { AppEpic, EpicDependencies } from './index';
-import { bulkDeleteProxies, createProxy, deleteProxy, listProxies, updateProxy } from './proxies-epic';
+import {
+    bulkDeleteProxies,
+    createProxy,
+    deleteProxy,
+    getProxyDetail,
+    getProxyInstructions,
+    listProxies,
+    updateProxy,
+} from './proxies-epic';
 import type { ProxyManagementApi } from 'types/openapi';
 import { LockTypeEnum, LockWidgetNameEnum } from 'types/user-interface';
 
@@ -93,6 +101,18 @@ describe('proxies epics', () => {
         ]);
     });
 
+    test('bulkDeleteProxies success emits bulkDeleteProxiesSuccess and alert success', async () => {
+        const deps = createDeps({
+            deleteProxy: (_request: any) => of(undefined),
+        });
+
+        const result = await runEpic(bulkDeleteProxies, proxiesActions.bulkDeleteProxies({ uuids: ['proxy-1'] }), deps);
+        expect(result).toEqual([
+            proxiesActions.bulkDeleteProxiesSuccess({ uuids: ['proxy-1'] }),
+            alertActions.success('Proxies successfully deleted'),
+        ]);
+    });
+
     test('bulkDeleteProxies failure emits bulkDeleteProxiesFailure and fetchError', async () => {
         const error = new Error('Bulk delete failed');
         const deps = createDeps({
@@ -104,6 +124,111 @@ describe('proxies epics', () => {
         expect(result[0].payload.error).toBe('Failed to delete proxies. Bulk delete failed');
         expect(result[1].type).toBe(appRedirectActions.fetchError.type);
         expect(result[1].payload.message).toBe('Failed to delete proxies');
+    });
+
+    test('getProxyDetail success emits getProxyDetailSuccess and removes lock', async () => {
+        const deps = createDeps({
+            getProxy: (request: any) => of(proxyDetail),
+        });
+
+        const result = await runEpic(getProxyDetail, proxiesActions.getProxyDetail({ uuid: 'proxy-1' }), deps);
+        expect(result).toEqual([
+            proxiesActions.getProxyDetailSuccess({ proxy: proxyDetail }),
+            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ProxyDetails),
+        ]);
+    });
+
+    test('getProxyDetail failure emits getProxyDetailFailure and inserts lock', async () => {
+        const error = new Error('Detail failed');
+        const deps = createDeps({
+            getProxy: (request: any) => throwError(() => error),
+        });
+
+        const result = await runEpic(getProxyDetail, proxiesActions.getProxyDetail({ uuid: 'proxy-1' }), deps);
+        expect(result[0].type).toBe(proxiesActions.getProxyDetailFailure.type);
+        expect(result[1].type).toBe(userInterfaceActions.insertWidgetLock.type);
+        expect(result[1].payload.widgetName).toBe(LockWidgetNameEnum.ProxyDetails);
+    });
+
+    test('getProxyInstructions success emits getProxyInstructionsSuccess', async () => {
+        const deps = createDeps({
+            getInstallationInstructions: (request: any) => of({ installationInstructions: 'do this' } as any),
+        });
+
+        const result = await runEpic(getProxyInstructions, proxiesActions.getProxyInstructions({ uuid: 'proxy-1' }), deps);
+        expect(result).toEqual([proxiesActions.getProxyInstructionsSuccess({ instructions: 'do this' })]);
+    });
+
+    test('getProxyInstructions failure emits getProxyInstructionsFailure and alert error', async () => {
+        const error = new Error('Instructions failed');
+        const deps = createDeps({
+            getInstallationInstructions: (request: any) => throwError(() => error),
+        });
+
+        const result = await runEpic(getProxyInstructions, proxiesActions.getProxyInstructions({ uuid: 'proxy-1' }), deps);
+        expect(result[0].type).toBe(proxiesActions.getProxyInstructionsFailure.type);
+        expect(result[1].type).toBe(alertActions.error.type);
+        expect(result[1].payload).toBe('Failed to get proxy installation instructions. Instructions failed');
+    });
+
+    test('getProxyInstructions success emits getProxyInstructionsSuccess with empty string if instructions are missing', async () => {
+        const deps = createDeps({
+            getInstallationInstructions: (request: any) => of({} as any),
+        });
+
+        const result = await runEpic(getProxyInstructions, proxiesActions.getProxyInstructions({ uuid: 'proxy-1' }), deps);
+        expect(result).toEqual([proxiesActions.getProxyInstructionsSuccess({ instructions: '' })]);
+    });
+
+    test('updateProxy failure emits updateProxyFailure and fetchError', async () => {
+        const error = new Error('Update failed');
+        const deps = createDeps({
+            editProxy: (request: any) => throwError(() => error),
+        });
+
+        const result = await runEpic(updateProxy, proxiesActions.updateProxy({ uuid: 'proxy-1', proxyUpdateRequest: proxyDetail }), deps);
+        expect(result[0].type).toBe(proxiesActions.updateProxyFailure.type);
+        expect(result[1].type).toBe(appRedirectActions.fetchError.type);
+        expect(result[1].payload.message).toBe('Failed to update proxy');
+    });
+
+    test('deleteProxy failure emits deleteProxyFailure and fetchError', async () => {
+        const error = new Error('Delete failed');
+        const deps = createDeps({
+            deleteProxy: (request: any) => throwError(() => error),
+        });
+
+        const result = await runEpic(deleteProxy, proxiesActions.deleteProxy({ uuid: 'proxy-1' }), deps);
+        expect(result[0].type).toBe(proxiesActions.deleteProxyFailure.type);
+        expect(result[0].payload.error).toBe('Failed to delete proxy. Delete failed');
+        expect(result[1].type).toBe(appRedirectActions.fetchError.type);
+        expect(result[1].payload.message).toBe('Failed to delete proxy');
+    });
+
+    test('createProxy success emits createProxySuccess and redirect with correct URL', async () => {
+        const deps = createDeps({
+            createProxy: (request: any) => of({ uuid: 'proxy-1' } as any),
+            getProxy: (request: any) => of(proxyDetail),
+        });
+
+        const result = await runEpic(createProxy, proxiesActions.createProxy(proxyDetail), deps);
+        expect(result).toEqual([
+            proxiesActions.createProxySuccess({ proxy: proxyDetail }),
+            appRedirectActions.redirect({ url: '../proxies/detail/proxy-1' }),
+        ]);
+    });
+
+    test('createProxy failure in getProxy emits createProxyFailure and fetchError', async () => {
+        const error = new Error('Get created proxy failed');
+        const deps = createDeps({
+            createProxy: (request: any) => of({ uuid: 'proxy-1' } as any),
+            getProxy: (request: any) => throwError(() => error),
+        });
+
+        const result = await runEpic(createProxy, proxiesActions.createProxy(proxyDetail), deps);
+        expect(result[0].type).toBe(proxiesActions.createProxyFailure.type);
+        expect(result[1].type).toBe(appRedirectActions.fetchError.type);
+        expect(result[1].payload.message).toBe('Failed to get created proxy');
     });
 });
 

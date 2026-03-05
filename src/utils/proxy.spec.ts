@@ -1,9 +1,9 @@
-import { test, expect } from '../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import { getProxyStatusColor } from './proxy';
 import { ProxyStatus } from 'types/openapi';
 
-test.describe('proxy utils', () => {
-    test.describe('getProxyStatusColor', () => {
+describe('proxy utils', () => {
+    describe('getProxyStatusColor', () => {
         test('returns success color for Connected status', () => {
             expect(getProxyStatusColor(ProxyStatus.Connected)).toBe('var(--status-success-color)');
         });

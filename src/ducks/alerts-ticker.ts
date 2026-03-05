@@ -8,6 +8,10 @@ type AlertsStore = {
 
 let tickerStarted = false;
 
+export const resetTickerStarted = () => {
+    tickerStarted = false;
+};
+
 export const startAlertsTicker = (store: AlertsStore) => {
     if (tickerStarted) return;
     tickerStarted = true;

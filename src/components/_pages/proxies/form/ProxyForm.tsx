@@ -14,7 +14,7 @@ import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/va
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { actions as proxiesActions, selectors as proxiesSelectors } from 'ducks/proxies';
 
-export interface ProxyFormValues {
+interface ProxyFormValues {
     name: string;
     description: string;
 }
@@ -39,10 +39,9 @@ export const ProxyForm = ({ onCancel, onSuccess }: ProxyFormProps = {}) => {
         };
     }, []);
 
-    const methods = useForm<ProxyFormValues>({
-        defaultValues,
-        mode: 'onChange',
-    });
+    const areDefaultValuesSame = useAreDefaultValuesSame(defaultValues as unknown as Record<string, unknown>);
+
+    const methods = useForm<ProxyFormValues>({ defaultValues, mode: 'onChange' });
 
     const {
         handleSubmit,
@@ -74,60 +73,56 @@ export const ProxyForm = ({ onCancel, onSuccess }: ProxyFormProps = {}) => {
         [dispatch],
     );
 
-    const areDefaultValuesSame = useAreDefaultValuesSame(defaultValues as unknown as Record<string, unknown>);
-
     return (
         <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <Widget noBorder busy={isBusy}>
-                    <div className="space-y-4">
-                        <Controller
-                            name="name"
-                            control={control}
-                            rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
-                            render={({ field, fieldState }) => (
-                                <TextInput
-                                    {...field}
-                                    id="name"
-                                    type="text"
-                                    label="Proxy Name"
-                                    required
-                                    placeholder="Enter the Proxy Name"
-                                    invalid={fieldState.error && fieldState.isTouched}
-                                    error={getFieldErrorMessage(fieldState)}
-                                />
-                            )}
-                        />
-
-                        <Controller
-                            name="description"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                                <TextArea
-                                    {...field}
-                                    id="description"
-                                    label="Description"
-                                    placeholder="Enter the Description"
-                                    invalid={fieldState.error && fieldState.isTouched}
-                                    error={getFieldErrorMessage(fieldState)}
-                                    rows={4}
-                                />
-                            )}
-                        />
-
-                        <Container className="flex-row justify-end modal-footer" gap={4}>
-                            <Button variant="outline" onClick={handleCancel} disabled={isSubmitting} type="button">
-                                Cancel
-                            </Button>
-                            <ProgressButton
-                                title={'Create'}
-                                inProgressTitle={'Creating...'}
-                                inProgress={isSubmitting}
-                                disabled={areDefaultValuesSame(formValues) || isSubmitting || !isValid || isBusy}
-                                type="submit"
+                <Widget noBorder busy={isBusy} className="space-y-4">
+                    <Controller
+                        name="name"
+                        rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
+                        control={control}
+                        render={({ field, fieldState }) => (
+                            <TextInput
+                                {...field}
+                                id="name"
+                                type="text"
+                                label="Proxy Name"
+                                required
+                                placeholder="Enter the Proxy Name"
+                                invalid={fieldState.error && fieldState.isTouched}
+                                error={getFieldErrorMessage(fieldState)}
                             />
-                        </Container>
-                    </div>
+                        )}
+                    />
+
+                    <Controller
+                        name="description"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                            <TextArea
+                                {...field}
+                                id="description"
+                                label="Description"
+                                placeholder="Enter the Description"
+                                invalid={fieldState.error && fieldState.isTouched}
+                                error={getFieldErrorMessage(fieldState)}
+                                rows={4}
+                            />
+                        )}
+                    />
+
+                    <Container className="flex-row justify-end modal-footer" gap={4}>
+                        <Button variant="outline" onClick={handleCancel} disabled={isSubmitting} type="button">
+                            Cancel
+                        </Button>
+                        <ProgressButton
+                            title={'Create'}
+                            inProgressTitle={'Creating...'}
+                            inProgress={isSubmitting}
+                            disabled={areDefaultValuesSame(formValues) || isSubmitting || !isValid || isBusy}
+                            type="submit"
+                        />
+                    </Container>
                 </Widget>
             </form>
         </FormProvider>

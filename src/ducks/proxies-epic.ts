@@ -165,7 +165,7 @@ export const bulkDeleteProxies: AppEpic = (action$, state, deps) => {
     );
 };
 
-const getProxyInstructions: AppEpic = (action$, state, deps) => {
+export const getProxyInstructions: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.getProxyInstructions.match),
         switchMap((action) =>

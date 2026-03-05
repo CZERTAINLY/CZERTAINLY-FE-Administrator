@@ -43,20 +43,12 @@ export const slice = createSlice({
     name: 'proxies',
     initialState,
     reducers: {
-        resetState: (state, action: PayloadAction<void>) => {
-            Object.keys(state).forEach((key) => {
-                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
-            });
-
-            Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
+        clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
+            state.deleteErrorMessage = '';
         },
 
         setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
             state.checkedRows = action.payload.checkedRows;
-        },
-
-        clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
-            state.deleteErrorMessage = '';
         },
 
         listProxies: (state, action: PayloadAction<{ status?: ProxyStatus }>) => {
@@ -179,6 +171,14 @@ export const slice = createSlice({
         bulkDeleteProxiesFailure: (state, action: PayloadAction<{ error: string }>) => {
             state.isBulkDeleting = false;
             state.deleteErrorMessage = action.payload.error;
+        },
+
+        resetState: (state, action: PayloadAction<void>) => {
+            Object.keys(state).forEach((key) => {
+                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+            });
+
+            Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
         },
     },
 });

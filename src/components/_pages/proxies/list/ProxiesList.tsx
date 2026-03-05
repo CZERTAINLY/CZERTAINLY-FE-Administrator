@@ -179,11 +179,11 @@ export const ProxiesList = () => {
             </Widget>
 
             <Dialog
-                isOpen={confirmDelete}
                 caption={`Delete ${checkedRows.length > 1 ? 'Proxies' : 'a Proxy'}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? 'Proxies' : 'a Proxy'}. Is this what you want to do?`}
-                toggle={() => setConfirmDelete(false)}
                 icon="delete"
+                toggle={() => setConfirmDelete(false)}
+                isOpen={confirmDelete}
+                body={`You are about to delete ${checkedRows.length > 1 ? 'Proxies' : 'a Proxy'}. Is this what you want to do?`}
                 buttons={[
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
