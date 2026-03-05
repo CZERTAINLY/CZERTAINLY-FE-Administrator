@@ -25,4 +25,35 @@ test.describe('DonutChart', () => {
         );
         await expect(component.getByRole('heading', { name: 'Empty chart' })).toBeVisible();
     });
+
+    test('should show values in legend when enabled', async ({ mount }) => {
+        const component = await mount(
+            <DonutChartWithStore
+                title="Legend values"
+                data={{ [CertificateState.Issued]: 10, [CertificateState.Revoked]: 2 }}
+                entity={EntityType.CERTIFICATE}
+                redirect="/certificates"
+                onSetFilter={() => []}
+                showValuesInLegend
+            />,
+        );
+
+        await expect(component.getByRole('button', { name: 'Issued 10' })).toBeVisible();
+        await expect(component.getByRole('button', { name: 'Revoked 2' })).toBeVisible();
+    });
+
+    test('should render non-clickable legend style when interactiveLegend is false', async ({ mount }) => {
+        const component = await mount(
+            <DonutChartWithStore
+                title="Static legend"
+                data={{ [CertificateState.Issued]: 1 }}
+                entity={EntityType.CERTIFICATE}
+                redirect="/certificates"
+                onSetFilter={() => []}
+                interactiveLegend={false}
+            />,
+        );
+
+        await expect(component.getByRole('button', { name: 'Issued' })).toHaveClass(/cursor-default/);
+    });
 });

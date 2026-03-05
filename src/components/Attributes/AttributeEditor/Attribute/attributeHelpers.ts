@@ -5,6 +5,35 @@ import type { RegexpAttributeConstraintModel } from 'types/attributes';
 import { getFormattedDateTime } from 'utils/dateUtil';
 import { composeValidators, validateFloat, validateInteger, validatePattern, validateRequired } from 'utils/validators';
 
+export function parseListValueByContentType(
+    contentType: AttributeContentType,
+    raw: string | number | boolean | { value: string | number; label: string } | undefined,
+): string | number | boolean | undefined {
+    if (raw === undefined || raw === null || raw === '') return undefined;
+    const val = typeof raw === 'object' && raw !== null && 'value' in raw ? raw.value : raw;
+    const str = String(val).trim();
+    if (str === '') return undefined;
+    switch (contentType) {
+        case AttributeContentType.Integer: {
+            const intVal = Number.parseInt(str, 10);
+            return Number.isNaN(intVal) ? undefined : intVal;
+        }
+        case AttributeContentType.Float: {
+            const floatVal = Number.parseFloat(str);
+            return Number.isNaN(floatVal) ? undefined : floatVal;
+        }
+        case AttributeContentType.Boolean:
+            return str === 'true' || str === '1';
+        case AttributeContentType.String:
+        case AttributeContentType.Text:
+        case AttributeContentType.Date:
+        case AttributeContentType.Time:
+        case AttributeContentType.Datetime:
+        default:
+            return str;
+    }
+}
+
 export function transformInputValueForDescriptor(value: any, descriptor: DataAttributeModel | CustomAttributeModel): any {
     if (descriptor.contentType === AttributeContentType.Datetime) {
         return getFormattedDateTime(value);

@@ -15,7 +15,7 @@ export default defineConfig({
     fullyParallel: true,
     forbidOnly: !!process.env.CI,
     retries: process.env.CI ? 2 : 0,
-    workers: process.env.CI ? 1 : undefined,
+    workers: process.env.CI ? 2 : undefined, // 2 workers (CI usually has 2 cores)
     reporter: [['html', { outputFolder: 'playwright-report' }], ['junit', { outputFile: 'playwright-report/junit.xml' }], ['list']],
     use: {
         trace: 'on-first-retry',

@@ -11,6 +11,7 @@ const defaultProperties: CustomAttributeModel['properties'] = {
     readOnly: false,
     list: false,
     multiSelect: false,
+    extensibleList: false,
 };
 
 export interface ContentValueFieldTestWrapperProps {

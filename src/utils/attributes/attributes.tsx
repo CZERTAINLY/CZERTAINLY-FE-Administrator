@@ -1,9 +1,14 @@
 import {
     AttributeDescriptorModel,
     AttributeRequestModel,
+    AttributeRequestModelV2,
+    AttributeRequestModelV3,
     AttributeResponseModel,
+    BaseAttributeContentDtoV2,
+    BaseAttributeContentDtoV3,
     BaseAttributeContentModel,
     CodeBlockAttributeContentDataModel,
+    CodeBlockAttributeContentDtoV2,
     CodeBlockAttributeContentModel,
     CustomAttributeModel,
     DataAttributeModel,
@@ -155,7 +160,7 @@ export const getAttributeFormValue = (
     if (contentType === AttributeContentType.Date) return getDateFormValue(item);
     if (contentType === AttributeContentType.Codeblock) {
         const language = getCodeBlockLanguage(item?.language, descriptorContent);
-        return { data: { code: utf8ToBase64(item.code), language } } as CodeBlockAttributeContentV2;
+        return { data: { code: utf8ToBase64(item.code), language } } as CodeBlockAttributeContentDtoV2;
     }
     if (contentType === AttributeContentType.Secret) {
         return { data: { secret: item } } as SecretAttributeContentV2;
@@ -200,6 +205,7 @@ export function collectFormAttributes(
     id: string,
     descriptors: AttributeDescriptorModel[] | undefined,
     values: Record<string, any>,
+    existingAttributes?: Array<AttributeResponseModel | { name: string; version?: AttributeVersion }>,
 ): AttributeRequestModel[] {
     if (!descriptors || !values[`__attributes__${id}__`]) return [];
 
@@ -248,23 +254,44 @@ export function collectFormAttributes(
                 content = getAttributeFormValue(descriptor.contentType, descriptor.content, attributes[attribute]);
             }
 
-            if (typeof content.data !== 'undefined' || typeof content.reference !== 'undefined' || Array.isArray(content)) {
-                const normalizedContent = (Array.isArray(content) ? content : [content]).map((item) => {
-                    if (attributeVersion === AttributeVersion.V3 && item && typeof item === 'object' && !('contentType' in item)) {
-                        return { ...item, contentType: descriptor.contentType };
-                    }
-                    return item;
-                });
+            if (typeof content.data !== 'undefined' || Array.isArray(content)) {
+                const contentArray = Array.isArray(content) ? content : [content];
+                const existing = existingAttributes?.find((a) => a.name === attributeName);
+                const existingVersion = (existing as { version?: AttributeVersion })?.version;
+                const descriptorVersion = (descriptor as unknown as { version?: AttributeVersion }).version;
+                let version: AttributeVersion;
+                if (existingVersion === AttributeVersion.V3 || existingVersion === AttributeVersion.V2) {
+                    version = existingVersion;
+                } else if (descriptorVersion === AttributeVersion.V3) {
+                    version = AttributeVersion.V3;
+                } else {
+                    version = AttributeVersion.V2;
+                }
 
-                const attr: AttributeRequestModel = {
-                    name: attributeName,
-                    content: normalizedContent,
-                    contentType: descriptor.contentType,
-                    uuid: descriptor.uuid,
-                    version: attributeVersion,
-                };
-
-                attrs.push(attr);
+                if (version === AttributeVersion.V3) {
+                    const finalContent = contentArray.map((item: { data: unknown }) => ({
+                        ...item,
+                        contentType: descriptor.contentType,
+                    })) as BaseAttributeContentDtoV3[];
+                    const attr: AttributeRequestModelV3 = {
+                        name: attributeName,
+                        content: finalContent,
+                        contentType: descriptor.contentType,
+                        uuid: descriptor.uuid,
+                        version,
+                    };
+                    attrs.push(attr);
+                } else {
+                    const finalContent = contentArray as BaseAttributeContentDtoV2[];
+                    const attr: AttributeRequestModelV2 = {
+                        name: attributeName,
+                        content: finalContent,
+                        contentType: descriptor.contentType,
+                        uuid: descriptor.uuid,
+                        version,
+                    };
+                    attrs.push(attr);
+                }
             }
         }
     }

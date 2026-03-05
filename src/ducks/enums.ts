@@ -25,11 +25,11 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = createFeatureSelector<State | undefined>(slice.name);
 
-const platformEnums = createSelector(state, (state: State) => state.platformEnums);
+const platformEnums = createSelector(state, (featureState) => featureState?.platformEnums ?? {});
 
-const platformEnum = (platformEnum: PlatformEnum) => createSelector(platformEnums, (platformEnums) => platformEnums[platformEnum]);
+const platformEnum = (platformEnum: PlatformEnum) => createSelector(platformEnums, (allEnums) => allEnums[platformEnum]);
 
 export const getEnumLabel = (platformEnum: { [key: string]: EnumItemModel } | undefined, enumItemKey: string): string =>
     platformEnum ? (platformEnum[enumItemKey]?.label ?? enumItemKey) : enumItemKey;

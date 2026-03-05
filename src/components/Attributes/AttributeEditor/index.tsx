@@ -885,7 +885,7 @@ function AttributeEditorInner({
 
         /* istanbul ignore next */
         function updateValueFromCallbackData(callbackId: string, callbackDescriptor: AttributeDescriptorModel) {
-            if (callbackDescriptor && isDataAttributeModel(callbackDescriptor)) {
+            if (callbackDescriptor && (isDataAttributeModel(callbackDescriptor) || isCustomAttributeModel(callbackDescriptor))) {
                 if (!callbackDescriptor.properties.list) {
                     setValue(callbackId, callbackData[callbackId][0].reference ?? callbackData[callbackId][0].data);
                 } else if (userInteractedRef.current) {
@@ -917,10 +917,11 @@ function AttributeEditorInner({
                 return { ...acc };
             }, {});
 
+            const mapCallbackItemToOption = (value: any) => {
+                return { label: value.reference ?? value.data?.toString?.() ?? String(value.data), value };
+            };
             const callbackContentOpts = {
-                [callbackId]: callbackData[callbackId]
-                    .filter((v: any) => !isAttributeDescriptorModel(v))
-                    .map((value: any) => ({ label: value.reference ?? value.data.toString(), value })),
+                [callbackId]: callbackData[callbackId].filter((v: any) => !isAttributeDescriptorModel(v)).map(mapCallbackItemToOption),
             };
 
             // multiple effects can modify opts during single render call

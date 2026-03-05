@@ -71,7 +71,7 @@ function DescriptorInputControl({
                 step={fieldStepValue}
                 placeholder="Default Content"
                 value={field.value || ''}
-                className={inputClassName}
+                className={`${inputClassName} text-[var(--dark-gray-color)]`}
             />
         );
     }
@@ -139,11 +139,7 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
                                     : buildValidationRules([validateRequired()])
                             }
                             render={({ field, fieldState }) => {
-                                const labelComponent = (
-                                    <Label htmlFor={name} className="!mb-0">
-                                        Default Content
-                                    </Label>
-                                );
+                                const labelComponent = index === 0 ? <Label htmlFor={name}>Default Content</Label> : null;
                                 const inputComponent = (
                                     <DescriptorInputControl
                                         name={name}
@@ -158,7 +154,7 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
                                         justify="start"
                                         buttons={[
                                             {
-                                                icon: 'trash',
+                                                icon: 'cross',
                                                 disabled: readOnly && contentValues?.length === 1,
                                                 tooltip: 'Remove',
                                                 onClick: () => {
@@ -205,8 +201,8 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
             })}
             {(isList || !contentValues || contentValues.length === 0) && (
                 <Button
-                    variant="outline"
-                    color="secondary"
+                    variant="transparent"
+                    className="text-blue-600"
                     onClick={() =>
                         setValue('content', [
                             ...(isList ? (contentValues ?? []) : []),
@@ -215,7 +211,7 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
                     }
                 >
                     <Plus className="w-4 h-4" />
-                    &nbsp;Add Content
+                    Add Content
                 </Button>
             )}
         </>

@@ -19,9 +19,20 @@ interface Props {
     redirect: string;
     onSetFilter: (index: number, labels: string[]) => SearchFilterModel[];
     colorOptions?: ColorOptions;
+    showValuesInLegend?: boolean;
+    interactiveLegend?: boolean;
 }
 
-function DonutChart({ title, colorOptions, data = {}, entity, redirect, onSetFilter: onLegendClick }: Props) {
+function DonutChart({
+    title,
+    colorOptions,
+    data = {},
+    entity,
+    redirect,
+    onSetFilter: onLegendClick,
+    showValuesInLegend = false,
+    interactiveLegend = true,
+}: Props) {
     const labels = useGetLabels(data);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -109,8 +120,11 @@ function DonutChart({ title, colorOptions, data = {}, entity, redirect, onSetFil
                                 <button
                                     type="button"
                                     key={label}
-                                    className="flex items-center gap-3 cursor-pointer bg-transparent border-none p-0 text-left"
+                                    className={`flex items-center gap-3 bg-transparent border-none p-0 text-left ${
+                                        interactiveLegend ? 'cursor-pointer' : 'cursor-default'
+                                    }`}
                                     onClick={() => {
+                                        if (!interactiveLegend) return;
                                         dispatch(actions.setCurrentFilters({ entity, currentFilters: onLegendClick(index, chartLabels) }));
                                         navigate(redirect);
                                     }}
@@ -119,7 +133,9 @@ function DonutChart({ title, colorOptions, data = {}, entity, redirect, onSetFil
                                         className="w-2 h-2 rounded-full flex-shrink-0"
                                         style={{ backgroundColor: chartColors[index] || '#6B7280' }}
                                     />
-                                    <span className="text-md text-one-row-ellipsis">{label}</span>
+                                    <span className="text-md text-one-row-ellipsis">
+                                        {showValuesInLegend ? `${label} ${values[index] ?? 0}` : label}
+                                    </span>
                                 </button>
                             ))}
                         </div>

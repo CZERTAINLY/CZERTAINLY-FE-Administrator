@@ -6,27 +6,28 @@ import { Link } from 'react-router';
 import Badge from 'components/Badge';
 import { actions, selectors } from 'ducks/connectors';
 
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import { TableDataRow, TableHeader } from 'components/CustomTable';
 import ForceDeleteErrorTable from 'components/ForceDeleteErrorTable';
 import Dialog from 'components/Dialog';
-import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import ConnectorForm from '../form';
+import PagedList from 'components/PagedList/PagedList';
 
-import { FunctionGroupModel } from 'types/connectors';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { attributeFieldNameTransform } from 'utils/attributes/attributes';
 import { inventoryStatus } from 'utils/connector';
+import { EntityType } from 'ducks/filters';
+import { selectors as pagingSelectors } from 'ducks/paging';
+import { ApiClients } from '../../../../api';
+import { SearchRequestModel } from 'types/certificate';
 
 export default function ConnectorList() {
     const dispatch = useDispatch();
 
-    const checkedRows = useSelector(selectors.checkedRows);
+    const checkedRows = useSelector(pagingSelectors.checkedRows(EntityType.CONNECTOR));
     const connectors = useSelector(selectors.connectors);
 
     const bulkDeleteErrorMessages = useSelector(selectors.bulkDeleteErrorMessages);
 
-    const isFetching = useSelector(selectors.isFetchingList);
     const isDeleting = useSelector(selectors.isDeleting);
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
     const isForceDeleting = useSelector(selectors.isBulkForceDeleting);
@@ -35,7 +36,7 @@ export default function ConnectorList() {
     const isCreating = useSelector(selectors.isCreating);
     const isUpdating = useSelector(selectors.isUpdating);
 
-    const isBusy = isFetching || isDeleting || isBulkDeleting || isForceDeleting || isBulkReconnecting || isBulkAuthorizing;
+    const isBusy = isDeleting || isBulkDeleting || isForceDeleting || isBulkReconnecting || isBulkAuthorizing;
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [confirmAuthorize, setConfirmAuthorize] = useState<boolean>(false);
@@ -43,26 +44,15 @@ export default function ConnectorList() {
     const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
     const [editingConnectorId, setEditingConnectorId] = useState<string | undefined>(undefined);
 
-    const getFreshData = useCallback(() => {
-        dispatch(actions.clearDeleteErrorMessages());
-        dispatch(actions.listConnectors({}));
-    }, [dispatch]);
-
-    useEffect(() => {
-        getFreshData();
-    }, [getFreshData]);
-
     useEffect(() => {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
     }, [bulkDeleteErrorMessages]);
 
     useRunOnFinished(isCreating, () => {
         setIsAddModalOpen(false);
-        getFreshData();
     });
     useRunOnFinished(isUpdating, () => {
         setEditingConnectorId(undefined);
-        getFreshData();
     });
 
     const handleOpenAddModal = useCallback(() => {
@@ -74,20 +64,9 @@ export default function ConnectorList() {
         setEditingConnectorId(undefined);
     }, []);
 
-    const onAddClick = useCallback(() => {
-        handleOpenAddModal();
-    }, [handleOpenAddModal]);
-
     const onReconnectClick = useCallback(() => {
         dispatch(actions.bulkReconnectConnectors({ uuids: checkedRows }));
     }, [checkedRows, dispatch]);
-
-    const setCheckedRows = useCallback(
-        (rows: (string | number)[]) => {
-            dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
-        },
-        [dispatch],
-    );
 
     const onDeleteConfirmed = useCallback(() => {
         setConfirmDelete(false);
@@ -104,6 +83,14 @@ export default function ConnectorList() {
         setConfirmAuthorize(false);
         dispatch(actions.bulkAuthorizeConnectors({ uuids: checkedRows }));
     }, [dispatch, checkedRows]);
+
+    const onListCallback = useCallback(
+        (filters: SearchRequestModel) => {
+            dispatch(actions.clearDeleteErrorMessages());
+            dispatch(actions.listConnectors(filters));
+        },
+        [dispatch],
+    );
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -141,31 +128,6 @@ export default function ConnectorList() {
         [checkedRows, handleOpenAddModal, onReconnectClick],
     );
 
-    const getKinds = useCallback((functionGroups: FunctionGroupModel[]) => {
-        return functionGroups.map((group) => (
-            <div key={group.uuid} style={{ margin: '1px' }}>
-                {group.kinds.map((kind) => (
-                    <span key={kind}>
-                        <Badge color="secondary">{kind}</Badge>
-                        &nbsp;
-                    </span>
-                ))}
-            </div>
-        ));
-    }, []);
-
-    const getFunctionGroups = useCallback(
-        (functionGroups: FunctionGroupModel[]) =>
-            functionGroups.map((group) => (
-                <div key={group.uuid}>
-                    <Badge color="primary" style={{ margin: '1px' }}>
-                        {attributeFieldNameTransform[group.name || ''] || group.name}
-                    </Badge>
-                </div>
-            )),
-        [],
-    );
-
     const forceDeleteBody = (
         <ForceDeleteErrorTable
             items={bulkDeleteErrorMessages}
@@ -185,18 +147,17 @@ export default function ConnectorList() {
                 width: '25%',
             },
             {
-                content: 'Function Groups',
-                align: 'center',
+                content: 'Ver',
                 sortable: true,
-                id: 'connectorFunctions',
-                width: '15%',
+                id: 'connectorVersion',
+                align: 'center',
+                width: '5%',
             },
             {
-                content: 'Kinds',
+                content: 'Proxy',
                 sortable: true,
-                id: 'kinds',
+                id: 'connectorProxy',
                 width: '15%',
-                align: 'center',
             },
             {
                 content: 'URL',
@@ -221,43 +182,45 @@ export default function ConnectorList() {
                 return {
                     id: connector.uuid,
                     columns: [
-                        <span style={{ whiteSpace: 'nowrap' }}>
+                        <span key="name" style={{ whiteSpace: 'nowrap' }}>
                             <Link to={`./detail/${connector.uuid}`}>{connector.name}</Link>
                         </span>,
-
-                        <span style={{ whiteSpace: 'nowrap' }}>{getFunctionGroups(connector.functionGroups)}</span>,
-
-                        <span style={{ whiteSpace: 'nowrap' }}>{getKinds(connector.functionGroups)}</span>,
-
-                        <span style={{ whiteSpace: 'nowrap' }}>{connector.url}</span>,
-
-                        <Badge style={{ backgroundColor: connectorStatus[1] }}>{connectorStatus[0]}</Badge>,
+                        <span key="version" style={{ whiteSpace: 'nowrap' }}>
+                            {connector.version || '-'}
+                        </span>,
+                        <span key="status" style={{ whiteSpace: 'nowrap' }}>
+                            coming soon
+                        </span>,
+                        <span key="url" style={{ whiteSpace: 'nowrap' }}>
+                            {connector.url}
+                        </span>,
+                        <Badge key="badge" style={{ backgroundColor: connectorStatus[1] }}>
+                            {connectorStatus[0]}
+                        </Badge>,
                     ],
                 };
             }),
-        [connectors, getFunctionGroups, getKinds],
+        [connectors],
     );
 
     return (
-        <div>
-            <Widget
-                dataTestId="connectors-list-widget"
+        <div className="space-y-4">
+            <PagedList
+                entity={EntityType.CONNECTOR}
+                headers={connectorsRowHeaders}
+                data={connectorList}
+                isBusy={isBusy}
+                onListCallback={onListCallback}
+                getAvailableFiltersApi={useCallback(
+                    (apiClients: ApiClients) => apiClients.connectorsV2.getConnectorSearchableFieldInformation(),
+                    [],
+                )}
                 title="Connector Store"
-                busy={isBusy}
-                widgetLockName={LockWidgetNameEnum.ConnectorStore}
-                refreshAction={getFreshData}
-                widgetButtons={buttons}
-                titleSize="large"
-            >
-                <CustomTable
-                    headers={connectorsRowHeaders}
-                    data={connectorList}
-                    onCheckedRowsChanged={setCheckedRows}
-                    hasCheckboxes={true}
-                    hasPagination={true}
-                    canSearch={true}
-                />
-            </Widget>
+                filterTitle="Connector Filter"
+                addHidden
+                additionalButtons={buttons}
+                pageWidgetLockName={LockWidgetNameEnum.ConnectorStore}
+            />
 
             <Dialog
                 isOpen={confirmDelete}

@@ -32,10 +32,12 @@ function AttributeEditForm({
     descriptor,
     initialContent,
     onSubmit,
+    onCancel,
 }: {
     descriptor: CustomAttributeModel;
     initialContent?: BaseAttributeContentModel[];
     onSubmit: (uuid: string, content: BaseAttributeContentModel[]) => void;
+    onCancel: () => void;
 }) {
     const methods = ReactHookForm.useForm<any>({
         defaultValues: {},
@@ -44,7 +46,13 @@ function AttributeEditForm({
     return (
         <ReactHookForm.FormProvider {...methods}>
             <form onSubmit={(e) => e.preventDefault()}>
-                <ContentValueField id={descriptor.name} descriptor={descriptor} initialContent={initialContent} onSubmit={onSubmit} />
+                <ContentValueField
+                    id={descriptor.name}
+                    descriptor={descriptor}
+                    initialContent={initialContent}
+                    onSubmit={onSubmit}
+                    onCancel={onCancel}
+                />
             </form>
         </ReactHookForm.FormProvider>
     );
@@ -116,6 +124,12 @@ export default function AttributeViewer({
                     content: 'Name',
                     sortable: true,
                     width: '20%',
+                },
+                {
+                    id: 'version',
+                    content: 'Ver',
+                    sortable: true,
+                    width: '5%',
                 },
                 {
                     id: 'contentType',
@@ -205,32 +219,51 @@ export default function AttributeViewer({
     );
 
     const getAttributesTableData = useCallback(
-        (attribute: AttributeResponseModel | MetadataItemModel, resource?: Resource): TableDataRow => ({
-            id: attribute.uuid || attribute.name,
-            columns: [
-                attribute.label || attribute.name || '',
-                getEnumLabel(contentTypeEnum, attribute.contentType),
-                <>
-                    {getContent(attribute.contentType, attribute.content)}
-                    {resource && renderSourceObjectsButton(attribute, resource)}
-                </>,
-                <WidgetButtons
-                    key="copy"
-                    buttons={[
-                        {
-                            id: 'copy',
-                            icon: 'copy',
-                            disabled: AttributeContentType.Secret === attribute.contentType,
-                            onClick: () => {
-                                onCopyContentClick(attribute);
+        (attribute: AttributeResponseModel | MetadataItemModel, resource?: Resource): TableDataRow => {
+            const renderContentCell = () => {
+                if (attribute.contentType === AttributeContentType.Resource && attribute.content?.[0]) {
+                    const first = attribute.content[0] as any;
+                    const data = first?.data as { uuid?: string; name?: string; resource?: Resource } | undefined;
+                    if (data?.uuid && data.resource) {
+                        return (
+                            <Link onClick={() => dispatch(userInterfaceActions.resetState())} to={`/${data.resource}/detail/${data.uuid}`}>
+                                {data.name || data.uuid}
+                            </Link>
+                        );
+                    }
+                }
+
+                return getContent(attribute.contentType, attribute.content);
+            };
+
+            return {
+                id: attribute.uuid || attribute.name,
+                columns: [
+                    attribute.label || attribute.name || '',
+                    attribute.version || '',
+                    getEnumLabel(contentTypeEnum, attribute.contentType) || attribute.contentType,
+                    <>
+                        {renderContentCell()}
+                        {resource && renderSourceObjectsButton(attribute, resource)}
+                    </>,
+                    <WidgetButtons
+                        key="copy"
+                        buttons={[
+                            {
+                                id: 'copy',
+                                icon: 'copy',
+                                disabled: AttributeContentType.Secret === attribute.contentType,
+                                onClick: () => {
+                                    onCopyContentClick(attribute);
+                                },
+                                tooltip: 'Copy to clipboard',
                             },
-                            tooltip: 'Copy to clipboard',
-                        },
-                    ]}
-                />,
-            ],
-        }),
-        [getContent, contentTypeEnum, renderSourceObjectsButton, onCopyContentClick],
+                        ]}
+                    />,
+                ],
+            };
+        },
+        [contentTypeEnum, dispatch, getContent, onCopyContentClick, renderSourceObjectsButton],
     );
 
     const getMetadataTableData = useCallback(
@@ -310,7 +343,8 @@ export default function AttributeViewer({
                         id: a.uuid || '',
                         columns: [
                             a.label || '',
-                            getEnumLabel(contentTypeEnum, a.contentType),
+                            a.version || '',
+                            getEnumLabel(contentTypeEnum, a.contentType) || a.contentType,
                             onSubmit && descriptor && editingAttributesNames.find((n) => n === a.name) ? (
                                 <AttributeEditForm
                                     descriptor={descriptor}
@@ -318,6 +352,9 @@ export default function AttributeViewer({
                                     onSubmit={(uuid, content) => {
                                         setEditingAttributesNames(editingAttributesNames.filter((n) => n !== descriptor.name));
                                         onSubmit(uuid, content);
+                                    }}
+                                    onCancel={() => {
+                                        setEditingAttributesNames(editingAttributesNames.filter((n) => n !== descriptor.name));
                                     }}
                                 />
                             ) : (

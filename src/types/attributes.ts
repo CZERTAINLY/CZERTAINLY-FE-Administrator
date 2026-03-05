@@ -3,43 +3,103 @@ import {
     AttributeCallbackMapping,
     AttributeMappingDto,
     AttributeType,
-    BaseAttributeConstraintDto as BaseAttributeConstraint,
-    BaseAttributeContentDto as BaseAttributeContent,
+    BaseAttributeConstraint,
+    BaseAttributeContentDtoV2,
+    BaseAttributeContentDtoV3,
     BaseAttributeDto,
-    BooleanAttributeContent,
-    CodeBlockAttributeContent,
+    BooleanAttributeContentV2,
+    BooleanAttributeContentV3,
     CodeBlockAttributeContentData,
-    CredentialAttributeContent,
+    CodeBlockAttributeContentV2,
+    CodeBlockAttributeContentV3,
     CredentialAttributeContentData,
+    CredentialAttributeContentV2,
     CustomAttribute,
     CustomAttributeProperties,
     DataAttribute,
     DataAttributeProperties,
-    DateAttributeContent,
+    DateAttributeContentV2,
+    DateAttributeContentV3,
     DateTimeAttributeConstraint,
     DateTimeAttributeConstraintData,
-    DateTimeAttributeContent,
-    FileAttributeContent,
+    DateTimeAttributeContentV2,
+    DateTimeAttributeContentV3,
     FileAttributeContentData,
-    FloatAttributeContent,
-    GroupAttribute,
-    InfoAttribute,
+    FileAttributeContentV2,
+    FileAttributeContentV3,
+    FloatAttributeContentV2,
+    FloatAttributeContentV3,
+    GroupAttributeV2,
+    GroupAttributeV3,
     InfoAttributeProperties,
-    IntegerAttributeContent,
-    MetadataAttribute,
+    InfoAttributeV2,
+    InfoAttributeV3,
+    IntegerAttributeContentV2,
+    IntegerAttributeContentV3,
     MetadataAttributeProperties,
-    ObjectAttributeContent,
+    MetadataAttributeV2,
+    MetadataAttributeV3,
+    ObjectAttributeContentV2,
+    ObjectAttributeContentV3,
     RangeAttributeConstraint,
     RangeAttributeConstraintData,
     RegexpAttributeConstraint,
-    RequestAttributeDto,
-    ResponseAttributeDto,
-    SecretAttributeContent,
+    RequestAttribute,
+    ResponseAttribute,
     SecretAttributeContentData,
-    StringAttributeContent,
-    TextAttributeContent,
-    TimeAttributeContent,
+    SecretAttributeContentV2,
+    StringAttributeContentV2,
+    StringAttributeContentV3,
+    TextAttributeContentV2,
+    TextAttributeContentV3,
+    TimeAttributeContentV2,
+    TimeAttributeContentV3,
 } from './openapi';
+
+// Union types for backward compatibility (when version is unknown)
+type BooleanAttributeContent = BooleanAttributeContentV2 | BooleanAttributeContentV3;
+type CodeBlockAttributeContent = CodeBlockAttributeContentV2 | CodeBlockAttributeContentV3;
+type CredentialAttributeContent = CredentialAttributeContentV2;
+type DateAttributeContent = DateAttributeContentV2 | DateAttributeContentV3;
+type DateTimeAttributeContent = DateTimeAttributeContentV2 | DateTimeAttributeContentV3;
+type FileAttributeContent = FileAttributeContentV2 | FileAttributeContentV3;
+type FloatAttributeContent = FloatAttributeContentV2 | FloatAttributeContentV3;
+type GroupAttribute = GroupAttributeV2 | GroupAttributeV3;
+type InfoAttribute = InfoAttributeV2 | InfoAttributeV3;
+type IntegerAttributeContent = IntegerAttributeContentV2 | IntegerAttributeContentV3;
+type MetadataAttribute = MetadataAttributeV2 | MetadataAttributeV3;
+type ObjectAttributeContent = ObjectAttributeContentV2 | ObjectAttributeContentV3;
+type SecretAttributeContent = SecretAttributeContentV2;
+type StringAttributeContent = StringAttributeContentV2 | StringAttributeContentV3;
+type TextAttributeContent = TextAttributeContentV2 | TextAttributeContentV3;
+type TimeAttributeContent = TimeAttributeContentV2 | TimeAttributeContentV3;
+type BaseAttributeContent = BaseAttributeContentDtoV2 | BaseAttributeContentDtoV3;
+
+// Version-specific types: use V2 types for v2 attributes, V3 types for v3 attributes
+export type BooleanAttributeContentDtoV2 = BooleanAttributeContentV2;
+export type BooleanAttributeContentDtoV3 = BooleanAttributeContentV3;
+export type CodeBlockAttributeContentDtoV2 = CodeBlockAttributeContentV2;
+export type CodeBlockAttributeContentDtoV3 = CodeBlockAttributeContentV3;
+export type DateAttributeContentDtoV2 = DateAttributeContentV2;
+export type DateAttributeContentDtoV3 = DateAttributeContentV3;
+export type DateTimeAttributeContentDtoV2 = DateTimeAttributeContentV2;
+export type DateTimeAttributeContentDtoV3 = DateTimeAttributeContentV3;
+export type FileAttributeContentDtoV2 = FileAttributeContentV2;
+export type FileAttributeContentDtoV3 = FileAttributeContentV3;
+export type FloatAttributeContentDtoV2 = FloatAttributeContentV2;
+export type FloatAttributeContentDtoV3 = FloatAttributeContentV3;
+export type IntegerAttributeContentDtoV2 = IntegerAttributeContentV2;
+export type IntegerAttributeContentDtoV3 = IntegerAttributeContentV3;
+export type ObjectAttributeContentDtoV2 = ObjectAttributeContentV2;
+export type ObjectAttributeContentDtoV3 = ObjectAttributeContentV3;
+export type StringAttributeContentDtoV2 = StringAttributeContentV2;
+export type StringAttributeContentDtoV3 = StringAttributeContentV3;
+export type TextAttributeContentDtoV2 = TextAttributeContentV2;
+export type TextAttributeContentDtoV3 = TextAttributeContentV3;
+export type TimeAttributeContentDtoV2 = TimeAttributeContentV2;
+export type TimeAttributeContentDtoV3 = TimeAttributeContentV3;
+
+export type { BaseAttributeContentDtoV2, BaseAttributeContentDtoV3 };
 
 export type BooleanAttributeContentDto = BooleanAttributeContent;
 export type BooleanAttributeContentModel = BooleanAttributeContentDto;
@@ -112,14 +172,18 @@ export type BaseAttributeContentModel =
     | TimeAttributeContentModel
     | CodeBlockAttributeContentModel;
 
-export type AttributeRequestDto = RequestAttributeDto;
-export type AttributeRequestModel = Omit<AttributeRequestDto, 'content'> & { content: Array<BaseAttributeContentModel> };
+export type AttributeRequestDto = RequestAttribute;
+export type AttributeRequestModelV2 = Omit<AttributeRequestDto, 'content'> & { content: Array<BaseAttributeContentDtoV2> };
+export type AttributeRequestModelV3 = Omit<AttributeRequestDto, 'content'> & { content: Array<BaseAttributeContentDtoV3> };
+export type AttributeRequestModel = AttributeRequestModelV2 | AttributeRequestModelV3;
 
 export type MappingAttributeDto = AttributeMappingDto;
 export type AttributeMappingModel = MappingAttributeDto;
 
-export type AttributeResponseDto = ResponseAttributeDto;
-export type AttributeResponseModel = Omit<AttributeResponseDto, 'content'> & { content?: Array<BaseAttributeContentModel> };
+export type AttributeResponseDto = ResponseAttribute;
+export type AttributeResponseModelV2 = Omit<AttributeResponseDto, 'content'> & { content?: Array<BaseAttributeContentDtoV2> };
+export type AttributeResponseModelV3 = Omit<AttributeResponseDto, 'content'> & { content?: Array<BaseAttributeContentDtoV3> };
+export type AttributeResponseModel = AttributeResponseModelV2 | AttributeResponseModelV3;
 
 export type DataAttributePropertiesDto = DataAttributeProperties;
 export type DataAttributePropertiesModel = DataAttributePropertiesDto;
