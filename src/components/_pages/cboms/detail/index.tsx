@@ -15,7 +15,6 @@ import TabLayout from 'components/Layout/TabLayout';
 import Widget from 'components/Widget';
 import { EntityType } from 'ducks/filters';
 import { actions, selectors } from 'ducks/cbom';
-import { actions as alertActions } from 'ducks/alerts';
 import { DashboardDict } from 'types/statisticsDashboard';
 import { dateFormatter } from 'utils/dateUtil';
 import { getDonutChartColorsByRandomNumberOfOptions } from 'utils/dashboard';

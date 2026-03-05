@@ -1,7 +1,7 @@
 export const CBOM_REPOSITORY_HEALTH_WARNING_MESSAGE = 'Ensure that entered CBOM Repository URL is reachable. Health check failed.';
 
 export const validateUrl = (url?: string): string | undefined => {
-    if (!url || /^https?:\/\/[a-zA-Z0-9\-.]+(:\d+?)?(\/[a-zA-Z0-9\-.]*)*/g.test(url)) {
+    if (!url || /^https?:\/\/[a-zA-Z0-9\-.]+(:\d+?)?(\/[a-zA-Z0-9\-.]*)*/.test(url)) {
         return undefined;
     }
     return 'Please enter valid URL.';

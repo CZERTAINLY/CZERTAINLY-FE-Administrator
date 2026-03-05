@@ -12,6 +12,7 @@ test.describe('DonutChart', () => {
                 entity={EntityType.CERTIFICATE}
                 redirect="/certificates"
                 onSetFilter={() => []}
+                showCenterLabel
             />,
         );
         await expect(component.getByRole('heading', { name: 'Certificates by status' })).toBeVisible();
