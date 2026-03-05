@@ -1,7 +1,7 @@
-import { test, expect } from '../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import { formatPEM } from './download';
 
-test.describe('formatPEM', () => {
+describe('formatPEM', () => {
     test('should format short PEM string', () => {
         const result = formatPEM('short');
         expect(result).toContain('-----BEGIN CERTIFICATE-----');

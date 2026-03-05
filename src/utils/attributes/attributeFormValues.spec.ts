@@ -1,9 +1,8 @@
-import { test, expect } from '../../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import { getDatetimeFormValue, getDateFormValue } from './attributeFormValues';
-import AttributeFormValuesCoverageRunner from './AttributeFormValuesCoverageRunner';
 
-test.describe('attributeFormValues', () => {
-    test.describe('getDatetimeFormValue', () => {
+describe('attributeFormValues', () => {
+    describe('getDatetimeFormValue', () => {
         test('uses item.value.data when present', () => {
             const result = getDatetimeFormValue({ value: { data: '2024-06-15T12:00:00Z' } });
             expect(result.data).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
@@ -21,7 +20,7 @@ test.describe('attributeFormValues', () => {
         });
     });
 
-    test.describe('getDateFormValue', () => {
+    describe('getDateFormValue', () => {
         test('uses item.value.data when present and returns YYYY-MM-DD', () => {
             const result = getDateFormValue({ value: { data: '2024-06-15T12:00:00Z' } });
             expect(result.data).toMatch(/^\d{4}-\d{2}-\d{2}$/);
@@ -38,10 +37,5 @@ test.describe('attributeFormValues', () => {
             const result = getDateFormValue(d);
             expect(result.data).toBe('2024-03-10');
         });
-    });
-
-    test('runs attributeFormValues in browser for coverage', async ({ mount, page }) => {
-        await mount(<AttributeFormValuesCoverageRunner />);
-        await expect(page.getByTestId('attribute-form-values-coverage-done')).toBeAttached();
     });
 });

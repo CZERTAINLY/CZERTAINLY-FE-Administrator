@@ -8,6 +8,7 @@ import { createFeatureSelector } from 'utils/ducks';
 export const enum EntityType {
     AUDIT_LOG,
     ENTITY,
+    CBOM,
     LOCATION,
     CERTIFICATE,
     KEY,
@@ -20,6 +21,7 @@ export const enum EntityType {
     CONDITIONS,
     ACTIONS,
     OID,
+    CONNECTOR,
 }
 
 export type Filter = {

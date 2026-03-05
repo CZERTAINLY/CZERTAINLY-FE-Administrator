@@ -1,4 +1,4 @@
-import { test, expect } from '../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import {
     getComplianceProfileStatusColor,
     truncateText,
@@ -13,8 +13,8 @@ import {
 import { ComplianceRuleAvailabilityStatus } from 'types/openapi';
 import { Resource } from 'types/openapi';
 
-test.describe('compliance-profile utils', () => {
-    test.describe('getComplianceProfileStatusColor', () => {
+describe('compliance-profile utils', () => {
+    describe('getComplianceProfileStatusColor', () => {
         test('returns success for Available', () => {
             expect(getComplianceProfileStatusColor(ComplianceRuleAvailabilityStatus.Available)).toBe('success');
         });
@@ -26,7 +26,7 @@ test.describe('compliance-profile utils', () => {
         });
     });
 
-    test.describe('truncateText', () => {
+    describe('truncateText', () => {
         test('returns text as-is when within maxLength', () => {
             expect(truncateText('hello', 10)).toBe('hello');
         });
@@ -35,7 +35,7 @@ test.describe('compliance-profile utils', () => {
         });
     });
 
-    test.describe('getRulesAndGroupsTableHeaders', () => {
+    describe('getRulesAndGroupsTableHeaders', () => {
         test('assigned type includes status column', () => {
             const headers = getRulesAndGroupsTableHeaders('assigned');
             expect(headers.some((h: any) => h.id === 'status')).toBe(true);
@@ -55,7 +55,7 @@ test.describe('compliance-profile utils', () => {
         });
     });
 
-    test.describe('getAssignedInternalListOfGroupsAndRules', () => {
+    describe('getAssignedInternalListOfGroupsAndRules', () => {
         test('returns empty array when profile is undefined', () => {
             expect(getAssignedInternalListOfGroupsAndRules(undefined)).toEqual([]);
         });
@@ -83,7 +83,7 @@ test.describe('compliance-profile utils', () => {
         });
     });
 
-    test.describe('getAssignedProviderListOfGroupsAndRules', () => {
+    describe('getAssignedProviderListOfGroupsAndRules', () => {
         test('returns empty array when profile is undefined', () => {
             expect(getAssignedProviderListOfGroupsAndRules(undefined)).toEqual([]);
         });
@@ -105,7 +105,7 @@ test.describe('compliance-profile utils', () => {
         });
     });
 
-    test.describe('formatAvailableRulesAndGroups', () => {
+    describe('formatAvailableRulesAndGroups', () => {
         test('adds entityDetails by type', () => {
             const list = [{ uuid: 'u1', name: 'Rule 1' }];
             const result = formatAvailableRulesAndGroups('rule', list as any);
@@ -114,7 +114,7 @@ test.describe('compliance-profile utils', () => {
         });
     });
 
-    test.describe('getListOfResources', () => {
+    describe('getListOfResources', () => {
         test('returns All plus unique resources', () => {
             const list = [
                 { resource: Resource.Certificates },
@@ -128,7 +128,7 @@ test.describe('compliance-profile utils', () => {
         });
     });
 
-    test.describe('makeOptions', () => {
+    describe('makeOptions', () => {
         test('filters out profiles that are in associations', () => {
             const profiles = [
                 { uuid: 'u1', name: 'P1' },
@@ -148,7 +148,7 @@ test.describe('compliance-profile utils', () => {
         });
     });
 
-    test.describe('rulesSourceOptions', () => {
+    describe('rulesSourceOptions', () => {
         test('has Provider and Internal', () => {
             expect(rulesSourceOptions).toHaveLength(2);
             expect(rulesSourceOptions.map((o) => o.value)).toContain('Provider');

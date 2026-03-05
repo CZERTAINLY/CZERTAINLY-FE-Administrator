@@ -1,8 +1,8 @@
-import { test, expect } from '../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import { inventoryStatus } from './connector';
 
-test.describe('connector utils', () => {
-    test.describe('inventoryStatus', () => {
+describe('connector utils', () => {
+    describe('inventoryStatus', () => {
         test('returns label and color for Success', () => {
             expect(inventoryStatus('Success')).toEqual(['Success', 'var(--status-success-color)']);
         });
