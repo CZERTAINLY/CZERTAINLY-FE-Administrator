@@ -12,6 +12,7 @@ import {
     HealthDto as HealthDtoOpenApi,
     RequestAttributeCallback,
     ResourceCallbackRequest,
+    ConnectorVersion,
 } from './openapi';
 
 export type BulkActionDto = BulkActionMessageDto;
@@ -40,6 +41,7 @@ export type ConnectorResponseModel = Omit<ConnectorResponseDto, 'functionGroups 
     functionGroups: Array<FunctionGroupModel>;
     authAttributes?: Array<AttributeResponseModel>;
     customAttributes?: Array<AttributeResponseModel>;
+    version?: ConnectorVersion;
 };
 
 export type HealthDto = HealthDtoOpenApi;
