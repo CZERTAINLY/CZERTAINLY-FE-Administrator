@@ -120,6 +120,8 @@ import CustomOIDDetail from 'components/_pages/custom-oid/detail';
 import Login from './_pages/login';
 import VaultsList from './_pages/vaults/list';
 import VaultDetail from './_pages/vaults/detail';
+import VaultProfilesList from './_pages/vault-profiles/list';
+import VaultProfileDetail from './_pages/vault-profiles/detail';
 
 import CbomsList from './_pages/cboms/list';
 import CbomDetail from 'components/_pages/cboms/detail';
@@ -254,6 +256,12 @@ export default function AppRouter() {
                     />
                     <Route path={`/${Resource.Vaults.toLowerCase()}/detail/:id`} element={<VaultDetail />} />
 
+                    <Route path={`/${Resource.VaultProfiles.toLowerCase()}`} element={<VaultProfilesList />} />
+                    <Route
+                        path={`/${Resource.VaultProfiles.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.VaultProfiles.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.VaultProfiles.toLowerCase()}/detail/:vaultUuid/:id`} element={<VaultProfileDetail />} />
 
                     <Route path={`/${Resource.Locations.toLowerCase()}`} element={<LocationsList />} />
                     <Route

@@ -52,6 +52,7 @@ import { initialState as initialUtilsOidState, slice as utilsOidSlice } from './
 import { initialState as initialOidsState, slice as oidsSlice } from './oids';
 import { initialState as initialInfoState, slice as infoSlice } from './info';
 import { initialState as initialCbomState, slice as cbomSlice } from './cbom';
+import { initialState as initialVaultProfilesState, slice as vaultProfilesSlice } from './vault-profiles';
 import { initialState as initialVaultsState, slice as vaultsSlice } from './vaults';
 
 export const initialState = {
@@ -101,5 +102,6 @@ export const initialState = {
     [oidsSlice.name]: initialOidsState,
     [infoSlice.name]: initialInfoState,
     [cbomSlice.name]: initialCbomState,
+    [vaultProfilesSlice.name]: initialVaultProfilesState,
     [vaultsSlice.name]: initialVaultsState,
 };

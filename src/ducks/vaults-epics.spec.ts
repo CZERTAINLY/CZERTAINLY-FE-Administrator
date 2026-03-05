@@ -1,4 +1,5 @@
 import { describe, expect, test, vi } from 'vitest';
+import type { AnyAction } from 'redux';
 import { firstValueFrom, of, throwError } from 'rxjs';
 import { take, toArray } from 'rxjs/operators';
 
@@ -62,7 +63,12 @@ function createDeps(overrides: Partial<EpicDeps['apiClients']> = {}): EpicDeps {
     };
 }
 
-async function runEpic(epicIndex: number, action: any, depsOverrides: Partial<EpicDeps['apiClients']> = {}, takeCount = 1) {
+async function runEpic(
+    epicIndex: number,
+    action: any,
+    depsOverrides: Partial<EpicDeps['apiClients']> = {},
+    takeCount = 1,
+): Promise<AnyAction[]> {
     const { default: epics } = await import('./vaults-epics');
     const deps = createDeps(depsOverrides);
     const epic = (epics as any)[epicIndex];
@@ -201,11 +207,11 @@ describe('vaults epics', () => {
         expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to update Vault' }));
     });
 
-    test('deleteVault success emits deleteVaultSuccess and info fetchError', async () => {
+    test('deleteVault success emits deleteVaultSuccess and success alert', async () => {
         const emitted = await runEpic(5, vaultActions.deleteVault({ uuid: 'v-1' }), {}, 2);
 
         expect(emitted[0]).toEqual(vaultActions.deleteVaultSuccess({ uuid: 'v-1' }));
-        expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: undefined as any, message: 'Vault deleted successfully' }));
+        expect(emitted[1]).toEqual(alertsSlice.actions.success('Vault deleted successfully.'));
     });
 
     test('deleteVault failure emits deleteVaultFailure and fetchError', async () => {

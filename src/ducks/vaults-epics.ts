@@ -3,6 +3,7 @@ import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { extractError } from 'utils/net';
 import { actions as appRedirectActions } from './app-redirect';
+import { actions as alertActions } from './alerts';
 import { slice } from './vaults';
 import { transformAttributeDescriptorDtoToModel } from './transform/attributes';
 import { actions as userInterfaceActions } from './user-interface';
@@ -145,7 +146,7 @@ const deleteVault = (action$: any, state$: any, deps: any) => {
                 mergeMap(() =>
                     of(
                         slice.actions.deleteVaultSuccess({ uuid: action.payload.uuid }),
-                        appRedirectActions.fetchError({ error: undefined as any, message: 'Vault deleted successfully' }),
+                        alertActions.success('Vault deleted successfully.'),
                     ),
                 ),
                 catchError((err) =>

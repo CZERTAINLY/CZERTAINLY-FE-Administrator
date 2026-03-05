@@ -138,6 +138,7 @@ const menuItemMappings: MenuItemMapping[] = [
                 link: '/notificationprofiles',
                 requiredResources: [Resource.NotificationProfiles],
             },
+            { _key: '/vaultprofiles', name: 'Vault Profiles', link: '/vaultprofiles', requiredResources: [Resource.VaultProfiles] },
         ],
     },
 
