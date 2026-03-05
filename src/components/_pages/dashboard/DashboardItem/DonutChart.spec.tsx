@@ -41,8 +41,13 @@ test.describe('DonutChart', () => {
             />,
         );
 
-        await expect(component.getByRole('button', { name: 'Issued 10' })).toBeVisible();
-        await expect(component.getByRole('button', { name: 'Revoked 2' })).toBeVisible();
+        const issuedLegendButton = component.getByRole('button', { name: /issued/i });
+        const revokedLegendButton = component.getByRole('button', { name: /revoked/i });
+
+        await expect(issuedLegendButton).toBeVisible();
+        await expect(issuedLegendButton.getByText('10')).toBeVisible();
+        await expect(revokedLegendButton).toBeVisible();
+        await expect(revokedLegendButton.getByText('2')).toBeVisible();
         await expect(component.getByText('Issued')).toHaveAttribute('title', 'Issued');
     });
 
@@ -77,7 +82,9 @@ test.describe('DonutChart', () => {
 
         await expect(component.getByRole('heading', { name: 'Fixed chart' })).toBeVisible();
         await expect(component.getByText('Total')).toHaveCount(0);
-        await expect(component.getByRole('button', { name: 'Issued 10' })).toBeVisible();
+        const issuedLegendButton = component.getByRole('button', { name: /issued/i });
+        await expect(issuedLegendButton).toBeVisible();
+        await expect(issuedLegendButton.getByText('10')).toBeVisible();
     });
 
     test('should shrink chart on small screens in full mode by default', async ({ mount }) => {
