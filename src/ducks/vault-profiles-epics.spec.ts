@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from 'vitest';
-import type { AnyAction } from 'redux';
+import type { UnknownAction } from '@reduxjs/toolkit';
 import { firstValueFrom, of, throwError } from 'rxjs';
 import { take, toArray } from 'rxjs/operators';
 
@@ -34,7 +34,7 @@ async function runEpic(
     action: any,
     depsOverrides: Partial<EpicDeps['apiClients']> = {},
     takeCount = 1,
-): Promise<AnyAction[]> {
+): Promise<UnknownAction[]> {
     const { default: epics } = await import('./vault-profiles-epics');
 
     const deps: EpicDeps = {

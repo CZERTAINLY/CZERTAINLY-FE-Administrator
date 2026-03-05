@@ -1,3 +1,4 @@
+import { AppEpic } from 'ducks';
 import { of } from 'rxjs';
 import { catchError, filter, switchMap, mergeMap } from 'rxjs/operators';
 import { extractError } from 'utils/net';
@@ -11,11 +12,9 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import { transformSearchRequestModelToDto } from './transform/certificates';
 import { store } from '../App';
 
-type AppEpic = any;
-
 const defaultSearch = { pageNumber: 1, itemsPerPage: 10, filters: [] };
 
-const listVaultProfiles: AppEpic = (action$: any, state$: any, deps: any) => {
+const listVaultProfiles: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listVaultProfiles.match),
         switchMap((action: ReturnType<typeof slice.actions.listVaultProfiles>) => {
@@ -47,7 +46,7 @@ const listVaultProfiles: AppEpic = (action$: any, state$: any, deps: any) => {
     );
 };
 
-const createVaultProfile: AppEpic = (action$: any, state$: any, deps: any) => {
+const createVaultProfile: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.createVaultProfile.match),
         switchMap((action: ReturnType<typeof slice.actions.createVaultProfile>) =>
@@ -76,7 +75,7 @@ const createVaultProfile: AppEpic = (action$: any, state$: any, deps: any) => {
     );
 };
 
-const getVaultProfileDetail: AppEpic = (action$: any, state$: any, deps: any) => {
+const getVaultProfileDetail: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.getVaultProfileDetail.match),
         switchMap((action: ReturnType<typeof slice.actions.getVaultProfileDetail>) =>
@@ -105,7 +104,7 @@ const getVaultProfileDetail: AppEpic = (action$: any, state$: any, deps: any) =>
     );
 };
 
-const deleteVaultProfile: AppEpic = (action$: any, state$: any, deps: any) => {
+const deleteVaultProfile: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.deleteVaultProfile.match),
         mergeMap((action: ReturnType<typeof slice.actions.deleteVaultProfile>) =>

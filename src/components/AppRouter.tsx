@@ -41,6 +41,7 @@ import CredentialsList from './_pages/credentials/list';
 
 import CryptographicKeyDetail from './_pages/cryptographic-keys/detail';
 import CryptographicKeyList from './_pages/cryptographic-keys/list';
+import SecretsList from './_pages/secrets/list';
 
 import CustomAttributesDetail from './_pages/custom-attributes/detail';
 import CustomAttributesList from './_pages/custom-attributes/list';
@@ -303,6 +304,12 @@ export default function AppRouter() {
                     <Route path={`/${Resource.Keys.toLowerCase()}/list`} element={<Navigate to={`/${Resource.Keys.toLowerCase()}`} />} />
 
                     <Route path={`/${Resource.Keys.toLowerCase()}/detail/:id/:keyItemUuid?`} element={<CryptographicKeyDetail />} />
+
+                    <Route path={`/${Resource.Secrets.toLowerCase()}`} element={<SecretsList />} />
+                    <Route
+                        path={`/${Resource.Secrets.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.Secrets.toLowerCase()}`} />}
+                    />
 
                     <Route path={`/${Resource.Settings.toLowerCase()}`} element={<PlatformSettingsDetail />} />
 

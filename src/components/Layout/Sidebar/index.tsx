@@ -63,6 +63,32 @@ function SidebarSubmenuItem({ child, index, totalCount }: { child: { name: strin
     );
 }
 
+function SecretsIcon() {
+    return (
+        <svg width={16} height={16} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+            />
+            <path
+                d="M14.9897 16.0474C15.0645 16.4408 14.7231 16.7998 14.2744 16.7999H9.72558C9.27688 16.7998 8.93552 16.4408 9.01032 16.0474L10.298 10.6934L11.2721 10.8393C11.3885 10.8567 11.4647 10.9704 11.4367 11.0847L10.298 15.7252H13.702L12.6174 11.083C12.5908 10.9693 12.6669 10.857 12.7825 10.8397L13.7589 10.6934L14.9897 16.0474Z"
+                fill="currentColor"
+                strokeWidth={1.5}
+            />
+            <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M12 6.22866C13.2887 6.22866 14.3333 7.32884 14.3333 8.68598C14.3333 9.56454 13.8949 10.3362 13.2327 10.7713L13.5347 12C14.6985 11.4011 15.5 10.142 15.5 8.68598C15.5 6.65027 13.933 5 12 5C10.067 5 8.5 6.65027 8.5 8.68598C8.5 10.0513 9.20492 11.243 10.2523 11.88L10.4653 12L10.7673 10.7713C10.1051 10.3362 9.66667 9.56454 9.66667 8.68598C9.66667 7.32884 10.7113 6.22866 12 6.22866Z"
+                fill="currentColor"
+                strokeWidth={1.5}
+            />
+        </svg>
+    );
+}
+
 const menuItemMappings: MenuItemMapping[] = [
     {
         _key: '/dashboard',
@@ -98,6 +124,13 @@ const menuItemMappings: MenuItemMapping[] = [
         header: 'Connectors',
         headerLink: '/connectors',
         requiredResources: [Resource.Connectors],
+    },
+    {
+        _key: '/secrets',
+        icon: <SecretsIcon />,
+        header: 'Secrets',
+        headerLink: '/secrets',
+        requiredResources: [Resource.Secrets],
     },
 
     {

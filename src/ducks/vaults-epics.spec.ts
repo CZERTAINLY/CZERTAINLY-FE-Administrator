@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from 'vitest';
-import type { AnyAction } from 'redux';
+import type { UnknownAction } from '@reduxjs/toolkit';
 import { firstValueFrom, of, throwError } from 'rxjs';
 import { take, toArray } from 'rxjs/operators';
 
@@ -68,7 +68,7 @@ async function runEpic(
     action: any,
     depsOverrides: Partial<EpicDeps['apiClients']> = {},
     takeCount = 1,
-): Promise<AnyAction[]> {
+): Promise<UnknownAction[]> {
     const { default: epics } = await import('./vaults-epics');
     const deps = createDeps(depsOverrides);
     const epic = (epics as any)[epicIndex];
@@ -139,8 +139,8 @@ describe('vaults epics', () => {
             } as any,
         });
         expect(emitted[0].type).toBe(vaultActions.getVaultInstanceAttributesSuccess.type);
-        expect(emitted[0].payload.connectorUuid).toBe('c-1');
-        expect(emitted[0].payload.attributes).toHaveLength(1);
+        expect((emitted[0] as unknown as { payload: { connectorUuid: string; attributes: unknown[] } }).payload.connectorUuid).toBe('c-1');
+        expect((emitted[0] as unknown as { payload: { connectorUuid: string; attributes: unknown[] } }).payload.attributes).toHaveLength(1);
     });
 
     test('getVaultInstanceAttributes failure emits getVaultInstanceAttributesFailure', async () => {
@@ -151,7 +151,7 @@ describe('vaults epics', () => {
             } as any,
         });
         expect(emitted[0].type).toBe(vaultActions.getVaultInstanceAttributesFailure.type);
-        expect(emitted[0].payload.connectorUuid).toBe('c-1');
+        expect((emitted[0] as unknown as { payload: { connectorUuid: string } }).payload.connectorUuid).toBe('c-1');
     });
 
     test('createVault success emits createVaultSuccess, listVaults and redirect', async () => {

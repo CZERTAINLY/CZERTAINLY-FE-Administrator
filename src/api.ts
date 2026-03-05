@@ -43,6 +43,7 @@ import {
     WorkflowActionsManagementApi,
     WorkflowRulesManagementApi,
     WorkflowTriggersManagementApi,
+    SecretManagementApi,
     VaultInstanceManagementApi,
     VaultProfileManagementApi,
 } from 'types/openapi';
@@ -109,6 +110,7 @@ export interface ApiClients {
     oids: CustomOIDManagementApi;
     vaults: VaultInstanceManagementApi;
     vaultProfiles: VaultProfileManagementApi;
+    secrets: SecretManagementApi;
 }
 
 export const backendClient: ApiClients = {
@@ -158,6 +160,7 @@ export const backendClient: ApiClients = {
     connectorsV2: new ConnectorManagementV2Api(configuration),
     vaults: new VaultInstanceManagementApi(configuration),
     vaultProfiles: new VaultProfileManagementApi(configuration),
+    secrets: new SecretManagementApi(configuration),
 };
 
 export const updateBackendUtilsClients = (url: string | undefined) => {

@@ -1,3 +1,4 @@
+import { AppEpic } from 'ducks';
 import { of } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -12,7 +13,7 @@ import { EntityType } from './filters';
 import { transformSearchRequestModelToDto } from './transform/certificates';
 import { store } from '../App';
 
-const listVaults = (action$: any, state$: any, deps: any) => {
+const listVaults: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listVaults.match),
         switchMap((action: ReturnType<typeof slice.actions.listVaults>) => {
@@ -40,7 +41,7 @@ const listVaults = (action$: any, state$: any, deps: any) => {
     );
 };
 
-const getVaultDetail = (action$: any, state$: any, deps: any) => {
+const getVaultDetail: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.getVaultDetail.match),
         switchMap((action: ReturnType<typeof slice.actions.getVaultDetail>) =>
@@ -64,7 +65,7 @@ const getVaultDetail = (action$: any, state$: any, deps: any) => {
     );
 };
 
-const getVaultInstanceAttributes = (action$: any, state$: any, deps: any) => {
+const getVaultInstanceAttributes: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.getVaultInstanceAttributes.match),
         switchMap((action: ReturnType<typeof slice.actions.getVaultInstanceAttributes>) => {
@@ -83,7 +84,7 @@ const getVaultInstanceAttributes = (action$: any, state$: any, deps: any) => {
     );
 };
 
-const createVault = (action$: any, state$: any, deps: any) => {
+const createVault: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.createVault.match),
         switchMap((action: ReturnType<typeof slice.actions.createVault>) =>
@@ -112,7 +113,7 @@ const createVault = (action$: any, state$: any, deps: any) => {
     );
 };
 
-const updateVault = (action$: any, state$: any, deps: any) => {
+const updateVault: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.updateVault.match),
         switchMap((action: ReturnType<typeof slice.actions.updateVault>) =>
@@ -138,7 +139,7 @@ const updateVault = (action$: any, state$: any, deps: any) => {
     );
 };
 
-const deleteVault = (action$: any, state$: any, deps: any) => {
+const deleteVault: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.deleteVault.match),
         mergeMap((action: ReturnType<typeof slice.actions.deleteVault>) =>

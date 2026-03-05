@@ -1,4 +1,4 @@
-import type { AppEpic } from 'ducks';
+import { AppEpic } from 'ducks';
 import { of } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 import { extractError } from 'utils/net';
@@ -91,7 +91,7 @@ const getSearchableFields: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.getSearchableFields.match),
         switchMap(() =>
-            deps.apiClients.cbomManagement.getSearchableFieldInformation5().pipe(
+            deps.apiClients.cbomManagement.getSearchableFieldInformation8().pipe(
                 map((fields) =>
                     slice.actions.getSearchableFieldsSuccess({
                         fields: transformSearchableFieldsDtoToModel(fields),
