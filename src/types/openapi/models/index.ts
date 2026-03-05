@@ -178,6 +178,7 @@ export * from './ConnectorDto';
 export * from './ConnectorDtoV2';
 export * from './ConnectorInfo';
 export * from './ConnectorInterface';
+export * from './ConnectorInterfaceDto';
 export * from './ConnectorInterfaceInfo';
 export * from './ConnectorMetadataPromotionRequestDto';
 export * from './ConnectorMetadataResponseDto';

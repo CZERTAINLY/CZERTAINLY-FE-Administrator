@@ -30,7 +30,7 @@ import type {
 
 export interface CreateVaultProfileRequest {
     vaultUuid: string;
-    vaultProfileRequestDto?: VaultProfileRequestDto;
+    vaultProfileRequestDto: VaultProfileRequestDto;
 }
 
 export interface DeleteVaultProfileRequest {
@@ -60,13 +60,13 @@ export interface GetVaultProfileDetailsRequest {
 }
 
 export interface ListVaultProfilesRequest {
-    searchRequestDto?: SearchRequestDto;
+    searchRequestDto: SearchRequestDto;
 }
 
 export interface UpdateVaultProfileRequest {
     vaultUuid: string;
     vaultProfileUuid: string;
-    vaultProfileUpdateRequestDto?: VaultProfileUpdateRequestDto;
+    vaultProfileUpdateRequestDto: VaultProfileUpdateRequestDto;
 }
 
 /**
@@ -81,6 +81,7 @@ export class VaultProfileManagementApi extends BaseAPI {
     createVaultProfile({ vaultUuid, vaultProfileRequestDto }: CreateVaultProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<VaultProfileDetailDto>>
     createVaultProfile({ vaultUuid, vaultProfileRequestDto }: CreateVaultProfileRequest, opts?: OperationOpts): Observable<VaultProfileDetailDto | AjaxResponse<VaultProfileDetailDto>> {
         throwIfNullOrUndefined(vaultUuid, 'vaultUuid', 'createVaultProfile');
+        throwIfNullOrUndefined(vaultProfileRequestDto, 'vaultProfileRequestDto', 'createVaultProfile');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
@@ -188,6 +189,7 @@ export class VaultProfileManagementApi extends BaseAPI {
     listVaultProfiles({ searchRequestDto }: ListVaultProfilesRequest): Observable<PaginationResponseDtoVaultProfileDto>
     listVaultProfiles({ searchRequestDto }: ListVaultProfilesRequest, opts?: OperationOpts): Observable<AjaxResponse<PaginationResponseDtoVaultProfileDto>>
     listVaultProfiles({ searchRequestDto }: ListVaultProfilesRequest, opts?: OperationOpts): Observable<PaginationResponseDtoVaultProfileDto | AjaxResponse<PaginationResponseDtoVaultProfileDto>> {
+        throwIfNullOrUndefined(searchRequestDto, 'searchRequestDto', 'listVaultProfiles');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
@@ -209,6 +211,7 @@ export class VaultProfileManagementApi extends BaseAPI {
     updateVaultProfile({ vaultUuid, vaultProfileUuid, vaultProfileUpdateRequestDto }: UpdateVaultProfileRequest, opts?: OperationOpts): Observable<VaultProfileDetailDto | AjaxResponse<VaultProfileDetailDto>> {
         throwIfNullOrUndefined(vaultUuid, 'vaultUuid', 'updateVaultProfile');
         throwIfNullOrUndefined(vaultProfileUuid, 'vaultProfileUuid', 'updateVaultProfile');
+        throwIfNullOrUndefined(vaultProfileUpdateRequestDto, 'vaultProfileUpdateRequestDto', 'updateVaultProfile');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',

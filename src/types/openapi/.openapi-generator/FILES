@@ -232,6 +232,7 @@ models/ConnectorDto.ts
 models/ConnectorDtoV2.ts
 models/ConnectorInfo.ts
 models/ConnectorInterface.ts
+models/ConnectorInterfaceDto.ts
 models/ConnectorInterfaceInfo.ts
 models/ConnectorMetadataPromotionRequestDto.ts
 models/ConnectorMetadataResponseDto.ts
