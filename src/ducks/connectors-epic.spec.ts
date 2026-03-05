@@ -384,7 +384,7 @@ describe('connectors epics', () => {
         expect(emitted[2]).toEqual(slice.actions.getConnectorHealth({ uuid: 'conn-1' }));
     });
 
-    test('bulkForceDeleteConnectors success with successRedirect emits success and redirect', async () => {
+    test('bulkForceDeleteConnectors success with successRedirect emits success, alert and redirect', async () => {
         const emitted = await runEpic(
             16,
             slice.actions.bulkForceDeleteConnectors({ uuids: ['c-1', 'c-2'], successRedirect: '/connectors' }),
@@ -396,10 +396,11 @@ describe('connectors epics', () => {
                     },
                 } as any,
             },
-            2,
+            3,
         );
         expect(emitted[0].type).toBe(slice.actions.bulkForceDeleteConnectorsSuccess.type);
-        expect(emitted[1]).toEqual(appRedirectActions.redirect({ url: '/connectors' }));
+        expect(emitted[1]).toEqual(alertsSlice.actions.success('Selected connectors successfully deleted.'));
+        expect(emitted[2]).toEqual(appRedirectActions.redirect({ url: '/connectors' }));
     });
 
     test('createConnector success emits createConnectorSuccess and redirect', async () => {
@@ -525,8 +526,8 @@ describe('connectors epics', () => {
         expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to update connector' }));
     });
 
-    test('bulkDeleteConnectors success emits bulkDeleteConnectorsSuccess and success alert', async () => {
-        const errors = [{ code: 'E', message: 'x' }] as any[];
+    test('bulkDeleteConnectors success with no errors emits bulkDeleteConnectorsSuccess and success alert', async () => {
+        const errors: any[] = [];
 
         const deps = createDeps({
             connectorsV2: {
@@ -541,8 +542,28 @@ describe('connectors epics', () => {
         const output$ = epic(of(slice.actions.bulkDeleteConnectors({ uuids: ['c-1', 'c-2'] })), of({}) as any, deps as any);
         const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
 
-        expect(emitted[0]).toEqual(slice.actions.bulkDeleteConnectorsSuccess({ uuids: ['c-1', 'c-2'], errors }));
+        expect(emitted[0]).toEqual(slice.actions.bulkDeleteConnectorsSuccess({ uuids: ['c-1', 'c-2'], errors: [] }));
         expect(emitted[1]).toEqual(alertsSlice.actions.success('Selected connectors successfully deleted.'));
+    });
+
+    test('bulkDeleteConnectors success with errors does not emit success alert', async () => {
+        const errors = [{ code: 'E', message: 'x' }] as any[];
+
+        const deps = createDeps({
+            connectorsV2: {
+                bulkDeleteConnectorV2: ({ requestBody }: { requestBody: any }) => {
+                    expect(requestBody).toEqual(['c-1', 'c-2']);
+                    return of(errors);
+                },
+            } as any,
+        });
+
+        const epic = connectorsEpics[9] as any;
+        const output$ = epic(of(slice.actions.bulkDeleteConnectors({ uuids: ['c-1', 'c-2'] })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(1), toArray()))) as any[];
+
+        expect(emitted).toHaveLength(1);
+        expect(emitted[0]).toEqual(slice.actions.bulkDeleteConnectorsSuccess({ uuids: ['c-1', 'c-2'], errors }));
     });
 
     test('bulkDeleteConnectors failure emits bulkDeleteConnectorsFailure and fetchError', async () => {
@@ -681,11 +702,15 @@ describe('connectors epics', () => {
         expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to bulk authorize connectors' }));
     });
 
-    test('bulkForceDeleteConnectors success without successRedirect emits success only', async () => {
-        const emitted = await runEpic(16, slice.actions.bulkForceDeleteConnectors({ uuids: ['c-1', 'c-2'] }), {
-            connectors: { forceDeleteConnector: () => of(null) } as any,
-        });
+    test('bulkForceDeleteConnectors success without successRedirect emits success and alert', async () => {
+        const emitted = await runEpic(
+            16,
+            slice.actions.bulkForceDeleteConnectors({ uuids: ['c-1', 'c-2'] }),
+            { connectors: { forceDeleteConnector: () => of(null) } as any },
+            2,
+        );
         expect(emitted[0]).toEqual(slice.actions.bulkForceDeleteConnectorsSuccess({ uuids: ['c-1', 'c-2'] }));
+        expect(emitted[1]).toEqual(alertsSlice.actions.success('Selected connectors successfully deleted.'));
     });
 
     test('bulkForceDeleteConnectors failure emits bulkForceDeleteConnectorsFailure and fetchError', async () => {
