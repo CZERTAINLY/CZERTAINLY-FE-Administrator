@@ -13,9 +13,10 @@ type Props = {
     onlyActiveTabContent?: boolean;
     selectedTab?: number;
     noBorder?: boolean;
+    onTabChange?: (tab: number) => void;
 };
 
-export default function TabLayout({ tabs, onlyActiveTabContent = true, selectedTab, noBorder = false }: Props) {
+export default function TabLayout({ tabs, onlyActiveTabContent = true, selectedTab, noBorder = false, onTabChange }: Props) {
     const [activeTab, setActiveTab] = useState(selectedTab ?? 0);
 
     const memoizedTabs = useMemo(() => {
@@ -35,6 +36,9 @@ export default function TabLayout({ tabs, onlyActiveTabContent = true, selectedT
     const handleTabChange = (tab: number) => {
         if (selectedTab === undefined) {
             setActiveTab(tab);
+        }
+        if (onTabChange) {
+            onTabChange(tab);
         }
     };
 

@@ -6,6 +6,8 @@ import { extractError } from 'utils/net';
 import { actions as alertActions } from './alerts';
 import { actions as appRedirectActions } from './app-redirect';
 import { actions as userInterfaceActions } from './user-interface';
+import { actions as pagingActions } from './paging';
+import { EntityType } from './filters';
 
 import { slice } from './connectors';
 
@@ -14,39 +16,50 @@ import {
     transformAttributeDescriptorDtoToModel,
     transformAttributeRequestModelToDto,
     transformCallbackAttributeModelToDto,
-    transformHealthDtoToModel,
+    transformHealthInfoToModel,
 } from './transform/attributes';
 
 import {
     transformBulkActionDtoToModel,
+    transformConnectorDetailV2ToModel,
+    transformConnectorDtoV2ToModel,
     transformConnectorRequestModelToDto,
     transformConnectorResponseDtoToModel,
     transformConnectorUpdateRequestModelToDto,
+    transformConnectInfoDtoToFunctionGroups,
     transformFunctionGroupDtoToModel,
 } from './transform/connectors';
+import { transformSearchRequestModelToDto } from './transform/certificates';
 
 const listConnectors: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.listConnectors.match),
-        switchMap((action) =>
-            deps.apiClients.connectors.listConnectors({ functionGroup: action.payload?.functionGroup }).pipe(
-                mergeMap((list) =>
-                    of(
-                        slice.actions.listConnectorsSuccess({
-                            connectorList: list.map(transformConnectorResponseDtoToModel),
-                        }),
-                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ConnectorStore),
+        switchMap((action) => {
+            const search = action.payload ?? { itemsPerPage: 10, pageNumber: 1, filters: [] };
+            return deps.apiClients.connectorsV2
+                .listConnectorsV2({
+                    searchRequestDto: transformSearchRequestModelToDto(search),
+                })
+                .pipe(
+                    mergeMap((page) =>
+                        of(
+                            slice.actions.listConnectorsSuccess({
+                                connectorList: page.items.map(transformConnectorDtoV2ToModel),
+                            }),
+                            pagingActions.listSuccess({ entity: EntityType.CONNECTOR, totalItems: page.totalItems }),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ConnectorStore),
+                        ),
                     ),
-                ),
 
-                catchError((error) =>
-                    of(
-                        slice.actions.listConnectorsFailure(),
-                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorStore),
+                    catchError((error) =>
+                        of(
+                            slice.actions.listConnectorsFailure(),
+                            pagingActions.listFailure(EntityType.CONNECTOR),
+                            userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorStore),
+                        ),
                     ),
-                ),
-            ),
-        ),
+                );
+        }),
     );
 };
 
@@ -54,7 +67,7 @@ const listConnectorsMerge: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.listConnectorsMerge.match),
         mergeMap((action) =>
-            deps.apiClients.connectors.listConnectors({ functionGroup: action.payload?.functionGroup }).pipe(
+            deps.apiClients.connectors.listConnectors({ functionGroup: action.payload.functionGroup }).pipe(
                 mergeMap((list) =>
                     of(
                         slice.actions.listConnectorsMergeSuccess({
@@ -63,7 +76,6 @@ const listConnectorsMerge: AppEpic = (action$, state, deps) => {
                         userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ConnectorStore),
                     ),
                 ),
-
                 catchError((error) =>
                     of(
                         slice.actions.listConnectorsMergeFailure(),
@@ -79,10 +91,10 @@ const getConnectorDetail: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.getConnectorDetail.match),
         switchMap((action) =>
-            deps.apiClients.connectors.getConnector({ uuid: action.payload.uuid }).pipe(
+            deps.apiClients.connectorsV2.getConnectorV2({ uuid: action.payload.uuid }).pipe(
                 mergeMap((detail) =>
                     of(
-                        slice.actions.getConnectorDetailSuccess({ connector: transformConnectorResponseDtoToModel(detail) }),
+                        slice.actions.getConnectorDetailSuccess({ connector: transformConnectorDetailV2ToModel(detail) }),
                         userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ConnectorDetails),
                     ),
                 ),
@@ -92,6 +104,18 @@ const getConnectorDetail: AppEpic = (action$, state, deps) => {
                         userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorDetails),
                     ),
                 ),
+            ),
+        ),
+    );
+};
+
+const getConnectorInfoV2: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getConnectorInfoV2.match),
+        switchMap((action) =>
+            deps.apiClients.connectorsV2.getInfoV2({ uuid: action.payload.uuid }).pipe(
+                map((info) => slice.actions.getConnectorInfoV2Success({ info })),
+                catchError(() => of(slice.actions.getConnectorInfoV2Failure())),
             ),
         ),
     );
@@ -155,9 +179,12 @@ const getConnectorHealth: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.getConnectorHealth.match),
         switchMap((action) =>
-            deps.apiClients.connectors.checkHealth({ uuid: action.payload.uuid }).pipe(
-                map((health) => slice.actions.getConnectorHealthSuccess({ health: transformHealthDtoToModel(health) })),
-
+            deps.apiClients.connectorsV2.checkHealthV2({ uuid: action.payload.uuid }).pipe(
+                map((healthInfo) =>
+                    slice.actions.getConnectorHealthSuccess({
+                        health: transformHealthInfoToModel(healthInfo as any),
+                    }),
+                ),
                 catchError((error) => of(slice.actions.getConnectorHealthFailure())),
             ),
         ),
@@ -168,34 +195,25 @@ const createConnector: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.createConnector.match),
         switchMap((action) =>
-            deps.apiClients.connectors.createConnector({ connectorRequestDto: transformConnectorRequestModelToDto(action.payload) }).pipe(
-                switchMap((obj) =>
-                    deps.apiClients.connectors.getConnector({ uuid: obj.uuid }).pipe(
-                        mergeMap((connector) =>
-                            of(
-                                slice.actions.createConnectorSuccess({
-                                    connector: transformConnectorResponseDtoToModel(connector),
-                                }),
-                                appRedirectActions.redirect({ url: `../connectors/detail/${connector.uuid}` }),
-                            ),
+            deps.apiClients.connectorsV2
+                .createConnectorV2({ connectorRequestDtoV2: transformConnectorRequestModelToDto(action.payload) as any })
+                .pipe(
+                    mergeMap((connector) =>
+                        of(
+                            slice.actions.createConnectorSuccess({
+                                connector: transformConnectorDetailV2ToModel(connector),
+                            }),
+                            appRedirectActions.redirect({ url: `../connectors/detail/${connector.uuid}` }),
                         ),
+                    ),
 
-                        catchError((error) =>
-                            of(
-                                slice.actions.createConnectorFailure(),
-                                appRedirectActions.fetchError({ error, message: 'Failed to get created connector' }),
-                            ),
+                    catchError((error) =>
+                        of(
+                            slice.actions.createConnectorFailure(),
+                            appRedirectActions.fetchError({ error, message: 'Failed to create connector' }),
                         ),
                     ),
                 ),
-
-                catchError((error) =>
-                    of(
-                        slice.actions.createConnectorFailure(),
-                        appRedirectActions.fetchError({ error, message: 'Failed to create connector' }),
-                    ),
-                ),
-            ),
         ),
     );
 };
@@ -204,15 +222,15 @@ const updateConnector: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.updateConnector.match),
         switchMap((action) =>
-            deps.apiClients.connectors
-                .editConnector({
+            deps.apiClients.connectorsV2
+                .editConnectorV2({
                     uuid: action.payload.uuid,
-                    connectorUpdateRequestDto: transformConnectorUpdateRequestModelToDto(action.payload.connectorUpdateRequest),
+                    connectorUpdateRequestDtoV2: transformConnectorUpdateRequestModelToDto(action.payload.connectorUpdateRequest) as any,
                 })
                 .pipe(
                     mergeMap((connector) =>
                         of(
-                            slice.actions.updateConnectorSuccess({ connector: transformConnectorResponseDtoToModel(connector) }),
+                            slice.actions.updateConnectorSuccess({ connector: transformConnectorDetailV2ToModel(connector) }),
                             appRedirectActions.redirect({ url: `../../connectors/detail/${connector.uuid}` }),
                         ),
                     ),
@@ -232,7 +250,7 @@ const deleteConnector: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.deleteConnector.match),
         switchMap((action) =>
-            deps.apiClients.connectors.deleteConnector({ uuid: action.payload.uuid }).pipe(
+            deps.apiClients.connectorsV2.deleteConnectorV2({ uuid: action.payload.uuid }).pipe(
                 mergeMap(() =>
                     of(
                         slice.actions.deleteConnectorSuccess({ uuid: action.payload.uuid }),
@@ -255,7 +273,7 @@ const bulkDeleteConnectors: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.bulkDeleteConnectors.match),
         switchMap((action) =>
-            deps.apiClients.connectors.bulkDeleteConnector({ requestBody: action.payload.uuids }).pipe(
+            deps.apiClients.connectorsV2.bulkDeleteConnectorV2({ requestBody: action.payload.uuids }).pipe(
                 mergeMap((errors) =>
                     of(
                         slice.actions.bulkDeleteConnectorsSuccess({
@@ -281,17 +299,18 @@ const connectConnector: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.connectConnector.match),
         switchMap((action) =>
-            deps.apiClients.connectors
-                .connect({
+            deps.apiClients.connectorsV2
+                .connectV2({
                     connectRequestDto: {
                         ...action.payload,
                         authAttributes: action.payload.authAttributes?.map(transformAttributeRequestModelToDto),
-                    },
+                    } as any,
                 })
                 .pipe(
                     map((connection) =>
                         slice.actions.connectConnectorSuccess({
-                            connectionDetails: connection.map((connection) => transformFunctionGroupDtoToModel(connection.functionGroup)),
+                            connectionDetails: connection.flatMap((c) => transformConnectInfoDtoToFunctionGroups(c)),
+                            connectInfo: connection,
                         }),
                     ),
 
@@ -310,12 +329,13 @@ const reconnectConnector: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.reconnectConnector.match),
         switchMap((action) =>
-            deps.apiClients.connectors.reconnect({ uuid: action.payload.uuid }).pipe(
+            deps.apiClients.connectorsV2.reconnectV2({ uuid: action.payload.uuid }).pipe(
                 mergeMap((connection) =>
                     of(
                         slice.actions.reconnectConnectorSuccess({
                             uuid: action.payload.uuid,
-                            functionGroups: connection.map((connection) => transformFunctionGroupDtoToModel(connection.functionGroup)),
+                            functionGroups: transformConnectInfoDtoToFunctionGroups(connection),
+                            connectInfo: [connection],
                         }),
                         slice.actions.getConnectorHealth({ uuid: action.payload.uuid }),
                     ),
@@ -336,7 +356,7 @@ const bulkReconnectConnectors: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.bulkReconnectConnectors.match),
         switchMap((action) =>
-            deps.apiClients.connectors.bulkReconnect({ requestBody: action.payload.uuids }).pipe(
+            deps.apiClients.connectorsV2.bulkReconnectV2({ requestBody: action.payload.uuids }).pipe(
                 map(() => slice.actions.bulkReconnectConnectorsSuccess({ uuids: action.payload.uuids })),
 
                 catchError((error) =>
@@ -354,7 +374,7 @@ const authorizeConnector: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.authorizeConnector.match),
         switchMap((action) =>
-            deps.apiClients.connectors.approve({ uuid: action.payload.uuid }).pipe(
+            deps.apiClients.connectorsV2.approveV2({ uuid: action.payload.uuid }).pipe(
                 mergeMap(() =>
                     of(
                         slice.actions.authorizeConnectorSuccess({ uuid: action.payload.uuid }),
@@ -378,9 +398,12 @@ const bulkAuthorizeConnectors: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.bulkAuthorizeConnectors.match),
         switchMap((action) =>
-            deps.apiClients.connectors.bulkApprove({ requestBody: action.payload.uuids }).pipe(
+            deps.apiClients.connectorsV2.bulkApproveV2({ requestBody: action.payload.uuids }).pipe(
                 mergeMap(() =>
-                    of(slice.actions.bulkAuthorizeConnectorsSuccess({ uuids: action.payload.uuids }), slice.actions.listConnectors({})),
+                    of(
+                        slice.actions.bulkAuthorizeConnectorsSuccess({ uuids: action.payload.uuids }),
+                        slice.actions.listConnectors({ itemsPerPage: 1000, pageNumber: 1, filters: [] }),
+                    ),
                 ),
 
                 catchError((error) =>
@@ -509,6 +532,7 @@ const epics = [
     deleteConnector,
     bulkDeleteConnectors,
     connectConnector,
+    getConnectorInfoV2,
     reconnectConnector,
     bulkReconnectConnectors,
     authorizeConnector,
