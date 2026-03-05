@@ -17,7 +17,7 @@ describe('api', () => {
     });
 
     it('should update backend utils clients when a valid URL is provided', () => {
-        const testUrl = 'http://test-utils-api.com';
+        const testUrl = 'https://test-utils-api.com';
         updateBackendUtilsClients(testUrl);
 
         expect(backendClient.utilsCertificate).toBeDefined();
@@ -28,7 +28,7 @@ describe('api', () => {
 
     it('should clear backend utils clients when an empty URL is provided', () => {
         // First set them
-        updateBackendUtilsClients('http://test-utils-api.com');
+        updateBackendUtilsClients('https://test-utils-api.com');
         expect(backendClient.utilsCertificate).toBeDefined();
 
         // Then clear them
@@ -41,7 +41,7 @@ describe('api', () => {
 
     it('should clear backend utils clients when undefined is provided', () => {
         // First set them
-        updateBackendUtilsClients('http://test-utils-api.com');
+        updateBackendUtilsClients('https://test-utils-api.com');
         expect(backendClient.utilsCertificate).toBeDefined();
 
         // Then clear them
