@@ -2,8 +2,8 @@ import { Action } from 'redux';
 import { Subject, lastValueFrom, of, throwError } from 'rxjs';
 import { toArray } from 'rxjs/operators';
 import { StateObservable } from 'redux-observable';
+import { describe, expect, test } from 'vitest';
 
-import { test, expect } from '../../playwright/ct-test';
 import { backendClient } from '../api';
 import { actions as alertActions } from './alerts';
 import { actions as appRedirectActions } from './app-redirect';
@@ -17,7 +17,7 @@ import { LockTypeEnum, LockWidgetNameEnum } from 'types/user-interface';
 const proxyList = [{ uuid: 'proxy-1', name: 'Proxy 1' }] as any;
 const proxyDetail = { uuid: 'proxy-1', name: 'Proxy 1' } as any;
 
-test.describe('proxies epics', () => {
+describe('proxies epics', () => {
     test('listProxies success emits listProxiesSuccess and removes lock', async () => {
         const deps = createDeps({
             listProxies: (request?: any) => of(proxyList),

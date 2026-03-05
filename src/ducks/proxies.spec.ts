@@ -1,11 +1,11 @@
-import { test, expect } from '../../playwright/ct-test';
+import { describe, expect, test } from 'vitest';
 import reducer, { actions, initialState } from './proxies';
 import { ProxyStatus } from 'types/openapi';
 
 const proxyA = { uuid: 'proxy-a', name: 'Proxy A', status: ProxyStatus.Connected, code: 'proxy-a-code' };
 const proxyB = { uuid: 'proxy-b', name: 'Proxy B', status: ProxyStatus.Disconnected, code: 'proxy-b-code' };
 
-test.describe('proxies rxjs slice', () => {
+describe('proxies rxjs slice', () => {
     test('initial state', () => {
         expect(reducer(undefined, { type: 'unknown' })).toEqual(initialState);
     });
