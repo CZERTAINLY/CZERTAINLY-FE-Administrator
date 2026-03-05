@@ -12,8 +12,7 @@ import TextArea from 'components/TextArea';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions as vaultActions, selectors as vaultSelectors } from 'ducks/vaults';
 
-import { Resource } from 'types/openapi';
-import { VaultInstanceDetailDto } from 'types/openapi';
+import { Resource, VaultInstanceDetailDto } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
 interface VaultEditFormProps {

@@ -37,22 +37,22 @@ async function runEpic(
 ): Promise<UnknownAction[]> {
     const { default: epics } = await import('./vault-profiles-epics');
 
+    const defaultVaultProfiles = {
+        listVaultProfiles: () =>
+            of({
+                items: [{ uuid: 'vp-1' }],
+                totalItems: 1,
+                pageNumber: 1,
+                itemsPerPage: 10,
+                totalPages: 1,
+            }),
+        getVaultProfileDetails: () => of({ uuid: 'vp-1', name: 'P1', vaultInstance: { uuid: 'v-1', name: 'V1' }, enabled: true }),
+        createVaultProfile: () => of({ uuid: 'vp-1', name: 'Profile 1' }),
+        deleteVaultProfile: () => of(null),
+    };
     const deps: EpicDeps = {
         apiClients: {
-            vaultProfiles: {
-                listVaultProfiles: () =>
-                    of({
-                        items: [{ uuid: 'vp-1' }],
-                        totalItems: 1,
-                        pageNumber: 1,
-                        itemsPerPage: 10,
-                        totalPages: 1,
-                    }),
-                getVaultProfileDetails: () => of({ uuid: 'vp-1', name: 'P1', vaultInstance: { uuid: 'v-1', name: 'V1' }, enabled: true }),
-                createVaultProfile: () => of({ uuid: 'vp-1', name: 'Profile 1' }),
-                deleteVaultProfile: () => of(null),
-                ...(depsOverrides.vaultProfiles || {}),
-            },
+            vaultProfiles: depsOverrides.vaultProfiles ? { ...defaultVaultProfiles, ...depsOverrides.vaultProfiles } : defaultVaultProfiles,
         },
     };
 

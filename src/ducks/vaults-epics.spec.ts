@@ -11,20 +11,8 @@ import { EntityType } from './filters';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { alertsSlice } from './alert-slice';
 
-vi.mock('../App', () => ({
-    store: {
-        dispatch: vi.fn(),
-        getState: vi.fn(() => ({})),
-    },
-}));
-
-vi.mock('./alerts', () => ({
-    actions: {
-        error: (message: string) => alertsSlice.actions.error(message),
-        success: (message: string) => alertsSlice.actions.success(message),
-        info: (message: string) => alertsSlice.actions.info(message),
-    },
-}));
+vi.mock('../App', async () => ({ store: (await import('./epics-test-mocks')).getEpicMocks().appStore }));
+vi.mock('./alerts', async () => ({ actions: (await import('./epics-test-mocks')).getEpicMocks().alertActions }));
 
 type EpicDeps = {
     apiClients: {
@@ -40,25 +28,25 @@ type EpicDeps = {
 };
 
 function createDeps(overrides: Partial<EpicDeps['apiClients']> = {}): EpicDeps {
+    const defaultVaults = {
+        listVaultInstances: () =>
+            of({
+                items: [{ uuid: 'v-1' }],
+                totalItems: 1,
+                pageNumber: 1,
+                itemsPerPage: 10,
+                totalPages: 1,
+            }),
+        getVaultInstanceDetails: () => of({ uuid: 'v-1', name: 'Vault' }),
+        listVaultInstanceAttributes: () => of([]),
+        createVaultInstance: () => of({ uuid: 'v-1', name: 'Vault' }),
+        updateVaultInstance: () =>
+            of({ uuid: 'v-1', name: 'Vault', description: '', connector: { uuid: 'c-1', name: 'C' }, attributes: [] }),
+        deleteVaultInstance: () => of(null),
+    };
     return {
         apiClients: {
-            vaults: {
-                listVaultInstances: () =>
-                    of({
-                        items: [{ uuid: 'v-1' }],
-                        totalItems: 1,
-                        pageNumber: 1,
-                        itemsPerPage: 10,
-                        totalPages: 1,
-                    }),
-                getVaultInstanceDetails: () => of({ uuid: 'v-1', name: 'Vault' }),
-                listVaultInstanceAttributes: () => of([]),
-                createVaultInstance: () => of({ uuid: 'v-1', name: 'Vault' }),
-                updateVaultInstance: () =>
-                    of({ uuid: 'v-1', name: 'Vault', description: '', connector: { uuid: 'c-1', name: 'C' }, attributes: [] }),
-                deleteVaultInstance: () => of(null),
-                ...(overrides.vaults || {}),
-            },
+            vaults: overrides.vaults ? { ...defaultVaults, ...overrides.vaults } : defaultVaults,
         },
     };
 }

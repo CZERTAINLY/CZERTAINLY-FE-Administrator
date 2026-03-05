@@ -73,9 +73,8 @@ function VaultProfileDetail() {
 
     const detailData: TableDataRow[] = useMemo(
         () =>
-            !profile
-                ? []
-                : [
+            profile
+                ? [
                       {
                           id: 'description',
                           columns: ['Description', profile.description ?? ''],
@@ -97,10 +96,13 @@ function VaultProfileDetail() {
                           id: 'status',
                           columns: [
                               'Status',
-                              <Badge color={profile.enabled ? 'success' : 'secondary'}>{profile.enabled ? 'Enabled' : 'Disabled'}</Badge>,
+                              <Badge key="status" color={profile.enabled ? 'success' : 'secondary'}>
+                                  {profile.enabled ? 'Enabled' : 'Disabled'}
+                              </Badge>,
                           ],
                       },
-                  ],
+                  ]
+                : [],
         [profile],
     );
 

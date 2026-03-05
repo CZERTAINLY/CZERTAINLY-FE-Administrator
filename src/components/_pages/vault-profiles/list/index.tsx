@@ -9,7 +9,6 @@ import Dialog from 'components/Dialog';
 import { ApiClients } from '../../../../api';
 import { actions as vaultProfileActions, selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
 import { EntityType } from 'ducks/filters';
-import { selectors as pagingSelectors } from 'ducks/paging';
 
 import { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -22,7 +21,6 @@ export default function VaultProfilesList() {
     const dispatch = useDispatch();
 
     const vaultProfiles = useSelector(vaultProfileSelectors.vaultProfiles);
-    const checkedRows = useSelector(pagingSelectors.checkedRows(EntityType.VAULT));
 
     const isFetchingList = useSelector(vaultProfileSelectors.isFetchingList);
     const isCreating = useSelector(vaultProfileSelectors.isCreating);
@@ -79,7 +77,9 @@ export default function VaultProfilesList() {
                     ) : (
                         ''
                     ),
-                    <Badge color={profile.enabled ? 'success' : 'secondary'}>{profile.enabled ? 'Enabled' : 'Disabled'}</Badge>,
+                    <Badge key="status" color={profile.enabled ? 'success' : 'secondary'}>
+                        {profile.enabled ? 'Enabled' : 'Disabled'}
+                    </Badge>,
                 ],
             })),
         [vaultProfiles],

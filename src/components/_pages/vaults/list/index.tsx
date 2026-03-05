@@ -10,7 +10,6 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { ApiClients } from '../../../../api';
 import { actions as vaultActions, selectors as vaultSelectors } from 'ducks/vaults';
 import { EntityType } from 'ducks/filters';
-import { selectors as pagingSelectors } from 'ducks/paging';
 
 import { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -22,7 +21,6 @@ export default function VaultsList() {
     const dispatch = useDispatch();
 
     const vaults = useSelector(vaultSelectors.vaults);
-    const checkedRows = useSelector(pagingSelectors.checkedRows(EntityType.VAULT));
 
     const isFetchingList = useSelector(vaultSelectors.isFetchingList);
     const isBusy = isFetchingList;
@@ -60,7 +58,9 @@ export default function VaultsList() {
             vaults.map((vault) => ({
                 id: vault.uuid,
                 columns: [
-                    <Link to={`./detail/${vault.uuid}`}>{vault.name}</Link>,
+                    <Link key="name" to={`./detail/${vault.uuid}`}>
+                        {vault.name}
+                    </Link>,
                     vault.description || '',
                     vault.connector ? (
                         <Link to={`/${Resource.Connectors.toLowerCase()}/detail/${vault.connector.uuid}`}>{vault.connector.name}</Link>
@@ -91,7 +91,7 @@ export default function VaultsList() {
             <PagedList
                 entity={EntityType.VAULT}
                 onListCallback={onListCallback}
-                onDeleteCallback={(uuids) => uuids.forEach((uuid) => dispatch(vaultActions.deleteVault({ uuid: uuid as string })))}
+                onDeleteCallback={(uuids) => uuids.forEach((uuid) => dispatch(vaultActions.deleteVault({ uuid: String(uuid) })))}
                 headers={headers}
                 data={rows}
                 isBusy={isBusy}

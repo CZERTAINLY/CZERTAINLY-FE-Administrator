@@ -9,22 +9,9 @@ import { actions as pagingActions } from './paging';
 import { actions as appRedirectActions } from './app-redirect';
 import { EntityType } from './filters';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { alertsSlice } from './alert-slice';
 
-vi.mock('../App', () => ({
-    store: {
-        dispatch: vi.fn(),
-        getState: vi.fn(() => ({})),
-    },
-}));
-
-vi.mock('./alerts', () => ({
-    actions: {
-        error: (message: string) => alertsSlice.actions.error(message),
-        success: (message: string) => alertsSlice.actions.success(message),
-        info: (message: string) => alertsSlice.actions.info(message),
-    },
-}));
+vi.mock('../App', async () => ({ store: (await import('./epics-test-mocks')).getEpicMocks().appStore }));
+vi.mock('./alerts', async () => ({ actions: (await import('./epics-test-mocks')).getEpicMocks().alertActions }));
 
 type EpicDeps = {
     apiClients: {
@@ -44,21 +31,21 @@ async function runEpic(
 ): Promise<UnknownAction[]> {
     const { default: epics } = await import('./secrets-epics');
 
+    const defaultSecrets = {
+        listSecrets: () =>
+            of({
+                items: [{ uuid: 's-1' }],
+                totalItems: 1,
+                pageNumber: 1,
+                itemsPerPage: 10,
+                totalPages: 1,
+            }),
+        deleteSecret: () => of(null),
+        updateSecretObjects: () => of(null),
+    };
     const deps: EpicDeps = {
         apiClients: {
-            secrets: {
-                listSecrets: () =>
-                    of({
-                        items: [{ uuid: 's-1' }],
-                        totalItems: 1,
-                        pageNumber: 1,
-                        itemsPerPage: 10,
-                        totalPages: 1,
-                    }),
-                deleteSecret: () => of(null),
-                updateSecretObjects: () => of(null),
-                ...(depsOverrides.secrets || {}),
-            },
+            secrets: depsOverrides.secrets ? { ...defaultSecrets, ...depsOverrides.secrets } : defaultSecrets,
         },
     };
 

@@ -73,9 +73,8 @@ function VaultDetail() {
 
     const detailData: TableDataRow[] = useMemo(
         () =>
-            !vault
-                ? []
-                : [
+            vault
+                ? [
                       {
                           id: 'uuid',
                           columns: ['UUID', vault.uuid],
@@ -105,7 +104,8 @@ function VaultDetail() {
                       //       id: 'features',
                       //       columns: ['Features', vault.features ?? ''],
                       //   },
-                  ],
+                  ]
+                : [],
         [vault],
     );
 
@@ -132,7 +132,7 @@ function VaultDetail() {
                         <CustomTable headers={detailHeaders} data={detailData} />
                     </Widget>
 
-                    {vault && vault.attributes && vault.attributes.length > 0 && (
+                    {vault?.attributes && vault.attributes.length > 0 && (
                         <Widget title="Attributes" titleSize="large">
                             <AttributeViewer attributes={vault.attributes} />
                         </Widget>

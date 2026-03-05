@@ -114,7 +114,7 @@ export default function SecretsList() {
             secrets.map((secret) => ({
                 id: secret.uuid,
                 columns: [
-                    <span style={{ whiteSpace: 'nowrap' }}>
+                    <span key="name" style={{ whiteSpace: 'nowrap' }}>
                         <Link to={`./detail/${secret.uuid}`}>{secret.name}</Link>
                     </span>,
                     getEnumLabel(secretTypeEnum, secret.type),
@@ -134,7 +134,9 @@ export default function SecretsList() {
                               </Fragment>
                           ))
                         : 'Unassigned',
-                    <Badge color={secret.enabled ? 'success' : 'danger'}>{secret.enabled ? 'Enabled' : 'Disabled'}</Badge>,
+                    <Badge key="status" color={secret.enabled ? 'success' : 'danger'}>
+                        {secret.enabled ? 'Enabled' : 'Disabled'}
+                    </Badge>,
                 ],
             })),
         [secrets, secretTypeEnum, secretStateEnum],
@@ -203,33 +205,33 @@ export default function SecretsList() {
 
     const handleDeleteSecrets = useCallback(
         (uuids: (string | number)[]) => {
-            uuids.forEach((uuid) => dispatch(actions.deleteSecret({ uuid: uuid as string })));
+            uuids.forEach((uuid) => dispatch(actions.deleteSecret({ uuid: String(uuid) })));
         },
         [dispatch],
     );
 
     const handleUpdateOwner = useCallback(() => {
         if (!ownerUuid) return;
-        checkedRows.forEach((uuid) => dispatch(actions.updateSecretObjects({ uuid: uuid as string, update: { ownerUuid } })));
+        checkedRows.forEach((uuid) => dispatch(actions.updateSecretObjects({ uuid: String(uuid), update: { ownerUuid } })));
         setIsUpdateOwnerOpen(false);
         setOwnerUuid('');
     }, [dispatch, checkedRows, ownerUuid]);
 
     const handleRemoveOwner = useCallback(() => {
-        checkedRows.forEach((uuid) => dispatch(actions.updateSecretObjects({ uuid: uuid as string, update: { ownerUuid: '' } })));
+        checkedRows.forEach((uuid) => dispatch(actions.updateSecretObjects({ uuid: String(uuid), update: { ownerUuid: '' } })));
         setIsUpdateOwnerOpen(false);
         setOwnerUuid('');
     }, [dispatch, checkedRows]);
 
     const handleUpdateGroups = useCallback(() => {
         const groupUuids = selectedGroups.map((g) => g.value);
-        checkedRows.forEach((uuid) => dispatch(actions.updateSecretObjects({ uuid: uuid as string, update: { groupUuids } })));
+        checkedRows.forEach((uuid) => dispatch(actions.updateSecretObjects({ uuid: String(uuid), update: { groupUuids } })));
         setIsUpdateGroupsOpen(false);
         setSelectedGroups([]);
     }, [dispatch, checkedRows, selectedGroups]);
 
     const handleClearGroups = useCallback(() => {
-        checkedRows.forEach((uuid) => dispatch(actions.updateSecretObjects({ uuid: uuid as string, update: { groupUuids: [] } })));
+        checkedRows.forEach((uuid) => dispatch(actions.updateSecretObjects({ uuid: String(uuid), update: { groupUuids: [] } })));
         setIsUpdateGroupsOpen(false);
         setSelectedGroups([]);
     }, [dispatch, checkedRows]);
@@ -239,7 +241,7 @@ export default function SecretsList() {
         checkedRows.forEach((uuid) =>
             dispatch(
                 actions.updateSecretObjects({
-                    uuid: uuid as string,
+                    uuid: String(uuid),
                     update: { sourceVaultProfileUuid: selectedVaultProfileUuid },
                 }),
             ),
