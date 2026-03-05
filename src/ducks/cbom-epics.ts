@@ -1,9 +1,11 @@
 import type { AppEpic } from 'ducks';
-import { of } from 'rxjs';
+import { concat, of } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 import { extractError } from 'utils/net';
 import { alertsSlice } from './alert-slice';
 import { actions as appRedirectActions } from './app-redirect';
+import { EntityType } from './filters';
+import { actions as pagingActions } from './paging';
 import { slice } from './cbom';
 import {
     transformCbomDtoToModel,
@@ -19,19 +21,27 @@ const listCboms: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.listCboms.match),
         switchMap((action) =>
-            deps.apiClients.cbomManagement.listCboms({ searchRequestDto: action.payload }).pipe(
-                mergeMap((response) =>
-                    of(
-                        slice.actions.listCbomsSuccess({
-                            data: transformPaginationResponseDtoToModel(response),
-                        }),
-                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfCboms),
+            concat(
+                of(pagingActions.list(EntityType.CBOM)),
+                deps.apiClients.cbomManagement.listCboms({ searchRequestDto: action.payload }).pipe(
+                    mergeMap((response) =>
+                        of(
+                            slice.actions.listCbomsSuccess({
+                                data: transformPaginationResponseDtoToModel(response),
+                            }),
+                            pagingActions.listSuccess({
+                                entity: EntityType.CBOM,
+                                totalItems: response.totalItems ?? response.items?.length ?? 0,
+                            }),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfCboms),
+                        ),
                     ),
-                ),
-                catchError((err) =>
-                    of(
-                        slice.actions.listCbomsFailure({ error: extractError(err, 'Failed to fetch CBOMs') }),
-                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfCboms),
+                    catchError((err) =>
+                        of(
+                            slice.actions.listCbomsFailure({ error: extractError(err, 'Failed to fetch CBOMs') }),
+                            pagingActions.listFailure(EntityType.CBOM),
+                            userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfCboms),
+                        ),
                     ),
                 ),
             ),

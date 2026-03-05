@@ -418,6 +418,7 @@ export default function CbomDetail() {
                 return;
             }
 
+            navigate(`/cboms/detail/${selectedValue}`);
             setSelectedVersionUuid(selectedValue);
         },
         [navigate, id],

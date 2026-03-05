@@ -16,6 +16,11 @@ import { ApiClients, backendClient } from '../../../../api';
 import { EntityType } from 'ducks/filters';
 import { CbomDetailDto } from 'types/openapi';
 
+const toFiniteNumber = (value: unknown): number => {
+    const parsed = typeof value === 'number' ? value : Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+};
+
 function CbomsList() {
     const dispatch = useDispatch();
 
@@ -25,13 +30,13 @@ function CbomsList() {
     const headers: TableHeader[] = useMemo(
         () => [
             { content: 'Serial number', sortable: true, id: 'serial' },
-            { content: 'Ver.', sortable: true, id: 'version', align: 'center' },
+            { content: 'Ver.', sortable: true, id: 'version', align: 'center', sortType: 'numeric' },
             { content: 'Source', sortable: true, id: 'source' },
-            { content: 'Alg.', sortable: true, id: 'algorithm', align: 'center' },
-            { content: 'Certs', sortable: true, id: 'certificates', align: 'center' },
-            { content: 'Proto.', sortable: true, id: 'protocol', align: 'center' },
-            { content: 'Material', sortable: true, id: 'material', align: 'center' },
-            { content: 'Assets', sortable: true, id: 'assets', align: 'center' },
+            { content: 'Alg.', sortable: true, id: 'algorithm', align: 'center', sortType: 'numeric' },
+            { content: 'Certs', sortable: true, id: 'certificates', align: 'center', sortType: 'numeric' },
+            { content: 'Proto.', sortable: true, id: 'protocol', align: 'center', sortType: 'numeric' },
+            { content: 'Material', sortable: true, id: 'material', align: 'center', sortType: 'numeric' },
+            { content: 'Assets', sortable: true, id: 'assets', align: 'center', sortType: 'numeric' },
             { content: 'Action', sortable: false, id: 'action', align: 'center' },
         ],
         [],
@@ -96,13 +101,13 @@ function CbomsList() {
                     <Link key="serial" to={`./detail/${c.uuid}`}>
                         {c.serialNumber}
                     </Link>,
-                    c.version,
+                    toFiniteNumber(c.version),
                     c.source || '-',
-                    c.algorithms,
-                    c.certificates,
-                    c.protocols,
-                    c.cryptoMaterial,
-                    c.totalAssets,
+                    toFiniteNumber(c.algorithms),
+                    toFiniteNumber(c.certificates),
+                    toFiniteNumber(c.protocols),
+                    toFiniteNumber(c.cryptoMaterial),
+                    toFiniteNumber(c.totalAssets),
                     <WidgetButtons
                         key={`actions-${c.uuid}`}
                         buttons={
@@ -157,6 +162,7 @@ function CbomsList() {
                 isBusy={isFetching}
                 title="CBOMs"
                 addHidden
+                hasCheckboxes={false}
                 additionalButtons={additionalButtons}
                 pageWidgetLockName={LockWidgetNameEnum.ListOfCboms}
             />

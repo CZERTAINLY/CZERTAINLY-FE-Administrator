@@ -4,6 +4,8 @@ import { take, toArray } from 'rxjs/operators';
 import cbomEpics from './cbom-epics';
 import { slice } from './cbom';
 import { alertsSlice } from './alert-slice';
+import { EntityType } from './filters';
+import { actions as pagingActions } from './paging';
 import { actions as userInterfaceActions } from './user-interface';
 import { actions as appRedirectActions } from './app-redirect';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -36,7 +38,7 @@ function createDeps(overrides: Partial<EpicDeps['apiClients']['cbomManagement']>
 }
 
 describe('cbom epics', () => {
-    test('listCboms success emits listCbomsSuccess and removeWidgetLock', async () => {
+    test('listCboms success emits paging and success actions', async () => {
         const searchRequest = { pageNumber: 1, itemsPerPage: 10, filters: [] } as any;
         const response = { items: [{ uuid: 'cbom-1' }], totalItems: 1, pageNumber: 1, itemsPerPage: 10, totalPages: 1 } as any;
 
@@ -48,15 +50,17 @@ describe('cbom epics', () => {
         });
 
         const output$ = (cbomEpics[0] as any)(of(slice.actions.listCboms(searchRequest)), of({}) as any, deps as any);
-        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+        const emitted = (await firstValueFrom(output$.pipe(take(4), toArray()))) as any[];
 
         expect(emitted).toEqual([
+            pagingActions.list(EntityType.CBOM),
             slice.actions.listCbomsSuccess({ data: response }),
+            pagingActions.listSuccess({ entity: EntityType.CBOM, totalItems: 1 }),
             userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfCboms),
         ]);
     });
 
-    test('listCboms failure emits listCbomsFailure and insertWidgetLock', async () => {
+    test('listCboms failure emits paging and failure actions', async () => {
         const deps = createDeps({
             listCboms: () => throwError(() => new Error('list failed')),
         });
@@ -66,11 +70,13 @@ describe('cbom epics', () => {
             of({}) as any,
             deps as any,
         );
-        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+        const emitted = (await firstValueFrom(output$.pipe(take(4), toArray()))) as any[];
 
-        expect(emitted[0]).toEqual(slice.actions.listCbomsFailure({ error: 'Failed to fetch CBOMs. list failed' }));
-        expect(emitted[1].type).toBe(userInterfaceActions.insertWidgetLock.type);
-        expect(emitted[1].payload.widgetName).toBe(LockWidgetNameEnum.ListOfCboms);
+        expect(emitted[0]).toEqual(pagingActions.list(EntityType.CBOM));
+        expect(emitted[1]).toEqual(slice.actions.listCbomsFailure({ error: 'Failed to fetch CBOMs. list failed' }));
+        expect(emitted[2]).toEqual(pagingActions.listFailure(EntityType.CBOM));
+        expect(emitted[3].type).toBe(userInterfaceActions.insertWidgetLock.type);
+        expect(emitted[3].payload.widgetName).toBe(LockWidgetNameEnum.ListOfCboms);
     });
 
     test('getCbomDetail success emits getCbomDetailSuccess and removeWidgetLock', async () => {
