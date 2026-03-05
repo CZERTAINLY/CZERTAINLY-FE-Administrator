@@ -43,6 +43,7 @@ import {
     WorkflowActionsManagementApi,
     WorkflowRulesManagementApi,
     WorkflowTriggersManagementApi,
+    VaultInstanceManagementApi,
 } from 'types/openapi';
 import { TokenInstanceControllerApi } from 'types/openapi/apis/TokenInstanceControllerApi';
 import {
@@ -105,6 +106,7 @@ export interface ApiClients {
     utilsCertificate?: CertificateUtilsAPIApi;
     utilsCertificateRequest?: CertificationRequestUtilsAPIApi;
     oids: CustomOIDManagementApi;
+    vaults: VaultInstanceManagementApi;
 }
 
 export const backendClient: ApiClients = {
@@ -152,6 +154,7 @@ export const backendClient: ApiClients = {
     cryptographicOperations: new CryptographicOperationsControllerApi(configuration),
     oids: new CustomOIDManagementApi(configuration),
     connectorsV2: new ConnectorManagementV2Api(configuration),
+    vaults: new VaultInstanceManagementApi(configuration),
 };
 
 export const updateBackendUtilsClients = (url: string | undefined) => {

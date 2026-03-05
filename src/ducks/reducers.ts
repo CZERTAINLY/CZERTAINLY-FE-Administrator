@@ -54,6 +54,7 @@ import { slice as utilsOidSlice } from './utilsOid';
 import { slice as oidsSlice } from './oids';
 import { slice as loginSlice } from './login';
 import { slice as cbomSlice } from './cbom';
+import { slice as vaultsSlice } from './vaults';
 
 export const reducers = combineReducers({
     [alertsSlice.name]: alertsSlice.reducer,
@@ -105,4 +106,5 @@ export const reducers = combineReducers({
     [oidsSlice.name]: oidsSlice.reducer,
     [loginSlice.name]: loginSlice.reducer,
     [cbomSlice.name]: cbomSlice.reducer,
+    [vaultsSlice.name]: vaultsSlice.reducer,
 });

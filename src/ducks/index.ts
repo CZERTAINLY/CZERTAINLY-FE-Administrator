@@ -53,6 +53,7 @@ import utilsCertificateRequestEpics from './utilsCertificateRequest-epics';
 import utilsOidEpics from './utilsOid-epics';
 import cbomEpics from './cbom-epics';
 import loginEpics from './login-epics';
+import vaultsEpics from './vaults-epics';
 
 export interface EpicDependencies {
     apiClients: ApiClients;
@@ -110,4 +111,5 @@ export const epics = combineEpics(
     ...oidsEpics,
     ...cbomEpics,
     ...loginEpics,
+    ...vaultsEpics,
 );

@@ -118,6 +118,8 @@ import { Resource } from 'types/openapi';
 import CustomOIDList from 'components/_pages/custom-oid/list';
 import CustomOIDDetail from 'components/_pages/custom-oid/detail';
 import Login from './_pages/login';
+import VaultsList from './_pages/vaults/list';
+import VaultDetail from './_pages/vaults/detail';
 
 import CbomsList from './_pages/cboms/list';
 import CbomDetail from 'components/_pages/cboms/detail';
@@ -244,6 +246,14 @@ export default function AppRouter() {
                         element={<Navigate to={`/${Resource.Entities.toLowerCase()}`} />}
                     />
                     <Route path={`/${Resource.Entities.toLowerCase()}/detail/:id`} element={<EntityDetail />} />
+
+                    <Route path={`/${Resource.Vaults.toLowerCase()}`} element={<VaultsList />} />
+                    <Route
+                        path={`/${Resource.Vaults.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.Vaults.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.Vaults.toLowerCase()}/detail/:id`} element={<VaultDetail />} />
+
 
                     <Route path={`/${Resource.Locations.toLowerCase()}`} element={<LocationsList />} />
                     <Route

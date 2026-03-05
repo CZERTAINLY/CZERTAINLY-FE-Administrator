@@ -12,6 +12,7 @@ export const enum EntityType {
     LOCATION,
     CERTIFICATE,
     KEY,
+    VAULT,
     DISCOVERY,
     NOTIFICATIONS,
     NOTIFICATION_PROFILES,

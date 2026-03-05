@@ -4,6 +4,7 @@ import {
     CallbackRequest,
     ConnectDto,
     ConnectorDto,
+    ConnectorInterfaceDto,
     ConnectorRequestDto as ConnectorRequestDtoOpenApi,
     ConnectorUpdateRequestDto as ConnectorUpdateRequestDtoOpenApi,
     ConnectRequestDto as ConnectRequestDtoOpenApi,
@@ -42,6 +43,7 @@ export type ConnectorResponseModel = Omit<ConnectorResponseDto, 'functionGroups 
     authAttributes?: Array<AttributeResponseModel>;
     customAttributes?: Array<AttributeResponseModel>;
     version?: ConnectorVersion;
+    interfaces?: Array<ConnectorInterfaceDto>;
 };
 
 export type HealthDto = HealthDtoOpenApi;
