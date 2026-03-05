@@ -37,7 +37,7 @@ function DonutChart({
     showValuesInLegend = false,
     interactiveLegend = true,
     chartSize = 'fixed',
-    showCenterLabel = true,
+    showCenterLabel = false,
     shrinkOnSmallScreen = true,
 }: Props) {
     const labels = useGetLabels(data);
@@ -212,8 +212,14 @@ function DonutChart({
                     )}
                 </div>
                 <SimpleBar forceVisible="y" style={{ height: '180px', width: '100%' }}>
-                    <div className="flex-1">
-                        <div className="space-y-1.5 h-full w-full overflow-y-auto">
+                    <div className={isFixedChartSize ? 'flex-1 flex justify-end' : 'flex-1'}>
+                        <div
+                            className={
+                                isFixedChartSize
+                                    ? 'space-y-1.5 h-full w-full max-w-[220px] overflow-y-auto'
+                                    : 'space-y-1.5 h-full w-full overflow-y-auto'
+                            }
+                        >
                             {chartLabels.map((label, index) => (
                                 <button
                                     type="button"
