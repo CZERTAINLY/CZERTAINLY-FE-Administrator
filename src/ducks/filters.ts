@@ -21,6 +21,7 @@ export const enum EntityType {
     CONDITIONS,
     ACTIONS,
     OID,
+    CONNECTOR,
 }
 
 export type Filter = {

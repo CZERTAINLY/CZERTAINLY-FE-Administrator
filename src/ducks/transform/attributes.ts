@@ -12,13 +12,22 @@ import {
     CustomAttributeModel,
 } from 'types/attributes';
 import { CallbackAttributeDto, CallbackAttributeModel, HealthDto, HealthModel } from 'types/connectors';
-import { AttributeMappingDto } from 'types/openapi';
+import { AttributeMappingDto, HealthInfo, HealthInfoComponent, HealthStatus, ResponseAttributeV2 } from 'types/openapi';
 
 export function transformAttributeResponseDtoToModel(attribute: AttributeResponseDto): AttributeResponseModel {
+    if ('content' in attribute) {
+        const attributeV2 = attribute as ResponseAttributeV2;
+
+        return {
+            ...attributeV2,
+            content: attributeV2.content ? JSON.parse(JSON.stringify(attributeV2.content)) : undefined,
+        };
+    }
+
     return {
         ...attribute,
-        content: attribute.content ? JSON.parse(JSON.stringify(attribute.content)) : undefined,
-    };
+        content: undefined,
+    } as AttributeResponseModel;
 }
 
 export function transformAttributeRequestModelToDto(attributeRequest: AttributeRequestModel): AttributeRequestDto {
@@ -79,6 +88,35 @@ export function transformHealthDtoToModel(health: HealthDto): HealthModel {
     return {
         status: health.status,
         description: health.description,
+        parts,
+    };
+}
+
+export function transformHealthInfoToModel(healthInfo: HealthInfo): HealthModel {
+    const parts: { [key: string]: HealthModel } | undefined = healthInfo.components ? {} : undefined;
+
+    if (parts && healthInfo.components) {
+        Object.entries(healthInfo.components).forEach(([key, component]) => {
+            const comp = component as HealthInfoComponent;
+            const details = comp.details || {};
+            const description =
+                typeof details.description === 'string'
+                    ? (details.description as string)
+                    : Object.entries(details)
+                          .map(([k, v]) => `${k}: ${String(v)}`)
+                          .join(', ');
+
+            parts[key] = {
+                status: comp.status ?? HealthStatus.Unknown,
+                description: description || undefined,
+                parts: undefined,
+            };
+        });
+    }
+
+    return {
+        status: healthInfo.status ?? HealthStatus.Unknown,
+        description: undefined,
         parts,
     };
 }

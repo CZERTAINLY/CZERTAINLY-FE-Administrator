@@ -1,4 +1,3 @@
-import AttributeDescriptorViewer from 'components/Attributes/AttributeDescriptorViewer';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 
@@ -14,20 +13,33 @@ import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 
-import Select from 'components/Select';
 import Badge from 'components/Badge';
 import { AttributeDescriptorModel } from 'types/attributes';
 import { FunctionGroupModel } from 'types/connectors';
 
-import { attributeFieldNameTransform } from 'utils/attributes/attributes';
 import { inventoryStatus } from 'utils/connector';
-import { ConnectorStatus, HealthStatus, PlatformEnum, Resource } from '../../../../types/openapi';
+import { ConnectorStatus, ConnectorVersion, HealthStatus, PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
+import FunctionGroupDetailsV1 from './FunctionGroupDetailsV1';
+import SupportedInterfacesV2 from './SupportedInterfacesV2';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
 import Breadcrumb from 'components/Breadcrumb';
 import Container from 'components/Container';
 import { CircleCheck, CircleAlert, CircleHelp } from 'lucide-react';
+
+function getHealthStatusIcon(status: string): { Icon: typeof CircleCheck; className: string } {
+    if (status === HealthStatus.Up) {
+        return { Icon: CircleCheck, className: 'text-[var(--status-success-color)]' };
+    }
+    if (status === HealthStatus.Down || status === HealthStatus.OutOfService) {
+        return { Icon: CircleAlert, className: 'text-[var(--status-danger-color)]' };
+    }
+    if (status === HealthStatus.Degraded) {
+        return { Icon: CircleAlert, className: 'text-[var(--status-warning-color)]' };
+    }
+    return { Icon: CircleHelp, className: 'text-[var(--status-light-gray-color)]' };
+}
 
 export default function ConnectorDetail() {
     const dispatch = useDispatch();
@@ -39,6 +51,7 @@ export default function ConnectorDetail() {
     const connector = useSelector(selectors.connector);
     const health = useSelector(selectors.connectorHealth);
     const attributes = useSelector(selectors.connectorAttributes);
+    const connectorInfoV2 = useSelector(selectors.connectorInfoV2);
 
     const isFetchingAllAttributes = useSelector(selectors.isFetchingAllAttributes);
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
@@ -47,7 +60,6 @@ export default function ConnectorDetail() {
     const isBulkReconnecting = useSelector(selectors.isBulkReconnecting);
     const isAuthorizing = useSelector(selectors.isAuthorizing);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
-    const functionGroupCodeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FunctionGroupCode));
     const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
 
     const [currentFunctionGroup, setFunctionGroup] = useState<FunctionGroupModel | undefined>();
@@ -81,7 +93,10 @@ export default function ConnectorDetail() {
         getFreshConnectorDetails();
         getFreshConnectorHealth();
         getFreshConnectorAttributesDesc();
-    }, [id, getFreshConnectorDetails, getFreshConnectorHealth, getFreshConnectorAttributesDesc]);
+        if (id) {
+            dispatch(actions.getConnectorInfoV2({ uuid: id }));
+        }
+    }, [id, getFreshConnectorDetails, getFreshConnectorHealth, getFreshConnectorAttributesDesc, dispatch]);
 
     useEffect(() => {
         if (!connector || connector.functionGroups.length === 0) {
@@ -220,12 +235,20 @@ export default function ConnectorDetail() {
                 columns: ['UUID', connector.uuid],
             },
             {
-                id: 'name',
-                columns: ['Name', connector.name],
-            },
-            {
                 id: 'url',
                 columns: ['URL', connector.url],
+            },
+            {
+                id: 'proxy',
+                columns: ['Proxy', 'coming soon'],
+            },
+            {
+                id: 'version',
+                columns: ['Version', connector.version],
+            },
+            {
+                id: 'authType',
+                columns: ['Auth Type', getEnumLabel(authTypeEnum, connector.authType)],
             },
             {
                 id: 'status',
@@ -236,56 +259,65 @@ export default function ConnectorDetail() {
                     </Badge>,
                 ],
             },
-            {
-                id: 'authType',
-                columns: ['Auth Type', getEnumLabel(authTypeEnum, connector.authType)],
-            },
         ];
     }, [connector, authTypeEnum]);
 
-    const functionalityHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'functionGroup',
-                content: 'Function Group',
-            },
-            {
-                id: 'kind',
-                content: 'Kind',
-            },
-        ],
-        [],
-    );
+    const connectorInfoData: TableDataRow[] = useMemo(() => {
+        if (!connector || connector.version !== ConnectorVersion.V2 || !connectorInfoV2) return [];
 
-    const functionalityData: TableDataRow[] = useMemo(
-        () =>
-            (connector?.functionGroups || []).map((functionGroup) => ({
-                id: functionGroup.name,
-                columns: [
-                    getEnumLabel(functionGroupCodeEnum, functionGroup.functionGroupCode ?? functionGroup.name),
-                    <>
-                        {functionGroup.kinds?.map((kind) => (
-                            <div key={kind}>
-                                <Badge color="secondary">{kind}</Badge>
-                            </div>
-                        ))}
-                    </>,
-                ],
-            })),
-        [connector, functionGroupCodeEnum],
-    );
+        const description = connectorInfoV2.description ?? '';
+        const metadata = connectorInfoV2.metadata as Record<string, unknown> | undefined;
+        const metadataString = metadata
+            ? Object.entries(metadata)
+                  .map(([key, value]) => `${key}:${String(value)}`)
+                  .join(' ')
+            : '';
+
+        const rows: TableDataRow[] = [
+            {
+                id: 'name',
+                columns: ['Name', connectorInfoV2.name],
+            },
+            {
+                id: 'id',
+                columns: ['ID', connectorInfoV2.id],
+            },
+            {
+                id: 'versionInfo',
+                columns: ['Version', connectorInfoV2.version ?? ''],
+            },
+        ];
+
+        if (description) {
+            rows.push({
+                id: 'description',
+                columns: ['Description', description],
+            });
+        }
+
+        if (metadataString) {
+            rows.push({
+                id: 'metadata',
+                columns: ['Metadata', metadataString],
+            });
+        }
+
+        return rows;
+    }, [connector, connectorInfoV2]);
 
     const renderStatusBadge = useCallback((status?: HealthStatus) => {
         if (!status) return <Badge color="transparent">Unknown</Badge>;
         switch (status) {
-            case HealthStatus.Ok:
+            case HealthStatus.Up:
                 return <Badge color="success">{status}</Badge>;
-            case HealthStatus.Nok:
+            case HealthStatus.Down:
+            case HealthStatus.OutOfService:
                 return <Badge color="danger">{status}</Badge>;
-            case HealthStatus.Unknown:
-                return <Badge color="transparent">{status}</Badge>;
-            default:
+            case HealthStatus.Degraded:
                 return <Badge color="warning">{status}</Badge>;
+            case HealthStatus.Unknown:
+            default:
+                return <Badge color="transparent">{status}</Badge>;
         }
     }, []);
 
@@ -335,56 +367,13 @@ export default function ConnectorDetail() {
         return data;
     }, [health, renderStatusBadge]);
 
+    const healthStatus = health?.status?.toUpperCase?.() ?? HealthStatus.Unknown;
+    const { Icon: HealthIcon, className: healthIconClassName } = getHealthStatusIcon(healthStatus);
     const healthButtonsNode = (
         <div>
-            {['up', 'ok', 'healthy'].includes(health ? health.status : 'unknown') ? (
-                <CircleCheck size={24} strokeWidth={3} className="text-[var(--status-success-color)]" />
-            ) : ['down', 'failed', 'notOk', 'nok', 'nOk'].includes(health ? health.status : 'unknown') ? (
-                <CircleAlert size={24} strokeWidth={3} className="text-[var(--status-danger-color)]" />
-            ) : (
-                <CircleHelp size={24} strokeWidth={3} className="text-[var(--status-light-gray-color)]" />
-            )}
+            <HealthIcon size={24} strokeWidth={3} className={healthIconClassName} />
         </div>
     );
-
-    const endPointsHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'name',
-                sortable: true,
-                sort: 'asc',
-                content: 'Name',
-            },
-            {
-                id: 'context',
-                sortable: true,
-                content: 'Context',
-            },
-            {
-                id: 'method',
-                sortable: true,
-                content: 'Method',
-            },
-        ],
-        [],
-    );
-
-    const endPointsData: TableDataRow[] = useMemo(
-        () =>
-            (currentFunctionGroup?.endPoints || []).map((endPoint) => ({
-                id: endPoint.name,
-                columns: [endPoint.name, endPoint.context, endPoint.method],
-            })),
-        [currentFunctionGroup],
-    );
-
-    const functionGroupSelectData =
-        connector?.functionGroups?.map((group) => ({
-            label: attributeFieldNameTransform[group?.name || ''] || group?.name,
-            value: group.functionGroupCode,
-        })) || [];
-
-    const functionGroupKinds = currentFunctionGroup?.kinds?.map((kind) => ({ label: kind, value: kind })) || [];
 
     return (
         <div>
@@ -394,23 +383,36 @@ export default function ConnectorDetail() {
                     { label: connector?.name || 'Connector Details', href: '' },
                 ]}
             />
-            <Container className="md:grid grid-cols-2">
-                <Widget
-                    title="Connector Details"
-                    busy={isFetchingDetail || isBulkReconnecting || isReconnecting || isAuthorizing}
-                    widgetButtons={widgetButtons}
-                    titleSize="large"
-                    refreshAction={getFreshConnectorDetails}
-                    widgetLockName={LockWidgetNameEnum.ConnectorDetails}
-                    lockSize="large"
-                >
-                    <CustomTable headers={attributesHeaders} data={attributesData} />
-                </Widget>
-                <Container>
-                    <Widget title="Connector Functionality" busy={isFetchingDetail || isReconnecting} titleSize="large">
-                        <CustomTable headers={functionalityHeaders} data={functionalityData} />
+
+            <div className="space-y-4">
+                <Container className="grid xl:grid-cols-2 items-start">
+                    <Widget
+                        title="Connector Details"
+                        busy={isFetchingDetail || isBulkReconnecting || isReconnecting || isAuthorizing}
+                        widgetButtons={widgetButtons}
+                        titleSize="large"
+                        refreshAction={getFreshConnectorDetails}
+                        widgetLockName={LockWidgetNameEnum.ConnectorDetails}
+                        lockSize="large"
+                    >
+                        <CustomTable headers={attributesHeaders} data={attributesData} />
                     </Widget>
 
+                    {connector && (
+                        <CustomAttributeWidget
+                            resource={Resource.Connectors}
+                            resourceUuid={connector.uuid}
+                            attributes={connector.customAttributes}
+                        />
+                    )}
+                </Container>
+
+                <Container className={connector?.version === ConnectorVersion.V2 ? 'grid gap-6 xl:grid-cols-2' : 'grid gap-6'}>
+                    {connector?.version === ConnectorVersion.V2 && connectorInfoData.length > 0 && (
+                        <Widget title="Connector Info" busy={isFetchingDetail} titleSize="large">
+                            <CustomTable headers={attributesHeaders} data={connectorInfoData} />
+                        </Widget>
+                    )}
                     <Widget
                         title="Connector Health"
                         busy={isFetchingHealth}
@@ -421,48 +423,26 @@ export default function ConnectorDetail() {
                         <CustomTable headers={healthHeaders} data={healthData} />
                     </Widget>
                 </Container>
-            </Container>
 
-            <Container marginTop>
-                {connector && (
-                    <CustomAttributeWidget
-                        resource={Resource.Connectors}
-                        resourceUuid={connector.uuid}
-                        attributes={connector.customAttributes}
+                {connector?.version === ConnectorVersion.V1 && (
+                    <FunctionGroupDetailsV1
+                        functionGroups={connector.functionGroups}
+                        currentFunctionGroup={currentFunctionGroup}
+                        currentFunctionGroupKind={currentFunctionGroupKind}
+                        currentFunctionGroupKindAttributes={currentFunctionGroupKindAttributes}
+                        isFetchingDetail={isFetchingDetail}
+                        isReconnecting={isReconnecting}
+                        isFetchingAllAttributes={isFetchingAllAttributes}
+                        onFunctionGroupChange={onFunctionGroupChange}
+                        onFunctionGroupKindChange={onFunctionGroupKindChange}
+                        getFreshConnectorAttributesDesc={getFreshConnectorAttributesDesc}
                     />
                 )}
 
-                <Widget title="Function Group Details" busy={isFetchingDetail || isReconnecting} titleSize="large">
-                    <Select
-                        id="functionGroup"
-                        options={functionGroupSelectData}
-                        value={currentFunctionGroup?.functionGroupCode || ''}
-                        onChange={(value) => onFunctionGroupChange((value as string) || '')}
-                    />
-                    <Container marginTop>
-                        <Widget title="Endpoints" titleSize="large">
-                            <CustomTable headers={endPointsHeaders} data={endPointsData} />
-                        </Widget>
-                        <Widget
-                            title="Attributes"
-                            busy={isFetchingAllAttributes}
-                            titleSize="large"
-                            refreshAction={getFreshConnectorAttributesDesc}
-                            widgetLockName={LockWidgetNameEnum.ConnectorAttributes}
-                            lockSize="large"
-                        >
-                            <Select
-                                id="functionGroupKind"
-                                options={functionGroupKinds}
-                                value={currentFunctionGroupKind || ''}
-                                placeholder={currentFunctionGroup?.kinds[0]}
-                                onChange={(value) => onFunctionGroupKindChange((value as string) || '')}
-                            />
-                            <AttributeDescriptorViewer attributeDescriptors={currentFunctionGroupKindAttributes || []} />
-                        </Widget>
-                    </Container>
-                </Widget>
-            </Container>
+                {connector?.version === ConnectorVersion.V2 && (
+                    <SupportedInterfacesV2 interfaces={(connector as any)?.interfaces} isBusy={isFetchingDetail || isReconnecting} />
+                )}
+            </div>
 
             <Dialog
                 isOpen={confirmDelete}

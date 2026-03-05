@@ -15,6 +15,7 @@ import {
 } from 'types/connectors';
 import { ConnectorStatus, FunctionGroupCode } from 'types/openapi';
 import { createFeatureSelector } from 'utils/ducks';
+import { SearchRequestModel } from 'types/certificate';
 
 export type State = {
     checkedRows: string[];
@@ -23,6 +24,8 @@ export type State = {
     connectorHealth?: HealthModel;
     connectorAttributes?: AttributeDescriptorCollectionModel;
     connectorConnectionDetails?: FunctionGroupModel[];
+    connectInfo?: any[];
+    connectorInfoV2?: any;
     connectors: ConnectorResponseModel[];
 
     callbackData: { [key: string]: any };
@@ -48,10 +51,26 @@ export type State = {
     isRunningCallback: { [key: string]: boolean };
 };
 
+function removeConnectorsByUuids(state: State, uuids: string[]) {
+    uuids.forEach((uuid) => {
+        const index = state.connectors.findIndex((connector) => connector.uuid === uuid);
+        if (index >= 0) state.connectors.splice(index, 1);
+    });
+    if (state.connector && uuids.includes(state.connector.uuid)) {
+        state.connector = undefined;
+        state.connectorHealth = undefined;
+        state.connectorAttributes = undefined;
+        state.connectorConnectionDetails = undefined;
+        state.connectInfo = undefined;
+    }
+}
+
 export const initialState: State = {
     checkedRows: [],
 
     connectors: [],
+
+    connectInfo: undefined,
 
     callbackData: {},
 
@@ -101,13 +120,14 @@ export const slice = createSlice({
 
         clearConnectionDetails: (state, action: PayloadAction<void>) => {
             state.connectorConnectionDetails = undefined;
+            state.connectInfo = undefined;
         },
 
         clearCallbackData: (state, action: PayloadAction<void>) => {
             state.callbackData = {};
         },
 
-        listConnectors: (state, action: PayloadAction<{ functionGroup?: FunctionGroupCode }>) => {
+        listConnectors: (state, action: PayloadAction<SearchRequestModel | undefined>) => {
             state.checkedRows = [];
             state.connectors = [];
             state.isFetchingList = true;
@@ -144,6 +164,8 @@ export const slice = createSlice({
             state.connectorAttributes = undefined;
             state.connectorHealth = undefined;
             state.connectorConnectionDetails = undefined;
+            state.connectInfo = undefined;
+            state.connectorInfoV2 = undefined;
             state.isFetchingDetail = true;
         },
 
@@ -165,6 +187,16 @@ export const slice = createSlice({
             state.isFetchingDetail = false;
         },
 
+        getConnectorInfoV2: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.connectorInfoV2 = undefined;
+        },
+
+        getConnectorInfoV2Success: (state, action: PayloadAction<{ info: any }>) => {
+            state.connectorInfoV2 = action.payload.info;
+        },
+
+        getConnectorInfoV2Failure: (state, action: PayloadAction<void>) => {},
+
         getConnectorAttributesDescriptors: (
             state,
             action: PayloadAction<{ uuid: string; functionGroup: FunctionGroupCode; kind: string }>,
@@ -185,9 +217,11 @@ export const slice = createSlice({
             action: PayloadAction<{ functionGroup: string; kind: string; attributes: AttributeDescriptorModel[] }>,
         ) => {
             state.isFetchingAllAttributes = false;
-            state.connectorAttributes = state.connectorAttributes || {};
-            state.connectorAttributes[action.payload.functionGroup] = state.connectorAttributes[action.payload.functionGroup] || {};
-            state.connectorAttributes[action.payload.functionGroup][action.payload.kind] = action.payload.attributes;
+            const connectorAttributes = (state.connectorAttributes || {}) as any;
+            const group = connectorAttributes[action.payload.functionGroup] || {};
+            group[action.payload.kind] = action.payload.attributes;
+            connectorAttributes[action.payload.functionGroup] = group;
+            state.connectorAttributes = connectorAttributes;
         },
 
         getConnectorAttributesDescriptorsFailure: (state, action: PayloadAction<void>) => {
@@ -244,6 +278,7 @@ export const slice = createSlice({
             state.connectorHealth = undefined;
             state.connectorAttributes = undefined;
             state.connectorConnectionDetails = undefined;
+            state.connectInfo = undefined;
         },
 
         createConnectorFailure: (state, action: PayloadAction<void>) => {
@@ -295,6 +330,7 @@ export const slice = createSlice({
                 state.connectorHealth = undefined;
                 state.connectorAttributes = undefined;
                 state.connectorConnectionDetails = undefined;
+                state.connectInfo = undefined;
             }
         },
 
@@ -316,17 +352,7 @@ export const slice = createSlice({
                 return;
             }
 
-            action.payload.uuids.forEach((uuid) => {
-                const index = state.connectors.findIndex((connector) => connector.uuid === uuid);
-                if (index >= 0) state.connectors.splice(index, 1);
-            });
-
-            if (state.connector && action.payload.uuids.includes(state.connector.uuid)) {
-                state.connector = undefined;
-                state.connectorHealth = undefined;
-                state.connectorAttributes = undefined;
-                state.connectorConnectionDetails = undefined;
-            }
+            removeConnectorsByUuids(state, action.payload.uuids);
         },
 
         bulkDeleteConnectorsFailure: (state, action: PayloadAction<void>) => {
@@ -339,18 +365,7 @@ export const slice = createSlice({
 
         bulkForceDeleteConnectorsSuccess: (state, action: PayloadAction<{ uuids: string[]; successRedirect?: string }>) => {
             state.isBulkForceDeleting = false;
-
-            action.payload.uuids.forEach((uuid) => {
-                const index = state.connectors.findIndex((connector) => connector.uuid === uuid);
-                if (index >= 0) state.connectors.splice(index, 1);
-            });
-
-            if (state.connector && action.payload.uuids.includes(state.connector.uuid)) {
-                state.connector = undefined;
-                state.connectorHealth = undefined;
-                state.connectorAttributes = undefined;
-                state.connectorConnectionDetails = undefined;
-            }
+            removeConnectorsByUuids(state, action.payload.uuids);
         },
 
         bulkForceDeleteConnectorsFailure: (state, action: PayloadAction<void>) => {
@@ -359,12 +374,14 @@ export const slice = createSlice({
 
         connectConnector: (state, action: PayloadAction<ConnectRequestModel>) => {
             state.connectorConnectionDetails = [];
+            state.connectInfo = undefined;
             state.isConnecting = true;
         },
 
-        connectConnectorSuccess: (state, action: PayloadAction<{ connectionDetails: FunctionGroupModel[] }>) => {
+        connectConnectorSuccess: (state, action: PayloadAction<{ connectionDetails: FunctionGroupModel[]; connectInfo: any[] }>) => {
             state.isConnecting = false;
             state.connectorConnectionDetails = action.payload.connectionDetails;
+            state.connectInfo = action.payload.connectInfo;
         },
 
         connectConnectorFailure: (state, action: PayloadAction<void>) => {
@@ -373,11 +390,16 @@ export const slice = createSlice({
 
         reconnectConnector: (state, action: PayloadAction<{ uuid: string }>) => {
             state.connectorConnectionDetails = undefined;
+            state.connectInfo = undefined;
             state.isReconnecting = true;
         },
 
-        reconnectConnectorSuccess: (state, action: PayloadAction<{ uuid: string; functionGroups: FunctionGroupModel[] }>) => {
+        reconnectConnectorSuccess: (
+            state,
+            action: PayloadAction<{ uuid: string; functionGroups: FunctionGroupModel[]; connectInfo?: any[] }>,
+        ) => {
             state.connectorConnectionDetails = action.payload.functionGroups;
+            state.connectInfo = action.payload.connectInfo ?? state.connectInfo;
             state.isReconnecting = false;
             if (state.connector) {
                 state.connector.functionGroups = action.payload.functionGroups;
@@ -471,6 +493,8 @@ const connector = createSelector(state, (state) => state.connector);
 const connectorHealth = createSelector(state, (state) => state.connectorHealth);
 const connectorAttributes = createSelector(state, (state) => state.connectorAttributes);
 const connectorConnectionDetails = createSelector(state, (state) => state.connectorConnectionDetails);
+const connectorConnectInfo = createSelector(state, (state) => state.connectInfo);
+const connectorInfoV2 = createSelector(state, (state) => state.connectorInfoV2);
 const callbackData = createSelector(state, (state) => state.callbackData);
 
 const connectors = createSelector(state, (state) => state.connectors);
@@ -505,6 +529,8 @@ export const selectors = {
     connectorHealth,
     connectorAttributes,
     connectorConnectionDetails,
+    connectorConnectInfo,
+    connectorInfoV2,
     connectors,
     callbackData,
 
