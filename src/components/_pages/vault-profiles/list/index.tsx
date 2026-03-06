@@ -36,13 +36,14 @@ export default function VaultProfilesList() {
             {
                 id: 'name',
                 content: 'Name',
-                width: '25%',
+                width: '30%',
                 sortable: true,
             },
             {
                 id: 'description',
                 content: 'Description',
-                width: '35%',
+                width: '30%',
+                maxWidth: 600,
             },
             {
                 id: 'vaultInstance',
