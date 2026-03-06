@@ -124,7 +124,7 @@ export default function SecretsList() {
                     ) : (
                         ''
                     ),
-                    secret.version?.toString() ?? '',
+                    secret.version ? `v${secret.version}` : '',
                     secret.owner ? <Link to={`../users/detail/${secret.owner.uuid}`}>{secret.owner.name}</Link> : 'Unassigned',
                     secret.groups && secret.groups.length > 0
                         ? secret.groups.map((group, i) => (

@@ -169,9 +169,6 @@ function SecretDetail() {
     const detailData: TableDataRow[] = useMemo(() => {
         if (!secret) return [];
 
-        const sourceVaultProfileVaultUuid =
-            vaultProfiles.find((p) => p.uuid === secret.sourceVaultProfile?.uuid)?.vaultInstance?.uuid ?? undefined;
-
         const rows: TableDataRow[] = [
             {
                 id: 'type',
@@ -184,25 +181,6 @@ function SecretDetail() {
                     <Badge key="state" color={secret.state === SecretState.Active ? 'success' : 'secondary'}>
                         {getEnumLabel(secretStateEnum, secret.state)}
                     </Badge>,
-                ],
-            },
-            {
-                id: 'vaultProfile',
-                columns: [
-                    'Vault Profile',
-                    secret.sourceVaultProfile ? (
-                        sourceVaultProfileVaultUuid ? (
-                            <Link
-                                to={`/${Resource.VaultProfiles.toLowerCase()}/detail/${sourceVaultProfileVaultUuid}/${secret.sourceVaultProfile.uuid}`}
-                            >
-                                {secret.sourceVaultProfile.name}
-                            </Link>
-                        ) : (
-                            secret.sourceVaultProfile.name
-                        )
-                    ) : (
-                        'Unassigned'
-                    ),
                 ],
             },
             {
@@ -225,7 +203,7 @@ function SecretDetail() {
         ];
 
         return rows;
-    }, [secret, vaultProfiles, secretTypeEnum, secretStateEnum]);
+    }, [secret, secretTypeEnum, secretStateEnum]);
 
     const syncVaultProfilesHeaders: TableHeader[] = useMemo(
         () => [

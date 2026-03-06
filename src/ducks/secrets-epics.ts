@@ -96,6 +96,7 @@ const deleteSecret: AppEpic = (action$, state$, deps) => {
                 mergeMap(() =>
                     of(
                         slice.actions.deleteSecretSuccess({ uuid: action.payload.uuid }),
+                        appRedirectActions.redirect({ url: '/secrets' }),
                         appRedirectActions.fetchError({ error: undefined as any, message: 'Secret deleted successfully' }),
                     ),
                 ),

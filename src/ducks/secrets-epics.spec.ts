@@ -121,10 +121,11 @@ describe('secrets epics', () => {
     });
 
     test('deleteSecret success emits deleteSecretSuccess and info fetchError', async () => {
-        const emitted = await runEpic(SecretsEpicIndex.Delete, secretsActions.deleteSecret({ uuid: 's-1' }), {}, 2);
+        const emitted = await runEpic(SecretsEpicIndex.Delete, secretsActions.deleteSecret({ uuid: 's-1' }), {}, 3);
 
         expect(emitted[0]).toEqual(secretsActions.deleteSecretSuccess({ uuid: 's-1' }));
-        expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: undefined as any, message: 'Secret deleted successfully' }));
+        expect(emitted[1]).toEqual(appRedirectActions.redirect({ url: '/secrets' }));
+        expect(emitted[2]).toEqual(appRedirectActions.fetchError({ error: undefined as any, message: 'Secret deleted successfully' }));
     });
 
     test('deleteSecret failure emits deleteSecretFailure and fetchError', async () => {

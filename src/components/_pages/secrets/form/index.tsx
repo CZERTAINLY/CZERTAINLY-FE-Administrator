@@ -396,6 +396,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                         label="Content inputs"
                                         value={getEnumLabel(secretTypeEnum, initialSecret.type)}
                                         disabled
+                                        onChange={() => {}}
                                     />
                                 ) : (
                                     <Controller
@@ -604,7 +605,18 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                     <Controller
                                         name="keyValueContent"
                                         control={control}
-                                        rules={buildValidationRules([validateRequired()])}
+                                        rules={buildValidationRules([
+                                            validateRequired(),
+                                            (value) => {
+                                                if (!value) return undefined;
+                                                try {
+                                                    JSON.parse(value as string);
+                                                    return undefined;
+                                                } catch {
+                                                    return 'Invalid JSON';
+                                                }
+                                            },
+                                        ])}
                                         render={({ field, fieldState }) => (
                                             <TextArea
                                                 id="secret-keyvalue-content"
@@ -612,7 +624,18 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                                 placeholder='{"key": "value"}'
                                                 value={field.value ?? ''}
                                                 onChange={field.onChange}
-                                                onBlur={field.onBlur}
+                                                onBlur={() => {
+                                                    field.onBlur();
+                                                    const raw = field.value as string | undefined;
+                                                    if (!raw) return;
+                                                    try {
+                                                        const parsed = JSON.parse(raw);
+                                                        const pretty = JSON.stringify(parsed, null, 2);
+                                                        if (pretty !== raw) {
+                                                            setValue('keyValueContent', pretty, { shouldDirty: true });
+                                                        }
+                                                    } catch {}
+                                                }}
                                                 error={getFieldErrorMessage(fieldState)}
                                                 className="font-mono text-sm"
                                             />
