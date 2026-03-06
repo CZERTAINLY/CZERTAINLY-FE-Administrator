@@ -1,12 +1,24 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createFeatureSelector } from 'utils/ducks';
 import { SearchRequestModel } from 'types/certificate';
-import { SecretDetailDto, SecretDto, SecretUpdateObjectsDto, SecretVersionDto } from 'types/openapi';
+import { AttributeDescriptorModel } from 'types/attributes';
+import {
+    SecretDetailDto,
+    SecretDto,
+    SecretRequestDto,
+    SecretType,
+    SecretUpdateObjectsDto,
+    SecretUpdateRequestDto,
+    SecretVersionDto,
+} from 'types/openapi';
 
 export type State = {
     secrets: SecretDto[];
     secret?: SecretDetailDto;
     versions: SecretVersionDto[];
+
+    secretCreationAttributeDescriptors: AttributeDescriptorModel[];
+    isFetchingSecretCreationAttributes: boolean;
 
     isFetchingList: boolean;
     isFetchingDetail: boolean;
@@ -22,6 +34,9 @@ export type State = {
 export const initialState: State = {
     secrets: [],
     versions: [],
+
+    secretCreationAttributeDescriptors: [],
+    isFetchingSecretCreationAttributes: false,
 
     isFetchingList: false,
     isFetchingDetail: false,
@@ -95,7 +110,24 @@ export const slice = createSlice({
             state.isFetchingVersions = false;
         },
 
-        createSecret: (state, action: PayloadAction<void>) => {
+        getSecretCreationAttributes: (
+            state,
+            _action: PayloadAction<{ vaultUuid: string; vaultProfileUuid: string; secretType: SecretType }>,
+        ) => {
+            state.secretCreationAttributeDescriptors = [];
+            state.isFetchingSecretCreationAttributes = true;
+        },
+
+        getSecretCreationAttributesSuccess: (state, action: PayloadAction<{ descriptors: AttributeDescriptorModel[] }>) => {
+            state.secretCreationAttributeDescriptors = action.payload.descriptors as typeof state.secretCreationAttributeDescriptors;
+            state.isFetchingSecretCreationAttributes = false;
+        },
+
+        getSecretCreationAttributesFailure: (state) => {
+            state.isFetchingSecretCreationAttributes = false;
+        },
+
+        createSecret: (state, action: PayloadAction<{ vaultUuid: string; vaultProfileUuid: string; request: SecretRequestDto }>) => {
             state.isCreating = true;
         },
 
@@ -108,7 +140,7 @@ export const slice = createSlice({
             state.isCreating = false;
         },
 
-        updateSecret: (state, action: PayloadAction<{ uuid: string }>) => {
+        updateSecret: (state, action: PayloadAction<{ uuid: string; update: SecretUpdateRequestDto }>) => {
             state.isUpdating = true;
         },
 
@@ -200,6 +232,9 @@ const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isEnabling = createSelector(state, (state) => state.isEnabling);
 const isDisabling = createSelector(state, (state) => state.isDisabling);
 
+const secretCreationAttributeDescriptors = createSelector(state, (state) => state.secretCreationAttributeDescriptors);
+const isFetchingSecretCreationAttributes = createSelector(state, (state) => state.isFetchingSecretCreationAttributes);
+
 export const selectors = {
     state,
 
@@ -216,6 +251,9 @@ export const selectors = {
     isDeleting,
     isEnabling,
     isDisabling,
+
+    secretCreationAttributeDescriptors,
+    isFetchingSecretCreationAttributes,
 };
 
 export const actions = slice.actions;

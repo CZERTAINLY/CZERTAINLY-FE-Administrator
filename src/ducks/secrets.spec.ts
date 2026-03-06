@@ -75,7 +75,18 @@ describe('secrets slice', () => {
     });
 
     test('createSecret / success / failure update flags and detail', () => {
-        let next = reducer(initialState, actions.createSecret());
+        const payload = {
+            vaultUuid: 'v-1',
+            vaultProfileUuid: 'vp-1',
+            request: {
+                name: 's1',
+                description: '',
+                sourceVaultProfileUuid: 'vp-1',
+                secret: { type: 'Generic', content: '' },
+                attributes: [],
+            } as any,
+        };
+        let next = reducer(initialState, actions.createSecret(payload));
         expect(next.isCreating).toBe(true);
 
         const detail = { uuid: 's-1', name: 'Secret' } as any;
@@ -88,7 +99,7 @@ describe('secrets slice', () => {
     });
 
     test('updateSecret / success / failure update flags and detail', () => {
-        let next = reducer(initialState, actions.updateSecret({ uuid: 's-1' }));
+        let next = reducer(initialState, actions.updateSecret({ uuid: 's-1', update: { description: '', attributes: [] } as any }));
         expect(next.isUpdating).toBe(true);
 
         const detail = { uuid: 's-1', name: 'Updated' } as any;

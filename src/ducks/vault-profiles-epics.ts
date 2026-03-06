@@ -104,6 +104,115 @@ const getVaultProfileDetail: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const enableVaultProfile: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.enableVaultProfile.match),
+        switchMap((action: ReturnType<typeof slice.actions.enableVaultProfile>) =>
+            deps.apiClients.vaultProfiles
+                .enableVaultProfile({
+                    vaultUuid: action.payload.vaultUuid,
+                    vaultProfileUuid: action.payload.vaultProfileUuid,
+                })
+                .pipe(
+                    switchMap(() =>
+                        deps.apiClients.vaultProfiles.getVaultProfileDetails({
+                            vaultUuid: action.payload.vaultUuid,
+                            vaultProfileUuid: action.payload.vaultProfileUuid,
+                        }),
+                    ),
+                    mergeMap((profile: import('types/openapi').VaultProfileDetailDto) =>
+                        of(
+                            slice.actions.enableVaultProfileSuccess({ profile }),
+                            alertActions.success('Vault Profile approved successfully.'),
+                        ),
+                    ),
+                    catchError((err) =>
+                        of(
+                            slice.actions.enableVaultProfileFailure({
+                                error: extractError(err, 'Failed to approve Vault Profile'),
+                            }),
+                            appRedirectActions.fetchError({
+                                error: err,
+                                message: 'Failed to approve Vault Profile',
+                            }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const disableVaultProfile: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.disableVaultProfile.match),
+        switchMap((action: ReturnType<typeof slice.actions.disableVaultProfile>) =>
+            deps.apiClients.vaultProfiles
+                .disableVaultProfile({
+                    vaultUuid: action.payload.vaultUuid,
+                    vaultProfileUuid: action.payload.vaultProfileUuid,
+                })
+                .pipe(
+                    switchMap(() =>
+                        deps.apiClients.vaultProfiles.getVaultProfileDetails({
+                            vaultUuid: action.payload.vaultUuid,
+                            vaultProfileUuid: action.payload.vaultProfileUuid,
+                        }),
+                    ),
+                    mergeMap((profile: import('types/openapi').VaultProfileDetailDto) =>
+                        of(
+                            slice.actions.disableVaultProfileSuccess({ profile }),
+                            alertActions.success('Vault Profile disapproved successfully.'),
+                        ),
+                    ),
+                    catchError((err) =>
+                        of(
+                            slice.actions.disableVaultProfileFailure({
+                                error: extractError(err, 'Failed to disapprove Vault Profile'),
+                            }),
+                            appRedirectActions.fetchError({
+                                error: err,
+                                message: 'Failed to disapprove Vault Profile',
+                            }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const updateVaultProfile: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.updateVaultProfile.match),
+        switchMap((action: ReturnType<typeof slice.actions.updateVaultProfile>) =>
+            deps.apiClients.vaultProfiles
+                .updateVaultProfile({
+                    vaultUuid: action.payload.vaultUuid,
+                    vaultProfileUuid: action.payload.vaultProfileUuid,
+                    vaultProfileUpdateRequestDto: action.payload.request,
+                })
+                .pipe(
+                    mergeMap((profile: import('types/openapi').VaultProfileDetailDto) =>
+                        of(
+                            slice.actions.updateVaultProfileSuccess({ profile }),
+                            alertActions.success('Vault Profile updated successfully.'),
+                        ),
+                    ),
+                    catchError((err) =>
+                        of(
+                            slice.actions.updateVaultProfileFailure({
+                                error: extractError(err, 'Failed to update Vault Profile'),
+                            }),
+                            appRedirectActions.fetchError({
+                                error: err,
+                                message: 'Failed to update Vault Profile',
+                            }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
 const deleteVaultProfile: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.deleteVaultProfile.match),
@@ -134,6 +243,14 @@ const deleteVaultProfile: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const epics = [listVaultProfiles, getVaultProfileDetail, createVaultProfile, deleteVaultProfile];
+const epics = [
+    listVaultProfiles,
+    getVaultProfileDetail,
+    createVaultProfile,
+    enableVaultProfile,
+    disableVaultProfile,
+    updateVaultProfile,
+    deleteVaultProfile,
+];
 
 export default epics;

@@ -1,5 +1,5 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { VaultProfileDetailDto, VaultProfileDto, VaultProfileRequestDto } from 'types/openapi';
+import { VaultProfileDetailDto, VaultProfileDto, VaultProfileRequestDto, VaultProfileUpdateRequestDto } from 'types/openapi';
 import { SearchRequestModel } from 'types/certificate';
 import { createFeatureSelector } from 'utils/ducks';
 
@@ -10,6 +10,9 @@ export type State = {
     isFetchingDetail: boolean;
     isCreating: boolean;
     isDeleting: boolean;
+    isEnabling: boolean;
+    isDisabling: boolean;
+    isUpdating: boolean;
 };
 
 export const initialState: State = {
@@ -19,6 +22,9 @@ export const initialState: State = {
     isFetchingDetail: false,
     isCreating: false,
     isDeleting: false,
+    isEnabling: false,
+    isDisabling: false,
+    isUpdating: false,
 };
 
 export const slice = createSlice({
@@ -100,6 +106,58 @@ export const slice = createSlice({
         getVaultProfileDetailFailure: (state, _action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingDetail = false;
         },
+
+        enableVaultProfile: (state, _action: PayloadAction<{ vaultUuid: string; vaultProfileUuid: string }>) => {
+            state.isEnabling = true;
+        },
+
+        enableVaultProfileSuccess: (state, action: PayloadAction<{ profile: VaultProfileDetailDto }>) => {
+            state.isEnabling = false;
+            if (state.vaultProfile?.uuid === action.payload.profile.uuid) {
+                state.vaultProfile = action.payload.profile;
+            }
+        },
+
+        enableVaultProfileFailure: (state, _action: PayloadAction<{ error: string | undefined }>) => {
+            state.isEnabling = false;
+        },
+
+        disableVaultProfile: (state, _action: PayloadAction<{ vaultUuid: string; vaultProfileUuid: string }>) => {
+            state.isDisabling = true;
+        },
+
+        disableVaultProfileSuccess: (state, action: PayloadAction<{ profile: VaultProfileDetailDto }>) => {
+            state.isDisabling = false;
+            if (state.vaultProfile?.uuid === action.payload.profile.uuid) {
+                state.vaultProfile = action.payload.profile;
+            }
+        },
+
+        disableVaultProfileFailure: (state, _action: PayloadAction<{ error: string | undefined }>) => {
+            state.isDisabling = false;
+        },
+
+        updateVaultProfile: (
+            state,
+            _action: PayloadAction<{
+                vaultUuid: string;
+                vaultProfileUuid: string;
+                request: VaultProfileUpdateRequestDto;
+            }>,
+        ) => {
+            state.isUpdating = true;
+        },
+
+        updateVaultProfileSuccess: (state, action: PayloadAction<{ profile: VaultProfileDetailDto }>) => {
+            state.isUpdating = false;
+            if (state.vaultProfile?.uuid === action.payload.profile.uuid) {
+                state.vaultProfile = action.payload.profile;
+            }
+        },
+
+        updateVaultProfileFailure: (state, _action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdating = false;
+        },
     },
 });
 
@@ -111,6 +169,9 @@ const isFetchingList = createSelector(state, (state: State) => state.isFetchingL
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
 const isCreating = createSelector(state, (state: State) => state.isCreating);
 const isDeleting = createSelector(state, (state: State) => state.isDeleting);
+const isEnabling = createSelector(state, (state: State) => state.isEnabling);
+const isDisabling = createSelector(state, (state: State) => state.isDisabling);
+const isUpdating = createSelector(state, (state: State) => state.isUpdating);
 
 export const selectors = {
     state,
@@ -120,6 +181,9 @@ export const selectors = {
     isFetchingDetail,
     isCreating,
     isDeleting,
+    isEnabling,
+    isDisabling,
+    isUpdating,
 };
 
 export const actions = slice.actions;

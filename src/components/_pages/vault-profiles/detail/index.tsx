@@ -17,6 +17,7 @@ import { PlatformEnum, Resource } from 'types/openapi';
 import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import Badge from 'components/Badge';
+import VaultProfileEditForm from '../edit-form';
 
 function VaultProfileDetail() {
     const dispatch = useDispatch();
@@ -25,11 +26,14 @@ function VaultProfileDetail() {
 
     const profile = useSelector(vaultProfileSelectors.vaultProfile);
     const isFetchingDetail = useSelector(vaultProfileSelectors.isFetchingDetail);
+    const isEnabling = useSelector(vaultProfileSelectors.isEnabling);
+    const isDisabling = useSelector(vaultProfileSelectors.isDisabling);
     const isDeleting = useSelector(vaultProfileSelectors.isDeleting);
 
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
 
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const [isEditOpen, setIsEditOpen] = useState(false);
 
     const getFreshDetails = useCallback(() => {
         if (!vaultUuid || !vaultProfileUuid) return;
@@ -46,6 +50,26 @@ function VaultProfileDetail() {
         getFreshDetails();
     }, [getFreshDetails]);
 
+    const onApprove = useCallback(() => {
+        if (!vaultUuid || !vaultProfileUuid) return;
+        dispatch(
+            vaultProfileActions.enableVaultProfile({
+                vaultUuid,
+                vaultProfileUuid,
+            }),
+        );
+    }, [dispatch, vaultUuid, vaultProfileUuid]);
+
+    const onDisapprove = useCallback(() => {
+        if (!vaultUuid || !vaultProfileUuid) return;
+        dispatch(
+            vaultProfileActions.disableVaultProfile({
+                vaultUuid,
+                vaultProfileUuid,
+            }),
+        );
+    }, [dispatch, vaultUuid, vaultProfileUuid]);
+
     const onDeleteConfirmed = useCallback(() => {
         if (!vaultUuid || !vaultProfileUuid) return;
         dispatch(
@@ -57,8 +81,28 @@ function VaultProfileDetail() {
         setConfirmDelete(false);
     }, [dispatch, vaultUuid, vaultProfileUuid]);
 
+    const handleCloseEdit = useCallback(() => setIsEditOpen(false), []);
+
     const widgetButtons: WidgetButtonProps[] = useMemo(
         () => [
+            {
+                icon: 'check',
+                disabled: !profile || profile.enabled,
+                tooltip: 'Approve',
+                onClick: onApprove,
+            },
+            {
+                icon: 'times',
+                disabled: !profile || !profile.enabled,
+                tooltip: 'Disapprove',
+                onClick: onDisapprove,
+            },
+            {
+                icon: 'pencil',
+                disabled: !profile,
+                tooltip: 'Edit',
+                onClick: () => setIsEditOpen(true),
+            },
             {
                 icon: 'trash',
                 disabled: !profile,
@@ -66,7 +110,7 @@ function VaultProfileDetail() {
                 onClick: () => setConfirmDelete(true),
             },
         ],
-        [profile],
+        [profile, onApprove, onDisapprove],
     );
 
     const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
@@ -122,7 +166,7 @@ function VaultProfileDetail() {
                 <Container className="grid gap-6 xl:grid-cols-2 items-start">
                     <Widget
                         title="Vault Details"
-                        busy={isFetchingDetail || isDeleting}
+                        busy={isFetchingDetail || isEnabling || isDisabling || isDeleting}
                         widgetButtons={widgetButtons}
                         titleSize="large"
                         refreshAction={getFreshDetails}
@@ -142,6 +186,23 @@ function VaultProfileDetail() {
                         />
                     </Container>
                 )}
+
+                <Dialog
+                    isOpen={isEditOpen}
+                    caption="Edit Vault Profile"
+                    body={
+                        profile && vaultUuid ? (
+                            <VaultProfileEditForm
+                                profile={profile}
+                                vaultUuid={vaultUuid}
+                                onCancel={handleCloseEdit}
+                                onSuccess={handleCloseEdit}
+                            />
+                        ) : null
+                    }
+                    toggle={handleCloseEdit}
+                    size="lg"
+                />
 
                 <Dialog
                     isOpen={confirmDelete}

@@ -17,10 +17,20 @@ type EpicDeps = {
             listVaultProfiles: (args: any) => any;
             getVaultProfileDetails: (args: any) => any;
             createVaultProfile: (args: any) => any;
+            enableVaultProfile: (args: any) => any;
+            disableVaultProfile: (args: any) => any;
+            updateVaultProfile: (args: any) => any;
             deleteVaultProfile: (args: any) => any;
         };
     };
 };
+
+enum VaultProfilesEpicIndex {
+    List = 0,
+    Detail = 1,
+    Create = 2,
+    Delete = 6,
+}
 
 vi.mock('../App', () => ({
     store: {
@@ -48,6 +58,9 @@ async function runEpic(
             }),
         getVaultProfileDetails: () => of({ uuid: 'vp-1', name: 'P1', vaultInstance: { uuid: 'v-1', name: 'V1' }, enabled: true }),
         createVaultProfile: () => of({ uuid: 'vp-1', name: 'Profile 1' }),
+        enableVaultProfile: () => of(undefined),
+        disableVaultProfile: () => of(undefined),
+        updateVaultProfile: () => of({ uuid: 'vp-1', name: 'P1', vaultInstance: { uuid: 'v-1', name: 'V1' }, enabled: true }),
         deleteVaultProfile: () => of(null),
     };
     const deps: EpicDeps = {
@@ -63,7 +76,7 @@ async function runEpic(
 
 describe('vaultProfiles epics', () => {
     test('listVaultProfiles success emits listVaultProfilesSuccess, paging listSuccess and removeWidgetLock', async () => {
-        const emitted = await runEpic(0, vaultProfileActions.listVaultProfiles(), {}, 3);
+        const emitted = await runEpic(VaultProfilesEpicIndex.List, vaultProfileActions.listVaultProfiles(), {}, 3);
 
         expect(emitted[0]).toEqual(
             vaultProfileActions.listVaultProfilesSuccess({
@@ -85,10 +98,13 @@ describe('vaultProfiles epics', () => {
                 },
                 getVaultProfileDetails: () => of({}),
                 createVaultProfile: () => of({}),
+                enableVaultProfile: () => of(undefined),
+                disableVaultProfile: () => of(undefined),
+                updateVaultProfile: () => of({}),
                 deleteVaultProfile: () => of(null),
             },
         };
-        await runEpic(0, vaultProfileActions.listVaultProfiles(search), customDeps, 3);
+        await runEpic(VaultProfilesEpicIndex.List, vaultProfileActions.listVaultProfiles(search), customDeps, 3);
         expect(capturedDto?.pageNumber).toBe(2);
         expect(capturedDto?.itemsPerPage).toBe(20);
         expect(capturedDto?.filters).toHaveLength(1);
@@ -97,7 +113,7 @@ describe('vaultProfiles epics', () => {
     test('listVaultProfiles failure emits listVaultProfilesFailure, paging listFailure and insertWidgetLock', async () => {
         const err = new Error('failed');
         const emitted = await runEpic(
-            0,
+            VaultProfilesEpicIndex.List,
             vaultProfileActions.listVaultProfiles(),
             {
                 vaultProfiles: {
@@ -119,7 +135,12 @@ describe('vaultProfiles epics', () => {
             attributes: [],
         } as any;
 
-        const emitted = await runEpic(2, vaultProfileActions.createVaultProfile({ vaultUuid: 'v-1', request }), {}, 2);
+        const emitted = await runEpic(
+            VaultProfilesEpicIndex.Create,
+            vaultProfileActions.createVaultProfile({ vaultUuid: 'v-1', request }),
+            {},
+            2,
+        );
 
         expect(emitted[0].type).toBe(vaultProfileActions.createVaultProfileSuccess.type);
         expect(emitted[1]).toEqual(appRedirectActions.redirect({ url: '/vaultprofiles' }));
@@ -128,7 +149,7 @@ describe('vaultProfiles epics', () => {
     test('createVaultProfile failure emits createVaultProfileFailure and fetchError', async () => {
         const err = new Error('failed');
         const emitted = await runEpic(
-            2,
+            VaultProfilesEpicIndex.Create,
             vaultProfileActions.createVaultProfile({ vaultUuid: 'v-1', request: {} as any }),
             {
                 vaultProfiles: {
@@ -145,7 +166,7 @@ describe('vaultProfiles epics', () => {
     test('getVaultProfileDetail success emits getVaultProfileDetailSuccess', async () => {
         const profile = { uuid: 'vp-1', name: 'P1', vaultInstance: { uuid: 'v-1', name: 'V1' }, enabled: true };
         const emitted = await runEpic(
-            1,
+            VaultProfilesEpicIndex.Detail,
             vaultProfileActions.getVaultProfileDetail({ vaultUuid: 'v-1', vaultProfileUuid: 'vp-1' }),
             {
                 vaultProfiles: {
@@ -160,7 +181,7 @@ describe('vaultProfiles epics', () => {
     test('getVaultProfileDetail failure emits getVaultProfileDetailFailure and fetchError', async () => {
         const err = new Error('failed');
         const emitted = await runEpic(
-            1,
+            VaultProfilesEpicIndex.Detail,
             vaultProfileActions.getVaultProfileDetail({ vaultUuid: 'v-1', vaultProfileUuid: 'vp-1' }),
             {
                 vaultProfiles: {
@@ -174,7 +195,12 @@ describe('vaultProfiles epics', () => {
     });
 
     test('deleteVaultProfile success emits deleteVaultProfileSuccess, redirect and success alert', async () => {
-        const emitted = await runEpic(3, vaultProfileActions.deleteVaultProfile({ vaultUuid: 'v-1', vaultProfileUuid: 'vp-1' }), {}, 3);
+        const emitted = await runEpic(
+            VaultProfilesEpicIndex.Delete,
+            vaultProfileActions.deleteVaultProfile({ vaultUuid: 'v-1', vaultProfileUuid: 'vp-1' }),
+            {},
+            3,
+        );
 
         expect(emitted[0]).toEqual(vaultProfileActions.deleteVaultProfileSuccess({ vaultProfileUuid: 'vp-1' }));
         expect(emitted[1]).toEqual(appRedirectActions.redirect({ url: '/vaultprofiles' }));
@@ -184,7 +210,7 @@ describe('vaultProfiles epics', () => {
     test('deleteVaultProfile failure emits deleteVaultProfileFailure and fetchError', async () => {
         const err = new Error('failed');
         const emitted = await runEpic(
-            3,
+            VaultProfilesEpicIndex.Delete,
             vaultProfileActions.deleteVaultProfile({ vaultUuid: 'v-1', vaultProfileUuid: 'vp-1' }),
             {
                 vaultProfiles: {
