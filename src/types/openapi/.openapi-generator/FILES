@@ -34,6 +34,7 @@ apis/InternalNotificationApi.ts
 apis/LocalOperationsApi.ts
 apis/LocationManagementApi.ts
 apis/NotificationProfileInventoryApi.ts
+apis/OAuth2LoginManagementV2Api.ts
 apis/RAProfileManagementApi.ts
 apis/ResourceManagementApi.ts
 apis/RoleManagementApi.ts
@@ -354,6 +355,7 @@ models/KeyValueSecretContent.ts
 models/LocationDto.ts
 models/LocationsResponseDto.ts
 models/LoggingSettingsDto.ts
+models/LoginProviderDto.ts
 models/MetadataAttributeProperties.ts
 models/MetadataAttributeV2.ts
 models/MetadataAttributeV3.ts
@@ -420,6 +422,7 @@ models/RequestAttributeCallback.ts
 models/RequestAttributeV2.ts
 models/RequestAttributeV3.ts
 models/Resource.ts
+models/ResourceCertificateContentData.ts
 models/ResourceDto.ts
 models/ResourceEvent.ts
 models/ResourceEventDto.ts
@@ -431,6 +434,8 @@ models/ResourceObjectIdentity.ts
 models/ResourcePermissionsDto.ts
 models/ResourcePermissionsRequestDto.ts
 models/ResourceRecord.ts
+models/ResourceSecretContentData.ts
+models/ResourceSimpleContentData.ts
 models/ResponseAttribute.ts
 models/ResponseAttributeV2.ts
 models/ResponseAttributeV3.ts

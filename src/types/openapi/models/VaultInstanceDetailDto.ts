@@ -12,6 +12,7 @@
  */
 
 import type {
+    ConnectorInterfaceDto,
     NameAndUuidDto,
     ResponseAttribute,
 } from './';
@@ -45,6 +46,12 @@ export interface VaultInstanceDetailDto {
      * @memberof VaultInstanceDetailDto
      */
     connector: NameAndUuidDto;
+    /**
+     * Connector Interface associated with this Vault instance
+     * @type {ConnectorInterfaceDto}
+     * @memberof VaultInstanceDetailDto
+     */
+    connectorInterface: ConnectorInterfaceDto;
     /**
      * List of attributes of the Vault instance
      * @type {Array<ResponseAttribute>}

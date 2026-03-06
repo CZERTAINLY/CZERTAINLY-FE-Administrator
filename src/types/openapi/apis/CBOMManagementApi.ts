@@ -108,6 +108,18 @@ export class CBOMManagementApi extends BaseAPI {
     };
 
     /**
+     * Sync CBOMs
+     */
+    sync(): Observable<void>
+    sync(opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    sync(opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        return this.request<void>({
+            url: '/v1/cboms/sync',
+            method: 'POST',
+        }, opts?.responseOpts);
+    };
+
+    /**
      * Upload CBOM
      */
     uploadCbom({ cbomUploadRequestDto }: UploadCbomRequest): Observable<CbomDto>
