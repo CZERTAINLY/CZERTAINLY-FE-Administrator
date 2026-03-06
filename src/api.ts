@@ -31,6 +31,7 @@ import {
     InternalNotificationApi,
     LocationManagementApi,
     NotificationProfileInventoryApi,
+    ProxyManagementApi,
     RAProfileManagementApi,
     ResourceManagementApi,
     RoleManagementApi,
@@ -51,9 +52,9 @@ import {
     CertificationRequestUtilsAPIApi,
     Configuration as ConfigurationUtils,
 } from 'types/openapi/utils';
-import { OIDUtilsAPIApi } from './types/openapi/utils';
+import { OIDUtilsAPIApi } from 'types/openapi/utils';
 
-const apiUrl = (window as any).__ENV__?.API_URL || '/api';
+const apiUrl = typeof window !== 'undefined' ? window?.__ENV__?.API_URL || '/api' : '/api';
 const configuration = new Configuration({ basePath: apiUrl });
 
 export interface ApiClients {
@@ -68,6 +69,7 @@ export interface ApiClients {
     credentials: CredentialManagementApi;
     connectors: ConnectorManagementApi;
     connectorsV2: ConnectorManagementV2Api;
+    proxies: ProxyManagementApi;
     callback: CallbackApi;
     statisticsDashboard: StatisticsDashboardApi;
     authorities: AuthorityManagementApi;
@@ -125,6 +127,7 @@ export const backendClient: ApiClients = {
     locations: new LocationManagementApi(configuration),
     notificationProfiles: new NotificationProfileInventoryApi(configuration),
     connectors: new ConnectorManagementApi(configuration),
+    proxies: new ProxyManagementApi(configuration),
     callback: new CallbackApi(configuration),
     statisticsDashboard: new StatisticsDashboardApi(configuration),
     acmeAccounts: new ACMEAccountManagementApi(configuration),

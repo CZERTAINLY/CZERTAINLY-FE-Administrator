@@ -26,6 +26,7 @@ export enum Resource {
     Connectors = 'connectors',
     Attributes = 'attributes',
     Jobs = 'jobs',
+    Proxies = 'proxies',
     Users = 'users',
     Roles = 'roles',
     AcmeAccounts = 'acmeAccounts',
