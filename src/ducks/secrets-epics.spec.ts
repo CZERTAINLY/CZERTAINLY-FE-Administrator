@@ -125,7 +125,7 @@ describe('secrets epics', () => {
 
         expect(emitted[0]).toEqual(secretsActions.deleteSecretSuccess({ uuid: 's-1' }));
         expect(emitted[1]).toEqual(appRedirectActions.redirect({ url: '/secrets' }));
-        expect(emitted[2]).toEqual(appRedirectActions.fetchError({ error: undefined as any, message: 'Secret deleted successfully' }));
+        expect(emitted[2]).toEqual(alertActions.success('Secret deleted successfully.'));
     });
 
     test('deleteSecret failure emits deleteSecretFailure and fetchError', async () => {
@@ -154,7 +154,7 @@ describe('secrets epics', () => {
         );
 
         expect(emitted[0].type).toBe(secretsActions.updateSecretSuccess.type);
-        expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: undefined as any, message: 'Secret updated successfully' }));
+        expect(emitted[1]).toEqual(alertActions.success('Secret updated successfully.'));
     });
 
     test('updateSecret failure emits updateSecretFailure and fetchError', async () => {
@@ -183,7 +183,7 @@ describe('secrets epics', () => {
         );
 
         expect(emitted[0]).toEqual(secretsActions.updateSecretObjectsSuccess({ uuid: 's-1' }));
-        expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: undefined as any, message: 'Secret updated successfully' }));
+        expect(emitted[1]).toEqual(alertActions.success('Secret updated successfully.'));
     });
 
     test('updateSecretObjects failure emits updateSecretObjectsFailure and fetchError', async () => {

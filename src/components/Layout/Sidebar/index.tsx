@@ -20,6 +20,7 @@ import {
     FileJson2,
     Split,
     ArrowRightToLine,
+    FileLock2,
 } from 'lucide-react';
 import Button from 'components/Button';
 import SimpleBar from 'simplebar-react';
@@ -132,7 +133,13 @@ const menuItemMappings: MenuItemMapping[] = [
         headerLink: '/secrets',
         requiredResources: [Resource.Secrets],
     },
-
+    {
+        _key: '/cboms',
+        icon: <FileLock2 size={16} strokeWidth={1.5} />,
+        header: 'CBOMs',
+        headerLink: '/cboms',
+        requiredResources: [Resource.Cboms],
+    },
     {
         _key: 'accessControl',
         icon: <CircleUser size={16} strokeWidth={1.5} />,
@@ -186,7 +193,6 @@ const menuItemMappings: MenuItemMapping[] = [
             { _key: '/groups', name: 'Groups', link: '/groups', requiredResources: [Resource.Groups] },
             { _key: '/entities', name: 'Entities', link: '/entities', requiredResources: [Resource.Entities] },
             { _key: '/locations', name: 'Locations', link: '/locations', requiredResources: [Resource.Locations] },
-            { _key: '/cboms', name: 'CBOM', link: '/cboms', requiredResources: [Resource.Cboms] },
             { _key: '/vaults', name: 'Vaults', link: '/vaults', requiredResources: [Resource.Vaults] },
         ],
     },

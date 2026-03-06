@@ -97,7 +97,7 @@ const deleteSecret: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.deleteSecretSuccess({ uuid: action.payload.uuid }),
                         appRedirectActions.redirect({ url: '/secrets' }),
-                        appRedirectActions.fetchError({ error: undefined as any, message: 'Secret deleted successfully' }),
+                        alertActions.success('Secret deleted successfully.'),
                     ),
                 ),
                 catchError((err) =>
@@ -124,10 +124,7 @@ const updateSecret: AppEpic = (action$, state$, deps) => {
                 })
                 .pipe(
                     mergeMap((secret) =>
-                        of(
-                            slice.actions.updateSecretSuccess({ secret }),
-                            appRedirectActions.fetchError({ error: undefined as any, message: 'Secret updated successfully' }),
-                        ),
+                        of(slice.actions.updateSecretSuccess({ secret }), alertActions.success('Secret updated successfully.')),
                     ),
                     catchError((err) =>
                         of(
@@ -205,7 +202,7 @@ const updateSecretObjects: AppEpic = (action$, state$, deps) => {
                     mergeMap(() =>
                         of(
                             slice.actions.updateSecretObjectsSuccess({ uuid: action.payload.uuid }),
-                            appRedirectActions.fetchError({ error: undefined as any, message: 'Secret updated successfully' }),
+                            alertActions.success('Secret updated successfully.'),
                         ),
                     ),
                     catchError((err) =>
