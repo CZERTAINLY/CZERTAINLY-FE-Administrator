@@ -37,6 +37,7 @@ export default function VaultProfilesList() {
                 id: 'name',
                 content: 'Name',
                 width: '25%',
+                sortable: true,
             },
             {
                 id: 'description',
@@ -47,11 +48,13 @@ export default function VaultProfilesList() {
                 id: 'vaultInstance',
                 content: 'Vault',
                 width: '25%',
+                sortable: true,
             },
             {
                 id: 'status',
                 content: 'Status',
                 width: '15%',
+                sortable: true,
             },
         ],
         [],

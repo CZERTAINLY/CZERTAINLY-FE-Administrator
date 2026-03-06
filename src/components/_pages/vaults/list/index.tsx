@@ -33,6 +33,7 @@ export default function VaultsList() {
                 id: 'name',
                 content: 'Name',
                 width: '25%',
+                sortable: true,
             },
             {
                 id: 'description',
@@ -43,6 +44,7 @@ export default function VaultsList() {
                 id: 'connector',
                 content: 'Connector',
                 width: '25%',
+                sortable: true,
             },
             {
                 id: 'features',

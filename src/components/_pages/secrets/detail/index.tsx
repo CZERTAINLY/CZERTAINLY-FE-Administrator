@@ -175,6 +175,10 @@ function SecretDetail() {
                 columns: ['Type', getEnumLabel(secretTypeEnum, secret.type)],
             },
             {
+                id: 'description',
+                columns: ['Description', secret.description ?? ''],
+            },
+            {
                 id: 'state',
                 columns: [
                     'State',
