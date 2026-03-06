@@ -16,151 +16,128 @@ describe('loginRedirect', () => {
         vi.clearAllMocks();
     });
 
+    const assertRedirect = (expectedUrl: string, callCount = 1) => {
+        expect(mockAssign).toHaveBeenCalledWith(expectedUrl);
+        expect(mockAssign).toHaveBeenCalledTimes(callCount);
+    };
+
     describe('URL construction with absolute URLs', () => {
-        test('should redirect to absolute HTTP URL without redirect parameter', () => {
-            const loginUrl = 'https://example.com/login';
-            loginRedirect(loginUrl, null);
-
-            expect(mockAssign).toHaveBeenCalledWith('https://example.com/login');
-            expect(mockAssign).toHaveBeenCalledTimes(1);
-        });
-
-        test('should redirect to absolute HTTPS URL without redirect parameter', () => {
-            const loginUrl = 'https://example.com/login';
-            loginRedirect(loginUrl, null);
-
-            expect(mockAssign).toHaveBeenCalledWith('https://example.com/login');
-            expect(mockAssign).toHaveBeenCalledTimes(1);
-        });
-
-        test('should append redirect parameter to absolute URL without query string', () => {
-            const loginUrl = 'https://example.com/login';
-            const redirect = '/dashboard';
+        test.each([
+            {
+                loginUrl: 'https://example.com/login',
+                redirect: null,
+                expected: 'https://example.com/login',
+                description: 'without redirect parameter',
+            },
+            {
+                loginUrl: 'https://example.com/login',
+                redirect: '/dashboard',
+                expected: 'https://example.com/login?redirect=%2Fdashboard',
+                description: 'with redirect parameter and no query string',
+            },
+            {
+                loginUrl: 'https://example.com/login?foo=bar',
+                redirect: '/dashboard',
+                expected: 'https://example.com/login?foo=bar&redirect=%2Fdashboard',
+                description: 'with redirect parameter and existing query string',
+            },
+        ])('should redirect to absolute URL $description', ({ loginUrl, redirect, expected }) => {
             loginRedirect(loginUrl, redirect);
-
-            expect(mockAssign).toHaveBeenCalledWith('https://example.com/login?redirect=%2Fdashboard');
-            expect(mockAssign).toHaveBeenCalledTimes(1);
-        });
-
-        test('should append redirect parameter to absolute URL with existing query string', () => {
-            const loginUrl = 'https://example.com/login?foo=bar';
-            const redirect = '/dashboard';
-            loginRedirect(loginUrl, redirect);
-
-            expect(mockAssign).toHaveBeenCalledWith('https://example.com/login?foo=bar&redirect=%2Fdashboard');
-            expect(mockAssign).toHaveBeenCalledTimes(1);
+            assertRedirect(expected);
         });
     });
 
     describe('URL construction with relative URLs', () => {
-        test('should convert relative URL to absolute using window.location.origin', () => {
-            // Mock window.location.origin
+        test.each([
+            {
+                loginUrl: '/auth/login',
+                redirect: null,
+                expected: 'http://localhost:3000/auth/login',
+                description: 'convert relative URL to absolute',
+            },
+            {
+                loginUrl: '/auth/login',
+                redirect: '/dashboard',
+                expected: 'http://localhost:3000/auth/login?redirect=%2Fdashboard',
+                description: 'with redirect parameter and no query string',
+            },
+            {
+                loginUrl: '/auth/login?session=abc123',
+                redirect: '/dashboard',
+                expected: 'http://localhost:3000/auth/login?session=abc123&redirect=%2Fdashboard',
+                description: 'with redirect parameter and existing query string',
+            },
+        ])('should handle relative URLs: $description', ({ loginUrl, redirect, expected }) => {
             Object.defineProperty(globalThis.location, 'origin', {
                 writable: true,
                 value: 'http://localhost:3000',
             });
-
-            const loginUrl = '/auth/login';
-            loginRedirect(loginUrl, null);
-
-            expect(mockAssign).toHaveBeenCalledWith('http://localhost:3000/auth/login');
-            expect(mockAssign).toHaveBeenCalledTimes(1);
-        });
-
-        test('should append redirect parameter to relative URL without query string', () => {
-            Object.defineProperty(globalThis.location, 'origin', {
-                writable: true,
-                value: 'http://localhost:3000',
-            });
-
-            const loginUrl = '/auth/login';
-            const redirect = '/dashboard';
             loginRedirect(loginUrl, redirect);
-
-            expect(mockAssign).toHaveBeenCalledWith('http://localhost:3000/auth/login?redirect=%2Fdashboard');
-            expect(mockAssign).toHaveBeenCalledTimes(1);
-        });
-
-        test('should append redirect parameter to relative URL with existing query string', () => {
-            Object.defineProperty(globalThis.location, 'origin', {
-                writable: true,
-                value: 'http://localhost:3000',
-            });
-
-            const loginUrl = '/auth/login?session=abc123';
-            const redirect = '/dashboard';
-            loginRedirect(loginUrl, redirect);
-
-            expect(mockAssign).toHaveBeenCalledWith('http://localhost:3000/auth/login?session=abc123&redirect=%2Fdashboard');
-            expect(mockAssign).toHaveBeenCalledTimes(1);
+            assertRedirect(expected);
         });
     });
 
     describe('redirect parameter encoding', () => {
-        test('should properly encode redirect parameter with special characters', () => {
-            const loginUrl = 'https://example.com/login';
-            const redirect = '/dashboard?tab=overview&id=123';
+        test.each([
+            {
+                loginUrl: 'https://example.com/login',
+                redirect: '/dashboard?tab=overview&id=123',
+                expected: 'https://example.com/login?redirect=%2Fdashboard%3Ftab%3Doverview%26id%3D123',
+                description: 'special characters',
+            },
+            {
+                loginUrl: 'https://example.com/login',
+                redirect: '/path with spaces',
+                expected: 'https://example.com/login?redirect=%2Fpath%20with%20spaces',
+                description: 'spaces',
+            },
+            {
+                loginUrl: 'https://example.com/login',
+                redirect: '/dashboard#section',
+                expected: 'https://example.com/login?redirect=%2Fdashboard%23section',
+                description: 'hash symbol',
+            },
+            {
+                loginUrl: 'https://example.com/login',
+                redirect: '',
+                expected: 'https://example.com/login',
+                description: 'empty string',
+            },
+        ])('should properly encode redirect parameter with $description', ({ loginUrl, redirect, expected }) => {
             loginRedirect(loginUrl, redirect);
-
-            expect(mockAssign).toHaveBeenCalledWith('https://example.com/login?redirect=%2Fdashboard%3Ftab%3Doverview%26id%3D123');
-        });
-
-        test('should properly encode redirect parameter with spaces', () => {
-            const loginUrl = 'https://example.com/login';
-            const redirect = '/path with spaces';
-            loginRedirect(loginUrl, redirect);
-
-            expect(mockAssign).toHaveBeenCalledWith('https://example.com/login?redirect=%2Fpath%20with%20spaces');
-        });
-
-        test('should properly encode redirect parameter with hash', () => {
-            const loginUrl = 'https://example.com/login';
-            const redirect = '/dashboard#section';
-            loginRedirect(loginUrl, redirect);
-
-            expect(mockAssign).toHaveBeenCalledWith('https://example.com/login?redirect=%2Fdashboard%23section');
-        });
-
-        test('should handle empty string redirect', () => {
-            const loginUrl = 'https://example.com/login';
-            const redirect = '';
-            loginRedirect(loginUrl, redirect);
-
-            expect(mockAssign).toHaveBeenCalledWith('https://example.com/login');
+            assertRedirect(expected);
         });
     });
 
     describe('edge cases', () => {
-        test('should handle URL with multiple query parameters', () => {
-            const loginUrl = 'https://example.com/login?foo=bar&baz=qux';
-            const redirect = '/home';
+        test.each([
+            {
+                loginUrl: 'https://example.com/login?foo=bar&baz=qux',
+                redirect: '/home',
+                expected: 'https://example.com/login?foo=bar&baz=qux&redirect=%2Fhome',
+                description: 'URL with multiple query parameters',
+            },
+            {
+                loginUrl: 'https://example.com/login/',
+                redirect: '/dashboard',
+                expected: 'https://example.com/login/?redirect=%2Fdashboard',
+                description: 'URL with trailing slash',
+            },
+            {
+                loginUrl: 'https://example.com/login',
+                redirect: 'https://other-domain.com/page',
+                expected: 'https://example.com/login?redirect=https%3A%2F%2Fother-domain.com%2Fpage',
+                description: 'redirect with absolute URL',
+            },
+            {
+                loginUrl: 'https://example.com/login',
+                redirect: null,
+                expected: 'https://example.com/login',
+                description: 'null redirect parameter',
+            },
+        ])('should handle $description', ({ loginUrl, redirect, expected }) => {
             loginRedirect(loginUrl, redirect);
-
-            expect(mockAssign).toHaveBeenCalledWith('https://example.com/login?foo=bar&baz=qux&redirect=%2Fhome');
-        });
-
-        test('should handle URL with trailing slash', () => {
-            const loginUrl = 'https://example.com/login/';
-            const redirect = '/dashboard';
-            loginRedirect(loginUrl, redirect);
-
-            expect(mockAssign).toHaveBeenCalledWith('https://example.com/login/?redirect=%2Fdashboard');
-        });
-
-        test('should handle redirect with absolute URL', () => {
-            const loginUrl = 'https://example.com/login';
-            const redirect = 'https://other-domain.com/page';
-            loginRedirect(loginUrl, redirect);
-
-            expect(mockAssign).toHaveBeenCalledWith('https://example.com/login?redirect=https%3A%2F%2Fother-domain.com%2Fpage');
-        });
-
-        test('should handle null redirect parameter', () => {
-            const loginUrl = 'https://example.com/login';
-            loginRedirect(loginUrl, null);
-
-            expect(mockAssign).toHaveBeenCalledWith('https://example.com/login');
-            expect(mockAssign).toHaveBeenCalledTimes(1);
+            assertRedirect(expected);
         });
     });
 });
