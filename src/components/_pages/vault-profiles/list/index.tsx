@@ -110,7 +110,7 @@ export default function VaultProfilesList() {
     return (
         <>
             <PagedList
-                entity={EntityType.VAULT}
+                entity={EntityType.VAULT_PROFILE}
                 onListCallback={onListCallback}
                 onDeleteCallback={(uuids) =>
                     uuids.forEach((uuid) => {
@@ -132,7 +132,7 @@ export default function VaultProfilesList() {
                 entityNameSingular="Vault Profile"
                 entityNamePlural="Vault Profiles"
                 filterTitle="Vault Profiles Filter"
-                pageWidgetLockName={LockWidgetNameEnum.ListOfVaults}
+                pageWidgetLockName={LockWidgetNameEnum.ListOfVaultProfiles}
                 getAvailableFiltersApi={useCallback(
                     (apiClients: ApiClients) => apiClients.vaultProfiles.getSearchableFieldInformation1(),
                     [],

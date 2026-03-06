@@ -20,15 +20,15 @@ const listVaultProfiles: AppEpic = (action$, state$, deps) => {
         switchMap((action: ReturnType<typeof slice.actions.listVaultProfiles>) => {
             const search = action.payload ?? defaultSearch;
             const searchRequestDto = transformSearchRequestModelToDto(search);
-            store.dispatch(pagingActions.list(EntityType.VAULT));
+            store.dispatch(pagingActions.list(EntityType.VAULT_PROFILE));
             return deps.apiClients.vaultProfiles.listVaultProfiles({ searchRequestDto }).pipe(
                 mergeMap((response: { items?: import('types/openapi').VaultProfileDto[]; totalItems?: number }) =>
                     of(
                         slice.actions.listVaultProfilesSuccess({
                             items: response.items ?? [],
                         }),
-                        pagingActions.listSuccess({ entity: EntityType.VAULT, totalItems: response.totalItems ?? 0 }),
-                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfVaults),
+                        pagingActions.listSuccess({ entity: EntityType.VAULT_PROFILE, totalItems: response.totalItems ?? 0 }),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfVaultProfiles),
                     ),
                 ),
                 catchError((err) =>
@@ -36,8 +36,8 @@ const listVaultProfiles: AppEpic = (action$, state$, deps) => {
                         slice.actions.listVaultProfilesFailure({
                             error: extractError(err, 'Failed to get Vault profiles'),
                         }),
-                        pagingActions.listFailure(EntityType.VAULT),
-                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfVaults),
+                        pagingActions.listFailure(EntityType.VAULT_PROFILE),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfVaultProfiles),
                         appRedirectActions.fetchError({ error: err, message: 'Failed to get Vault profiles' }),
                     ),
                 ),
@@ -57,10 +57,7 @@ const createVaultProfile: AppEpic = (action$, state$, deps) => {
                 })
                 .pipe(
                     mergeMap((profile: Parameters<typeof slice.actions.createVaultProfileSuccess>[0]['profile']) =>
-                        of(
-                            slice.actions.createVaultProfileSuccess({ profile }),
-                            appRedirectActions.redirect({ url: `/${'vaultprofiles'}` }),
-                        ),
+                        of(slice.actions.createVaultProfileSuccess({ profile }), appRedirectActions.redirect({ url: '/vaultprofiles' })),
                     ),
                     catchError((err) =>
                         of(
@@ -123,7 +120,7 @@ const enableVaultProfile: AppEpic = (action$, state$, deps) => {
                     mergeMap((profile: import('types/openapi').VaultProfileDetailDto) =>
                         of(
                             slice.actions.enableVaultProfileSuccess({ profile }),
-                            alertActions.success('Vault Profile approved successfully.'),
+                            alertActions.success('Vault Profile enabled successfully.'),
                         ),
                     ),
                     catchError((err) =>
@@ -161,7 +158,7 @@ const disableVaultProfile: AppEpic = (action$, state$, deps) => {
                     mergeMap((profile: import('types/openapi').VaultProfileDetailDto) =>
                         of(
                             slice.actions.disableVaultProfileSuccess({ profile }),
-                            alertActions.success('Vault Profile disapproved successfully.'),
+                            alertActions.success('Vault Profile disabled successfully.'),
                         ),
                     ),
                     catchError((err) =>
@@ -226,7 +223,7 @@ const deleteVaultProfile: AppEpic = (action$, state$, deps) => {
                     mergeMap(() =>
                         of(
                             slice.actions.deleteVaultProfileSuccess({ vaultProfileUuid: action.payload.vaultProfileUuid }),
-                            appRedirectActions.redirect({ url: `/${'vaultprofiles'}` }),
+                            appRedirectActions.redirect({ url: '/vaultprofiles' }),
                             alertActions.success('Vault Profile deleted successfully.'),
                         ),
                     ),

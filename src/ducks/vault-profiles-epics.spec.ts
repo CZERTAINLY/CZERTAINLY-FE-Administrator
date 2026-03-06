@@ -83,8 +83,8 @@ describe('vaultProfiles epics', () => {
                 items: [{ uuid: 'vp-1' }] as any,
             }),
         );
-        expect(emitted[1]).toEqual(pagingActions.listSuccess({ entity: EntityType.VAULT, totalItems: 1 }));
-        expect(emitted[2]).toEqual(userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfVaults));
+        expect(emitted[1]).toEqual(pagingActions.listSuccess({ entity: EntityType.VAULT_PROFILE, totalItems: 1 }));
+        expect(emitted[2]).toEqual(userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfVaultProfiles));
     });
 
     test('listVaultProfiles with filters passes searchRequestDto to API', async () => {
@@ -124,7 +124,7 @@ describe('vaultProfiles epics', () => {
         );
 
         expect(emitted[0].type).toBe(vaultProfileActions.listVaultProfilesFailure.type);
-        expect(emitted[1]).toEqual(pagingActions.listFailure(EntityType.VAULT));
+        expect(emitted[1]).toEqual(pagingActions.listFailure(EntityType.VAULT_PROFILE));
         expect(emitted[2].type).toBe(userInterfaceActions.insertWidgetLock.type);
     });
 
