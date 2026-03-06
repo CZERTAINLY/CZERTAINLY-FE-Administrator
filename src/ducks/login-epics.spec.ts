@@ -10,7 +10,6 @@ describe('login epics', () => {
     const originalLocation = globalThis.location;
 
     beforeEach(() => {
-        // @ts-ignore
         delete (globalThis as any).location;
         globalThis.location = { ...originalLocation, assign: vi.fn(), origin: 'http://localhost' } as unknown as Location;
     });
@@ -74,7 +73,16 @@ describe('login epics', () => {
     });
 
     test('getLoginMethods failure emits getLoginMethodsFailure', async () => {
-        const error = new AjaxError('Not Found', { status: 404, response: { message: 'Not Found' } } as any, 'GET', 'url');
+        const xhr = {
+            status: 404,
+            responseType: 'json' as XMLHttpRequestResponseType,
+            responseText: '{}',
+            response: {
+                message: 'Not Found',
+            },
+        } as XMLHttpRequest;
+        const request = {} as any;
+        const error = new AjaxError('Not Found', xhr, request);
         const action$ = of(slice.actions.getLoginMethods({}));
         const state$ = of({} as AppState);
         const deps = createLoginMethodsDeps(throwError(() => error));
