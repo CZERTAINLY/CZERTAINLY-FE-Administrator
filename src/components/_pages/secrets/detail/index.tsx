@@ -35,7 +35,6 @@ function SecretDetail() {
     const secret = useSelector(secretsSelectors.secret);
     const versions = useSelector(secretsSelectors.versions);
     const isFetchingDetail = useSelector(secretsSelectors.isFetchingDetail);
-    const isFetchingVersions = useSelector(secretsSelectors.isFetchingVersions);
     const isDeleting = useSelector(secretsSelectors.isDeleting);
     const isUpdating = useSelector(secretsSelectors.isUpdating);
 

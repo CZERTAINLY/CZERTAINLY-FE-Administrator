@@ -233,7 +233,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
             case SecretType.KeyStore:
                 return {
                     type: SecretType.KeyStore,
-                    keyStoreType: (values.keyStoreType ?? KeyStoreType.Pkcs12) as KeyStoreType,
+                    keyStoreType: values.keyStoreType ?? KeyStoreType.Pkcs12,
                     content: values.keyStoreContent ?? '',
                     password: values.keyStorePassword ?? '',
                 } as KeyStoreSecretContent;
