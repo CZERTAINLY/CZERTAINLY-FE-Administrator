@@ -177,9 +177,14 @@ export class VaultProfileManagementApi extends BaseAPI {
         throwIfNullOrUndefined(vaultUuid, 'vaultUuid', 'getVaultProfileDetails');
         throwIfNullOrUndefined(vaultProfileUuid, 'vaultProfileUuid', 'getVaultProfileDetails');
 
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
         return this.request<VaultProfileDetailDto>({
             url: '/v1/vaults/{vaultUuid}/vaultProfiles/{vaultProfileUuid}'.replace('{vaultUuid}', encodeURI(vaultUuid)).replace('{vaultProfileUuid}', encodeURI(vaultProfileUuid)),
             method: 'GET',
+            headers,
         }, opts?.responseOpts);
     };
 
