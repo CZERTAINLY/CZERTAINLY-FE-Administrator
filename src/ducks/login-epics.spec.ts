@@ -1,5 +1,5 @@
 import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
-import { firstValueFrom, of, throwError } from 'rxjs';
+import { firstValueFrom, of, throwError, Observable } from 'rxjs';
 import { AjaxError } from 'rxjs/ajax';
 import { take, toArray } from 'rxjs/operators';
 import { AppState, EpicDependencies } from './index';
@@ -20,23 +20,31 @@ describe('login epics', () => {
         vi.unstubAllGlobals();
     });
 
+    const createLoginMethodsDeps = (mockReturnValue: Observable<any>): EpicDependencies =>
+        ({
+            apiClients: {
+                login: {
+                    getOAuth2Providers: vi.fn().mockReturnValue(mockReturnValue),
+                },
+            },
+        }) as unknown as EpicDependencies;
+
+    const executeLoginEpic = async (loginMethods: any, redirect?: string) => {
+        const action$ = of(slice.actions.getLoginMethods(redirect ? { redirect } : {}));
+        const state$ = of({} as AppState);
+        const deps = createLoginMethodsDeps(of(loginMethods));
+
+        const output$ = loginEpics[0](action$, state$, deps);
+        return { output$, deps };
+    };
+
     test('getLoginMethods success with multiple methods emits getLoginMethodsSuccess', async () => {
         const loginMethods = [
             { name: 'Method 1', loginUrl: 'http://localhost/login1' },
             { name: 'Method 2', loginUrl: 'http://localhost/login2' },
         ];
 
-        const action$ = of(slice.actions.getLoginMethods({ redirect: 'dashboard' }));
-        const state$ = of({} as AppState);
-        const deps = {
-            apiClients: {
-                login: {
-                    getOAuth2Providers: vi.fn().mockReturnValue(of(loginMethods)),
-                },
-            },
-        } as unknown as EpicDependencies;
-
-        const output$ = loginEpics[0](action$, state$, deps);
+        const { output$, deps } = await executeLoginEpic(loginMethods, 'dashboard');
         const emitted = await firstValueFrom(output$.pipe(take(1), toArray()));
 
         expect(emitted).toEqual([slice.actions.getLoginMethodsSuccess({ loginMethods })]);
@@ -46,17 +54,7 @@ describe('login epics', () => {
     test('getLoginMethods success with single method redirects', async () => {
         const loginMethods = [{ name: 'Method 1', loginUrl: 'http://localhost/login1' }];
 
-        const action$ = of(slice.actions.getLoginMethods({ redirect: 'dashboard' }));
-        const state$ = of({} as AppState);
-        const deps = {
-            apiClients: {
-                login: {
-                    getOAuth2Providers: vi.fn().mockReturnValue(of(loginMethods)),
-                },
-            },
-        } as unknown as EpicDependencies;
-
-        const output$ = loginEpics[0](action$, state$, deps);
+        const { output$ } = await executeLoginEpic(loginMethods, 'dashboard');
 
         // When there is a redirect, it returns EMPTY, so we use toArray and expect empty
         const emitted = await firstValueFrom(output$.pipe(toArray()));
@@ -68,15 +66,7 @@ describe('login epics', () => {
     test('getLoginMethods with absolute loginUrl redirects correctly', async () => {
         const loginMethods = [{ name: 'Method 1', loginUrl: 'https://other-domain.com/login' }];
 
-        const deps = {
-            apiClients: {
-                login: {
-                    getOAuth2Providers: vi.fn().mockReturnValue(of(loginMethods)),
-                },
-            },
-        } as unknown as EpicDependencies;
-
-        const output$ = loginEpics[0](of(slice.actions.getLoginMethods({ redirect: 'home' })), of({} as AppState), deps);
+        const { output$ } = await executeLoginEpic(loginMethods, 'home');
 
         await firstValueFrom(output$.pipe(toArray()));
 
@@ -85,16 +75,11 @@ describe('login epics', () => {
 
     test('getLoginMethods failure emits getLoginMethodsFailure', async () => {
         const error = new AjaxError('Not Found', { status: 404, response: { message: 'Not Found' } } as any, 'GET', 'url');
-        const deps = {
-            apiClients: {
-                login: {
-                    getOAuth2Providers: vi.fn().mockReturnValue(throwError(() => error)),
-                },
-            },
-        } as unknown as EpicDependencies;
-
         const action$ = of(slice.actions.getLoginMethods({}));
-        const output$ = loginEpics[0](action$, of({} as AppState), deps);
+        const state$ = of({} as AppState);
+        const deps = createLoginMethodsDeps(throwError(() => error));
+
+        const output$ = loginEpics[0](action$, state$, deps);
         const emitted = await firstValueFrom(output$.pipe(take(1), toArray()));
 
         expect(emitted).toEqual([slice.actions.getLoginMethodsFailure({ error: 'Failed to load login methods (404): Not Found' })]);
@@ -102,16 +87,11 @@ describe('login epics', () => {
 
     test('getLoginMethods catch network error emits getLoginMethodsFailure', async () => {
         const error = new Error('Network failure');
-        const deps = {
-            apiClients: {
-                login: {
-                    getOAuth2Providers: vi.fn().mockReturnValue(throwError(() => error)),
-                },
-            },
-        } as unknown as EpicDependencies;
-
         const action$ = of(slice.actions.getLoginMethods({}));
-        const output$ = loginEpics[0](action$, of({} as AppState), deps);
+        const state$ = of({} as AppState);
+        const deps = createLoginMethodsDeps(throwError(() => error));
+
+        const output$ = loginEpics[0](action$, state$, deps);
         const emitted = await firstValueFrom(output$.pipe(take(1), toArray()));
 
         expect(emitted).toEqual([slice.actions.getLoginMethodsFailure({ error: 'Failed to load login methods. Network failure' })]);
