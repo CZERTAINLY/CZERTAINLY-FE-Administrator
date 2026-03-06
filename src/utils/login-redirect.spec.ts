@@ -2,17 +2,17 @@ import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
 import { loginRedirect } from './login-redirect';
 
 describe('loginRedirect', () => {
-    const originalLocation = window.location;
+    const originalLocation = globalThis.location;
     const mockAssign = vi.fn();
 
     beforeEach(() => {
         // Mock window.location.assign
-        delete (window as any).location;
-        window.location = { ...originalLocation, assign: mockAssign };
+        delete (globalThis as any).location;
+        globalThis.location = { ...originalLocation, assign: mockAssign } as Location;
     });
 
     afterEach(() => {
-        window.location = originalLocation;
+        globalThis.location = originalLocation;
         vi.clearAllMocks();
     });
 
@@ -55,7 +55,7 @@ describe('loginRedirect', () => {
     describe('URL construction with relative URLs', () => {
         test('should convert relative URL to absolute using window.location.origin', () => {
             // Mock window.location.origin
-            Object.defineProperty(window.location, 'origin', {
+            Object.defineProperty(globalThis.location, 'origin', {
                 writable: true,
                 value: 'http://localhost:3000',
             });
@@ -68,7 +68,7 @@ describe('loginRedirect', () => {
         });
 
         test('should append redirect parameter to relative URL without query string', () => {
-            Object.defineProperty(window.location, 'origin', {
+            Object.defineProperty(globalThis.location, 'origin', {
                 writable: true,
                 value: 'http://localhost:3000',
             });
@@ -82,7 +82,7 @@ describe('loginRedirect', () => {
         });
 
         test('should append redirect parameter to relative URL with existing query string', () => {
-            Object.defineProperty(window.location, 'origin', {
+            Object.defineProperty(globalThis.location, 'origin', {
                 writable: true,
                 value: 'http://localhost:3000',
             });

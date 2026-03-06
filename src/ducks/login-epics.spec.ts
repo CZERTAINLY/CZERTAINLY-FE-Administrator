@@ -7,16 +7,16 @@ import * as slice from './login';
 import loginEpics from './login-epics';
 
 describe('login epics', () => {
-    const originalLocation = window.location;
+    const originalLocation = globalThis.location;
 
     beforeEach(() => {
         // @ts-ignore
-        delete (window as any).location;
-        window.location = { ...originalLocation, assign: vi.fn(), origin: 'http://localhost' } as unknown as Location;
+        delete (globalThis as any).location;
+        globalThis.location = { ...originalLocation, assign: vi.fn(), origin: 'http://localhost' } as unknown as Location;
     });
 
     afterEach(() => {
-        window.location = originalLocation;
+        globalThis.location = originalLocation;
         vi.unstubAllGlobals();
     });
 
@@ -60,7 +60,7 @@ describe('login epics', () => {
         const emitted = await firstValueFrom(output$.pipe(toArray()));
 
         expect(emitted).toEqual([]);
-        expect(window.location.assign).toHaveBeenCalledWith('http://localhost/login1?redirect=dashboard');
+        expect(globalThis.location.assign).toHaveBeenCalledWith('http://localhost/login1?redirect=dashboard');
     });
 
     test('getLoginMethods with absolute loginUrl redirects correctly', async () => {
@@ -70,7 +70,7 @@ describe('login epics', () => {
 
         await firstValueFrom(output$.pipe(toArray()));
 
-        expect(window.location.assign).toHaveBeenCalledWith('https://other-domain.com/login?redirect=home');
+        expect(globalThis.location.assign).toHaveBeenCalledWith('https://other-domain.com/login?redirect=home');
     });
 
     test('getLoginMethods failure emits getLoginMethodsFailure', async () => {
