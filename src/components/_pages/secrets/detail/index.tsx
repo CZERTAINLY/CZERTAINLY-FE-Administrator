@@ -20,8 +20,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { PlatformEnum, Resource, SecretState } from 'types/openapi';
+import { PlatformEnum, Resource } from 'types/openapi';
 import SecretForm from '../form';
+import SecretStateBadge from '../SecretStateBadge';
 import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import Select from 'components/Select';
@@ -181,14 +182,14 @@ function SecretDetail() {
                 id: 'state',
                 columns: [
                     'State',
-                    <Badge key="state" color={secret.state === SecretState.Active ? 'success' : 'secondary'}>
+                    <SecretStateBadge key="state" state={secret.state}>
                         {getEnumLabel(secretStateEnum, secret.state)}
-                    </Badge>,
+                    </SecretStateBadge>,
                 ],
             },
             {
                 id: 'version',
-                columns: ['Version', secret.version ? `v${secret.version}` : ''],
+                columns: ['Version', secret.version ? secret.version.toString() : ''],
             },
             {
                 id: 'status',

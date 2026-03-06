@@ -25,6 +25,7 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum } from 'types/openapi';
 
 import SecretForm from '../form';
+import SecretStateBadge from '../SecretStateBadge';
 
 export default function SecretsList() {
     const dispatch = useDispatch();
@@ -126,13 +127,15 @@ export default function SecretsList() {
                         <Link to={`./detail/${secret.uuid}`}>{secret.name}</Link>
                     </span>,
                     getEnumLabel(secretTypeEnum, secret.type),
-                    getEnumLabel(secretStateEnum, secret.state),
+                    <SecretStateBadge key="state" state={secret.state}>
+                        {getEnumLabel(secretStateEnum, secret.state)}
+                    </SecretStateBadge>,
                     secret.sourceVaultProfile ? (
                         <Link to={`../vaultprofiles/detail/${secret.sourceVaultProfile.uuid}`}>{secret.sourceVaultProfile.name}</Link>
                     ) : (
                         ''
                     ),
-                    secret.version ? `v${secret.version}` : '',
+                    secret.version ? secret.version.toString() : '',
                     secret.owner ? <Link to={`../users/detail/${secret.owner.uuid}`}>{secret.owner.name}</Link> : 'Unassigned',
                     secret.groups && secret.groups.length > 0
                         ? secret.groups.map((group, i) => (
