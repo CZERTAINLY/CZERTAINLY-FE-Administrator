@@ -16,14 +16,11 @@ import type { AjaxResponse } from 'rxjs/ajax';
 import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
 import type { OperationOpts, HttpQuery } from '../runtime';
 import type {
+    ErrorMessageDto,
     LoginProviderDto,
 } from '../models';
 
-export interface GetJwkSetRequest {
-    provider: string;
-}
-
-export interface LoginRequest {
+export interface GetOAuth2ProvidersRequest {
     error?: string;
 }
 
@@ -35,42 +32,29 @@ export interface LoginWithProviderRequest {
 /**
  * no description
  */
-export class LoginManagementApi extends BaseAPI {
+export class OAuth2LoginManagementV2Api extends BaseAPI {
 
     /**
-     * Get JWK Set of a provider
+     * Get available OAuth2 authentication providers
      */
-    getJwkSet({ provider }: GetJwkSetRequest): Observable<string>
-    getJwkSet({ provider }: GetJwkSetRequest, opts?: OperationOpts): Observable<AjaxResponse<string>>
-    getJwkSet({ provider }: GetJwkSetRequest, opts?: OperationOpts): Observable<string | AjaxResponse<string>> {
-        throwIfNullOrUndefined(provider, 'provider', 'getJwkSet');
-
-        return this.request<string>({
-            url: '/oauth2/{provider}/jwkSet'.replace('{provider}', encodeURI(provider)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
-
-    /**
-     * Get available login providers
-     */
-    login({ error }: LoginRequest): Observable<Array<LoginProviderDto>>
-    login({ error }: LoginRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<LoginProviderDto>>>
-    login({ error }: LoginRequest, opts?: OperationOpts): Observable<Array<LoginProviderDto> | AjaxResponse<Array<LoginProviderDto>>> {
+    getOAuth2Providers({ error }: GetOAuth2ProvidersRequest): Observable<Array<LoginProviderDto>>
+    getOAuth2Providers({ error }: GetOAuth2ProvidersRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<LoginProviderDto>>>
+    getOAuth2Providers({ error }: GetOAuth2ProvidersRequest, opts?: OperationOpts): Observable<Array<LoginProviderDto> | AjaxResponse<Array<LoginProviderDto>>> {
 
         const query: HttpQuery = {};
 
         if (error != null) { query['error'] = error; }
 
         return this.request<Array<LoginProviderDto>>({
-            url: '/login',
+            url: '/v2/oauth2/providers',
             method: 'GET',
             query,
         }, opts?.responseOpts);
     };
 
     /**
-     * Login with provider
+     * Initiates OAuth2 login flow with the specified provider. Returns a redirect response to the provider\'s authentication page.
+     * Login with OAuth2 provider
      */
     loginWithProvider({ provider, redirect }: LoginWithProviderRequest): Observable<void>
     loginWithProvider({ provider, redirect }: LoginWithProviderRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
@@ -82,7 +66,7 @@ export class LoginManagementApi extends BaseAPI {
         if (redirect != null) { query['redirect'] = redirect; }
 
         return this.request<void>({
-            url: '/oauth2/authorization/{provider}/prepare'.replace('{provider}', encodeURI(provider)),
+            url: '/v2/oauth2/providers/{provider}/login'.replace('{provider}', encodeURI(provider)),
             method: 'GET',
             query,
         }, opts?.responseOpts);

@@ -31,7 +31,7 @@ describe('login epics', () => {
         const deps = {
             apiClients: {
                 login: {
-                    login: vi.fn().mockReturnValue(of(loginMethods)),
+                    getOAuth2Providers: vi.fn().mockReturnValue(of(loginMethods)),
                 },
             },
         } as unknown as EpicDependencies;
@@ -40,7 +40,7 @@ describe('login epics', () => {
         const emitted = await firstValueFrom(output$.pipe(take(1), toArray()));
 
         expect(emitted).toEqual([slice.actions.getLoginMethodsSuccess({ loginMethods })]);
-        expect(deps.apiClients.login.login).toHaveBeenCalledWith({});
+        expect(deps.apiClients.login.getOAuth2Providers).toHaveBeenCalledWith({});
     });
 
     test('getLoginMethods success with single method redirects', async () => {
@@ -51,7 +51,7 @@ describe('login epics', () => {
         const deps = {
             apiClients: {
                 login: {
-                    login: vi.fn().mockReturnValue(of(loginMethods)),
+                    getOAuth2Providers: vi.fn().mockReturnValue(of(loginMethods)),
                 },
             },
         } as unknown as EpicDependencies;
@@ -71,7 +71,7 @@ describe('login epics', () => {
         const deps = {
             apiClients: {
                 login: {
-                    login: vi.fn().mockReturnValue(of(loginMethods)),
+                    getOAuth2Providers: vi.fn().mockReturnValue(of(loginMethods)),
                 },
             },
         } as unknown as EpicDependencies;
@@ -88,7 +88,7 @@ describe('login epics', () => {
         const deps = {
             apiClients: {
                 login: {
-                    login: vi.fn().mockReturnValue(throwError(() => error)),
+                    getOAuth2Providers: vi.fn().mockReturnValue(throwError(() => error)),
                 },
             },
         } as unknown as EpicDependencies;
@@ -105,7 +105,7 @@ describe('login epics', () => {
         const deps = {
             apiClients: {
                 login: {
-                    login: vi.fn().mockReturnValue(throwError(() => error)),
+                    getOAuth2Providers: vi.fn().mockReturnValue(throwError(() => error)),
                 },
             },
         } as unknown as EpicDependencies;

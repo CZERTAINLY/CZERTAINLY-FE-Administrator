@@ -9,7 +9,7 @@ const getLoginMethods: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.getLoginMethods.match),
         switchMap((action) => {
             const redirectParam = action.payload.redirect || 'dashboard';
-            return deps.apiClients.login.login({}).pipe(
+            return deps.apiClients.login.getOAuth2Providers({}).pipe(
                 switchMap((loginMethods) => {
                     if (loginMethods.length === 1) {
                         const loginUrl = loginMethods[0].loginUrl;
