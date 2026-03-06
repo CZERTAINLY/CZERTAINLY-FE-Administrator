@@ -3,6 +3,7 @@ import { catchError, filter, switchMap } from 'rxjs/operators';
 import { AppEpic } from 'ducks';
 import { extractError } from 'utils/net';
 import * as slice from './login';
+import { loginRedirect } from 'utils/login-redirect';
 
 const getLoginMethods: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -12,8 +13,7 @@ const getLoginMethods: AppEpic = (action$, state$, deps) => {
             return deps.apiClients.login.getOAuth2Providers({}).pipe(
                 switchMap((loginMethods) => {
                     if (loginMethods.length === 1) {
-                        const loginUrl = loginMethods[0].loginUrl;
-                        window.location.assign(`${loginUrl}?redirect=${encodeURIComponent(redirectParam)}`);
+                        loginRedirect(loginMethods[0].loginUrl, redirectParam);
                         return EMPTY;
                     }
                     return of(slice.actions.getLoginMethodsSuccess({ loginMethods }));
