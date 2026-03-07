@@ -1,0 +1,162 @@
+import { useCallback, useEffect, useMemo } from 'react';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+
+import AttributeEditor from 'components/Attributes/AttributeEditor';
+import Button from 'components/Button';
+import Container from 'components/Container';
+import ProgressButton from 'components/ProgressButton';
+import TabLayout from 'components/Layout/TabLayout';
+import TextArea from 'components/TextArea';
+
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
+import { actions as vaultActions, selectors as vaultSelectors } from 'ducks/vaults';
+
+import { Resource, VaultInstanceDetailDto } from 'types/openapi';
+import { collectFormAttributes } from 'utils/attributes/attributes';
+
+interface VaultEditFormProps {
+    vault: VaultInstanceDetailDto;
+    onCancel?: () => void;
+    onSuccess?: () => void;
+}
+
+interface FormValues {
+    description: string;
+    [key: string]: unknown;
+}
+
+export default function VaultEditForm({ vault, onCancel, onSuccess }: VaultEditFormProps) {
+    const dispatch = useDispatch();
+
+    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+    const vaultInstanceAttributeDescriptors = useSelector(vaultSelectors.vaultInstanceAttributeDescriptors);
+    const vaultInstanceAttributesConnectorUuid = useSelector(vaultSelectors.vaultInstanceAttributesConnectorUuid);
+    const isFetchingVaultInstanceAttributes = useSelector(vaultSelectors.isFetchingVaultInstanceAttributes);
+    const isUpdating = useSelector(vaultSelectors.isUpdating);
+
+    const connectorUuid = vault.connector?.uuid;
+
+    useEffect(() => {
+        dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Vaults));
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (connectorUuid) {
+            dispatch(vaultActions.getVaultInstanceAttributes({ connectorUuid }));
+        }
+    }, [dispatch, connectorUuid]);
+
+    const vaultAttributeDescriptors = useMemo(() => {
+        if (vaultInstanceAttributesConnectorUuid !== connectorUuid) return [];
+        return vaultInstanceAttributeDescriptors;
+    }, [vaultInstanceAttributeDescriptors, vaultInstanceAttributesConnectorUuid, connectorUuid]);
+
+    const defaultValues: FormValues = useMemo(
+        () => ({
+            description: vault.description ?? '',
+        }),
+        [vault.description],
+    );
+
+    const methods = useForm<FormValues>({
+        defaultValues,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit,
+        control,
+        formState: { isDirty, isSubmitting, isValid },
+    } = methods;
+
+    const onSubmit = useCallback(
+        (values: FormValues) => {
+            dispatch(
+                vaultActions.updateVault({
+                    uuid: vault.uuid,
+                    request: {
+                        description: values.description ?? '',
+                        attributes: collectFormAttributes('vault', vaultAttributeDescriptors, values),
+                        customAttributes: collectFormAttributes('customVault', resourceCustomAttributes, values),
+                    },
+                }),
+            );
+            onSuccess?.();
+        },
+        [dispatch, onSuccess, resourceCustomAttributes, vault.uuid, vaultAttributeDescriptors],
+    );
+
+    const attributeTabs = useMemo(
+        () => [
+            {
+                title: 'Attributes',
+                content:
+                    vaultAttributeDescriptors.length > 0 ? (
+                        <AttributeEditor id="vault" attributeDescriptors={vaultAttributeDescriptors} attributes={vault.attributes ?? []} />
+                    ) : (
+                        <div className="text-sm text-gray-500">
+                            {connectorUuid && isFetchingVaultInstanceAttributes
+                                ? 'Loading attributes...'
+                                : 'No connector attributes configured for vaults.'}
+                        </div>
+                    ),
+            },
+            {
+                title: 'Custom Attributes',
+                content: (
+                    <AttributeEditor
+                        id="customVault"
+                        attributeDescriptors={resourceCustomAttributes}
+                        attributes={vault.customAttributes ?? []}
+                    />
+                ),
+            },
+        ],
+        [
+            connectorUuid,
+            isFetchingVaultInstanceAttributes,
+            resourceCustomAttributes,
+            vault.attributes,
+            vault.customAttributes,
+            vaultAttributeDescriptors,
+        ],
+    );
+
+    return (
+        <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)}>
+                <div className="space-y-4">
+                    <Controller
+                        name="description"
+                        control={control}
+                        render={({ field }) => (
+                            <TextArea
+                                id="vault-edit-description"
+                                label="Description"
+                                placeholder="Describe the vault"
+                                value={field.value}
+                                onChange={field.onChange}
+                                onBlur={field.onBlur}
+                            />
+                        )}
+                    />
+                    <TabLayout tabs={attributeTabs} />
+                    <Container className="flex-row justify-end modal-footer" gap={4}>
+                        <Button variant="outline" onClick={onCancel} type="button">
+                            Cancel
+                        </Button>
+                        <ProgressButton
+                            inProgress={isSubmitting || isUpdating}
+                            disabled={!isDirty || !isValid || isSubmitting || isUpdating}
+                            title="Save"
+                            inProgressTitle="Saving..."
+                            type="submit"
+                            color="primary"
+                        />
+                    </Container>
+                </div>
+            </form>
+        </FormProvider>
+    );
+}

@@ -12,6 +12,8 @@ export const enum EntityType {
     LOCATION,
     CERTIFICATE,
     KEY,
+    VAULT,
+    VAULT_PROFILE,
     DISCOVERY,
     NOTIFICATIONS,
     NOTIFICATION_PROFILES,
@@ -22,6 +24,7 @@ export const enum EntityType {
     ACTIONS,
     OID,
     CONNECTOR,
+    SECRET,
 }
 
 export type Filter = {

@@ -78,6 +78,9 @@ export enum PlatformEnum {
     AuthMethod = 'AuthMethod',
     Operation = 'Operation',
     OperationResult = 'OperationResult',
-    ApprovalStatusEnum = 'ApprovalStatusEnum'
+    ApprovalStatusEnum = 'ApprovalStatusEnum',
+    SecretType = 'SecretType',
+    KeyStoreType = 'KeyStoreType',
+    SecretState = 'SecretState'
 }
 

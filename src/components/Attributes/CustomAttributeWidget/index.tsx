@@ -15,9 +15,10 @@ export type Props = {
     resourceUuid: string;
     attributes: AttributeResponseModel[] | undefined;
     className?: string;
+    noBorder?: boolean;
 };
 
-export default function CustomAttributeWidget({ resource, resourceUuid, attributes, className }: Props) {
+export default function CustomAttributeWidget({ resource, resourceUuid, attributes, className, noBorder }: Props) {
     const dispatch = useDispatch();
     const [isAttributeContentLoaded, setIsAttributeContentLoaded] = useState<boolean>(false);
 
@@ -118,6 +119,7 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
             titleSize="large"
             widgetLockName={LockWidgetNameEnum.CustomAttributeWidget}
             className={className}
+            noBorder={noBorder}
         >
             <AttributeViewer
                 attributes={loadedAttributes}
