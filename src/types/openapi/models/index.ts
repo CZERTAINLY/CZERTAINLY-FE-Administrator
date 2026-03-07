@@ -292,6 +292,7 @@ export * from './KeyUsage';
 export * from './LocationDto';
 export * from './LocationsResponseDto';
 export * from './LoggingSettingsDto';
+export * from './LoginProviderDto';
 export * from './MetadataAttributeProperties';
 export * from './MetadataAttributeV2';
 export * from './MetadataAttributeV3';
