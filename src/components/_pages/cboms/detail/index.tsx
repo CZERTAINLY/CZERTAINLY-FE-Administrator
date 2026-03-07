@@ -2,20 +2,20 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import Button from 'components/Button';
-import { Copy, Download } from 'lucide-react';
+import { Copy, Download, Eye, Info } from 'lucide-react';
 import Breadcrumb from 'components/Breadcrumb';
 import Container from 'components/Container';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import JsonViewer from 'components/JsonViewer';
 import Select from 'components/Select';
+import TextInput from 'components/TextInput';
 import DonutChart from 'components/_pages/dashboard/DashboardItem/DonutChart';
 import Spinner from 'components/Spinner';
 import TabLayout from 'components/Layout/TabLayout';
 import Widget from 'components/Widget';
 import { EntityType } from 'ducks/filters';
 import { actions, selectors } from 'ducks/cbom';
-import { actions as alertActions } from 'ducks/alerts';
 import { DashboardDict } from 'types/statisticsDashboard';
 import { dateFormatter } from 'utils/dateUtil';
 import { getDonutChartColorsByRandomNumberOfOptions } from 'utils/dashboard';
@@ -48,42 +48,14 @@ type GenericObject = Record<string, unknown>;
 
 type LocationModalState = {
     asset: string;
-    location: string;
     rawJson: string;
+    assetData: CbomComponent;
 };
 
 const VERSION_HISTORY_OPTION_VALUE = '__CBOM_VIEW_VERSION_HISTORY__';
+const ALL_ASSET_TYPES_OPTION_VALUE = '__CBOM_ALL_ASSET_TYPES__';
 
 const toArray = <T,>(v: T | T[] | undefined | null): T[] => (v == null ? [] : Array.isArray(v) ? v : [v]);
-
-const ASSET_TYPE_LABELS: Record<string, string> = {
-    algorithm: 'Algorithm',
-    certificate: 'Certificate',
-    'related-crypto-material': 'Related Crypto Material',
-};
-
-const PRIMITIVE_LABELS: Record<string, string> = {
-    signature: 'Signature',
-    hash: 'Hash',
-    mac: 'MAC',
-    'stream-cipher': 'Stream Cipher',
-    'block-cipher': 'Block Cipher',
-    'key-agreement': 'Key Agreement',
-    'key-derivation': 'Key Derivation',
-    'public-key-encryption': 'Public-key Encryption',
-};
-
-const toDisplayName = (value?: string, labels?: Record<string, string>): string => {
-    if (!value) return '-';
-    const normalized = value.trim().toLowerCase();
-    if (labels?.[normalized]) return labels[normalized];
-
-    return value
-        .split(/[-_\s]+/)
-        .filter(Boolean)
-        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-        .join(' ');
-};
 
 const toChartRows = (map: Map<string, number>): TableDataRow[] =>
     [...map.entries()].sort((a, b) => b[1] - a[1]).map(([name, count]) => ({ id: `${name}-${count}`, columns: [name, count] }));
@@ -99,31 +71,6 @@ const toDashboardDict = (rows: TableDataRow[]): DashboardDict =>
 
 const isRecord = (value: unknown): value is GenericObject => typeof value === 'object' && value !== null;
 
-const getPathValue = (source: unknown, path: string): unknown => {
-    if (!isRecord(source)) return undefined;
-
-    const normalizedPath = path.replace(/^\//, '');
-
-    if (path in source) return source[path];
-    if (`/${normalizedPath}` in source) return source[`/${normalizedPath}`];
-    if (normalizedPath in source) return source[normalizedPath];
-
-    return normalizedPath.split('/').reduce<unknown>((acc, segment) => {
-        if (!segment || !isRecord(acc)) return undefined;
-        return acc[segment];
-    }, source);
-};
-
-const getMetadataPropertyValue = (source: unknown, propertyName: string): unknown => {
-    const properties = getPathValue(source, 'properties');
-    if (!Array.isArray(properties)) return undefined;
-
-    const property = properties.find((item) => isRecord(item) && item.name === propertyName);
-    if (!isRecord(property)) return undefined;
-
-    return property.value;
-};
-
 const toCellValue = (value: unknown): string | number => {
     if (value === null || value === undefined || value === '') return '-';
     if (typeof value === 'number') return value;
@@ -132,11 +79,26 @@ const toCellValue = (value: unknown): string | number => {
     return JSON.stringify(value);
 };
 
-type HandleLocationClick = (assetName: string, location: string, locationData: unknown) => void;
+const getPathValue = (obj: unknown, path: string): unknown => {
+    if (!path) return undefined;
+
+    const parts = path.split('/');
+    let current: unknown = obj;
+
+    for (const part of parts) {
+        if (!isRecord(current)) return undefined;
+        current = current[part];
+        if (current === undefined) return undefined;
+    }
+
+    return current;
+};
+
+type HandleAssetDetailClick = (assetName: string, assetData: unknown) => void;
 
 const buildComponentRows = (
     components: CbomComponent[],
-    handleLocationClick: HandleLocationClick,
+    handleAssetDetailClick: HandleAssetDetailClick,
     view: 'assets' | 'overview',
 ): TableDataRow[] =>
     components.map((c, i: number) => {
@@ -150,36 +112,38 @@ const buildComponentRows = (
                         const location = occurrence?.location || '-';
                         const key = `${String(assetName)}-${location}-${index}`;
 
-                        return (
-                            <Button
-                                key={key}
-                                variant="transparent"
-                                color="secondary"
-                                type="button"
-                                className="!p-0 !border-0 !inline text-blue-600 hover:!bg-transparent hover:underline focus:!bg-transparent w-fit"
-                                onClick={() => handleLocationClick(String(assetName), location, occurrence)}
-                            >
-                                {location}
-                            </Button>
-                        );
+                        return <div key={key}>{location}</div>;
                     })}
                 </div>
             ) : (
                 '-'
             );
 
-        const assetType = toDisplayName(c?.cryptoProperties?.assetType ?? c?.type, ASSET_TYPE_LABELS);
-        const primitive =
-            toArray(c?.cryptoProperties?.algorithmProperties?.primitive)
-                .map((p) => toDisplayName(p, PRIMITIVE_LABELS))
-                .join(', ') || '-';
+        const actionColumn = (
+            <Button
+                variant="transparent"
+                color="secondary"
+                type="button"
+                title="View asset detail"
+                onClick={() => handleAssetDetailClick(String(assetName), c)}
+                className="!p-1"
+            >
+                <Info size={16} aria-hidden="true" />
+            </Button>
+        );
+
+        const assetType = toCellValue(c?.cryptoProperties?.assetType ?? c?.type);
+        const primitiveValues = toArray(c?.cryptoProperties?.algorithmProperties?.primitive).filter(
+            (value): value is string => typeof value === 'string' && value.trim().length > 0,
+        );
+        const primitive = primitiveValues.length > 0 ? primitiveValues.join(', ') : '-';
 
         return {
             id: c?.bomRef ?? c?.['bom-ref'] ?? (view === 'overview' ? `overview-${i}` : i),
             columns:
                 view === 'overview'
-                    ? [assetName, assetType, primitive, locationsColumn]
-                    : [assetName, locationsColumn, assetType, primitive],
+                    ? [assetName, assetType, primitive, locationsColumn, actionColumn]
+                    : [assetName, locationsColumn, assetType, primitive, actionColumn],
         };
     });
 
@@ -194,7 +158,8 @@ export default function CbomDetail() {
     const isFetchingVersions = useSelector(selectors.selectIsFetchingVersions);
     const [locationModalData, setLocationModalData] = useState<LocationModalState>();
     const [selectedVersionUuid, setSelectedVersionUuid] = useState(id);
-
+    const [assetSearchQuery, setAssetSearchQuery] = useState('');
+    const [selectedAssetType, setSelectedAssetType] = useState<string>(ALL_ASSET_TYPES_OPTION_VALUE);
     const getFreshCbomDetail = useCallback(() => {
         if (!selectedVersionUuid || selectedVersionUuid === VERSION_HISTORY_OPTION_VALUE) return;
         dispatch(actions.clearCbomDetail());
@@ -323,11 +288,15 @@ export default function CbomDetail() {
         [detail],
     );
 
-    const metadataSummaryRows: TableDataRow[] = useMemo(
-        () => [
+    const metadataSummaryRows: TableDataRow[] = useMemo(() => {
+        const properties = isRecord(metadata) ? metadata.properties : undefined;
+
+        const timestampRaw = detail?.timestamp ?? getPathValue(metadata, 'timestamp');
+
+        const predefinedRows: TableDataRow[] = [
             {
                 id: 'timestamp',
-                columns: ['Timestamp', toCellValue(detail?.timestamp ?? getPathValue(metadata, 'timestamp'))],
+                columns: ['Timestamp', toCellValue(timestampRaw ? dateFormatter(timestampRaw as any) : undefined)],
             },
             {
                 id: 'type',
@@ -349,21 +318,29 @@ export default function CbomDetail() {
                     ),
                 ],
             },
-            {
-                id: 'cbom-lens-files-total',
-                columns: ['/cbom-lens/files/total', toCellValue(getMetadataPropertyValue(metadata, '/cbom-lens/files/total'))],
-            },
-            {
-                id: 'cbom-lens-ports-total',
-                columns: ['/cbom-lens/ports/total', toCellValue(getMetadataPropertyValue(metadata, '/cbom-lens/ports/total'))],
-            },
-            {
-                id: 'cbom-lens-containers-total',
-                columns: ['/cbom-lens/containers/total', toCellValue(getMetadataPropertyValue(metadata, '/cbom-lens/containers/total'))],
-            },
-        ],
-        [detail, metadata],
-    );
+        ];
+
+        if (!Array.isArray(properties)) return predefinedRows;
+
+        const propertiesRows = properties.map((property, index) => {
+            if (!isRecord(property)) {
+                return {
+                    id: `metadata-property-${index}`,
+                    columns: [`Property ${index + 1}`, '-'],
+                };
+            }
+
+            const propertyName =
+                typeof property.name === 'string' && property.name.trim().length > 0 ? property.name : `Property ${index + 1}`;
+
+            return {
+                id: `metadata-property-${index}`,
+                columns: [propertyName, toCellValue(property.value)],
+            };
+        });
+
+        return [...predefinedRows, ...propertiesRows];
+    }, [metadata, detail]);
 
     const componentHeaders: TableHeader[] = useMemo(
         () => [
@@ -371,6 +348,7 @@ export default function CbomDetail() {
             { id: 'location', content: 'Location' },
             { id: 'type', content: 'Asset Type' },
             { id: 'primitive', content: 'Primitive' },
+            { id: 'action', content: 'Action', align: 'center' },
         ],
         [],
     );
@@ -381,38 +359,57 @@ export default function CbomDetail() {
             { id: 'type', content: 'Asset Type' },
             { id: 'primitive', content: 'Primitive' },
             { id: 'location', content: 'Location' },
+            { id: 'action', content: 'Action', align: 'center' },
         ],
         [],
     );
 
-    const handleLocationClick = useCallback((assetName: string, location: string, locationData: unknown) => {
+    const handleAssetDetailClick = useCallback((assetName: string, assetData: unknown) => {
+        const typedAssetData = (assetData ?? {}) as CbomComponent;
         setLocationModalData({
             asset: assetName,
-            location,
-            rawJson: JSON.stringify(locationData ?? { location }, null, 2),
+            rawJson: JSON.stringify(typedAssetData, null, 2),
+            assetData: typedAssetData,
         });
     }, []);
 
-    const componentRows: TableDataRow[] = useMemo(
-        () => buildComponentRows(components, handleLocationClick, 'assets'),
-        [components, handleLocationClick],
+    const modalAssetDetailHeaders: TableHeader[] = useMemo(
+        () => [
+            { id: 'attribute', content: 'Attribute' },
+            { id: 'value', content: 'Value' },
+        ],
+        [],
     );
+
+    const modalAssetDetailRows: TableDataRow[] = useMemo(() => {
+        if (!locationModalData?.assetData) return [];
+
+        const asset = locationModalData.assetData;
+        const primitiveValues = toArray(asset?.cryptoProperties?.algorithmProperties?.primitive).filter(
+            (value): value is string => typeof value === 'string' && value.trim().length > 0,
+        );
+        const locationValues = toArray(asset?.evidence?.occurrences)
+            .map((occurrence) => occurrence?.location)
+            .filter((location): location is string => typeof location === 'string' && location.trim().length > 0);
+
+        return [
+            { id: 'asset-type', columns: ['Asset type', toCellValue(asset?.cryptoProperties?.assetType)] },
+            { id: 'type', columns: ['Type', toCellValue(asset?.type)] },
+            { id: 'primitive', columns: ['Primitive', primitiveValues.length > 0 ? primitiveValues.join(', ') : '-'] },
+            { id: 'location', columns: ['Location', locationValues.length > 0 ? locationValues.join(', ') : '-'] },
+            { id: 'source', columns: ['Source', toCellValue(detail?.source)] },
+            { id: 'cbom-version', columns: ['CBOM version', toCellValue(detail?.version)] },
+        ];
+    }, [locationModalData, detail]);
+
+    const handleCopyAssetJson = useCallback(() => {
+        if (!locationModalData?.rawJson) return;
+        void navigator.clipboard.writeText(locationModalData.rawJson);
+    }, [locationModalData]);
 
     const handleCloseLocationModal = useCallback(() => {
         setLocationModalData(undefined);
     }, []);
-
-    const handleCopyLocationExcerpt = useCallback(() => {
-        const textToCopy = locationModalData?.rawJson ?? '';
-        void navigator.clipboard
-            .writeText(textToCopy)
-            .then(() => {
-                dispatch(alertActions.success('Excerpt copied to clipboard.'));
-            })
-            .catch(() => {
-                dispatch(alertActions.error('Failed to copy excerpt to clipboard.'));
-            });
-    }, [locationModalData, dispatch]);
 
     const versionSelectOptions = useMemo(() => {
         const latestVersionNumber = cbomVersions.length ? Math.max(...cbomVersions.map((version) => version.version)) : undefined;
@@ -457,14 +454,90 @@ export default function CbomDetail() {
                 return;
             }
 
+            navigate(`/cboms/detail/${selectedValue}`);
             setSelectedVersionUuid(selectedValue);
         },
         [navigate, id],
     );
 
     const overviewComponentRows: TableDataRow[] = useMemo(
-        () => buildComponentRows(components, handleLocationClick, 'overview'),
-        [components, handleLocationClick],
+        () => buildComponentRows(components, handleAssetDetailClick, 'overview'),
+        [components, handleAssetDetailClick],
+    );
+
+    const assetTypeOptions = useMemo(() => {
+        const uniqueTypes = new Set<string>();
+
+        for (const component of components) {
+            const typeValue = component?.cryptoProperties?.assetType ?? component?.type;
+            if (typeof typeValue === 'string' && typeValue.trim().length > 0) {
+                uniqueTypes.add(typeValue.trim());
+            }
+        }
+
+        return [
+            {
+                value: ALL_ASSET_TYPES_OPTION_VALUE,
+                label: 'All asset types',
+            },
+            ...[...uniqueTypes]
+                .sort((a, b) => a.localeCompare(b))
+                .map((type) => ({
+                    value: type,
+                    label: type,
+                })),
+        ];
+    }, [components]);
+
+    useEffect(() => {
+        const hasSelectedOption = assetTypeOptions.some((option) => String(option.value) === selectedAssetType);
+        if (!hasSelectedOption) {
+            setSelectedAssetType(ALL_ASSET_TYPES_OPTION_VALUE);
+        }
+    }, [assetTypeOptions, selectedAssetType]);
+
+    const filteredComponents = useMemo(() => {
+        const normalizedSearch = assetSearchQuery.trim().toLowerCase();
+
+        return components.filter((component) => {
+            const componentAssetType = component?.cryptoProperties?.assetType ?? component?.type;
+            const assetTypeMatches = selectedAssetType === ALL_ASSET_TYPES_OPTION_VALUE || componentAssetType === selectedAssetType;
+
+            if (!assetTypeMatches) return false;
+            if (!normalizedSearch) return true;
+
+            const assetName = component?.name ?? component?.['bom-ref'] ?? component?.bomRef ?? '';
+            const locations = toArray(component?.evidence?.occurrences)
+                .map((occurrence) => occurrence?.location)
+                .filter((location): location is string => typeof location === 'string' && location.trim().length > 0)
+                .join(' ');
+            const primitive = toArray(component?.cryptoProperties?.algorithmProperties?.primitive).join(' ');
+            const cryptoFunctions = toArray(component?.cryptoProperties?.algorithmProperties?.cryptoFunctions).join(' ');
+
+            const searchableText = `${assetName} ${componentAssetType ?? ''} ${locations} ${primitive} ${cryptoFunctions} ${JSON.stringify(
+                component ?? {},
+            )}`
+                .toLowerCase()
+                .trim();
+
+            return searchableText.includes(normalizedSearch);
+        });
+    }, [components, assetSearchQuery, selectedAssetType]);
+
+    const handleAssetTypeChange = useCallback((value: string | number | object | { value: string | number | object; label: string }) => {
+        const selectedValue =
+            typeof value === 'string' || typeof value === 'number'
+                ? String(value)
+                : typeof value === 'object' && value !== null && 'value' in value
+                  ? String(value.value)
+                  : ALL_ASSET_TYPES_OPTION_VALUE;
+
+        setSelectedAssetType(selectedValue || ALL_ASSET_TYPES_OPTION_VALUE);
+    }, []);
+
+    const componentRows: TableDataRow[] = useMemo(
+        () => buildComponentRows(filteredComponents, handleAssetDetailClick, 'assets'),
+        [filteredComponents, handleAssetDetailClick],
     );
 
     return (
@@ -519,6 +592,8 @@ export default function CbomDetail() {
                                             redirect="../cboms"
                                             showValuesInLegend
                                             interactiveLegend={false}
+                                            showCenterLabel
+                                            chartSize="full"
                                         />
                                     )}
                                     {Object.keys(algorithmsByNameChartData).length > 0 && (
@@ -533,6 +608,8 @@ export default function CbomDetail() {
                                             redirect="../cboms"
                                             showValuesInLegend
                                             interactiveLegend={false}
+                                            showCenterLabel
+                                            chartSize="full"
                                         />
                                     )}
                                     {Object.keys(cryptoFunctionsChartData).length > 0 && (
@@ -547,6 +624,8 @@ export default function CbomDetail() {
                                             redirect="../cboms"
                                             showValuesInLegend
                                             interactiveLegend={false}
+                                            showCenterLabel
+                                            chartSize="full"
                                         />
                                     )}
                                     {Object.keys(cryptoPrimitivesChartData).length > 0 && (
@@ -561,6 +640,8 @@ export default function CbomDetail() {
                                             redirect="../cboms"
                                             showValuesInLegend
                                             interactiveLegend={false}
+                                            showCenterLabel
+                                            chartSize="full"
                                         />
                                     )}
                                     {Object.keys(relatedMaterialTypesChartData).length > 0 && (
@@ -575,6 +656,8 @@ export default function CbomDetail() {
                                             redirect="../cboms"
                                             showValuesInLegend
                                             interactiveLegend={false}
+                                            showCenterLabel
+                                            chartSize="full"
                                         />
                                     )}
                                 </div>
@@ -591,6 +674,24 @@ export default function CbomDetail() {
                         content: (
                             <Container>
                                 <Widget titleSize="large">
+                                    <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+                                        <div className="md:col-span-2">
+                                            <TextInput
+                                                id="cbom-assets-search"
+                                                value={assetSearchQuery}
+                                                onChange={setAssetSearchQuery}
+                                                placeholder="Search assets (name, location, type, primitive, metadata)"
+                                            />
+                                        </div>
+                                        <Select
+                                            id="cbom-assets-type-filter"
+                                            value={selectedAssetType}
+                                            onChange={handleAssetTypeChange}
+                                            options={assetTypeOptions}
+                                            placeholder="Filter by asset type"
+                                        />
+                                    </div>
+
                                     <CustomTable headers={componentHeaders} data={componentRows} hasPagination />
                                 </Widget>
                             </Container>
@@ -637,28 +738,20 @@ export default function CbomDetail() {
             <Dialog
                 isOpen={!!locationModalData}
                 toggle={handleCloseLocationModal}
-                caption="Asset JSON excerpt"
+                caption="Asset detail"
                 size="xl"
                 noBorder
                 body={
                     <div className="flex flex-col gap-4 pb-6">
-                        <div className="flex flex-row items-center gap-5">
-                            <div className="flex flex-row items-center gap-1 font-medium">
-                                <div className="text-gray-500">Asset:</div>
-                                <div className="text-[var(--dark-gray-color)] break-all">{locationModalData?.asset ?? '-'}</div>
-                            </div>
-                            <div className="flex flex-row items-center gap-1 font-medium">
-                                <div className="text-gray-500">Location:</div>
-                                <div className="text-[var(--dark-gray-color)] break-all">{locationModalData?.location ?? '-'}</div>
-                            </div>
-                        </div>
+                        <CustomTable headers={modalAssetDetailHeaders} data={modalAssetDetailRows} />
 
                         <JsonViewer value={locationModalData?.rawJson ?? ''} height={278} />
 
                         <div className="flex items-center justify-between pt-2">
-                            <Button type="button" color="primary" onClick={handleCopyLocationExcerpt}>
-                                Copy Excerpt
+                            <Button type="button" variant="solid" color="primary" onClick={handleCopyAssetJson} className="text-black">
+                                Copy JSON
                             </Button>
+
                             <Button
                                 type="button"
                                 variant="outline"

@@ -13,7 +13,7 @@
 
 import type {
     AuthType,
-    ConnectorInterfaceInfo,
+    ConnectorInterfaceDto,
     ConnectorStatus,
     ConnectorVersion,
     FunctionGroupDto,
@@ -63,10 +63,10 @@ export interface ConnectorDetailDtoV2 {
     functionGroups: Array<FunctionGroupDto>;
     /**
      * List of connector interfaces implemented by the Connector
-     * @type {Array<ConnectorInterfaceInfo>}
+     * @type {Array<ConnectorInterfaceDto>}
      * @memberof ConnectorDetailDtoV2
      */
-    interfaces: Array<ConnectorInterfaceInfo>;
+    interfaces: Array<ConnectorInterfaceDto>;
     /**
      * Type of authentication for the Connector
      * @type {AuthType}

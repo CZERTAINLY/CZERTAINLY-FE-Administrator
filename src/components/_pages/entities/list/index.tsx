@@ -112,7 +112,7 @@ function EntityList() {
                 entity={EntityType.ENTITY}
                 onListCallback={onListCallback}
                 onDeleteCallback={(uuids) => uuids.map((uuid) => dispatch(actions.deleteEntity({ uuid })))}
-                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.entities.getSearchableFieldInformation2(), [])}
+                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.entities.getSearchableFieldInformation5(), [])}
                 headers={entitiesRowHeaders}
                 data={entityList}
                 isBusy={isBusy}

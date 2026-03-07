@@ -153,7 +153,7 @@ function DiscoveryList() {
                 onListCallback={onListCallback}
                 onDeleteCallback={(uuids) => dispatch(actions.bulkDeleteDiscovery({ uuids }))}
                 getAvailableFiltersApi={useCallback(
-                    (apiClients: ApiClients) => apiClients.discoveries.getSearchableFieldInformation3(),
+                    (apiClients: ApiClients) => apiClients.discoveries.getSearchableFieldInformation6(),
                     [],
                 )}
                 headers={discoveriesRowHeaders}

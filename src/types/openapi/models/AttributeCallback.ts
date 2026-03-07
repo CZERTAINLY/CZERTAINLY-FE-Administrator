@@ -31,7 +31,7 @@ export interface AttributeCallback {
      * @type {string}
      * @memberof AttributeCallback
      */
-    callbackMethod: string;
+    callbackMethod?: string;
     /**
      * Mappings for the callback method
      * @type {Array<AttributeCallbackMapping>}

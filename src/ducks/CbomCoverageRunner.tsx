@@ -38,6 +38,19 @@ function runReducerAndSelectors() {
     state = reducer(state, actions.uploadCbom({ content: { metadata: {} } } as any));
     state = reducer(state, actions.uploadCbomSuccess({ cbom: { uuid: 'cbom-new' } as any }));
     state = reducer(state, actions.uploadCbomFailure({ error: 'err' }));
+
+    state = reducer(state, actions.deleteCbom({ uuid: 'cbom-new' }));
+    state = reducer(state, actions.deleteCbomSuccess({ uuid: 'cbom-new' }));
+    state = reducer(state, actions.deleteCbomFailure({ error: 'err' }));
+
+    state = reducer(state, actions.bulkDeleteCbom({ uuids: ['cbom-1', 'cbom-2'] }));
+    state = reducer(state, actions.bulkDeleteCbomSuccess({ uuids: ['cbom-1', 'cbom-2'] }));
+    state = reducer(state, actions.bulkDeleteCbomFailure({ error: 'err' }));
+
+    state = reducer(state, actions.syncCboms());
+    state = reducer(state, actions.syncCbomsSuccess());
+    state = reducer(state, actions.syncCbomsFailure({ error: 'err' }));
+
     state = reducer(state, actions.resetState());
 
     const rootState = { cbom: state } as any;
@@ -51,6 +64,10 @@ function runReducerAndSelectors() {
     selectors.selectIsFetchingVersions(rootState);
     selectors.selectIsFetchingSearchableFields(rootState);
     selectors.selectIsUploading(rootState);
+    selectors.selectIsUploadSuccess(rootState);
+    selectors.selectIsDeleting(rootState);
+    selectors.selectIsBulkDeleting(rootState);
+    selectors.selectIsSyncing(rootState);
 
     reducer(
         {
@@ -84,8 +101,11 @@ function runEpics() {
                 listCboms: () => of({ items: [{ uuid: 'cbom-1' }], totalItems: 1, pageNumber: 1, itemsPerPage: 10, totalPages: 1 }),
                 getCbomDetail: () => of({ uuid: 'detail-1', version: 1 }),
                 listCbomVersions: () => of([{ uuid: 'v-1', version: 1 }]),
-                getSearchableFieldInformation5: () => of([{ group: 'cbom', fields: [] }]),
+                getSearchableFieldInformation8: () => of([{ group: 'cbom', fields: [] }]),
                 uploadCbom: () => of({ uuid: 'created-1' }),
+                deleteCbom: () => of(undefined),
+                bulkDeleteCbom: () => of([]),
+                sync: () => of(undefined),
             },
         },
     } as any;
@@ -96,8 +116,11 @@ function runEpics() {
                 listCboms: () => throwError(() => new Error('list failed')),
                 getCbomDetail: () => throwError(() => new Error('detail failed')),
                 listCbomVersions: () => throwError(() => new Error('versions failed')),
-                getSearchableFieldInformation5: () => throwError(() => new Error('search fields failed')),
+                getSearchableFieldInformation8: () => throwError(() => new Error('search fields failed')),
                 uploadCbom: () => throwError(() => new Error('upload failed')),
+                deleteCbom: () => throwError(() => new Error('delete failed')),
+                bulkDeleteCbom: () => throwError(() => new Error('bulk delete failed')),
+                sync: () => throwError(() => new Error('sync failed')),
             },
         },
     } as any;
@@ -124,6 +147,15 @@ function runEpics() {
 
     cbomEpics[4](of(actions.uploadCbom({ content: { metadata: {} } } as any)) as any, of({}) as any, successDeps).subscribe();
     cbomEpics[4](of(actions.uploadCbom({ content: { metadata: {} } } as any)) as any, of({}) as any, failureDeps).subscribe();
+
+    cbomEpics[5](of(actions.deleteCbom({ uuid: 'detail-1' })) as any, of({}) as any, successDeps).subscribe();
+    cbomEpics[5](of(actions.deleteCbom({ uuid: 'detail-1' })) as any, of({}) as any, failureDeps).subscribe();
+
+    cbomEpics[6](of(actions.bulkDeleteCbom({ uuids: ['cbom-1', 'cbom-2'] })) as any, of({}) as any, successDeps).subscribe();
+    cbomEpics[6](of(actions.bulkDeleteCbom({ uuids: ['cbom-1', 'cbom-2'] })) as any, of({}) as any, failureDeps).subscribe();
+
+    cbomEpics[7](of(actions.syncCboms()) as any, of({}) as any, successDeps).subscribe();
+    cbomEpics[7](of(actions.syncCboms()) as any, of({}) as any, failureDeps).subscribe();
 }
 
 export default function CbomCoverageRunner() {
