@@ -26,6 +26,11 @@ function CbomsList() {
 
     const cboms = useSelector(selectors.selectCbomList);
     const isFetching = useSelector(selectors.selectIsFetchingList);
+    const isDeleting = useSelector(selectors.selectIsDeleting);
+    const isBulkDeleting = useSelector(selectors.selectIsBulkDeleting);
+    const isSyncing = useSelector(selectors.selectIsSyncing);
+
+    const isBusy = isFetching || isDeleting || isBulkDeleting || isSyncing;
 
     const headers: TableHeader[] = useMemo(
         () => [
@@ -52,8 +57,14 @@ function CbomsList() {
                 tooltip: 'Upload CBOM',
                 onClick: () => setIsUploadOpen(true),
             },
+            {
+                icon: 'sync',
+                disabled: isSyncing,
+                tooltip: 'Sync CBOMs',
+                onClick: () => dispatch(actions.syncCboms()),
+            },
         ],
-        [],
+        [dispatch, isSyncing],
     );
 
     const getCbomJson = useCallback(async (uuid: string): Promise<string> => {
@@ -141,9 +152,16 @@ function CbomsList() {
     const onList = useCallback((filters: SearchRequestModel) => dispatch(actions.listCboms(filters)), [dispatch]);
 
     const isUploading = useSelector(selectors.selectIsUploading);
+    const isUploadSuccess = useSelector(selectors.selectIsUploadSuccess);
 
     useRunOnFinished(isUploading, () => {
-        setIsUploadOpen(false);
+        if (isUploadSuccess) {
+            setIsUploadOpen(false);
+            onList({ itemsPerPage: 10, pageNumber: 1, filters: [] });
+        }
+    });
+
+    useRunOnFinished(isSyncing, () => {
         onList({ itemsPerPage: 10, pageNumber: 1, filters: [] });
     });
 
@@ -152,17 +170,29 @@ function CbomsList() {
             <PagedList
                 entity={EntityType.CBOM}
                 onListCallback={onList}
+                onDeleteCallback={(uuids) => {
+                    if (uuids.length === 1) {
+                        dispatch(actions.deleteCbom({ uuid: uuids[0] }));
+                        return;
+                    }
+
+                    if (uuids.length > 1) {
+                        dispatch(actions.bulkDeleteCbom({ uuids }));
+                    }
+                }}
                 getAvailableFiltersApi={useCallback(
-                    (apiClients: ApiClients) => apiClients.cbomManagement.getSearchableFieldInformation5(),
+                    (apiClients: ApiClients) => apiClients.cbomManagement.getSearchableFieldInformation8(),
                     [],
                 )}
                 filterTitle="CBOMs Filter"
                 headers={headers}
                 data={rows}
-                isBusy={isFetching}
+                isBusy={isBusy}
                 title="CBOMs"
+                entityNameSingular="a CBOM"
+                entityNamePlural="CBOMs"
                 addHidden
-                hasCheckboxes={false}
+                hasCheckboxes={true}
                 additionalButtons={additionalButtons}
                 pageWidgetLockName={LockWidgetNameEnum.ListOfCboms}
             />

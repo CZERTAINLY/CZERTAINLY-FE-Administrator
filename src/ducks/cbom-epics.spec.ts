@@ -16,8 +16,11 @@ type EpicDeps = {
             listCboms: (args: any) => any;
             getCbomDetail: (args: any) => any;
             listCbomVersions: (args: any) => any;
-            getSearchableFieldInformation5: () => any;
+            getSearchableFieldInformation8: () => any;
             uploadCbom: (args: any) => any;
+            deleteCbom: (args: any) => any;
+            bulkDeleteCbom: (args: any) => any;
+            sync: () => any;
         };
     };
 };
@@ -29,8 +32,11 @@ function createDeps(overrides: Partial<EpicDeps['apiClients']['cbomManagement']>
                 listCboms: () => of({ items: [], totalItems: 0, pageNumber: 1, itemsPerPage: 10, totalPages: 0 }),
                 getCbomDetail: () => of({ uuid: 'detail-default' }),
                 listCbomVersions: () => of([]),
-                getSearchableFieldInformation5: () => of([]),
+                getSearchableFieldInformation8: () => of([]),
                 uploadCbom: () => of({ uuid: 'uploaded-default' }),
+                deleteCbom: () => of(undefined),
+                bulkDeleteCbom: () => of([]),
+                sync: () => of(undefined),
                 ...overrides,
             },
         },
@@ -151,7 +157,7 @@ describe('cbom epics', () => {
     test('getSearchableFields success emits getSearchableFieldsSuccess', async () => {
         const fields = [{ group: 'cbom', fields: [{ field: 'serialNumber', label: 'Serial Number' }] }] as any;
         const deps = createDeps({
-            getSearchableFieldInformation5: () => of(fields),
+            getSearchableFieldInformation8: () => of(fields),
         });
 
         const output$ = (cbomEpics[3] as any)(of(slice.actions.getSearchableFields()), of({}) as any, deps as any);
@@ -163,7 +169,7 @@ describe('cbom epics', () => {
     test('getSearchableFields failure emits getSearchableFieldsFailure and fetchError', async () => {
         const err = new Error('searchable failed');
         const deps = createDeps({
-            getSearchableFieldInformation5: () => throwError(() => err),
+            getSearchableFieldInformation8: () => throwError(() => err),
         });
 
         const output$ = (cbomEpics[3] as any)(of(slice.actions.getSearchableFields()), of({}) as any, deps as any);
@@ -206,5 +212,101 @@ describe('cbom epics', () => {
 
         expect(emitted[0]).toEqual(slice.actions.uploadCbomFailure({ error: 'Failed to upload CBOM. upload failed' }));
         expect(emitted[1]).toEqual(alertsSlice.actions.error('Failed to upload CBOM. upload failed'));
+    });
+
+    test('uploadCbom failure deduplicates repeated already exists phrase', async () => {
+        const deps = createDeps({
+            uploadCbom: () => throwError(() => ({ message: 'Object already exists already exists' })),
+        });
+
+        const output$ = (cbomEpics[4] as any)(
+            of(slice.actions.uploadCbom({ content: { metadata: {} } } as any)),
+            of({}) as any,
+            deps as any,
+        );
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+
+        expect(emitted[0]).toEqual(slice.actions.uploadCbomFailure({ error: 'Failed to upload CBOM. Object already exists' }));
+        expect(emitted[1]).toEqual(alertsSlice.actions.error('Failed to upload CBOM. Object already exists'));
+    });
+
+    test('deleteCbom success emits deleteCbomSuccess and success alert', async () => {
+        const uuid = 'cbom-delete-1';
+        const deps = createDeps({
+            deleteCbom: ({ uuid: value }) => {
+                expect(value).toBe(uuid);
+                return of(undefined);
+            },
+        });
+
+        const output$ = (cbomEpics[5] as any)(of(slice.actions.deleteCbom({ uuid })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+
+        expect(emitted).toEqual([slice.actions.deleteCbomSuccess({ uuid }), alertsSlice.actions.success('CBOM successfully deleted.')]);
+    });
+
+    test('deleteCbom failure emits deleteCbomFailure and error alert', async () => {
+        const deps = createDeps({
+            deleteCbom: () => throwError(() => new Error('delete failed')),
+        });
+
+        const output$ = (cbomEpics[5] as any)(of(slice.actions.deleteCbom({ uuid: 'u' })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+
+        expect(emitted[0]).toEqual(slice.actions.deleteCbomFailure({ error: 'Failed to delete CBOM. delete failed' }));
+        expect(emitted[1]).toEqual(alertsSlice.actions.error('Failed to delete CBOM. delete failed'));
+    });
+
+    test('bulkDeleteCbom success emits bulkDeleteCbomSuccess and success alert', async () => {
+        const uuids = ['u1', 'u2'];
+        const deps = createDeps({
+            bulkDeleteCbom: ({ requestBody }) => {
+                expect(requestBody).toEqual(uuids);
+                return of([]);
+            },
+        });
+
+        const output$ = (cbomEpics[6] as any)(of(slice.actions.bulkDeleteCbom({ uuids })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+
+        expect(emitted).toEqual([
+            slice.actions.bulkDeleteCbomSuccess({ uuids }),
+            alertsSlice.actions.success('Selected CBOMs successfully deleted.'),
+        ]);
+    });
+
+    test('bulkDeleteCbom failure emits bulkDeleteCbomFailure and error alert', async () => {
+        const deps = createDeps({
+            bulkDeleteCbom: () => throwError(() => new Error('bulk delete failed')),
+        });
+
+        const output$ = (cbomEpics[6] as any)(of(slice.actions.bulkDeleteCbom({ uuids: ['u1', 'u2'] })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+
+        expect(emitted[0]).toEqual(slice.actions.bulkDeleteCbomFailure({ error: 'Failed to bulk delete CBOMs. bulk delete failed' }));
+        expect(emitted[1]).toEqual(alertsSlice.actions.error('Failed to bulk delete CBOMs. bulk delete failed'));
+    });
+
+    test('syncCboms success emits syncCbomsSuccess and success alert', async () => {
+        const deps = createDeps({
+            sync: () => of(undefined),
+        });
+
+        const output$ = (cbomEpics[7] as any)(of(slice.actions.syncCboms()), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+
+        expect(emitted).toEqual([slice.actions.syncCbomsSuccess(), alertsSlice.actions.success('CBOMs successfully synchronized.')]);
+    });
+
+    test('syncCboms failure emits syncCbomsFailure and error alert', async () => {
+        const deps = createDeps({
+            sync: () => throwError(() => new Error('sync failed')),
+        });
+
+        const output$ = (cbomEpics[7] as any)(of(slice.actions.syncCboms()), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+
+        expect(emitted[0]).toEqual(slice.actions.syncCbomsFailure({ error: 'Failed to sync CBOMs. sync failed' }));
+        expect(emitted[1]).toEqual(alertsSlice.actions.error('Failed to sync CBOMs. sync failed'));
     });
 });

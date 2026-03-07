@@ -27,6 +27,7 @@ export enum Module {
     Entities = 'entities',
     Protocols = 'protocols',
     Scheduler = 'scheduler',
+    Secrets = 'secrets',
     Workflows = 'workflows'
 }
 

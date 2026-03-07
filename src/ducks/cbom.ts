@@ -20,6 +20,10 @@ export type State = {
     isFetchingVersions: boolean;
     isFetchingSearchableFields: boolean;
     isUploading: boolean;
+    isUploadSuccess: boolean;
+    isDeleting: boolean;
+    isBulkDeleting: boolean;
+    isSyncing: boolean;
 };
 
 export const initialState: State = {
@@ -31,6 +35,10 @@ export const initialState: State = {
     isFetchingVersions: false,
     isFetchingSearchableFields: false,
     isUploading: false,
+    isUploadSuccess: false,
+    isDeleting: false,
+    isBulkDeleting: false,
+    isSyncing: false,
 };
 
 export const slice = createSlice({
@@ -114,10 +122,12 @@ export const slice = createSlice({
         // Upload CBOM
         uploadCbom: (state, action: PayloadAction<CbomUploadRequestDto>) => {
             state.isUploading = true;
+            state.isUploadSuccess = false;
         },
 
         uploadCbomSuccess: (state, action: PayloadAction<{ cbom: CbomDto }>) => {
             state.isUploading = false;
+            state.isUploadSuccess = true;
             if (state.cbomsData) {
                 state.cbomsData.items.unshift(action.payload.cbom);
             }
@@ -125,6 +135,56 @@ export const slice = createSlice({
 
         uploadCbomFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUploading = false;
+            state.isUploadSuccess = false;
+        },
+
+        // Delete CBOM
+        deleteCbom: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isDeleting = true;
+        },
+
+        deleteCbomSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isDeleting = false;
+
+            if (state.cbomsData) {
+                const index = state.cbomsData.items.findIndex((cbom) => cbom.uuid === action.payload.uuid);
+                if (index !== -1) state.cbomsData.items.splice(index, 1);
+            }
+        },
+
+        deleteCbomFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isDeleting = false;
+        },
+
+        // Bulk delete CBOM
+        bulkDeleteCbom: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkDeleting = true;
+        },
+
+        bulkDeleteCbomSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkDeleting = false;
+
+            if (state.cbomsData) {
+                const uuidSet = new Set(action.payload.uuids);
+                state.cbomsData.items = state.cbomsData.items.filter((item) => !uuidSet.has(item.uuid));
+            }
+        },
+
+        bulkDeleteCbomFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isBulkDeleting = false;
+        },
+
+        // Sync CBOMs
+        syncCboms: (state, action: PayloadAction<void>) => {
+            state.isSyncing = true;
+        },
+
+        syncCbomsSuccess: (state, action: PayloadAction<void>) => {
+            state.isSyncing = false;
+        },
+
+        syncCbomsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isSyncing = false;
         },
     },
 });
@@ -142,6 +202,10 @@ export const selectIsFetchingDetail = createSelector(featureSelector, (state) =>
 export const selectIsFetchingVersions = createSelector(featureSelector, (state) => state.isFetchingVersions);
 export const selectIsFetchingSearchableFields = createSelector(featureSelector, (state) => state.isFetchingSearchableFields);
 export const selectIsUploading = createSelector(featureSelector, (state) => state.isUploading);
+export const selectIsUploadSuccess = createSelector(featureSelector, (state) => state.isUploadSuccess);
+export const selectIsDeleting = createSelector(featureSelector, (state) => state.isDeleting);
+export const selectIsBulkDeleting = createSelector(featureSelector, (state) => state.isBulkDeleting);
+export const selectIsSyncing = createSelector(featureSelector, (state) => state.isSyncing);
 
 export const selectors = {
     selectCbomsData,
@@ -154,6 +218,10 @@ export const selectors = {
     selectIsFetchingVersions,
     selectIsFetchingSearchableFields,
     selectIsUploading,
+    selectIsUploadSuccess,
+    selectIsDeleting,
+    selectIsBulkDeleting,
+    selectIsSyncing,
 };
 
 export const { actions } = slice;

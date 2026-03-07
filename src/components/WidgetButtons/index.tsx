@@ -117,7 +117,7 @@ const getIcon = (icon: IconName, size: number = 20): React.ReactNode => {
         retweet: Repeat2,
         'minus-square': MinusSquare,
         push: ArrowUpCircle,
-        sync: RefreshCw,
+        sync: Repeat2,
         info: Info,
         minus: Minus,
         gavel: Gavel,

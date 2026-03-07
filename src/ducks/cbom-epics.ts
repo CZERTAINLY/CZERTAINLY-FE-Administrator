@@ -17,6 +17,12 @@ import {
 import { actions as userInterfaceActions } from './user-interface';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
+const normalizeCbomUploadErrorMessage = (message: string): string =>
+    message
+        .replace(/\balready exists(?:\s+already exists)+\b/gi, 'already exists')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+
 const listCboms: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.listCboms.match),
@@ -101,7 +107,7 @@ const getSearchableFields: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.getSearchableFields.match),
         switchMap(() =>
-            deps.apiClients.cbomManagement.getSearchableFieldInformation5().pipe(
+            deps.apiClients.cbomManagement.getSearchableFieldInformation8().pipe(
                 map((fields) =>
                     slice.actions.getSearchableFieldsSuccess({
                         fields: transformSearchableFieldsDtoToModel(fields),
@@ -129,9 +135,31 @@ const uploadCbom: AppEpic = (action$, state, deps) => {
                     }),
                 ),
                 catchError((err) =>
+                    (() => {
+                        const errorMessage = normalizeCbomUploadErrorMessage(extractError(err, 'Failed to upload CBOM'));
+                        return of(slice.actions.uploadCbomFailure({ error: errorMessage }), alertsSlice.actions.error(errorMessage));
+                    })(),
+                ),
+            ),
+        ),
+    );
+};
+
+const deleteCbom: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.deleteCbom.match),
+        switchMap((action) =>
+            deps.apiClients.cbomManagement.deleteCbom({ uuid: action.payload.uuid }).pipe(
+                mergeMap(() =>
                     of(
-                        slice.actions.uploadCbomFailure({ error: extractError(err, 'Failed to upload CBOM') }),
-                        alertsSlice.actions.error(extractError(err, 'Failed to upload CBOM')),
+                        slice.actions.deleteCbomSuccess({ uuid: action.payload.uuid }),
+                        alertsSlice.actions.success('CBOM successfully deleted.'),
+                    ),
+                ),
+                catchError((err) =>
+                    of(
+                        slice.actions.deleteCbomFailure({ error: extractError(err, 'Failed to delete CBOM') }),
+                        alertsSlice.actions.error(extractError(err, 'Failed to delete CBOM')),
                     ),
                 ),
             ),
@@ -139,4 +167,43 @@ const uploadCbom: AppEpic = (action$, state, deps) => {
     );
 };
 
-export default [listCboms, getCbomDetail, listCbomVersions, getSearchableFields, uploadCbom];
+const bulkDeleteCbom: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkDeleteCbom.match),
+        switchMap((action) =>
+            deps.apiClients.cbomManagement.bulkDeleteCbom({ requestBody: action.payload.uuids }).pipe(
+                mergeMap(() =>
+                    of(
+                        slice.actions.bulkDeleteCbomSuccess({ uuids: action.payload.uuids }),
+                        alertsSlice.actions.success('Selected CBOMs successfully deleted.'),
+                    ),
+                ),
+                catchError((err) =>
+                    of(
+                        slice.actions.bulkDeleteCbomFailure({ error: extractError(err, 'Failed to bulk delete CBOMs') }),
+                        alertsSlice.actions.error(extractError(err, 'Failed to bulk delete CBOMs')),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const syncCboms: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.syncCboms.match),
+        switchMap(() =>
+            deps.apiClients.cbomManagement.sync().pipe(
+                mergeMap(() => of(slice.actions.syncCbomsSuccess(), alertsSlice.actions.success('CBOMs successfully synchronized.'))),
+                catchError((err) =>
+                    of(
+                        slice.actions.syncCbomsFailure({ error: extractError(err, 'Failed to sync CBOMs') }),
+                        alertsSlice.actions.error(extractError(err, 'Failed to sync CBOMs')),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+export default [listCboms, getCbomDetail, listCbomVersions, getSearchableFields, uploadCbom, deleteCbom, bulkDeleteCbom, syncCboms];

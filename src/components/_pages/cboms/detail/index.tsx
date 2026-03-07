@@ -2,13 +2,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import Button from 'components/Button';
-import { Copy, Download, Eye } from 'lucide-react';
+import { Copy, Download, Eye, Info } from 'lucide-react';
 import Breadcrumb from 'components/Breadcrumb';
 import Container from 'components/Container';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import JsonViewer from 'components/JsonViewer';
 import Select from 'components/Select';
+import TextInput from 'components/TextInput';
 import DonutChart from 'components/_pages/dashboard/DashboardItem/DonutChart';
 import Spinner from 'components/Spinner';
 import TabLayout from 'components/Layout/TabLayout';
@@ -48,9 +49,11 @@ type GenericObject = Record<string, unknown>;
 type LocationModalState = {
     asset: string;
     rawJson: string;
+    assetData: CbomComponent;
 };
 
 const VERSION_HISTORY_OPTION_VALUE = '__CBOM_VIEW_VERSION_HISTORY__';
+const ALL_ASSET_TYPES_OPTION_VALUE = '__CBOM_ALL_ASSET_TYPES__';
 
 const toArray = <T,>(v: T | T[] | undefined | null): T[] => (v == null ? [] : Array.isArray(v) ? v : [v]);
 
@@ -125,7 +128,7 @@ const buildComponentRows = (
                 onClick={() => handleAssetDetailClick(String(assetName), c)}
                 className="!p-1"
             >
-                <Eye size={16} aria-hidden="true" />
+                <Info size={16} aria-hidden="true" />
             </Button>
         );
 
@@ -155,6 +158,8 @@ export default function CbomDetail() {
     const isFetchingVersions = useSelector(selectors.selectIsFetchingVersions);
     const [locationModalData, setLocationModalData] = useState<LocationModalState>();
     const [selectedVersionUuid, setSelectedVersionUuid] = useState(id);
+    const [assetSearchQuery, setAssetSearchQuery] = useState('');
+    const [selectedAssetType, setSelectedAssetType] = useState<string>(ALL_ASSET_TYPES_OPTION_VALUE);
     const getFreshCbomDetail = useCallback(() => {
         if (!selectedVersionUuid || selectedVersionUuid === VERSION_HISTORY_OPTION_VALUE) return;
         dispatch(actions.clearCbomDetail());
@@ -360,16 +365,47 @@ export default function CbomDetail() {
     );
 
     const handleAssetDetailClick = useCallback((assetName: string, assetData: unknown) => {
+        const typedAssetData = (assetData ?? {}) as CbomComponent;
         setLocationModalData({
             asset: assetName,
-            rawJson: JSON.stringify(assetData ?? {}, null, 2),
+            rawJson: JSON.stringify(typedAssetData, null, 2),
+            assetData: typedAssetData,
         });
     }, []);
 
-    const componentRows: TableDataRow[] = useMemo(
-        () => buildComponentRows(components, handleAssetDetailClick, 'assets'),
-        [components, handleAssetDetailClick],
+    const modalAssetDetailHeaders: TableHeader[] = useMemo(
+        () => [
+            { id: 'attribute', content: 'Attribute' },
+            { id: 'value', content: 'Value' },
+        ],
+        [],
     );
+
+    const modalAssetDetailRows: TableDataRow[] = useMemo(() => {
+        if (!locationModalData?.assetData) return [];
+
+        const asset = locationModalData.assetData;
+        const primitiveValues = toArray(asset?.cryptoProperties?.algorithmProperties?.primitive).filter(
+            (value): value is string => typeof value === 'string' && value.trim().length > 0,
+        );
+        const locationValues = toArray(asset?.evidence?.occurrences)
+            .map((occurrence) => occurrence?.location)
+            .filter((location): location is string => typeof location === 'string' && location.trim().length > 0);
+
+        return [
+            { id: 'asset-type', columns: ['Asset type', toCellValue(asset?.cryptoProperties?.assetType)] },
+            { id: 'type', columns: ['Type', toCellValue(asset?.type)] },
+            { id: 'primitive', columns: ['Primitive', primitiveValues.length > 0 ? primitiveValues.join(', ') : '-'] },
+            { id: 'location', columns: ['Location', locationValues.length > 0 ? locationValues.join(', ') : '-'] },
+            { id: 'source', columns: ['Source', toCellValue(detail?.source)] },
+            { id: 'cbom-version', columns: ['CBOM version', toCellValue(detail?.version)] },
+        ];
+    }, [locationModalData, detail]);
+
+    const handleCopyAssetJson = useCallback(() => {
+        if (!locationModalData?.rawJson) return;
+        void navigator.clipboard.writeText(locationModalData.rawJson);
+    }, [locationModalData]);
 
     const handleCloseLocationModal = useCallback(() => {
         setLocationModalData(undefined);
@@ -427,6 +463,81 @@ export default function CbomDetail() {
     const overviewComponentRows: TableDataRow[] = useMemo(
         () => buildComponentRows(components, handleAssetDetailClick, 'overview'),
         [components, handleAssetDetailClick],
+    );
+
+    const assetTypeOptions = useMemo(() => {
+        const uniqueTypes = new Set<string>();
+
+        for (const component of components) {
+            const typeValue = component?.cryptoProperties?.assetType ?? component?.type;
+            if (typeof typeValue === 'string' && typeValue.trim().length > 0) {
+                uniqueTypes.add(typeValue.trim());
+            }
+        }
+
+        return [
+            {
+                value: ALL_ASSET_TYPES_OPTION_VALUE,
+                label: 'All asset types',
+            },
+            ...[...uniqueTypes]
+                .sort((a, b) => a.localeCompare(b))
+                .map((type) => ({
+                    value: type,
+                    label: type,
+                })),
+        ];
+    }, [components]);
+
+    useEffect(() => {
+        const hasSelectedOption = assetTypeOptions.some((option) => String(option.value) === selectedAssetType);
+        if (!hasSelectedOption) {
+            setSelectedAssetType(ALL_ASSET_TYPES_OPTION_VALUE);
+        }
+    }, [assetTypeOptions, selectedAssetType]);
+
+    const filteredComponents = useMemo(() => {
+        const normalizedSearch = assetSearchQuery.trim().toLowerCase();
+
+        return components.filter((component) => {
+            const componentAssetType = component?.cryptoProperties?.assetType ?? component?.type;
+            const assetTypeMatches = selectedAssetType === ALL_ASSET_TYPES_OPTION_VALUE || componentAssetType === selectedAssetType;
+
+            if (!assetTypeMatches) return false;
+            if (!normalizedSearch) return true;
+
+            const assetName = component?.name ?? component?.['bom-ref'] ?? component?.bomRef ?? '';
+            const locations = toArray(component?.evidence?.occurrences)
+                .map((occurrence) => occurrence?.location)
+                .filter((location): location is string => typeof location === 'string' && location.trim().length > 0)
+                .join(' ');
+            const primitive = toArray(component?.cryptoProperties?.algorithmProperties?.primitive).join(' ');
+            const cryptoFunctions = toArray(component?.cryptoProperties?.algorithmProperties?.cryptoFunctions).join(' ');
+
+            const searchableText = `${assetName} ${componentAssetType ?? ''} ${locations} ${primitive} ${cryptoFunctions} ${JSON.stringify(
+                component ?? {},
+            )}`
+                .toLowerCase()
+                .trim();
+
+            return searchableText.includes(normalizedSearch);
+        });
+    }, [components, assetSearchQuery, selectedAssetType]);
+
+    const handleAssetTypeChange = useCallback((value: string | number | object | { value: string | number | object; label: string }) => {
+        const selectedValue =
+            typeof value === 'string' || typeof value === 'number'
+                ? String(value)
+                : typeof value === 'object' && value !== null && 'value' in value
+                  ? String(value.value)
+                  : ALL_ASSET_TYPES_OPTION_VALUE;
+
+        setSelectedAssetType(selectedValue || ALL_ASSET_TYPES_OPTION_VALUE);
+    }, []);
+
+    const componentRows: TableDataRow[] = useMemo(
+        () => buildComponentRows(filteredComponents, handleAssetDetailClick, 'assets'),
+        [filteredComponents, handleAssetDetailClick],
     );
 
     return (
@@ -563,6 +674,24 @@ export default function CbomDetail() {
                         content: (
                             <Container>
                                 <Widget titleSize="large">
+                                    <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+                                        <div className="md:col-span-2">
+                                            <TextInput
+                                                id="cbom-assets-search"
+                                                value={assetSearchQuery}
+                                                onChange={setAssetSearchQuery}
+                                                placeholder="Search assets (name, location, type, primitive, metadata)"
+                                            />
+                                        </div>
+                                        <Select
+                                            id="cbom-assets-type-filter"
+                                            value={selectedAssetType}
+                                            onChange={handleAssetTypeChange}
+                                            options={assetTypeOptions}
+                                            placeholder="Filter by asset type"
+                                        />
+                                    </div>
+
                                     <CustomTable headers={componentHeaders} data={componentRows} hasPagination />
                                 </Widget>
                             </Container>
@@ -614,9 +743,15 @@ export default function CbomDetail() {
                 noBorder
                 body={
                     <div className="flex flex-col gap-4 pb-6">
+                        <CustomTable headers={modalAssetDetailHeaders} data={modalAssetDetailRows} />
+
                         <JsonViewer value={locationModalData?.rawJson ?? ''} height={278} />
 
-                        <div className="flex items-center justify-end pt-2">
+                        <div className="flex items-center justify-between pt-2">
+                            <Button type="button" variant="solid" color="primary" onClick={handleCopyAssetJson} className="text-black">
+                                Copy JSON
+                            </Button>
+
                             <Button
                                 type="button"
                                 variant="outline"
