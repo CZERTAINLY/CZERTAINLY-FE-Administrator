@@ -95,6 +95,7 @@ export default defineConfig({
                         if (p.endsWith('.css')) return false;
                         if (p.includes('node_modules')) return false;
                         if (p.includes('/_pages/')) return false;
+                        if (p.includes('/types/openapi/')) return false; // Exclude generated types
 
                         return /^src\/.*\.(ts|tsx|js|jsx)$/.test(p);
                     },

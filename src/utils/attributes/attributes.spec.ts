@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 import {
     getAttributeCopyValue,
     getAttributeContent,
+    getAttributeFormValue,
     attributeFieldNameTransform,
     transformAttributes,
     getCodeBlockLanguage,
@@ -155,6 +156,41 @@ describe('attributes utils', () => {
             const result = getAttributeContent(AttributeContentType.File, [{ data: 'not-a-file-object' } as any]);
             expect(result).toBe('Unknown data type');
         });
+
+        test('returns CodeBlock React element for Codeblock content type', () => {
+            const result = getAttributeContent(AttributeContentType.Codeblock, [{ data: { code: base64Encode('print(1)') } } as any]);
+            expect(result).toBeTruthy();
+            expect(typeof result).toBe('object');
+        });
+
+        test('falls back to Unknown data type for unsupported content type mapping', () => {
+            const result = getAttributeContent('unsupported' as any, [{ data: 'x' } as any]);
+            expect(result).toBe('Unknown data type');
+        });
+    });
+
+    describe('getAttributeFormValue', () => {
+        test('truncates Integer numeric values from object data', () => {
+            const result = getAttributeFormValue(AttributeContentType.Integer, undefined, { data: '12.9' }) as any;
+            expect(result).toEqual({ data: 12 });
+        });
+
+        test('keeps original value when Integer parsing fails', () => {
+            const result = getAttributeFormValue(AttributeContentType.Integer, undefined, { value: 'NaN-value' }) as any;
+            expect(result).toEqual({ data: 'NaN-value' });
+        });
+
+        test('omits empty reference while normalizing content item', () => {
+            const result = getAttributeFormValue(AttributeContentType.String, undefined, { data: 'abc', reference: '' }) as any;
+            expect(result).toEqual({ data: 'abc' });
+        });
+
+        test('normalizes nested value object containing data and reference', () => {
+            const result = getAttributeFormValue(AttributeContentType.Float, undefined, {
+                value: { data: '3.50', reference: 'Threshold' },
+            }) as any;
+            expect(result).toEqual({ data: 3.5, reference: 'Threshold' });
+        });
     });
 
     describe('transformAttributes', () => {
@@ -185,6 +221,11 @@ describe('attributes utils', () => {
         });
         test('defaults to Javascript when no language anywhere', () => {
             expect(getCodeBlockLanguage(undefined, undefined)).toBe(ProgrammingLanguageEnum.Javascript);
+        });
+
+        test('defaults to Javascript when descriptor content data is empty', () => {
+            const descriptorContent = [{ data: null }] as any;
+            expect(getCodeBlockLanguage(undefined, descriptorContent)).toBe(ProgrammingLanguageEnum.Javascript);
         });
     });
 
@@ -424,6 +465,149 @@ describe('attributes utils', () => {
             expect(result).toHaveLength(1);
             expect(result[0].content[0].data).toBe('blue');
         });
+
+        test('skips attributes without matching descriptor', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'known',
+                    uuid: 'u-known',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'Known', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { unknown: 'value' } };
+
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toEqual([]);
+        });
+
+        test('skips attributes with null value', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'known',
+                    uuid: 'u-known',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'Known', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { known: null } };
+
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toEqual([]);
+        });
+
+        test('processes Custom attribute descriptors', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Custom,
+                    name: 'customKey',
+                    uuid: 'u-custom',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'Custom', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { customKey: 'customValue' } };
+
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toHaveLength(1);
+            expect(result[0].name).toBe('customKey');
+            expect(result[0].content[0].data).toBe('customValue');
+        });
+
+        test('handles array attribute values for Data descriptors', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'tags',
+                    uuid: 'u-tags',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'Tags', readOnly: false, visible: true, list: true, multiSelect: true },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { tags: ['a', 'b'] } };
+
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toHaveLength(1);
+            expect(result[0].content).toEqual([{ data: 'a' }, { data: 'b' }]);
+        });
+
+        test('supports schemaVersion V3 on descriptor', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    schemaVersion: AttributeVersion.V3,
+                    name: 'attr1',
+                    uuid: 'u1',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'A', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { attr1: 'value1' } };
+            const result = collectFormAttributes('id1', descriptors, values);
+
+            expect(result).toHaveLength(1);
+            expect(result[0].version).toBe(AttributeVersion.V2);
+        });
+
+        test('ignores inherited keys on attributes object', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'inherited',
+                    uuid: 'u-inherited',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'Inherited', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+
+            const inheritedAttributes = Object.create({ inherited: 'value' });
+            const values = { __attributes__id1__: inheritedAttributes };
+
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toEqual([]);
+        });
+
+        test('skips descriptor types that are neither Data nor Custom', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Group,
+                    name: 'grouped',
+                    uuid: 'u-group',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'Grouped', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { grouped: 'value' } };
+
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toEqual([]);
+        });
+
+        test('skips content object without data and without array payload', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'emptyRef',
+                    uuid: 'u-empty-ref',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'EmptyRef', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { emptyRef: { reference: '' } } };
+
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toEqual([]);
+        });
     });
 
     describe('mapAttributeContentToOptionValue', () => {
@@ -448,6 +632,30 @@ describe('attributes utils', () => {
             const result = mapAttributeContentToOptionValue(content, descriptor);
             expect(result.label).toBe('plain');
             expect(result.value).toBe(content);
+        });
+
+        test('formats Date label from content data', () => {
+            const content = { data: '2024-01-10T00:00:00.000Z' } as any;
+            const descriptor = {
+                contentType: AttributeContentType.Date,
+                content: [],
+                properties: {},
+            } as any;
+            const result = mapAttributeContentToOptionValue(content, descriptor);
+            expect(typeof result.label).toBe('string');
+            expect((result.label as string).length).toBeGreaterThan(0);
+        });
+
+        test('formats Datetime label from content data', () => {
+            const content = { data: '2024-01-10T12:15:00.000Z' } as any;
+            const descriptor = {
+                contentType: AttributeContentType.Datetime,
+                content: [],
+                properties: {},
+            } as any;
+            const result = mapAttributeContentToOptionValue(content, descriptor);
+            expect(typeof result.label).toBe('string');
+            expect((result.label as string).length).toBeGreaterThan(0);
         });
     });
 
@@ -487,6 +695,97 @@ describe('attributes utils', () => {
             } as any;
             const result = testAttributeSetFunction(descriptor, undefined, 'form.flag', true, false);
             expect(result.formAttributeValue).toBe(false);
+        });
+
+        test('for non-required Boolean without value keeps descriptor default when present', () => {
+            const descriptor = {
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Boolean,
+                content: [{ data: true }],
+                properties: { list: false, multiSelect: false, required: false, label: 'Flag', readOnly: false, visible: true },
+            } as any;
+            const result = testAttributeSetFunction(descriptor, undefined, 'form.flag', true, false);
+            expect(result.formAttributeValue).toBe(true);
+        });
+
+        test('for list without value returns undefined formAttributeValue', () => {
+            const descriptor = {
+                type: AttributeType.Data,
+                contentType: AttributeContentType.String,
+                content: [],
+                properties: { list: true, multiSelect: false, required: false },
+            } as any;
+            const result = testAttributeSetFunction(descriptor, undefined, 'profile.x', true, false);
+            expect(result.formAttributeValue).toBeUndefined();
+        });
+
+        test('decodes Codeblock default descriptor value', () => {
+            const descriptor = {
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Codeblock,
+                content: [{ data: { code: base64Encode('echo 1'), language: ProgrammingLanguageEnum.Bash } }],
+                properties: { list: false, multiSelect: false, required: false },
+            } as any;
+            const result = testAttributeSetFunction(descriptor, undefined, 'profile.script', false, true);
+            expect(result.formAttributeValue).toEqual({ code: 'echo 1', language: ProgrammingLanguageEnum.Bash });
+        });
+
+        test('returns Codeblock language-only object when code is missing', () => {
+            const descriptor = {
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Codeblock,
+                content: [{ data: { language: ProgrammingLanguageEnum.Python } }],
+                properties: { list: false, multiSelect: false, required: false },
+            } as any;
+            const result = testAttributeSetFunction(descriptor, undefined, 'profile.script', false, true);
+            expect(result.formAttributeValue).toEqual({ language: ProgrammingLanguageEnum.Python });
+        });
+
+        test('uses descriptor default even when not required if setDefaultOnRequiredValuesOnly is false', () => {
+            const descriptor = {
+                type: AttributeType.Data,
+                contentType: AttributeContentType.String,
+                content: [{ data: 'default-value' }],
+                properties: { list: false, multiSelect: false, required: false },
+            } as any;
+            const result = testAttributeSetFunction(descriptor, undefined, 'profile.value', false, false);
+            expect(result.formAttributeValue).toBe('default-value');
+        });
+
+        test('for list with applied content maps first option for single select', () => {
+            const descriptor = {
+                type: AttributeType.Data,
+                contentType: AttributeContentType.String,
+                content: [],
+                properties: { list: true, multiSelect: false, required: false },
+            } as any;
+            const attribute = { content: [{ data: 'set', reference: 'Set label' }] } as any;
+            const result = testAttributeSetFunction(descriptor, attribute, 'profile.select', true, false);
+            expect(result.formAttributeValue).toEqual({ label: 'Set label', value: attribute.content[0] });
+        });
+
+        test('for multiSelect list with non-array applied content sets undefined', () => {
+            const descriptor = {
+                type: AttributeType.Data,
+                contentType: AttributeContentType.String,
+                content: [{ data: 'x' }],
+                properties: { list: true, multiSelect: true, required: false },
+            } as any;
+            const attribute = { content: { data: 'wrong-shape' } } as any;
+            const result = testAttributeSetFunction(descriptor, attribute, 'profile.multi', true, false);
+            expect(result.formAttributeValue).toBeUndefined();
+        });
+
+        test('for Boolean with applied content returns applied boolean value', () => {
+            const descriptor = {
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Boolean,
+                content: [{ data: false }],
+                properties: { list: false, multiSelect: false, required: true, label: 'Flag', readOnly: false, visible: true },
+            } as any;
+            const attribute = { content: [{ data: true }] } as any;
+            const result = testAttributeSetFunction(descriptor, attribute, 'form.flag', true, false);
+            expect(result.formAttributeValue).toBe(true);
         });
     });
 
