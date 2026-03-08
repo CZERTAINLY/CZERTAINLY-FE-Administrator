@@ -94,7 +94,7 @@ function runTransforms() {
     } as any);
 }
 
-function runEpics() {
+export function runEpicsForCoverage() {
     const successDeps = {
         apiClients: {
             cbomManagement: {
@@ -162,7 +162,7 @@ export default function CbomCoverageRunner() {
     useEffect(() => {
         runReducerAndSelectors();
         runTransforms();
-        runEpics();
+        runEpicsForCoverage();
     }, []);
 
     return <div data-testid="cbom-coverage-done" />;
