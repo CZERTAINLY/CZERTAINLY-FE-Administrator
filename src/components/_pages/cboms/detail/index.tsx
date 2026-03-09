@@ -215,7 +215,6 @@ export default function CbomDetail() {
             { id: 'certificates', columns: ['Certificates', detail.certificates ?? 0] },
             { id: 'protocols', columns: ['Protocols', detail.protocols ?? 0] },
             { id: 'cryptoMaterial', columns: ['Related Crypto Material', detail.cryptoMaterial ?? 0] },
-            { id: 'totalAssets', columns: ['Total Assets', detail.totalAssets ?? 0] },
         ];
     }, [detail]);
 
@@ -291,7 +290,7 @@ export default function CbomDetail() {
     const metadataSummaryRows: TableDataRow[] = useMemo(() => {
         const properties = isRecord(metadata) ? metadata.properties : undefined;
 
-        const timestampRaw = detail?.timestamp ?? getPathValue(metadata, 'timestamp');
+        const timestampRaw = getPathValue(metadata, 'timestamp');
 
         const predefinedRows: TableDataRow[] = [
             {
