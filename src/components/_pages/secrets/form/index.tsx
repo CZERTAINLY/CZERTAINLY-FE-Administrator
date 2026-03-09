@@ -713,7 +713,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                             <AttributeEditor
                                                 id="secret"
                                                 attributeDescriptors={secretCreationAttributeDescriptors}
-                                                attributes={initialSecret?.attributes ?? []}
+                                                attributes={initialSecret?.attributes}
                                             />
                                         ),
                                     },
@@ -723,7 +723,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                             <AttributeEditor
                                                 id="customSecret"
                                                 attributeDescriptors={resourceCustomAttributes}
-                                                attributes={initialSecret?.customAttributes ?? []}
+                                                attributes={initialSecret?.customAttributes}
                                             />
                                         ),
                                     },

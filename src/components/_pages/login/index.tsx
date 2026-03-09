@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions, selectors } from 'ducks/login';
 import Button from 'components/Button';
+import { loginRedirect } from 'utils/login-redirect';
 
 export default function Login() {
     const dispatch = useDispatch();
@@ -16,17 +17,6 @@ export default function Login() {
     useEffect(() => {
         dispatch(actions.getLoginMethods({ redirect: redirect || undefined }));
     }, [dispatch, redirect]);
-
-    const handleLoginClick = (loginUrl: string) => {
-        const fullUrl = loginUrl.startsWith('http') ? loginUrl : `${window.location.origin}${loginUrl}`;
-        if (redirect) {
-            const separator = fullUrl.includes('?') ? '&' : '?';
-            const finalUrl = `${fullUrl}${separator}redirect=${encodeURIComponent(redirect)}`;
-            window.location.assign(finalUrl);
-        } else {
-            window.location.assign(fullUrl);
-        }
-    };
 
     const capitalizeFirst = (str: string) => {
         return str.charAt(0).toUpperCase() + str.slice(1);
@@ -69,7 +59,7 @@ export default function Login() {
                             {(loginMethods || []).map((method) => (
                                 <li key={method.name} className="w-1/2 p-2.5">
                                     <Button
-                                        onClick={() => handleLoginClick(method.loginUrl)}
+                                        onClick={() => loginRedirect(method.loginUrl, redirect)}
                                         variant="outline"
                                         color="lightGray"
                                         className="w-full capitalize !text-base font-semibold justify-center"
