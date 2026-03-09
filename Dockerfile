@@ -18,6 +18,10 @@ RUN npm run build
 # production environment
 FROM nginxinc/nginx-unprivileged:1.29.5-alpine
 
+USER root
+RUN apk update && apk upgrade --no-cache
+USER 101
+
 WORKDIR /usr/share/nginx/html
 
 ENV API_URL=/api
