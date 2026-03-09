@@ -100,6 +100,7 @@ export enum LockWidgetNameEnum {
     CbomDetail,
     CbomVersions,
     ListOfSecrets,
+    SecretDetailsWidget,
     ListOfVaults,
     ListOfVaultProfiles,
     VaultDetails,

@@ -417,7 +417,7 @@ function SecretDetail() {
                                         widgetButtons={widgetButtons}
                                         titleSize="large"
                                         refreshAction={getFreshSecretDetails}
-                                        widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
+                                        widgetLockName={LockWidgetNameEnum.SecretDetailsWidget}
                                         lockSize="large"
                                     >
                                         <CustomTable headers={detailHeaders} data={detailData} />

@@ -49,7 +49,7 @@ const getSecretDetail: AppEpic = (action$, state$, deps) => {
                 mergeMap((secret) =>
                     of(
                         slice.actions.getSecretDetailSuccess({ secret }),
-                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.CertificateDetailsWidget),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.SecretDetailsWidget),
                     ),
                 ),
                 catchError((err) =>
@@ -57,7 +57,7 @@ const getSecretDetail: AppEpic = (action$, state$, deps) => {
                         slice.actions.getSecretDetailFailure({
                             error: extractError(err, 'Failed to get Secret details'),
                         }),
-                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.CertificateDetailsWidget),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.SecretDetailsWidget),
                     ),
                 ),
             ),
