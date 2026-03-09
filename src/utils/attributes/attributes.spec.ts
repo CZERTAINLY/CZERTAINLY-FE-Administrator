@@ -290,6 +290,24 @@ describe('attributes utils', () => {
             expect(result[0].version).toBe(AttributeVersion.V3);
             expect(result[0].content).toEqual([{ data: 'value1', contentType: AttributeContentType.String }]);
         });
+        test('uses V3 when descriptor has schemaVersion V3 and no existing attribute', () => {
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'attr1',
+                    uuid: 'u1',
+                    schemaVersion: AttributeVersion.V3,
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'A', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { attr1: 'value1' } };
+            const result = collectFormAttributes('id1', descriptors, values);
+            expect(result).toHaveLength(1);
+            expect(result[0].version).toBe(AttributeVersion.V3);
+            expect(result[0].content).toEqual([{ data: 'value1', contentType: AttributeContentType.String }]);
+        });
         test('skips deleted attributes', () => {
             const descriptors = [
                 {
@@ -553,7 +571,8 @@ describe('attributes utils', () => {
             const result = collectFormAttributes('id1', descriptors, values);
 
             expect(result).toHaveLength(1);
-            expect(result[0].version).toBe(AttributeVersion.V2);
+            expect(result[0].version).toBe(AttributeVersion.V3);
+            expect(result[0].content).toEqual([{ data: 'value1', contentType: AttributeContentType.String }]);
         });
 
         test('ignores inherited keys on attributes object', () => {

@@ -105,6 +105,18 @@ test.describe('Sidebar', () => {
         await expect(component.getByRole('button', { name: 'Access Control' })).toBeVisible();
     });
 
+    test('shows Secrets item with custom icon when Secrets resource is allowed', async ({ mount }) => {
+        const store = createMockStore();
+        const component = await mount(withProviders(<Sidebar allowedResources={[Resource.Secrets]} />, { store, initialRoute: '/' }));
+
+        const secretsLink = component.getByRole('link', { name: 'Secrets' });
+        await expect(secretsLink).toBeVisible();
+
+        // custom icon rendered inside the link as an SVG
+        const secretsIcon = secretsLink.locator('svg');
+        await expect(secretsIcon).toBeVisible();
+    });
+
     test('empty allowedResources shows no menu items', async ({ mount }) => {
         const store = createMockStore();
         const component = await mount(withProviders(<Sidebar allowedResources={[]} />, { store, initialRoute: '/' }));
