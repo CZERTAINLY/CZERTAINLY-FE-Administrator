@@ -288,7 +288,7 @@ function CryptographicKeyList() {
                 onListCallback={onListCallback}
                 onDeleteCallback={(uuids) => dispatch(actions.bulkDeleteCryptographicKeyItems({ uuids }))}
                 getAvailableFiltersApi={useCallback(
-                    (apiClients: ApiClients) => apiClients.cryptographicKeys.getSearchableFieldInformation1(),
+                    (apiClients: ApiClients) => apiClients.cryptographicKeys.getSearchableFieldInformation4(),
                     [],
                 )}
                 additionalButtons={buttons}

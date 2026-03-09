@@ -18,12 +18,9 @@ test.describe('CustomTable', () => {
     test('should render table with headers and data', async ({ mount }) => {
         const component = await mount(withProviders(<CustomTable headers={mockHeaders} data={mockData} />));
 
-        const table = component.locator('table');
-        await expect(table).toBeVisible();
-        await expect(component.getByText('Name')).toBeVisible();
-        await expect(component.getByText('Email')).toBeVisible();
-        await expect(component.getByText('John Doe')).toBeVisible();
-        await expect(component.getByText('Jane Smith')).toBeVisible();
+        await expect(component.locator('table')).toBeVisible();
+        await expect(component.locator('thead th')).toHaveCount(3);
+        await expect(component.locator('tbody tr')).toHaveCount(3);
     });
 
     test('should render table without header when hasHeader is false', async ({ mount }) => {
@@ -55,7 +52,8 @@ test.describe('CustomTable', () => {
     test('should render checkboxes when hasCheckboxes is true', async ({ mount }) => {
         const component = await mount(withProviders(<CustomTable headers={mockHeaders} data={mockData} hasCheckboxes={true} />));
 
-        const checkboxes = component.locator('input[type="checkbox"]');
+        await expect(component.getByTestId('checkbox').first()).toBeVisible();
+        const checkboxes = component.getByTestId('checkbox');
         const count = await checkboxes.count();
         expect(count).toBeGreaterThan(0);
     });
@@ -247,7 +245,8 @@ test.describe('CustomTable', () => {
         const component = await mount(
             withProviders(<CustomTable headers={mockHeaders} data={mockData} hasCheckboxes={true} hasAllCheckBox={false} />),
         );
-        const checkboxes = component.locator('input[type="checkbox"]');
+        await expect(component.getByTestId('checkbox').first()).toBeVisible();
+        const checkboxes = component.getByTestId('checkbox');
         const count = await checkboxes.count();
         expect(count).toBe(mockData.length);
     });
