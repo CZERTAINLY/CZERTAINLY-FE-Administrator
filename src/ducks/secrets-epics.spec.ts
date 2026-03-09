@@ -22,6 +22,8 @@ type EpicDeps = {
             deleteSecret: (args: any) => any;
             updateSecret: (args: any) => any;
             updateSecretObjects: (args: any) => any;
+            addVaultProfileToSecret: (args: any) => any;
+            removeVaultProfileFromSecret: (args: any) => any;
         };
     };
 };
@@ -37,6 +39,8 @@ enum SecretsEpicIndex {
     Disable = 7,
     Update = 8,
     UpdateObjects = 9,
+    AddSyncVaultProfile = 10,
+    RemoveSyncVaultProfile = 11,
 }
 
 async function runEpic(
@@ -60,6 +64,8 @@ async function runEpic(
         deleteSecret: () => of(null),
         updateSecret: () => of({ uuid: 's-1', name: 'Updated Secret' }),
         updateSecretObjects: () => of(null),
+        addVaultProfileToSecret: () => of(null),
+        removeVaultProfileFromSecret: () => of(null),
     };
     const deps: EpicDeps = {
         apiClients: {
@@ -201,5 +207,75 @@ describe('secrets epics', () => {
 
         expect(emitted[0].type).toBe(secretsActions.updateSecretObjectsFailure.type);
         expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to update Secret' }));
+    });
+
+    test('addSyncVaultProfile success emits addSyncVaultProfileSuccess, getSecretDetail and success alert', async () => {
+        const emitted = await runEpic(
+            SecretsEpicIndex.AddSyncVaultProfile,
+            secretsActions.addSyncVaultProfile({ uuid: 's-1', vaultProfileUuid: 'vp-1' } as any),
+            {},
+            3,
+        );
+
+        expect(emitted[0]).toEqual(secretsActions.addSyncVaultProfileSuccess({ uuid: 's-1' }));
+        expect(emitted[1]).toEqual(secretsActions.getSecretDetail({ uuid: 's-1' }));
+        expect(emitted[2]).toEqual(alertActions.success('Vault profile added successfully.'));
+    });
+
+    test('addSyncVaultProfile failure emits addSyncVaultProfileFailure and fetchError', async () => {
+        const err = new Error('failed');
+        const emitted = await runEpic(
+            SecretsEpicIndex.AddSyncVaultProfile,
+            secretsActions.addSyncVaultProfile({ uuid: 's-1', vaultProfileUuid: 'vp-1' } as any),
+            {
+                secrets: {
+                    addVaultProfileToSecret: () => throwError(() => err),
+                } as any,
+            },
+            2,
+        );
+
+        expect(emitted[0].type).toBe(secretsActions.addSyncVaultProfileFailure.type);
+        expect(emitted[1]).toEqual(
+            appRedirectActions.fetchError({
+                error: err,
+                message: 'Failed to add Vault profile to Secret',
+            }),
+        );
+    });
+
+    test('removeSyncVaultProfile success emits removeSyncVaultProfileSuccess, getSecretDetail and success alert', async () => {
+        const emitted = await runEpic(
+            SecretsEpicIndex.RemoveSyncVaultProfile,
+            secretsActions.removeSyncVaultProfile({ uuid: 's-1', vaultProfileUuid: 'vp-1' } as any),
+            {},
+            3,
+        );
+
+        expect(emitted[0]).toEqual(secretsActions.removeSyncVaultProfileSuccess({ uuid: 's-1', vaultProfileUuid: 'vp-1' }));
+        expect(emitted[1]).toEqual(secretsActions.getSecretDetail({ uuid: 's-1' }));
+        expect(emitted[2]).toEqual(alertActions.success('Vault profile removed successfully.'));
+    });
+
+    test('removeSyncVaultProfile failure emits removeSyncVaultProfileFailure and fetchError', async () => {
+        const err = new Error('failed');
+        const emitted = await runEpic(
+            SecretsEpicIndex.RemoveSyncVaultProfile,
+            secretsActions.removeSyncVaultProfile({ uuid: 's-1', vaultProfileUuid: 'vp-1' } as any),
+            {
+                secrets: {
+                    removeVaultProfileFromSecret: () => throwError(() => err),
+                } as any,
+            },
+            2,
+        );
+
+        expect(emitted[0].type).toBe(secretsActions.removeSyncVaultProfileFailure.type);
+        expect(emitted[1]).toEqual(
+            appRedirectActions.fetchError({
+                error: err,
+                message: 'Failed to remove Vault profile from Secret',
+            }),
+        );
     });
 });

@@ -218,6 +218,76 @@ const updateSecretObjects: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const addSyncVaultProfile: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.addSyncVaultProfile.match),
+        switchMap((action: ReturnType<typeof slice.actions.addSyncVaultProfile>) =>
+            deps.apiClients.secrets
+                .addVaultProfileToSecret({
+                    uuid: action.payload.uuid,
+                    vaultProfileUuid: action.payload.vaultProfileUuid,
+                    requestAttribute: [],
+                })
+                .pipe(
+                    mergeMap(() =>
+                        of(
+                            slice.actions.addSyncVaultProfileSuccess({ uuid: action.payload.uuid }),
+                            slice.actions.getSecretDetail({ uuid: action.payload.uuid }),
+                            alertActions.success('Vault profile added successfully.'),
+                        ),
+                    ),
+                    catchError((err) =>
+                        of(
+                            slice.actions.addSyncVaultProfileFailure({
+                                error: extractError(err, 'Failed to add Vault profile to Secret'),
+                            }),
+                            appRedirectActions.fetchError({
+                                error: err,
+                                message: 'Failed to add Vault profile to Secret',
+                            }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const removeSyncVaultProfile: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.removeSyncVaultProfile.match),
+        switchMap((action: ReturnType<typeof slice.actions.removeSyncVaultProfile>) =>
+            deps.apiClients.secrets
+                .removeVaultProfileFromSecret({
+                    uuid: action.payload.uuid,
+                    vaultProfileUuid: action.payload.vaultProfileUuid,
+                })
+                .pipe(
+                    mergeMap(() =>
+                        of(
+                            slice.actions.removeSyncVaultProfileSuccess({
+                                uuid: action.payload.uuid,
+                                vaultProfileUuid: action.payload.vaultProfileUuid,
+                            }),
+                            slice.actions.getSecretDetail({ uuid: action.payload.uuid }),
+                            alertActions.success('Vault profile removed successfully.'),
+                        ),
+                    ),
+                    catchError((err) =>
+                        of(
+                            slice.actions.removeSyncVaultProfileFailure({
+                                error: extractError(err, 'Failed to remove Vault profile from Secret'),
+                            }),
+                            appRedirectActions.fetchError({
+                                error: err,
+                                message: 'Failed to remove Vault profile from Secret',
+                            }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
 const getSecretCreationAttributes: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.getSecretCreationAttributes.match),
@@ -288,6 +358,8 @@ const epics = [
     disableSecret,
     updateSecret,
     updateSecretObjects,
+    addSyncVaultProfile,
+    removeSyncVaultProfile,
 ];
 
 export default epics;

@@ -165,6 +165,30 @@ export const slice = createSlice({
             state.isUpdating = false;
         },
 
+        addSyncVaultProfile: (state, _action: PayloadAction<{ uuid: string; vaultProfileUuid: string }>) => {
+            state.isUpdating = true;
+        },
+
+        addSyncVaultProfileSuccess: (state, _action: PayloadAction<{ uuid: string }>) => {
+            state.isUpdating = false;
+        },
+
+        addSyncVaultProfileFailure: (state, _action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdating = false;
+        },
+
+        removeSyncVaultProfile: (state, _action: PayloadAction<{ uuid: string; vaultProfileUuid: string }>) => {
+            state.isUpdating = true;
+        },
+
+        removeSyncVaultProfileSuccess: (state, _action: PayloadAction<{ uuid: string; vaultProfileUuid: string }>) => {
+            state.isUpdating = false;
+        },
+
+        removeSyncVaultProfileFailure: (state, _action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdating = false;
+        },
+
         deleteSecret: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isDeleting = true;
         },

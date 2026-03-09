@@ -8,6 +8,7 @@ import Breadcrumb from 'components/Breadcrumb';
 import TabLayout from 'components/Layout/TabLayout';
 import EditIcon from 'components/icons/EditIcon';
 import Badge from 'components/Badge';
+import { SquareMinus } from 'lucide-react';
 
 import { actions as secretsActions, selectors as secretsSelectors } from 'ducks/secrets';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -54,10 +55,12 @@ function SecretDetail() {
     const [isUpdateGroupsOpen, setIsUpdateGroupsOpen] = useState(false);
     const [isUpdateVaultProfileOpen, setIsUpdateVaultProfileOpen] = useState(false);
     const [isEditSecretOpen, setIsEditSecretOpen] = useState(false);
+    const [isAddSyncVaultProfileOpen, setIsAddSyncVaultProfileOpen] = useState(false);
 
     const [ownerUuid, setOwnerUuid] = useState('');
     const [selectedGroups, setSelectedGroups] = useState<{ value: string; label: string }[]>([]);
     const [selectedVaultProfileUuid, setSelectedVaultProfileUuid] = useState('');
+    const [selectedSyncVaultProfileUuid, setSelectedSyncVaultProfileUuid] = useState('');
 
     const getFreshSecretDetails = useCallback(() => {
         if (!id) return;
@@ -164,6 +167,18 @@ function SecretDetail() {
         [secret],
     );
 
+    const syncVaultProfilesButtons: WidgetButtonProps[] = useMemo(
+        () => [
+            {
+                icon: 'plus',
+                disabled: !secret,
+                tooltip: 'Add Sync Vault Profile',
+                onClick: () => setIsAddSyncVaultProfileOpen(true),
+            },
+        ],
+        [secret],
+    );
+
     const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const detailData: TableDataRow[] = useMemo(() => {
@@ -213,6 +228,7 @@ function SecretDetail() {
         () => [
             { id: 'name', content: 'Name' },
             { id: 'description', content: 'Description' },
+            { id: 'action', content: 'Action' },
         ],
         [],
     );
@@ -234,10 +250,27 @@ function SecretDetail() {
                         profile.name
                     ),
                     '',
+                    <div key="action" className="flex">
+                        <Button
+                            variant="transparent"
+                            color="secondary"
+                            onClick={() => {
+                                dispatch(
+                                    secretsActions.removeSyncVaultProfile({
+                                        uuid: secret.uuid,
+                                        vaultProfileUuid: profile.uuid,
+                                    }),
+                                );
+                            }}
+                            title="Remove Sync Vault Profile"
+                        >
+                            <SquareMinus size={16} />
+                        </Button>
+                    </div>,
                 ],
             };
         });
-    }, [secret, vaultProfiles]);
+    }, [secret, vaultProfiles, dispatch]);
 
     const userOptions = useMemo(
         () =>
@@ -267,6 +300,20 @@ function SecretDetail() {
                 })),
         [vaultProfiles],
     );
+
+    const syncVaultProfileOptions = useMemo(() => {
+        const existing =
+            secret?.syncVaultProfiles?.reduce((set, profile) => {
+                set.add(profile.uuid);
+                return set;
+            }, new Set<string>()) ?? new Set<string>();
+
+        if (secret?.sourceVaultProfile?.uuid) {
+            existing.add(secret.sourceVaultProfile.uuid);
+        }
+
+        return vaultProfileOptions.filter((option) => !existing.has(option.value));
+    }, [secret, vaultProfileOptions]);
 
     const versionsHeaders: TableHeader[] = useMemo(
         () => [
@@ -431,6 +478,7 @@ function SecretDetail() {
                                                 refreshAction={getFreshSecretDetails}
                                                 widgetLockName={LockWidgetNameEnum.ListOfVaults}
                                                 lockSize="large"
+                                                widgetButtons={syncVaultProfilesButtons}
                                             >
                                                 <CustomTable headers={syncVaultProfilesHeaders} data={syncVaultProfilesData} />
                                             </Widget>
@@ -619,6 +667,51 @@ function SecretDetail() {
                     size="md"
                     buttons={[]}
                 />
+
+                {secret && (
+                    <Dialog
+                        isOpen={isAddSyncVaultProfileOpen}
+                        caption="Add Sync Vault Profile"
+                        body={
+                            <>
+                                <Select
+                                    id="secret-sync-vault-profile-detail"
+                                    label="Vault Profile"
+                                    placeholder="Select vault profile"
+                                    options={syncVaultProfileOptions}
+                                    value={selectedSyncVaultProfileUuid || ''}
+                                    onChange={(value) => setSelectedSyncVaultProfileUuid(value as string)}
+                                />
+                                <Container className="flex-row justify-end modal-footer mt-4" gap={4}>
+                                    <Button variant="outline" onClick={() => setIsAddSyncVaultProfileOpen(false)} type="button">
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        color="primary"
+                                        onClick={() => {
+                                            if (!selectedSyncVaultProfileUuid) return;
+                                            dispatch(
+                                                secretsActions.addSyncVaultProfile({
+                                                    uuid: secret.uuid,
+                                                    vaultProfileUuid: selectedSyncVaultProfileUuid,
+                                                }),
+                                            );
+                                            setIsAddSyncVaultProfileOpen(false);
+                                            setSelectedSyncVaultProfileUuid('');
+                                        }}
+                                        type="button"
+                                        disabled={!selectedSyncVaultProfileUuid}
+                                    >
+                                        Add
+                                    </Button>
+                                </Container>
+                            </>
+                        }
+                        toggle={() => setIsAddSyncVaultProfileOpen(false)}
+                        size="md"
+                        buttons={[]}
+                    />
+                )}
             </div>
         </div>
     );
