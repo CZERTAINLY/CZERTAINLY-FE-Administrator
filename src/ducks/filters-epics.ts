@@ -2,7 +2,7 @@ import { catchError, filter, map, switchMap } from 'rxjs/operators';
 
 import { AppEpic } from 'ducks';
 
-import { of } from 'rxjs';
+import { defer, of } from 'rxjs';
 import { extractError } from 'utils/net';
 import { actions as appRedirectActions } from './app-redirect';
 import { slice } from './filters';
@@ -12,7 +12,7 @@ const getAvailableFilters: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.getAvailableFilters.match),
         switchMap((action) =>
-            action.payload.getAvailableFiltersApi(deps.apiClients).pipe(
+            defer(() => action.payload.getAvailableFiltersApi(deps.apiClients)).pipe(
                 map((filters) =>
                     slice.actions.getAvailableFiltersSuccess({
                         entity: action.payload.entity,

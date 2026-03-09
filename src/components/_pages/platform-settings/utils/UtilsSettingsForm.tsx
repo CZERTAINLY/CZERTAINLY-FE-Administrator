@@ -4,45 +4,18 @@ import Button from 'components/Button';
 import Container from 'components/Container';
 import { actions, selectors } from 'ducks/settings';
 
-import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { getFieldErrorMessage } from 'utils/validators-helper';
 import { useDispatch, useSelector } from 'react-redux';
 import { SettingsPlatformModel } from 'types/settings';
-
-const validateUrl = (url?: string): string | undefined => {
-    if (!url || /^https?:\/\/[a-zA-Z0-9\-.]+(:\d+?)?(\/[a-zA-Z0-9\-.]*)*/g.test(url)) {
-        return undefined;
-    }
-    return 'Please enter valid URL.';
-};
-
-const normalizeUrl = (url: string): string => {
-    let endIndex = url.length;
-    while (endIndex > 0 && url.charCodeAt(endIndex - 1) === 47) {
-        endIndex -= 1;
-    }
-    return endIndex === url.length ? url : url.slice(0, endIndex);
-};
-
-const buildCbomHealthPath = (url: string): string => {
-    const baseUrl = normalizeUrl(url);
-    return baseUrl.endsWith('/api') ? '/v1/health' : '/api/v1/health';
-};
-
-const validateHealthUrl = async (url: string | undefined, path: string, error: string): Promise<string | undefined> => {
-    if (!url) {
-        return undefined;
-    }
-    try {
-        const healthUrl = `${normalizeUrl(url)}${path}`;
-        const result = await fetch(healthUrl);
-        const json = await result.json();
-        return result.status === 200 && json.status === 'UP' ? undefined : error;
-    } catch {
-        return error;
-    }
-};
+import {
+    buildCbomHealthPath,
+    CBOM_REPOSITORY_HEALTH_WARNING_MESSAGE,
+    validateCbomRepositoryUrl,
+    validateHealthUrl,
+    validateUrl,
+} from './UtilsSettingsForm.validation';
 
 class DebouncingHealthValidation {
     clearTimeout = () => {};
@@ -101,6 +74,7 @@ const UtilsSettingsForm = ({ onCancel, onSuccess }: UtilsSettingsFormProps = {})
         formState: { isDirty, isSubmitting, isValid },
         reset,
     } = methods;
+    const [cbomRepositoryHealthWarning, setCbomRepositoryHealthWarning] = useState<string | undefined>(undefined);
 
     // Reset form when platformSettings change
     useEffect(() => {
@@ -115,6 +89,28 @@ const UtilsSettingsForm = ({ onCancel, onSuccess }: UtilsSettingsFormProps = {})
 
     const debouncingUtilsHealthValidation = useMemo(() => new DebouncingHealthValidation(), []);
     const debouncingCbomHealthValidation = useMemo(() => new DebouncingHealthValidation(), []);
+    const cbomRepositoryUrlValue = useWatch({ control, name: 'cbomRepositoryUrl' });
+
+    useEffect(() => {
+        if (!cbomRepositoryUrlValue || validateCbomRepositoryUrl(cbomRepositoryUrlValue)) {
+            setCbomRepositoryHealthWarning(undefined);
+            return;
+        }
+
+        let active = true;
+
+        void debouncingCbomHealthValidation
+            .validateHealth(cbomRepositoryUrlValue, buildCbomHealthPath(cbomRepositoryUrlValue), CBOM_REPOSITORY_HEALTH_WARNING_MESSAGE)
+            .then((warningMessage) => {
+                if (!active) return;
+                setCbomRepositoryHealthWarning(warningMessage);
+            });
+
+        return () => {
+            active = false;
+            debouncingCbomHealthValidation.clearTimeout();
+        };
+    }, [cbomRepositoryUrlValue, debouncingCbomHealthValidation]);
 
     const onSubmit = useCallback(
         (values: FormValues) => {
@@ -181,29 +177,26 @@ const UtilsSettingsForm = ({ onCancel, onSuccess }: UtilsSettingsFormProps = {})
                     control={control}
                     rules={{
                         validate: async (value) => {
-                            const urlError = validateUrl(value);
-                            if (urlError) return urlError;
-                            if (value) {
-                                const cbomHealthPath = buildCbomHealthPath(value);
-                                return await debouncingCbomHealthValidation.validateHealth(
-                                    value,
-                                    cbomHealthPath,
-                                    'Please enter reachable and valid CBOM Repository base URL (with /api/v1/health endpoint).',
-                                );
-                            }
-                            return undefined;
+                            return validateCbomRepositoryUrl(value);
                         },
                     }}
                     render={({ field, fieldState }) => (
-                        <TextInput
-                            {...field}
-                            id="cbomRepositoryUrl"
-                            type="text"
-                            label="CBOM Repository URL"
-                            placeholder="CBOM Repository URL"
-                            invalid={fieldState.error && fieldState.isTouched}
-                            error={getFieldErrorMessage(fieldState)}
-                        />
+                        <>
+                            <TextInput
+                                {...field}
+                                id="cbomRepositoryUrl"
+                                type="text"
+                                label="CBOM Repository URL"
+                                placeholder="CBOM Repository URL"
+                                invalid={fieldState.error && fieldState.isTouched}
+                                error={getFieldErrorMessage(fieldState)}
+                            />
+                            {!fieldState.error && cbomRepositoryHealthWarning && (
+                                <p className="mt-1 text-sm text-yellow-600" data-testid="cbom-repository-health-warning">
+                                    {cbomRepositoryHealthWarning}
+                                </p>
+                            )}
+                        </>
                     )}
                 />
 

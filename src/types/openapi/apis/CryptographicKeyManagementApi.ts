@@ -803,9 +803,9 @@ export class CryptographicKeyManagementApi extends BaseAPI {
     /**
      * Get CryptographicKey searchable fields information
      */
-    getSearchableFieldInformation1(): Observable<Array<SearchFieldDataByGroupDto>>
-    getSearchableFieldInformation1(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
-    getSearchableFieldInformation1(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
+    getSearchableFieldInformation4(): Observable<Array<SearchFieldDataByGroupDto>>
+    getSearchableFieldInformation4(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
+    getSearchableFieldInformation4(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
         return this.request<Array<SearchFieldDataByGroupDto>>({
             url: '/v1/keys/search',
             method: 'GET',
