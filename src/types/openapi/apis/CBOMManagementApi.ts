@@ -17,6 +17,7 @@ import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
 import type { OperationOpts, HttpHeaders } from '../runtime';
 import type {
     AuthenticationServiceExceptionDto,
+    BulkActionMessageDto,
     CbomDetailDto,
     CbomDto,
     CbomUploadRequestDto,
@@ -25,6 +26,14 @@ import type {
     SearchFieldDataByGroupDto,
     SearchRequestDto,
 } from '../models';
+
+export interface BulkDeleteCbomRequest {
+    requestBody: Array<string>;
+}
+
+export interface DeleteCbomRequest {
+    uuid: string;
+}
 
 export interface GetCbomDetailRequest {
     uuid: string;
@@ -48,6 +57,40 @@ export interface UploadCbomRequest {
 export class CBOMManagementApi extends BaseAPI {
 
     /**
+     * Delete multiple CBOM entries
+     */
+    bulkDeleteCbom({ requestBody }: BulkDeleteCbomRequest): Observable<Array<BulkActionMessageDto>>
+    bulkDeleteCbom({ requestBody }: BulkDeleteCbomRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BulkActionMessageDto>>>
+    bulkDeleteCbom({ requestBody }: BulkDeleteCbomRequest, opts?: OperationOpts): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDeleteCbom');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<Array<BulkActionMessageDto>>({
+            url: '/v1/cboms',
+            method: 'DELETE',
+            headers,
+            body: requestBody,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Delete CBOM entry
+     */
+    deleteCbom({ uuid }: DeleteCbomRequest): Observable<void>
+    deleteCbom({ uuid }: DeleteCbomRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    deleteCbom({ uuid }: DeleteCbomRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(uuid, 'uuid', 'deleteCbom');
+
+        return this.request<void>({
+            url: '/v1/cboms/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'DELETE',
+        }, opts?.responseOpts);
+    };
+
+    /**
      * CBOM detail
      */
     getCbomDetail({ uuid }: GetCbomDetailRequest): Observable<CbomDetailDto>
@@ -64,9 +107,9 @@ export class CBOMManagementApi extends BaseAPI {
     /**
      * Get Cbom searchable fields information
      */
-    getSearchableFieldInformation5(): Observable<Array<SearchFieldDataByGroupDto>>
-    getSearchableFieldInformation5(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
-    getSearchableFieldInformation5(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
+    getSearchableFieldInformation8(): Observable<Array<SearchFieldDataByGroupDto>>
+    getSearchableFieldInformation8(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
+    getSearchableFieldInformation8(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
         return this.request<Array<SearchFieldDataByGroupDto>>({
             url: '/v1/cboms/search',
             method: 'GET',
@@ -104,6 +147,18 @@ export class CBOMManagementApi extends BaseAPI {
             method: 'POST',
             headers,
             body: searchRequestDto,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Sync CBOMs
+     */
+    sync(): Observable<void>
+    sync(opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    sync(opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        return this.request<void>({
+            url: '/v1/cboms/sync',
+            method: 'POST',
         }, opts?.responseOpts);
     };
 

@@ -12,8 +12,10 @@
  */
 
 import type {
+    ConnectorInterfaceDto,
     ConnectorStatus,
     ConnectorVersion,
+    FunctionGroupDto,
 } from './';
 
 /**
@@ -51,6 +53,18 @@ export interface ConnectorDtoV2 {
      * @memberof ConnectorDtoV2
      */
     status: ConnectorStatus;
+    /**
+     * List of Function Groups implemented by the Connector
+     * @type {Array<FunctionGroupDto>}
+     * @memberof ConnectorDtoV2
+     */
+    functionGroups: Array<FunctionGroupDto>;
+    /**
+     * List of connector interfaces implemented by the Connector
+     * @type {Array<ConnectorInterfaceDto>}
+     * @memberof ConnectorDtoV2
+     */
+    interfaces: Array<ConnectorInterfaceDto>;
 }
 
 

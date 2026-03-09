@@ -21,6 +21,7 @@ export enum AttributeResource {
     Credentials = 'credentials',
     Authorities = 'authorities',
     Entities = 'entities',
-    Locations = 'locations'
+    Locations = 'locations',
+    Secrets = 'secrets'
 }
 
