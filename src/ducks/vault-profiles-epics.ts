@@ -126,11 +126,11 @@ const enableVaultProfile: AppEpic = (action$, state$, deps) => {
                     catchError((err) =>
                         of(
                             slice.actions.enableVaultProfileFailure({
-                                error: extractError(err, 'Failed to approve Vault Profile'),
+                                error: extractError(err, 'Failed to enable Vault Profile'),
                             }),
                             appRedirectActions.fetchError({
                                 error: err,
-                                message: 'Failed to approve Vault Profile',
+                                message: 'Failed to enable Vault Profile',
                             }),
                         ),
                     ),
@@ -164,11 +164,11 @@ const disableVaultProfile: AppEpic = (action$, state$, deps) => {
                     catchError((err) =>
                         of(
                             slice.actions.disableVaultProfileFailure({
-                                error: extractError(err, 'Failed to disapprove Vault Profile'),
+                                error: extractError(err, 'Failed to disable Vault Profile'),
                             }),
                             appRedirectActions.fetchError({
                                 error: err,
-                                message: 'Failed to disapprove Vault Profile',
+                                message: 'Failed to disable Vault Profile',
                             }),
                         ),
                     ),

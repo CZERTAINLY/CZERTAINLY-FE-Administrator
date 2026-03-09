@@ -88,13 +88,13 @@ function VaultProfileDetail() {
             {
                 icon: 'check',
                 disabled: !profile || profile.enabled,
-                tooltip: 'Approve',
+                tooltip: 'Enable',
                 onClick: onApprove,
             },
             {
                 icon: 'times',
                 disabled: !profile || !profile.enabled,
-                tooltip: 'Disapprove',
+                tooltip: 'Disable',
                 onClick: onDisapprove,
             },
             {

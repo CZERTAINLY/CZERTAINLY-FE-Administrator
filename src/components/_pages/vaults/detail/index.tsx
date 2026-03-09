@@ -96,14 +96,6 @@ function VaultDetail() {
                               ),
                           ],
                       },
-                      //   {
-                      //       id: 'version',
-                      //       columns: ['Version', vault.version ?? ''],
-                      //   },
-                      //   {
-                      //       id: 'features',
-                      //       columns: ['Features', vault.features ?? ''],
-                      //   },
                   ]
                 : [],
         [vault],
