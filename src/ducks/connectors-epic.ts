@@ -1,5 +1,5 @@
 import { AppEpic } from 'ducks';
-import { iif, of } from 'rxjs';
+import { of } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { extractError } from 'utils/net';
@@ -274,15 +274,17 @@ const bulkDeleteConnectors: AppEpic = (action$, state, deps) => {
         filter(slice.actions.bulkDeleteConnectors.match),
         switchMap((action) =>
             deps.apiClients.connectorsV2.bulkDeleteConnectorV2({ requestBody: action.payload.uuids }).pipe(
-                mergeMap((errors) =>
-                    of(
-                        slice.actions.bulkDeleteConnectorsSuccess({
-                            uuids: action.payload.uuids,
-                            errors: errors.map(transformBulkActionDtoToModel),
-                        }),
-                        alertActions.success('Selected connectors successfully deleted.'),
-                    ),
-                ),
+                mergeMap((errors) => {
+                    const errorsTransformed = (errors ?? []).map(transformBulkActionDtoToModel);
+                    const successAction = slice.actions.bulkDeleteConnectorsSuccess({
+                        uuids: action.payload.uuids,
+                        errors: errorsTransformed,
+                    });
+                    if (errorsTransformed.length === 0) {
+                        return of(successAction, alertActions.success('Selected connectors successfully deleted.'));
+                    }
+                    return of(successAction);
+                }),
 
                 catchError((error) =>
                     of(
@@ -422,24 +424,17 @@ const bulkForceDeleteConnectors: AppEpic = (action$, state, deps) => {
         filter(slice.actions.bulkForceDeleteConnectors.match),
         switchMap((action) =>
             deps.apiClients.connectors.forceDeleteConnector({ requestBody: action.payload.uuids }).pipe(
-                mergeMap(() =>
-                    iif(
-                        () => !!action.payload.successRedirect,
-                        of(
-                            slice.actions.bulkForceDeleteConnectorsSuccess({
-                                uuids: action.payload.uuids,
-                                successRedirect: action.payload.successRedirect,
-                            }),
-                            appRedirectActions.redirect({ url: action.payload.successRedirect! }),
-                        ),
-                        of(
-                            slice.actions.bulkForceDeleteConnectorsSuccess({
-                                uuids: action.payload.uuids,
-                                successRedirect: action.payload.successRedirect,
-                            }),
-                        ),
-                    ),
-                ),
+                mergeMap(() => {
+                    const successAction = slice.actions.bulkForceDeleteConnectorsSuccess({
+                        uuids: action.payload.uuids,
+                        successRedirect: action.payload.successRedirect,
+                    });
+                    const alertAction = alertActions.success('Selected connectors successfully deleted.');
+                    if (action.payload.successRedirect) {
+                        return of(successAction, alertAction, appRedirectActions.redirect({ url: action.payload.successRedirect }));
+                    }
+                    return of(successAction, alertAction);
+                }),
 
                 catchError((error) =>
                     of(
