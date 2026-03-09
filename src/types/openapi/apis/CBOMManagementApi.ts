@@ -17,6 +17,7 @@ import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
 import type { OperationOpts, HttpHeaders } from '../runtime';
 import type {
     AuthenticationServiceExceptionDto,
+    BulkActionMessageDto,
     CbomDetailDto,
     CbomDto,
     CbomUploadRequestDto,
@@ -25,6 +26,14 @@ import type {
     SearchFieldDataByGroupDto,
     SearchRequestDto,
 } from '../models';
+
+export interface BulkDeleteCbomRequest {
+    requestBody: Array<string>;
+}
+
+export interface DeleteCbomRequest {
+    uuid: string;
+}
 
 export interface GetCbomDetailRequest {
     uuid: string;
@@ -46,6 +55,40 @@ export interface UploadCbomRequest {
  * no description
  */
 export class CBOMManagementApi extends BaseAPI {
+
+    /**
+     * Delete multiple CBOM entries
+     */
+    bulkDeleteCbom({ requestBody }: BulkDeleteCbomRequest): Observable<Array<BulkActionMessageDto>>
+    bulkDeleteCbom({ requestBody }: BulkDeleteCbomRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BulkActionMessageDto>>>
+    bulkDeleteCbom({ requestBody }: BulkDeleteCbomRequest, opts?: OperationOpts): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDeleteCbom');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<Array<BulkActionMessageDto>>({
+            url: '/v1/cboms',
+            method: 'DELETE',
+            headers,
+            body: requestBody,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Delete CBOM entry
+     */
+    deleteCbom({ uuid }: DeleteCbomRequest): Observable<void>
+    deleteCbom({ uuid }: DeleteCbomRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    deleteCbom({ uuid }: DeleteCbomRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(uuid, 'uuid', 'deleteCbom');
+
+        return this.request<void>({
+            url: '/v1/cboms/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'DELETE',
+        }, opts?.responseOpts);
+    };
 
     /**
      * CBOM detail
