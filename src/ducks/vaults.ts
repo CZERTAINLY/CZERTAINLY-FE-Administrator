@@ -1,0 +1,190 @@
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createFeatureSelector } from 'utils/ducks';
+import { SearchRequestModel } from 'types/certificate';
+import { VaultInstanceDetailDto, VaultInstanceDto, VaultInstanceUpdateRequestDto } from 'types/openapi';
+import type { AttributeDescriptorModel } from 'types/attributes';
+
+export type State = {
+    vaults: VaultInstanceDto[];
+    vault?: VaultInstanceDetailDto;
+
+    vaultInstanceAttributeDescriptors: AttributeDescriptorModel[];
+    vaultInstanceAttributesConnectorUuid: string | null;
+    isFetchingVaultInstanceAttributes: boolean;
+
+    isFetchingList: boolean;
+    isFetchingDetail: boolean;
+
+    isCreating: boolean;
+    isUpdating: boolean;
+    isDeleting: boolean;
+};
+
+export const initialState: State = {
+    vaults: [],
+
+    vaultInstanceAttributeDescriptors: [],
+    vaultInstanceAttributesConnectorUuid: null,
+    isFetchingVaultInstanceAttributes: false,
+
+    isFetchingList: false,
+    isFetchingDetail: false,
+
+    isCreating: false,
+    isUpdating: false,
+    isDeleting: false,
+};
+
+export const slice = createSlice({
+    name: 'vaults',
+
+    initialState,
+
+    reducers: {
+        resetState: (state, action: PayloadAction<void>) => {
+            Object.keys(state).forEach((key) => {
+                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+            });
+
+            Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
+        },
+
+        listVaults: (state, action: PayloadAction<SearchRequestModel>) => {
+            state.vaults = [];
+            state.isFetchingList = true;
+        },
+
+        listVaultsSuccess: (state, action: PayloadAction<{ items: VaultInstanceDto[] }>) => {
+            state.vaults = action.payload.items;
+            state.isFetchingList = false;
+        },
+
+        listVaultsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingList = false;
+        },
+
+        getVaultDetail: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.vault = undefined;
+            state.isFetchingDetail = true;
+        },
+
+        getVaultDetailSuccess: (state, action: PayloadAction<{ vault: VaultInstanceDetailDto }>) => {
+            state.vault = action.payload.vault;
+            state.isFetchingDetail = false;
+        },
+
+        getVaultDetailFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingDetail = false;
+        },
+
+        getVaultInstanceAttributes: (state, action: PayloadAction<{ connectorUuid: string }>) => {
+            state.isFetchingVaultInstanceAttributes = true;
+            state.vaultInstanceAttributesConnectorUuid = action.payload.connectorUuid;
+        },
+
+        getVaultInstanceAttributesSuccess: (
+            state,
+            action: PayloadAction<{ connectorUuid: string; attributes: AttributeDescriptorModel[] }>,
+        ) => {
+            if (state.vaultInstanceAttributesConnectorUuid === action.payload.connectorUuid) {
+                state.vaultInstanceAttributeDescriptors = action.payload.attributes as typeof state.vaultInstanceAttributeDescriptors;
+                state.vaultInstanceAttributesConnectorUuid = action.payload.connectorUuid;
+            }
+            state.isFetchingVaultInstanceAttributes = false;
+        },
+
+        getVaultInstanceAttributesFailure: (state, action: PayloadAction<{ connectorUuid: string }>) => {
+            if (state.vaultInstanceAttributesConnectorUuid === action.payload.connectorUuid) {
+                state.vaultInstanceAttributeDescriptors = [];
+                state.vaultInstanceAttributesConnectorUuid = null;
+            }
+            state.isFetchingVaultInstanceAttributes = false;
+        },
+
+        createVault: (
+            state,
+            action: PayloadAction<{
+                request: {
+                    connectorUuid: string;
+                    interfaceUuid: string;
+                    name: string;
+                    description?: string;
+                    attributes: any[];
+                    customAttributes?: any[];
+                };
+            }>,
+        ) => {
+            state.isCreating = true;
+        },
+
+        createVaultSuccess: (state, action: PayloadAction<{ vault: VaultInstanceDetailDto }>) => {
+            state.isCreating = false;
+            state.vault = action.payload.vault;
+        },
+
+        createVaultFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isCreating = false;
+        },
+
+        updateVault: (state, action: PayloadAction<{ uuid: string; request: VaultInstanceUpdateRequestDto }>) => {
+            state.isUpdating = true;
+        },
+
+        updateVaultSuccess: (state, action: PayloadAction<{ vault: VaultInstanceDetailDto }>) => {
+            state.isUpdating = false;
+            state.vault = action.payload.vault;
+        },
+
+        updateVaultFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdating = false;
+        },
+
+        deleteVault: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isDeleting = true;
+        },
+
+        deleteVaultSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isDeleting = false;
+            state.vaults = state.vaults.filter((v) => v.uuid !== action.payload.uuid);
+            if (state.vault?.uuid === action.payload.uuid) {
+                state.vault = undefined;
+            }
+        },
+
+        deleteVaultFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isDeleting = false;
+        },
+    },
+});
+
+const state = createFeatureSelector<State>(slice.name);
+
+const vaults = createSelector(state, (state) => state.vaults);
+const vault = createSelector(state, (state) => state.vault);
+const isFetchingList = createSelector(state, (state) => state.isFetchingList);
+const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
+const isCreating = createSelector(state, (state) => state.isCreating);
+const isUpdating = createSelector(state, (state) => state.isUpdating);
+const isDeleting = createSelector(state, (state) => state.isDeleting);
+
+const vaultInstanceAttributeDescriptors = createSelector(state, (state) => state.vaultInstanceAttributeDescriptors);
+const vaultInstanceAttributesConnectorUuid = createSelector(state, (state) => state.vaultInstanceAttributesConnectorUuid);
+const isFetchingVaultInstanceAttributes = createSelector(state, (state) => state.isFetchingVaultInstanceAttributes);
+
+export const selectors = {
+    state,
+    vaults,
+    vault,
+    isFetchingList,
+    isFetchingDetail,
+    vaultInstanceAttributeDescriptors,
+    vaultInstanceAttributesConnectorUuid,
+    isFetchingVaultInstanceAttributes,
+    isCreating,
+    isUpdating,
+    isDeleting,
+};
+
+export const actions = slice.actions;
+
+export default slice.reducer;

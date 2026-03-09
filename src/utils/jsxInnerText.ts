@@ -1,7 +1,7 @@
 export function jsxInnerText(obj: React.ReactNode): string {
     var buf = '';
 
-    if (obj) {
+    if (obj !== null && obj !== undefined) {
         var type = typeof obj;
 
         if (type === 'string' || type === 'number' || type === 'boolean') {

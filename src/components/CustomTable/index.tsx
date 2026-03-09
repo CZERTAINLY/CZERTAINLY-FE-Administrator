@@ -389,7 +389,11 @@ function CustomTable({
                     )}
                     data-id={header.id}
                     {...(header.sortable ? { onClick: onColumnSortClick } : {})}
-                    style={{ ...(header.width ? { width: header.width } : {}), ...(header.align ? { textAlign: header.align } : {}) }}
+                    style={{
+                        ...(header.width ? { width: header.width } : {}),
+                        ...(header.maxWidth != null ? { maxWidth: `${header.maxWidth}px` } : {}),
+                        ...(header.align ? { textAlign: header.align } : {}),
+                    }}
                 >
                     {header.id === '__checkbox__' ? (
                         hasAllCheckBox && multiSelect ? (

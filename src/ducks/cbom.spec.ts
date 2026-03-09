@@ -19,6 +19,10 @@ describe('cbom slice', () => {
             isFetchingVersions: true,
             isFetchingSearchableFields: true,
             isUploading: true,
+            isUploadSuccess: true,
+            isDeleting: true,
+            isBulkDeleting: true,
+            isSyncing: true,
             tempOnlyKey: 'to-be-removed',
         } as any;
 
@@ -90,9 +94,11 @@ describe('cbom slice', () => {
     test('uploadCbom / success / failure updates flags and prepends to list when available', () => {
         let next = reducer(initialState, actions.uploadCbom({ content: { metadata: {} } } as any));
         expect(next.isUploading).toBe(true);
+        expect(next.isUploadSuccess).toBe(false);
 
         next = reducer(next, actions.uploadCbomFailure({ error: 'upload failed' }));
         expect(next.isUploading).toBe(false);
+        expect(next.isUploadSuccess).toBe(false);
 
         const withList = {
             ...initialState,
@@ -102,13 +108,66 @@ describe('cbom slice', () => {
         const createdCbom = { uuid: 'new-1' } as any;
         next = reducer(withList, actions.uploadCbomSuccess({ cbom: createdCbom }));
         expect(next.isUploading).toBe(false);
+        expect(next.isUploadSuccess).toBe(true);
         expect(next.cbomsData!.items[0]).toEqual(createdCbom);
         expect(next.cbomsData!.items[1]).toEqual({ uuid: 'old-1' });
 
         const withoutList = { ...initialState, isUploading: true };
         next = reducer(withoutList, actions.uploadCbomSuccess({ cbom: createdCbom }));
         expect(next.isUploading).toBe(false);
+        expect(next.isUploadSuccess).toBe(true);
         expect(next.cbomsData).toBeUndefined();
+    });
+
+    test('deleteCbom / success / failure updates flags and list data', () => {
+        const state = {
+            ...initialState,
+            cbomsData: { items: [{ uuid: 'cbom-1' }, { uuid: 'cbom-2' }], totalItems: 2, pageNumber: 1, itemsPerPage: 10, totalPages: 1 },
+        } as any;
+
+        let next = reducer(state, actions.deleteCbom({ uuid: 'cbom-1' }));
+        expect(next.isDeleting).toBe(true);
+
+        next = reducer(next, actions.deleteCbomSuccess({ uuid: 'cbom-1' }));
+        expect(next.isDeleting).toBe(false);
+        expect(next.cbomsData.items).toEqual([{ uuid: 'cbom-2' }]);
+
+        next = reducer({ ...next, isDeleting: true }, actions.deleteCbomFailure({ error: 'err' }));
+        expect(next.isDeleting).toBe(false);
+    });
+
+    test('bulkDeleteCbom / success / failure updates flags and list data', () => {
+        const state = {
+            ...initialState,
+            cbomsData: {
+                items: [{ uuid: 'cbom-1' }, { uuid: 'cbom-2' }, { uuid: 'cbom-3' }],
+                totalItems: 3,
+                pageNumber: 1,
+                itemsPerPage: 10,
+                totalPages: 1,
+            },
+        } as any;
+
+        let next = reducer(state, actions.bulkDeleteCbom({ uuids: ['cbom-1', 'cbom-3'] }));
+        expect(next.isBulkDeleting).toBe(true);
+
+        next = reducer(next, actions.bulkDeleteCbomSuccess({ uuids: ['cbom-1', 'cbom-3'] }));
+        expect(next.isBulkDeleting).toBe(false);
+        expect(next.cbomsData.items).toEqual([{ uuid: 'cbom-2' }]);
+
+        next = reducer({ ...next, isBulkDeleting: true }, actions.bulkDeleteCbomFailure({ error: 'err' }));
+        expect(next.isBulkDeleting).toBe(false);
+    });
+
+    test('syncCboms / success / failure updates sync flag', () => {
+        let next = reducer(initialState, actions.syncCboms());
+        expect(next.isSyncing).toBe(true);
+
+        next = reducer(next, actions.syncCbomsSuccess());
+        expect(next.isSyncing).toBe(false);
+
+        next = reducer({ ...next, isSyncing: true }, actions.syncCbomsFailure({ error: 'err' }));
+        expect(next.isSyncing).toBe(false);
     });
 });
 
@@ -130,6 +189,10 @@ describe('cbom selectors', () => {
             isFetchingVersions: true,
             isFetchingSearchableFields: false,
             isUploading: true,
+            isUploadSuccess: false,
+            isDeleting: true,
+            isBulkDeleting: false,
+            isSyncing: true,
         } as any;
         const state = { cbom: cbomState, userInterface: { widgetLocks: [{ widgetName: LockWidgetNameEnum.CbomDetail }] } } as any;
 
@@ -143,5 +206,9 @@ describe('cbom selectors', () => {
         expect(selectors.selectIsFetchingVersions(state)).toBe(true);
         expect(selectors.selectIsFetchingSearchableFields(state)).toBe(false);
         expect(selectors.selectIsUploading(state)).toBe(true);
+        expect(selectors.selectIsUploadSuccess(state)).toBe(false);
+        expect(selectors.selectIsDeleting(state)).toBe(true);
+        expect(selectors.selectIsBulkDeleting(state)).toBe(false);
+        expect(selectors.selectIsSyncing(state)).toBe(true);
     });
 });

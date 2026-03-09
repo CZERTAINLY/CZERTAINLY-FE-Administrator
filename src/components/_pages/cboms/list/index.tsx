@@ -16,21 +16,32 @@ import { ApiClients, backendClient } from '../../../../api';
 import { EntityType } from 'ducks/filters';
 import { CbomDetailDto } from 'types/openapi';
 
+const toFiniteNumber = (value: unknown): number => {
+    const parsed = typeof value === 'number' ? value : Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+};
+
 function CbomsList() {
     const dispatch = useDispatch();
 
     const cboms = useSelector(selectors.selectCbomList);
     const isFetching = useSelector(selectors.selectIsFetchingList);
+    const isDeleting = useSelector(selectors.selectIsDeleting);
+    const isBulkDeleting = useSelector(selectors.selectIsBulkDeleting);
+    const isSyncing = useSelector(selectors.selectIsSyncing);
+
+    const isBusy = isFetching || isDeleting || isBulkDeleting || isSyncing;
 
     const headers: TableHeader[] = useMemo(
         () => [
             { content: 'Serial number', sortable: true, id: 'serial' },
-            { content: 'Ver.', sortable: true, id: 'version', align: 'center' },
-            { content: 'Alg.', sortable: true, id: 'algorithm', align: 'center' },
-            { content: 'Certs', sortable: true, id: 'certificates', align: 'center' },
-            { content: 'Proto.', sortable: true, id: 'protocol', align: 'center' },
-            { content: 'Material', sortable: true, id: 'material', align: 'center' },
-            { content: 'Assets', sortable: true, id: 'assets', align: 'center' },
+            { content: 'Ver.', sortable: true, id: 'version', align: 'center', sortType: 'numeric' },
+            { content: 'Source', sortable: true, id: 'source' },
+            { content: 'Alg.', sortable: true, id: 'algorithm', align: 'center', sortType: 'numeric' },
+            { content: 'Certs', sortable: true, id: 'certificates', align: 'center', sortType: 'numeric' },
+            { content: 'Proto.', sortable: true, id: 'protocol', align: 'center', sortType: 'numeric' },
+            { content: 'Material', sortable: true, id: 'material', align: 'center', sortType: 'numeric' },
+            { content: 'Assets', sortable: true, id: 'assets', align: 'center', sortType: 'numeric' },
             { content: 'Action', sortable: false, id: 'action', align: 'center' },
         ],
         [],
@@ -46,8 +57,14 @@ function CbomsList() {
                 tooltip: 'Upload CBOM',
                 onClick: () => setIsUploadOpen(true),
             },
+            {
+                icon: 'sync',
+                disabled: isSyncing,
+                tooltip: 'Sync CBOMs',
+                onClick: () => dispatch(actions.syncCboms()),
+            },
         ],
-        [],
+        [dispatch, isSyncing],
     );
 
     const getCbomJson = useCallback(async (uuid: string): Promise<string> => {
@@ -95,12 +112,13 @@ function CbomsList() {
                     <Link key="serial" to={`./detail/${c.uuid}`}>
                         {c.serialNumber}
                     </Link>,
-                    c.version,
-                    c.algorithms,
-                    c.certificates,
-                    c.protocols,
-                    c.cryptoMaterial,
-                    c.totalAssets,
+                    toFiniteNumber(c.version),
+                    c.source || '-',
+                    toFiniteNumber(c.algorithms),
+                    toFiniteNumber(c.certificates),
+                    toFiniteNumber(c.protocols),
+                    toFiniteNumber(c.cryptoMaterial),
+                    toFiniteNumber(c.totalAssets),
                     <WidgetButtons
                         key={`actions-${c.uuid}`}
                         buttons={
@@ -134,9 +152,16 @@ function CbomsList() {
     const onList = useCallback((filters: SearchRequestModel) => dispatch(actions.listCboms(filters)), [dispatch]);
 
     const isUploading = useSelector(selectors.selectIsUploading);
+    const isUploadSuccess = useSelector(selectors.selectIsUploadSuccess);
 
     useRunOnFinished(isUploading, () => {
-        setIsUploadOpen(false);
+        if (isUploadSuccess) {
+            setIsUploadOpen(false);
+            onList({ itemsPerPage: 10, pageNumber: 1, filters: [] });
+        }
+    });
+
+    useRunOnFinished(isSyncing, () => {
         onList({ itemsPerPage: 10, pageNumber: 1, filters: [] });
     });
 
@@ -145,16 +170,29 @@ function CbomsList() {
             <PagedList
                 entity={EntityType.CBOM}
                 onListCallback={onList}
+                onDeleteCallback={(uuids) => {
+                    if (uuids.length === 1) {
+                        dispatch(actions.deleteCbom({ uuid: uuids[0] }));
+                        return;
+                    }
+
+                    if (uuids.length > 1) {
+                        dispatch(actions.bulkDeleteCbom({ uuids }));
+                    }
+                }}
                 getAvailableFiltersApi={useCallback(
-                    (apiClients: ApiClients) => apiClients.cbomManagement.getSearchableFieldInformation5(),
+                    (apiClients: ApiClients) => apiClients.cbomManagement.getSearchableFieldInformation8(),
                     [],
                 )}
                 filterTitle="CBOMs Filter"
                 headers={headers}
                 data={rows}
-                isBusy={isFetching}
+                isBusy={isBusy}
                 title="CBOMs"
+                entityNameSingular="a CBOM"
+                entityNamePlural="CBOMs"
                 addHidden
+                hasCheckboxes={true}
                 additionalButtons={additionalButtons}
                 pageWidgetLockName={LockWidgetNameEnum.ListOfCboms}
             />
