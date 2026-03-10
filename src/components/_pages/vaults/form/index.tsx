@@ -20,7 +20,7 @@ import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/va
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 
 import { ConnectorResponseModel } from 'types/connectors';
-import { ConnectorInterface, FilterConditionOperator, FilterFieldSource, Resource } from 'types/openapi';
+import { ConnectorInterface, FilterConditionOperator, FilterFieldSource, FunctionGroupCode, Resource } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
 interface VaultFormProps {
@@ -165,7 +165,13 @@ export default function VaultForm({ onCancel, onSuccess }: VaultFormProps) {
                 title: 'Attributes',
                 content:
                     selectedConnectorUuid && vaultAttributeDescriptors.length > 0 ? (
-                        <AttributeEditor id="vault" attributeDescriptors={vaultAttributeDescriptors} />
+                        <AttributeEditor
+                            id="vault"
+                            attributeDescriptors={vaultAttributeDescriptors}
+                            connectorUuid={selectedConnectorUuid}
+                            functionGroupCode={FunctionGroupCode.CredentialProvider}
+                            kind="vaultManagement"
+                        />
                     ) : (
                         <div className="text-sm text-gray-500">No connector attributes configured for vaults.</div>
                     ),

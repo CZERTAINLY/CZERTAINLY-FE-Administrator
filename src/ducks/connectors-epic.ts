@@ -452,8 +452,8 @@ const callbackConnector: AppEpic = (action$, state, deps) => {
         filter(slice.actions.callbackConnector.match),
         mergeMap((action) =>
             deps.apiClients.callback
-                .callback({
-                    ...action.payload.callbackConnector,
+                .callbackV2({
+                    uuid: action.payload.callbackConnector.uuid,
                     requestAttributeCallback: transformCallbackAttributeModelToDto(
                         action.payload.callbackConnector.requestAttributeCallback,
                     ),

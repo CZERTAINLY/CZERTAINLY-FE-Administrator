@@ -44,6 +44,7 @@ type EpicDeps = {
         };
         callback: {
             callback: (args: any) => any;
+            callbackV2: (args: any) => any;
             resourceCallback: (args: any) => any;
         };
     };
@@ -77,6 +78,7 @@ function createDeps(overrides: Partial<EpicDeps['apiClients']> = {}): EpicDeps {
             },
             callback: {
                 callback: () => of({}),
+                callbackV2: () => of({}),
                 resourceCallback: () => of({}),
                 ...(overrides.callback || {}),
             },
@@ -704,11 +706,11 @@ describe('connectors epics', () => {
         const data = { result: 'ok' } as any;
         const action = slice.actions.callbackConnector({
             callbackId: 'cb-1',
-            callbackConnector: { requestAttributeCallback: { mappings: [] } } as any,
+            callbackConnector: { uuid: 'c-1', requestAttributeCallback: { mappings: [] } } as any,
         });
         const emitted = await runEpic(17, action, {
             callback: {
-                callback: ({ requestAttributeCallback }: { requestAttributeCallback: any }) => {
+                callbackV2: ({ requestAttributeCallback }: { requestAttributeCallback: any }) => {
                     expect(requestAttributeCallback).toBeDefined();
                     return of(data);
                 },
@@ -721,13 +723,13 @@ describe('connectors epics', () => {
         const err = new Error('callback failed');
         const action = slice.actions.callbackConnector({
             callbackId: 'cb-1',
-            callbackConnector: { requestAttributeCallback: { mappings: [] } } as any,
+            callbackConnector: { uuid: 'c-1', requestAttributeCallback: { mappings: [] } } as any,
         });
         const emitted = await runEpic(
             17,
             action,
             {
-                callback: { callback: () => throwError(() => err) } as any,
+                callback: { callbackV2: () => throwError(() => err) } as any,
             },
             2,
         );
