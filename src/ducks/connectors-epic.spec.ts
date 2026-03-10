@@ -762,14 +762,14 @@ describe('connectors epics', () => {
     test('callbackConnector outer catchError emits callbackFailure and fetchError when callback throws', async () => {
         const action = slice.actions.callbackConnector({
             callbackId: 'cb-1',
-            callbackConnector: { requestAttributeCallback: { mappings: [] } } as any,
+            callbackConnector: { uuid: 'c-1', requestAttributeCallback: { mappings: [] } } as any,
         });
         const emitted = await runEpic(
             17,
             action,
             {
                 callback: {
-                    callback: () => {
+                    callbackV2: () => {
                         throw new Error('sync callback error');
                     },
                 } as any,
