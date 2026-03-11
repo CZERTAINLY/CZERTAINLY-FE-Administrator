@@ -710,6 +710,18 @@ export class CryptographicKeyManagementApi extends BaseAPI {
     };
 
     /**
+     * Get CryptographicKey searchable fields information
+     */
+    getCryptographicKeySearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>
+    getCryptographicKeySearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
+    getCryptographicKeySearchableFields(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
+        return this.request<Array<SearchFieldDataByGroupDto>>({
+            url: '/v1/keys/search',
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
      * Get Key Item event history
      */
     getEventHistory({ uuid, keyItemUuid }: GetEventHistoryRequest): Observable<Array<KeyEventHistoryDto>>
@@ -796,18 +808,6 @@ export class CryptographicKeyManagementApi extends BaseAPI {
 
         return this.request<KeyDetailDto>({
             url: '/v1/tokens/{tokenInstanceUuid}/keys/{uuid}'.replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid)).replace('{uuid}', encodeURI(uuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
-
-    /**
-     * Get CryptographicKey searchable fields information
-     */
-    getSearchableFieldInformation4(): Observable<Array<SearchFieldDataByGroupDto>>
-    getSearchableFieldInformation4(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
-    getSearchableFieldInformation4(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
-        return this.request<Array<SearchFieldDataByGroupDto>>({
-            url: '/v1/keys/search',
             method: 'GET',
         }, opts?.responseOpts);
     };

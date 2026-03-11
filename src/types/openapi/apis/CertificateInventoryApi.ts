@@ -428,6 +428,18 @@ export class CertificateInventoryApi extends BaseAPI {
     };
 
     /**
+     * Get Certificate searchable fields information
+     */
+    getCertificateSearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>
+    getCertificateSearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
+    getCertificateSearchableFields(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
+        return this.request<Array<SearchFieldDataByGroupDto>>({
+            url: '/v1/certificates/search',
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
      * Get Certificate Validation Result
      */
     getCertificateValidationResult({ uuid }: GetCertificateValidationResultRequest): Observable<CertificateValidationResultDto>
@@ -449,18 +461,6 @@ export class CertificateInventoryApi extends BaseAPI {
     getCsrGenerationAttributes(opts?: OperationOpts): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
         return this.request<Array<BaseAttributeDto>>({
             url: '/v1/certificates/csr/attributes',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
-
-    /**
-     * Get Certificate searchable fields information
-     */
-    getSearchableFieldInformation7(): Observable<Array<SearchFieldDataByGroupDto>>
-    getSearchableFieldInformation7(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
-    getSearchableFieldInformation7(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
-        return this.request<Array<SearchFieldDataByGroupDto>>({
-            url: '/v1/certificates/search',
             method: 'GET',
         }, opts?.responseOpts);
     };

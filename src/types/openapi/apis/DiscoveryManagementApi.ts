@@ -156,9 +156,9 @@ export class DiscoveryManagementApi extends BaseAPI {
     /**
      * Get Discovery searchable fields information
      */
-    getSearchableFieldInformation6(): Observable<Array<SearchFieldDataByGroupDto>>
-    getSearchableFieldInformation6(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
-    getSearchableFieldInformation6(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
+    getDiscoverySearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>
+    getDiscoverySearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
+    getDiscoverySearchableFields(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
         return this.request<Array<SearchFieldDataByGroupDto>>({
             url: '/v1/discoveries/search',
             method: 'GET',
