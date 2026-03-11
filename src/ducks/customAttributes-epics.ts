@@ -95,6 +95,45 @@ const createContentFailureAction = (operation: 'update' | 'remove', resource: Re
         : slice.actions.removeCustomAttributeContentFailure(payload);
 };
 
+const createContentSuccessAction = (
+    operation: 'update' | 'remove',
+    resource: Resource,
+    resourceUuid: string,
+    customAttributes: AttributeResponseDto[],
+) =>
+    operation === 'update'
+        ? slice.actions.updateCustomAttributeContentSuccess(createContentPayload(resource, resourceUuid, customAttributes))
+        : slice.actions.removeCustomAttributeContentSuccess(createContentPayload(resource, resourceUuid, customAttributes));
+
+const createContentFailureWithRedirect = (operation: 'update' | 'remove', resource: Resource, resourceUuid: string, err: unknown) => {
+    const message = `Failed to ${operation} custom attribute content`;
+
+    return of(
+        createContentFailureAction(operation, resource, resourceUuid, err),
+        appRedirectActions.fetchError({ error: err as Error, message }),
+    );
+};
+
+const buildNextCustomAttributes = (
+    operation: 'update' | 'remove',
+    state: AppState,
+    attributeUuid: string,
+    content: AttributeResponseModel['content'] | undefined,
+    currentCustomAttributes: AttributeResponseModel[],
+): AttributeResponseModel[] | undefined => {
+    if (operation === 'remove') {
+        return currentCustomAttributes.filter((entry) => entry.uuid !== attributeUuid);
+    }
+
+    const updatedAttribute = resolveUpdatedAttribute(state, attributeUuid, content, currentCustomAttributes);
+
+    if (!updatedAttribute) {
+        return undefined;
+    }
+
+    return [...currentCustomAttributes.filter((entry) => entry.uuid !== attributeUuid), updatedAttribute];
+};
+
 const resolveUpdatedAttribute = (
     state: AppState,
     attributeUuid: string,
@@ -311,22 +350,18 @@ const updateCustomAttributeContent: AppEpic = (action$, state$, deps) => {
                     return of(createContentFailureAction('update', action.payload.resource, action.payload.resourceUuid, error));
                 }
 
-                const updatedAttribute = resolveUpdatedAttribute(
+                const nextCustomAttributes = buildNextCustomAttributes(
+                    'update',
                     state,
                     action.payload.attributeUuid,
                     action.payload.content,
                     currentCustomAttributes,
                 );
 
-                if (!updatedAttribute) {
+                if (!nextCustomAttributes) {
                     const error = new Error('Missing descriptor for selected custom attribute');
                     return of(createContentFailureAction('update', action.payload.resource, action.payload.resourceUuid, error));
                 }
-
-                const nextCustomAttributes = [
-                    ...currentCustomAttributes.filter((entry) => entry.uuid !== action.payload.attributeUuid),
-                    updatedAttribute,
-                ];
 
                 return deps.apiClients.vaults
                     .updateVaultInstance({
@@ -339,21 +374,17 @@ const updateCustomAttributeContent: AppEpic = (action$, state$, deps) => {
                     .pipe(
                         mergeMap((vault) =>
                             of(
-                                slice.actions.updateCustomAttributeContentSuccess(
-                                    createContentPayload(
-                                        action.payload.resource,
-                                        action.payload.resourceUuid,
-                                        vault.customAttributes ?? [],
-                                    ),
+                                createContentSuccessAction(
+                                    'update',
+                                    action.payload.resource,
+                                    action.payload.resourceUuid,
+                                    vault.customAttributes ?? [],
                                 ),
                                 vaultActions.updateVaultSuccess({ vault }),
                             ),
                         ),
                         catchError((err) =>
-                            of(
-                                createContentFailureAction('update', action.payload.resource, action.payload.resourceUuid, err),
-                                appRedirectActions.fetchError({ error: err, message: 'Failed to update custom attribute content' }),
-                            ),
+                            createContentFailureWithRedirect('update', action.payload.resource, action.payload.resourceUuid, err),
                         ),
                     );
             }
@@ -368,22 +399,18 @@ const updateCustomAttributeContent: AppEpic = (action$, state$, deps) => {
                     return of(createContentFailureAction('update', action.payload.resource, action.payload.resourceUuid, error));
                 }
 
-                const updatedAttribute = resolveUpdatedAttribute(
+                const nextAttributes = buildNextCustomAttributes(
+                    'update',
                     state,
                     action.payload.attributeUuid,
                     action.payload.content,
                     currentAttributes,
                 );
 
-                if (!updatedAttribute) {
+                if (!nextAttributes) {
                     const error = new Error('Missing descriptor for selected custom attribute');
                     return of(createContentFailureAction('update', action.payload.resource, action.payload.resourceUuid, error));
                 }
-
-                const nextAttributes = [
-                    ...currentAttributes.filter((entry) => entry.uuid !== action.payload.attributeUuid),
-                    updatedAttribute,
-                ];
 
                 return deps.apiClients.vaultProfiles
                     .updateVaultProfile({
@@ -396,21 +423,17 @@ const updateCustomAttributeContent: AppEpic = (action$, state$, deps) => {
                     .pipe(
                         mergeMap((profile) =>
                             of(
-                                slice.actions.updateCustomAttributeContentSuccess(
-                                    createContentPayload(
-                                        action.payload.resource,
-                                        action.payload.resourceUuid,
-                                        profile.customAttributes ?? [],
-                                    ),
+                                createContentSuccessAction(
+                                    'update',
+                                    action.payload.resource,
+                                    action.payload.resourceUuid,
+                                    profile.customAttributes ?? [],
                                 ),
                                 vaultProfileActions.updateVaultProfileSuccess({ profile }),
                             ),
                         ),
                         catchError((err) =>
-                            of(
-                                createContentFailureAction('update', action.payload.resource, action.payload.resourceUuid, err),
-                                appRedirectActions.fetchError({ error: err, message: 'Failed to update custom attribute content' }),
-                            ),
+                            createContentFailureWithRedirect('update', action.payload.resource, action.payload.resourceUuid, err),
                         ),
                     );
             }
@@ -423,16 +446,9 @@ const updateCustomAttributeContent: AppEpic = (action$, state$, deps) => {
                     attributeContent: action.payload.content,
                 })
                 .pipe(
-                    map((response) =>
-                        slice.actions.updateCustomAttributeContentSuccess(
-                            createContentPayload(action.payload.resource, action.payload.resourceUuid, response),
-                        ),
-                    ),
+                    map((response) => createContentSuccessAction('update', action.payload.resource, action.payload.resourceUuid, response)),
                     catchError((err) =>
-                        of(
-                            createContentFailureAction('update', action.payload.resource, action.payload.resourceUuid, err),
-                            appRedirectActions.fetchError({ error: err, message: 'Failed to update custom attribute content' }),
-                        ),
+                        createContentFailureWithRedirect('update', action.payload.resource, action.payload.resourceUuid, err),
                     ),
                 );
         }),
@@ -454,7 +470,13 @@ const removeCustomAttributeContent: AppEpic = (action$, state$, deps) => {
                     return of(createContentFailureAction('remove', action.payload.resource, action.payload.resourceUuid, error));
                 }
 
-                const nextCustomAttributes = currentCustomAttributes.filter((entry) => entry.uuid !== action.payload.attributeUuid);
+                const nextCustomAttributes = buildNextCustomAttributes(
+                    'remove',
+                    state,
+                    action.payload.attributeUuid,
+                    undefined,
+                    currentCustomAttributes,
+                )!;
 
                 return deps.apiClients.vaults
                     .updateVaultInstance({
@@ -467,21 +489,17 @@ const removeCustomAttributeContent: AppEpic = (action$, state$, deps) => {
                     .pipe(
                         mergeMap((vault) =>
                             of(
-                                slice.actions.removeCustomAttributeContentSuccess(
-                                    createContentPayload(
-                                        action.payload.resource,
-                                        action.payload.resourceUuid,
-                                        vault.customAttributes ?? [],
-                                    ),
+                                createContentSuccessAction(
+                                    'remove',
+                                    action.payload.resource,
+                                    action.payload.resourceUuid,
+                                    vault.customAttributes ?? [],
                                 ),
                                 vaultActions.updateVaultSuccess({ vault }),
                             ),
                         ),
                         catchError((err) =>
-                            of(
-                                createContentFailureAction('remove', action.payload.resource, action.payload.resourceUuid, err),
-                                appRedirectActions.fetchError({ error: err, message: 'Failed to remove custom attribute content' }),
-                            ),
+                            createContentFailureWithRedirect('remove', action.payload.resource, action.payload.resourceUuid, err),
                         ),
                     );
             }
@@ -496,7 +514,13 @@ const removeCustomAttributeContent: AppEpic = (action$, state$, deps) => {
                     return of(createContentFailureAction('remove', action.payload.resource, action.payload.resourceUuid, error));
                 }
 
-                const nextAttributes = currentAttributes.filter((entry) => entry.uuid !== action.payload.attributeUuid);
+                const nextAttributes = buildNextCustomAttributes(
+                    'remove',
+                    state,
+                    action.payload.attributeUuid,
+                    undefined,
+                    currentAttributes,
+                )!;
 
                 return deps.apiClients.vaultProfiles
                     .updateVaultProfile({
@@ -509,21 +533,17 @@ const removeCustomAttributeContent: AppEpic = (action$, state$, deps) => {
                     .pipe(
                         mergeMap((profile) =>
                             of(
-                                slice.actions.removeCustomAttributeContentSuccess(
-                                    createContentPayload(
-                                        action.payload.resource,
-                                        action.payload.resourceUuid,
-                                        profile.customAttributes ?? [],
-                                    ),
+                                createContentSuccessAction(
+                                    'remove',
+                                    action.payload.resource,
+                                    action.payload.resourceUuid,
+                                    profile.customAttributes ?? [],
                                 ),
                                 vaultProfileActions.updateVaultProfileSuccess({ profile }),
                             ),
                         ),
                         catchError((err) =>
-                            of(
-                                createContentFailureAction('remove', action.payload.resource, action.payload.resourceUuid, err),
-                                appRedirectActions.fetchError({ error: err, message: 'Failed to remove custom attribute content' }),
-                            ),
+                            createContentFailureWithRedirect('remove', action.payload.resource, action.payload.resourceUuid, err),
                         ),
                     );
             }
@@ -535,16 +555,9 @@ const removeCustomAttributeContent: AppEpic = (action$, state$, deps) => {
                     attributeUuid: action.payload.attributeUuid,
                 })
                 .pipe(
-                    map((response) =>
-                        slice.actions.removeCustomAttributeContentSuccess(
-                            createContentPayload(action.payload.resource, action.payload.resourceUuid, response),
-                        ),
-                    ),
+                    map((response) => createContentSuccessAction('remove', action.payload.resource, action.payload.resourceUuid, response)),
                     catchError((err) =>
-                        of(
-                            createContentFailureAction('remove', action.payload.resource, action.payload.resourceUuid, err),
-                            appRedirectActions.fetchError({ error: err, message: 'Failed to remove custom attribute content' }),
-                        ),
+                        createContentFailureWithRedirect('remove', action.payload.resource, action.payload.resourceUuid, err),
                     ),
                 );
         }),
