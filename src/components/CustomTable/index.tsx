@@ -446,6 +446,7 @@ function CustomTable({
                                   },
                               }
                             : {})}
+                        className={row.options?.rowClassName}
                         style={getRowStyle(row)}
                         data-id={row.id}
                     >
