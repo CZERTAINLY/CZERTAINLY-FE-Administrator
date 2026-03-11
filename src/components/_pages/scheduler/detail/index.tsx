@@ -293,7 +293,7 @@ export default function SchedulerJobDetail() {
                 <Dialog
                     isOpen={confirmDelete}
                     caption="Delete Scheduled Job"
-                    body="You are about to delete Scheduled Job. Is this what you want to do?"
+                    body="You are about to delete this Scheduled Job. Is this what you want to do?"
                     toggle={() => setConfirmDelete(false)}
                     icon="delete"
                     buttons={[

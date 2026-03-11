@@ -22,7 +22,7 @@ import { actions as vaultProfileActions, selectors as vaultProfileSelectors } fr
 
 import { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { PlatformEnum } from 'types/openapi';
+import { PlatformEnum, Resource } from 'types/openapi';
 
 import SecretForm from '../form';
 import SecretStateBadge from '../SecretStateBadge';
@@ -130,11 +130,21 @@ export default function SecretsList() {
                     <SecretStateBadge key="state" state={secret.state}>
                         {getEnumLabel(secretStateEnum, secret.state)}
                     </SecretStateBadge>,
-                    secret.sourceVaultProfile ? (
-                        <Link to={`../vaultprofiles/detail/${secret.sourceVaultProfile.uuid}`}>{secret.sourceVaultProfile.name}</Link>
-                    ) : (
-                        ''
-                    ),
+                    secret.sourceVaultProfile
+                        ? (() => {
+                              const profile = vaultProfiles.find((p) => p.uuid === secret.sourceVaultProfile?.uuid);
+                              const vaultUuid = profile?.vaultInstance?.uuid;
+                              return vaultUuid ? (
+                                  <Link
+                                      to={`/${Resource.VaultProfiles.toLowerCase()}/detail/${vaultUuid}/${secret.sourceVaultProfile.uuid}`}
+                                  >
+                                      {secret.sourceVaultProfile.name}
+                                  </Link>
+                              ) : (
+                                  secret.sourceVaultProfile.name
+                              );
+                          })()
+                        : '',
                     secret.version ? secret.version.toString() : '',
                     secret.owner ? <Link to={`../users/detail/${secret.owner.uuid}`}>{secret.owner.name}</Link> : 'Unassigned',
                     secret.groups && secret.groups.length > 0
@@ -150,7 +160,7 @@ export default function SecretsList() {
                     </Badge>,
                 ],
             })),
-        [secrets, secretTypeEnum, secretStateEnum],
+        [secrets, secretTypeEnum, secretStateEnum, vaultProfiles],
     );
 
     const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listSecrets(filters)), [dispatch]);
