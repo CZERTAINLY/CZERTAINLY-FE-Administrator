@@ -148,7 +148,7 @@ export function Attribute({
 
     if (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
         const hasOptions = Array.isArray(options) && options.length > 0;
-        const shouldRenderSelect = descriptor.properties.list || hasOptions;
+        const shouldRenderSelect = descriptor.properties.list || descriptor.contentType === AttributeContentType.Resource || hasOptions;
 
         if (shouldRenderSelect) {
             return (
