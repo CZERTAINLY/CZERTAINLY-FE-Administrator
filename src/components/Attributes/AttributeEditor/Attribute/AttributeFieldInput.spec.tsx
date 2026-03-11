@@ -84,14 +84,14 @@ test.describe('AttributeFieldInput', () => {
         await expect(input).toHaveAttribute('type', 'number');
     });
 
-    test('does not render label when descriptor.properties.visible is false', async ({ mount, page }) => {
+    test('does not render label or input when descriptor.properties.visible is false', async ({ mount, page }) => {
         const descriptor = minimalDescriptor(AttributeContentType.String, {
             properties: { ...defaultProperties, visible: false, label: 'Hidden Label' },
         } as any);
         await mount(<AttributeFieldInputTestWrapper name="testField" descriptor={descriptor} />);
 
         await expect(page.getByText('Hidden Label')).toHaveCount(0);
-        await expect(page.locator('#testField')).toBeVisible();
+        await expect(page.locator('#testField')).toHaveCount(0);
     });
 
     test('renders description when descriptor.description is set and visible', async ({ mount, page }) => {

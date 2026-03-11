@@ -138,7 +138,7 @@ export function AttributeFieldInput({ name, descriptor, busy, deleteButton }: At
     const formValues = watch();
 
     // Attribute should not be rendered in form but its value should be sent to BE
-    if (!descriptor.properties.visible) {
+    if (descriptor.properties.visible === false) {
         return null;
     }
 
