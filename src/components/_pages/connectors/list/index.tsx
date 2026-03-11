@@ -211,10 +211,7 @@ export default function ConnectorList() {
                 data={connectorList}
                 isBusy={isBusy}
                 onListCallback={onListCallback}
-                getAvailableFiltersApi={useCallback(
-                    (apiClients: ApiClients) => apiClients.connectorsV2.getConnectorSearchableFieldInformation(),
-                    [],
-                )}
+                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.connectorsV2.getConnectorSearchableFields(), [])}
                 title="Connector Store"
                 filterTitle="Connector Filter"
                 addHidden

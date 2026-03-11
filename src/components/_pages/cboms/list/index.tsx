@@ -194,10 +194,7 @@ function CbomsList() {
                         dispatch(actions.bulkDeleteCbom({ uuids }));
                     }
                 }}
-                getAvailableFiltersApi={useCallback(
-                    (apiClients: ApiClients) => apiClients.cbomManagement.getSearchableFieldInformation8(),
-                    [],
-                )}
+                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.cbomManagement.getCbomSearchableFields(), [])}
                 filterTitle="CBOMs Filter"
                 headers={headers}
                 data={rows}

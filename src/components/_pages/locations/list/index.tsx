@@ -185,7 +185,7 @@ function LocationList() {
                         ),
                     )
                 }
-                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.locations.getSearchableFieldInformation3(), [])}
+                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.locations.getLocationSearchableFields(), [])}
                 headers={locationsRowHeaders}
                 data={locationList}
                 isBusy={isBusy}

@@ -275,7 +275,7 @@ export default function SecretsList() {
                 entityNamePlural="Secrets"
                 filterTitle="Secrets Inventory Filter"
                 pageWidgetLockName={LockWidgetNameEnum.ListOfSecrets}
-                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.secrets.getSearchableFieldInformation2(), [])}
+                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.secrets.getSecretSearchableFields(), [])}
                 additionalButtons={buttons}
                 addHidden
             />

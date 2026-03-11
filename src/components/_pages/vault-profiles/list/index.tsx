@@ -135,7 +135,7 @@ export default function VaultProfilesList() {
                 filterTitle="Vault Profiles Filter"
                 pageWidgetLockName={LockWidgetNameEnum.ListOfVaultProfiles}
                 getAvailableFiltersApi={useCallback(
-                    (apiClients: ApiClients) => apiClients.vaultProfiles.getSearchableFieldInformation1(),
+                    (apiClients: ApiClients) => apiClients.vaultProfiles.getVaultProfileSearchableFields(),
                     [],
                 )}
                 additionalButtons={buttons}
