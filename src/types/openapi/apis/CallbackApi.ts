@@ -29,6 +29,11 @@ export interface CallbackRequest {
     requestAttributeCallback: RequestAttributeCallback;
 }
 
+export interface CallbackV2Request {
+    uuid: string;
+    requestAttributeCallback: RequestAttributeCallback;
+}
+
 export interface ResourceCallbackRequest {
     resource: Resource;
     parentObjectUuid: string;
@@ -58,6 +63,28 @@ export class CallbackApi extends BaseAPI {
 
         return this.request<object>({
             url: '/v1/connectors/{uuid}/{functionGroup}/{kind}/callback'.replace('{uuid}', encodeURI(uuid)).replace('{functionGroup}', encodeURI(functionGroup)).replace('{kind}', encodeURI(kind)),
+            method: 'POST',
+            headers,
+            body: requestAttributeCallback,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * API to trigger the Callback for Connector.
+     * Connector Callback API v2
+     */
+    callbackV2({ uuid, requestAttributeCallback }: CallbackV2Request): Observable<object>
+    callbackV2({ uuid, requestAttributeCallback }: CallbackV2Request, opts?: OperationOpts): Observable<AjaxResponse<object>>
+    callbackV2({ uuid, requestAttributeCallback }: CallbackV2Request, opts?: OperationOpts): Observable<object | AjaxResponse<object>> {
+        throwIfNullOrUndefined(uuid, 'uuid', 'callbackV2');
+        throwIfNullOrUndefined(requestAttributeCallback, 'requestAttributeCallback', 'callbackV2');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<object>({
+            url: '/v2/connectors/{uuid}/callback'.replace('{uuid}', encodeURI(uuid)),
             method: 'POST',
             headers,
             body: requestAttributeCallback,

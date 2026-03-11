@@ -140,8 +140,8 @@ export class ConnectorManagementV2Api extends BaseAPI {
         };
 
         return this.request<Array<BulkActionMessageDto>>({
-            url: '/v2/connectors/delete',
-            method: 'POST',
+            url: '/v2/connectors',
+            method: 'DELETE',
             headers,
             body: requestBody,
         }, opts?.responseOpts);

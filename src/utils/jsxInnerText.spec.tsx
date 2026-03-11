@@ -11,6 +11,10 @@ test.describe('jsxInnerText', () => {
         expect(jsxInnerText(42)).toBe('42');
     });
 
+    test('should return string for zero number input', () => {
+        expect(jsxInnerText(0)).toBe('0');
+    });
+
     test('should return string for boolean input', () => {
         expect(jsxInnerText(true)).toBe('true');
     });

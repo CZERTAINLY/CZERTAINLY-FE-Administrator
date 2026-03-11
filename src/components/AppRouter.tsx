@@ -44,6 +44,8 @@ import CredentialsList from './_pages/credentials/list';
 
 import CryptographicKeyDetail from './_pages/cryptographic-keys/detail';
 import CryptographicKeyList from './_pages/cryptographic-keys/list';
+import SecretsList from './_pages/secrets/list';
+import SecretDetail from './_pages/secrets/detail';
 
 import CustomAttributesDetail from './_pages/custom-attributes/detail';
 import CustomAttributesList from './_pages/custom-attributes/list';
@@ -121,6 +123,10 @@ import { Resource } from 'types/openapi';
 import CustomOIDList from 'components/_pages/custom-oid/list';
 import CustomOIDDetail from 'components/_pages/custom-oid/detail';
 import Login from './_pages/login';
+import VaultsList from './_pages/vaults/list';
+import VaultDetail from './_pages/vaults/detail';
+import VaultProfilesList from './_pages/vault-profiles/list';
+import VaultProfileDetail from './_pages/vault-profiles/detail';
 
 import CbomsList from './_pages/cboms/list';
 import CbomDetail from 'components/_pages/cboms/detail';
@@ -255,6 +261,20 @@ export default function AppRouter() {
                     />
                     <Route path={`/${Resource.Entities.toLowerCase()}/detail/:id`} element={<EntityDetail />} />
 
+                    <Route path={`/${Resource.Vaults.toLowerCase()}`} element={<VaultsList />} />
+                    <Route
+                        path={`/${Resource.Vaults.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.Vaults.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.Vaults.toLowerCase()}/detail/:id`} element={<VaultDetail />} />
+
+                    <Route path={`/${Resource.VaultProfiles.toLowerCase()}`} element={<VaultProfilesList />} />
+                    <Route
+                        path={`/${Resource.VaultProfiles.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.VaultProfiles.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.VaultProfiles.toLowerCase()}/detail/:vaultUuid/:id`} element={<VaultProfileDetail />} />
+
                     <Route path={`/${Resource.Locations.toLowerCase()}`} element={<LocationsList />} />
                     <Route
                         path={`/${Resource.Locations.toLowerCase()}/list`}
@@ -295,6 +315,13 @@ export default function AppRouter() {
                     <Route path={`/${Resource.Keys.toLowerCase()}/list`} element={<Navigate to={`/${Resource.Keys.toLowerCase()}`} />} />
 
                     <Route path={`/${Resource.Keys.toLowerCase()}/detail/:id/:keyItemUuid?`} element={<CryptographicKeyDetail />} />
+
+                    <Route path={`/${Resource.Secrets.toLowerCase()}`} element={<SecretsList />} />
+                    <Route
+                        path={`/${Resource.Secrets.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.Secrets.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.Secrets.toLowerCase()}/detail/:id`} element={<SecretDetail />} />
 
                     <Route path={`/${Resource.Settings.toLowerCase()}`} element={<PlatformSettingsDetail />} />
 

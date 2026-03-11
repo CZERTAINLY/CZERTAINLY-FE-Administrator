@@ -57,6 +57,7 @@ export function transformConnectorDtoV2ToModel(connector: ConnectorDtoV2): Conne
         authAttributes: [],
         customAttributes: [],
         version: connector.version,
+        interfaces: connector.interfaces ?? [],
     };
 }
 

@@ -32,6 +32,7 @@ import {
     LocationManagementApi,
     NotificationProfileInventoryApi,
     ProxyManagementApi,
+    OAuth2LoginManagementV2Api,
     RAProfileManagementApi,
     ResourceManagementApi,
     RoleManagementApi,
@@ -44,6 +45,9 @@ import {
     WorkflowActionsManagementApi,
     WorkflowRulesManagementApi,
     WorkflowTriggersManagementApi,
+    SecretManagementApi,
+    VaultInstanceManagementApi,
+    VaultProfileManagementApi,
 } from 'types/openapi';
 import { TokenInstanceControllerApi } from 'types/openapi/apis/TokenInstanceControllerApi';
 import {
@@ -77,6 +81,7 @@ export interface ApiClients {
     entities: EntityManagementApi;
     resources: ResourceManagementApi;
     locations: LocationManagementApi;
+    login: OAuth2LoginManagementV2Api;
     notificationProfiles: NotificationProfileInventoryApi;
     certificates: CertificateInventoryApi;
     acmeAccounts: ACMEAccountManagementApi;
@@ -107,6 +112,9 @@ export interface ApiClients {
     utilsCertificate?: CertificateUtilsAPIApi;
     utilsCertificateRequest?: CertificationRequestUtilsAPIApi;
     oids: CustomOIDManagementApi;
+    vaults: VaultInstanceManagementApi;
+    vaultProfiles: VaultProfileManagementApi;
+    secrets: SecretManagementApi;
 }
 
 export const backendClient: ApiClients = {
@@ -125,6 +133,7 @@ export const backendClient: ApiClients = {
     entities: new EntityManagementApi(configuration),
     resources: new ResourceManagementApi(configuration),
     locations: new LocationManagementApi(configuration),
+    login: new OAuth2LoginManagementV2Api(configuration),
     notificationProfiles: new NotificationProfileInventoryApi(configuration),
     connectors: new ConnectorManagementApi(configuration),
     proxies: new ProxyManagementApi(configuration),
@@ -155,6 +164,9 @@ export const backendClient: ApiClients = {
     cryptographicOperations: new CryptographicOperationsControllerApi(configuration),
     oids: new CustomOIDManagementApi(configuration),
     connectorsV2: new ConnectorManagementV2Api(configuration),
+    vaults: new VaultInstanceManagementApi(configuration),
+    vaultProfiles: new VaultProfileManagementApi(configuration),
+    secrets: new SecretManagementApi(configuration),
 };
 
 export const updateBackendUtilsClients = (url: string | undefined) => {

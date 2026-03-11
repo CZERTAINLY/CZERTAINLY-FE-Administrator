@@ -13,44 +13,16 @@
 
 import type {
     AttributeResource,
+    CertificateType,
+    ResourceCertificateContentData,
+    ResourceSecretContentData,
+    ResourceSimpleContentData,
     ResponseAttribute,
+    SecretContent,
 } from './';
 
 /**
+ * @type ResourceObjectContentData
  * @export
- * @interface ResourceObjectContentData
  */
-export interface ResourceObjectContentData {
-    /**
-     * Object identifier
-     * @type {string}
-     * @memberof ResourceObjectContentData
-     */
-    uuid: string;
-    /**
-     * Object Name
-     * @type {string}
-     * @memberof ResourceObjectContentData
-     */
-    name: string;
-    /**
-     * Resource contained in data
-     * @type {AttributeResource}
-     * @memberof ResourceObjectContentData
-     */
-    resource: AttributeResource;
-    /**
-     * Base64 encoded content of the resource object
-     * @type {string}
-     * @memberof ResourceObjectContentData
-     */
-    content?: string;
-    /**
-     * Attributes of the resource object
-     * @type {Array<ResponseAttribute>}
-     * @memberof ResourceObjectContentData
-     */
-    attributes?: Array<ResponseAttribute>;
-}
-
-
+export type ResourceObjectContentData = ResourceCertificateContentData | ResourceSecretContentData | ResourceSimpleContentData;

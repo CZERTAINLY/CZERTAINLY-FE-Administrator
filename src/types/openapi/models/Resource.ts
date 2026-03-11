@@ -71,6 +71,9 @@ export enum Resource {
     AcmeChallenges = 'acmeChallenges',
     CmpTransactions = 'cmpTransactions',
     EndEntityProfiles = 'endEntityProfiles',
-    AuthenticationProviders = 'authenticationProviders'
+    AuthenticationProviders = 'authenticationProviders',
+    Vaults = 'vaults',
+    VaultProfiles = 'vaultProfiles',
+    Secrets = 'secrets'
 }
 
