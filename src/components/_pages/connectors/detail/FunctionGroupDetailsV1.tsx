@@ -78,8 +78,8 @@ export default function FunctionGroupDetailsV1({
 
     const endPointsData: TableDataRow[] = useMemo(
         () =>
-            (currentFunctionGroup?.endPoints || []).map((endPoint) => ({
-                id: endPoint.name,
+            (currentFunctionGroup?.endPoints || []).map((endPoint, index) => ({
+                id: `${endPoint.name}-${endPoint.context}-${endPoint.method}-${index}`,
                 columns: [endPoint.name, endPoint.context, endPoint.method],
             })),
         [currentFunctionGroup],

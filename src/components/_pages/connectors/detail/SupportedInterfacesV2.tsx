@@ -30,7 +30,7 @@ export default function SupportedInterfacesV2({ interfaces, isBusy }: Props) {
         return {
             id: `${iface.code}-${iface.version}`,
             columns: [
-                toTitleCase(String(iface.code)),
+                <Badge color="primary">{toTitleCase(String(iface.code))}</Badge>,
                 iface.version,
                 iface.features?.length ? (
                     <div key={iface.code} className="flex flex-wrap gap-2">

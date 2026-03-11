@@ -139,7 +139,7 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
     const {
         handleSubmit,
         control,
-        formState: { isSubmitting },
+        formState: { isSubmitting, isValid, isDirty },
     } = methods;
 
     const formValues = useWatch({ control });
@@ -205,6 +205,15 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
         authenticationSchemeOptions[AuthenticationScheme.JwtBearer],
         authenticationSchemeOptions[AuthenticationScheme.OAuth2Flow],
     ];
+
+    const isSubmitDisabled = useMemo(
+        () =>
+            isBusy ||
+            isSubmitting ||
+            !isValid ||
+            (editMode ? areDefaultValuesSame(formValues as unknown as Record<string, unknown>) : !isDirty),
+        [areDefaultValuesSame, editMode, formValues, isBusy, isDirty, isSubmitting, isValid],
+    );
 
     const requiredFields = useMemo(() => {
         const fields: Partial<Record<keyof FormValues, boolean>> = {};
@@ -637,7 +646,7 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
                                 title={editMode ? 'Save' : 'Create'}
                                 inProgressTitle={editMode ? 'Saving...' : 'Creating...'}
                                 inProgress={isSubmitting}
-                                disabled={areDefaultValuesSame(formValues as FormValues) || isBusy}
+                                disabled={isSubmitDisabled}
                                 type="submit"
                             />
                         </Container>

@@ -65,10 +65,10 @@ function NotificationsList() {
                 id: notification.uuid,
                 columns: [
                     dateFormatter(notification.sentAt),
-                    <div key={notification.uuid} className={notification.readAt ? '' : 'font-semibold'}>
+                    <div key={notification.uuid} className={`flex items-center ${notification.readAt ? '' : 'font-semibold'}`}>
                         <button
                             type="button"
-                            className="text-left w-full bg-transparent border-0 p-0 font-inherit"
+                            className="text-left bg-transparent border-0 p-0 font-inherit"
                             onClick={(event) => {
                                 event.stopPropagation();
                                 if (!notification.readAt) {
@@ -89,7 +89,7 @@ function NotificationsList() {
                         {notification.targetObjectType && notification.targetObjectIdentification && (
                             <Button
                                 color="secondary"
-                                className="ml-2 !rounded-full !p-0.5 relative top-[-1px]"
+                                className="ml-2 !rounded-full !p-0.5"
                                 onClick={() => {
                                     navigate(
                                         `/${notification.targetObjectType}/detail/${notification.targetObjectIdentification?.reduce(

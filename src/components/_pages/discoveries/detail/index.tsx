@@ -312,7 +312,7 @@ export default function DiscoveryDetail() {
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Certification Discovery"
-                body="You are about to delete Discovery. Is this what you want to do?"
+                body="You are about to delete this Discovery. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 size="md"

@@ -181,7 +181,7 @@ describe('cbom epics', () => {
         expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to fetch searchable fields' }));
     });
 
-    test('uploadCbom success emits uploadCbomSuccess', async () => {
+    test('uploadCbom success emits uploadCbomSuccess and success alert', async () => {
         const uploadPayload = { content: { metadata: { serialNumber: 'urn:cbom:1' } } } as any;
         const created = { uuid: 'created-cbom', serialNumber: 'urn:cbom:1' } as any;
 
@@ -193,9 +193,12 @@ describe('cbom epics', () => {
         });
 
         const output$ = (cbomEpics[4] as any)(of(slice.actions.uploadCbom(uploadPayload)), of({}) as any, deps as any);
-        const emitted = (await firstValueFrom(output$.pipe(take(1), toArray()))) as any[];
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
 
-        expect(emitted).toEqual([slice.actions.uploadCbomSuccess({ cbom: created })]);
+        expect(emitted).toEqual([
+            slice.actions.uploadCbomSuccess({ cbom: created }),
+            alertsSlice.actions.success('CBOM uploaded successfully.'),
+        ]);
     });
 
     test('uploadCbom failure emits uploadCbomFailure and alert error', async () => {

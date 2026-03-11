@@ -37,4 +37,15 @@ test.describe('JsonViewer', () => {
         await expect(component.locator('pre')).toHaveCSS('height', '278px');
         await expect(component.locator('pre')).toHaveCSS('padding-top', '44px');
     });
+
+    test('wraps long lines and hides horizontal scrollbar', async ({ mount }) => {
+        const component = await mount(
+            <div style={{ width: '240px' }}>
+                <JsonViewer value={JSON.stringify({ veryLongKey: 'a'.repeat(600) })} />
+            </div>,
+        );
+
+        await expect(component.locator('pre')).toHaveCSS('white-space', 'pre-wrap');
+        await expect(component.locator('pre')).toHaveCSS('overflow-x', 'hidden');
+    });
 });
