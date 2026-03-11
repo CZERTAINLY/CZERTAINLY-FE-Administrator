@@ -129,10 +129,13 @@ const uploadCbom: AppEpic = (action$, state, deps) => {
         filter(slice.actions.uploadCbom.match),
         switchMap((action) =>
             deps.apiClients.cbomManagement.uploadCbom({ cbomUploadRequestDto: transformCbomUploadRequestModelToDto(action.payload) }).pipe(
-                map((cbom) =>
-                    slice.actions.uploadCbomSuccess({
-                        cbom: transformCbomDtoToModel(cbom),
-                    }),
+                mergeMap((cbom) =>
+                    of(
+                        slice.actions.uploadCbomSuccess({
+                            cbom: transformCbomDtoToModel(cbom),
+                        }),
+                        alertsSlice.actions.success('CBOM uploaded successfully.'),
+                    ),
                 ),
                 catchError((err) =>
                     (() => {
