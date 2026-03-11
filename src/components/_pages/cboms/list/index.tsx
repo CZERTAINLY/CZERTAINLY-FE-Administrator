@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import { firstValueFrom } from 'rxjs';
@@ -49,6 +49,7 @@ function CbomsList() {
 
     const copyToClipboard = useCopyToClipboard();
     const [isUploadOpen, setIsUploadOpen] = useState(false);
+    const [highlightedCbomUuid, setHighlightedCbomUuid] = useState<string>();
     const additionalButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
@@ -108,6 +109,9 @@ function CbomsList() {
         () =>
             cboms.map((c) => ({
                 id: c.uuid,
+                options: {
+                    rowClassName: c.uuid === highlightedCbomUuid ? 'bg-green-50' : undefined,
+                },
                 columns: [
                     <Link key="serial" to={`./detail/${c.uuid}`}>
                         {c.serialNumber}
@@ -146,7 +150,7 @@ function CbomsList() {
                     />,
                 ],
             })),
-        [cboms, handleCopyCbomJson, handleDownloadCbomJson],
+        [cboms, handleCopyCbomJson, handleDownloadCbomJson, highlightedCbomUuid],
     );
 
     const onList = useCallback((filters: SearchRequestModel) => dispatch(actions.listCboms(filters)), [dispatch]);
@@ -157,9 +161,19 @@ function CbomsList() {
     useRunOnFinished(isUploading, () => {
         if (isUploadSuccess) {
             setIsUploadOpen(false);
+            setHighlightedCbomUuid(cboms[0]?.uuid);
             onList({ itemsPerPage: 10, pageNumber: 1, filters: [] });
         }
     });
+
+    useEffect(() => {
+        if (!highlightedCbomUuid) {
+            return;
+        }
+
+        const timeoutId = window.setTimeout(() => setHighlightedCbomUuid(undefined), 5000);
+        return () => window.clearTimeout(timeoutId);
+    }, [highlightedCbomUuid]);
 
     useRunOnFinished(isSyncing, () => {
         onList({ itemsPerPage: 10, pageNumber: 1, filters: [] });

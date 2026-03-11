@@ -78,13 +78,17 @@ export default function JsonViewer({ value, height, className, paddingTop }: Pro
     return (
         <pre
             className={cn(
-                'w-full overflow-auto rounded-lg bg-[#0B1220] p-3 text-xs leading-5 text-[#c8d3f5] [scrollbar-width:thin] [scrollbar-color:#4b5563_#111827] [&::-webkit-scrollbar]:h-3 [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-[#111827] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-2 [&::-webkit-scrollbar-thumb]:border-[#111827] [&::-webkit-scrollbar-thumb]:bg-[#4b5563] hover:[&::-webkit-scrollbar-thumb]:bg-[#6b7280]',
+                'w-full overflow-y-auto overflow-x-hidden whitespace-pre-wrap break-words rounded-lg bg-[#0B1220] p-3 text-xs leading-5 text-[#c8d3f5] [scrollbar-width:thin] [scrollbar-color:#4b5563_#111827] [&::-webkit-scrollbar]:h-3 [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-[#111827] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-2 [&::-webkit-scrollbar-thumb]:border-[#111827] [&::-webkit-scrollbar-thumb]:bg-[#4b5563] hover:[&::-webkit-scrollbar-thumb]:bg-[#6b7280]',
                 className,
             )}
             style={{
                 height,
                 paddingTop,
                 fontFamily: 'monospace',
+                whiteSpace: 'pre-wrap',
+                overflowWrap: 'anywhere',
+                overflowX: 'hidden',
+                overflowY: 'auto',
             }}
         >
             <code dangerouslySetInnerHTML={{ __html: highlightedHtml }} />

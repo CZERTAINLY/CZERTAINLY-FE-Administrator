@@ -67,4 +67,24 @@ test.describe('FileUpload', () => {
         await expect(component.locator('textarea')).not.toBeDisabled();
         await expect(component.getByText('Select or drag & drop json file')).toBeVisible();
     });
+
+    test('should render custom placeholder and drop zone hint text from props', async ({ mount }) => {
+        const placeholderText = 'Custom placeholder text';
+        const hintText = 'Custom drop zone hint text';
+
+        const component = await mount(
+            <div>
+                <FileUpload
+                    onFileContentLoaded={() => {}}
+                    showContent={true}
+                    editable={true}
+                    contentPlaceholderText={placeholderText}
+                    dropZoneHintText={hintText}
+                />
+            </div>,
+        );
+
+        await expect(component.locator('textarea')).toHaveAttribute('placeholder', placeholderText);
+        await expect(component.getByText(hintText)).toBeVisible();
+    });
 });
