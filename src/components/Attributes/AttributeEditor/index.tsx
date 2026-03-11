@@ -618,17 +618,20 @@ function AttributeEditorInner({
     const getAttributeStaticOptions = useCallback(
         (descriptor: DataAttributeModel | CustomAttributeModel | GroupAttributeModel, formAttributeName: string) => {
             let newOptions = {};
-            if (
-                (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) &&
-                descriptor.properties.list &&
-                Array.isArray(descriptor.content)
-            ) {
+
+            if ((isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) && Array.isArray(descriptor.content)) {
+                const safeOptions = descriptor.content
+                    .filter((item) => item != null)
+                    .map((data: any) => {
+                        const ref = data?.reference;
+                        const val = data?.data;
+                        const label = ref ?? (val != null ? String(val) : '');
+                        return { label, value: data };
+                    });
+
                 newOptions = {
                     ...newOptions,
-                    [formAttributeName]: descriptor.content.map((data) => ({
-                        label: data.reference ?? data.data.toString(),
-                        value: data,
-                    })),
+                    [formAttributeName]: safeOptions,
                 };
             }
 
@@ -897,12 +900,20 @@ function AttributeEditorInner({
 
         /* istanbul ignore next */
         function updateValueFromCallbackData(callbackId: string, callbackDescriptor: AttributeDescriptorModel) {
-            if (callbackDescriptor && (isDataAttributeModel(callbackDescriptor) || isCustomAttributeModel(callbackDescriptor))) {
-                if (!callbackDescriptor.properties.list) {
-                    setValue(callbackId, callbackData[callbackId][0].reference ?? callbackData[callbackId][0].data);
-                } else if (userInteractedRef.current) {
-                    setValue(callbackId, undefined);
-                }
+            if (!callbackDescriptor) return;
+            if (!isDataAttributeModel(callbackDescriptor) && !isCustomAttributeModel(callbackDescriptor)) return;
+
+            const callbackValues = callbackData[callbackId];
+            if (!Array.isArray(callbackValues) || callbackValues.length === 0) return;
+
+            if (!callbackDescriptor.properties.list && callbackDescriptor.contentType !== AttributeContentType.Resource) {
+                const first = callbackValues[0] as any;
+                if (!first) return;
+                const value = first.reference ?? first.data;
+                if (typeof value === 'undefined') return;
+                setValue(callbackId, value);
+            } else if (userInteractedRef.current) {
+                setValue(callbackId, undefined);
             }
         }
 

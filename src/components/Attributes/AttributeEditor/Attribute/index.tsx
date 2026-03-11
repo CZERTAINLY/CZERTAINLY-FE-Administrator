@@ -147,7 +147,10 @@ export function Attribute({
     if (!descriptor) return <></>;
 
     if (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
-        if (descriptor.properties.list) {
+        const hasOptions = Array.isArray(options) && options.length > 0;
+        const shouldRenderSelect = descriptor.properties.list || hasOptions;
+
+        if (shouldRenderSelect) {
             return (
                 <AttributeFieldSelect
                     name={name}

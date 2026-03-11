@@ -389,8 +389,12 @@ export const testAttributeSetFunction = (
         setSelectListAttributeValue();
     } else if (appliedContent) {
         formAttributeValue = appliedContent[0].reference ?? appliedContent[0].data;
-    } else if (descriptor.content && descriptor.content.length > 0 && (!setDefaultOnRequiredValuesOnly || descriptor.properties.required)) {
-        // This acts as a fallback for the case when the attribute has no value, but has a default value in the descriptor
+    } else if (
+        descriptor.content &&
+        descriptor.content.length > 0 &&
+        descriptor.contentType !== AttributeContentType.Resource &&
+        (!setDefaultOnRequiredValuesOnly || descriptor.properties.required)
+    ) {
         formAttributeValue = descriptor.content[0].reference ?? descriptor.content[0].data;
     }
 
