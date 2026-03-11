@@ -710,7 +710,8 @@ describe('connectors epics', () => {
         });
         const emitted = await runEpic(17, action, {
             callback: {
-                callbackV2: ({ requestAttributeCallback }: { requestAttributeCallback: any }) => {
+                callbackV2: ({ uuid, requestAttributeCallback }: { uuid: string; requestAttributeCallback: any }) => {
+                    expect(uuid).toBe('c-1');
                     expect(requestAttributeCallback).toBeDefined();
                     return of(data);
                 },

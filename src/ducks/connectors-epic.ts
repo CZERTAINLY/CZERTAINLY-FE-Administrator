@@ -450,13 +450,13 @@ const bulkForceDeleteConnectors: AppEpic = (action$, state, deps) => {
 const callbackConnector: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.callbackConnector.match),
-        mergeMap((action) =>
-            deps.apiClients.callback
+        mergeMap((action) => {
+            const { callbackConnector: payload } = action.payload;
+            const requestAttributeCallback = transformCallbackAttributeModelToDto(payload.requestAttributeCallback);
+            return deps.apiClients.callback
                 .callbackV2({
-                    uuid: action.payload.callbackConnector.uuid,
-                    requestAttributeCallback: transformCallbackAttributeModelToDto(
-                        action.payload.callbackConnector.requestAttributeCallback,
-                    ),
+                    uuid: payload.uuid,
+                    requestAttributeCallback,
                 })
                 .pipe(
                     map((data) => {
@@ -469,8 +469,8 @@ const callbackConnector: AppEpic = (action$, state, deps) => {
                             appRedirectActions.fetchError({ error, message: 'Connector callback failure' }),
                         ),
                     ),
-                ),
-        ),
+                );
+        }),
 
         catchError((error) =>
             of(

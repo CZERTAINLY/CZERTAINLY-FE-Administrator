@@ -272,6 +272,7 @@ function AttributeEditorInner({
                 pathVariable: {},
                 requestParameter: {},
                 body: {},
+                filter: {},
             };
 
             if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor)) {
@@ -312,6 +313,9 @@ function AttributeEditorInner({
                         }
                         if (target === AttributeValueTarget.RequestParameter) {
                             data.requestParameter![mapping.to] = value;
+                        }
+                        if (target === AttributeValueTarget.Filter) {
+                            data.filter![mapping.to] = value;
                         }
                     });
                 });
@@ -606,6 +610,10 @@ function AttributeEditorInner({
     );
     /* c8 ignore stop */
 
+    // Track which descriptors have already had their initial callback executed,
+    // to avoid infinite callback loops when callback responses update descriptors/values.
+    const initialCallbackRunRef = useRef<Set<string>>(new Set());
+
     /* c8 ignore start */
     const getAttributeStaticOptions = useCallback(
         (descriptor: DataAttributeModel | CustomAttributeModel | GroupAttributeModel, formAttributeName: string) => {
@@ -625,11 +633,15 @@ function AttributeEditorInner({
             }
 
             if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor)) {
-                // Perform initial callbacks based on "static" mappings
+                // Perform initial callbacks based on "static" mappings only once per descriptor
                 if (descriptor.attributeCallback) {
-                    let mappings = buildCallbackMappings(descriptor);
-                    if (mappings) {
-                        executeCallback(mappings, descriptor, formAttributeName);
+                    const key = `${formAttributeName}`;
+                    if (!initialCallbackRunRef.current.has(key)) {
+                        const mappings = buildCallbackMappings(descriptor);
+                        if (mappings) {
+                            executeCallback(mappings, descriptor, formAttributeName);
+                            initialCallbackRunRef.current.add(key);
+                        }
                     }
                 }
             }

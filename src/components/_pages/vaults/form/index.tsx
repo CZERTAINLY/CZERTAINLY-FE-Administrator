@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -19,6 +19,7 @@ import AttributeEditor from 'components/Attributes/AttributeEditor';
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 
+import { AttributeDescriptorModel } from 'types/attributes';
 import { ConnectorResponseModel } from 'types/connectors';
 import { ConnectorInterface, FilterConditionOperator, FilterFieldSource, FunctionGroupCode, Resource } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
@@ -111,10 +112,18 @@ export default function VaultForm({ onCancel, onSuccess }: VaultFormProps) {
         return connector?.interfaces ?? [];
     }, [connectors, selectedConnectorUuid]);
 
+    const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
+
     const vaultAttributeDescriptors = useMemo(() => {
         if (vaultInstanceAttributesConnectorUuid !== selectedConnectorUuid) return [];
         return vaultInstanceAttributeDescriptors;
     }, [vaultInstanceAttributeDescriptors, vaultInstanceAttributesConnectorUuid, selectedConnectorUuid]);
+
+    useEffect(() => {
+        if (!selectedConnectorUuid) return;
+        dispatch(connectorsActions.clearCallbackData());
+        setGroupAttributesCallbackAttributes([]);
+    }, [dispatch, selectedConnectorUuid]);
 
     const optionsForVersions = useMemo(() => {
         return connectorInterfaces
@@ -142,14 +151,18 @@ export default function VaultForm({ onCancel, onSuccess }: VaultFormProps) {
                         interfaceUuid: values.interfaceUuid,
                         name: values.name,
                         description: values.description ?? '',
-                        attributes: collectFormAttributes('vault', vaultAttributeDescriptors, values),
+                        attributes: collectFormAttributes(
+                            'vault',
+                            [...vaultAttributeDescriptors, ...groupAttributesCallbackAttributes],
+                            values,
+                        ),
                         customAttributes: collectFormAttributes('customVault', resourceCustomAttributes, values),
                     },
                 }),
             );
             onSuccess?.();
         },
-        [dispatch, onSuccess, resourceCustomAttributes, vaultAttributeDescriptors],
+        [dispatch, onSuccess, resourceCustomAttributes, vaultAttributeDescriptors, groupAttributesCallbackAttributes],
     );
 
     const handleCancel = useCallback(() => {
@@ -171,6 +184,8 @@ export default function VaultForm({ onCancel, onSuccess }: VaultFormProps) {
                             connectorUuid={selectedConnectorUuid}
                             functionGroupCode={FunctionGroupCode.CredentialProvider}
                             kind="vaultManagement"
+                            groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                            setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
                         />
                     ) : (
                         <div className="text-sm text-gray-500">No connector attributes configured for vaults.</div>
@@ -181,7 +196,7 @@ export default function VaultForm({ onCancel, onSuccess }: VaultFormProps) {
                 content: <AttributeEditor id="customVault" attributeDescriptors={resourceCustomAttributes} attributes={[]} />,
             },
         ],
-        [resourceCustomAttributes, selectedConnectorUuid, vaultAttributeDescriptors],
+        [resourceCustomAttributes, selectedConnectorUuid, vaultAttributeDescriptors, groupAttributesCallbackAttributes],
     );
 
     return (
