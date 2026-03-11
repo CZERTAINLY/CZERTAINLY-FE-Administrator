@@ -137,6 +137,11 @@ export function AttributeFieldInput({ name, descriptor, busy, deleteButton }: At
     const { setValue, control, watch } = useFormContext<Record<string, any>>();
     const formValues = watch();
 
+    // Attribute should not be rendered in form but its value should be sent to BE
+    if (!descriptor.properties.visible) {
+        return null;
+    }
+
     if (descriptor.contentType === AttributeContentType.Codeblock) {
         const attributeValue = formValues[name];
         const language = getCodeBlockLanguage(attributeValue?.language ?? undefined, descriptor.content);
