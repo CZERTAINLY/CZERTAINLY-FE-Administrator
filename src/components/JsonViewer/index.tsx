@@ -85,6 +85,8 @@ export default function JsonViewer({ value, height, className, paddingTop }: Pro
                 height,
                 paddingTop,
                 fontFamily: 'monospace',
+                whiteSpace: 'pre-wrap',
+                overflowWrap: 'anywhere',
             }}
         >
             <code dangerouslySetInnerHTML={{ __html: highlightedHtml }} />
