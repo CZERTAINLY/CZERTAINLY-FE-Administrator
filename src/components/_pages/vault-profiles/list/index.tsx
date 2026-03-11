@@ -43,7 +43,7 @@ export default function VaultProfilesList() {
                 id: 'description',
                 content: 'Description',
                 width: '30%',
-                maxWidth: 600,
+                maxWidth: 450,
             },
             {
                 id: 'vaultInstance',
