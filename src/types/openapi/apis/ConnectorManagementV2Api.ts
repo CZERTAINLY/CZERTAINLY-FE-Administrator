@@ -279,9 +279,9 @@ export class ConnectorManagementV2Api extends BaseAPI {
     /**
      * Get Connectors searchable fields information
      */
-    getConnectorSearchableFieldInformation(): Observable<Array<SearchFieldDataByGroupDto>>
-    getConnectorSearchableFieldInformation(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
-    getConnectorSearchableFieldInformation(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
+    getConnectorSearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>
+    getConnectorSearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
+    getConnectorSearchableFields(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
         return this.request<Array<SearchFieldDataByGroupDto>>({
             url: '/v2/connectors/search',
             method: 'GET',

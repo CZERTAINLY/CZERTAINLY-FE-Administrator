@@ -147,7 +147,9 @@ export function Attribute({
     if (!descriptor) return <></>;
 
     if (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
-        if (descriptor.properties.list) {
+        const shouldRenderSelect = descriptor.properties.list || descriptor.contentType === AttributeContentType.Resource;
+
+        if (shouldRenderSelect) {
             return (
                 <AttributeFieldSelect
                     name={name}

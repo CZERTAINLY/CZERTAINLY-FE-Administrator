@@ -44,6 +44,7 @@ type EpicDeps = {
         };
         callback: {
             callback: (args: any) => any;
+            callbackV2: (args: any) => any;
             resourceCallback: (args: any) => any;
         };
     };
@@ -77,6 +78,7 @@ function createDeps(overrides: Partial<EpicDeps['apiClients']> = {}): EpicDeps {
             },
             callback: {
                 callback: () => of({}),
+                callbackV2: () => of({}),
                 resourceCallback: () => of({}),
                 ...(overrides.callback || {}),
             },
@@ -704,11 +706,12 @@ describe('connectors epics', () => {
         const data = { result: 'ok' } as any;
         const action = slice.actions.callbackConnector({
             callbackId: 'cb-1',
-            callbackConnector: { requestAttributeCallback: { mappings: [] } } as any,
+            callbackConnector: { uuid: 'c-1', requestAttributeCallback: { mappings: [] } } as any,
         });
         const emitted = await runEpic(17, action, {
             callback: {
-                callback: ({ requestAttributeCallback }: { requestAttributeCallback: any }) => {
+                callbackV2: ({ uuid, requestAttributeCallback }: { uuid: string; requestAttributeCallback: any }) => {
+                    expect(uuid).toBe('c-1');
                     expect(requestAttributeCallback).toBeDefined();
                     return of(data);
                 },
@@ -721,13 +724,13 @@ describe('connectors epics', () => {
         const err = new Error('callback failed');
         const action = slice.actions.callbackConnector({
             callbackId: 'cb-1',
-            callbackConnector: { requestAttributeCallback: { mappings: [] } } as any,
+            callbackConnector: { uuid: 'c-1', requestAttributeCallback: { mappings: [] } } as any,
         });
         const emitted = await runEpic(
             17,
             action,
             {
-                callback: { callback: () => throwError(() => err) } as any,
+                callback: { callbackV2: () => throwError(() => err) } as any,
             },
             2,
         );
@@ -760,14 +763,14 @@ describe('connectors epics', () => {
     test('callbackConnector outer catchError emits callbackFailure and fetchError when callback throws', async () => {
         const action = slice.actions.callbackConnector({
             callbackId: 'cb-1',
-            callbackConnector: { requestAttributeCallback: { mappings: [] } } as any,
+            callbackConnector: { uuid: 'c-1', requestAttributeCallback: { mappings: [] } } as any,
         });
         const emitted = await runEpic(
             17,
             action,
             {
                 callback: {
-                    callback: () => {
+                    callbackV2: () => {
                         throw new Error('sync callback error');
                     },
                 } as any,

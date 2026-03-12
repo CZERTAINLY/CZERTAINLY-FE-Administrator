@@ -355,7 +355,7 @@ export default function CertificateList({
                 onListCallback={onListCallback}
                 onDeleteCallback={(uuids, filters) => dispatch(actions.bulkDelete({ uuids, filters }))}
                 getAvailableFiltersApi={useCallback(
-                    (apiClients: ApiClients) => apiClients.certificates.getSearchableFieldInformation7(),
+                    (apiClients: ApiClients) => apiClients.certificates.getCertificateSearchableFields(),
                     [],
                 )}
                 additionalButtons={hideAdditionalButtons ? [] : buttons}

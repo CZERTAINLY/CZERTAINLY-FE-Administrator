@@ -92,18 +92,6 @@ export class VaultInstanceManagementApi extends BaseAPI {
     };
 
     /**
-     * List search filters for Vault instances
-     */
-    getSearchableFieldInformation(): Observable<Array<SearchFieldDataByGroupDto>>
-    getSearchableFieldInformation(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
-    getSearchableFieldInformation(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
-        return this.request<Array<SearchFieldDataByGroupDto>>({
-            url: '/v1/vaults/search',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
-
-    /**
      * Details of a Vault instance
      */
     getVaultInstanceDetails({ uuid }: GetVaultInstanceDetailsRequest): Observable<VaultInstanceDetailDto>
@@ -113,6 +101,18 @@ export class VaultInstanceManagementApi extends BaseAPI {
 
         return this.request<VaultInstanceDetailDto>({
             url: '/v1/vaults/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * List search filters for Vault instances
+     */
+    getVaultInstanceSearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>
+    getVaultInstanceSearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
+    getVaultInstanceSearchableFields(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
+        return this.request<Array<SearchFieldDataByGroupDto>>({
+            url: '/v1/vaults/search',
             method: 'GET',
         }, opts?.responseOpts);
     };

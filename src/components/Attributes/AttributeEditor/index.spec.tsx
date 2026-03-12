@@ -256,13 +256,15 @@ test.describe('AttributeEditor', () => {
             dataDescriptor({
                 name: 'withDefault',
                 uuid: 'default-uuid',
-                properties: { label: 'With Default', required: true } as any,
+                properties: { label: 'With Default', required: true, list: false, multiSelect: false } as any,
                 content: [{ data: 'defaultValue' }] as any,
             }),
         ];
         await mount(<AttributeEditorTestWrapper id={editorId} attributeDescriptors={descriptors} />);
+        await expect(page.getByTestId('select-__attributes__testEditor__.withDefaultSelect-input')).toHaveCount(0);
         const input = page.getByTestId('text-input-__attributes__testEditor__.withDefault');
         await expect(input).toBeVisible({ timeout: 10000 });
+        await expect(input).toHaveAttribute('type', 'text');
         await expect(input).toHaveValue('defaultValue');
     });
 
