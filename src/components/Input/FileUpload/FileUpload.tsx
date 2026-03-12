@@ -13,6 +13,8 @@ interface Props {
     showContent?: boolean;
     showFileInfo?: boolean;
     editable?: boolean;
+    contentPlaceholderText?: string;
+    dropZoneHintText?: string;
 }
 
 export default function FileUpload({
@@ -22,6 +24,8 @@ export default function FileUpload({
     onFileContentLoaded,
     showContent = true,
     showFileInfo = true,
+    contentPlaceholderText,
+    dropZoneHintText,
 }: Props) {
     const [fileContent, setFileContent] = useState('');
     const [fileName, setFileName] = useState('');
@@ -87,6 +91,11 @@ export default function FileUpload({
         [onFileContentLoaded, fileContent],
     );
 
+    const resolvedContentPlaceholderText =
+        contentPlaceholderText || `Select or drag & drop ${fileType} file or paste file content in the text area.`;
+    const resolvedDropZoneHintText =
+        dropZoneHintText || `Select or drag & drop ${fileType} file to drop zone or paste file content in the text area.`;
+
     return (
         <div role="region" aria-label="File upload area" onDrop={onFileDrop} onDragOver={onFileDragOver}>
             {showFileInfo && (
@@ -123,7 +132,7 @@ export default function FileUpload({
                         id={`${id}__fileUpload__fileContent`}
                         label="File content"
                         rows={3}
-                        placeholder={`Select or drag & drop ${fileType} file or paste file content in the text area.`}
+                        placeholder={resolvedContentPlaceholderText}
                         disabled={!editable}
                         value={fileContent}
                         onChange={onFileInputTextChanged}
@@ -132,9 +141,7 @@ export default function FileUpload({
                 </div>
             )}
 
-            <div className="text-sm text-gray-500 mt-4 dark:text-neutral-400 mb-2">
-                Select or drag &amp; drop {fileType} file to drop zone or paste file content in the text area.
-            </div>
+            <div className="text-sm text-gray-500 mt-4 dark:text-neutral-400 mb-2">{resolvedDropZoneHintText}</div>
             <div>
                 <Label htmlFor={`${id}__fileUpload__file`} className="cursor-pointer">
                     <Button variant="transparent" color="secondary" onClick={() => {}} className="pointer-events-none">

@@ -46,6 +46,8 @@ interface FormValues {
     oneTime: boolean;
 }
 
+const DEFAULT_CRON_EXPRESSION = '0 0 00 1/1 * ? *';
+
 export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProps) {
     const dispatch = useDispatch();
 
@@ -219,8 +221,11 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
 
     const onOpenCronModal = useCallback(() => {
         setOriginalCronExpression(watchedCronExpression);
+        if (!watchedCronExpression) {
+            setValue('cronExpression', DEFAULT_CRON_EXPRESSION);
+        }
         setCronModalOpen(true);
-    }, [watchedCronExpression]);
+    }, [setValue, watchedCronExpression]);
 
     return (
         <FormProvider {...methods}>
@@ -466,9 +471,7 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
                         color: 'secondary',
                         variant: 'outline',
                         onClick: () => {
-                            if (originalCronExpression !== undefined) {
-                                setValue('cronExpression', originalCronExpression);
-                            }
+                            setValue('cronExpression', originalCronExpression);
                             setCronModalOpen(false);
                         },
                         body: 'Cancel',

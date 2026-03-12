@@ -215,7 +215,6 @@ export default function CbomDetail() {
             { id: 'certificates', columns: ['Certificates', detail.certificates ?? 0] },
             { id: 'protocols', columns: ['Protocols', detail.protocols ?? 0] },
             { id: 'cryptoMaterial', columns: ['Related Crypto Material', detail.cryptoMaterial ?? 0] },
-            { id: 'totalAssets', columns: ['Total Assets', detail.totalAssets ?? 0] },
         ];
     }, [detail]);
 
@@ -291,7 +290,7 @@ export default function CbomDetail() {
     const metadataSummaryRows: TableDataRow[] = useMemo(() => {
         const properties = isRecord(metadata) ? metadata.properties : undefined;
 
-        const timestampRaw = detail?.timestamp ?? getPathValue(metadata, 'timestamp');
+        const timestampRaw = getPathValue(metadata, 'timestamp');
 
         const predefinedRows: TableDataRow[] = [
             {
@@ -511,14 +510,11 @@ export default function CbomDetail() {
                 .map((occurrence) => occurrence?.location)
                 .filter((location): location is string => typeof location === 'string' && location.trim().length > 0)
                 .join(' ');
-            const primitive = toArray(component?.cryptoProperties?.algorithmProperties?.primitive).join(' ');
-            const cryptoFunctions = toArray(component?.cryptoProperties?.algorithmProperties?.cryptoFunctions).join(' ');
+            const primitive = toArray(component?.cryptoProperties?.algorithmProperties?.primitive)
+                .filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
+                .join(' ');
 
-            const searchableText = `${assetName} ${componentAssetType ?? ''} ${locations} ${primitive} ${cryptoFunctions} ${JSON.stringify(
-                component ?? {},
-            )}`
-                .toLowerCase()
-                .trim();
+            const searchableText = `${assetName} ${locations} ${primitive}`.toLowerCase().trim();
 
             return searchableText.includes(normalizedSearch);
         });
@@ -680,7 +676,7 @@ export default function CbomDetail() {
                                                 id="cbom-assets-search"
                                                 value={assetSearchQuery}
                                                 onChange={setAssetSearchQuery}
-                                                placeholder="Search assets (name, location, type, primitive, metadata)"
+                                                placeholder="Search assets (crypto asset, location, primitive)"
                                             />
                                         </div>
                                         <Select
