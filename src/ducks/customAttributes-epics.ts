@@ -1,5 +1,6 @@
-import { AppEpic } from 'ducks';
-import { of, forkJoin } from 'rxjs';
+import { AppEpic, AppState } from 'ducks';
+import { AnyAction } from '@reduxjs/toolkit';
+import { of, forkJoin, Observable } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 
 import { extractError } from 'utils/net';
@@ -10,12 +11,323 @@ import { transformAttributeResponseDtoToModel, transformCustomAttributeDtoToMode
 import { actions as userInterfaceActions } from './user-interface';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
+import { AttributeVersion, Resource } from 'types/openapi';
 import {
     transformCustomAttributeCreateRequestModelToDto,
     transformCustomAttributeDetailResponseDtoToModel,
     transformCustomAttributeResponseDtoToModel,
     transformCustomAttributeUpdateRequestModelToDto,
 } from './transform/customAttributes';
+import { actions as vaultProfileActions } from './vault-profiles';
+import { actions as vaultActions } from './vaults';
+import { AttributeRequestModel, AttributeResponseDto, AttributeResponseModel } from 'types/attributes';
+
+const normalizeAttributeVersion = (version: unknown): AttributeVersion => {
+    if (version === AttributeVersion.V3 || version === 'v3' || version === '3' || version === 3) {
+        return AttributeVersion.V3;
+    }
+    return AttributeVersion.V2;
+};
+
+const toAttributeRequestModel = (attribute: AttributeResponseModel): AttributeRequestModel => {
+    const version = normalizeAttributeVersion(attribute.version);
+    const content = JSON.parse(JSON.stringify(attribute.content ?? []));
+
+    return {
+        uuid: attribute.uuid,
+        name: attribute.name,
+        contentType: attribute.contentType,
+        version,
+        content:
+            version === AttributeVersion.V3
+                ? content.map((item: Record<string, unknown>) => ({
+                      ...item,
+                      contentType: item.contentType ?? attribute.contentType,
+                  }))
+                : content,
+    };
+};
+
+const getVaultProfileCurrentCustomAttributes = (state: AppState, resourceUuid: string) => {
+    const fromCache = state.customAttributes.resourceCustomAttributesContents.find(
+        (entry) => entry.resource === Resource.VaultProfiles && entry.resourceUuid === resourceUuid,
+    )?.customAttributes;
+
+    if (fromCache) return fromCache;
+
+    return state.vaultProfiles.vaultProfile?.uuid === resourceUuid
+        ? (state.vaultProfiles.vaultProfile.customAttributes ?? []).map(transformAttributeResponseDtoToModel)
+        : undefined;
+};
+
+const getVaultCurrentAttributes = (state: AppState, resourceUuid: string) => {
+    if (state.vaults.vault?.uuid !== resourceUuid) return undefined;
+    return state.vaults.vault.attributes.map(transformAttributeResponseDtoToModel);
+};
+
+const getVaultCurrentCustomAttributes = (state: AppState, resourceUuid: string) => {
+    const fromCache = state.customAttributes.resourceCustomAttributesContents.find(
+        (entry) => entry.resource === Resource.Vaults && entry.resourceUuid === resourceUuid,
+    )?.customAttributes;
+
+    if (fromCache) return fromCache;
+
+    return state.vaults.vault?.uuid === resourceUuid
+        ? (state.vaults.vault.customAttributes ?? []).map(transformAttributeResponseDtoToModel)
+        : undefined;
+};
+
+const createContentPayload = (resource: Resource, resourceUuid: string, customAttributes: AttributeResponseDto[]) => ({
+    resource,
+    resourceUuid,
+    customAttributes: customAttributes.map(transformAttributeResponseDtoToModel),
+});
+
+const createContentFailureAction = (operation: 'update' | 'remove', resource: Resource, resourceUuid: string, err: unknown) => {
+    const message = `Failed to ${operation} custom attribute content`;
+    const payload = {
+        resource,
+        resourceUuid,
+        error: extractError(err as Error, message),
+    };
+
+    return operation === 'update'
+        ? slice.actions.updateCustomAttributeContentFailure(payload)
+        : slice.actions.removeCustomAttributeContentFailure(payload);
+};
+
+const createContentSuccessAction = (
+    operation: 'update' | 'remove',
+    resource: Resource,
+    resourceUuid: string,
+    customAttributes: AttributeResponseDto[],
+) =>
+    operation === 'update'
+        ? slice.actions.updateCustomAttributeContentSuccess(createContentPayload(resource, resourceUuid, customAttributes))
+        : slice.actions.removeCustomAttributeContentSuccess(createContentPayload(resource, resourceUuid, customAttributes));
+
+const createContentFailureWithRedirect = (operation: 'update' | 'remove', resource: Resource, resourceUuid: string, err: unknown) => {
+    const message = `Failed to ${operation} custom attribute content`;
+
+    return of(
+        createContentFailureAction(operation, resource, resourceUuid, err),
+        appRedirectActions.fetchError({ error: err as Error, message }),
+    );
+};
+
+const buildNextCustomAttributes = (
+    operation: 'update' | 'remove',
+    state: AppState,
+    attributeUuid: string,
+    content: AttributeResponseModel['content'] | undefined,
+    currentCustomAttributes: AttributeResponseModel[],
+): AttributeResponseModel[] | undefined => {
+    if (operation === 'remove') {
+        return currentCustomAttributes.filter((entry) => entry.uuid !== attributeUuid);
+    }
+
+    const updatedAttribute = resolveUpdatedAttribute(state, attributeUuid, content, currentCustomAttributes);
+
+    if (!updatedAttribute) {
+        return undefined;
+    }
+
+    return [...currentCustomAttributes.filter((entry) => entry.uuid !== attributeUuid), updatedAttribute];
+};
+
+type ContentOperation = 'update' | 'remove';
+
+type ContentActionPayload = {
+    resource: Resource;
+    resourceUuid: string;
+    attributeUuid: string;
+    content?: AttributeResponseModel['content'];
+};
+
+const createMissingContextError = (operation: ContentOperation, resource: Resource): Error => {
+    if (resource === Resource.Vaults) {
+        return new Error(`Vault context is not available for custom attribute ${operation === 'update' ? 'update' : 'removal'}`);
+    }
+
+    return new Error(`Vault profile context is not available for custom attribute ${operation === 'update' ? 'update' : 'removal'}`);
+};
+
+const handleVaultsContentUpdate = (
+    operation: ContentOperation,
+    payload: ContentActionPayload,
+    state: AppState,
+    deps: any,
+): Observable<AnyAction> => {
+    const currentVault = state.vaults.vault;
+    const currentAttributes = getVaultCurrentAttributes(state, payload.resourceUuid);
+    const currentCustomAttributes = getVaultCurrentCustomAttributes(state, payload.resourceUuid);
+
+    if (!currentVault || currentVault.uuid !== payload.resourceUuid || !currentAttributes || !currentCustomAttributes) {
+        return of(
+            createContentFailureAction(
+                operation,
+                payload.resource,
+                payload.resourceUuid,
+                createMissingContextError(operation, payload.resource),
+            ),
+        );
+    }
+
+    const nextCustomAttributes = buildNextCustomAttributes(
+        operation,
+        state,
+        payload.attributeUuid,
+        payload.content,
+        currentCustomAttributes,
+    );
+
+    if (!nextCustomAttributes) {
+        return of(
+            createContentFailureAction(
+                operation,
+                payload.resource,
+                payload.resourceUuid,
+                new Error('Missing descriptor for selected custom attribute'),
+            ),
+        );
+    }
+
+    return deps.apiClients.vaults
+        .updateVaultInstance({
+            uuid: payload.resourceUuid,
+            vaultInstanceUpdateRequestDto: {
+                attributes: currentAttributes.map(toAttributeRequestModel),
+                customAttributes: nextCustomAttributes.map(toAttributeRequestModel),
+            },
+        })
+        .pipe(
+            mergeMap((vault: any) =>
+                of(
+                    createContentSuccessAction(operation, payload.resource, payload.resourceUuid, vault.customAttributes ?? []),
+                    vaultActions.updateVaultSuccess({ vault }),
+                ),
+            ),
+            catchError((err) => createContentFailureWithRedirect(operation, payload.resource, payload.resourceUuid, err)),
+        );
+};
+
+const handleVaultProfilesContentUpdate = (
+    operation: ContentOperation,
+    payload: ContentActionPayload,
+    state: AppState,
+    deps: any,
+): Observable<AnyAction> => {
+    const currentVaultProfile = state.vaultProfiles.vaultProfile;
+    const currentAttributes = getVaultProfileCurrentCustomAttributes(state, payload.resourceUuid);
+
+    if (!currentVaultProfile || currentVaultProfile.uuid !== payload.resourceUuid || !currentAttributes) {
+        return of(
+            createContentFailureAction(
+                operation,
+                payload.resource,
+                payload.resourceUuid,
+                createMissingContextError(operation, payload.resource),
+            ),
+        );
+    }
+
+    const nextAttributes = buildNextCustomAttributes(operation, state, payload.attributeUuid, payload.content, currentAttributes);
+
+    if (!nextAttributes) {
+        return of(
+            createContentFailureAction(
+                operation,
+                payload.resource,
+                payload.resourceUuid,
+                new Error('Missing descriptor for selected custom attribute'),
+            ),
+        );
+    }
+
+    return deps.apiClients.vaultProfiles
+        .updateVaultProfile({
+            vaultUuid: currentVaultProfile.vaultInstance.uuid,
+            vaultProfileUuid: payload.resourceUuid,
+            vaultProfileUpdateRequestDto: {
+                customAttributes: nextAttributes.map(toAttributeRequestModel),
+            },
+        })
+        .pipe(
+            mergeMap((profile: any) =>
+                of(
+                    createContentSuccessAction(operation, payload.resource, payload.resourceUuid, profile.customAttributes ?? []),
+                    vaultProfileActions.updateVaultProfileSuccess({ profile }),
+                ),
+            ),
+            catchError((err) => createContentFailureWithRedirect(operation, payload.resource, payload.resourceUuid, err)),
+        );
+};
+
+const handleGenericContentUpdate = (operation: ContentOperation, payload: ContentActionPayload, deps: any): Observable<AnyAction> => {
+    const request = {
+        resourceName: payload.resource,
+        objectUuid: payload.resourceUuid,
+        attributeUuid: payload.attributeUuid,
+    };
+
+    const request$ =
+        operation === 'update'
+            ? deps.apiClients.customAttributes.updateAttributeContentForResource({
+                  ...request,
+                  attributeContent: payload.content,
+              })
+            : deps.apiClients.customAttributes.deleteAttributeContentForResource(request);
+
+    return request$.pipe(
+        map((response: AttributeResponseDto[]) => createContentSuccessAction(operation, payload.resource, payload.resourceUuid, response)),
+        catchError((err: unknown) => createContentFailureWithRedirect(operation, payload.resource, payload.resourceUuid, err)),
+    );
+};
+
+const handleCustomAttributeContentUpdate = (
+    operation: ContentOperation,
+    payload: ContentActionPayload,
+    state: AppState,
+    deps: any,
+): Observable<AnyAction> => {
+    if (payload.resource === Resource.Vaults) {
+        return handleVaultsContentUpdate(operation, payload, state, deps);
+    }
+
+    if (payload.resource === Resource.VaultProfiles) {
+        return handleVaultProfilesContentUpdate(operation, payload, state, deps);
+    }
+
+    return handleGenericContentUpdate(operation, payload, deps);
+};
+
+const resolveUpdatedAttribute = (
+    state: AppState,
+    attributeUuid: string,
+    content: AttributeResponseModel['content'],
+    currentAttributes: AttributeResponseModel[],
+): AttributeResponseModel | undefined => {
+    const descriptor = state.customAttributes.resourceCustomAttributes.find((entry) => entry.uuid === attributeUuid);
+    const existingAttribute = currentAttributes.find((entry) => entry.uuid === attributeUuid);
+
+    if (existingAttribute) {
+        return { ...existingAttribute, content };
+    }
+
+    if (!descriptor) {
+        return undefined;
+    }
+
+    return {
+        uuid: attributeUuid,
+        name: descriptor.name,
+        label: descriptor?.properties?.label ?? descriptor.name,
+        type: descriptor.type,
+        contentType: descriptor.contentType,
+        version: descriptor.version as unknown as AttributeResponseModel['version'],
+        content,
+    };
+};
 
 const listCustomAttributes: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -193,67 +505,14 @@ const updateCustomAttribute: AppEpic = (action$, state$, deps) => {
 const updateCustomAttributeContent: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.updateCustomAttributeContent.match),
-        switchMap((action) =>
-            deps.apiClients.customAttributes
-                .updateAttributeContentForResource({
-                    resourceName: action.payload.resource,
-                    objectUuid: action.payload.resourceUuid,
-                    attributeUuid: action.payload.attributeUuid,
-                    attributeContent: action.payload.content,
-                })
-                .pipe(
-                    map((response) =>
-                        slice.actions.updateCustomAttributeContentSuccess({
-                            resource: action.payload.resource,
-                            resourceUuid: action.payload.resourceUuid,
-                            customAttributes: response.map(transformAttributeResponseDtoToModel),
-                        }),
-                    ),
-                    catchError((err) =>
-                        of(
-                            slice.actions.updateCustomAttributeContentFailure({
-                                resource: action.payload.resource,
-                                resourceUuid: action.payload.resourceUuid,
-                                error: extractError(err, 'Failed to update custom attribute content'),
-                            }),
-                            appRedirectActions.fetchError({ error: err, message: 'Failed to update custom attribute content' }),
-                        ),
-                    ),
-                ),
-        ),
+        switchMap((action) => handleCustomAttributeContentUpdate('update', action.payload, state$.value, deps)),
     );
 };
 
 const removeCustomAttributeContent: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.removeCustomAttributeContent.match),
-        switchMap((action) =>
-            deps.apiClients.customAttributes
-                .deleteAttributeContentForResource({
-                    resourceName: action.payload.resource,
-                    objectUuid: action.payload.resourceUuid,
-                    attributeUuid: action.payload.attributeUuid,
-                })
-                .pipe(
-                    map((response) =>
-                        slice.actions.removeCustomAttributeContentSuccess({
-                            resource: action.payload.resource,
-                            resourceUuid: action.payload.resourceUuid,
-                            customAttributes: response.map(transformAttributeResponseDtoToModel),
-                        }),
-                    ),
-                    catchError((err) =>
-                        of(
-                            slice.actions.removeCustomAttributeContentFailure({
-                                resource: action.payload.resource,
-                                resourceUuid: action.payload.resourceUuid,
-                                error: extractError(err, 'Failed to remove custom attribute content'),
-                            }),
-                            appRedirectActions.fetchError({ error: err, message: 'Failed to remove custom attribute content' }),
-                        ),
-                    ),
-                ),
-        ),
+        switchMap((action) => handleCustomAttributeContentUpdate('remove', action.payload, state$.value, deps)),
     );
 };
 
