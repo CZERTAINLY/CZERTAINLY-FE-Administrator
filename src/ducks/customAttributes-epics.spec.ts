@@ -560,11 +560,7 @@ describe('customAttributes epics', () => {
         const success = await runEpic(scenario.index, scenario.action(), { takeCount: 2 });
         expect(success[0].type).toBe(scenario.successType);
 
-        if ('type' in (scenario.successSecond as any)) {
-            expect(success[1]).toEqual(scenario.successSecond);
-        } else {
-            expect(success[1]).toEqual(scenario.successSecond);
-        }
+        expect(success[1]).toEqual(scenario.successSecond);
 
         const err = new Error(`${scenario.name} failed`);
         const failure = await runEpic(scenario.index, scenario.action(), {
