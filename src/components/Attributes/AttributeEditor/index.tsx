@@ -619,26 +619,33 @@ function AttributeEditorInner({
         (descriptor: DataAttributeModel | CustomAttributeModel | GroupAttributeModel, formAttributeName: string) => {
             let newOptions = {};
 
-            if ((isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) && Array.isArray(descriptor.content)) {
-                const safeOptions = descriptor.content
-                    .filter((item) => item != null)
-                    .map((data: any) => {
-                        const ref = data?.reference;
-                        const val = data?.data;
-                        const label = ref ?? (val != null ? String(val) : '');
-                        return { label, value: data };
-                    });
+            if (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
+                const typedDescriptor = descriptor as DataAttributeModel | CustomAttributeModel;
+                const hasArrayContent = Array.isArray(typedDescriptor.content);
+                const shouldHaveStaticOptions =
+                    hasArrayContent && (typedDescriptor.properties.list || typedDescriptor.contentType === AttributeContentType.Resource);
 
-                newOptions = {
-                    ...newOptions,
-                    [formAttributeName]: safeOptions,
-                };
+                if (shouldHaveStaticOptions && Array.isArray(typedDescriptor.content)) {
+                    const safeOptions = typedDescriptor.content
+                        .filter((item: any) => item != null)
+                        .map((data: any) => {
+                            const ref = data?.reference;
+                            const val = data?.data;
+                            const label = ref ?? (val != null ? String(val) : '');
+                            return { label, value: data };
+                        });
+
+                    newOptions = {
+                        ...newOptions,
+                        [formAttributeName]: safeOptions,
+                    };
+                }
             }
 
             if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor)) {
                 // Perform initial callbacks based on "static" mappings only once per descriptor
                 if (descriptor.attributeCallback) {
-                    const key = `${formAttributeName}`;
+                    const key = `${connectorUuid ?? 'global'}:${descriptor.uuid}:${formAttributeName}`;
                     if (!initialCallbackRunRef.current.has(key)) {
                         const mappings = buildCallbackMappings(descriptor);
                         if (mappings) {
@@ -650,7 +657,7 @@ function AttributeEditorInner({
             }
             return newOptions;
         },
-        [buildCallbackMappings, executeCallback],
+        [buildCallbackMappings, executeCallback, connectorUuid],
     );
     /* c8 ignore stop */
     /**
