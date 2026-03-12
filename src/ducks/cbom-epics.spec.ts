@@ -229,8 +229,40 @@ describe('cbom epics', () => {
         );
         const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
 
-        expect(emitted[0]).toEqual(slice.actions.uploadCbomFailure({ error: 'Failed to upload CBOM. Object already exists' }));
-        expect(emitted[1]).toEqual(alertsSlice.actions.error('Failed to upload CBOM. Object already exists'));
+        expect(emitted[0]).toEqual(
+            slice.actions.uploadCbomFailure({
+                error: 'A CBOM with the same serial number and version already exists.\nPlease upload a new version or update the existing CBOM.',
+            }),
+        );
+        expect(emitted[1]).toEqual(
+            alertsSlice.actions.error(
+                'A CBOM with the same serial number and version already exists.\nPlease upload a new version or update the existing CBOM.',
+            ),
+        );
+    });
+
+    test('uploadCbom failure maps backend duplicate serial/version message to user-friendly text', async () => {
+        const deps = createDeps({
+            uploadCbom: () =>
+                throwError(() => ({
+                    message:
+                        "Failed to upload CBOM (400): Object of type 'CbomDetailDto' identified by CBOM with given serial number and version already exists.",
+                })),
+        });
+
+        const output$ = (cbomEpics[4] as any)(of(slice.actions.uploadCbom({ content: {} } as any)), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+
+        expect(emitted[0]).toEqual(
+            slice.actions.uploadCbomFailure({
+                error: 'A CBOM with the same serial number and version already exists.\nPlease upload a new version or update the existing CBOM.',
+            }),
+        );
+        expect(emitted[1]).toEqual(
+            alertsSlice.actions.error(
+                'A CBOM with the same serial number and version already exists.\nPlease upload a new version or update the existing CBOM.',
+            ),
+        );
     });
 
     test('deleteCbom success emits deleteCbomSuccess and success alert', async () => {

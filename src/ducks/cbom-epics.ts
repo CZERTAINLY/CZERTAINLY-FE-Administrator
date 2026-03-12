@@ -17,11 +17,19 @@ import {
 import { actions as userInterfaceActions } from './user-interface';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
-const normalizeCbomUploadErrorMessage = (message: string): string =>
-    message
+const DUPLICATE_CBOM_MESSAGE =
+    'A CBOM with the same serial number and version already exists.\nPlease upload a new version or update the existing CBOM.';
+
+const normalizeCbomUploadErrorMessage = (message: string): string => {
+    if (/serial number and version already exists|already exists/gi.test(message)) {
+        return DUPLICATE_CBOM_MESSAGE;
+    }
+
+    return message
         .replace(/\balready exists(?:\s+already exists)+\b/gi, 'already exists')
         .replace(/\s{2,}/g, ' ')
         .trim();
+};
 
 const listCboms: AppEpic = (action$, state, deps) => {
     return action$.pipe(
