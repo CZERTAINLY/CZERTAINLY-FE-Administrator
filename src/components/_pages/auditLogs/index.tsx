@@ -125,7 +125,7 @@ function AuditLogs() {
         <PagedList
             entity={EntityType.AUDIT_LOG}
             onListCallback={onListCallback}
-            getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.auditLogs.getSearchableFieldInformation9(), [])}
+            getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.auditLogs.getAuditLogSearchableFields(), [])}
             addHidden
             hasCheckboxes={false}
             additionalButtons={buttons}
