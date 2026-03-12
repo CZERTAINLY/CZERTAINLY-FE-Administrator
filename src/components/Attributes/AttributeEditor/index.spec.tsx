@@ -261,9 +261,7 @@ test.describe('AttributeEditor', () => {
             }),
         ];
         await mount(<AttributeEditorTestWrapper id={editorId} attributeDescriptors={descriptors} />);
-        const input = page.getByTestId('text-input-__attributes__testEditor__.withDefault');
-        await expect(input).toBeVisible({ timeout: 10000 });
-        await expect(input).toHaveValue('defaultValue');
+        await expect(page.getByRole('button', { name: 'defaultValue' })).toBeVisible({ timeout: 10000 });
     });
 
     test('Boolean required with no value shows false', async ({ mount, page }) => {
