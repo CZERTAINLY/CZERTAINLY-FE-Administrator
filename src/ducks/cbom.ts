@@ -12,6 +12,7 @@ import { createFeatureSelector } from 'utils/ducks';
 export type State = {
     cbomsData?: PaginationResponseDtoCbomDto;
     cbomDetail?: CbomDetailDto;
+    cbomDetailError?: string;
     cbomVersions: CbomDto[];
     searchableFields: SearchFieldDataByGroupDto[];
 
@@ -73,20 +74,24 @@ export const slice = createSlice({
         // Get CBOM Detail
         getCbomDetail: (state, action: PayloadAction<{ uuid: string }>) => {
             state.cbomDetail = undefined;
+            state.cbomDetailError = undefined;
             state.isFetchingDetail = true;
         },
 
         getCbomDetailSuccess: (state, action: PayloadAction<{ detail: CbomDetailDto }>) => {
             state.cbomDetail = action.payload.detail;
+            state.cbomDetailError = undefined;
             state.isFetchingDetail = false;
         },
 
         getCbomDetailFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.cbomDetailError = action.payload.error;
             state.isFetchingDetail = false;
         },
 
         clearCbomDetail: (state, action: PayloadAction<void>) => {
             state.cbomDetail = undefined;
+            state.cbomDetailError = undefined;
         },
 
         // List CBOM Versions
@@ -194,6 +199,7 @@ const featureSelector = createFeatureSelector<State>('cbom');
 export const selectCbomsData = createSelector(featureSelector, (state) => state.cbomsData);
 export const selectCbomList = createSelector(featureSelector, (state) => state.cbomsData?.items || []);
 export const selectCbomDetail = createSelector(featureSelector, (state) => state.cbomDetail);
+export const selectCbomDetailError = createSelector(featureSelector, (state) => state.cbomDetailError);
 export const selectCbomVersions = createSelector(featureSelector, (state) => state.cbomVersions);
 export const selectSearchableFields = createSelector(featureSelector, (state) => state.searchableFields);
 
@@ -211,6 +217,7 @@ export const selectors = {
     selectCbomsData,
     selectCbomList,
     selectCbomDetail,
+    selectCbomDetailError,
     selectCbomVersions,
     selectSearchableFields,
     selectIsFetchingList,

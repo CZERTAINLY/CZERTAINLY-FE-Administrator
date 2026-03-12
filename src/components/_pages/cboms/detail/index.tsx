@@ -153,6 +153,7 @@ export default function CbomDetail() {
     const { id = '' } = useParams();
 
     const detail = useSelector(selectors.selectCbomDetail);
+    const detailError = useSelector(selectors.selectCbomDetailError);
     const cbomVersions = useSelector(selectors.selectCbomVersions);
     const isFetching = useSelector(selectors.selectIsFetchingDetail);
     const isFetchingVersions = useSelector(selectors.selectIsFetchingVersions);
@@ -579,6 +580,10 @@ export default function CbomDetail() {
         </Container>
     );
 
+    const isCbomMissingInRepository = /404|not found|does not exist|doesn't exist/gi.test(detailError ?? '');
+
+    console.log({ isCbomMissingInRepository, detailError });
+
     if (isFetching && !detail) {
         return (
             <div>
@@ -591,6 +596,41 @@ export default function CbomDetail() {
                 <div className="min-h-[320px] flex flex-col items-center justify-center gap-4">
                     <Spinner active size="lg" />
                 </div>
+            </div>
+        );
+    }
+
+    if (!isFetching && !detail) {
+        return (
+            <div>
+                <Breadcrumb
+                    items={[
+                        { label: 'CBOM Inventory', href: '/cboms' },
+                        { label: 'CBOM Detail', href: '' },
+                    ]}
+                />
+
+                <Container>
+                    <Widget titleSize="large">
+                        <div className="py-8 px-4">
+                            <p className="text-base font-medium">
+                                {isCbomMissingInRepository
+                                    ? 'This CBOM no longer exists in the repository.'
+                                    : 'Unable to load CBOM detail.'}
+                            </p>
+                            <p className="mt-2 text-sm text-base-content/80">
+                                {isCbomMissingInRepository
+                                    ? 'Please synchronize the inventory.'
+                                    : (detailError ?? 'Please try again later.')}
+                            </p>
+                            <div className="mt-4">
+                                <Button type="button" variant="solid" color="primary" onClick={() => navigate('/cboms')}>
+                                    Back to CBOM Inventory
+                                </Button>
+                            </div>
+                        </div>
+                    </Widget>
+                </Container>
             </div>
         );
     }

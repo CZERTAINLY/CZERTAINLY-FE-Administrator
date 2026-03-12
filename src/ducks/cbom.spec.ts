@@ -49,18 +49,22 @@ describe('cbom slice', () => {
     test('getCbomDetail / success / failure and clearCbomDetail', () => {
         let next = reducer({ ...initialState, cbomDetail: { uuid: 'old' } as any }, actions.getCbomDetail({ uuid: 'u-1' }));
         expect(next.cbomDetail).toBeUndefined();
+        expect(next.cbomDetailError).toBeUndefined();
         expect(next.isFetchingDetail).toBe(true);
 
         const detail = { uuid: 'u-1', version: 2 } as any;
         next = reducer(next, actions.getCbomDetailSuccess({ detail }));
         expect(next.cbomDetail).toEqual(detail);
+        expect(next.cbomDetailError).toBeUndefined();
         expect(next.isFetchingDetail).toBe(false);
 
         next = reducer({ ...next, isFetchingDetail: true }, actions.getCbomDetailFailure({ error: 'fail' }));
+        expect(next.cbomDetailError).toBe('fail');
         expect(next.isFetchingDetail).toBe(false);
 
         next = reducer(next, actions.clearCbomDetail());
         expect(next.cbomDetail).toBeUndefined();
+        expect(next.cbomDetailError).toBeUndefined();
     });
 
     test('listCbomVersions / success / failure updates versions and flags', () => {
@@ -182,6 +186,7 @@ describe('cbom selectors', () => {
             ...initialState,
             cbomsData: { items: [{ uuid: '1' }], totalItems: 1, pageNumber: 1, itemsPerPage: 10, totalPages: 1 },
             cbomDetail: { uuid: 'detail-1' },
+            cbomDetailError: 'detail missing',
             cbomVersions: [{ uuid: 'v-1' }],
             searchableFields: [{ group: 'cbom', fields: [] }],
             isFetchingList: true,
@@ -199,6 +204,7 @@ describe('cbom selectors', () => {
         expect(selectors.selectCbomsData(state)).toEqual(cbomState.cbomsData);
         expect(selectors.selectCbomList(state)).toEqual(cbomState.cbomsData.items);
         expect(selectors.selectCbomDetail(state)).toEqual(cbomState.cbomDetail);
+        expect(selectors.selectCbomDetailError(state)).toEqual(cbomState.cbomDetailError);
         expect(selectors.selectCbomVersions(state)).toEqual(cbomState.cbomVersions);
         expect(selectors.selectSearchableFields(state)).toEqual(cbomState.searchableFields);
         expect(selectors.selectIsFetchingList(state)).toBe(true);
