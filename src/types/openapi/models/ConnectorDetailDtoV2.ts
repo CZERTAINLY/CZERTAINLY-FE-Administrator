@@ -90,8 +90,8 @@ export interface ConnectorDetailDtoV2 {
      * Proxy for message queue routing.
      * When set, connector communicates via message queue proxy.
      * When null, connector uses direct REST communication.
-     * @type {string}
-     * @memberof ConnectorDto
+     * @type {ProxyDto}
+     * @memberof ConnectorDetailDtoV2
      */
     proxy?: ProxyDto;
 }
