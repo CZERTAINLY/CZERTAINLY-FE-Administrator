@@ -1,0 +1,151 @@
+import { describe, expect, test, vi } from 'vitest';
+
+import reducer, { actions, selectors } from './alerts';
+import { store } from '../App';
+import { initialState as sliceInitialState } from './alert-slice';
+
+describe('alerts slice', () => {
+    test('returns initial state for unknown action', () => {
+        expect(reducer(undefined, { type: 'unknown' })).toEqual(sliceInitialState);
+    });
+
+    test('error action adds danger message and increments msgId', () => {
+        const before = sliceInitialState;
+
+        const next = reducer(before, actions.error('Something went wrong'));
+
+        expect(next.messages).toHaveLength(1);
+        expect(next.messages[0].message).toBe('Something went wrong');
+        expect(next.messages[0].color).toBe('danger');
+        expect(next.messages[0].id).toBe(0);
+        expect(typeof next.messages[0].time).toBe('number');
+        expect(next.msgId).toBe(1);
+    });
+
+    test('success action adds success message and increments msgId', () => {
+        const before = { ...sliceInitialState, msgId: 5, messages: [] };
+
+        const next = reducer(before, actions.success('All good'));
+
+        expect(next.messages).toHaveLength(1);
+        expect(next.messages[0].message).toBe('All good');
+        expect(next.messages[0].color).toBe('success');
+        expect(next.messages[0].id).toBe(5);
+        expect(next.msgId).toBe(6);
+    });
+
+    test('info action adds info message and increments msgId', () => {
+        const before = { ...sliceInitialState, msgId: 2, messages: [] };
+
+        const next = reducer(before, actions.info('Some info'));
+
+        expect(next.messages).toHaveLength(1);
+        expect(next.messages[0].message).toBe('Some info');
+        expect(next.messages[0].color).toBe('info');
+        expect(next.messages[0].id).toBe(2);
+        expect(next.msgId).toBe(3);
+    });
+
+    test('hide sets isHiding flag for existing message', () => {
+        const before = {
+            ...sliceInitialState,
+            messages: [
+                { id: 1, time: 0, message: 'Test', color: 'info' as const },
+                { id: 2, time: 0, message: 'Other', color: 'danger' as const },
+            ],
+        };
+
+        const next = reducer(before, actions.hide(2));
+
+        expect(next.messages[0].isHiding).toBeUndefined();
+        expect(next.messages[1].isHiding).toBe(true);
+    });
+
+    test('hide is a no-op for unknown id', () => {
+        const before = {
+            ...sliceInitialState,
+            messages: [{ id: 1, time: 0, message: 'Test', color: 'info' as const }],
+        };
+
+        const next = reducer(before, actions.hide(999));
+
+        expect(next).toEqual(before);
+    });
+
+    test('dismiss removes message by id', () => {
+        const before = {
+            ...sliceInitialState,
+            messages: [
+                { id: 1, time: 0, message: 'First', color: 'info' as const },
+                { id: 2, time: 0, message: 'Second', color: 'danger' as const },
+            ],
+        };
+
+        const next = reducer(before, actions.dismiss(1));
+
+        expect(next.messages).toHaveLength(1);
+        expect(next.messages[0].id).toBe(2);
+    });
+
+    test('dismiss is a no-op for unknown id', () => {
+        const before = {
+            ...sliceInitialState,
+            messages: [{ id: 1, time: 0, message: 'Only', color: 'info' as const }],
+        };
+
+        const next = reducer(before, actions.dismiss(999));
+
+        expect(next).toEqual(before);
+    });
+});
+
+describe('alerts selectors', () => {
+    test('selectState returns alerts slice', () => {
+        const alertsState = {
+            ...sliceInitialState,
+            messages: [{ id: 1, time: 0, message: 'Msg', color: 'info' as const }],
+        };
+
+        const state = { alerts: alertsState } as any;
+
+        expect(selectors.selectState(state)).toEqual(alertsState);
+    });
+
+    test('selectMessages returns messages, or empty array when undefined', () => {
+        const alertsState = {
+            ...sliceInitialState,
+            messages: [{ id: 1, time: 0, message: 'Msg', color: 'info' as const }],
+        };
+        const state = { alerts: alertsState } as any;
+
+        expect(selectors.selectMessages(state)).toEqual(alertsState.messages);
+
+        const emptyState = { alerts: undefined } as any;
+        expect(selectors.selectMessages(emptyState)).toEqual([]);
+    });
+});
+
+describe('alerts interval behaviour', () => {
+    test('periodic check hides and dismisses old messages', async () => {
+        const originalGetState = store.getState;
+        const originalDispatch = store.dispatch;
+
+        const now = Date.now();
+
+        const dispatchSpy = vi.fn();
+        (store as any).getState = vi.fn().mockReturnValue({
+            alerts: {
+                messages: [{ id: 1, time: now - 9000, message: 'Old', color: 'info' as const }],
+            },
+        });
+        (store as any).dispatch = dispatchSpy;
+
+        await new Promise((resolve) => setTimeout(resolve, 600));
+
+        expect(dispatchSpy).toHaveBeenCalledWith(actions.hide(1));
+        expect(dispatchSpy).toHaveBeenCalledWith(actions.dismiss(1));
+
+        (store as any).getState = originalGetState;
+        (store as any).dispatch = originalDispatch;
+    });
+});
