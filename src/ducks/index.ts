@@ -46,6 +46,7 @@ import startupEpics from './startup-epics';
 import dashboardEpics from './statisticsDashboard-epics';
 import tokenProfileEpics from './token-profiles-epics';
 import tokenEpics from './tokens-epics';
+import trustedCertificatesEpics from './trusted-certificates-epics';
 import usersEpics from './users-epics';
 import utilsActuatorEpics from './utilsActuator-epics';
 import cbomActuatorEpics from './cbomActuator-epics';
@@ -105,6 +106,7 @@ export const epics = combineEpics(
     ...infoEpics,
     ...tokenEpics,
     ...tokenProfileEpics,
+    ...trustedCertificatesEpics,
     ...cryptographicKeyEpics,
     ...cryptographicOperationsEpics,
     ...utilsOidEpics,

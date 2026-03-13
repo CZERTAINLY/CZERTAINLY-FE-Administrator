@@ -462,6 +462,8 @@ export * from './TriggerHistoryRecordDto';
 export * from './TriggerHistorySummaryDto';
 export * from './TriggerRequestDto';
 export * from './TriggerType';
+export * from './TrustedCertificateDto';
+export * from './TrustedCertificateRequestDto';
 export * from './UpdateActionRequestDto';
 export * from './UpdateConditionRequestDto';
 export * from './UpdateExecutionRequestDto';

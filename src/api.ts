@@ -48,6 +48,7 @@ import {
     SecretManagementApi,
     VaultInstanceManagementApi,
     VaultProfileManagementApi,
+    TrustedCertificateManagementApi,
 } from 'types/openapi';
 import { TokenInstanceControllerApi } from 'types/openapi/apis/TokenInstanceControllerApi';
 import {
@@ -107,6 +108,7 @@ export interface ApiClients {
     tokenProfiles: TokenProfileManagementApi;
     cryptographicKeys: CryptographicKeyManagementApi;
     cryptographicOperations: CryptographicOperationsControllerApi;
+    trustedCertificates: TrustedCertificateManagementApi;
     utilsOid?: OIDUtilsAPIApi;
     utilsActuator?: ActuatorApi;
     utilsCertificate?: CertificateUtilsAPIApi;
@@ -164,6 +166,7 @@ export const backendClient: ApiClients = {
     cryptographicOperations: new CryptographicOperationsControllerApi(configuration),
     oids: new CustomOIDManagementApi(configuration),
     connectorsV2: new ConnectorManagementV2Api(configuration),
+    trustedCertificates: new TrustedCertificateManagementApi(configuration),
     vaults: new VaultInstanceManagementApi(configuration),
     vaultProfiles: new VaultProfileManagementApi(configuration),
     secrets: new SecretManagementApi(configuration),

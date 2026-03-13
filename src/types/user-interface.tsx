@@ -107,6 +107,8 @@ export enum LockWidgetNameEnum {
     ListOfVaultProfiles,
     VaultDetails,
     VaultProfileDetails,
+    ListOfTrustedCertificates,
+    TrustedCertificateDetails,
 }
 
 export interface WidgetLockModel {
