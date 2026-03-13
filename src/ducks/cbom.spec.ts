@@ -50,21 +50,25 @@ describe('cbom slice', () => {
         let next = reducer({ ...initialState, cbomDetail: { uuid: 'old' } as any }, actions.getCbomDetail({ uuid: 'u-1' }));
         expect(next.cbomDetail).toBeUndefined();
         expect(next.cbomDetailError).toBeUndefined();
+        expect(next.cbomDetailErrorStatusCode).toBeUndefined();
         expect(next.isFetchingDetail).toBe(true);
 
         const detail = { uuid: 'u-1', version: 2 } as any;
         next = reducer(next, actions.getCbomDetailSuccess({ detail }));
         expect(next.cbomDetail).toEqual(detail);
         expect(next.cbomDetailError).toBeUndefined();
+        expect(next.cbomDetailErrorStatusCode).toBeUndefined();
         expect(next.isFetchingDetail).toBe(false);
 
-        next = reducer({ ...next, isFetchingDetail: true }, actions.getCbomDetailFailure({ error: 'fail' }));
+        next = reducer({ ...next, isFetchingDetail: true }, actions.getCbomDetailFailure({ error: 'fail', statusCode: 404 }));
         expect(next.cbomDetailError).toBe('fail');
+        expect(next.cbomDetailErrorStatusCode).toBe(404);
         expect(next.isFetchingDetail).toBe(false);
 
         next = reducer(next, actions.clearCbomDetail());
         expect(next.cbomDetail).toBeUndefined();
         expect(next.cbomDetailError).toBeUndefined();
+        expect(next.cbomDetailErrorStatusCode).toBeUndefined();
     });
 
     test('listCbomVersions / success / failure updates versions and flags', () => {
@@ -134,7 +138,7 @@ describe('cbom slice', () => {
 
         next = reducer(next, actions.deleteCbomSuccess({ uuid: 'cbom-1' }));
         expect(next.isDeleting).toBe(false);
-        expect(next.cbomsData.items).toEqual([{ uuid: 'cbom-2' }]);
+        expect(next.cbomsData!.items).toEqual([{ uuid: 'cbom-2' }]);
 
         next = reducer({ ...next, isDeleting: true }, actions.deleteCbomFailure({ error: 'err' }));
         expect(next.isDeleting).toBe(false);
@@ -157,7 +161,7 @@ describe('cbom slice', () => {
 
         next = reducer(next, actions.bulkDeleteCbomSuccess({ uuids: ['cbom-1', 'cbom-3'] }));
         expect(next.isBulkDeleting).toBe(false);
-        expect(next.cbomsData.items).toEqual([{ uuid: 'cbom-2' }]);
+        expect(next.cbomsData!.items).toEqual([{ uuid: 'cbom-2' }]);
 
         next = reducer({ ...next, isBulkDeleting: true }, actions.bulkDeleteCbomFailure({ error: 'err' }));
         expect(next.isBulkDeleting).toBe(false);
@@ -187,6 +191,7 @@ describe('cbom selectors', () => {
             cbomsData: { items: [{ uuid: '1' }], totalItems: 1, pageNumber: 1, itemsPerPage: 10, totalPages: 1 },
             cbomDetail: { uuid: 'detail-1' },
             cbomDetailError: 'detail missing',
+            cbomDetailErrorStatusCode: 404,
             cbomVersions: [{ uuid: 'v-1' }],
             searchableFields: [{ group: 'cbom', fields: [] }],
             isFetchingList: true,
@@ -205,6 +210,7 @@ describe('cbom selectors', () => {
         expect(selectors.selectCbomList(state)).toEqual(cbomState.cbomsData.items);
         expect(selectors.selectCbomDetail(state)).toEqual(cbomState.cbomDetail);
         expect(selectors.selectCbomDetailError(state)).toEqual(cbomState.cbomDetailError);
+        expect(selectors.selectCbomDetailErrorStatusCode(state)).toEqual(cbomState.cbomDetailErrorStatusCode);
         expect(selectors.selectCbomVersions(state)).toEqual(cbomState.cbomVersions);
         expect(selectors.selectSearchableFields(state)).toEqual(cbomState.searchableFields);
         expect(selectors.selectIsFetchingList(state)).toBe(true);

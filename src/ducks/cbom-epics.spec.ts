@@ -118,6 +118,21 @@ describe('cbom epics', () => {
         expect(emitted[1].payload.widgetName).toBe(LockWidgetNameEnum.CbomDetail);
     });
 
+    test('getCbomDetail failure includes backend status code when present', async () => {
+        const deps = createDeps({
+            getCbomDetail: () => throwError(() => ({ status: 404, message: 'not found' })),
+        });
+
+        const output$ = (cbomEpics[1] as any)(of(slice.actions.getCbomDetail({ uuid: 'u' })), of({}) as any, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(2), toArray()))) as any[];
+
+        expect(emitted[0]).toEqual(
+            slice.actions.getCbomDetailFailure({ error: 'Failed to fetch CBOM detail. not found', statusCode: 404 }),
+        );
+        expect(emitted[1].type).toBe(userInterfaceActions.insertWidgetLock.type);
+        expect(emitted[1].payload.widgetName).toBe(LockWidgetNameEnum.CbomDetail);
+    });
+
     test('listCbomVersions success emits listCbomVersionsSuccess and removeWidgetLock', async () => {
         const uuid = 'cbom-versions-1';
         const versions = [

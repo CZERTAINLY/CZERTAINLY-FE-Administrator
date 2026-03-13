@@ -77,10 +77,18 @@ const getCbomDetail: AppEpic = (action$, state, deps) => {
                     ),
                 ),
                 catchError((err) =>
-                    of(
-                        slice.actions.getCbomDetailFailure({ error: extractError(err, 'Failed to fetch CBOM detail') }),
-                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.CbomDetail),
-                    ),
+                    (() => {
+                        const statusCode = typeof err?.status === 'number' ? err.status : undefined;
+                        const payload =
+                            typeof statusCode === 'number'
+                                ? { error: extractError(err, 'Failed to fetch CBOM detail'), statusCode }
+                                : { error: extractError(err, 'Failed to fetch CBOM detail') };
+
+                        return of(
+                            slice.actions.getCbomDetailFailure(payload),
+                            userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.CbomDetail),
+                        );
+                    })(),
                 ),
             ),
         ),

@@ -154,6 +154,7 @@ export default function CbomDetail() {
 
     const detail = useSelector(selectors.selectCbomDetail);
     const detailError = useSelector(selectors.selectCbomDetailError);
+    const detailErrorStatusCode = useSelector(selectors.selectCbomDetailErrorStatusCode);
     const cbomVersions = useSelector(selectors.selectCbomVersions);
     const isFetching = useSelector(selectors.selectIsFetchingDetail);
     const isFetchingVersions = useSelector(selectors.selectIsFetchingVersions);
@@ -580,9 +581,7 @@ export default function CbomDetail() {
         </Container>
     );
 
-    const isCbomMissingInRepository = /404|not found|does not exist|doesn't exist/gi.test(detailError ?? '');
-
-    console.log({ isCbomMissingInRepository, detailError });
+    const isCbomMissingInRepository = detailErrorStatusCode === 404;
 
     if (isFetching && !detail) {
         return (
