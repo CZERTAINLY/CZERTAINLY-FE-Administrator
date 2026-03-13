@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -82,10 +82,18 @@ export default function VaultEditForm({ vault, onCancel, onSuccess }: VaultEditF
                     },
                 }),
             );
-            onSuccess?.();
         },
-        [dispatch, onSuccess, resourceCustomAttributes, vault.uuid, vaultAttributeDescriptors],
+        [dispatch, resourceCustomAttributes, vault.uuid, vaultAttributeDescriptors],
     );
+
+    const wasUpdatingRef = useRef(false);
+
+    useEffect(() => {
+        if (wasUpdatingRef.current && !isUpdating) {
+            onSuccess?.();
+        }
+        wasUpdatingRef.current = isUpdating;
+    }, [isUpdating, onSuccess]);
 
     const attributeTabs = useMemo(
         () => [

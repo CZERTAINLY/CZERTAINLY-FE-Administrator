@@ -15,18 +15,23 @@ export const selectors = {
 
 export const actions = alertsSlice.actions;
 
+const HIDE_AFTER_MS = 7000;
+const DISMISS_AFTER_MS = 8000;
+
 setInterval(() => {
     const alerts = store.getState().alerts;
     if (!alerts?.messages?.length) return;
     alerts.messages.forEach((message: MessageModel) => {
-        if (Date.now() - message.time > 17000) {
+        const age = Date.now() - message.time;
+
+        if (age > HIDE_AFTER_MS) {
             store.dispatch(actions.hide(message.id));
         }
 
-        if (Date.now() - message.time > 20000) {
+        if (age > DISMISS_AFTER_MS) {
             store.dispatch(actions.dismiss(message.id));
         }
     });
-}, 1000);
+}, 500);
 
 export default alertsSlice.reducer;
