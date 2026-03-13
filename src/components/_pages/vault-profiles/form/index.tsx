@@ -169,7 +169,7 @@ export default function VaultProfileForm({ onCancel, onSuccess }: VaultProfileFo
                         />
 
                         <Widget title="Custom Attributes" titleSize="large">
-                            <AttributeEditor id="customVaultProfile" attributeDescriptors={resourceCustomAttributes} attributes={[]} />
+                            <AttributeEditor id="customVaultProfile" attributeDescriptors={resourceCustomAttributes} />
                         </Widget>
 
                         <Container className="flex-row justify-end modal-footer" gap={4}>

@@ -65,9 +65,9 @@ export class AuditLogApi extends BaseAPI {
     /**
      * Get Audit logs searchable fields information
      */
-    getSearchableFieldInformation9(): Observable<Array<SearchFieldDataByGroupDto>>
-    getSearchableFieldInformation9(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
-    getSearchableFieldInformation9(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
+    getAuditLogSearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>
+    getAuditLogSearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
+    getAuditLogSearchableFields(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
         return this.request<Array<SearchFieldDataByGroupDto>>({
             url: '/v1/auditLogs/search',
             method: 'GET',

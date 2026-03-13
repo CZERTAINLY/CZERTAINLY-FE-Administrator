@@ -148,9 +148,9 @@ export class CustomOIDManagementApi extends BaseAPI {
     /**
      * Get searchable filter fields for custom OID entries
      */
-    getSearchableInformation(): Observable<Array<SearchFieldDataByGroupDto>>
-    getSearchableInformation(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
-    getSearchableInformation(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
+    getCustomOidEntrySearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>
+    getCustomOidEntrySearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
+    getCustomOidEntrySearchableFields(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
         return this.request<Array<SearchFieldDataByGroupDto>>({
             url: '/v1/oids/search',
             method: 'GET',

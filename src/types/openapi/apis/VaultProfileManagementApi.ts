@@ -157,18 +157,6 @@ export class VaultProfileManagementApi extends BaseAPI {
     };
 
     /**
-     * List search filters for Vault Profiles
-     */
-    getSearchableFieldInformation1(): Observable<Array<SearchFieldDataByGroupDto>>
-    getSearchableFieldInformation1(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
-    getSearchableFieldInformation1(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
-        return this.request<Array<SearchFieldDataByGroupDto>>({
-            url: '/v1/vaultProfiles/search',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
-
-    /**
      * Get details of a Vault Profile
      */
     getVaultProfileDetails({ vaultUuid, vaultProfileUuid }: GetVaultProfileDetailsRequest): Observable<VaultProfileDetailDto>
@@ -179,6 +167,18 @@ export class VaultProfileManagementApi extends BaseAPI {
 
         return this.request<VaultProfileDetailDto>({
             url: '/v1/vaults/{vaultUuid}/vaultProfiles/{vaultProfileUuid}'.replace('{vaultUuid}', encodeURI(vaultUuid)).replace('{vaultProfileUuid}', encodeURI(vaultProfileUuid)),
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * List search filters for Vault Profiles
+     */
+    getVaultProfileSearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>
+    getVaultProfileSearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
+    getVaultProfileSearchableFields(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
+        return this.request<Array<SearchFieldDataByGroupDto>>({
+            url: '/v1/vaultProfiles/search',
             method: 'GET',
         }, opts?.responseOpts);
     };
