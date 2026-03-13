@@ -16,7 +16,7 @@ type EpicDeps = {
             listCboms: (args: any) => any;
             getCbomDetail: (args: any) => any;
             listCbomVersions: (args: any) => any;
-            getSearchableFieldInformation8: () => any;
+            getCbomSearchableFields: () => any;
             uploadCbom: (args: any) => any;
             deleteCbom: (args: any) => any;
             bulkDeleteCbom: (args: any) => any;
@@ -32,7 +32,7 @@ function createDeps(overrides: Partial<EpicDeps['apiClients']['cbomManagement']>
                 listCboms: () => of({ items: [], totalItems: 0, pageNumber: 1, itemsPerPage: 10, totalPages: 0 }),
                 getCbomDetail: () => of({ uuid: 'detail-default' }),
                 listCbomVersions: () => of([]),
-                getSearchableFieldInformation8: () => of([]),
+                getCbomSearchableFields: () => of([]),
                 uploadCbom: () => of({ uuid: 'uploaded-default' }),
                 deleteCbom: () => of(undefined),
                 bulkDeleteCbom: () => of([]),
@@ -172,7 +172,7 @@ describe('cbom epics', () => {
     test('getSearchableFields success emits getSearchableFieldsSuccess', async () => {
         const fields = [{ group: 'cbom', fields: [{ field: 'serialNumber', label: 'Serial Number' }] }] as any;
         const deps = createDeps({
-            getSearchableFieldInformation8: () => of(fields),
+            getCbomSearchableFields: () => of(fields),
         });
 
         const output$ = (cbomEpics[3] as any)(of(slice.actions.getSearchableFields()), of({}) as any, deps as any);
@@ -184,7 +184,7 @@ describe('cbom epics', () => {
     test('getSearchableFields failure emits getSearchableFieldsFailure and fetchError', async () => {
         const err = new Error('searchable failed');
         const deps = createDeps({
-            getSearchableFieldInformation8: () => throwError(() => err),
+            getCbomSearchableFields: () => throwError(() => err),
         });
 
         const output$ = (cbomEpics[3] as any)(of(slice.actions.getSearchableFields()), of({}) as any, deps as any);

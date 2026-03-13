@@ -39,7 +39,7 @@ export default function VaultsList() {
                 id: 'description',
                 content: 'Description',
                 width: '30%',
-                maxWidth: 600,
+                maxWidth: 450,
             },
             {
                 id: 'connector',
@@ -103,7 +103,7 @@ export default function VaultsList() {
                 entityNamePlural="Vaults"
                 filterTitle="Vaults Filter"
                 pageWidgetLockName={LockWidgetNameEnum.ListOfVaults}
-                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.vaults.getSearchableFieldInformation(), [])}
+                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.vaults.getVaultInstanceSearchableFields(), [])}
                 additionalButtons={buttons}
                 addHidden
             />
