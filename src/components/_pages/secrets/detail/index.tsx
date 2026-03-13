@@ -24,6 +24,7 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from 'types/openapi';
 import SecretForm from '../form';
 import SecretStateBadge from '../SecretStateBadge';
+import { dateFormatter } from 'utils/dateUtil';
 import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import Select from 'components/Select';
@@ -217,7 +218,7 @@ function SecretDetail() {
             },
             {
                 id: 'lastUpdate',
-                columns: ['Last update', secret.updatedAt ?? ''],
+                columns: ['Last update', secret.updatedAt ? dateFormatter(secret.updatedAt) : ''],
             },
         ];
 
@@ -328,7 +329,7 @@ function SecretDetail() {
         () =>
             versions.map((v) => ({
                 id: v.version.toString(),
-                columns: [v.version.toString(), v.createdAt ?? '', v.fingerprint ?? ''],
+                columns: [v.version.toString(), v.createdAt ? dateFormatter(v.createdAt) : '', v.fingerprint ?? ''],
             })),
         [versions],
     );
@@ -553,7 +554,7 @@ function SecretDetail() {
                     caption="Disable Secret"
                     body="You are about to disable a Secret. Is this what you want to do?"
                     toggle={() => setConfirmDisable(false)}
-                    icon="times"
+                    icon="warning"
                     buttons={[
                         { color: 'danger', onClick: onDisableConfirmed, body: 'Disable' },
                         { color: 'secondary', variant: 'outline', onClick: () => setConfirmDisable(false), body: 'Cancel' },

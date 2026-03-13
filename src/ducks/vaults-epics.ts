@@ -147,6 +147,8 @@ const deleteVault: AppEpic = (action$, state$, deps) => {
                 mergeMap(() =>
                     of(
                         slice.actions.deleteVaultSuccess({ uuid: action.payload.uuid }),
+                        slice.actions.listVaults({ pageNumber: 1, itemsPerPage: 10, filters: [] }),
+                        appRedirectActions.redirect({ url: `/${'vaults'}` }),
                         alertActions.success('Vault deleted successfully.'),
                     ),
                 ),
