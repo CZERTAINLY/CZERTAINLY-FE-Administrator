@@ -214,10 +214,10 @@ export const ProxyDetail = () => {
 
     const managedConnectorsTableHeaders: TableHeader[] = useMemo(
         () => [
-            { id: 'name', content: 'Name', sortable: true, sort: 'asc' },
-            { id: 'proxy', content: 'Proxy', sortable: true },
-            { id: 'url', content: 'URL', sortable: true },
-            { id: 'status', content: 'Status', sortable: true },
+            { id: 'name', key: 'name', content: 'Name', sortable: true, sort: 'asc' },
+            { id: 'proxy', key: 'proxy', content: 'Proxy', sortable: true },
+            { id: 'url', key: 'url', content: 'URL', sortable: true },
+            { id: 'status', key: 'status', content: 'Status', sortable: true },
         ],
         [],
     );

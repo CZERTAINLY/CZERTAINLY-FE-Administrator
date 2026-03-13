@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import reducer, { actions, initialState, selectors } from './proxies';
+import reducer, { actions, initialState } from './proxies';
 import { ProxyStatus } from 'types/openapi';
 
 const proxyA = { uuid: 'proxy-a', name: 'Proxy A', status: ProxyStatus.Connected, code: 'proxy-a-code' };

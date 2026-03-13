@@ -55,8 +55,8 @@ import {
     CertificateUtilsAPIApi,
     CertificationRequestUtilsAPIApi,
     Configuration as ConfigurationUtils,
+    OIDUtilsAPIApi,
 } from 'types/openapi/utils';
-import { OIDUtilsAPIApi } from 'types/openapi/utils';
 
 const apiUrl = typeof window !== 'undefined' ? window?.__ENV__?.API_URL || '/api' : '/api';
 const configuration = new Configuration({ basePath: apiUrl });
