@@ -220,12 +220,13 @@ export default function VaultForm({ onCancel, onSuccess }: VaultFormProps) {
                             render={({ field, fieldState }) => (
                                 <TextInput
                                     id="vault-name"
-                                    label="Name*"
+                                    label="Name"
                                     placeholder="Enter the vault name"
                                     value={field.value}
                                     onChange={field.onChange}
                                     onBlur={field.onBlur}
                                     error={getFieldErrorMessage(fieldState)}
+                                    required
                                 />
                             )}
                         />
@@ -237,12 +238,13 @@ export default function VaultForm({ onCancel, onSuccess }: VaultFormProps) {
                                 render={({ field, fieldState }) => (
                                     <Select
                                         id="vault-connector"
-                                        label="Connector*"
+                                        label="Connector"
                                         placeholder="Select connector"
                                         options={optionsForConnectors}
                                         value={field.value || ''}
                                         onChange={field.onChange}
                                         error={getFieldErrorMessage(fieldState)}
+                                        required
                                     />
                                 )}
                             />

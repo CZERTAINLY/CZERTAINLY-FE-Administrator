@@ -134,12 +134,13 @@ export default function VaultProfileForm({ onCancel, onSuccess }: VaultProfileFo
                             render={({ field, fieldState }) => (
                                 <TextInput
                                     id="vault-profile-name"
-                                    label="Name*"
+                                    label="Name"
                                     placeholder="Enter the vault profile name"
                                     value={field.value}
                                     onChange={field.onChange}
                                     onBlur={field.onBlur}
                                     error={getFieldErrorMessage(fieldState)}
+                                    required
                                 />
                             )}
                         />
@@ -151,12 +152,13 @@ export default function VaultProfileForm({ onCancel, onSuccess }: VaultProfileFo
                             render={({ field, fieldState }) => (
                                 <Select
                                     id="vault-profile-vault"
-                                    label="Vault*"
+                                    label="Vault"
                                     placeholder="Select vault"
                                     options={optionsForVaults}
                                     value={field.value || ''}
                                     onChange={field.onChange}
                                     error={getFieldErrorMessage(fieldState)}
+                                    required
                                 />
                             )}
                         />
