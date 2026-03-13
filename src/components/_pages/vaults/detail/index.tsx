@@ -148,16 +148,13 @@ function VaultDetail() {
                         { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     ]}
                 />
-
-                {vault && (
-                    <Dialog
-                        isOpen={isEditOpen}
-                        toggle={handleCloseEdit}
-                        caption={`Edit "${vault.name}"`}
-                        size="xl"
-                        body={<VaultEditForm vault={vault} onCancel={handleCloseEdit} onSuccess={handleCloseEdit} />}
-                    />
-                )}
+                <Dialog
+                    isOpen={isEditOpen}
+                    toggle={handleCloseEdit}
+                    caption={`Edit "${vault?.name ?? ''}"`}
+                    size="xl"
+                    body={<VaultEditForm vault={vault} onCancel={handleCloseEdit} onSuccess={handleCloseEdit} />}
+                />
             </div>
         </div>
     );
