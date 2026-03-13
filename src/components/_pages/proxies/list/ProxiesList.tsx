@@ -10,6 +10,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/proxies';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { ProxyStatus } from 'types/openapi';
+import { dateFormatter } from 'utils/dateUtil';
 import { PROXY_STATUS_OPTIONS } from 'utils/proxy';
 import { useRunOnFinished } from 'utils/common-hooks';
 import { ProxyStatusBadge } from '../ProxyStatusBadge';
@@ -144,15 +145,16 @@ export const ProxiesList = () => {
             proxies.map((proxy) => ({
                 id: proxy.uuid,
                 columns: [
-                    <span style={{ whiteSpace: 'nowrap' }}>
+                    <span style={{ whiteSpace: 'nowrap' }} key="name">
                         <Link to={`./detail/${proxy.uuid}`}>{proxy.name}</Link>
                     </span>,
-
-                    <span style={{ whiteSpace: 'nowrap' }}>{proxy.description || '-'}</span>,
-
-                    <ProxyStatusBadge status={proxy.status} />,
-
-                    <span style={{ whiteSpace: 'nowrap' }}>{proxy.lastActivity || '-'}</span>,
+                    <span style={{ whiteSpace: 'nowrap' }} key="description">
+                        {proxy.description || '-'}
+                    </span>,
+                    <ProxyStatusBadge status={proxy.status} key="status" />,
+                    <span style={{ whiteSpace: 'nowrap' }} key="lastActivity">
+                        {proxy.lastActivity ? dateFormatter(new Date(proxy.lastActivity)) : '-'}
+                    </span>,
                 ],
             })),
         [proxies],

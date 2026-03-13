@@ -16,9 +16,10 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as proxiesActions, selectors as proxiesSelectors } from 'ducks/proxies';
 import { getEnumLabel, selectors as enumSelectors } from 'ducks/enums';
 import { PlatformEnum, ProxyStatus, Resource } from 'types/openapi';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { dateFormatter } from 'utils/dateUtil';
 import ConnectorStatusBadge from '../../connectors/ConnectorStatus';
 import { ProxyStatusBadge } from '../ProxyStatusBadge';
-import { LockWidgetNameEnum } from 'types/user-interface';
 
 export const ProxyDetail = () => {
     const { id } = useParams();
@@ -191,7 +192,7 @@ export const ProxyDetail = () => {
             },
             {
                 id: 'lastActivity',
-                columns: ['Last Activity', proxyDetails.lastActivity || '-', ''],
+                columns: ['Last Activity', proxyDetails.lastActivity ? dateFormatter(new Date(proxyDetails.lastActivity)) : '-', ''],
             },
             {
                 id: 'code',
@@ -229,10 +230,14 @@ export const ProxyDetail = () => {
         return proxyDetails.connectors.map((connector) => ({
             id: connector.uuid,
             columns: [
-                <Link to={`../connectors/detail/${connector.uuid}`}>{connector.name}</Link>,
-                <Link to={`../proxies/detail/${proxyDetails.uuid}`}>{proxyDetails.name}</Link>,
+                <Link to={`../connectors/detail/${connector.uuid}`} key="connector">
+                    {connector.name}
+                </Link>,
+                <Link to={`../proxies/detail/${proxyDetails.uuid}`} key="proxy">
+                    {proxyDetails.name}
+                </Link>,
                 connector.url,
-                <ConnectorStatusBadge status={connector.status} />,
+                <ConnectorStatusBadge status={connector.status} key="status" />,
             ],
         }));
     }, [proxyDetails, showManagedConnectors]);
