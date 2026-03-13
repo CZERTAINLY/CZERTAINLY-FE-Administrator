@@ -256,12 +256,35 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
     const onSubmit = useCallback(
         (values: FormValues) => {
             const sourceVaultProfileUuid = values.sourceVaultProfile;
-            const type = values.type as SecretType;
-            if (!sourceVaultProfileUuid || !type) return;
+            const effectiveType = (initialSecret?.type ?? values.type) as SecretType | undefined;
+            if (!sourceVaultProfileUuid || !effectiveType) return;
 
             const selectedProfile = vaultProfiles.find((p) => p.uuid === sourceVaultProfileUuid);
             const vaultUuid = selectedProfile?.vaultInstance?.uuid;
             if (!vaultUuid) return;
+
+            let includeSecret = false;
+
+            switch (effectiveType) {
+                case SecretType.BasicAuth:
+                    includeSecret = Boolean(values.username || values.password);
+                    break;
+                case SecretType.ApiKey:
+                case SecretType.JwtToken:
+                case SecretType.SecretKey:
+                case SecretType.PrivateKey:
+                case SecretType.Generic:
+                    includeSecret = Boolean(values.content);
+                    break;
+                case SecretType.KeyStore:
+                    includeSecret = Boolean(values.keyStoreContent || values.keyStorePassword || values.keyStoreType);
+                    break;
+                case SecretType.KeyValue:
+                    includeSecret = Boolean(values.keyValueContent);
+                    break;
+                default:
+                    includeSecret = false;
+            }
 
             const secretContent = buildSecretContent(values);
             const allValues = getValues();
@@ -275,9 +298,10 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                         uuid: initialSecret.uuid,
                         update: {
                             description: values.description ?? '',
-                            secret: secretContent,
                             attributes,
                             customAttributes,
+                            // For updates, secret content itself is optional; backend keeps existing content if it's not provided.
+                            ...(includeSecret ? { secret: secretContent as any } : {}),
                         } as any,
                     }),
                 );
@@ -294,6 +318,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                     );
                 }
             } else {
+                // Create mode – secret content is required by API
                 dispatch(
                     secretsActions.createSecret({
                         vaultUuid,
@@ -435,7 +460,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                         <Controller
                                             name="username"
                                             control={control}
-                                            rules={buildValidationRules([validateRequired()])}
+                                            rules={initialSecret ? undefined : buildValidationRules([validateRequired()])}
                                             render={({ field, fieldState }) => (
                                                 <TextInput
                                                     id="secret-username"
@@ -452,7 +477,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                         <Controller
                                             name="password"
                                             control={control}
-                                            rules={buildValidationRules([validateRequired()])}
+                                            rules={initialSecret ? undefined : buildValidationRules([validateRequired()])}
                                             render={({ field, fieldState }) => (
                                                 <TextInput
                                                     id="secret-password"
@@ -473,7 +498,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                     <Controller
                                         name="content"
                                         control={control}
-                                        rules={buildValidationRules([validateRequired()])}
+                                        rules={initialSecret ? undefined : buildValidationRules([validateRequired()])}
                                         render={({ field, fieldState }) => (
                                             <TextInput
                                                 id="secret-apikey-content"
@@ -493,7 +518,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                     <Controller
                                         name="content"
                                         control={control}
-                                        rules={buildValidationRules([validateRequired()])}
+                                        rules={initialSecret ? undefined : buildValidationRules([validateRequired()])}
                                         render={({ field, fieldState }) => (
                                             <TextArea
                                                 id="secret-jwt-content"
@@ -513,7 +538,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                         <Controller
                                             name="content"
                                             control={control}
-                                            rules={buildValidationRules([validateRequired()])}
+                                            rules={initialSecret ? undefined : buildValidationRules([validateRequired()])}
                                             render={({ field, fieldState }) => (
                                                 <TextArea
                                                     id="secret-secretkey-content"
@@ -546,7 +571,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                         <Controller
                                             name="content"
                                             control={control}
-                                            rules={buildValidationRules([validateRequired()])}
+                                            rules={initialSecret ? undefined : buildValidationRules([validateRequired()])}
                                             render={({ field, fieldState }) => (
                                                 <TextArea
                                                     id="secret-privatekey-content"
@@ -579,7 +604,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                         <Controller
                                             name="keyStoreType"
                                             control={control}
-                                            rules={buildValidationRules([validateRequired()])}
+                                            rules={initialSecret ? undefined : buildValidationRules([validateRequired()])}
                                             render={({ field, fieldState }) => (
                                                 <Select
                                                     id="secret-keystore-type"
@@ -609,7 +634,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                         <Controller
                                             name="keyStorePassword"
                                             control={control}
-                                            rules={buildValidationRules([validateRequired()])}
+                                            rules={initialSecret ? undefined : buildValidationRules([validateRequired()])}
                                             render={({ field, fieldState }) => (
                                                 <TextInput
                                                     id="secret-keystore-password"
@@ -630,18 +655,32 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                     <Controller
                                         name="keyValueContent"
                                         control={control}
-                                        rules={buildValidationRules([
-                                            validateRequired(),
-                                            (value) => {
-                                                if (!value) return undefined;
-                                                try {
-                                                    JSON.parse(value as string);
-                                                    return undefined;
-                                                } catch {
-                                                    return 'Invalid JSON';
-                                                }
-                                            },
-                                        ])}
+                                        rules={
+                                            initialSecret
+                                                ? buildValidationRules([
+                                                      (value) => {
+                                                          if (!value) return undefined;
+                                                          try {
+                                                              JSON.parse(value as string);
+                                                              return undefined;
+                                                          } catch {
+                                                              return 'Invalid JSON';
+                                                          }
+                                                      },
+                                                  ])
+                                                : buildValidationRules([
+                                                      validateRequired(),
+                                                      (value) => {
+                                                          if (!value) return undefined;
+                                                          try {
+                                                              JSON.parse(value as string);
+                                                              return undefined;
+                                                          } catch {
+                                                              return 'Invalid JSON';
+                                                          }
+                                                      },
+                                                  ])
+                                        }
                                         render={({ field, fieldState }) => (
                                             <TextArea
                                                 id="secret-keyvalue-content"
@@ -663,7 +702,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                                 }}
                                                 error={getFieldErrorMessage(fieldState)}
                                                 className="font-mono text-sm"
-                                                required
+                                                required={!initialSecret}
                                             />
                                         )}
                                     />
@@ -672,7 +711,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                     <Controller
                                         name="content"
                                         control={control}
-                                        rules={buildValidationRules([validateRequired()])}
+                                        rules={initialSecret ? undefined : buildValidationRules([validateRequired()])}
                                         render={({ field, fieldState }) => (
                                             <TextInput
                                                 id="secret-generic-content"
@@ -683,7 +722,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                                 onChange={field.onChange}
                                                 onBlur={field.onBlur}
                                                 error={getFieldErrorMessage(fieldState)}
-                                                required
+                                                required={!initialSecret}
                                             />
                                         )}
                                     />
