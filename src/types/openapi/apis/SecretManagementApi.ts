@@ -177,18 +177,6 @@ export class SecretManagementApi extends BaseAPI {
     };
 
     /**
-     * List search filters for secrets
-     */
-    getSearchableFieldInformation2(): Observable<Array<SearchFieldDataByGroupDto>>
-    getSearchableFieldInformation2(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
-    getSearchableFieldInformation2(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
-        return this.request<Array<SearchFieldDataByGroupDto>>({
-            url: '/v1/secrets/search',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
-
-    /**
      * Get secret content
      */
     getSecretContent({ uuid }: GetSecretContentRequest): Observable<SecretContent>
@@ -212,6 +200,18 @@ export class SecretManagementApi extends BaseAPI {
 
         return this.request<SecretDetailDto>({
             url: '/v1/secrets/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * List search filters for secrets
+     */
+    getSecretSearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>
+    getSecretSearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
+    getSecretSearchableFields(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
+        return this.request<Array<SearchFieldDataByGroupDto>>({
+            url: '/v1/secrets/search',
             method: 'GET',
         }, opts?.responseOpts);
     };

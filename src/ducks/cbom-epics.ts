@@ -107,7 +107,7 @@ const getSearchableFields: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.getSearchableFields.match),
         switchMap(() =>
-            deps.apiClients.cbomManagement.getSearchableFieldInformation8().pipe(
+            deps.apiClients.cbomManagement.getCbomSearchableFields().pipe(
                 map((fields) =>
                     slice.actions.getSearchableFieldsSuccess({
                         fields: transformSearchableFieldsDtoToModel(fields),

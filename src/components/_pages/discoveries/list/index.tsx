@@ -152,10 +152,7 @@ function DiscoveryList() {
                 entity={EntityType.DISCOVERY}
                 onListCallback={onListCallback}
                 onDeleteCallback={(uuids) => dispatch(actions.bulkDeleteDiscovery({ uuids }))}
-                getAvailableFiltersApi={useCallback(
-                    (apiClients: ApiClients) => apiClients.discoveries.getSearchableFieldInformation6(),
-                    [],
-                )}
+                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.discoveries.getDiscoverySearchableFields(), [])}
                 headers={discoveriesRowHeaders}
                 data={discoveryList}
                 isBusy={isBusy}

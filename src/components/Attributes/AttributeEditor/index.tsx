@@ -272,6 +272,7 @@ function AttributeEditorInner({
                 pathVariable: {},
                 requestParameter: {},
                 body: {},
+                filter: {},
             };
 
             if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor)) {
@@ -312,6 +313,9 @@ function AttributeEditorInner({
                         }
                         if (target === AttributeValueTarget.RequestParameter) {
                             data.requestParameter![mapping.to] = value;
+                        }
+                        if (target === AttributeValueTarget.Filter) {
+                            data.filter![mapping.to] = value;
                         }
                     });
                 });
@@ -606,36 +610,54 @@ function AttributeEditorInner({
     );
     /* c8 ignore stop */
 
+    // Track which descriptors have already had their initial callback executed,
+    // to avoid infinite callback loops when callback responses update descriptors/values.
+    const initialCallbackRunRef = useRef<Set<string>>(new Set());
+
     /* c8 ignore start */
     const getAttributeStaticOptions = useCallback(
         (descriptor: DataAttributeModel | CustomAttributeModel | GroupAttributeModel, formAttributeName: string) => {
             let newOptions = {};
-            if (
-                (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) &&
-                descriptor.properties.list &&
-                Array.isArray(descriptor.content)
-            ) {
-                newOptions = {
-                    ...newOptions,
-                    [formAttributeName]: descriptor.content.map((data) => ({
-                        label: data.reference ?? data.data.toString(),
-                        value: data,
-                    })),
-                };
+
+            if (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
+                const typedDescriptor = descriptor as DataAttributeModel | CustomAttributeModel;
+                const hasArrayContent = Array.isArray(typedDescriptor.content);
+                const shouldHaveStaticOptions =
+                    hasArrayContent && (typedDescriptor.properties.list || typedDescriptor.contentType === AttributeContentType.Resource);
+
+                if (shouldHaveStaticOptions && Array.isArray(typedDescriptor.content)) {
+                    const safeOptions = typedDescriptor.content
+                        .filter((item: any) => item != null)
+                        .map((data: any) => {
+                            const ref = data?.reference;
+                            const val = data?.data;
+                            const label = ref ?? (val != null ? String(val) : '');
+                            return { label, value: data };
+                        });
+
+                    newOptions = {
+                        ...newOptions,
+                        [formAttributeName]: safeOptions,
+                    };
+                }
             }
 
             if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor)) {
-                // Perform initial callbacks based on "static" mappings
+                // Perform initial callbacks based on "static" mappings only once per descriptor
                 if (descriptor.attributeCallback) {
-                    let mappings = buildCallbackMappings(descriptor);
-                    if (mappings) {
-                        executeCallback(mappings, descriptor, formAttributeName);
+                    const key = `${connectorUuid ?? 'global'}:${descriptor.uuid}:${formAttributeName}`;
+                    if (!initialCallbackRunRef.current.has(key)) {
+                        const mappings = buildCallbackMappings(descriptor);
+                        if (mappings) {
+                            executeCallback(mappings, descriptor, formAttributeName);
+                            initialCallbackRunRef.current.add(key);
+                        }
                     }
                 }
             }
             return newOptions;
         },
-        [buildCallbackMappings, executeCallback],
+        [buildCallbackMappings, executeCallback, connectorUuid],
     );
     /* c8 ignore stop */
     /**
@@ -885,12 +907,20 @@ function AttributeEditorInner({
 
         /* istanbul ignore next */
         function updateValueFromCallbackData(callbackId: string, callbackDescriptor: AttributeDescriptorModel) {
-            if (callbackDescriptor && (isDataAttributeModel(callbackDescriptor) || isCustomAttributeModel(callbackDescriptor))) {
-                if (!callbackDescriptor.properties.list) {
-                    setValue(callbackId, callbackData[callbackId][0].reference ?? callbackData[callbackId][0].data);
-                } else if (userInteractedRef.current) {
-                    setValue(callbackId, undefined);
-                }
+            if (!callbackDescriptor) return;
+            if (!isDataAttributeModel(callbackDescriptor) && !isCustomAttributeModel(callbackDescriptor)) return;
+
+            const callbackValues = callbackData[callbackId];
+            if (!Array.isArray(callbackValues) || callbackValues.length === 0) return;
+
+            if (!callbackDescriptor.properties.list && callbackDescriptor.contentType !== AttributeContentType.Resource) {
+                const first = callbackValues[0] as any;
+                if (!first) return;
+                const value = first.reference ?? first.data;
+                if (typeof value === 'undefined') return;
+                setValue(callbackId, value);
+            } else if (userInteractedRef.current) {
+                setValue(callbackId, undefined);
             }
         }
 

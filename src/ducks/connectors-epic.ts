@@ -2,6 +2,7 @@ import { AppEpic } from 'ducks';
 import { of } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 import { LockWidgetNameEnum } from 'types/user-interface';
+import { ConnectorVersion } from 'types/openapi';
 import { extractError } from 'utils/net';
 import { actions as alertActions } from './alerts';
 import { actions as appRedirectActions } from './app-redirect';
@@ -450,27 +451,38 @@ const bulkForceDeleteConnectors: AppEpic = (action$, state, deps) => {
 const callbackConnector: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.callbackConnector.match),
-        mergeMap((action) =>
-            deps.apiClients.callback
-                .callback({
-                    ...action.payload.callbackConnector,
-                    requestAttributeCallback: transformCallbackAttributeModelToDto(
-                        action.payload.callbackConnector.requestAttributeCallback,
-                    ),
-                })
-                .pipe(
-                    map((data) => {
-                        return slice.actions.callbackSuccess({ callbackId: action.payload.callbackId, data });
-                    }),
+        mergeMap((action) => {
+            const { callbackConnector: payload } = action.payload;
+            const requestAttributeCallback = transformCallbackAttributeModelToDto(payload.requestAttributeCallback);
+            const rootState: any = (state as any).value ?? (state as any);
+            const connectorsState: any = rootState.connectors;
+            const connector = connectorsState?.connectors?.find((c: any) => c.uuid === payload.uuid) ?? connectorsState?.connector;
+            const isV2 = connector?.version === ConnectorVersion.V2;
+            const api$ = isV2
+                ? deps.apiClients.callback.callbackV2({
+                      uuid: payload.uuid,
+                      requestAttributeCallback,
+                  })
+                : deps.apiClients.callback.callback({
+                      uuid: payload.uuid,
+                      functionGroup: payload.functionGroup,
+                      kind: payload.kind,
+                      requestAttributeCallback,
+                  });
 
-                    catchError((error) =>
-                        of(
-                            slice.actions.callbackFailure({ callbackId: action.payload.callbackId }),
-                            appRedirectActions.fetchError({ error, message: 'Connector callback failure' }),
-                        ),
+            return api$.pipe(
+                map((data) => {
+                    return slice.actions.callbackSuccess({ callbackId: action.payload.callbackId, data });
+                }),
+
+                catchError((error) =>
+                    of(
+                        slice.actions.callbackFailure({ callbackId: action.payload.callbackId }),
+                        appRedirectActions.fetchError({ error, message: 'Connector callback failure' }),
                     ),
                 ),
-        ),
+            );
+        }),
 
         catchError((error) =>
             of(
