@@ -554,7 +554,7 @@ function SecretDetail() {
                     caption="Disable Secret"
                     body="You are about to disable a Secret. Is this what you want to do?"
                     toggle={() => setConfirmDisable(false)}
-                    icon="times"
+                    icon="warning"
                     buttons={[
                         { color: 'danger', onClick: onDisableConfirmed, body: 'Disable' },
                         { color: 'secondary', variant: 'outline', onClick: () => setConfirmDisable(false), body: 'Cancel' },
