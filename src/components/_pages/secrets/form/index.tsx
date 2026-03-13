@@ -417,7 +417,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                         render={({ field, fieldState }) => (
                                             <Select
                                                 id="secret-type"
-                                                label="Content inputs*"
+                                                label="Secret type*"
                                                 placeholder="Select"
                                                 options={optionsForTypes}
                                                 value={field.value || ''}
