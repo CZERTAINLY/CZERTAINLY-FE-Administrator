@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -41,6 +41,7 @@ export default function VaultForm({ onCancel, onSuccess }: VaultFormProps) {
 
     const connectors = useSelector(connectorsSelectors.connectors);
     const isCreating = useSelector(vaultSelectors.isCreating);
+    const createdVault = useSelector(vaultSelectors.vault);
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
     const vaultInstanceAttributesConnectorUuid = useSelector(vaultSelectors.vaultInstanceAttributesConnectorUuid);
     const vaultInstanceAttributeDescriptors = useSelector(vaultSelectors.vaultInstanceAttributeDescriptors);
@@ -160,10 +161,18 @@ export default function VaultForm({ onCancel, onSuccess }: VaultFormProps) {
                     },
                 }),
             );
-            onSuccess?.();
         },
-        [dispatch, onSuccess, resourceCustomAttributes, vaultAttributeDescriptors, groupAttributesCallbackAttributes],
+        [dispatch, resourceCustomAttributes, vaultAttributeDescriptors, groupAttributesCallbackAttributes],
     );
+
+    const wasCreatingRef = useRef(false);
+
+    useEffect(() => {
+        if (wasCreatingRef.current && !isCreating && createdVault) {
+            onSuccess?.();
+        }
+        wasCreatingRef.current = isCreating;
+    }, [isCreating, createdVault, onSuccess]);
 
     const handleCancel = useCallback(() => {
         onCancel?.();

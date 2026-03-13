@@ -102,10 +102,18 @@ export default function VaultProfileForm({ onCancel, onSuccess }: VaultProfileFo
                     request,
                 }),
             );
-            onSuccess?.();
         },
-        [dispatch, getValues, onSuccess, resourceCustomAttributes],
+        [dispatch, getValues, resourceCustomAttributes],
     );
+
+    const wasCreatingRef = useRef(false);
+
+    useEffect(() => {
+        if (wasCreatingRef.current && !isCreating) {
+            onSuccess?.();
+        }
+        wasCreatingRef.current = isCreating;
+    }, [isCreating, onSuccess]);
 
     const handleCancel = useCallback(() => {
         onCancel?.();

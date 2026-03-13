@@ -16,7 +16,7 @@ import { actions as secretsActions, selectors as secretsSelectors } from 'ducks/
 import { actions as vaultProfileActions, selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -74,6 +74,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
     const groups = useSelector(groupSelectors.certificateGroups);
     const isCreating = useSelector(secretsSelectors.isCreating);
     const isUpdating = useSelector(secretsSelectors.isUpdating);
+    const secret = useSelector(secretsSelectors.secret);
     const vaultProfiles = useSelector(vaultProfileSelectors.vaultProfiles);
     const secretCreationAttributeDescriptors = useSelector(secretsSelectors.secretCreationAttributeDescriptors);
     const isFetchingSecretCreationAttributes = useSelector(secretsSelectors.isFetchingSecretCreationAttributes);
@@ -292,10 +293,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                         }),
                     );
                 }
-
-                onSuccess?.();
             } else {
-                // Create mode
                 dispatch(
                     secretsActions.createSecret({
                         vaultUuid,
@@ -310,7 +308,6 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                         },
                     }),
                 );
-                onSuccess?.();
             }
         },
         [
@@ -318,12 +315,26 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
             dispatch,
             getValues,
             initialSecret,
-            onSuccess,
             resourceCustomAttributes,
             secretCreationAttributeDescriptors,
             vaultProfiles,
         ],
     );
+
+    const wasCreatingRef = useRef(false);
+    const wasUpdatingRef = useRef(false);
+
+    useEffect(() => {
+        const justFinishedCreate = wasCreatingRef.current && !isCreating;
+        const justFinishedUpdate = wasUpdatingRef.current && !isUpdating;
+
+        if ((justFinishedCreate || justFinishedUpdate) && secret) {
+            onSuccess?.();
+        }
+
+        wasCreatingRef.current = isCreating;
+        wasUpdatingRef.current = isUpdating;
+    }, [isCreating, isUpdating, secret, onSuccess]);
 
     const handleCancel = useCallback(() => {
         onCancel?.();
