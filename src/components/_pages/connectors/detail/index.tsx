@@ -1,32 +1,28 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useParams } from 'react-router';
+import { CircleCheck, CircleAlert, CircleHelp } from 'lucide-react';
+
+import Badge from 'components/Badge';
+import Breadcrumb from 'components/Breadcrumb';
+import Container from 'components/Container';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
-
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
-import ConnectorForm from '../form';
-
 import { actions, selectors } from 'ducks/connectors';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as userInterfaceActions } from 'ducks/user-interface';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
-import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router';
-
-import Badge from 'components/Badge';
 import { AttributeDescriptorModel } from 'types/attributes';
 import { FunctionGroupModel } from 'types/connectors';
-
+import { ConnectorStatus, ConnectorVersion, HealthStatus, PlatformEnum, Resource } from 'types/openapi';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { inventoryStatus } from 'utils/connector';
-import { ConnectorStatus, ConnectorVersion, HealthStatus, PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
+import ConnectorForm from '../form';
 import FunctionGroupDetailsV1 from './FunctionGroupDetailsV1';
 import SupportedInterfacesV2 from './SupportedInterfacesV2';
-
-import { LockWidgetNameEnum } from 'types/user-interface';
-import Breadcrumb from 'components/Breadcrumb';
-import Container from 'components/Container';
-import { CircleCheck, CircleAlert, CircleHelp } from 'lucide-react';
 
 function getHealthStatusIcon(status: string): { Icon: typeof CircleCheck; className: string } {
     if (status === HealthStatus.Up) {
@@ -240,7 +236,10 @@ export default function ConnectorDetail() {
             },
             {
                 id: 'proxy',
-                columns: ['Proxy', 'coming soon'],
+                columns: [
+                    'Proxy',
+                    connector.proxy ? <Link to={`../proxies/detail/${connector.proxy.uuid}`}>{connector.proxy.name}</Link> : '-',
+                ],
             },
             {
                 id: 'version',

@@ -16,6 +16,7 @@ import type {
     ConnectorStatus,
     ConnectorVersion,
     FunctionGroupDto,
+    ProxyDto,
 } from './';
 
 /**
@@ -65,6 +66,15 @@ export interface ConnectorDtoV2 {
      * @memberof ConnectorDtoV2
      */
     interfaces: Array<ConnectorInterfaceDto>;
+
+    /**
+     * Proxy for message queue routing.
+     * When set, connector communicates via message queue proxy.
+     * When null, connector uses direct REST communication.
+     * @type {string}
+     * @memberof ConnectorDto
+     */
+    proxy?: ProxyDto;
 }
 
 

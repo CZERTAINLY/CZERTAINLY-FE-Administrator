@@ -189,7 +189,7 @@ export default function ConnectorList() {
                             {connector.version || '-'}
                         </span>,
                         <span key="status" style={{ whiteSpace: 'nowrap' }}>
-                            coming soon
+                            {connector.proxy ? <Link to={`../proxies/detail/${connector.proxy.uuid}`}>{connector.proxy.name}</Link> : '-'}
                         </span>,
                         <span key="url" style={{ whiteSpace: 'nowrap' }}>
                             {connector.url}

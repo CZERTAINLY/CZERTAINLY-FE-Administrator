@@ -14,6 +14,7 @@ import {
     RequestAttributeCallback,
     ResourceCallbackRequest,
     ConnectorVersion,
+    ProxyDto as ProxyResponseDto,
 } from './openapi';
 
 export type BulkActionDto = BulkActionMessageDto;
@@ -44,6 +45,7 @@ export type ConnectorResponseModel = Omit<ConnectorResponseDto, 'functionGroups 
     customAttributes?: Array<AttributeResponseModel>;
     version?: ConnectorVersion;
     interfaces?: Array<ConnectorInterfaceDto>;
+    proxy?: ProxyResponseDto;
 };
 
 export type HealthDto = HealthDtoOpenApi;
