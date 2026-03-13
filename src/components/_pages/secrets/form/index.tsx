@@ -435,7 +435,8 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                         <Controller
                                             name="username"
                                             control={control}
-                                            render={({ field }) => (
+                                            rules={buildValidationRules([validateRequired()])}
+                                            render={({ field, fieldState }) => (
                                                 <TextInput
                                                     id="secret-username"
                                                     label="Username"
@@ -443,6 +444,8 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                                     value={field.value ?? ''}
                                                     onChange={field.onChange}
                                                     onBlur={field.onBlur}
+                                                    error={getFieldErrorMessage(fieldState)}
+                                                    required
                                                 />
                                             )}
                                         />
