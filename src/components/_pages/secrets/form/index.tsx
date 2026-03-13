@@ -356,12 +356,13 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                 render={({ field, fieldState }) => (
                                     <TextInput
                                         id="secret-name"
-                                        label="Name*"
+                                        label="Name"
                                         placeholder="Enter the secret name"
                                         value={field.value}
                                         onChange={field.onChange}
                                         onBlur={field.onBlur}
                                         error={getFieldErrorMessage(fieldState)}
+                                        required
                                     />
                                 )}
                             />
@@ -389,12 +390,13 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                             render={({ field, fieldState }) => (
                                 <Select
                                     id="secret-vault-profile"
-                                    label="Source Vault Profile*"
+                                    label="Source Vault Profile"
                                     placeholder="Select profile"
                                     options={optionsForVaultProfiles}
                                     value={field.value || ''}
                                     onChange={field.onChange}
                                     error={getFieldErrorMessage(fieldState)}
+                                    required
                                 />
                             )}
                         />
@@ -404,7 +406,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                 {initialSecret ? (
                                     <TextInput
                                         id="secret-type"
-                                        label="Content inputs"
+                                        label="Secret type"
                                         value={getEnumLabel(secretTypeEnum, initialSecret.type)}
                                         disabled
                                         onChange={() => {}}
@@ -417,12 +419,13 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                         render={({ field, fieldState }) => (
                                             <Select
                                                 id="secret-type"
-                                                label="Secret type*"
+                                                label="Secret type"
                                                 placeholder="Select"
                                                 options={optionsForTypes}
                                                 value={field.value || ''}
                                                 onChange={field.onChange}
                                                 error={getFieldErrorMessage(fieldState)}
+                                                required
                                             />
                                         )}
                                     />
@@ -451,12 +454,13 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                                 <TextInput
                                                     id="secret-password"
                                                     type="password"
-                                                    label="Password*"
+                                                    label="Password"
                                                     placeholder="Password"
                                                     value={field.value ?? ''}
                                                     onChange={field.onChange}
                                                     onBlur={field.onBlur}
                                                     error={getFieldErrorMessage(fieldState)}
+                                                    required
                                                 />
                                             )}
                                         />
@@ -471,12 +475,13 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                             <TextInput
                                                 id="secret-apikey-content"
                                                 type="password"
-                                                label="API Key*"
+                                                label="API Key"
                                                 placeholder="API key content"
                                                 value={field.value ?? ''}
                                                 onChange={field.onChange}
                                                 onBlur={field.onBlur}
                                                 error={getFieldErrorMessage(fieldState)}
+                                                required
                                             />
                                         )}
                                     />
@@ -489,12 +494,13 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                         render={({ field, fieldState }) => (
                                             <TextArea
                                                 id="secret-jwt-content"
-                                                label="JWT Token*"
+                                                label="JWT Token"
                                                 placeholder="JWT token (decoded or BASE64 encoded)"
                                                 value={field.value ?? ''}
                                                 onChange={field.onChange}
                                                 onBlur={field.onBlur}
                                                 error={getFieldErrorMessage(fieldState)}
+                                                required
                                             />
                                         )}
                                     />
@@ -508,12 +514,13 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                             render={({ field, fieldState }) => (
                                                 <TextArea
                                                     id="secret-secretkey-content"
-                                                    label="Secret Key*"
+                                                    label="Secret Key"
                                                     placeholder="Paste BASE64 encoded content or use file upload below"
                                                     value={field.value ?? ''}
                                                     onChange={field.onChange}
                                                     onBlur={field.onBlur}
                                                     error={getFieldErrorMessage(fieldState)}
+                                                    required
                                                 />
                                             )}
                                         />
@@ -540,12 +547,13 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                             render={({ field, fieldState }) => (
                                                 <TextArea
                                                     id="secret-privatekey-content"
-                                                    label="Private Key*"
+                                                    label="Private Key"
                                                     placeholder="Paste PEM content or use file upload below"
                                                     value={field.value ?? ''}
                                                     onChange={field.onChange}
                                                     onBlur={field.onBlur}
                                                     error={getFieldErrorMessage(fieldState)}
+                                                    required
                                                 />
                                             )}
                                         />
@@ -572,12 +580,13 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                             render={({ field, fieldState }) => (
                                                 <Select
                                                     id="secret-keystore-type"
-                                                    label="Key Store type*"
+                                                    label="Key Store type"
                                                     placeholder="Select"
                                                     options={optionsForKeyStoreType}
                                                     value={field.value ?? ''}
                                                     onChange={field.onChange}
                                                     error={getFieldErrorMessage(fieldState)}
+                                                    required
                                                 />
                                             )}
                                         />
@@ -585,8 +594,9 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                             <Label
                                                 htmlFor="secret-keystore-file__fileUpload__file"
                                                 className="mb-1 block text-sm font-medium"
+                                                required
                                             >
-                                                Key Store*
+                                                Key Store
                                             </Label>
                                             <FileUpload
                                                 id="secret-keystore-file"
@@ -601,12 +611,13 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                                 <TextInput
                                                     id="secret-keystore-password"
                                                     type="password"
-                                                    label="Password*"
+                                                    label="Password"
                                                     placeholder="Key store password"
                                                     value={field.value ?? ''}
                                                     onChange={field.onChange}
                                                     onBlur={field.onBlur}
                                                     error={getFieldErrorMessage(fieldState)}
+                                                    required
                                                 />
                                             )}
                                         />
@@ -631,7 +642,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                         render={({ field, fieldState }) => (
                                             <TextArea
                                                 id="secret-keyvalue-content"
-                                                label="Secret*"
+                                                label="Secret"
                                                 placeholder='{"key": "value"}'
                                                 value={field.value ?? ''}
                                                 onChange={field.onChange}
@@ -649,6 +660,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                                 }}
                                                 error={getFieldErrorMessage(fieldState)}
                                                 className="font-mono text-sm"
+                                                required
                                             />
                                         )}
                                     />
@@ -662,12 +674,13 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                             <TextInput
                                                 id="secret-generic-content"
                                                 type="password"
-                                                label="Secret*"
+                                                label="Secret"
                                                 placeholder="Secret content"
                                                 value={field.value ?? ''}
                                                 onChange={field.onChange}
                                                 onBlur={field.onBlur}
                                                 error={getFieldErrorMessage(fieldState)}
+                                                required
                                             />
                                         )}
                                     />
