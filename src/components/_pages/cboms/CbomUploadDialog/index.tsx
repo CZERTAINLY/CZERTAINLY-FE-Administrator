@@ -34,7 +34,10 @@ export default function CbomUploadDialog({ onCancel, onUpload, okButtonTitle = '
                 return false;
             }
 
-            if ('metadata' in parsedContent && parsedContent.metadata != null && typeof parsedContent.metadata !== 'object') {
+            if (
+                'metadata' in parsedContent &&
+                (parsedContent.metadata === null || typeof parsedContent.metadata !== 'object' || Array.isArray(parsedContent.metadata))
+            ) {
                 dispatch(alertActions.error('Failed to upload CBOM: metadata must be an object when provided'));
                 return false;
             }

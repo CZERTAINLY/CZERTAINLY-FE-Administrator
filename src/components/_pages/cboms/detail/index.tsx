@@ -582,8 +582,9 @@ export default function CbomDetail() {
     );
 
     const isCbomMissingInRepository = detailErrorStatusCode === 404;
+    const hasDetailRequestFailed = detailErrorStatusCode !== undefined || Boolean(detailError);
 
-    if (isFetching && !detail) {
+    if (!detail && (isFetching || !hasDetailRequestFailed)) {
         return (
             <div>
                 <Breadcrumb
@@ -599,7 +600,7 @@ export default function CbomDetail() {
         );
     }
 
-    if (!isFetching && !detail) {
+    if (!isFetching && !detail && hasDetailRequestFailed) {
         return (
             <div>
                 <Breadcrumb
