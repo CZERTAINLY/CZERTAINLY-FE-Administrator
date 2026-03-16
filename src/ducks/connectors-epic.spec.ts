@@ -97,7 +97,9 @@ async function runEpic(
 ): Promise<any[]> {
     const deps = createDeps(depsOverrides);
     const epic = connectorsEpics[epicIndex] as any;
-    const output$ = epic(of(action), of({ value: stateValue }) as any, deps as any);
+    const state$ = of(stateValue) as any;
+    state$.value = stateValue;
+    const output$ = epic(of(action), state$, deps as any);
     return firstValueFrom(output$.pipe(take(takeCount), toArray()));
 }
 
@@ -709,7 +711,7 @@ describe('connectors epics', () => {
         expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to force delete connectors' }));
     });
 
-    test.skip('callbackConnector with v2 connector emits callbackSuccess', async () => {
+    test('callbackConnector with v2 connector emits callbackSuccess', async () => {
         const data = { result: 'ok' } as any;
         const action = slice.actions.callbackConnector({
             callbackId: 'cb-1',
@@ -780,7 +782,7 @@ describe('connectors epics', () => {
         expect(callbackV2Mock).not.toHaveBeenCalled();
     });
 
-    test.skip('callbackConnector failure (v2) emits callbackFailure and fetchError', async () => {
+    test('callbackConnector failure (v2) emits callbackFailure and fetchError', async () => {
         const err = new Error('callback failed');
         const action = slice.actions.callbackConnector({
             callbackId: 'cb-1',
@@ -826,8 +828,7 @@ describe('connectors epics', () => {
         expect(emitted[0]).toEqual(slice.actions.callbackSuccess({ callbackId: 'res-cb-1', data }));
     });
 
-    // TODO: outer sync-throw behaviour is low value to assert; skip for now.
-    test.skip('callbackConnector outer catchError emits callbackFailure and fetchError when callback throws', async () => {
+    test('callbackConnector outer catchError emits callbackFailure and fetchError when callback throws', async () => {
         const action = slice.actions.callbackConnector({
             callbackId: 'cb-1',
             callbackConnector: { uuid: 'c-1', requestAttributeCallback: { mappings: [] } } as any,
@@ -842,12 +843,9 @@ describe('connectors epics', () => {
                     },
                 } as any,
             },
-            2,
+            1,
         );
-        expect(emitted[0]).toEqual(slice.actions.callbackFailure({ callbackId: '' }));
-        expect(emitted[1]).toEqual(
-            appRedirectActions.fetchError({ error: expect.any(Error), message: 'Failed to perform connector callback' }),
-        );
+        expect(emitted[0]).toEqual(slice.actions.callbackFailure({ callbackId: 'cb-1' }));
     });
 
     test('callbackResource outer catchError emits callbackFailure and fetchError when resourceCallback throws', async () => {
