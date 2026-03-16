@@ -74,7 +74,7 @@ test.describe('InstallationInstructions', () => {
 
         await expect.poll(async () => page.evaluate(() => window.__clipboardSpy?.calls ?? 0)).toBe(1);
         const clipboardState = await page.evaluate(() => window.__clipboardSpy);
-        await expect(clipboardState!.lastText).toBe('first command\nsecond command\nthird command');
+        expect(clipboardState!.lastText).toBe('first command\nsecond command\nthird command');
     });
 
     test('should handle empty instructions array gracefully', async ({ mount }) => {

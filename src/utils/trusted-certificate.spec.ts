@@ -4,12 +4,12 @@ import {
     formatTrustedCertificateValue,
     MISSING_TRUSTED_CERTIFICATE_FIELD_CLICKABLE,
     MISSING_TRUSTED_CERTIFICATE_FIELD_NORMAL,
-} from './trustedCertificateHelpers';
+} from './trusted-certificate';
 
-describe('trustedCertificateHelpers', () => {
+describe('trusted-certificate helpers', () => {
     describe('formatTrustedCertificateValue', () => {
         test('returns the placeholder for missing values', () => {
-            expect(formatTrustedCertificateValue(undefined)).toBe(MISSING_TRUSTED_CERTIFICATE_FIELD_NORMAL);
+            expect(formatTrustedCertificateValue()).toBe(MISSING_TRUSTED_CERTIFICATE_FIELD_NORMAL);
             expect(formatTrustedCertificateValue(null)).toBe(MISSING_TRUSTED_CERTIFICATE_FIELD_NORMAL);
             expect(formatTrustedCertificateValue('')).toBe(MISSING_TRUSTED_CERTIFICATE_FIELD_NORMAL);
             expect(formatTrustedCertificateValue('   ')).toBe(MISSING_TRUSTED_CERTIFICATE_FIELD_NORMAL);
@@ -29,7 +29,7 @@ describe('trustedCertificateHelpers', () => {
 
     describe('formatTrustedCertificateDate', () => {
         test('returns the placeholder for missing dates', () => {
-            expect(formatTrustedCertificateDate(undefined)).toBe(MISSING_TRUSTED_CERTIFICATE_FIELD_NORMAL);
+            expect(formatTrustedCertificateDate()).toBe(MISSING_TRUSTED_CERTIFICATE_FIELD_NORMAL);
             expect(formatTrustedCertificateDate('')).toBe(MISSING_TRUSTED_CERTIFICATE_FIELD_NORMAL);
         });
 

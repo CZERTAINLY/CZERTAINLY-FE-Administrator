@@ -11,8 +11,8 @@ import CertificateUploadDialog from 'components/_pages/certificates/CertificateU
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/trusted-certificates';
 import { Resource } from 'types/openapi';
+import { formatTrustedCertificateDate, formatTrustedCertificateValue } from 'utils/trusted-certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { formatTrustedCertificateDate, formatTrustedCertificateValue } from '../trustedCertificateHelpers';
 
 export const TrustedCertificatesList = () => {
     const dispatch = useDispatch();
@@ -69,7 +69,7 @@ export const TrustedCertificatesList = () => {
             trustedCertificates.map((trustedCertificate) => ({
                 id: trustedCertificate.uuid,
                 columns: [
-                    <Link to={`/${Resource.TrustedCertificates.toLowerCase()}/detail/${trustedCertificate.uuid}`}>
+                    <Link to={`/${Resource.TrustedCertificates.toLowerCase()}/detail/${trustedCertificate.uuid}`} key="subject">
                         {formatTrustedCertificateValue(trustedCertificate.subject, true)}
                     </Link>,
                     formatTrustedCertificateValue(trustedCertificate.issuer),

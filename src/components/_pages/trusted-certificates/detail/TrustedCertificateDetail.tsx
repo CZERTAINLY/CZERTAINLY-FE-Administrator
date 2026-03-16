@@ -12,8 +12,8 @@ import { actions, selectors } from 'ducks/trusted-certificates';
 import { Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { useRunOnFinished } from 'utils/common-hooks';
+import { formatTrustedCertificateDate, formatTrustedCertificateValue } from 'utils/trusted-certificate';
 import { createWidgetDetailHeaders } from 'utils/widget';
-import { formatTrustedCertificateDate, formatTrustedCertificateValue } from '../trustedCertificateHelpers';
 
 export const TrustedCertificateDetail = () => {
     const dispatch = useDispatch();
@@ -70,9 +70,8 @@ export const TrustedCertificateDetail = () => {
 
     const detailData: TableDataRow[] = useMemo(
         () =>
-            !trustedCertificate
-                ? []
-                : [
+            trustedCertificate
+                ? [
                       { id: 'uuid', columns: ['UUID', trustedCertificate.uuid] },
                       { id: 'subject', columns: ['Subject DN', formatTrustedCertificateValue(trustedCertificate.subject)] },
                       { id: 'issuer', columns: ['Issuer DN', formatTrustedCertificateValue(trustedCertificate.issuer)] },
@@ -81,7 +80,8 @@ export const TrustedCertificateDetail = () => {
                       { id: 'serialNumber', columns: ['Serial Number', formatTrustedCertificateValue(trustedCertificate.serialNumber)] },
                       { id: 'thumbprint', columns: ['Thumbprint', formatTrustedCertificateValue(trustedCertificate.thumbprint)] },
                       { id: 'san', columns: ['Subject Alternative Name(s)', formatTrustedCertificateValue(trustedCertificate.san)] },
-                  ],
+                  ]
+                : [],
         [trustedCertificate],
     );
 
