@@ -110,12 +110,14 @@ export default function UsersList() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
+                id: 'create-user',
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
                 onClick: handleOpenAddModal,
             },
             {
+                id: 'delete-users',
                 icon: 'trash',
                 disabled: checkedRows.length === 0 || isSystemUserSelected,
                 tooltip: 'Delete',
@@ -124,6 +126,7 @@ export default function UsersList() {
                 },
             },
             {
+                id: 'enable-users',
                 icon: 'check',
                 disabled: isSystemUserSelected || !canEnable,
                 tooltip: 'Enable',
@@ -132,6 +135,7 @@ export default function UsersList() {
                 },
             },
             {
+                id: 'disable-users',
                 icon: 'times',
                 disabled: isSystemUserSelected || !canDisable,
                 tooltip: 'Disable',

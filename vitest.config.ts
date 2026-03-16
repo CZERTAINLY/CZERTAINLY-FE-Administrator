@@ -9,13 +9,13 @@ export default defineConfig({
     test: {
         globals: true,
         environment: 'happy-dom',
-        include: ['src/utils/**/*.spec.ts', 'src/ducks/**/*.spec.ts'],
+        include: ['src/utils/**/*.spec.ts', 'src/ducks/**/*.spec.ts', '**/*.integration.spec.tsx'],
         exclude: ['node_modules', 'build', 'dist', 'src/components/**/*'],
         coverage: {
             provider: 'v8',
             reporter: ['lcovonly', 'text-summary'],
             reportsDirectory: './coverage-vitest',
-            include: ['src/utils/**/*.{ts,tsx}', 'src/ducks/**/*.{ts,tsx}'],
+            include: ['**/*.{ts,tsx}'],
             exclude: [
                 'node_modules',
                 'src/**/*.spec.{ts,tsx}',

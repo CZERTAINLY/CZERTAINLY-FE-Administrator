@@ -105,6 +105,7 @@ export default function UserDetail() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
+                id: 'edit-user',
                 icon: 'pencil',
                 disabled: isBusy || user?.systemUser || false,
                 tooltip: 'Edit',
@@ -113,6 +114,7 @@ export default function UserDetail() {
                 },
             },
             {
+                id: 'delete-user',
                 icon: 'trash',
                 disabled: user?.systemUser || false,
                 tooltip: 'Delete',
@@ -121,6 +123,7 @@ export default function UserDetail() {
                 },
             },
             {
+                id: 'enable-user',
                 icon: 'check',
                 disabled: user?.enabled || user?.systemUser || false,
                 tooltip: 'Enable',
@@ -129,6 +132,7 @@ export default function UserDetail() {
                 },
             },
             {
+                id: 'disable-user',
                 icon: 'times',
                 disabled: !(user?.enabled || false) || user?.systemUser || false,
                 tooltip: 'Disable',
