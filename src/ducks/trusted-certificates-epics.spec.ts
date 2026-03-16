@@ -99,4 +99,50 @@ describe('trusted certificates epics', () => {
         expect(emitted[1].type).toBe(userInterfaceActions.insertWidgetLock.type);
         expect(emitted[2]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to get Trusted Certificate details' }));
     });
+
+    test('createTrustedCertificate success emits createTrustedCertificateSuccess and listTrustedCertificates', async () => {
+        const emitted = await runEpic(
+            2,
+            trustedCertificatesActions.createTrustedCertificate({
+                trustedCertificate: { certificateContent: 'BASE64_CERT' },
+            }),
+            {
+                trustedCertificates: {
+                    createTrustedCertificate: ({ trustedCertificateRequestDto }: any) => {
+                        expect(trustedCertificateRequestDto).toEqual({ certificateContent: 'BASE64_CERT' });
+                        return of({ uuid: 'tc-created' });
+                    },
+                    getTrustedCertificate: ({ uuid }: { uuid: string }) => of({ uuid, certificateContent: 'BASE64_CERT' }),
+                } as any,
+            },
+            2,
+        );
+
+        expect(emitted[0].type).toBe(trustedCertificatesActions.createTrustedCertificateSuccess.type);
+        expect(emitted[0]).toEqual(
+            trustedCertificatesActions.createTrustedCertificateSuccess({
+                trustedCertificate: { uuid: 'tc-created', certificateContent: 'BASE64_CERT' },
+            }),
+        );
+        expect(emitted[1]).toEqual(trustedCertificatesActions.listTrustedCertificates());
+    });
+
+    test('createTrustedCertificate failure emits createTrustedCertificateFailure and fetchError', async () => {
+        const err = new Error('create failed');
+        const emitted = await runEpic(
+            2,
+            trustedCertificatesActions.createTrustedCertificate({
+                trustedCertificate: { certificateContent: 'BASE64_CERT' },
+            }),
+            {
+                trustedCertificates: {
+                    createTrustedCertificate: () => throwError(() => err),
+                } as any,
+            },
+            2,
+        );
+
+        expect(emitted[0].type).toBe(trustedCertificatesActions.createTrustedCertificateFailure.type);
+        expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to create Trusted Certificate' }));
+    });
 });
