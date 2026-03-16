@@ -278,6 +278,12 @@ const menuItemMappings: MenuItemMapping[] = [
                 requiredResources: [Resource.Settings],
             },
             { _key: '/custom-oids', name: 'Custom OIDs', link: '/custom-oids', requiredResources: [Resource.Settings] },
+            {
+                _key: `/${Resource.TrustedCertificates.toLowerCase()}`,
+                name: 'Trusted Certificates',
+                link: `/${Resource.TrustedCertificates.toLowerCase()}`,
+                requiredResources: [Resource.Settings],
+            },
         ],
     },
 

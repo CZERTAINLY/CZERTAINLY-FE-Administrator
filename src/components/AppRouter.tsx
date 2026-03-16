@@ -10,6 +10,9 @@ import OAuth2ProviderDetail from './_pages/auth-settings/detail';
 
 import LoggingSettings from './_pages/logging-settings';
 
+import { TrustedCertificateDetail } from './_pages/trusted-certificates/detail/TrustedCertificateDetail';
+import { TrustedCertificatesList } from './_pages/trusted-certificates/list/TrustedCertificateList';
+
 import AcmeAccountDetail from './_pages/acme-accounts/detail';
 import AcmeAccountsList from './_pages/acme-accounts/list';
 
@@ -355,6 +358,10 @@ export default function AppRouter() {
                     <Route path={`/approvals`} element={<ApprovalsList />} />
                     <Route path={'/custom-oids'} element={<CustomOIDList />} />
                     <Route path={'/custom-oids/detail/:id'} element={<CustomOIDDetail />} />
+
+                    <Route path={`/${Resource.TrustedCertificates.toLowerCase()}`} element={<TrustedCertificatesList />} />
+                    <Route path={`/${Resource.TrustedCertificates.toLowerCase()}/detail/:id`} element={<TrustedCertificateDetail />} />
+
                     <Route path={`/${Resource.Cboms.toLowerCase()}`} element={<CbomsList />} />
                     <Route path={`/${Resource.Cboms.toLowerCase()}/detail/:id`} element={<CbomDetail />} />
                     <Route path={`/${Resource.Cboms.toLowerCase()}/detail/:id/versions/:versionId?`} element={<CbomVersionsHistory />} />
