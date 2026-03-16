@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -11,12 +11,14 @@ import TextArea from 'components/TextArea';
 
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions as vaultActions, selectors as vaultSelectors } from 'ducks/vaults';
+import { actions as connectorsActions } from 'ducks/connectors';
 
-import { Resource, VaultInstanceDetailDto } from 'types/openapi';
+import { AttributeDescriptorModel } from 'types/attributes';
+import { FunctionGroupCode, Resource, VaultInstanceDetailDto } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
 interface VaultEditFormProps {
-    vault: VaultInstanceDetailDto;
+    vault?: VaultInstanceDetailDto | null;
     onCancel?: () => void;
     onSuccess?: () => void;
 }
@@ -35,16 +37,18 @@ export default function VaultEditForm({ vault, onCancel, onSuccess }: VaultEditF
     const isFetchingVaultInstanceAttributes = useSelector(vaultSelectors.isFetchingVaultInstanceAttributes);
     const isUpdating = useSelector(vaultSelectors.isUpdating);
 
-    const connectorUuid = vault.connector?.uuid;
+    const connectorUuid = vault?.connector?.uuid;
+
+    const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
     useEffect(() => {
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Vaults));
     }, [dispatch]);
 
     useEffect(() => {
-        if (connectorUuid) {
-            dispatch(vaultActions.getVaultInstanceAttributes({ connectorUuid }));
-        }
+        if (!connectorUuid) return;
+        dispatch(vaultActions.getVaultInstanceAttributes({ connectorUuid }));
+        dispatch(connectorsActions.getConnectorDetail({ uuid: connectorUuid }));
     }, [dispatch, connectorUuid]);
 
     const vaultAttributeDescriptors = useMemo(() => {
@@ -54,9 +58,9 @@ export default function VaultEditForm({ vault, onCancel, onSuccess }: VaultEditF
 
     const defaultValues: FormValues = useMemo(
         () => ({
-            description: vault.description ?? '',
+            description: vault?.description ?? '',
         }),
-        [vault.description],
+        [vault],
     );
 
     const methods = useForm<FormValues>({
@@ -72,18 +76,25 @@ export default function VaultEditForm({ vault, onCancel, onSuccess }: VaultEditF
 
     const onSubmit = useCallback(
         (values: FormValues) => {
+            if (!vault) return;
+            if (!vault) return;
+
             dispatch(
                 vaultActions.updateVault({
                     uuid: vault.uuid,
                     request: {
                         description: values.description ?? '',
-                        attributes: collectFormAttributes('vault', vaultAttributeDescriptors, values),
+                        attributes: collectFormAttributes(
+                            'vault',
+                            [...vaultAttributeDescriptors, ...groupAttributesCallbackAttributes],
+                            values,
+                        ),
                         customAttributes: collectFormAttributes('customVault', resourceCustomAttributes, values),
                     },
                 }),
             );
         },
-        [dispatch, resourceCustomAttributes, vault.uuid, vaultAttributeDescriptors],
+        [dispatch, resourceCustomAttributes, vault, vaultAttributeDescriptors, groupAttributesCallbackAttributes],
     );
 
     const wasUpdatingRef = useRef(false);
@@ -101,7 +112,16 @@ export default function VaultEditForm({ vault, onCancel, onSuccess }: VaultEditF
                 title: 'Attributes',
                 content:
                     vaultAttributeDescriptors.length > 0 ? (
-                        <AttributeEditor id="vault" attributeDescriptors={vaultAttributeDescriptors} attributes={vault.attributes ?? []} />
+                        <AttributeEditor
+                            id="vault"
+                            attributeDescriptors={vaultAttributeDescriptors}
+                            attributes={vault?.attributes ?? []}
+                            connectorUuid={connectorUuid}
+                            functionGroupCode={FunctionGroupCode.CredentialProvider}
+                            kind="vaultManagement"
+                            groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                            setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                        />
                     ) : (
                         <div className="text-sm text-gray-500">
                             {connectorUuid && isFetchingVaultInstanceAttributes
@@ -116,7 +136,7 @@ export default function VaultEditForm({ vault, onCancel, onSuccess }: VaultEditF
                     <AttributeEditor
                         id="customVault"
                         attributeDescriptors={resourceCustomAttributes}
-                        attributes={vault.customAttributes ?? []}
+                        attributes={vault?.customAttributes ?? []}
                     />
                 ),
             },
@@ -125,9 +145,9 @@ export default function VaultEditForm({ vault, onCancel, onSuccess }: VaultEditF
             connectorUuid,
             isFetchingVaultInstanceAttributes,
             resourceCustomAttributes,
-            vault.attributes,
-            vault.customAttributes,
+            vault,
             vaultAttributeDescriptors,
+            groupAttributesCallbackAttributes,
         ],
     );
 
@@ -149,14 +169,14 @@ export default function VaultEditForm({ vault, onCancel, onSuccess }: VaultEditF
                             />
                         )}
                     />
-                    <TabLayout tabs={attributeTabs} />
+                    <TabLayout tabs={attributeTabs} onlyActiveTabContent={false} />
                     <Container className="flex-row justify-end modal-footer" gap={4}>
                         <Button variant="outline" onClick={onCancel} type="button">
                             Cancel
                         </Button>
                         <ProgressButton
                             inProgress={isSubmitting || isUpdating}
-                            disabled={!isDirty || !isValid || isSubmitting || isUpdating}
+                            disabled={!isValid || isSubmitting || isUpdating}
                             title="Save"
                             inProgressTitle="Saving..."
                             type="submit"

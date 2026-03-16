@@ -108,8 +108,8 @@ export default function SecretsList() {
                 sortable: true,
             },
             {
-                id: 'enabled',
-                content: 'Enabled',
+                id: 'status',
+                content: 'Status',
                 width: '5%',
                 align: 'center',
                 sortable: true,
@@ -165,6 +165,14 @@ export default function SecretsList() {
 
     const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listSecrets(filters)), [dispatch]);
 
+    const handleEnableSecrets = useCallback(() => {
+        checkedRows.forEach((uuid) => dispatch(actions.enableSecret({ uuid: String(uuid) })));
+    }, [dispatch, checkedRows]);
+
+    const handleDisableSecrets = useCallback(() => {
+        checkedRows.forEach((uuid) => dispatch(actions.disableSecret({ uuid: String(uuid) })));
+    }, [dispatch, checkedRows]);
+
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
@@ -172,6 +180,18 @@ export default function SecretsList() {
                 disabled: false,
                 tooltip: 'Create Secret',
                 onClick: () => setIsAddOpen(true),
+            },
+            {
+                icon: 'check',
+                disabled: checkedRows.length === 0,
+                tooltip: 'Enable selected Secrets',
+                onClick: handleEnableSecrets,
+            },
+            {
+                icon: 'times',
+                disabled: checkedRows.length === 0,
+                tooltip: 'Disable selected Secrets',
+                onClick: handleDisableSecrets,
             },
             {
                 icon: 'user',
@@ -192,7 +212,7 @@ export default function SecretsList() {
                 onClick: () => setIsUpdateVaultProfileOpen(true),
             },
         ],
-        [checkedRows],
+        [checkedRows, handleDisableSecrets, handleEnableSecrets],
     );
 
     const userOptions = useMemo(
