@@ -54,7 +54,7 @@ type LocationModalState = {
 
 const VERSION_HISTORY_OPTION_VALUE = '__CBOM_VIEW_VERSION_HISTORY__';
 const ALL_ASSET_TYPES_OPTION_VALUE = '__CBOM_ALL_ASSET_TYPES__';
-const NON_CBOM_NOTICE_MESSAGE = 'The uploaded file is not a CBOM and does not contain cryptographic assets.';
+const NON_CBOM_NOTICE_MESSAGE = 'The uploaded file does not contain cryptographic assets.';
 
 const NonCbomNotice = () => (
     <div className="rounded-md border border-base-300 bg-base-200/30 p-4 text-sm" role="status" aria-live="polite" aria-atomic="true">
