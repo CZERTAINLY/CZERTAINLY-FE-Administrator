@@ -5,7 +5,6 @@ import {
     CustomAttributeResponseModel,
     CustomAttributeUpdateRequestModel,
 } from 'types/customAttributes';
-import { createFeatureSelector } from 'utils/ducks';
 import { AttributeResponseModel, BaseAttributeContentModel, CustomAttributeModel } from '../types/attributes';
 import { AttributeContentType, Resource } from '../types/openapi';
 
@@ -398,7 +397,7 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = (reduxStore: any): State => reduxStore[slice.name];
 
 const checkedRows = createSelector(state, (state: State) => state.checkedRows);
 

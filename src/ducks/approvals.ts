@@ -1,7 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ApprovalModel, DetailApprovalModel, ResponseApprovalModel, UserApprovalModel } from 'types/approvals';
 import { ApprovalDetailDtoStatusEnum, ApprovalDtoStatusEnum } from 'types/openapi';
-import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     approvalDetails?: DetailApprovalModel;
@@ -189,7 +188,7 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = (reduxStore: any): State => reduxStore[slice.name];
 
 const approvalDetails = createSelector(state, (state) => state.approvalDetails);
 const approvals = createSelector(state, (state) => state.approvals);

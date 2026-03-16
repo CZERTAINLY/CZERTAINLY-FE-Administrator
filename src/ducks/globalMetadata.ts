@@ -1,5 +1,4 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { createFeatureSelector } from 'utils/ducks';
 import {
     ConnectorMetadataResponseModel,
     GlobalMetadataCreateRequestModel,
@@ -180,7 +179,7 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = (reduxStore: any): State => reduxStore[slice.name];
 
 const checkedRows = createSelector(state, (state: State) => state.checkedRows);
 

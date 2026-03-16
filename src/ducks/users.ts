@@ -1,7 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RoleResponseModel, UserDetailModel, UserUpdateRequestModel } from 'types/auth';
 import { UserAddRequestModel, UserResponseModel } from 'types/users';
-import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     usersListCheckedRows: string[];
@@ -278,7 +277,7 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = (reduxStore: any): State => reduxStore[slice.name];
 
 const usersListCheckedRows = createSelector(state, (state) => state.usersListCheckedRows);
 const userRolesListCheckedRows = createSelector(state, (state) => state.userRolesListCheckedRows);

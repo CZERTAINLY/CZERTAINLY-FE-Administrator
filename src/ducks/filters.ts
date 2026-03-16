@@ -3,7 +3,6 @@ import { ApiClients } from '../api';
 import { WritableDraft } from 'immer/dist/internal';
 import { Observable } from 'rxjs';
 import { SearchFieldListModel, SearchFilterModel } from 'types/certificate';
-import { createFeatureSelector } from 'utils/ducks';
 
 export const enum EntityType {
     AUDIT_LOG,
@@ -110,7 +109,7 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = (reduxStore: any): State => reduxStore[slice.name];
 
 const availableFilters = (entity: EntityType) =>
     createSelector(state, (state) => (state.filters.find((f) => f.entity === entity)?.filter ?? EMPTY_FILTER).availableFilters);

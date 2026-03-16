@@ -1,7 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { VaultProfileDetailDto, VaultProfileDto, VaultProfileRequestDto, VaultProfileUpdateRequestDto } from 'types/openapi';
 import { SearchRequestModel } from 'types/certificate';
-import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     vaultProfiles: VaultProfileDto[];
@@ -161,7 +160,7 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = (reduxStore: any): State => reduxStore[slice.name];
 
 const vaultProfiles = createSelector(state, (state: State) => state.vaultProfiles);
 const vaultProfile = createSelector(state, (state: State) => state.vaultProfile);

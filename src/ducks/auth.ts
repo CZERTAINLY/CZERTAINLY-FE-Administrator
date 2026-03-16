@@ -2,7 +2,6 @@ import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AuthResourceModel, UserDetailModel, UserProfileDetailModel, UserUpdateRequestModel } from 'types/auth';
 import { NameAndUuidModel } from 'types/locations';
 import { Resource } from 'types/openapi';
-import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     profile?: UserProfileDetailModel;
@@ -107,7 +106,7 @@ export const slice = createSlice({
     },
 });
 
-const selectState = createFeatureSelector<State>(slice.name);
+const selectState = (reduxStore: any): State => reduxStore[slice.name];
 
 const profile = createSelector(selectState, (state) => state.profile);
 const resources = createSelector(selectState, (state) => state.resources);

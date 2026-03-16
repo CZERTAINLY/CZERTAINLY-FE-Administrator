@@ -17,7 +17,6 @@ import {
     CryptographicKeyResponseModel,
 } from 'types/cryptographic-keys';
 import { KeyRequestType, KeyState, KeyUsage } from 'types/openapi';
-import { createFeatureSelector } from 'utils/ducks';
 import { SearchRequestModel } from '../types/certificate';
 
 export type State = {
@@ -738,7 +737,7 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = (reduxStore: any): State => reduxStore[slice.name];
 
 const cryptographicKey = createSelector(state, (state: State) => state.cryptographicKey);
 const cryptographicKeys = createSelector(state, (state: State) => state.cryptographicKeys);

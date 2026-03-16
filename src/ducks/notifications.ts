@@ -4,7 +4,6 @@ import { SearchRequestModel } from 'types/certificate';
 import { ConnectorResponseModel } from 'types/connectors';
 import { NotificationInstanceModel, NotificationInstanceRequestModel, NotificationModel } from 'types/notifications';
 import { ListMappingAttributesRequest } from 'types/openapi';
-import { createFeatureSelector } from 'utils/ducks';
 
 const MAX_FAILED_RETRY_COUNT = 10;
 export type State = {
@@ -275,7 +274,7 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = (reduxStore: any): State => reduxStore[slice.name];
 
 const overviewNotifications = createSelector(state, (state) => state.overviewNotifications);
 const notifications = createSelector(state, (state) => state.notifications);

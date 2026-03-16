@@ -1,7 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Resource } from 'types/openapi';
 import { ResourceEventModel, ResourceModel } from 'types/resource';
-import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     resourcesList: ResourceModel[];
@@ -79,7 +78,7 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = (reduxStore: any): State => reduxStore[slice.name];
 
 const resourcesList = createSelector(state, (state) => state.resourcesList);
 const resourcesWithComplianceProfiles = createSelector(resourcesList, (list) => list.filter((r) => r.hasComplianceProfiles === true));

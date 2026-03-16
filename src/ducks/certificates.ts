@@ -32,7 +32,6 @@ import {
 import { RaProfileResponseModel } from 'types/ra-profiles';
 import { UserResponseModel } from 'types/users';
 import { downloadFileZip } from 'utils/download';
-import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     deleteErrorMessage: string;
@@ -887,7 +886,7 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = (reduxStore: any): State => reduxStore[slice.name];
 
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
 
