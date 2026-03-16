@@ -71,6 +71,15 @@ const toDashboardDict = (rows: TableDataRow[]): DashboardDict =>
 
 const isRecord = (value: unknown): value is GenericObject => typeof value === 'object' && value !== null;
 
+const isNonEmptyString = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0;
+
+const isCryptographicComponent = (component: CbomComponent): boolean => {
+    const cbomAssetType = component?.cryptoProperties?.assetType;
+    if (isNonEmptyString(cbomAssetType)) return true;
+
+    return component?.type === 'cryptographic-asset';
+};
+
 const toCellValue = (value: unknown): string | number => {
     if (value === null || value === undefined || value === '') return '-';
     if (typeof value === 'number') return value;
@@ -212,54 +221,74 @@ export default function CbomDetail() {
         URL.revokeObjectURL(url);
     }, [rawJsonText, detail, id]);
 
+    const cryptographicComponents = useMemo(() => components.filter(isCryptographicComponent), [components]);
+
+    const hasCryptographicAssets = cryptographicComponents.length > 0;
+    const showNonCbomAssetsNotice = !hasCryptographicAssets && components.length > 0;
+
     const assetsByCategoryRows: TableDataRow[] = useMemo(() => {
-        if (!detail) return [];
+        const map = new Map<string, number>([
+            ['algorithm', 0],
+            ['certificate', 0],
+            ['protocol', 0],
+            ['related-crypto-material', 0],
+        ]);
+
+        for (const component of cryptographicComponents) {
+            const rawAssetType = component?.cryptoProperties?.assetType;
+            if (!isNonEmptyString(rawAssetType)) continue;
+
+            const normalizedAssetType = rawAssetType.trim().toLowerCase();
+            if (!map.has(normalizedAssetType)) continue;
+
+            map.set(normalizedAssetType, (map.get(normalizedAssetType) ?? 0) + 1);
+        }
 
         return [
-            { id: 'algorithms', columns: ['Algorithms', detail.algorithms ?? 0] },
-            { id: 'certificates', columns: ['Certificates', detail.certificates ?? 0] },
-            { id: 'protocols', columns: ['Protocols', detail.protocols ?? 0] },
-            { id: 'cryptoMaterial', columns: ['Related Crypto Material', detail.cryptoMaterial ?? 0] },
+            { id: 'algorithms', columns: ['Algorithms', map.get('algorithm') ?? 0] },
+            { id: 'certificates', columns: ['Certificates', map.get('certificate') ?? 0] },
+            { id: 'protocols', columns: ['Protocols', map.get('protocol') ?? 0] },
+            { id: 'cryptoMaterial', columns: ['Related Crypto Material', map.get('related-crypto-material') ?? 0] },
         ];
-    }, [detail]);
+    }, [cryptographicComponents]);
 
     const algorithmsByNameRows = useMemo(() => {
         const map = new Map<string, number>();
-        for (const c of components) {
+        for (const c of cryptographicComponents) {
             if (c?.cryptoProperties?.assetType === 'algorithm') {
                 map.set(c?.name ?? 'Unknown', (map.get(c?.name ?? 'Unknown') ?? 0) + 1);
             }
         }
         return toChartRows(map);
-    }, [components]);
+    }, [cryptographicComponents]);
 
     const cryptoFunctionsRows = useMemo(() => {
         const map = new Map<string, number>();
-        for (const c of components) {
+        for (const c of cryptographicComponents) {
             const vals = toArray<string>(c?.cryptoProperties?.algorithmProperties?.cryptoFunctions);
             for (const v of vals) map.set(v, (map.get(v) ?? 0) + 1);
         }
         return toChartRows(map);
-    }, [components]);
+    }, [cryptographicComponents]);
 
     const cryptoPrimitivesRows = useMemo(() => {
         const map = new Map<string, number>();
-        for (const c of components) {
+        for (const c of cryptographicComponents) {
             const vals = toArray<string>(c?.cryptoProperties?.algorithmProperties?.primitive);
             for (const v of vals) map.set(v, (map.get(v) ?? 0) + 1);
         }
         return toChartRows(map);
-    }, [components]);
+    }, [cryptographicComponents]);
 
     const relatedMaterialTypesRows = useMemo(() => {
         const map = new Map<string, number>();
-        for (const c of components) {
+        for (const c of cryptographicComponents) {
             if (c?.cryptoProperties?.assetType !== 'related-crypto-material') continue;
             const type = c?.cryptoProperties?.relatedCryptoMaterialProperties?.type ?? 'Unknown';
             map.set(type, (map.get(type) ?? 0) + 1);
         }
         return toChartRows(map);
-    }, [components]);
+    }, [cryptographicComponents]);
 
     const assetsByCategoryChartData = useMemo(() => toDashboardDict(assetsByCategoryRows), [assetsByCategoryRows]);
     const algorithmsByNameChartData = useMemo(() => toDashboardDict(algorithmsByNameRows), [algorithmsByNameRows]);
@@ -465,14 +494,14 @@ export default function CbomDetail() {
     );
 
     const overviewComponentRows: TableDataRow[] = useMemo(
-        () => buildComponentRows(components, handleAssetDetailClick, 'overview'),
-        [components, handleAssetDetailClick],
+        () => buildComponentRows(cryptographicComponents, handleAssetDetailClick, 'overview'),
+        [cryptographicComponents, handleAssetDetailClick],
     );
 
     const assetTypeOptions = useMemo(() => {
         const uniqueTypes = new Set<string>();
 
-        for (const component of components) {
+        for (const component of cryptographicComponents) {
             const typeValue = component?.cryptoProperties?.assetType ?? component?.type;
             if (typeof typeValue === 'string' && typeValue.trim().length > 0) {
                 uniqueTypes.add(typeValue.trim());
@@ -491,7 +520,7 @@ export default function CbomDetail() {
                     label: type,
                 })),
         ];
-    }, [components]);
+    }, [cryptographicComponents]);
 
     useEffect(() => {
         const hasSelectedOption = assetTypeOptions.some((option) => String(option.value) === selectedAssetType);
@@ -503,7 +532,7 @@ export default function CbomDetail() {
     const filteredComponents = useMemo(() => {
         const normalizedSearch = assetSearchQuery.trim().toLowerCase();
 
-        return components.filter((component) => {
+        return cryptographicComponents.filter((component) => {
             const componentAssetType = component?.cryptoProperties?.assetType ?? component?.type;
             const assetTypeMatches = selectedAssetType === ALL_ASSET_TYPES_OPTION_VALUE || componentAssetType === selectedAssetType;
 
@@ -523,7 +552,7 @@ export default function CbomDetail() {
 
             return searchableText.includes(normalizedSearch);
         });
-    }, [components, assetSearchQuery, selectedAssetType]);
+    }, [cryptographicComponents, assetSearchQuery, selectedAssetType]);
 
     const handleAssetTypeChange = useCallback((value: string | number | object | { value: string | number | object; label: string }) => {
         const selectedValue =
@@ -763,7 +792,17 @@ export default function CbomDetail() {
                                     </div>
                                     <div className="mt-4 md:mt-8">
                                         <Widget title="Assets" titleSize="large">
-                                            <CustomTable headers={overviewComponentHeaders} data={overviewComponentRows} hasPagination />
+                                            {showNonCbomAssetsNotice ? (
+                                                <div className="rounded-md border border-base-300 bg-base-200/30 p-4 text-sm">
+                                                    The uploaded file is not a CBOM and does not contain cryptographic assets.
+                                                </div>
+                                            ) : (
+                                                <CustomTable
+                                                    headers={overviewComponentHeaders}
+                                                    data={overviewComponentRows}
+                                                    hasPagination
+                                                />
+                                            )}
                                         </Widget>
                                     </div>
                                 </Container>
@@ -777,25 +816,33 @@ export default function CbomDetail() {
                             ) : (
                                 <Container>
                                     <Widget titleSize="large">
-                                        <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
-                                            <div className="md:col-span-2">
-                                                <TextInput
-                                                    id="cbom-assets-search"
-                                                    value={assetSearchQuery}
-                                                    onChange={setAssetSearchQuery}
-                                                    placeholder="Search assets (crypto asset, location, primitive)"
-                                                />
+                                        {showNonCbomAssetsNotice ? (
+                                            <div className="rounded-md border border-base-300 bg-base-200/30 p-4 text-sm">
+                                                The uploaded file is not a CBOM and does not contain cryptographic assets.
                                             </div>
-                                            <Select
-                                                id="cbom-assets-type-filter"
-                                                value={selectedAssetType}
-                                                onChange={handleAssetTypeChange}
-                                                options={assetTypeOptions}
-                                                placeholder="Filter by asset type"
-                                            />
-                                        </div>
+                                        ) : (
+                                            <>
+                                                <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+                                                    <div className="md:col-span-2">
+                                                        <TextInput
+                                                            id="cbom-assets-search"
+                                                            value={assetSearchQuery}
+                                                            onChange={setAssetSearchQuery}
+                                                            placeholder="Search assets (crypto asset, location, primitive)"
+                                                        />
+                                                    </div>
+                                                    <Select
+                                                        id="cbom-assets-type-filter"
+                                                        value={selectedAssetType}
+                                                        onChange={handleAssetTypeChange}
+                                                        options={assetTypeOptions}
+                                                        placeholder="Filter by asset type"
+                                                    />
+                                                </div>
 
-                                        <CustomTable headers={componentHeaders} data={componentRows} hasPagination />
+                                                <CustomTable headers={componentHeaders} data={componentRows} hasPagination />
+                                            </>
+                                        )}
                                     </Widget>
                                 </Container>
                             ),
