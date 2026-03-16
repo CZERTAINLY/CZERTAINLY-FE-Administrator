@@ -71,6 +71,7 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
         const iconColor = {
             delete: '#991B1B',
             destroy: '#991B1B',
+            warning: '#991B1B',
             check: '#115E59',
         };
         let iconElement = null;

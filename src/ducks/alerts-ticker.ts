@@ -1,6 +1,9 @@
 import { MessageModel } from 'types/alerts';
 import { actions } from './alerts';
 
+const HIDE_AFTER_MS = 7000;
+const DISMISS_AFTER_MS = 8000;
+
 type AlertsStore = {
     getState: () => { alerts?: { messages?: MessageModel[] } };
     dispatch: (action: unknown) => void;
@@ -20,13 +23,15 @@ export const startAlertsTicker = (store: AlertsStore) => {
         const alerts = store.getState().alerts;
         if (!alerts?.messages?.length) return;
         alerts.messages.forEach((message: MessageModel) => {
-            if (Date.now() - message.time > 17000) {
+            const age = Date.now() - message.time;
+
+            if (age > HIDE_AFTER_MS) {
                 store.dispatch(actions.hide(message.id));
             }
 
-            if (Date.now() - message.time > 20000) {
+            if (age > DISMISS_AFTER_MS) {
                 store.dispatch(actions.dismiss(message.id));
             }
         });
-    }, 1000);
+    }, 500);
 };

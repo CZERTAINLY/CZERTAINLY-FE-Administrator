@@ -195,11 +195,13 @@ describe('vaults epics', () => {
         expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to update Vault' }));
     });
 
-    test('deleteVault success emits deleteVaultSuccess and success alert', async () => {
-        const emitted = await runEpic(5, vaultActions.deleteVault({ uuid: 'v-1' }), {}, 2);
+    test('deleteVault success emits deleteVaultSuccess, listVaults, redirect and success alert', async () => {
+        const emitted = await runEpic(5, vaultActions.deleteVault({ uuid: 'v-1' }), {}, 4);
 
         expect(emitted[0]).toEqual(vaultActions.deleteVaultSuccess({ uuid: 'v-1' }));
-        expect(emitted[1]).toEqual(alertsSlice.actions.success('Vault deleted successfully.'));
+        expect(emitted[1]).toEqual(vaultActions.listVaults({ pageNumber: 1, itemsPerPage: 10, filters: [] }));
+        expect(emitted[2]).toEqual(appRedirectActions.redirect({ url: '/vaults' }));
+        expect(emitted[3]).toEqual(alertsSlice.actions.success('Vault deleted successfully.'));
     });
 
     test('deleteVault failure emits deleteVaultFailure and fetchError', async () => {
