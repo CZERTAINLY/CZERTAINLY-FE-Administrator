@@ -54,6 +54,13 @@ type LocationModalState = {
 
 const VERSION_HISTORY_OPTION_VALUE = '__CBOM_VIEW_VERSION_HISTORY__';
 const ALL_ASSET_TYPES_OPTION_VALUE = '__CBOM_ALL_ASSET_TYPES__';
+const NON_CBOM_NOTICE_MESSAGE = 'The uploaded file is not a CBOM and does not contain cryptographic assets.';
+
+const NonCbomNotice = () => (
+    <div className="rounded-md border border-base-300 bg-base-200/30 p-4 text-sm" role="status" aria-live="polite" aria-atomic="true">
+        {NON_CBOM_NOTICE_MESSAGE}
+    </div>
+);
 
 const toArray = <T,>(v: T | T[] | undefined | null): T[] => (v == null ? [] : Array.isArray(v) ? v : [v]);
 
@@ -793,9 +800,7 @@ export default function CbomDetail() {
                                     <div className="mt-4 md:mt-8">
                                         <Widget title="Assets" titleSize="large">
                                             {showNonCbomAssetsNotice ? (
-                                                <div className="rounded-md border border-base-300 bg-base-200/30 p-4 text-sm">
-                                                    The uploaded file is not a CBOM and does not contain cryptographic assets.
-                                                </div>
+                                                <NonCbomNotice />
                                             ) : (
                                                 <CustomTable
                                                     headers={overviewComponentHeaders}
@@ -817,9 +822,7 @@ export default function CbomDetail() {
                                 <Container>
                                     <Widget titleSize="large">
                                         {showNonCbomAssetsNotice ? (
-                                            <div className="rounded-md border border-base-300 bg-base-200/30 p-4 text-sm">
-                                                The uploaded file is not a CBOM and does not contain cryptographic assets.
-                                            </div>
+                                            <NonCbomNotice />
                                         ) : (
                                             <>
                                                 <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
