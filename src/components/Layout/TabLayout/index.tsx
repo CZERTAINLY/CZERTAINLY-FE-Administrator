@@ -46,7 +46,13 @@ export default function TabLayout({ tabs, onlyActiveTabContent = true, selectedT
         <Widget noBorder={noBorder} dataTestId="tab-layout">
             <Tabs tabs={memoizedTabs} selectedTab={currentTab} onTabChange={handleTabChange} />
             <hr className="my-4 border-gray-200" />
-            {memoizedTabs.map((t, i) => (onlyActiveTabContent === false || currentTab === i ? <div key={i}>{t.content}</div> : null))}
+            {memoizedTabs.map((t, i) =>
+                onlyActiveTabContent === false || currentTab === i ? (
+                    <div key={i} className={currentTab === i ? '' : 'hidden'}>
+                        {t.content}
+                    </div>
+                ) : null,
+            )}
         </Widget>
     );
 }

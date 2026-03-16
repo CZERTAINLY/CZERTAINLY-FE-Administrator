@@ -169,7 +169,7 @@ export default function VaultEditForm({ vault, onCancel, onSuccess }: VaultEditF
                             />
                         )}
                     />
-                    <TabLayout tabs={attributeTabs} />
+                    <TabLayout tabs={attributeTabs} onlyActiveTabContent={false} />
                     <Container className="flex-row justify-end modal-footer" gap={4}>
                         <Button variant="outline" onClick={onCancel} type="button">
                             Cancel
