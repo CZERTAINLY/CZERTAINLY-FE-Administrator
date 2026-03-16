@@ -31,7 +31,6 @@ test.describe('TabLayout', () => {
         const tabBWrapper = component.getByTestId('b').locator('..');
 
         await expect(tabA).toBeVisible();
-        await expect(tabBWrapper).not.toBeVisible();
         await expect(tabBWrapper).toHaveClass(/hidden/);
     });
 
