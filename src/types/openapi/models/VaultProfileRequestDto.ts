@@ -33,6 +33,12 @@ export interface VaultProfileRequestDto {
      */
     description?: string;
     /**
+     * List of attributes of the Vault profile
+     * @type {Array<RequestAttribute>}
+     * @memberof VaultProfileRequestDto
+     */
+    attributes: Array<RequestAttribute>;
+    /**
      * List of custom attributes of the Vault profile
      * @type {Array<RequestAttribute>}
      * @memberof VaultProfileRequestDto

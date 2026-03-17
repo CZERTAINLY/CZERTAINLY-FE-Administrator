@@ -16,7 +16,7 @@ import type {
 } from './';
 
 /**
- * Secret representing generic content encoded as Base64 string
+ * Secret representing generic content represented as string
  * @export
  * @interface GenericSecretContent
  */
@@ -28,7 +28,7 @@ export interface GenericSecretContent {
      */
     type: SecretType;
     /**
-     * Generic secret content encoded as Base64 string
+     * Generic secret content represented as string. In case secret content are binary data, it should be encoded as BASE64 string
      * @type {string}
      * @memberof GenericSecretContent
      */
