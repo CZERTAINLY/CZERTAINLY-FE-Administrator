@@ -7,7 +7,6 @@ import {
     SearchFieldDataByGroupDto,
     SearchRequestDto,
 } from 'types/openapi';
-import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     cbomsData?: PaginationResponseDtoCbomDto;
@@ -199,7 +198,7 @@ export const slice = createSlice({
     },
 });
 
-const featureSelector = createFeatureSelector<State>('cbom');
+const featureSelector = (reduxStore: any): State => reduxStore['cbom'];
 
 export const selectCbomsData = createSelector(featureSelector, (state) => state.cbomsData);
 export const selectCbomList = createSelector(featureSelector, (state) => state.cbomsData?.items || []);

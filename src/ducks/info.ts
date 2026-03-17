@@ -1,6 +1,5 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { CoreInfoResponseModel } from 'types/info';
-import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     platformInfo?: CoreInfoResponseModel;
@@ -31,7 +30,7 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const platformInfo = createSelector(state, (state: State) => state.platformInfo);
 const isFetching = createSelector(state, (state: State) => state.isFetching);
