@@ -117,10 +117,14 @@ export function buildAttributeValidators(descriptor: DataAttributeModel | Custom
         return composeValidators.apply(undefined, validators);
     }
     if (descriptor.properties.required) validators.push(validateRequired());
-    if (descriptor.contentType === AttributeContentType.Integer) validators.push(validateInteger());
-    if (descriptor.contentType === AttributeContentType.Float) validators.push(validateFloat());
-    if (isDataAttributeModel(descriptor)) {
-        addDataAttributeConstraintValidators(descriptor, validators);
+    // Skip type/constraint validators for list attributes — their form values are content objects
+    // {data, reference} rather than raw primitives, which are incompatible with these validators.
+    if (!descriptor.properties.list) {
+        if (descriptor.contentType === AttributeContentType.Integer) validators.push(validateInteger());
+        if (descriptor.contentType === AttributeContentType.Float) validators.push(validateFloat());
+        if (isDataAttributeModel(descriptor)) {
+            addDataAttributeConstraintValidators(descriptor, validators);
+        }
     }
     return composeValidators.apply(undefined, validators);
 }
