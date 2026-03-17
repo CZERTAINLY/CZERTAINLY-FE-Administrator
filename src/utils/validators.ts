@@ -20,7 +20,7 @@ const getValueFromObject = (value: any) => {
     }
     // Attribute content objects from list (select) fields are stored as {data, reference}.
     // Extract the primitive data value so pattern validators can test it correctly.
-    if (typeof value === 'object' && value && value.hasOwnProperty('data')) {
+    if (typeof value === 'object' && value?.hasOwnProperty('data')) {
         return value['data'];
     }
     return value;

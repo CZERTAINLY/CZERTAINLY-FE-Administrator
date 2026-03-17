@@ -333,18 +333,18 @@ describe('validators', () => {
         });
 
         test('returns error for forbidden backslash sequence \\Q', () => {
-            const result = validatePostgresPosixRegex('\\Qabc\\E');
+            const result = validatePostgresPosixRegex(String.raw`\Qabc\E`);
             expect(result).toBeTruthy();
         });
 
         test('returns error for forbidden single-backslash escape \\Z', () => {
-            const result = validatePostgresPosixRegex('abc\\Z');
+            const result = validatePostgresPosixRegex(String.raw`abc\Z`);
             expect(result).toBeTruthy();
             expect(result).toContain('Unsupported escape sequence');
         });
 
         test('returns empty string for double-backslash (escaped backslash)', () => {
-            expect(validatePostgresPosixRegex('abc\\\\Z')).toBe('');
+            expect(validatePostgresPosixRegex(String.raw`abc\\Z`)).toBe('');
         });
 
         test('returns error for unbalanced closing paren (caught by JS parse)', () => {
@@ -394,17 +394,17 @@ describe('validators', () => {
         });
 
         test('returns empty string for valid backreference', () => {
-            expect(validatePostgresPosixRegex('(abc)\\1')).toBe('');
+            expect(validatePostgresPosixRegex(String.raw`(abc)\1`)).toBe('');
         });
 
         test('returns error for backreference to non-existent group', () => {
-            const result = validatePostgresPosixRegex('abc\\1');
+            const result = validatePostgresPosixRegex(String.raw`abc\1`);
             expect(result).toContain('Backreference');
             expect(result).toContain('non-existent capturing group');
         });
 
         test('returns empty string for complex valid POSIX pattern', () => {
-            expect(validatePostgresPosixRegex('^([[:alpha:]]+)\\s[[:digit:]]{2,4}$')).toBe('');
+            expect(validatePostgresPosixRegex(String.raw`^([[:alpha:]]+)\s[[:digit:]]{2,4}$`)).toBe('');
         });
     });
 });
