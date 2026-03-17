@@ -182,7 +182,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const schedulerJob = createSelector(state, (state) => state.schedulerJob);
 const schedulerJobs = createSelector(state, (state) => state.schedulerJobs);

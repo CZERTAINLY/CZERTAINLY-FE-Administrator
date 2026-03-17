@@ -72,7 +72,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const auditLogs = createSelector(state, (state) => state.auditLogs);
 

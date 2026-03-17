@@ -70,7 +70,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const totalItems = (entity: EntityType) =>
     createSelector(state, (state) => (state.pagings.find((f) => f.entity === entity)?.paging ?? EMPTY_PAGING).totalItems);

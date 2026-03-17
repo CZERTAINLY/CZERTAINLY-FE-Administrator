@@ -196,7 +196,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const discoveryProviders = createSelector(state, (state) => state.discoveryProviders);
 const discoveryProviderAttributeDescriptors = createSelector(state, (state) => state.discoveryProviderAttributeDescriptors);

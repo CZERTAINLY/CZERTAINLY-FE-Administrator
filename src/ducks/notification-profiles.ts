@@ -128,7 +128,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const notificationProfile = createSelector(state, (state: State) => state.notificationProfile);
 const notificationProfiles = createSelector(state, (state: State) => state.notificationProfiles);

@@ -163,7 +163,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const entityProviders = createSelector(state, (state) => state.entityProviders);
 const entityProviderAttributeDescriptors = createSelector(state, (state) => state.entityProviderAttributeDescriptors);

@@ -33,7 +33,7 @@ export const slice = createSlice({
     },
 });
 
-const selectState = (reduxStore: any): State => reduxStore[slice.name];
+const selectState = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const statisticsDashboard = createSelector(selectState, (state) => state.statisticsDashboard);
 

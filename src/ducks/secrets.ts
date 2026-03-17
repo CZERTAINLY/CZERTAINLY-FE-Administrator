@@ -239,7 +239,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const secrets = createSelector(state, (state) => state.secrets);
 const secret = createSelector(state, (state) => state.secret);

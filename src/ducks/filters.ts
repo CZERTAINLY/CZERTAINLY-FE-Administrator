@@ -109,7 +109,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const availableFilters = (entity: EntityType) =>
     createSelector(state, (state) => (state.filters.find((f) => f.entity === entity)?.filter ?? EMPTY_FILTER).availableFilters);

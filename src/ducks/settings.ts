@@ -121,7 +121,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const platformSettings = createSelector(state, (state: State) => state.platformSettings);
 const isFetchingPlatform = createSelector(state, (state: State) => state.isFetchingPlatform);

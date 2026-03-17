@@ -288,7 +288,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const acmeProfile = createSelector(state, (state) => state.acmeProfile);
 const acmeProfiles = createSelector(state, (state) => state.acmeProfiles);

@@ -36,7 +36,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const parsedCertificateRequest = createSelector(state, (state: State) => state.parsedCertificateRequest);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);

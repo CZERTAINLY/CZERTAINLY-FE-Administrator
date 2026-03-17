@@ -45,7 +45,7 @@ export const slice = createSlice({
     },
 });
 
-const selectState = (reduxStore: any): State => reduxStore[slice.name];
+const selectState = (reduxStore: any): State => reduxStore?.[slice.name];
 
 export const selectors = {
     loginMethods: createSelector(selectState, (state) => state.loginMethods),

@@ -522,7 +522,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const rules = createSelector(state, (state) => state.rules);
 const ruleDetails = createSelector(state, (state) => state.ruleDetails);

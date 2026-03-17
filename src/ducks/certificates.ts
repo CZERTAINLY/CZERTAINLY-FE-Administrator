@@ -886,7 +886,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
 

@@ -156,7 +156,7 @@ export const slice = createSlice({
     },
 });
 
-const selectState = (reduxStore: any): State => reduxStore[slice.name];
+const selectState = (state: any): State => state?.[slice.name];
 
 const selectWidgetLocks = createSelector(selectState, (state) => state?.widgetLocks ?? []);
 const selectGlobalModal = createSelector(selectState, (state) => state?.globalModal ?? initialState.globalModal);

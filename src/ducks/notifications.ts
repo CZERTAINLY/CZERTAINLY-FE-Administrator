@@ -274,7 +274,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const overviewNotifications = createSelector(state, (state) => state.overviewNotifications);
 const notifications = createSelector(state, (state) => state.notifications);

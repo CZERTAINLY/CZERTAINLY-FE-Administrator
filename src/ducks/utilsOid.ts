@@ -30,7 +30,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const oidInfo = createSelector(state, (state: State) => state.oidInfo);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);

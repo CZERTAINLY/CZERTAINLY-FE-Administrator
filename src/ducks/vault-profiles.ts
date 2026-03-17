@@ -160,7 +160,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const vaultProfiles = createSelector(state, (state: State) => state.vaultProfiles);
 const vaultProfile = createSelector(state, (state: State) => state.vaultProfile);

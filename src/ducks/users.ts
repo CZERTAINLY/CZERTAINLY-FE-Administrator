@@ -277,7 +277,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const usersListCheckedRows = createSelector(state, (state) => state.usersListCheckedRows);
 const userRolesListCheckedRows = createSelector(state, (state) => state.userRolesListCheckedRows);

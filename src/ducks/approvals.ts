@@ -188,7 +188,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const approvalDetails = createSelector(state, (state) => state.approvalDetails);
 const approvals = createSelector(state, (state) => state.approvals);

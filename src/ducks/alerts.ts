@@ -3,7 +3,7 @@ import { createSelector } from 'reselect';
 import { MessageModel } from 'types/alerts';
 import { alertsSlice, State } from './alert-slice';
 
-const selectState = (reduxStore: any): State => reduxStore[alertsSlice.name];
+const selectState = (reduxStore: any): State => reduxStore?.[alertsSlice.name];
 
 const selectMessages = createSelector(selectState, (state) => state?.messages ?? []);
 

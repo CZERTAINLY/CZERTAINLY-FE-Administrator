@@ -126,7 +126,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const profileApprovalDetail = createSelector(state, (state) => state.profileApprovalDetail);
 const profileApprovalList = createSelector(state, (state) => state.profileApprovalList);

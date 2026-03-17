@@ -213,7 +213,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const signatureAttributeDescriptors = createSelector(state, (state: State) => state.signatureAttributeDescriptors);
 const altSignatureAttributeDescriptors = createSelector(state, (state: State) => state.altSignatureAttributeDescriptors);

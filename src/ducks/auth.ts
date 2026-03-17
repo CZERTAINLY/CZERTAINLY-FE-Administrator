@@ -106,7 +106,7 @@ export const slice = createSlice({
     },
 });
 
-const selectState = (reduxStore: any): State => reduxStore[slice.name];
+const selectState = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const profile = createSelector(selectState, (state) => state.profile);
 const resources = createSelector(selectState, (state) => state.resources);

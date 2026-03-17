@@ -737,7 +737,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const cryptographicKey = createSelector(state, (state: State) => state.cryptographicKey);
 const cryptographicKeys = createSelector(state, (state: State) => state.cryptographicKeys);

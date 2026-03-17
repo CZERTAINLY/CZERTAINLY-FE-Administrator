@@ -78,7 +78,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const resourcesList = createSelector(state, (state) => state.resourcesList);
 const resourcesWithComplianceProfiles = createSelector(resourcesList, (list) => list.filter((r) => r.hasComplianceProfiles === true));

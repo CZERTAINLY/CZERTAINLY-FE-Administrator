@@ -154,7 +154,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const authenticationSettings = createSelector(state, (state) => state.authenticationSettings);
 const oauth2Provider = createSelector(state, (state) => state.oauth2Provider);

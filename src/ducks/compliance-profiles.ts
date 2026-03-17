@@ -487,7 +487,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore[slice.name];
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const complianceProfile = createSelector(state, (state) => state.complianceProfile);
 const complianceProfiles = createSelector(state, (state) => state.complianceProfiles);

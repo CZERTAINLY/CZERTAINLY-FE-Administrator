@@ -24,7 +24,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State | undefined => reduxStore[slice.name];
+const state = (reduxStore: any): State | undefined => reduxStore?.[slice.name];
 
 const platformEnums = createSelector(state, (featureState) => featureState?.platformEnums ?? {});
 
