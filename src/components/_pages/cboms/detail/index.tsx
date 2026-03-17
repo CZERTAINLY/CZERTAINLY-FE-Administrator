@@ -581,10 +581,13 @@ export default function CbomDetail() {
         </Container>
     );
 
+    const isStaleDetailFromPreviousCbom =
+        Boolean(detail?.uuid) && Boolean(selectedVersionUuid) && String(detail?.uuid) !== String(selectedVersionUuid);
+
     const isCbomMissingInRepository = detailErrorStatusCode === 404;
     const hasDetailRequestFailed = detailErrorStatusCode !== undefined || Boolean(detailError);
 
-    if (!detail && (isFetching || !hasDetailRequestFailed)) {
+    if ((!detail || isStaleDetailFromPreviousCbom) && (isFetching || !hasDetailRequestFailed || isStaleDetailFromPreviousCbom)) {
         return (
             <div>
                 <Breadcrumb
