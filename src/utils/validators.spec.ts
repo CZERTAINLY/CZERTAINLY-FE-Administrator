@@ -332,12 +332,12 @@ describe('validators', () => {
             expect(result).toContain('Unsupported regex token');
         });
 
-        test('returns error for forbidden backslash sequence \\Q', () => {
+        test(String.raw`returns error for forbidden backslash sequence \Q`, () => {
             const result = validatePostgresPosixRegex(String.raw`\Qabc\E`);
             expect(result).toBeTruthy();
         });
 
-        test('returns error for forbidden single-backslash escape \\Z', () => {
+        test(String.raw`returns error for forbidden single-backslash escape \Z`, () => {
             const result = validatePostgresPosixRegex(String.raw`abc\Z`);
             expect(result).toBeTruthy();
             expect(result).toContain('Unsupported escape sequence');
