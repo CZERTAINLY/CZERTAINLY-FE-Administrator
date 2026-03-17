@@ -31,7 +31,6 @@ describe('cbom slice', () => {
         expect(next).toEqual(initialState);
         expect((next as any).tempOnlyKey).toBeUndefined();
     });
-
     test('listCboms / success / failure update list flags and data', () => {
         let next = reducer(initialState, actions.listCboms({ filters: [], pageNumber: 1, itemsPerPage: 10 } as any));
         expect(next.cbomsData).toBeUndefined();
