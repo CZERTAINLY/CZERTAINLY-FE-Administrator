@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import Button from 'components/Button';
-import { Copy, Download, Eye, Info } from 'lucide-react';
+import { Copy, Download, Eye, Info, X } from 'lucide-react';
 import Breadcrumb from 'components/Breadcrumb';
 import Container from 'components/Container';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
@@ -835,6 +835,18 @@ export default function CbomDetail() {
                                                             value={assetSearchQuery}
                                                             onChange={setAssetSearchQuery}
                                                             placeholder="Search assets (crypto asset, location, primitive)"
+                                                            buttonRight={
+                                                                assetSearchQuery ? (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => setAssetSearchQuery('')}
+                                                                        aria-label="Clear search"
+                                                                        title="Clear search"
+                                                                    >
+                                                                        <X size={16} />
+                                                                    </button>
+                                                                ) : undefined
+                                                            }
                                                         />
                                                     </div>
                                                     <Select
@@ -846,7 +858,12 @@ export default function CbomDetail() {
                                                     />
                                                 </div>
 
-                                                <CustomTable headers={componentHeaders} data={componentRows} hasPagination />
+                                                <CustomTable
+                                                    headers={componentHeaders}
+                                                    data={componentRows}
+                                                    hasPagination
+                                                    itemsPerPageOptions={[10, 20, 50, 100, 200, 500, 1000]}
+                                                />
                                             </>
                                         )}
                                     </Widget>

@@ -23,6 +23,23 @@ const rows = [
     { id: 'row-3', columns: ['Third row'] },
 ];
 
+const preloadedDeleteState = {
+    pagings: {
+        pagings: [
+            {
+                entity: EntityType.CBOM,
+                paging: {
+                    totalItems: 10,
+                    checkedRows: ['row-1', 'row-2'],
+                    isFetchingList: false,
+                    pageNumber: 1,
+                    pageSize: 10,
+                },
+            },
+        ],
+    } as any,
+};
+
 function createStore(preloadedState?: Partial<RootState>) {
     return configureStore({
         reducer,
@@ -118,46 +135,7 @@ test.describe('PagedList', () => {
         await mount(
             renderPagedList({
                 onDeleteCallback: () => {},
-                preloadedState: {
-                    pagings: {
-                        pagings: [
-                            {
-                                entity: EntityType.CBOM,
-                                paging: {
-                                    totalItems: 10,
-                                    checkedRows: ['row-1', 'row-2'],
-                                    isFetchingList: false,
-                                    pageNumber: 1,
-                                    pageSize: 10,
-                                },
-                            },
-                        ],
-                    } as any,
-                },
-            }),
-        );
-    });
-
-    test('mounts with delete callback contract', async ({ mount }) => {
-        await mount(
-            renderPagedList({
-                onDeleteCallback: () => {},
-                preloadedState: {
-                    pagings: {
-                        pagings: [
-                            {
-                                entity: EntityType.CBOM,
-                                paging: {
-                                    totalItems: 10,
-                                    checkedRows: ['row-1', 'row-2'],
-                                    isFetchingList: false,
-                                    pageNumber: 1,
-                                    pageSize: 10,
-                                },
-                            },
-                        ],
-                    } as any,
-                },
+                preloadedState: preloadedDeleteState,
             }),
         );
     });
