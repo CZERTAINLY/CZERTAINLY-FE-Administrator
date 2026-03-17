@@ -41,37 +41,44 @@ vi.mock('components/Dialog', () => ({
 }));
 
 vi.mock('components/Widget', () => ({
-    default: ({ title, children, widgetButtons }: any) =>
+    default: ({ title, children, widgetButtons, busy, hideWidgetButtons }: any) =>
         React.createElement(
             'section',
-            null,
+            { 'data-testid': 'mock-widget', 'data-busy': String(!!busy), 'data-hide-widget-buttons': String(!!hideWidgetButtons) },
             React.createElement('h2', null, title),
-            React.createElement(
-                'div',
-                { 'data-testid': 'mock-widget-buttons' },
-                ...(widgetButtons || []).map((button: any, index: number) =>
-                    React.createElement(
-                        'button',
-                        {
-                            key: `${button.tooltip}-${index}`,
-                            type: 'button',
-                            title: button.tooltip,
-                            disabled: !!button.disabled,
-                            onClick: (event) => button.onClick(event),
-                        },
-                        button.tooltip,
-                    ),
-                ),
-            ),
+            !hideWidgetButtons
+                ? React.createElement(
+                      'div',
+                      { 'data-testid': 'mock-widget-buttons' },
+                      ...(widgetButtons || []).map((button: any, index: number) =>
+                          React.createElement(
+                              'button',
+                              {
+                                  key: `${button.tooltip}-${index}`,
+                                  type: 'button',
+                                  title: button.tooltip,
+                                  disabled: !!button.disabled,
+                                  onClick: (event) => button.onClick(event),
+                              },
+                              button.tooltip,
+                          ),
+                      ),
+                  )
+                : null,
             children,
         ),
 }));
 
 vi.mock('components/CustomTable', () => ({
-    default: ({ onPageChanged, onPageSizeChanged }: any) =>
+    default: ({ onPageChanged, onPageSizeChanged, hasCheckboxes, multiSelect, hasDetails }: any) =>
         React.createElement(
             'div',
-            { 'data-testid': 'mock-custom-table' },
+            {
+                'data-testid': 'mock-custom-table',
+                'data-has-checkboxes': String(!!hasCheckboxes),
+                'data-multi-select': String(!!multiSelect),
+                'data-has-details': String(!!hasDetails),
+            },
             React.createElement(
                 'button',
                 {
@@ -115,10 +122,12 @@ function renderPagedList({
     store,
     onListCallback,
     onDeleteCallback,
+    props,
 }: {
     store: MockStore;
     onListCallback: (filters: any) => void;
     onDeleteCallback?: (uuids: string[], filters: any[]) => void;
+    props?: Partial<React.ComponentProps<typeof PagedList>>;
 }) {
     return React.createElement(
         Provider as any,
@@ -131,6 +140,7 @@ function renderPagedList({
             onListCallback,
             onDeleteCallback,
             addHidden: true,
+            ...props,
         }),
     );
 }
@@ -159,6 +169,62 @@ describe('PagedList (redux pagination logic)', () => {
         container.remove();
         vi.clearAllMocks();
         navigateMock.mockReset();
+    });
+
+    test('uses default values for busy, multiSelect, hideWidgetButtons, hasCheckboxes and hasDetails', async () => {
+        const onListCallback = vi.fn();
+        const store = createStore();
+
+        await act(async () => {
+            root.render(
+                renderPagedList({
+                    store,
+                    onListCallback,
+                    props: {
+                        addHidden: false,
+                    },
+                }),
+            );
+        });
+        await flushEffects();
+
+        const widget = container.querySelector('[data-testid="mock-widget"]') as HTMLElement;
+        expect(widget).toBeTruthy();
+        expect(widget.getAttribute('data-busy')).toBe('false');
+        expect(widget.getAttribute('data-hide-widget-buttons')).toBe('false');
+
+        const table = container.querySelector('[data-testid="mock-custom-table"]') as HTMLElement;
+        expect(table).toBeTruthy();
+        expect(table.getAttribute('data-has-checkboxes')).toBe('true');
+        expect(table.getAttribute('data-multi-select')).toBe('true');
+        expect(table.getAttribute('data-has-details')).toBe('false');
+    });
+
+    test('mount list refresh clears checked rows through onCheckedRowsChanged', async () => {
+        const onListCallback = vi.fn();
+        const store = createStore({
+            pagings: {
+                pagings: [
+                    {
+                        entity: EntityType.CBOM,
+                        paging: {
+                            totalItems: 100,
+                            checkedRows: ['row-1'],
+                            isFetchingList: false,
+                            pageNumber: 1,
+                            pageSize: 10,
+                        },
+                    },
+                ],
+            },
+        });
+
+        await act(async () => {
+            root.render(renderPagedList({ store, onListCallback }));
+        });
+        await flushEffects();
+
+        expect((store.getState() as any).pagings.pagings[0].paging.checkedRows).toEqual([]);
     });
 
     test('initial list call uses redux pagination values', async () => {
@@ -384,18 +450,13 @@ describe('PagedList (redux pagination logic)', () => {
 
         await act(async () => {
             root.render(
-                React.createElement(
-                    Provider as any,
-                    { store },
-                    React.createElement(PagedList, {
-                        entity: EntityType.CBOM,
-                        headers: [{ id: 'name', content: 'Name' }] as any,
-                        data: [{ id: 'row-1', columns: ['First row'] }] as any,
-                        title: 'CBOMs',
-                        onListCallback,
+                renderPagedList({
+                    store,
+                    onListCallback,
+                    props: {
                         addHidden: false,
-                    }),
-                ),
+                    },
+                }),
             );
         });
         await flushEffects();
@@ -508,20 +569,15 @@ describe('PagedList (redux pagination logic)', () => {
 
         await act(async () => {
             root.render(
-                React.createElement(
-                    Provider as any,
-                    { store },
-                    React.createElement(PagedList, {
-                        entity: EntityType.CBOM,
-                        headers: [{ id: 'name', content: 'Name' }] as any,
-                        data: [{ id: 'row-1', columns: ['First row'] }] as any,
-                        title: 'CBOMs',
-                        onListCallback,
+                renderPagedList({
+                    store,
+                    onListCallback,
+                    props: {
                         filterTitle: 'Filters',
                         getAvailableFiltersApi: (() => ({ subscribe: () => ({ unsubscribe: () => {} }) })) as any,
                         addHidden: true,
-                    }),
-                ),
+                    },
+                }),
             );
         });
         await flushEffects();
