@@ -17,9 +17,13 @@ export const validateRequired = () => (value: any) => {
 const getValueFromObject = (value: any) => {
     if (typeof value === 'object' && value && value.hasOwnProperty('label') && value.hasOwnProperty('value')) {
         return value['value']['data'];
-    } else {
-        return value;
     }
+    // Attribute content objects from list (select) fields are stored as {data, reference}.
+    // Extract the primitive data value so pattern validators can test it correctly.
+    if (typeof value === 'object' && value && value.hasOwnProperty('data')) {
+        return value['data'];
+    }
+    return value;
 };
 
 export const validatePattern = (pattern: RegExp, message?: string) => (value: any) => {

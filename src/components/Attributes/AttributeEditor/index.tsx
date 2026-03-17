@@ -957,9 +957,11 @@ function AttributeEditorInner({
             const mapCallbackItemToOption = (value: any) => {
                 return { label: value.reference ?? value.data?.toString?.() ?? String(value.data), value };
             };
-            const callbackContentOpts = {
-                [callbackId]: callbackData[callbackId].filter((v: any) => !isAttributeDescriptorModel(v)).map(mapCallbackItemToOption),
-            };
+            // Only update options for callbackId when the callback returned actual content values,
+            // not just group attribute descriptors. An empty update would overwrite existing options with [].
+            const nonDescriptorCallbackValues = callbackData[callbackId].filter((v: any) => !isAttributeDescriptorModel(v));
+            const callbackContentOpts =
+                nonDescriptorCallbackValues.length > 0 ? { [callbackId]: nonDescriptorCallbackValues.map(mapCallbackItemToOption) } : {};
 
             // multiple effects can modify opts during single render call
             // eslint-disable-next-line react-hooks/exhaustive-deps
