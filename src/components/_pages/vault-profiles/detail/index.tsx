@@ -1,22 +1,23 @@
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
-import Dialog from 'components/Dialog';
-import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
-import Container from 'components/Container';
-import Breadcrumb from 'components/Breadcrumb';
-
-import { actions as vaultProfileActions, selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
-import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 
+import AttributeViewer from 'components/Attributes/AttributeViewer';
+import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
+import Badge from 'components/Badge';
+import Breadcrumb from 'components/Breadcrumb';
+import Container from 'components/Container';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+
+import { actions as vaultProfileActions, selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from 'types/openapi';
-import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
 import { createWidgetDetailHeaders } from 'utils/widget';
-import Badge from 'components/Badge';
 import VaultProfileEditForm from '../edit-form';
 
 function VaultProfileDetail() {
@@ -175,6 +176,12 @@ function VaultProfileDetail() {
                     >
                         <CustomTable headers={detailHeaders} data={detailData} />
                     </Widget>
+
+                    {profile?.attributes && profile.attributes.length > 0 && (
+                        <Widget title="Attributes" titleSize="large">
+                            <AttributeViewer attributes={profile.attributes} />
+                        </Widget>
+                    )}
                 </Container>
 
                 {profile && (

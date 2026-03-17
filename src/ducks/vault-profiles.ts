@@ -1,10 +1,16 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { VaultProfileDetailDto, VaultProfileDto, VaultProfileRequestDto, VaultProfileUpdateRequestDto } from 'types/openapi';
 import { SearchRequestModel } from 'types/certificate';
+import type { AttributeDescriptorModel } from 'types/attributes';
 
 export type State = {
     vaultProfiles: VaultProfileDto[];
     vaultProfile: VaultProfileDetailDto | null;
+
+    vaultProfileAttributeDescriptors: AttributeDescriptorModel[];
+    vaultProfileAttributesVaultUuid: string | null;
+    isFetchingVaultProfileAttributes: boolean;
+
     isFetchingList: boolean;
     isFetchingDetail: boolean;
     isCreating: boolean;
@@ -17,6 +23,11 @@ export type State = {
 export const initialState: State = {
     vaultProfiles: [],
     vaultProfile: null,
+
+    vaultProfileAttributeDescriptors: [],
+    vaultProfileAttributesVaultUuid: null,
+    isFetchingVaultProfileAttributes: false,
+
     isFetchingList: false,
     isFetchingDetail: false,
     isCreating: false,
@@ -38,6 +49,27 @@ export const slice = createSlice({
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
+        },
+
+        getVaultProfileAttributes: (state, action: PayloadAction<{ vaultUuid: string }>) => {
+            state.isFetchingVaultProfileAttributes = true;
+            state.vaultProfileAttributesVaultUuid = action.payload.vaultUuid;
+        },
+
+        getVaultProfileAttributesSuccess: (state, action: PayloadAction<{ vaultUuid: string; attributes: AttributeDescriptorModel[] }>) => {
+            if (state.vaultProfileAttributesVaultUuid === action.payload.vaultUuid) {
+                state.vaultProfileAttributeDescriptors = action.payload.attributes as typeof state.vaultProfileAttributeDescriptors;
+                state.vaultProfileAttributesVaultUuid = action.payload.vaultUuid;
+            }
+            state.isFetchingVaultProfileAttributes = false;
+        },
+
+        getVaultProfileAttributesFailure: (state, action: PayloadAction<{ vaultUuid: string }>) => {
+            if (state.vaultProfileAttributesVaultUuid === action.payload.vaultUuid) {
+                state.vaultProfileAttributeDescriptors = [];
+                state.vaultProfileAttributesVaultUuid = null;
+            }
+            state.isFetchingVaultProfileAttributes = false;
         },
 
         listVaultProfiles: (state, _action: PayloadAction<SearchRequestModel | undefined>) => {
@@ -172,6 +204,10 @@ const isEnabling = createSelector(state, (state: State) => state.isEnabling);
 const isDisabling = createSelector(state, (state: State) => state.isDisabling);
 const isUpdating = createSelector(state, (state: State) => state.isUpdating);
 
+const vaultProfileAttributeDescriptors = createSelector(state, (state: State) => state.vaultProfileAttributeDescriptors);
+const vaultProfileAttributesVaultUuid = createSelector(state, (state: State) => state.vaultProfileAttributesVaultUuid);
+const isFetchingVaultProfileAttributes = createSelector(state, (state: State) => state.isFetchingVaultProfileAttributes);
+
 export const selectors = {
     state,
     vaultProfiles,
@@ -183,6 +219,9 @@ export const selectors = {
     isEnabling,
     isDisabling,
     isUpdating,
+    vaultProfileAttributeDescriptors,
+    vaultProfileAttributesVaultUuid,
+    isFetchingVaultProfileAttributes,
 };
 
 export const actions = slice.actions;

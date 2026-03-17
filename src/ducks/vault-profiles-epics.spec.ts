@@ -22,6 +22,9 @@ type EpicDeps = {
             updateVaultProfile: (args: any) => any;
             deleteVaultProfile: (args: any) => any;
         };
+        vaults: {
+            listVaultProfileAttributes: (args: any) => any;
+        };
     };
 };
 
@@ -30,6 +33,7 @@ enum VaultProfilesEpicIndex {
     Detail = 1,
     Create = 2,
     Delete = 6,
+    GetAttributes = 7,
 }
 
 vi.mock('../App', () => ({
@@ -63,9 +67,15 @@ async function runEpic(
         updateVaultProfile: () => of({ uuid: 'vp-1', name: 'P1', vaultInstance: { uuid: 'v-1', name: 'V1' }, enabled: true }),
         deleteVaultProfile: () => of(null),
     };
+
+    const defaultVaults = {
+        listVaultProfileAttributes: () => of([]),
+    };
+
     const deps: EpicDeps = {
         apiClients: {
             vaultProfiles: depsOverrides.vaultProfiles ? { ...defaultVaultProfiles, ...depsOverrides.vaultProfiles } : defaultVaultProfiles,
+            vaults: depsOverrides.vaults ? { ...defaultVaults, ...depsOverrides.vaults } : defaultVaults,
         },
     };
 
@@ -164,7 +174,7 @@ describe('vaultProfiles epics', () => {
     });
 
     test('getVaultProfileDetail success emits getVaultProfileDetailSuccess', async () => {
-        const profile = { uuid: 'vp-1', name: 'P1', vaultInstance: { uuid: 'v-1', name: 'V1' }, enabled: true };
+        const profile = { uuid: 'vp-1', name: 'P1', vaultInstance: { uuid: 'v-1', name: 'V1' }, enabled: true, attributes: [] };
         const emitted = await runEpic(
             VaultProfilesEpicIndex.Detail,
             vaultProfileActions.getVaultProfileDetail({ vaultUuid: 'v-1', vaultProfileUuid: 'vp-1' }),
@@ -222,5 +232,39 @@ describe('vaultProfiles epics', () => {
 
         expect(emitted[0].type).toBe(vaultProfileActions.deleteVaultProfileFailure.type);
         expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to delete Vault Profile' }));
+    });
+
+    test('getVaultProfileAttributes success emits getVaultProfileAttributesSuccess', async () => {
+        const attrs = [{ uuid: 'a-1', name: 'Attr' }] as any[];
+        const emitted = await runEpic(
+            VaultProfilesEpicIndex.GetAttributes,
+            vaultProfileActions.getVaultProfileAttributes({ vaultUuid: 'v-1' }),
+            {
+                vaults: {
+                    listVaultProfileAttributes: ({ uuid }: { uuid: string }) => {
+                        expect(uuid).toBe('v-1');
+                        return of(attrs);
+                    },
+                },
+            },
+        );
+        expect(emitted[0].type).toBe(vaultProfileActions.getVaultProfileAttributesSuccess.type);
+        expect((emitted[0] as unknown as { payload: { vaultUuid: string; attributes: unknown[] } }).payload.vaultUuid).toBe('v-1');
+        expect((emitted[0] as unknown as { payload: { vaultUuid: string; attributes: unknown[] } }).payload.attributes).toHaveLength(1);
+    });
+
+    test('getVaultProfileAttributes failure emits getVaultProfileAttributesFailure', async () => {
+        const err = new Error('attrs failed');
+        const emitted = await runEpic(
+            VaultProfilesEpicIndex.GetAttributes,
+            vaultProfileActions.getVaultProfileAttributes({ vaultUuid: 'v-1' }),
+            {
+                vaults: {
+                    listVaultProfileAttributes: () => throwError(() => err),
+                },
+            },
+        );
+        expect(emitted[0].type).toBe(vaultProfileActions.getVaultProfileAttributesFailure.type);
+        expect((emitted[0] as unknown as { payload: { vaultUuid: string } }).payload.vaultUuid).toBe('v-1');
     });
 });

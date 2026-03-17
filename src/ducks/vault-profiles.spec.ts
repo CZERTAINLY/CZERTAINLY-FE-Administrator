@@ -16,6 +16,9 @@ describe('vaultProfiles slice', () => {
             isFetchingDetail: true,
             isCreating: true,
             isDeleting: true,
+            vaultProfileAttributeDescriptors: [{ uuid: 'a-1' } as any],
+            vaultProfileAttributesVaultUuid: 'v-1',
+            isFetchingVaultProfileAttributes: true,
             tempOnlyKey: 'to-be-removed',
         } as any;
 
@@ -88,11 +91,59 @@ describe('vaultProfiles slice', () => {
         next = reducer({ ...next, isFetchingDetail: true }, actions.getVaultProfileDetailFailure({ error: 'err' }));
         expect(next.isFetchingDetail).toBe(false);
     });
+
+    test('getVaultProfileAttributes / success / failure update descriptors and flags', () => {
+        let next = reducer(initialState, actions.getVaultProfileAttributes({ vaultUuid: 'v-1' }));
+        expect(next.isFetchingVaultProfileAttributes).toBe(true);
+        expect(next.vaultProfileAttributesVaultUuid).toBe('v-1');
+
+        const attrs = [{ uuid: 'a-1', name: 'Attr1' }] as any[];
+        next = reducer(next, actions.getVaultProfileAttributesSuccess({ vaultUuid: 'v-1', attributes: attrs }));
+        expect(next.isFetchingVaultProfileAttributes).toBe(false);
+        expect(next.vaultProfileAttributeDescriptors).toEqual(attrs);
+        expect(next.vaultProfileAttributesVaultUuid).toBe('v-1');
+
+        next = reducer(
+            { ...next, vaultProfileAttributesVaultUuid: 'v-1', vaultProfileAttributeDescriptors: attrs },
+            actions.getVaultProfileAttributesFailure({ vaultUuid: 'v-1' }),
+        );
+        expect(next.vaultProfileAttributeDescriptors).toEqual([]);
+        expect(next.vaultProfileAttributesVaultUuid).toBeNull();
+        expect(next.isFetchingVaultProfileAttributes).toBe(false);
+    });
+
+    test('getVaultProfileAttributesSuccess ignores result when vaultUuid does not match', () => {
+        const attrs = [{ uuid: 'a-1' }] as any[];
+        const next = reducer(
+            { ...initialState, vaultProfileAttributesVaultUuid: 'v-other', isFetchingVaultProfileAttributes: true },
+            actions.getVaultProfileAttributesSuccess({ vaultUuid: 'v-1', attributes: attrs }),
+        );
+        expect(next.vaultProfileAttributeDescriptors).toEqual([]);
+        expect(next.vaultProfileAttributesVaultUuid).toBe('v-other');
+        expect(next.isFetchingVaultProfileAttributes).toBe(false);
+    });
+
+    test('getVaultProfileAttributesFailure clears descriptors only when vaultUuid matches', () => {
+        const attrs = [{ uuid: 'a-1' }] as any[];
+        const next = reducer(
+            {
+                ...initialState,
+                vaultProfileAttributesVaultUuid: 'v-1',
+                vaultProfileAttributeDescriptors: attrs,
+                isFetchingVaultProfileAttributes: true,
+            },
+            actions.getVaultProfileAttributesFailure({ vaultUuid: 'v-other' }),
+        );
+        expect(next.vaultProfileAttributeDescriptors).toEqual(attrs);
+        expect(next.vaultProfileAttributesVaultUuid).toBe('v-1');
+        expect(next.isFetchingVaultProfileAttributes).toBe(false);
+    });
 });
 
 describe('vaultProfiles selectors', () => {
     test('selectors read values from vaultProfiles state', () => {
         const profile = { uuid: 'vp-1', name: 'P', vaultInstance: { uuid: 'v-1', name: 'V' }, enabled: true } as any;
+        const attrs = [{ uuid: 'a-1' }] as any[];
         const vpState = {
             ...initialState,
             vaultProfiles: [profile],
@@ -101,6 +152,9 @@ describe('vaultProfiles selectors', () => {
             isFetchingDetail: true,
             isCreating: true,
             isDeleting: true,
+            vaultProfileAttributeDescriptors: attrs,
+            vaultProfileAttributesVaultUuid: 'v-1',
+            isFetchingVaultProfileAttributes: true,
         };
 
         const state = { vaultProfiles: vpState } as any;
@@ -111,5 +165,8 @@ describe('vaultProfiles selectors', () => {
         expect(selectors.isFetchingDetail(state)).toBe(true);
         expect(selectors.isCreating(state)).toBe(true);
         expect(selectors.isDeleting(state)).toBe(true);
+        expect(selectors.vaultProfileAttributeDescriptors(state)).toEqual(attrs);
+        expect(selectors.vaultProfileAttributesVaultUuid(state)).toBe('v-1');
+        expect(selectors.isFetchingVaultProfileAttributes(state)).toBe(true);
     });
 });
