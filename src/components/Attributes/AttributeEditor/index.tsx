@@ -910,8 +910,15 @@ function AttributeEditorInner({
             if (!callbackDescriptor) return;
             if (!isDataAttributeModel(callbackDescriptor) && !isCustomAttributeModel(callbackDescriptor)) return;
 
-            const callbackValues = callbackData[callbackId];
-            if (!Array.isArray(callbackValues) || callbackValues.length === 0) return;
+            const rawCallbackValues = callbackData[callbackId];
+            if (!Array.isArray(rawCallbackValues) || rawCallbackValues.length === 0) return;
+
+            // Filter out group attribute descriptors — they are additional fields added to the form,
+            // not content values for the current attribute. Without this filter, a callback that
+            // returns only descriptors (e.g. Algorithm returning RSA key size descriptor) would
+            // incorrectly clear the parent attribute's own value.
+            const callbackValues = rawCallbackValues.filter((v: any) => !isAttributeDescriptorModel(v));
+            if (callbackValues.length === 0) return;
 
             if (!callbackDescriptor.properties.list && callbackDescriptor.contentType !== AttributeContentType.Resource) {
                 const first = callbackValues[0] as any;
@@ -950,9 +957,11 @@ function AttributeEditorInner({
             const mapCallbackItemToOption = (value: any) => {
                 return { label: value.reference ?? value.data?.toString?.() ?? String(value.data), value };
             };
-            const callbackContentOpts = {
-                [callbackId]: callbackData[callbackId].filter((v: any) => !isAttributeDescriptorModel(v)).map(mapCallbackItemToOption),
-            };
+            // Only update options for callbackId when the callback returned actual content values,
+            // not just group attribute descriptors. An empty update would overwrite existing options with [].
+            const nonDescriptorCallbackValues = callbackData[callbackId].filter((v: any) => !isAttributeDescriptorModel(v));
+            const callbackContentOpts =
+                nonDescriptorCallbackValues.length > 0 ? { [callbackId]: nonDescriptorCallbackValues.map(mapCallbackItemToOption) } : {};
 
             // multiple effects can modify opts during single render call
             // eslint-disable-next-line react-hooks/exhaustive-deps
