@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -8,18 +8,18 @@ import Container from 'components/Container';
 import Select from 'components/Select';
 
 import { actions as secretsActions, selectors as secretsSelectors } from 'ducks/secrets';
-import { SecretDetailDto, VaultProfileDto } from 'types/openapi';
+import { selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
+import { SecretDetailDto } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
 interface SyncVaultProfileDialogProps {
     secret: SecretDetailDto;
-    vaultProfiles: VaultProfileDto[];
-    syncVaultProfileOptions: { value: string; label: string }[];
     onClose: () => void;
 }
 
-export const SyncVaultProfileDialog = ({ secret, vaultProfiles, syncVaultProfileOptions, onClose }: SyncVaultProfileDialogProps) => {
+export const SyncVaultProfileDialog = ({ secret, onClose }: SyncVaultProfileDialogProps) => {
     const dispatch = useDispatch();
+    const vaultProfiles = useSelector(vaultProfileSelectors.vaultProfiles);
     const syncVaultProfileAttributeDescriptors = useSelector(secretsSelectors.syncVaultProfileAttributeDescriptors);
     const isFetchingSyncVaultProfileAttributes = useSelector(secretsSelectors.isFetchingSyncVaultProfileAttributes);
 
@@ -27,6 +27,14 @@ export const SyncVaultProfileDialog = ({ secret, vaultProfiles, syncVaultProfile
 
     const methods = useForm({ mode: 'onChange', defaultValues: {} });
     const { getValues } = methods;
+
+    const syncVaultProfileOptions = useMemo(() => {
+        const existing = new Set<string>(secret.syncVaultProfiles?.map((p) => p.uuid) ?? []);
+        if (secret.sourceVaultProfile?.uuid) {
+            existing.add(secret.sourceVaultProfile.uuid);
+        }
+        return vaultProfiles.filter((p) => p.enabled && !existing.has(p.uuid)).map((p) => ({ value: p.uuid, label: p.name }));
+    }, [vaultProfiles, secret.syncVaultProfiles, secret.sourceVaultProfile]);
 
     useEffect(() => {
         if (!selectedVaultProfileUuid || !secret.type) return;

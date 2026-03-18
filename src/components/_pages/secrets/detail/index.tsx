@@ -31,7 +31,7 @@ import { createWidgetDetailHeaders } from 'utils/widget';
 
 import SecretForm from '../form';
 import SecretStateBadge from '../SecretStateBadge';
-import { SyncVaultProfileDialog } from '../SyncVaultProfileDialog';
+import { SyncVaultProfileDialog } from '../SyncVaultProfileDialog/SyncVaultProfileDialog';
 
 function SecretDetail() {
     const dispatch = useDispatch();
@@ -303,20 +303,6 @@ function SecretDetail() {
                 })),
         [vaultProfiles],
     );
-
-    const syncVaultProfileOptions = useMemo(() => {
-        const existing =
-            secret?.syncVaultProfiles?.reduce((set, profile) => {
-                set.add(profile.uuid);
-                return set;
-            }, new Set<string>()) ?? new Set<string>();
-
-        if (secret?.sourceVaultProfile?.uuid) {
-            existing.add(secret.sourceVaultProfile.uuid);
-        }
-
-        return vaultProfileOptions.filter((option) => !existing.has(option.value));
-    }, [secret, vaultProfileOptions]);
 
     const versionsHeaders: TableHeader[] = useMemo(
         () => [
@@ -675,14 +661,7 @@ function SecretDetail() {
                     <Dialog
                         isOpen={isAddSyncVaultProfileOpen}
                         caption="Add Sync Vault Profile"
-                        body={
-                            <SyncVaultProfileDialog
-                                secret={secret}
-                                vaultProfiles={vaultProfiles}
-                                syncVaultProfileOptions={syncVaultProfileOptions}
-                                onClose={() => setIsAddSyncVaultProfileOpen(false)}
-                            />
-                        }
+                        body={<SyncVaultProfileDialog secret={secret} onClose={() => setIsAddSyncVaultProfileOpen(false)} />}
                         toggle={() => setIsAddSyncVaultProfileOpen(false)}
                         size="md"
                         buttons={[]}
