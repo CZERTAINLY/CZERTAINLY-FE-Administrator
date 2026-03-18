@@ -17,7 +17,7 @@ test.describe('TabLayout', () => {
         await expect(component.getByTestId('tab-one-content')).toHaveText('Content 1');
     });
 
-    test('should render with onlyActiveTabContent false', async ({ mount }) => {
+    test('should render all tab contents with onlyActiveTabContent false but hide inactive ones', async ({ mount }) => {
         const component = await mount(
             <TabLayoutWithStore
                 tabs={[
@@ -27,8 +27,11 @@ test.describe('TabLayout', () => {
                 onlyActiveTabContent={false}
             />,
         );
-        await expect(component.getByTestId('a')).toBeVisible();
-        await expect(component.getByTestId('b')).toBeVisible();
+        const tabA = component.getByTestId('a');
+        const tabBWrapper = component.getByTestId('b').locator('..');
+
+        await expect(tabA).toBeVisible();
+        await expect(tabBWrapper).toHaveClass(/hidden/);
     });
 
     test('should switch content when second tab is clicked', async ({ mount }) => {

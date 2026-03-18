@@ -7,11 +7,12 @@ import {
     SearchFieldDataByGroupDto,
     SearchRequestDto,
 } from 'types/openapi';
-import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     cbomsData?: PaginationResponseDtoCbomDto;
     cbomDetail?: CbomDetailDto;
+    cbomDetailError?: string;
+    cbomDetailErrorStatusCode?: number;
     cbomVersions: CbomDto[];
     searchableFields: SearchFieldDataByGroupDto[];
 
@@ -73,20 +74,28 @@ export const slice = createSlice({
         // Get CBOM Detail
         getCbomDetail: (state, action: PayloadAction<{ uuid: string }>) => {
             state.cbomDetail = undefined;
+            state.cbomDetailError = undefined;
+            state.cbomDetailErrorStatusCode = undefined;
             state.isFetchingDetail = true;
         },
 
         getCbomDetailSuccess: (state, action: PayloadAction<{ detail: CbomDetailDto }>) => {
             state.cbomDetail = action.payload.detail;
+            state.cbomDetailError = undefined;
+            state.cbomDetailErrorStatusCode = undefined;
             state.isFetchingDetail = false;
         },
 
-        getCbomDetailFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+        getCbomDetailFailure: (state, action: PayloadAction<{ error: string | undefined; statusCode?: number }>) => {
+            state.cbomDetailError = action.payload.error;
+            state.cbomDetailErrorStatusCode = action.payload.statusCode;
             state.isFetchingDetail = false;
         },
 
         clearCbomDetail: (state, action: PayloadAction<void>) => {
             state.cbomDetail = undefined;
+            state.cbomDetailError = undefined;
+            state.cbomDetailErrorStatusCode = undefined;
         },
 
         // List CBOM Versions
@@ -189,11 +198,13 @@ export const slice = createSlice({
     },
 });
 
-const featureSelector = createFeatureSelector<State>('cbom');
+const featureSelector = (reduxStore: any): State => reduxStore['cbom'];
 
 export const selectCbomsData = createSelector(featureSelector, (state) => state.cbomsData);
 export const selectCbomList = createSelector(featureSelector, (state) => state.cbomsData?.items || []);
 export const selectCbomDetail = createSelector(featureSelector, (state) => state.cbomDetail);
+export const selectCbomDetailError = createSelector(featureSelector, (state) => state.cbomDetailError);
+export const selectCbomDetailErrorStatusCode = createSelector(featureSelector, (state) => state.cbomDetailErrorStatusCode);
 export const selectCbomVersions = createSelector(featureSelector, (state) => state.cbomVersions);
 export const selectSearchableFields = createSelector(featureSelector, (state) => state.searchableFields);
 
@@ -211,6 +222,8 @@ export const selectors = {
     selectCbomsData,
     selectCbomList,
     selectCbomDetail,
+    selectCbomDetailError,
+    selectCbomDetailErrorStatusCode,
     selectCbomVersions,
     selectSearchableFields,
     selectIsFetchingList,

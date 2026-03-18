@@ -353,7 +353,7 @@ export default function Sidebar({ allowedResources }: Props) {
         const pathname = location.pathname;
         const item = allowedMenuItems.find(
             (m): m is MenuItemMapping & { children: Array<{ link: string }> } =>
-                'children' in m && m.children.some((c) => c.link === pathname),
+                'children' in m && m.children.some((c) => pathname === c.link || pathname.startsWith(`${c.link}/`)),
         );
         return item ? item._key : null;
     }, [location.pathname, allowedMenuItems]);
@@ -380,7 +380,7 @@ export default function Sidebar({ allowedResources }: Props) {
         if ('children' in mapping) {
             const childrenKeys = mapping.children.map((child) => child.link);
             const activePage = location.pathname;
-            const isChildActive = childrenKeys.some((child) => child === activePage);
+            const isChildActive = childrenKeys.some((child) => child === activePage || activePage.startsWith(`${child}/`));
             const isActive = openMenuItems.includes(mapping._key);
             return (
                 <li key={mapping.header} className={cn('flex justify-center', { 'flex-col': menuSize != 'small' })}>

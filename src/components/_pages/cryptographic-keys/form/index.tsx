@@ -10,7 +10,7 @@ import { actions as userActions, selectors as userSelectors } from 'ducks/users'
 
 import { actions as cryptographicKeysActions, selectors as cryptographicKeysSelectors } from 'ducks/cryptographic-keys';
 import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } from 'ducks/token-profiles';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
@@ -232,7 +232,6 @@ export default function CryptographicKeyForm({ keyId, onSuccess, onCancel, usesG
                         },
                     }),
                 );
-                onSuccess?.();
             } else {
                 const selectedTokenProfile = tokenProfiles.find((p) => p.uuid === values.tokenProfile);
                 if (!selectedTokenProfile || !values.type) return;
@@ -256,7 +255,6 @@ export default function CryptographicKeyForm({ keyId, onSuccess, onCancel, usesG
                         usesGlobalModal: usesGlobalModal,
                     }),
                 );
-                onSuccess?.();
             }
         },
         [
@@ -267,10 +265,24 @@ export default function CryptographicKeyForm({ keyId, onSuccess, onCancel, usesG
             groupAttributesCallbackAttributes,
             resourceCustomAttributes,
             tokenProfiles,
-            onSuccess,
             usesGlobalModal,
         ],
     );
+
+    const wasCreatingRef = useRef(false);
+    const wasUpdatingRef = useRef(false);
+
+    useEffect(() => {
+        const justFinishedCreate = wasCreatingRef.current && !isCreating;
+        const justFinishedUpdate = wasUpdatingRef.current && !isUpdating;
+
+        if (justFinishedCreate || justFinishedUpdate) {
+            onSuccess?.();
+        }
+
+        wasCreatingRef.current = isCreating;
+        wasUpdatingRef.current = isUpdating;
+    }, [isCreating, isUpdating, onSuccess]);
 
     const optionsForType = () => {
         let options: { value: string; label: string }[] = [];
@@ -553,7 +565,7 @@ export default function CryptographicKeyForm({ keyId, onSuccess, onCancel, usesG
                         />
                     )}
 
-                    <TabLayout tabs={attributeTabs(watchedTokenProfileUuid)} noBorder />
+                    <TabLayout tabs={attributeTabs(watchedTokenProfileUuid)} noBorder onlyActiveTabContent={false} />
 
                     <Container className="flex-row justify-end modal-footer mt-4" gap={4}>
                         <Button variant="outline" onClick={onCancelClick} disabled={isSubmitting} type="button">
