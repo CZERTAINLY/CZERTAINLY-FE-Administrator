@@ -103,6 +103,23 @@ async function runEpic(
     return firstValueFrom(output$.pipe(take(takeCount), toArray()));
 }
 
+// Shared helpers for callbackConnector tests — keep test bodies below CPD token threshold
+
+function ccAction(uuid: string, extra: Record<string, unknown> = {}) {
+    return slice.actions.callbackConnector({
+        callbackId: 'cb',
+        callbackConnector: { uuid, requestAttributeCallback: { mappings: [] }, ...extra } as any,
+    });
+}
+
+async function assertV2Ok(uuid: string, stateOverride: object) {
+    const data = { v: 2 } as any;
+    const v2 = vi.fn(() => of(data));
+    const out = await runEpic(17, ccAction(uuid), { callback: { callbackV2: v2 } as any }, 1, stateOverride);
+    expect(v2).toHaveBeenCalledTimes(1);
+    expect(out[0]).toEqual(slice.actions.callbackSuccess({ callbackId: 'cb', data }));
+}
+
 describe('connectors epics', () => {
     test('listConnectors success emits listConnectorsSuccess, paging listSuccess and removeWidgetLock', async () => {
         const searchRequest = { pageNumber: 1, itemsPerPage: 10, filters: [] } as any;
@@ -749,23 +766,6 @@ describe('connectors epics', () => {
         expect(emitted[0]).toEqual(slice.actions.callbackSuccess({ callbackId: 'cb-1', data }));
     });
 
-    // Shared helpers for callbackConnector tests — keep test bodies below CPD token threshold
-
-    function ccAction(uuid: string, extra: Record<string, unknown> = {}) {
-        return slice.actions.callbackConnector({
-            callbackId: 'cb',
-            callbackConnector: { uuid, requestAttributeCallback: { mappings: [] }, ...extra } as any,
-        });
-    }
-
-    async function assertV2Ok(uuid: string, stateOverride: object) {
-        const data = { v: 2 } as any;
-        const v2 = vi.fn(() => of(data));
-        const out = await runEpic(17, ccAction(uuid), { callback: { callbackV2: v2 } as any }, 1, stateOverride);
-        expect(v2).toHaveBeenCalledTimes(1);
-        expect(out[0]).toEqual(slice.actions.callbackSuccess({ callbackId: 'cb', data }));
-    }
-
     test('callbackConnector with v1 connector uses V1 API with correct args', async () => {
         const data = { result: 'ok-v1' } as any;
         const v1 = vi.fn(({ uuid, functionGroup, kind }: { uuid: string; functionGroup: string; kind: string }) => {
@@ -793,7 +793,7 @@ describe('connectors epics', () => {
         const data = { r: 1 } as any;
         const v1 = vi.fn(() => of(data));
         const v2 = vi.fn(() => of({}));
-        const out = await runEpic(
+        await runEpic(
             17,
             ccAction('c-target', { functionGroup: 'FG', kind: 'k' }),
             { callback: { callback: v1, callbackV2: v2 } as any },
