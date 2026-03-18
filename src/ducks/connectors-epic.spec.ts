@@ -749,37 +749,208 @@ describe('connectors epics', () => {
         expect(emitted[0]).toEqual(slice.actions.callbackSuccess({ callbackId: 'cb-1', data }));
     });
 
-    test('callbackConnector with v1 connector emits callbackSuccess (skipped when connector not in state)', async () => {
+    test('callbackConnector with v1 connector emits callbackSuccess via V1 API', async () => {
         const data = { result: 'ok-v1' } as any;
         const action = slice.actions.callbackConnector({
             callbackId: 'cb-1',
             callbackConnector: { uuid: 'c-1', functionGroup: 'FG', kind: 'kind', requestAttributeCallback: { mappings: [] } } as any,
         });
 
-        const callbackMock = vi.fn();
+        const callbackMock = vi.fn(({ uuid, functionGroup, kind }: { uuid: string; functionGroup: string; kind: string }) => {
+            expect(uuid).toBe('c-1');
+            expect(functionGroup).toBe('FG');
+            expect(kind).toBe('kind');
+            return of(data);
+        });
+        const callbackV2Mock = vi.fn(() => of({}));
+
+        const emitted = await runEpic(17, action, { callback: { callback: callbackMock, callbackV2: callbackV2Mock } as any }, 1, {
+            connectors: { connectors: [{ uuid: 'c-1', version: ConnectorVersion.V1 }], connector: undefined },
+        });
+
+        expect(callbackMock).toHaveBeenCalledTimes(1);
+        expect(callbackV2Mock).not.toHaveBeenCalled();
+        expect(emitted[0]).toEqual(slice.actions.callbackSuccess({ callbackId: 'cb-1', data }));
+    });
+
+    test('callbackConnector finds connector in single-detail state when UUID matches', async () => {
+        const data = { result: 'detail-v2' } as any;
+        const action = slice.actions.callbackConnector({
+            callbackId: 'cb-det',
+            callbackConnector: { uuid: 'c-detail', requestAttributeCallback: { mappings: [] } } as any,
+        });
+
+        const callbackV2Mock = vi.fn(() => of(data));
+
+        const emitted = await runEpic(
+            17,
+            action,
+            { callback: { callbackV2: callbackV2Mock } as any },
+            1,
+            // connector detail in state matches the UUID — should pick V2
+            { connectors: { connectors: [], connector: { uuid: 'c-detail', version: ConnectorVersion.V2 } } },
+        );
+
+        expect(callbackV2Mock).toHaveBeenCalledTimes(1);
+        expect(emitted[0]).toEqual(slice.actions.callbackSuccess({ callbackId: 'cb-det', data }));
+    });
+
+    test('callbackConnector ignores single-detail connector when UUID does not match', async () => {
+        // connector detail belongs to a different connector — should fall through to V1 (not found)
+        const data = { result: 'v1-fallback' } as any;
+        const action = slice.actions.callbackConnector({
+            callbackId: 'cb-mismatch',
+            callbackConnector: { uuid: 'c-target', functionGroup: 'FG', kind: 'k', requestAttributeCallback: { mappings: [] } } as any,
+        });
+
+        const callbackMock = vi.fn(() => of(data));
         const callbackV2Mock = vi.fn(() => of({}));
 
         const emitted = await runEpic(
             17,
             action,
-            {
-                callback: {
-                    callback: callbackMock,
-                    callbackV2: callbackV2Mock,
-                } as any,
-            },
+            { callback: { callback: callbackMock, callbackV2: callbackV2Mock } as any },
             1,
-            {
-                connectors: {
-                    connectors: [{ uuid: 'c-1', version: ConnectorVersion.V1 }],
-                    connector: undefined,
-                },
-            },
+            // detail connector UUID does NOT match the target UUID
+            { connectors: { connectors: [], connector: { uuid: 'c-other', version: ConnectorVersion.V2 } } },
         );
 
-        // When connector state is present, v1 callback should be used.
-        // Current epic behaviour short-circuits when connector is missing, so just assert no v2 call.
+        // V2 must NOT be called; falls through to V1 (connector not found, isV2=false)
         expect(callbackV2Mock).not.toHaveBeenCalled();
+        expect(callbackMock).toHaveBeenCalledTimes(1);
+        expect(emitted[0]).toEqual(slice.actions.callbackSuccess({ callbackId: 'cb-mismatch', data }));
+    });
+
+    test('callbackConnector finds connector in tokens.tokenProviders and uses V2 API', async () => {
+        const data = { result: 'token-v2' } as any;
+        const action = slice.actions.callbackConnector({
+            callbackId: 'cb-tok',
+            callbackConnector: { uuid: 'c-tok', requestAttributeCallback: { mappings: [] } } as any,
+        });
+
+        const callbackV2Mock = vi.fn(() => of(data));
+
+        const emitted = await runEpic(17, action, { callback: { callbackV2: callbackV2Mock } as any }, 1, {
+            connectors: { connectors: [], connector: undefined },
+            tokens: { tokenProviders: [{ uuid: 'c-tok', version: ConnectorVersion.V2 }] },
+        });
+
+        expect(callbackV2Mock).toHaveBeenCalledTimes(1);
+        expect(emitted[0]).toEqual(slice.actions.callbackSuccess({ callbackId: 'cb-tok', data }));
+    });
+
+    test('callbackConnector finds connector in authorities.authorityProviders and uses V2 API', async () => {
+        const data = { result: 'auth-v2' } as any;
+        const action = slice.actions.callbackConnector({
+            callbackId: 'cb-auth',
+            callbackConnector: { uuid: 'c-auth', requestAttributeCallback: { mappings: [] } } as any,
+        });
+
+        const callbackV2Mock = vi.fn(() => of(data));
+
+        const emitted = await runEpic(17, action, { callback: { callbackV2: callbackV2Mock } as any }, 1, {
+            connectors: { connectors: [], connector: undefined },
+            authorities: { authorityProviders: [{ uuid: 'c-auth', version: ConnectorVersion.V2 }] },
+        });
+
+        expect(callbackV2Mock).toHaveBeenCalledTimes(1);
+        expect(emitted[0]).toEqual(slice.actions.callbackSuccess({ callbackId: 'cb-auth', data }));
+    });
+
+    test('callbackConnector finds connector in discoveries.discoveryProviders and uses V2 API', async () => {
+        const data = { result: 'disc-v2' } as any;
+        const action = slice.actions.callbackConnector({
+            callbackId: 'cb-disc',
+            callbackConnector: { uuid: 'c-disc', requestAttributeCallback: { mappings: [] } } as any,
+        });
+
+        const callbackV2Mock = vi.fn(() => of(data));
+
+        const emitted = await runEpic(17, action, { callback: { callbackV2: callbackV2Mock } as any }, 1, {
+            connectors: { connectors: [], connector: undefined },
+            discoveries: { discoveryProviders: [{ uuid: 'c-disc', version: ConnectorVersion.V2 }] },
+        });
+
+        expect(callbackV2Mock).toHaveBeenCalledTimes(1);
+        expect(emitted[0]).toEqual(slice.actions.callbackSuccess({ callbackId: 'cb-disc', data }));
+    });
+
+    test('callbackConnector finds connector in entities.entityProviders and uses V2 API', async () => {
+        const data = { result: 'ent-v2' } as any;
+        const action = slice.actions.callbackConnector({
+            callbackId: 'cb-ent',
+            callbackConnector: { uuid: 'c-ent', requestAttributeCallback: { mappings: [] } } as any,
+        });
+
+        const callbackV2Mock = vi.fn(() => of(data));
+
+        const emitted = await runEpic(17, action, { callback: { callbackV2: callbackV2Mock } as any }, 1, {
+            connectors: { connectors: [], connector: undefined },
+            entities: { entityProviders: [{ uuid: 'c-ent', version: ConnectorVersion.V2 }] },
+        });
+
+        expect(callbackV2Mock).toHaveBeenCalledTimes(1);
+        expect(emitted[0]).toEqual(slice.actions.callbackSuccess({ callbackId: 'cb-ent', data }));
+    });
+
+    test('callbackConnector finds connector in credentials.credentialProviders and uses V2 API', async () => {
+        const data = { result: 'cred-v2' } as any;
+        const action = slice.actions.callbackConnector({
+            callbackId: 'cb-cred',
+            callbackConnector: { uuid: 'c-cred', requestAttributeCallback: { mappings: [] } } as any,
+        });
+
+        const callbackV2Mock = vi.fn(() => of(data));
+
+        const emitted = await runEpic(17, action, { callback: { callbackV2: callbackV2Mock } as any }, 1, {
+            connectors: { connectors: [], connector: undefined },
+            credentials: { credentialProviders: [{ uuid: 'c-cred', version: ConnectorVersion.V2 }] },
+        });
+
+        expect(callbackV2Mock).toHaveBeenCalledTimes(1);
+        expect(emitted[0]).toEqual(slice.actions.callbackSuccess({ callbackId: 'cb-cred', data }));
+    });
+
+    test('callbackConnector finds connector in notifications.notificationInstanceProviders and uses V2 API', async () => {
+        const data = { result: 'notif-v2' } as any;
+        const action = slice.actions.callbackConnector({
+            callbackId: 'cb-notif',
+            callbackConnector: { uuid: 'c-notif', requestAttributeCallback: { mappings: [] } } as any,
+        });
+
+        const callbackV2Mock = vi.fn(() => of(data));
+
+        const emitted = await runEpic(17, action, { callback: { callbackV2: callbackV2Mock } as any }, 1, {
+            connectors: { connectors: [], connector: undefined },
+            notifications: { notificationInstanceProviders: [{ uuid: 'c-notif', version: ConnectorVersion.V2 }] },
+        });
+
+        expect(callbackV2Mock).toHaveBeenCalledTimes(1);
+        expect(emitted[0]).toEqual(slice.actions.callbackSuccess({ callbackId: 'cb-notif', data }));
+    });
+
+    test('callbackConnector defaults to V1 when connector not found in any state slice', async () => {
+        const data = { result: 'v1-default' } as any;
+        const action = slice.actions.callbackConnector({
+            callbackId: 'cb-unknown',
+            callbackConnector: { uuid: 'c-unknown', functionGroup: 'FG', kind: 'k', requestAttributeCallback: { mappings: [] } } as any,
+        });
+
+        const callbackMock = vi.fn(() => of(data));
+        const callbackV2Mock = vi.fn(() => of({}));
+
+        const emitted = await runEpic(
+            17,
+            action,
+            { callback: { callback: callbackMock, callbackV2: callbackV2Mock } as any },
+            1,
+            // empty state — connector not found anywhere
+            { connectors: { connectors: [], connector: undefined } },
+        );
+
+        expect(callbackV2Mock).not.toHaveBeenCalled();
+        expect(callbackMock).toHaveBeenCalledTimes(1);
+        expect(emitted[0]).toEqual(slice.actions.callbackSuccess({ callbackId: 'cb-unknown', data }));
     });
 
     test('callbackConnector failure (v2) emits callbackFailure and fetchError', async () => {
@@ -854,6 +1025,19 @@ describe('connectors epics', () => {
         expect(emitted[1]).toEqual(
             appRedirectActions.fetchError({ error: new Error('sync callback error'), message: 'Connector callback failure' }),
         );
+    });
+
+    test('callbackResource failure (observable error) emits callbackFailure and fetchError', async () => {
+        const err = new Error('resource callback observable failed');
+        const action = slice.actions.callbackResource({
+            callbackId: 'res-fail',
+            callbackResource: { uuid: 'c-1', functionGroup: 'FG', kind: 'kind', requestAttributeCallback: { mappings: [] } } as any,
+        });
+
+        const emitted = await runEpic(18, action, { callback: { resourceCallback: () => throwError(() => err) } as any }, 2);
+
+        expect(emitted[0]).toEqual(slice.actions.callbackFailure({ callbackId: 'res-fail' }));
+        expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Resource callback failure' }));
     });
 
     test('callbackResource outer catchError emits callbackFailure and fetchError when resourceCallback throws', async () => {
