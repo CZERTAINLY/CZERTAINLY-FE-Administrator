@@ -19,7 +19,9 @@ export type State = {
 
     isFetchingDetail: boolean;
     isCreating: boolean;
+    createLocationSucceeded: boolean;
     isUpdating: boolean;
+    updateLocationSucceeded: boolean;
     isDeleting: boolean;
 
     isEnabling: boolean;
@@ -42,8 +44,10 @@ export const initialState: State = {
 
     isFetchingDetail: false,
     isCreating: false,
+    createLocationSucceeded: false,
     isDeleting: false,
     isUpdating: false,
+    updateLocationSucceeded: false,
 
     isEnabling: false,
     isDisabling: false,
@@ -106,15 +110,18 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isCreating = true;
+            state.createLocationSucceeded = false;
         },
 
         addLocationSuccess: (state, action: PayloadAction<{ location: LocationResponseModel; entityUuid: string }>) => {
             state.isCreating = false;
+            state.createLocationSucceeded = true;
             state.locations.push(action.payload.location);
         },
 
         addLocationFailure: (state, action: PayloadAction<{ error: string }>) => {
             state.isCreating = false;
+            state.createLocationSucceeded = false;
         },
 
         editLocation: (
@@ -126,16 +133,19 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isUpdating = true;
+            state.updateLocationSucceeded = false;
         },
 
         editLocationSuccess: (state, action: PayloadAction<{ location: LocationResponseModel }>) => {
             state.isUpdating = false;
+            state.updateLocationSucceeded = true;
             const index = state.locations.findIndex((l) => l.uuid === action.payload.location.uuid);
             if (index > 0) state.locations[index] = action.payload.location;
         },
 
         editLocationFailure: (state, action: PayloadAction<{ error: string }>) => {
             state.isUpdating = false;
+            state.updateLocationSucceeded = false;
         },
 
         deleteLocation: (state, action: PayloadAction<{ entityUuid: string; uuid: string; redirect?: string }>) => {
@@ -322,7 +332,9 @@ export const isFetchingCSRAttributeDescriptors = createSelector(state, (state) =
 
 export const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 export const isCreating = createSelector(state, (state) => state.isCreating);
+export const createLocationSucceeded = createSelector(state, (state) => state.createLocationSucceeded);
 export const isUpdating = createSelector(state, (state) => state.isUpdating);
+export const updateLocationSucceeded = createSelector(state, (state) => state.updateLocationSucceeded);
 export const isDeleting = createSelector(state, (state) => state.isDeleting);
 
 export const isEnabling = createSelector(state, (state) => state.isEnabling);
@@ -350,7 +362,9 @@ export const selectors = {
 
     isFetchingDetail,
     isCreating,
+    createLocationSucceeded,
     isUpdating,
+    updateLocationSucceeded,
     isDeleting,
 
     isEnabling,

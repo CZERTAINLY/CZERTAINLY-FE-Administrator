@@ -18,6 +18,7 @@ import { actions as customAttributesActions, selectors as customAttributesSelect
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { collectFormAttributes } from 'utils/attributes/attributes';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
 import { Resource, VaultInstanceDto } from 'types/openapi';
 import type { VaultProfileRequestDto } from 'types/openapi';
@@ -46,6 +47,7 @@ export default function VaultProfileForm({ onCancel, onSuccess }: VaultProfileFo
 
     const vaults = useSelector(vaultSelectors.vaults);
     const isCreating = useSelector(vaultProfileSelectors.isCreating);
+    const createVaultProfileSucceeded = useSelector(vaultProfileSelectors.createVaultProfileSucceeded);
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
 
     useEffect(() => {
@@ -106,14 +108,11 @@ export default function VaultProfileForm({ onCancel, onSuccess }: VaultProfileFo
         [dispatch, getValues, resourceCustomAttributes],
     );
 
-    const wasCreatingRef = useRef(false);
+    const handleCreateSuccess = useCallback(() => {
+        onSuccess?.();
+    }, [onSuccess]);
 
-    useEffect(() => {
-        if (wasCreatingRef.current && !isCreating) {
-            onSuccess?.();
-        }
-        wasCreatingRef.current = isCreating;
-    }, [isCreating, onSuccess]);
+    useRunOnSuccessfulFinish(isCreating, createVaultProfileSucceeded, handleCreateSuccess);
 
     const handleCancel = useCallback(() => {
         onCancel?.();

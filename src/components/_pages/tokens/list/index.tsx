@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import Badge from 'components/Badge';
@@ -26,6 +26,8 @@ function TokenList() {
     const isUpdating = useSelector(selectors.isUpdating);
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
     const isCreating = useSelector(selectors.isCreating);
+    const createTokenSucceeded = useSelector(selectors.createTokenSucceeded);
+    const updateTokenSucceeded = useSelector(selectors.updateTokenSucceeded);
 
     const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting;
 
@@ -45,11 +47,11 @@ function TokenList() {
         getFreshData();
     }, [getFreshData]);
 
-    useRunOnFinished(isCreating, () => {
+    useRunOnSuccessfulFinish(isCreating, createTokenSucceeded, () => {
         setIsAddModalOpen(false);
         getFreshData();
     });
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateTokenSucceeded, () => {
         setEditingTokenId(undefined);
         getFreshData();
     });

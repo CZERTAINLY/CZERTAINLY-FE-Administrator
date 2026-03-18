@@ -13,7 +13,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/locations';
 import { actions as raActions, selectors as raSelectors } from 'ducks/ra-profiles';
 import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
@@ -288,6 +288,7 @@ export default function LocationDetail() {
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
     const isUpdating = useSelector(selectors.isUpdating);
+    const updateLocationSucceeded = useSelector(selectors.updateLocationSucceeded);
     const isFetchingPushAttributeDescriptors = useSelector(selectors.isFetchingPushAttributeDescriptors);
     const isFetchingCSRAttributeDescriptors = useSelector(selectors.isFetchingCSRAttributeDescriptors);
     const isPushingCertificate = useSelector(selectors.isPushingCertificate);
@@ -355,7 +356,7 @@ export default function LocationDetail() {
         dispatch(raActions.listRaProfiles());
     }, [dispatch, issueDialog]);
 
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateLocationSucceeded, () => {
         setIsEditModalOpen(false);
         getFreshLocationDetails();
     });

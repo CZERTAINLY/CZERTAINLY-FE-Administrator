@@ -5,7 +5,7 @@ import Widget from 'components/Widget';
 import { actions, selectors } from 'ducks/customAttributes';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useEffect, useMemo } from 'react';
-import { useAreDefaultValuesSame, useRunOnFinished } from 'utils/common-hooks';
+import { useAreDefaultValuesSame, useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
@@ -38,6 +38,8 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
     const isFetchingResources = useSelector(selectors.isFetchingResources);
     const isCreating = useSelector(selectors.isCreating);
     const isUpdating = useSelector(selectors.isUpdating);
+    const createCustomAttributeSucceeded = useSelector(selectors.createCustomAttributeSucceeded);
+    const updateCustomAttributeSucceeded = useSelector(selectors.updateCustomAttributeSucceeded);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const protectionLevelEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ProtectionLevel));
 
@@ -125,8 +127,8 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
         }
     }, [dispatch, editMode, id, customAttributeDetail?.uuid]);
 
-    useRunOnFinished(isCreating, onSuccess);
-    useRunOnFinished(isUpdating, onSuccess);
+    useRunOnSuccessfulFinish(isCreating, createCustomAttributeSucceeded, onSuccess);
+    useRunOnSuccessfulFinish(isUpdating, updateCustomAttributeSucceeded, onSuccess);
 
     useEffect(() => {
         if (watchedContentType === AttributeContentType.Boolean) {

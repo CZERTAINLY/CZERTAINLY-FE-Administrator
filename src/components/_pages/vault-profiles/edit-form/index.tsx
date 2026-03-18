@@ -14,6 +14,7 @@ import { actions as vaultProfileActions, selectors as vaultProfileSelectors } fr
 import { Resource } from 'types/openapi';
 import type { VaultProfileDetailDto } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
 interface VaultProfileEditFormProps {
     profile: VaultProfileDetailDto;
@@ -32,6 +33,7 @@ export default function VaultProfileEditForm({ profile, vaultUuid, onCancel, onS
 
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
     const isUpdating = useSelector(vaultProfileSelectors.isUpdating);
+    const updateVaultProfileSucceeded = useSelector(vaultProfileSelectors.updateVaultProfileSucceeded);
 
     useEffect(() => {
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.VaultProfiles));
@@ -69,10 +71,15 @@ export default function VaultProfileEditForm({ profile, vaultUuid, onCancel, onS
                     },
                 }),
             );
-            onSuccess?.();
         },
-        [dispatch, getValues, onSuccess, profile.uuid, resourceCustomAttributes, vaultUuid],
+        [dispatch, getValues, profile.uuid, resourceCustomAttributes, vaultUuid],
     );
+
+    const handleUpdateSuccess = useCallback(() => {
+        onSuccess?.();
+    }, [onSuccess]);
+
+    useRunOnSuccessfulFinish(isUpdating, updateVaultProfileSucceeded, handleUpdateSuccess);
 
     return (
         <FormProvider {...methods}>

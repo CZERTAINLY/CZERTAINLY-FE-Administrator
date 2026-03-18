@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import Badge from 'components/Badge';
@@ -24,7 +24,9 @@ function CredentialList() {
     const isDeleting = useSelector(selectors.isDeleting);
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
     const isCreating = useSelector(selectors.isCreating);
+    const createCredentialSucceeded = useSelector(selectors.createCredentialSucceeded);
     const isUpdating = useSelector(selectors.isUpdating);
+    const updateCredentialSucceeded = useSelector(selectors.updateCredentialSucceeded);
 
     const isBusy = isFetching || isDeleting || isBulkDeleting;
 
@@ -42,11 +44,11 @@ function CredentialList() {
         getFreshData();
     }, [getFreshData]);
 
-    useRunOnFinished(isCreating, () => {
+    useRunOnSuccessfulFinish(isCreating, createCredentialSucceeded, () => {
         setIsAddModalOpen(false);
         getFreshData();
     });
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateCredentialSucceeded, () => {
         setEditingCredentialId(undefined);
         getFreshData();
     });

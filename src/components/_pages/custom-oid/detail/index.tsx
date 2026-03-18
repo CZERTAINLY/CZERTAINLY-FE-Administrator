@@ -5,7 +5,7 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/oids';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -25,6 +25,7 @@ export default function CustomOIDDetail() {
     const isFetching = useSelector(selectors.isFetching);
     const isDeleting = useSelector(selectors.isDeleting);
     const isUpdating = useSelector(selectors.isUpdating);
+    const updateOidSucceeded = useSelector(selectors.updateOidSucceeded);
     const oidCategoryEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.OidCategory));
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
 
@@ -57,7 +58,7 @@ export default function CustomOIDDetail() {
         setIsEditDialogOpen(false);
     }, []);
 
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateOidSucceeded, () => {
         if (isEditDialogOpen) {
             handleCloseEditDialog();
             getFreshOIDDetails();

@@ -6,7 +6,7 @@ import TextInput from 'components/TextInput';
 import { actions, selectors } from 'ducks/certificateGroups';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -46,6 +46,8 @@ export default function GroupForm({ groupId, onCancel, onSuccess }: GroupFormPro
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const isCreating = useSelector(selectors.isCreating);
     const isUpdating = useSelector(selectors.isUpdating);
+    const createGroupSucceeded = useSelector(selectors.createGroupSucceeded);
+    const updateGroupSucceeded = useSelector(selectors.updateGroupSucceeded);
 
     const [group, setGroup] = useState<CertificateGroupResponseModel>();
 
@@ -168,8 +170,8 @@ export default function GroupForm({ groupId, onCancel, onSuccess }: GroupFormPro
         }
     }, [editMode, group, id, reset, isFetchingDetail]);
 
-    useRunOnFinished(isCreating, onSuccess);
-    useRunOnFinished(isUpdating, onSuccess);
+    useRunOnSuccessfulFinish(isCreating, createGroupSucceeded, onSuccess);
+    useRunOnSuccessfulFinish(isUpdating, updateGroupSucceeded, onSuccess);
 
     return (
         <FormProvider {...methods}>

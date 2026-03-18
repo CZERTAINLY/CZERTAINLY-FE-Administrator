@@ -15,8 +15,10 @@ export type State = {
     isFetchingList: boolean;
     isFetchingDetail: boolean;
     isCreating: boolean;
+    createNotificationProfileSucceeded: boolean;
     isDeleting: boolean;
     isUpdating: boolean;
+    updateNotificationProfileSucceeded: boolean;
 };
 
 export const initialState: State = {
@@ -24,8 +26,10 @@ export const initialState: State = {
     isFetchingList: false,
     isFetchingDetail: false,
     isCreating: false,
+    createNotificationProfileSucceeded: false,
     isDeleting: false,
     isUpdating: false,
+    updateNotificationProfileSucceeded: false,
 };
 
 export const slice = createSlice({
@@ -77,14 +81,17 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isCreating = true;
+            state.createNotificationProfileSucceeded = false;
         },
 
         createNotificationProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isCreating = false;
+            state.createNotificationProfileSucceeded = true;
         },
 
         createNotificationProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
+            state.createNotificationProfileSucceeded = false;
         },
 
         updateNotificationProfile: (
@@ -96,6 +103,7 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isUpdating = true;
+            state.updateNotificationProfileSucceeded = false;
         },
 
         updateNotificationProfileSuccess: (
@@ -103,11 +111,13 @@ export const slice = createSlice({
             action: PayloadAction<{ notificationProfile: NotificationProfileDetailModel; redirect?: string }>,
         ) => {
             state.isUpdating = false;
+            state.updateNotificationProfileSucceeded = true;
             state.notificationProfile = action.payload.notificationProfile;
         },
 
         updateNotificationProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateNotificationProfileSucceeded = false;
         },
 
         deleteNotificationProfile: (state, action: PayloadAction<{ uuid: string; redirect?: string }>) => {
@@ -136,8 +146,10 @@ const notificationProfiles = createSelector(state, (state: State) => state.notif
 const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
 const isCreating = createSelector(state, (state: State) => state.isCreating);
+const createNotificationProfileSucceeded = createSelector(state, (state: State) => state.createNotificationProfileSucceeded);
 const isDeleting = createSelector(state, (state: State) => state.isDeleting);
 const isUpdating = createSelector(state, (state: State) => state.isUpdating);
+const updateNotificationProfileSucceeded = createSelector(state, (state: State) => state.updateNotificationProfileSucceeded);
 
 export const selectors = {
     state,
@@ -148,8 +160,10 @@ export const selectors = {
     isFetchingList,
     isFetchingDetail,
     isCreating,
+    createNotificationProfileSucceeded,
     isDeleting,
     isUpdating,
+    updateNotificationProfileSucceeded,
 };
 
 export const actions = slice.actions;

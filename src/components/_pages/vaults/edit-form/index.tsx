@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -16,6 +16,7 @@ import { actions as connectorsActions } from 'ducks/connectors';
 import { AttributeDescriptorModel } from 'types/attributes';
 import { FunctionGroupCode, Resource, VaultInstanceDetailDto } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
 interface VaultEditFormProps {
     vault?: VaultInstanceDetailDto | null;
@@ -36,6 +37,7 @@ export default function VaultEditForm({ vault, onCancel, onSuccess }: VaultEditF
     const vaultInstanceAttributesConnectorUuid = useSelector(vaultSelectors.vaultInstanceAttributesConnectorUuid);
     const isFetchingVaultInstanceAttributes = useSelector(vaultSelectors.isFetchingVaultInstanceAttributes);
     const isUpdating = useSelector(vaultSelectors.isUpdating);
+    const updateVaultSucceeded = useSelector(vaultSelectors.updateVaultSucceeded);
 
     const connectorUuid = vault?.connector?.uuid;
 
@@ -97,14 +99,11 @@ export default function VaultEditForm({ vault, onCancel, onSuccess }: VaultEditF
         [dispatch, resourceCustomAttributes, vault, vaultAttributeDescriptors, groupAttributesCallbackAttributes],
     );
 
-    const wasUpdatingRef = useRef(false);
+    const handleUpdateSuccess = useCallback(() => {
+        onSuccess?.();
+    }, [onSuccess]);
 
-    useEffect(() => {
-        if (wasUpdatingRef.current && !isUpdating) {
-            onSuccess?.();
-        }
-        wasUpdatingRef.current = isUpdating;
-    }, [isUpdating, onSuccess]);
+    useRunOnSuccessfulFinish(isUpdating, updateVaultSucceeded, handleUpdateSuccess);
 
     const attributeTabs = useMemo(
         () => [

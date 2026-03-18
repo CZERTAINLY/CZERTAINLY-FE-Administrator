@@ -9,7 +9,7 @@ import { actions, selectors } from 'ducks/connectors';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as userInterfaceActions } from 'ducks/user-interface';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 
@@ -70,6 +70,7 @@ export default function ConnectorDetail() {
     const [confirmAuthorize, setConfirmAuthorize] = useState<boolean>(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
     const isUpdating = useSelector(selectors.isUpdating);
+    const updateConnectorSucceeded = useSelector(selectors.updateConnectorSucceeded);
 
     const getFreshConnectorDetails = useCallback(() => {
         if (!id) return;
@@ -125,7 +126,7 @@ export default function ConnectorDetail() {
         setCurrentFunctionGroupKindAttributes(attrs);
     }, [attributes, connector, currentFunctionGroup, currentFunctionGroupKind]);
 
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateConnectorSucceeded, () => {
         setIsEditModalOpen(false);
         getFreshConnectorDetails();
     });

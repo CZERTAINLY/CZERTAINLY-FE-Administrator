@@ -10,7 +10,7 @@ import CmpProfileForm from '../form';
 
 import { actions, selectors } from 'ducks/cmp-profiles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -33,6 +33,7 @@ export default function AdministratorDetail() {
     const isDisabling = useSelector(selectors.isDisabling);
     const isEnabling = useSelector(selectors.isEnabling);
     const isUpdating = useSelector(selectors.isUpdating);
+    const updateCmpProfileSucceeded = useSelector(selectors.updateCmpProfileSucceeded);
     const cmpCmpProfileVariantEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CmpProfileVariant));
     const protectionMethodEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ProtectionMethod));
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
@@ -61,7 +62,7 @@ export default function AdministratorDetail() {
         dispatch(groupsActions.listGroups());
     }, [dispatch]);
 
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateCmpProfileSucceeded, () => {
         setIsEditModalOpen(false);
         getFreshCmpProfile();
     });

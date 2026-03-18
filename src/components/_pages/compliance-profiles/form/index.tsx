@@ -4,7 +4,7 @@ import Widget from 'components/Widget';
 
 import { actions, selectors } from 'ducks/compliance-profiles';
 import { useCallback, useEffect, useMemo } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -37,6 +37,7 @@ function ComplianceProfileForm({ complianceProfileId, onCancel, onSuccess }: Com
     const navigate = useNavigate();
 
     const isCreating = useSelector(selectors.isCreating);
+    const createComplianceProfileSucceeded = useSelector(selectors.createComplianceProfileSucceeded);
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
 
@@ -78,7 +79,7 @@ function ComplianceProfileForm({ complianceProfileId, onCancel, onSuccess }: Com
         formState: { isSubmitting, isValid, isDirty },
     } = methods;
 
-    useRunOnFinished(isCreating, onSuccess);
+    useRunOnSuccessfulFinish(isCreating, createComplianceProfileSucceeded, onSuccess);
 
     return (
         <FormProvider {...methods}>

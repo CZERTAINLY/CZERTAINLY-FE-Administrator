@@ -7,7 +7,7 @@ import { actions as alertActions } from 'ducks/alerts';
 import { actions as connectorActions } from 'ducks/connectors';
 import { actions as entityActions, selectors as entitySelectors } from 'ducks/entities';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -58,7 +58,9 @@ export default function EntityForm({ entityId, onCancel, onSuccess }: EntityForm
     const isFetchingEntityProviders = useSelector(entitySelectors.isFetchingEntityProviders);
     const isFetchingAttributeDescriptors = useSelector(entitySelectors.isFetchingEntityProviderAttributeDescriptors);
     const isCreating = useSelector(entitySelectors.isCreating);
+    const createEntitySucceeded = useSelector(entitySelectors.createEntitySucceeded);
     const isUpdating = useSelector(entitySelectors.isUpdating);
+    const updateEntitySucceeded = useSelector(entitySelectors.updateEntitySucceeded);
 
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
@@ -266,8 +268,8 @@ export default function EntityForm({ entityId, onCancel, onSuccess }: EntityForm
         return <AttributeEditor id="customEntity" attributeDescriptors={resourceCustomAttributes} attributes={entity?.customAttributes} />;
     }, [isBusy, entity, resourceCustomAttributes]);
 
-    useRunOnFinished(isCreating, onSuccess);
-    useRunOnFinished(isUpdating, onSuccess);
+    useRunOnSuccessfulFinish(isCreating, createEntitySucceeded, onSuccess);
+    useRunOnSuccessfulFinish(isUpdating, updateEntitySucceeded, onSuccess);
 
     return (
         <FormProvider {...methods}>

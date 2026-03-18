@@ -79,15 +79,22 @@ export const useCopyToClipboard = () => {
     return copyToClipboard;
 };
 
-export function useRunOnFinished(flag: boolean, callback?: () => void) {
-    const wasTrue = useRef(flag);
+/**
+ * Calls `callback` only when async operation finished successfully.
+ *
+ * Usage pattern:
+ * - `isLoading` goes `true -> false`
+ * - `isSucceeded` must be `true` for the same operation
+ */
+export function useRunOnSuccessfulFinish(isLoading: boolean, isSucceeded: boolean, callback?: () => void) {
+    const wasLoading = useRef(isLoading);
 
     useEffect(() => {
-        if (wasTrue.current && !flag) {
+        if (wasLoading.current && !isLoading && isSucceeded) {
             callback?.();
         }
-        wasTrue.current = flag;
-    }, [flag, callback]);
+        wasLoading.current = isLoading;
+    }, [isLoading, isSucceeded, callback]);
 }
 
 export function useAreDefaultValuesSame(defaultValues: Record<string, unknown>) {

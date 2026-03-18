@@ -7,7 +7,7 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { Link } from 'react-router';
 import Select from 'components/Select';
 import { PlatformEnum, Resource } from 'types/openapi';
@@ -27,6 +27,7 @@ const TriggerList = () => {
     const isFetchingList = useSelector(rulesSelectors.isFetchingTriggers);
     const isDeleting = useSelector(rulesSelectors.isDeletingTrigger);
     const isCreatingTrigger = useSelector(rulesSelectors.isCreatingTrigger);
+    const createTriggerSucceeded = useSelector(rulesSelectors.createTriggerSucceeded);
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
@@ -51,7 +52,7 @@ const TriggerList = () => {
         dispatch(rulesActions.listTriggers({ resource: selectedResource }));
     }, [dispatch, selectedResource]);
 
-    useRunOnFinished(isCreatingTrigger, () => {
+    useRunOnSuccessfulFinish(isCreatingTrigger, createTriggerSucceeded, () => {
         setIsAddModalOpen(false);
         getFreshList();
     });

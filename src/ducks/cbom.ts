@@ -26,6 +26,7 @@ export type State = {
     isDeleting: boolean;
     isBulkDeleting: boolean;
     isSyncing: boolean;
+    syncSucceeded: boolean;
 };
 
 export const initialState: State = {
@@ -41,6 +42,7 @@ export const initialState: State = {
     isDeleting: false,
     isBulkDeleting: false,
     isSyncing: false,
+    syncSucceeded: false,
 };
 
 export const slice = createSlice({
@@ -187,14 +189,17 @@ export const slice = createSlice({
         // Sync CBOMs
         syncCboms: (state, action: PayloadAction<void>) => {
             state.isSyncing = true;
+            state.syncSucceeded = false;
         },
 
         syncCbomsSuccess: (state, action: PayloadAction<void>) => {
             state.isSyncing = false;
+            state.syncSucceeded = true;
         },
 
         syncCbomsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isSyncing = false;
+            state.syncSucceeded = false;
         },
     },
 });
@@ -218,6 +223,7 @@ export const selectIsUploadSuccess = createSelector(featureSelector, (state) => 
 export const selectIsDeleting = createSelector(featureSelector, (state) => state.isDeleting);
 export const selectIsBulkDeleting = createSelector(featureSelector, (state) => state.isBulkDeleting);
 export const selectIsSyncing = createSelector(featureSelector, (state) => state.isSyncing);
+export const selectSyncSucceeded = createSelector(featureSelector, (state) => state.syncSucceeded);
 
 export const selectors = {
     selectCbomsData,
@@ -236,6 +242,7 @@ export const selectors = {
     selectIsDeleting,
     selectIsBulkDeleting,
     selectIsSyncing,
+    selectSyncSucceeded,
 };
 
 export const { actions } = slice;

@@ -2,7 +2,7 @@ import Widget from 'components/Widget';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo } from 'react';
-import { useAreDefaultValuesSame, useRunOnFinished } from 'utils/common-hooks';
+import { useAreDefaultValuesSame, useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { actions as resourceActions, selectors as resourceSelectors } from 'ducks/resource';
@@ -42,6 +42,7 @@ const TriggerForm = ({ onCancel, onSuccess }: TriggerFormProps = {}) => {
     const allResourceEvents = useSelector(resourceSelectors.allResourceEvents);
     const rules = useSelector(rulesSelectors.rules);
     const isCreatingTrigger = useSelector(rulesSelectors.isCreatingTrigger);
+    const createTriggerSucceeded = useSelector(rulesSelectors.createTriggerSucceeded);
 
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const resourceEventEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
@@ -177,7 +178,7 @@ const TriggerForm = ({ onCancel, onSuccess }: TriggerFormProps = {}) => {
         [dispatch],
     );
 
-    useRunOnFinished(isCreatingTrigger, onSuccess);
+    useRunOnSuccessfulFinish(isCreatingTrigger, createTriggerSucceeded, onSuccess);
 
     const areDefaultValuesSame = useAreDefaultValuesSame(defaultValues as unknown as Record<string, unknown>);
 

@@ -2,7 +2,7 @@ import Widget from 'components/Widget';
 import { EntityType, actions as filterActions } from 'ducks/filters';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo } from 'react';
-import { useAreDefaultValuesSame, useRunOnFinished } from 'utils/common-hooks';
+import { useAreDefaultValuesSame, useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
@@ -34,6 +34,7 @@ const RulesForm = ({ onCancel, onSuccess }: RulesFormProps = {}) => {
 
     const conditions = useSelector(rulesSelectors.conditions);
     const isCreatingRule = useSelector(rulesSelectors.isCreatingRule);
+    const createRuleSucceeded = useSelector(rulesSelectors.createRuleSucceeded);
     const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
     const isBusy = useMemo(() => isCreatingRule || isFetchingResourcesList, [isCreatingRule, isFetchingResourcesList]);
@@ -83,7 +84,7 @@ const RulesForm = ({ onCancel, onSuccess }: RulesFormProps = {}) => {
         };
     }, [dispatch]);
 
-    useRunOnFinished(isCreatingRule, onSuccess);
+    useRunOnSuccessfulFinish(isCreatingRule, createRuleSucceeded, onSuccess);
 
     const submitTitle = 'Create';
     const inProgressTitle = 'Creating...';
@@ -234,7 +235,7 @@ const RulesForm = ({ onCancel, onSuccess }: RulesFormProps = {}) => {
                                 inProgressTitle={inProgressTitle}
                                 inProgress={isSubmitting}
                                 disabled={
-                                    areDefaultValuesSame(formValues as ruleFormValues) ||
+                                    areDefaultValuesSame(formValues as unknown as Record<string, unknown>) ||
                                     formValues.resource === Resource.None ||
                                     isSubmitting ||
                                     !isValid ||

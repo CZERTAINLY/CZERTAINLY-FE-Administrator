@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -23,6 +23,7 @@ import { AttributeDescriptorModel } from 'types/attributes';
 import { ConnectorResponseModel } from 'types/connectors';
 import { ConnectorInterface, FilterConditionOperator, FilterFieldSource, FunctionGroupCode, Resource } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
 interface VaultFormProps {
     onCancel?: () => void;
@@ -42,6 +43,7 @@ export default function VaultForm({ onCancel, onSuccess }: VaultFormProps) {
     const connectors = useSelector(connectorsSelectors.connectors);
     const isCreating = useSelector(vaultSelectors.isCreating);
     const createdVault = useSelector(vaultSelectors.vault);
+    const createVaultSucceeded = useSelector(vaultSelectors.createVaultSucceeded);
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
     const vaultInstanceAttributesConnectorUuid = useSelector(vaultSelectors.vaultInstanceAttributesConnectorUuid);
     const vaultInstanceAttributeDescriptors = useSelector(vaultSelectors.vaultInstanceAttributeDescriptors);
@@ -165,14 +167,11 @@ export default function VaultForm({ onCancel, onSuccess }: VaultFormProps) {
         [dispatch, resourceCustomAttributes, vaultAttributeDescriptors, groupAttributesCallbackAttributes],
     );
 
-    const wasCreatingRef = useRef(false);
+    const handleCreateSuccess = useCallback(() => {
+        if (createdVault) onSuccess?.();
+    }, [createdVault, onSuccess]);
 
-    useEffect(() => {
-        if (wasCreatingRef.current && !isCreating && createdVault) {
-            onSuccess?.();
-        }
-        wasCreatingRef.current = isCreating;
-    }, [isCreating, createdVault, onSuccess]);
+    useRunOnSuccessfulFinish(isCreating, createVaultSucceeded, handleCreateSuccess);
 
     const handleCancel = useCallback(() => {
         onCancel?.();

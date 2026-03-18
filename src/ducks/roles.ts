@@ -24,8 +24,10 @@ export type State = {
     isFetchingUsers: boolean;
     isFetchingPermissions: boolean;
     isCreating: boolean;
+    createRoleSucceeded: boolean;
     isDeleting: boolean;
     isUpdating: boolean;
+    updateRoleSucceeded: boolean;
     isUpdatingPermissions: boolean;
     isUpdatingUsers: boolean;
 };
@@ -43,8 +45,10 @@ export const initialState: State = {
     isFetchingUsers: false,
     isFetchingPermissions: false,
     isCreating: false,
+    createRoleSucceeded: false,
     isDeleting: false,
     isUpdating: false,
+    updateRoleSucceeded: false,
     isUpdatingPermissions: false,
     isUpdatingUsers: false,
 };
@@ -106,19 +110,23 @@ export const slice = createSlice({
 
         create: (state, action: PayloadAction<RoleRequestModel>) => {
             state.isCreating = true;
+            state.createRoleSucceeded = false;
         },
 
         createSuccess: (state, action: PayloadAction<{ role: RoleDetailModel }>) => {
             state.roles = [...state.roles, action.payload.role];
             state.isCreating = false;
+            state.createRoleSucceeded = true;
         },
 
         createFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
+            state.createRoleSucceeded = false;
         },
 
         update: (state, action: PayloadAction<{ uuid: string; roleRequest: RoleRequestModel }>) => {
             state.isUpdating = true;
+            state.updateRoleSucceeded = false;
         },
 
         updateSuccess: (state, action: PayloadAction<{ role: RoleDetailModel }>) => {
@@ -129,10 +137,12 @@ export const slice = createSlice({
             }
 
             state.isUpdating = false;
+            state.updateRoleSucceeded = true;
         },
 
         updateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateRoleSucceeded = false;
         },
 
         delete: (state, action: PayloadAction<{ uuid: string; redirect?: string }>) => {
@@ -237,8 +247,10 @@ const isFetchingPermissions = createSelector(state, (state) => state.isFetchingP
 const isFetchingUsers = createSelector(state, (state) => state.isFetchingUsers);
 
 const isCreating = createSelector(state, (state) => state.isCreating);
+const createRoleSucceeded = createSelector(state, (state) => state.createRoleSucceeded);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isUpdating = createSelector(state, (state) => state.isUpdating);
+const updateRoleSucceeded = createSelector(state, (state) => state.updateRoleSucceeded);
 const isUpdatingUsers = createSelector(state, (state) => state.isUpdatingUsers);
 const isUpdatingPermissions = createSelector(state, (state) => state.isUpdatingPermissions);
 
@@ -258,8 +270,10 @@ export const selectors = {
     isFetchingUsers,
 
     isCreating,
+    createRoleSucceeded,
     isDeleting,
     isUpdating,
+    updateRoleSucceeded,
     isUpdatingUsers,
     isUpdatingPermissions,
 };

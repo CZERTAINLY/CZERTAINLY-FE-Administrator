@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
@@ -34,7 +34,9 @@ export default function ConnectorList() {
     const isBulkReconnecting = useSelector(selectors.isBulkReconnecting);
     const isBulkAuthorizing = useSelector(selectors.isBulkAuthorizing);
     const isCreating = useSelector(selectors.isCreating);
+    const createConnectorSucceeded = useSelector(selectors.createConnectorSucceeded);
     const isUpdating = useSelector(selectors.isUpdating);
+    const updateConnectorSucceeded = useSelector(selectors.updateConnectorSucceeded);
 
     const isBusy = isDeleting || isBulkDeleting || isForceDeleting || isBulkReconnecting || isBulkAuthorizing;
 
@@ -48,10 +50,10 @@ export default function ConnectorList() {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
     }, [bulkDeleteErrorMessages]);
 
-    useRunOnFinished(isCreating, () => {
+    useRunOnSuccessfulFinish(isCreating, createConnectorSucceeded, () => {
         setIsAddModalOpen(false);
     });
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateConnectorSucceeded, () => {
         setEditingConnectorId(undefined);
     });
 

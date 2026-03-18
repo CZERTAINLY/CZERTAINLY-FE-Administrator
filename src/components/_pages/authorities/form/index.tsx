@@ -9,7 +9,7 @@ import { actions as authorityActions, selectors as authoritySelectors } from 'du
 import { actions as connectorActions } from 'ducks/connectors';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -64,6 +64,8 @@ export default function AuthorityForm({ authorityId, onCancel, onSuccess }: Auth
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
     const isCreating = useSelector(authoritySelectors.isCreating);
     const isUpdating = useSelector(authoritySelectors.isUpdating);
+    const createAuthoritySucceeded = useSelector(authoritySelectors.createAuthoritySucceeded);
+    const updateAuthoritySucceeded = useSelector(authoritySelectors.updateAuthoritySucceeded);
 
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
@@ -345,8 +347,8 @@ export default function AuthorityForm({ authorityId, onCancel, onSuccess }: Auth
         );
     }, [resourceCustomAttributes, authority, isBusy]);
 
-    useRunOnFinished(isCreating, onSuccess);
-    useRunOnFinished(isUpdating, onSuccess);
+    useRunOnSuccessfulFinish(isCreating, createAuthoritySucceeded, onSuccess);
+    useRunOnSuccessfulFinish(isUpdating, updateAuthoritySucceeded, onSuccess);
 
     return (
         <div>

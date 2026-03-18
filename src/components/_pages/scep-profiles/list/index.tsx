@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import Container from 'components/Container';
@@ -31,6 +31,8 @@ export default function ScepProfiles() {
     const isBulkDisabling = useSelector(selectors.isBulkDisabling);
     const isBulkForceDeleting = useSelector(selectors.isBulkForceDeleting);
     const isCreating = useSelector(selectors.isCreating);
+    const createScepProfileSucceeded = useSelector(selectors.createScepProfileSucceeded);
+    const updateScepProfileSucceeded = useSelector(selectors.updateScepProfileSucceeded);
 
     const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isBulkEnabling || isBulkDisabling || isBulkForceDeleting;
 
@@ -52,11 +54,11 @@ export default function ScepProfiles() {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
     }, [bulkDeleteErrorMessages]);
 
-    useRunOnFinished(isCreating, () => {
+    useRunOnSuccessfulFinish(isCreating, createScepProfileSucceeded, () => {
         setIsAddModalOpen(false);
         getFreshData();
     });
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateScepProfileSucceeded, () => {
         setEditingScepProfileId(undefined);
         getFreshData();
     });

@@ -163,14 +163,37 @@ describe('connectors slice', () => {
 
         let next = reducer(initialState, actions.createConnector({ name: 'New' } as any));
         expect(next.isCreating).toBe(true);
+        expect(next.createConnectorSucceeded).toBe(false);
 
         next = reducer(next, actions.createConnectorSuccess({ connector }));
         expect(next.isCreating).toBe(false);
+        expect(next.createConnectorSucceeded).toBe(true);
         expect(next.connectors).toContainEqual(connector);
         expect(next.connector).toEqual(connector);
 
         next = reducer({ ...next, isCreating: true }, actions.createConnectorFailure());
         expect(next.isCreating).toBe(false);
+        expect(next.createConnectorSucceeded).toBe(false);
+    });
+
+    test('updateConnector / success / failure updates updateConnectorSucceeded', () => {
+        const updated = { uuid: 'c-1', name: 'Updated' } as any;
+        const listWithMatch = [{ uuid: 'c-1', name: 'Old' } as any, { uuid: 'c-2' } as any];
+
+        let next = reducer(
+            { ...initialState, connectors: listWithMatch, connector: { uuid: 'c-1', name: 'Old' } as any },
+            actions.updateConnector({ uuid: 'c-1', connectorUpdateRequest: { name: 'Updated' } } as any),
+        );
+        expect(next.isUpdating).toBe(true);
+        expect(next.updateConnectorSucceeded).toBe(false);
+
+        next = reducer(next, actions.updateConnectorSuccess({ connector: updated }));
+        expect(next.isUpdating).toBe(false);
+        expect(next.updateConnectorSucceeded).toBe(true);
+
+        next = reducer({ ...next, isUpdating: true }, actions.updateConnectorFailure());
+        expect(next.isUpdating).toBe(false);
+        expect(next.updateConnectorSucceeded).toBe(false);
     });
 
     test('updateConnectorSuccess updates list by index or push, and current connector when uuid matches', () => {
@@ -448,10 +471,12 @@ describe('connectors selectors', () => {
             isFetchingAttributes: true,
             isFetchingAllAttributes: true,
             isCreating: true,
+            createConnectorSucceeded: true,
             isDeleting: true,
             isBulkDeleting: true,
             isBulkForceDeleting: true,
             isUpdating: true,
+            updateConnectorSucceeded: true,
             isConnecting: true,
             isReconnecting: true,
             isBulkReconnecting: true,
@@ -480,10 +505,12 @@ describe('connectors selectors', () => {
         expect(selectors.isFetchingAttributes(state)).toBe(true);
         expect(selectors.isFetchingAllAttributes(state)).toBe(true);
         expect(selectors.isCreating(state)).toBe(true);
+        expect(selectors.createConnectorSucceeded(state)).toBe(true);
         expect(selectors.isDeleting(state)).toBe(true);
         expect(selectors.isBulkDeleting(state)).toBe(true);
         expect(selectors.isBulkForceDeleting(state)).toBe(true);
         expect(selectors.isUpdating(state)).toBe(true);
+        expect(selectors.updateConnectorSucceeded(state)).toBe(true);
         expect(selectors.isConnecting(state)).toBe(true);
         expect(selectors.isBulkConnecting(state)).toBe(true);
         expect(selectors.isReconnecting(state)).toBe(true);

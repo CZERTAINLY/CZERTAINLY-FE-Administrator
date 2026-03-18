@@ -41,9 +41,11 @@ export type State = {
     isDeleting: boolean;
     isBulkDeleting: boolean;
     isUpdating: boolean;
+    createCryptographicKeySucceeded: boolean;
     isEnabling: boolean;
     isBulkEnabling: boolean;
     isDisabling: boolean;
+    updateCryptographicKeySucceeded: boolean;
     isBulkDisabling: boolean;
     isCompromising: boolean;
     isBulkCompromising: boolean;
@@ -74,9 +76,11 @@ export const initialState: State = {
     isUpdatingKeyUsage: false,
     isBulkUpdatingKeyUsage: false,
     isCreating: false,
+    createCryptographicKeySucceeded: false,
     isDeleting: false,
     isBulkDeleting: false,
     isUpdating: false,
+    updateCryptographicKeySucceeded: false,
     isEnabling: false,
     isDisabling: false,
     isBulkEnabling: false,
@@ -192,6 +196,7 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isCreating = true;
+            state.createCryptographicKeySucceeded = false;
         },
 
         createCryptographicKeyFromGlobalModal: (
@@ -204,6 +209,7 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isCreating = true;
+            state.createCryptographicKeySucceeded = false;
         },
 
         listAttributeDescriptors: (
@@ -228,10 +234,12 @@ export const slice = createSlice({
 
         createCryptographicKeySuccess: (state, action: PayloadAction<{ uuid: string; tokenInstanceUuid: string }>) => {
             state.isCreating = false;
+            state.createCryptographicKeySucceeded = true;
         },
 
         createCryptographicKeyFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
+            state.createCryptographicKeySucceeded = false;
         },
 
         updateCryptographicKey: (
@@ -243,6 +251,7 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isUpdating = true;
+            state.updateCryptographicKeySucceeded = false;
         },
 
         updateCryptographicKeySuccess: (
@@ -250,11 +259,13 @@ export const slice = createSlice({
             action: PayloadAction<{ cryptographicKey: CryptographicKeyDetailResponseModel; redirect?: string }>,
         ) => {
             state.isUpdating = false;
+            state.updateCryptographicKeySucceeded = true;
             state.cryptographicKey = action.payload.cryptographicKey;
         },
 
         updateCryptographicKeyFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateCryptographicKeySucceeded = false;
         },
 
         updateCryptographicKeyItem: (
@@ -751,6 +762,8 @@ const isCreating = createSelector(state, (state: State) => state.isCreating);
 const isDeleting = createSelector(state, (state: State) => state.isDeleting);
 const isBulkDeleting = createSelector(state, (state: State) => state.isBulkDeleting);
 const isUpdating = createSelector(state, (state: State) => state.isUpdating);
+const createCryptographicKeySucceeded = createSelector(state, (state: State) => state.createCryptographicKeySucceeded);
+const updateCryptographicKeySucceeded = createSelector(state, (state: State) => state.updateCryptographicKeySucceeded);
 const isEnabling = createSelector(state, (state: State) => state.isEnabling);
 const isBulkEnabling = createSelector(state, (state: State) => state.isBulkEnabling);
 const isDisabling = createSelector(state, (state: State) => state.isDisabling);
@@ -782,9 +795,11 @@ export const selectors = {
     isFetchingKeyPairs,
     isFetchingDetail,
     isCreating,
+    createCryptographicKeySucceeded,
     isDeleting,
     isBulkDeleting,
     isUpdating,
+    updateCryptographicKeySucceeded,
     isEnabling,
     isBulkEnabling,
     isDisabling,

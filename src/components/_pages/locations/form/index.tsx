@@ -7,7 +7,7 @@ import { actions as entityActions, selectors as entitySelectors } from 'ducks/en
 
 import { actions as locationActions, selectors as locationSelectors } from 'ducks/locations';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -60,7 +60,9 @@ export default function LocationForm({ locationId, entityId: propEntityId, onCan
     const isFetchingLocationDetail = useSelector(locationSelectors.isFetchingDetail);
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
     const isCreating = useSelector(locationSelectors.isCreating);
+    const createLocationSucceeded = useSelector(locationSelectors.createLocationSucceeded);
     const isUpdating = useSelector(locationSelectors.isUpdating);
+    const updateLocationSucceeded = useSelector(locationSelectors.updateLocationSucceeded);
 
     const isFetchingLocationAttributeDescriptors = useSelector(entitySelectors.isFetchingLocationAttributeDescriptors);
     const isFetchingEntities = useSelector(pagingSelectors.isFetchingList(EntityType.ENTITY));
@@ -244,8 +246,8 @@ export default function LocationForm({ locationId, entityId: propEntityId, onCan
         );
     }, [isBusy, location, resourceCustomAttributes]);
 
-    useRunOnFinished(isCreating, onSuccess);
-    useRunOnFinished(isUpdating, onSuccess);
+    useRunOnSuccessfulFinish(isCreating, createLocationSucceeded, onSuccess);
+    useRunOnSuccessfulFinish(isUpdating, updateLocationSucceeded, onSuccess);
 
     return (
         <FormProvider {...methods}>

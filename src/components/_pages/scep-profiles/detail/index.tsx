@@ -10,7 +10,7 @@ import CertificateStatus from 'components/_pages/certificates/CertificateStatus'
 
 import { actions, selectors } from 'ducks/scep-profiles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import ScepProfileForm from '../form';
@@ -34,6 +34,7 @@ export default function ScepProfileDetail() {
     const isDisabling = useSelector(selectors.isDisabling);
     const isEnabling = useSelector(selectors.isEnabling);
     const isUpdating = useSelector(selectors.isUpdating);
+    const updateScepProfileSucceeded = useSelector(selectors.updateScepProfileSucceeded);
     const users = useSelector(userSelectors.users);
     const groups = useSelector(groupsSelectors.certificateGroups);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
@@ -60,7 +61,7 @@ export default function ScepProfileDetail() {
         dispatch(groupsActions.listGroups());
     }, [dispatch]);
 
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateScepProfileSucceeded, () => {
         setIsEditModalOpen(false);
         getFreshScepProfile();
     });

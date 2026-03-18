@@ -6,7 +6,7 @@ import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { Link } from 'react-router';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
@@ -24,6 +24,7 @@ const ConditionsList = () => {
     const isFetchingList = useSelector(rulesSelectors.isFetchingConditions);
     const isDeleting = useSelector(rulesSelectors.isDeletingCondition);
     const isCreatingCondition = useSelector(rulesSelectors.isCreatingCondition);
+    const createConditionSucceeded = useSelector(rulesSelectors.createConditionSucceeded);
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
@@ -39,7 +40,7 @@ const ConditionsList = () => {
         dispatch(rulesActions.listConditions({ resource: selectedResource }));
     }, [dispatch, selectedResource]);
 
-    useRunOnFinished(isCreatingCondition, () => {
+    useRunOnSuccessfulFinish(isCreatingCondition, createConditionSucceeded, () => {
         setIsAddModalOpen(false);
         getFreshListConditionGroups();
     });

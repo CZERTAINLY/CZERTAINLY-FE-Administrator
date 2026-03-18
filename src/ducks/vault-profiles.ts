@@ -9,10 +9,12 @@ export type State = {
     isFetchingList: boolean;
     isFetchingDetail: boolean;
     isCreating: boolean;
+    createVaultProfileSucceeded: boolean;
     isDeleting: boolean;
     isEnabling: boolean;
     isDisabling: boolean;
     isUpdating: boolean;
+    updateVaultProfileSucceeded: boolean;
 };
 
 export const initialState: State = {
@@ -21,10 +23,12 @@ export const initialState: State = {
     isFetchingList: false,
     isFetchingDetail: false,
     isCreating: false,
+    createVaultProfileSucceeded: false,
     isDeleting: false,
     isEnabling: false,
     isDisabling: false,
     isUpdating: false,
+    updateVaultProfileSucceeded: false,
 };
 
 export const slice = createSlice({
@@ -63,15 +67,18 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isCreating = true;
+            state.createVaultProfileSucceeded = false;
         },
 
         createVaultProfileSuccess: (state, action: PayloadAction<{ profile: VaultProfileDto }>) => {
             state.isCreating = false;
+            state.createVaultProfileSucceeded = true;
             state.vaultProfiles.push(action.payload.profile);
         },
 
         createVaultProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
+            state.createVaultProfileSucceeded = false;
         },
 
         deleteVaultProfile: (
@@ -146,10 +153,12 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isUpdating = true;
+            state.updateVaultProfileSucceeded = false;
         },
 
         updateVaultProfileSuccess: (state, action: PayloadAction<{ profile: VaultProfileDetailDto }>) => {
             state.isUpdating = false;
+            state.updateVaultProfileSucceeded = true;
             if (state.vaultProfile?.uuid === action.payload.profile.uuid) {
                 state.vaultProfile = action.payload.profile;
             }
@@ -157,6 +166,7 @@ export const slice = createSlice({
 
         updateVaultProfileFailure: (state, _action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateVaultProfileSucceeded = false;
         },
     },
 });
@@ -168,10 +178,12 @@ const vaultProfile = createSelector(state, (state: State) => state.vaultProfile)
 const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
 const isCreating = createSelector(state, (state: State) => state.isCreating);
+const createVaultProfileSucceeded = createSelector(state, (state: State) => state.createVaultProfileSucceeded);
 const isDeleting = createSelector(state, (state: State) => state.isDeleting);
 const isEnabling = createSelector(state, (state: State) => state.isEnabling);
 const isDisabling = createSelector(state, (state: State) => state.isDisabling);
 const isUpdating = createSelector(state, (state: State) => state.isUpdating);
+const updateVaultProfileSucceeded = createSelector(state, (state: State) => state.updateVaultProfileSucceeded);
 
 export const selectors = {
     state,
@@ -180,10 +192,12 @@ export const selectors = {
     isFetchingList,
     isFetchingDetail,
     isCreating,
+    createVaultProfileSucceeded,
     isDeleting,
     isEnabling,
     isDisabling,
     isUpdating,
+    updateVaultProfileSucceeded,
 };
 
 export const actions = slice.actions;

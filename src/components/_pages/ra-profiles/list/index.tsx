@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
@@ -26,6 +26,8 @@ function RaProfileList() {
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
     const isUpdating = useSelector(selectors.isUpdating);
     const isCreating = useSelector(selectors.isCreating);
+    const createRaProfileSucceeded = useSelector(selectors.createRaProfileSucceeded);
+    const updateRaProfileSucceeded = useSelector(selectors.updateRaProfileSucceeded);
     const isEnabling = useSelector(selectors.isEnabling);
     const isBulkEnabling = useSelector(selectors.isBulkEnabling);
     const isBulkDisabling = useSelector(selectors.isBulkDisabling);
@@ -47,12 +49,12 @@ function RaProfileList() {
         getFreshData();
     }, [getFreshData]);
 
-    useRunOnFinished(isCreating, () => {
+    useRunOnSuccessfulFinish(isCreating, createRaProfileSucceeded, () => {
         setIsAddModalOpen(false);
         setEditingAuthorityId(undefined);
         getFreshData();
     });
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateRaProfileSucceeded, () => {
         setEditingRaProfileId(undefined);
         setEditingAuthorityId(undefined);
         getFreshData();

@@ -10,7 +10,7 @@ import { actions as raProfileActions, selectors as raProfileSelectors } from 'du
 import { actions as scepProfileActions, selectors as scepProfileSelectors } from 'ducks/scep-profiles';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
@@ -75,6 +75,8 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
     const isFetchingDetail = useSelector(scepProfileSelectors.isFetchingDetail);
     const isCreating = useSelector(scepProfileSelectors.isCreating);
     const isUpdating = useSelector(scepProfileSelectors.isUpdating);
+    const createScepProfileSucceeded = useSelector(scepProfileSelectors.createScepProfileSucceeded);
+    const updateScepProfileSucceeded = useSelector(scepProfileSelectors.updateScepProfileSucceeded);
 
     const isFetchingRaProfilesList = useSelector(raProfileSelectors.isFetchingList);
     const isFetchingIssuanceAttributes = useSelector(raProfileSelectors.isFetchingIssuanceAttributes);
@@ -401,8 +403,8 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
         groupOptions,
     ]);
 
-    useRunOnFinished(isCreating, onSuccess);
-    useRunOnFinished(isUpdating, onSuccess);
+    useRunOnSuccessfulFinish(isCreating, createScepProfileSucceeded, onSuccess);
+    useRunOnSuccessfulFinish(isUpdating, updateScepProfileSucceeded, onSuccess);
 
     const allFormValues = useWatch({ control });
     const isEqual = useMemo(() => deepEqual(defaultValues, allFormValues), [defaultValues, allFormValues]);
