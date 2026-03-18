@@ -53,6 +53,7 @@ export const slice = createSlice({
 
         getVaultProfileAttributes: (state, action: PayloadAction<{ vaultUuid: string }>) => {
             state.isFetchingVaultProfileAttributes = true;
+            state.vaultProfileAttributeDescriptors = [];
             state.vaultProfileAttributesVaultUuid = action.payload.vaultUuid;
         },
 
@@ -60,16 +61,16 @@ export const slice = createSlice({
             if (state.vaultProfileAttributesVaultUuid === action.payload.vaultUuid) {
                 state.vaultProfileAttributeDescriptors = action.payload.attributes as typeof state.vaultProfileAttributeDescriptors;
                 state.vaultProfileAttributesVaultUuid = action.payload.vaultUuid;
+                state.isFetchingVaultProfileAttributes = false;
             }
-            state.isFetchingVaultProfileAttributes = false;
         },
 
         getVaultProfileAttributesFailure: (state, action: PayloadAction<{ vaultUuid: string }>) => {
             if (state.vaultProfileAttributesVaultUuid === action.payload.vaultUuid) {
                 state.vaultProfileAttributeDescriptors = [];
                 state.vaultProfileAttributesVaultUuid = null;
+                state.isFetchingVaultProfileAttributes = false;
             }
-            state.isFetchingVaultProfileAttributes = false;
         },
 
         listVaultProfiles: (state, _action: PayloadAction<SearchRequestModel | undefined>) => {

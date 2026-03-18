@@ -274,6 +274,7 @@ function createVaultProfileReadyState(
             vaultProfile: {
                 uuid: 'vp-1',
                 vaultInstance: { uuid: 'vault-1' },
+                attributes: [],
                 customAttributes: custom,
             },
         },

@@ -28,7 +28,7 @@ export interface GenericSecretContent {
      */
     type: SecretType;
     /**
-     * Generic secret content represented as string. In case secret content are binary data, it should be encoded as BASE64 string
+     * Generic secret content represented as string. In case secret content is binary data, it should be encoded as BASE64 string.
      * @type {string}
      * @memberof GenericSecretContent
      */
