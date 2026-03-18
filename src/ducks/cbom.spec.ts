@@ -45,7 +45,7 @@ describe('cbom slice', () => {
         expect(next.isFetchingList).toBe(false);
     });
 
-    test('listCbomsSuccess filters out stale already deleted UUIDs', () => {
+    test('listCbomsSuccess stores payload as-is (filtering handled in epic)', () => {
         const state = {
             ...initialState,
             deletedCbomUuids: ['cbom-deleted'],
@@ -62,8 +62,7 @@ describe('cbom slice', () => {
 
         const next = reducer(state, actions.listCbomsSuccess({ data: payload }));
 
-        expect(next.cbomsData?.items).toEqual([{ uuid: 'cbom-2' }]);
-        expect(next.cbomsData?.totalItems).toBe(1);
+        expect(next.cbomsData).toEqual(payload);
         expect(next.isFetchingList).toBe(false);
     });
 

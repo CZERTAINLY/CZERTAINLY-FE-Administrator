@@ -65,22 +65,7 @@ export const slice = createSlice({
         },
 
         listCbomsSuccess: (state, action: PayloadAction<{ data: PaginationResponseDtoCbomDto }>) => {
-            const deletedUuids = new Set(state.deletedCbomUuids);
-            const originalItems = action.payload.data.items ?? [];
-
-            if (deletedUuids.size === 0) {
-                state.cbomsData = action.payload.data;
-            } else {
-                const filteredItems = originalItems.filter((item) => !deletedUuids.has(item.uuid));
-                const removedItemsCount = originalItems.length - filteredItems.length;
-                const totalItems = action.payload.data.totalItems ?? originalItems.length;
-
-                state.cbomsData = {
-                    ...action.payload.data,
-                    items: filteredItems,
-                    totalItems: Math.max(0, totalItems - removedItemsCount),
-                };
-            }
+            state.cbomsData = action.payload.data;
             state.isFetchingList = false;
         },
 

@@ -85,6 +85,36 @@ describe('cbom epics', () => {
         expect(emitted[3].payload.widgetName).toBe(LockWidgetNameEnum.ListOfCboms);
     });
 
+    test('listCboms success adjusts paging totalItems for locally deleted cboms', async () => {
+        const searchRequest = { pageNumber: 1, itemsPerPage: 10, filters: [] } as any;
+        const response = {
+            items: [{ uuid: 'cbom-deleted' }, { uuid: 'cbom-visible-1' }, { uuid: 'cbom-visible-2' }],
+            totalItems: 3,
+            pageNumber: 1,
+            itemsPerPage: 10,
+            totalPages: 1,
+        } as any;
+
+        const deps = createDeps({
+            listCboms: () => of(response),
+        });
+
+        const state$ = { value: { cbom: { deletedCbomUuids: ['cbom-deleted'] } } } as any;
+
+        const output$ = (cbomEpics[0] as any)(of(slice.actions.listCboms(searchRequest)), state$, deps as any);
+        const emitted = (await firstValueFrom(output$.pipe(take(4), toArray()))) as any[];
+        const adjustedResponse = {
+            ...response,
+            items: [{ uuid: 'cbom-visible-1' }, { uuid: 'cbom-visible-2' }],
+            totalItems: 2,
+        };
+
+        expect(emitted[0]).toEqual(pagingActions.list(EntityType.CBOM));
+        expect(emitted[1]).toEqual(slice.actions.listCbomsSuccess({ data: adjustedResponse }));
+        expect(emitted[2]).toEqual(pagingActions.listSuccess({ entity: EntityType.CBOM, totalItems: 2 }));
+        expect(emitted[3]).toEqual(userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfCboms));
+    });
+
     test('getCbomDetail success emits getCbomDetailSuccess and removeWidgetLock', async () => {
         const uuid = 'cbom-detail-1';
         const detail = { uuid, version: 4, serialNumber: 'urn:cbom:1' } as any;
