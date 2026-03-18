@@ -391,7 +391,7 @@ export default function CertificateList({
 
             <Dialog
                 isOpen={updateGroup}
-                caption="Update Groups"
+                caption="Override Groups"
                 body={
                     <CertificateGroupDialog
                         uuids={checkedRows}
@@ -407,7 +407,7 @@ export default function CertificateList({
 
             <Dialog
                 isOpen={updateOwner}
-                caption="Update Owner"
+                caption="Override Owner"
                 body={
                     <CertificateOwnerDialog
                         users={users}

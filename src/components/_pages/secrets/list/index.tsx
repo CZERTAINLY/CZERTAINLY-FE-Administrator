@@ -196,19 +196,19 @@ export default function SecretsList() {
             {
                 icon: 'user',
                 disabled: checkedRows.length === 0,
-                tooltip: 'Update Owner',
+                tooltip: 'Override Owner',
                 onClick: () => setIsUpdateOwnerOpen(true),
             },
             {
                 icon: 'group',
                 disabled: checkedRows.length === 0,
-                tooltip: 'Update Groups',
+                tooltip: 'Override Groups',
                 onClick: () => setIsUpdateGroupsOpen(true),
             },
             {
                 icon: 'plug',
                 disabled: checkedRows.length === 0,
-                tooltip: 'Update Source Vault Profile',
+                tooltip: 'Override Source Vault Profile',
                 onClick: () => setIsUpdateVaultProfileOpen(true),
             },
         ],
