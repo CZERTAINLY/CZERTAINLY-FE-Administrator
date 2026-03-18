@@ -879,17 +879,17 @@ function AttributeEditorInner({
         };
     }, [formValues]);
 
-    /* c8 ignore start */
     // When a running callback finishes, re-trigger doCallbacks so that any pending form
     // changes (that were skipped while isRunningCb was true) can now fire their callbacks.
+    /* istanbul ignore next */
     const prevIsRunningCbRef = useRef(isRunningCb);
+    /* istanbul ignore next */
     useEffect(() => {
         if (prevIsRunningCbRef.current && !isRunningCb) {
             debouncedDoCallbacksRef.current();
         }
         prevIsRunningCbRef.current = isRunningCb;
     }, [isRunningCb]);
-    /* c8 ignore stop */
 
     /* istanbul ignore next */
     useEffect(() => {
