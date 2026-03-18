@@ -615,6 +615,7 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
 
                                 <TabLayout
                                     noBorder
+                                    onlyActiveTabContent={false}
                                     tabs={[
                                         {
                                             title: 'Issue Attributes',

@@ -434,6 +434,7 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
 
                         <TabLayout
                             noBorder
+                            onlyActiveTabContent={false}
                             tabs={[
                                 {
                                     title: 'Connector Attributes',

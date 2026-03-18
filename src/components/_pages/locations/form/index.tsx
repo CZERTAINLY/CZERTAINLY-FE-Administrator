@@ -330,6 +330,7 @@ export default function LocationForm({ locationId, entityId: propEntityId, onCan
 
                         <TabLayout
                             noBorder
+                            onlyActiveTabContent={false}
                             tabs={[
                                 {
                                     title: 'Connector Attributes',

@@ -406,6 +406,7 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
 
                         <TabLayout
                             noBorder
+                            onlyActiveTabContent={false}
                             tabs={[
                                 {
                                     title: 'Connector Attributes',

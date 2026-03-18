@@ -379,6 +379,7 @@ export default function EntityForm({ entityId, onCancel, onSuccess }: EntityForm
 
                         <TabLayout
                             noBorder
+                            onlyActiveTabContent={false}
                             tabs={[
                                 {
                                     title: 'Connector Attributes',

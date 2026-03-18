@@ -281,7 +281,7 @@ export default function VaultForm({ onCancel, onSuccess }: VaultFormProps) {
                             )}
                         />
 
-                        <TabLayout tabs={attributeTabs} />
+                        <TabLayout tabs={attributeTabs} onlyActiveTabContent={false} />
 
                         <Container className="flex-row justify-end modal-footer" gap={4}>
                             <Button variant="outline" onClick={handleCancel} type="button">

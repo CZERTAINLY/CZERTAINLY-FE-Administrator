@@ -684,6 +684,7 @@ export default function AcmeProfileForm({ acmeProfileId, onCancel, onSuccess }: 
                                 />
                                 <TabLayout
                                     noBorder
+                                    onlyActiveTabContent={false}
                                     tabs={[
                                         {
                                             title: 'Issue Attributes',

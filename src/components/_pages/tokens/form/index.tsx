@@ -404,6 +404,7 @@ export default function TokenForm({ tokenId, onCancel, onSuccess }: TokenFormPro
 
                         <TabLayout
                             noBorder
+                            onlyActiveTabContent={false}
                             tabs={[
                                 {
                                     title: 'Connector Attributes',

@@ -770,6 +770,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                         <Widget title="Attributes" noBorder>
                             <TabLayout
                                 noBorder
+                                onlyActiveTabContent={false}
                                 tabs={[
                                     {
                                         title: 'Attributes',

@@ -468,6 +468,7 @@ export default function AuthorityForm({ authorityId, onCancel, onSuccess }: Auth
 
                                 <TabLayout
                                     noBorder
+                                    onlyActiveTabContent={false}
                                     tabs={[
                                         {
                                             title: 'Connector Attributes',

@@ -808,6 +808,7 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
 
                                         <TabLayout
                                             noBorder
+                                            onlyActiveTabContent={false}
                                             tabs={[
                                                 {
                                                     title: 'Issue Attributes',
