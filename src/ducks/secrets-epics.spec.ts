@@ -211,7 +211,7 @@ describe('secrets epics', () => {
     test('addSyncVaultProfile success emits addSyncVaultProfileSuccess, getSecretDetail and success alert', async () => {
         const emitted = await runEpic(
             SecretsEpicIndex.AddSyncVaultProfile,
-            secretsActions.addSyncVaultProfile({ uuid: 's-1', vaultProfileUuid: 'vp-1' } as any),
+            secretsActions.addSyncVaultProfile({ uuid: 's-1', vaultProfileUuid: 'vp-1', attributes: [] }),
             {},
             3,
         );
@@ -225,7 +225,7 @@ describe('secrets epics', () => {
         const err = new Error('failed');
         const emitted = await runEpic(
             SecretsEpicIndex.AddSyncVaultProfile,
-            secretsActions.addSyncVaultProfile({ uuid: 's-1', vaultProfileUuid: 'vp-1' } as any),
+            secretsActions.addSyncVaultProfile({ uuid: 's-1', vaultProfileUuid: 'vp-1', attributes: [] }),
             {
                 secrets: {
                     addVaultProfileToSecret: () => throwError(() => err),

@@ -1,6 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { SearchRequestModel } from 'types/certificate';
-import { AttributeDescriptorModel } from 'types/attributes';
+import { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
 import {
     SecretDetailDto,
     SecretDto,
@@ -164,7 +164,10 @@ export const slice = createSlice({
             state.isUpdating = false;
         },
 
-        addSyncVaultProfile: (state, _action: PayloadAction<{ uuid: string; vaultProfileUuid: string }>) => {
+        addSyncVaultProfile: (
+            state,
+            _action: PayloadAction<{ uuid: string; vaultProfileUuid: string; attributes: AttributeRequestModel[] }>,
+        ) => {
             state.isUpdating = true;
         },
 

@@ -226,7 +226,7 @@ const addSyncVaultProfile: AppEpic = (action$, state$, deps) => {
                 .addVaultProfileToSecret({
                     uuid: action.payload.uuid,
                     vaultProfileUuid: action.payload.vaultProfileUuid,
-                    requestAttribute: [],
+                    requestAttribute: action.payload.attributes,
                 })
                 .pipe(
                     mergeMap(() =>
