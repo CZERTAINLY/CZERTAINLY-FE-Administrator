@@ -254,7 +254,18 @@ const getVaultProfileAttributes: AppEpic = (action$, state$, deps) => {
                         attributes: list.map((attr: any) => transformAttributeDescriptorDtoToModel(attr)),
                     });
                 }),
-                catchError(() => of(slice.actions.getVaultProfileAttributesFailure({ vaultUuid }))),
+                catchError((err) =>
+                    of(
+                        slice.actions.getVaultProfileAttributesFailure({
+                            vaultUuid,
+                            error: extractError(err, 'Failed to get Vault Profile Attribute Descriptor list'),
+                        }),
+                        appRedirectActions.fetchError({
+                            error: err,
+                            message: 'Failed to get Vault Profile Attribute Descriptor list',
+                        }),
+                    ),
+                ),
             );
         }),
     );

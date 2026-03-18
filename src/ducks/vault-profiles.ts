@@ -65,7 +65,7 @@ export const slice = createSlice({
             }
         },
 
-        getVaultProfileAttributesFailure: (state, action: PayloadAction<{ vaultUuid: string }>) => {
+        getVaultProfileAttributesFailure: (state, action: PayloadAction<{ vaultUuid: string; error: string | undefined }>) => {
             if (state.vaultProfileAttributesVaultUuid === action.payload.vaultUuid) {
                 state.vaultProfileAttributeDescriptors = [];
                 state.vaultProfileAttributesVaultUuid = null;

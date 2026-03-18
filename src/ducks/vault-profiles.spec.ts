@@ -105,7 +105,7 @@ describe('vaultProfiles slice', () => {
 
         next = reducer(
             { ...next, vaultProfileAttributesVaultUuid: 'v-1', vaultProfileAttributeDescriptors: attrs },
-            actions.getVaultProfileAttributesFailure({ vaultUuid: 'v-1' }),
+            actions.getVaultProfileAttributesFailure({ vaultUuid: 'v-1', error: 'err' }),
         );
         expect(next.vaultProfileAttributeDescriptors).toEqual([]);
         expect(next.vaultProfileAttributesVaultUuid).toBeNull();
@@ -120,7 +120,7 @@ describe('vaultProfiles slice', () => {
         );
         expect(next.vaultProfileAttributeDescriptors).toEqual([]);
         expect(next.vaultProfileAttributesVaultUuid).toBe('v-other');
-        expect(next.isFetchingVaultProfileAttributes).toBe(false);
+        expect(next.isFetchingVaultProfileAttributes).toBe(true);
     });
 
     test('getVaultProfileAttributesFailure clears descriptors only when vaultUuid matches', () => {
@@ -132,11 +132,11 @@ describe('vaultProfiles slice', () => {
                 vaultProfileAttributeDescriptors: attrs,
                 isFetchingVaultProfileAttributes: true,
             },
-            actions.getVaultProfileAttributesFailure({ vaultUuid: 'v-other' }),
+            actions.getVaultProfileAttributesFailure({ vaultUuid: 'v-other', error: 'err' }),
         );
         expect(next.vaultProfileAttributeDescriptors).toEqual(attrs);
         expect(next.vaultProfileAttributesVaultUuid).toBe('v-1');
-        expect(next.isFetchingVaultProfileAttributes).toBe(false);
+        expect(next.isFetchingVaultProfileAttributes).toBe(true);
     });
 });
 

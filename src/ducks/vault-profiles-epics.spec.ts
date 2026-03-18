@@ -253,7 +253,7 @@ describe('vaultProfiles epics', () => {
         expect((emitted[0] as unknown as { payload: { vaultUuid: string; attributes: unknown[] } }).payload.attributes).toHaveLength(1);
     });
 
-    test('getVaultProfileAttributes failure emits getVaultProfileAttributesFailure', async () => {
+    test('getVaultProfileAttributes failure emits getVaultProfileAttributesFailure and fetchError', async () => {
         const err = new Error('attrs failed');
         const emitted = await runEpic(
             VaultProfilesEpicIndex.GetAttributes,
@@ -263,8 +263,13 @@ describe('vaultProfiles epics', () => {
                     listVaultProfileAttributes: () => throwError(() => err),
                 },
             },
+            2,
         );
         expect(emitted[0].type).toBe(vaultProfileActions.getVaultProfileAttributesFailure.type);
-        expect((emitted[0] as unknown as { payload: { vaultUuid: string } }).payload.vaultUuid).toBe('v-1');
+        expect((emitted[0] as any).payload.vaultUuid).toBe('v-1');
+        expect((emitted[0] as any).payload.error).toContain('attrs failed');
+        expect(emitted[1]).toEqual(
+            appRedirectActions.fetchError({ error: err, message: 'Failed to get Vault Profile Attribute Descriptor list' }),
+        );
     });
 });
