@@ -20,8 +20,8 @@ interface SyncVaultProfileDialogProps {
 
 export const SyncVaultProfileDialog = ({ secret, vaultProfiles, syncVaultProfileOptions, onClose }: SyncVaultProfileDialogProps) => {
     const dispatch = useDispatch();
-    const secretCreationAttributeDescriptors = useSelector(secretsSelectors.secretCreationAttributeDescriptors);
-    const isFetchingSecretCreationAttributes = useSelector(secretsSelectors.isFetchingSecretCreationAttributes);
+    const syncVaultProfileAttributeDescriptors = useSelector(secretsSelectors.syncVaultProfileAttributeDescriptors);
+    const isFetchingSyncVaultProfileAttributes = useSelector(secretsSelectors.isFetchingSyncVaultProfileAttributes);
 
     const [selectedVaultProfileUuid, setSelectedVaultProfileUuid] = useState('');
 
@@ -34,7 +34,7 @@ export const SyncVaultProfileDialog = ({ secret, vaultProfiles, syncVaultProfile
         const vaultUuid = profile?.vaultInstance?.uuid;
         if (!vaultUuid) return;
         dispatch(
-            secretsActions.getSecretCreationAttributes({
+            secretsActions.getSyncVaultProfileAttributes({
                 vaultUuid,
                 vaultProfileUuid: selectedVaultProfileUuid,
                 secretType: secret.type,
@@ -45,7 +45,7 @@ export const SyncVaultProfileDialog = ({ secret, vaultProfiles, syncVaultProfile
     const handleAdd = useCallback(() => {
         if (!selectedVaultProfileUuid) return;
         const values = getValues();
-        const attributes = collectFormAttributes('syncVaultProfile', secretCreationAttributeDescriptors, values);
+        const attributes = collectFormAttributes('syncVaultProfile', syncVaultProfileAttributeDescriptors, values);
         dispatch(
             secretsActions.addSyncVaultProfile({
                 uuid: secret.uuid,
@@ -54,7 +54,7 @@ export const SyncVaultProfileDialog = ({ secret, vaultProfiles, syncVaultProfile
             }),
         );
         onClose();
-    }, [dispatch, getValues, onClose, secret.uuid, secretCreationAttributeDescriptors, selectedVaultProfileUuid]);
+    }, [dispatch, getValues, onClose, secret.uuid, syncVaultProfileAttributeDescriptors, selectedVaultProfileUuid]);
 
     return (
         <FormProvider {...methods}>
@@ -66,9 +66,9 @@ export const SyncVaultProfileDialog = ({ secret, vaultProfiles, syncVaultProfile
                 value={selectedVaultProfileUuid || ''}
                 onChange={(value) => setSelectedVaultProfileUuid(value as string)}
             />
-            {selectedVaultProfileUuid && (isFetchingSecretCreationAttributes || secretCreationAttributeDescriptors.length > 0) && (
+            {selectedVaultProfileUuid && (isFetchingSyncVaultProfileAttributes || syncVaultProfileAttributeDescriptors.length > 0) && (
                 <div className="mt-4">
-                    <AttributeEditor id="syncVaultProfile" attributeDescriptors={secretCreationAttributeDescriptors} />
+                    <AttributeEditor id="syncVaultProfile" attributeDescriptors={syncVaultProfileAttributeDescriptors} />
                 </div>
             )}
             <Container className="flex-row justify-end modal-footer mt-4" gap={4}>
@@ -79,7 +79,7 @@ export const SyncVaultProfileDialog = ({ secret, vaultProfiles, syncVaultProfile
                     color="primary"
                     onClick={handleAdd}
                     type="button"
-                    disabled={!selectedVaultProfileUuid || isFetchingSecretCreationAttributes}
+                    disabled={!selectedVaultProfileUuid || isFetchingSyncVaultProfileAttributes}
                 >
                     Add
                 </Button>

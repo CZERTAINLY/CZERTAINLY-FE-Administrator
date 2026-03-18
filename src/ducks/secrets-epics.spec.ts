@@ -25,6 +25,9 @@ type EpicDeps = {
             addVaultProfileToSecret: (args: any) => any;
             removeVaultProfileFromSecret: (args: any) => any;
         };
+        vaultProfiles: {
+            getAttributesForCreatingSecret: (args: any) => any;
+        };
     };
 };
 
@@ -41,6 +44,7 @@ enum SecretsEpicIndex {
     UpdateObjects = 9,
     AddSyncVaultProfile = 10,
     RemoveSyncVaultProfile = 11,
+    GetSyncVaultProfileAttributes = 12,
 }
 
 async function runEpic(
@@ -67,9 +71,13 @@ async function runEpic(
         addVaultProfileToSecret: () => of(null),
         removeVaultProfileFromSecret: () => of(null),
     };
+    const defaultVaultProfiles = {
+        getAttributesForCreatingSecret: () => of([{ uuid: 'attr-1' }]),
+    };
     const deps: EpicDeps = {
         apiClients: {
             secrets: depsOverrides.secrets ? { ...defaultSecrets, ...depsOverrides.secrets } : defaultSecrets,
+            vaultProfiles: depsOverrides.vaultProfiles ? { ...defaultVaultProfiles, ...depsOverrides.vaultProfiles } : defaultVaultProfiles,
         },
     };
 
@@ -275,6 +283,39 @@ describe('secrets epics', () => {
                 error: err,
                 message: 'Failed to remove Vault profile from Secret',
             }),
+        );
+    });
+
+    test('getSyncVaultProfileAttributes success emits getSyncVaultProfileAttributesSuccess', async () => {
+        const payload = { vaultUuid: 'v-1', vaultProfileUuid: 'vp-1', secretType: 'Generic' as any };
+        const emitted = await runEpic(
+            SecretsEpicIndex.GetSyncVaultProfileAttributes,
+            secretsActions.getSyncVaultProfileAttributes(payload),
+            {},
+            1,
+        );
+
+        expect(emitted[0].type).toBe(secretsActions.getSyncVaultProfileAttributesSuccess.type);
+        expect((emitted[0] as any).payload.descriptors).toHaveLength(1);
+    });
+
+    test('getSyncVaultProfileAttributes failure emits getSyncVaultProfileAttributesFailure and fetchError', async () => {
+        const err = new Error('failed');
+        const payload = { vaultUuid: 'v-1', vaultProfileUuid: 'vp-1', secretType: 'Generic' as any };
+        const emitted = await runEpic(
+            SecretsEpicIndex.GetSyncVaultProfileAttributes,
+            secretsActions.getSyncVaultProfileAttributes(payload),
+            {
+                vaultProfiles: {
+                    getAttributesForCreatingSecret: () => throwError(() => err),
+                } as any,
+            },
+            2,
+        );
+
+        expect(emitted[0].type).toBe(secretsActions.getSyncVaultProfileAttributesFailure.type);
+        expect(emitted[1]).toEqual(
+            appRedirectActions.fetchError({ error: err, message: 'Failed to get Vault profile attributes for sync' }),
         );
     });
 });

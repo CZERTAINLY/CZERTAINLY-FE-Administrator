@@ -315,6 +315,40 @@ const getSecretCreationAttributes: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const getSyncVaultProfileAttributes: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getSyncVaultProfileAttributes.match),
+        switchMap((action: ReturnType<typeof slice.actions.getSyncVaultProfileAttributes>) =>
+            deps.apiClients.vaultProfiles
+                .getAttributesForCreatingSecret({
+                    vaultUuid: action.payload.vaultUuid,
+                    vaultProfileUuid: action.payload.vaultProfileUuid,
+                    secretType: action.payload.secretType,
+                })
+                .pipe(
+                    mergeMap((list: unknown) => {
+                        const arr = Array.isArray(list) ? list : [];
+                        return of(
+                            slice.actions.getSyncVaultProfileAttributesSuccess({
+                                descriptors: arr.map((attr: unknown) =>
+                                    transformAttributeDescriptorDtoToModel(attr as import('types/attributes').AttributeDescriptorDto),
+                                ),
+                            }),
+                        );
+                    }),
+                    catchError((err) =>
+                        of(
+                            slice.actions.getSyncVaultProfileAttributesFailure({
+                                error: extractError(err, 'Failed to get Vault profile attributes for sync'),
+                            }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to get Vault profile attributes for sync' }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
 const createSecret: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.createSecret.match),
@@ -360,6 +394,7 @@ const epics = [
     updateSecretObjects,
     addSyncVaultProfile,
     removeSyncVaultProfile,
+    getSyncVaultProfileAttributes,
 ];
 
 export default epics;

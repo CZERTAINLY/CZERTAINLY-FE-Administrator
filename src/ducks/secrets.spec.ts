@@ -74,6 +74,40 @@ describe('secrets slice', () => {
         expect(next.isFetchingVersions).toBe(false);
     });
 
+    test('getSyncVaultProfileAttributes / success / failure updates dedicated flags and descriptors', () => {
+        const payload = { vaultUuid: 'v-1', vaultProfileUuid: 'vp-1', secretType: 'Generic' as any };
+
+        let next = reducer(initialState, actions.getSyncVaultProfileAttributes(payload));
+        expect(next.isFetchingSyncVaultProfileAttributes).toBe(true);
+        expect(next.syncVaultProfileAttributeDescriptors).toEqual([]);
+
+        const descriptors = [{ uuid: 'a-1' }] as any[];
+        next = reducer(next, actions.getSyncVaultProfileAttributesSuccess({ descriptors }));
+        expect(next.isFetchingSyncVaultProfileAttributes).toBe(false);
+        expect(next.syncVaultProfileAttributeDescriptors).toEqual(descriptors);
+
+        next = reducer(
+            { ...next, isFetchingSyncVaultProfileAttributes: true },
+            actions.getSyncVaultProfileAttributesFailure({ error: 'err' }),
+        );
+        expect(next.isFetchingSyncVaultProfileAttributes).toBe(false);
+    });
+
+    test('getSyncVaultProfileAttributes does not touch secretCreationAttributeDescriptors', () => {
+        const existingDescriptors = [{ uuid: 'existing' }] as any[];
+        const stateWithDescriptors = {
+            ...initialState,
+            secretCreationAttributeDescriptors: existingDescriptors,
+            isFetchingSecretCreationAttributes: false,
+        };
+        const next = reducer(
+            stateWithDescriptors,
+            actions.getSyncVaultProfileAttributes({ vaultUuid: 'v', vaultProfileUuid: 'vp', secretType: 'Generic' as any }),
+        );
+        expect(next.secretCreationAttributeDescriptors).toEqual(existingDescriptors);
+        expect(next.isFetchingSecretCreationAttributes).toBe(false);
+    });
+
     test('createSecret / success / failure update flags and detail', () => {
         const payload = {
             vaultUuid: 'v-1',
@@ -205,5 +239,9 @@ describe('secrets selectors', () => {
         expect(selectors.isDeleting(state)).toBe(true);
         expect(selectors.isEnabling(state)).toBe(true);
         expect(selectors.isDisabling(state)).toBe(true);
+        expect(selectors.secretCreationAttributeDescriptors(state)).toEqual([]);
+        expect(selectors.isFetchingSecretCreationAttributes(state)).toBe(false);
+        expect(selectors.syncVaultProfileAttributeDescriptors(state)).toEqual([]);
+        expect(selectors.isFetchingSyncVaultProfileAttributes(state)).toBe(false);
     });
 });
