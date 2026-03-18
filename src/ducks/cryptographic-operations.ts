@@ -10,7 +10,6 @@ import {
 } from 'types/cryptographic-operations';
 import { KeyAlgorithm } from 'types/openapi';
 import { downloadFile } from 'utils/download';
-import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     signatureAttributeDescriptors?: AttributeDescriptorModel[];
@@ -214,7 +213,7 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const signatureAttributeDescriptors = createSelector(state, (state: State) => state.signatureAttributeDescriptors);
 const altSignatureAttributeDescriptors = createSelector(state, (state: State) => state.altSignatureAttributeDescriptors);

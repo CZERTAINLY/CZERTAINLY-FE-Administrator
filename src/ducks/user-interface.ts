@@ -4,7 +4,6 @@ import { Edge } from 'reactflow';
 import { createSelector } from 'reselect';
 import { AjaxError } from 'rxjs/ajax';
 import { GlobalModalModel, LockWidgetNameEnum, ReactFlowUI, WidgetLockErrorModel, WidgetLockModel } from 'types/user-interface';
-import { createFeatureSelector } from 'utils/ducks';
 import { getLockWidgetObject } from 'utils/net';
 
 export type State = {
@@ -157,7 +156,7 @@ export const slice = createSlice({
     },
 });
 
-const selectState = createFeatureSelector<State>(slice.name);
+const selectState = (state: any): State => state?.[slice.name];
 
 const selectWidgetLocks = createSelector(selectState, (state) => state?.widgetLocks ?? []);
 const selectGlobalModal = createSelector(selectState, (state) => state?.globalModal ?? initialState.globalModal);
