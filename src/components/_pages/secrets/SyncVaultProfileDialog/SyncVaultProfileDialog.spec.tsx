@@ -48,13 +48,13 @@ function mountDialog(
 
 /** Opens the vault profile HSSelect dropdown by clicking the toggle button. */
 async function openDropdown(page: Page): Promise<void> {
-    await page.locator('button[aria-expanded]').click();
+    await page.getByTestId('vault-profile-select').locator('button[aria-expanded]').click();
 }
 
 /** Opens the vault profile dropdown and selects the option for the given profile UUID. */
 async function selectVaultProfile(page: Page, profileUuid: string): Promise<void> {
     await openDropdown(page);
-    await page.locator(`.hs-select-option-row[data-value="${profileUuid}"]`).click();
+    await page.locator(`[data-value="${profileUuid}"]`).click();
 }
 
 // ── tests ─────────────────────────────────────────────────────────────────────
@@ -64,8 +64,8 @@ test.describe('SyncVaultProfileDialog', () => {
         await mountDialog(mount);
 
         await openDropdown(page);
-        await expect(page.locator('.hs-select-option-row[data-value="vp-uuid-1"]')).toBeVisible();
-        await expect(page.locator('.hs-select-option-row[data-value="vp-uuid-2"]')).toBeVisible();
+        await expect(page.locator('[data-value="vp-uuid-1"]')).toBeVisible();
+        await expect(page.locator('[data-value="vp-uuid-2"]')).toBeVisible();
     });
 
     test('renders Cancel and Add buttons', async ({ mount }) => {
@@ -97,33 +97,24 @@ test.describe('SyncVaultProfileDialog', () => {
         await expect(component.getByRole('button', { name: 'Add' })).toBeEnabled();
     });
 
-    test('calls onGetSyncVaultProfileAttributes when a vault profile is selected', async ({ mount, page }) => {
-        const calls: any[] = [];
-        await mountDialog(mount, { onGetSyncVaultProfileAttributes: (p) => calls.push(p) });
+    for (const { profileUuid, vaultUuid } of VAULT_PROFILES.map((vp) => ({ profileUuid: vp.uuid, vaultUuid: vp.vaultInstance.uuid }))) {
+        test(`calls onGetSyncVaultProfileAttributes with correct vault when profile ${profileUuid} is selected`, async ({
+            mount,
+            page,
+        }) => {
+            const calls: any[] = [];
+            await mountDialog(mount, { onGetSyncVaultProfileAttributes: (p) => calls.push(p) });
 
-        await selectVaultProfile(page, 'vp-uuid-1');
+            await selectVaultProfile(page, profileUuid);
 
-        await expect.poll(() => calls.length, { timeout: 3000 }).toBe(1);
-        expect(calls[0]).toMatchObject({
-            vaultUuid: 'vi-uuid-1',
-            vaultProfileUuid: 'vp-uuid-1',
-            secretType: SecretType.Generic,
+            await expect.poll(() => calls.length, { timeout: 3000 }).toBe(1);
+            expect(calls[0]).toMatchObject({
+                vaultUuid,
+                vaultProfileUuid: profileUuid,
+                secretType: SecretType.Generic,
+            });
         });
-    });
-
-    test('calls onGetSyncVaultProfileAttributes with correct vault when a different profile is selected', async ({ mount, page }) => {
-        const calls: any[] = [];
-        await mountDialog(mount, { onGetSyncVaultProfileAttributes: (p) => calls.push(p) });
-
-        await selectVaultProfile(page, 'vp-uuid-2');
-
-        await expect.poll(() => calls.length, { timeout: 3000 }).toBe(1);
-        expect(calls[0]).toMatchObject({
-            vaultUuid: 'vi-uuid-2',
-            vaultProfileUuid: 'vp-uuid-2',
-            secretType: SecretType.Generic,
-        });
-    });
+    }
 
     test('renders AttributeEditor when profile is selected and attribute descriptors are present', async ({ mount, page }) => {
         const component = await mountDialog(mount, { syncVaultProfileAttributeDescriptors: [DATA_DESCRIPTOR] });

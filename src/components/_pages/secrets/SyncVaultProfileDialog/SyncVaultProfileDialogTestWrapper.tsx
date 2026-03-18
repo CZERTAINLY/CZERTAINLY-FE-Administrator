@@ -3,9 +3,11 @@ import { useMemo } from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router';
 
+import { actions as secretsActions } from 'ducks/secrets';
+import { testReducers, testInitialState } from 'ducks/test-reducers';
+
 import type { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
 import type { SecretDetailDto, SecretType, VaultProfileDto } from 'types/openapi';
-import { testReducers, testInitialState } from 'ducks/test-reducers';
 
 import { SyncVaultProfileDialog } from './SyncVaultProfileDialog';
 
@@ -35,10 +37,10 @@ export function SyncVaultProfileDialogTestWrapper({
                 middleware: (getDefaultMiddleware) =>
                     getDefaultMiddleware({ serializableCheck: false }).concat(
                         (_store: any) => (next: (arg0: any) => any) => (action: any) => {
-                            if (action.type === 'secrets/getSyncVaultProfileAttributes') {
+                            if (action.type === secretsActions.getSyncVaultProfileAttributes.type) {
                                 onGetSyncVaultProfileAttributes?.(action.payload);
                             }
-                            if (action.type === 'secrets/addSyncVaultProfile') {
+                            if (action.type === secretsActions.addSyncVaultProfile.type) {
                                 onAddSyncVaultProfile?.(action.payload);
                             }
                             return next(action);

@@ -73,6 +73,7 @@ export const SyncVaultProfileDialog = ({ secret, onClose }: SyncVaultProfileDial
                 options={syncVaultProfileOptions}
                 value={selectedVaultProfileUuid || ''}
                 onChange={(value) => setSelectedVaultProfileUuid(value as string)}
+                dataTestId="vault-profile-select"
             />
             {selectedVaultProfileUuid && (isFetchingSyncVaultProfileAttributes || syncVaultProfileAttributeDescriptors.length > 0) && (
                 <div className="mt-4">
