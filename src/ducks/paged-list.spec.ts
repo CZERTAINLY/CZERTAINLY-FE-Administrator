@@ -190,14 +190,14 @@ describe('PagedList (redux pagination logic)', () => {
 
         const widget = container.querySelector('[data-testid="mock-widget"]') as HTMLElement;
         expect(widget).toBeTruthy();
-        expect(widget.getAttribute('data-busy')).toBe('false');
-        expect(widget.getAttribute('data-hide-widget-buttons')).toBe('false');
+        expect(widget.dataset.busy).toBe('false');
+        expect(widget.dataset.hideWidgetButtons).toBe('false');
 
         const table = container.querySelector('[data-testid="mock-custom-table"]') as HTMLElement;
         expect(table).toBeTruthy();
-        expect(table.getAttribute('data-has-checkboxes')).toBe('true');
-        expect(table.getAttribute('data-multi-select')).toBe('true');
-        expect(table.getAttribute('data-has-details')).toBe('false');
+        expect(table.dataset.hasCheckboxes).toBe('true');
+        expect(table.dataset.multiSelect).toBe('true');
+        expect(table.dataset.hasDetails).toBe('false');
     });
 
     test('mount list refresh clears checked rows through onCheckedRowsChanged', async () => {
