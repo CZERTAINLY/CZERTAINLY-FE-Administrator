@@ -810,11 +810,12 @@ function AttributeEditorInner({
 
         if (deepEqual(previousAttributes, currentAttributes)) return;
 
-        previousAttributesRef.current = cloneForCompare(currentAttributes);
-
-        // I am not really sure about this. It is currently preventing other callbacks when the form is open in "edit" mode and data loaded to it
-        // It works, but this state should be managed in a different way
+        // Do not update the ref if a callback is already running — we need to preserve the
+        // "pending change" so that when the running callback finishes and re-triggers doCallbacks,
+        // the change is still detected and the dependent callback can fire.
         if (isRunningCb) return;
+
+        previousAttributesRef.current = cloneForCompare(currentAttributes);
 
         const changedAttributes: { [name: string]: { previous: any; current: any } } = {};
 
@@ -877,6 +878,17 @@ function AttributeEditorInner({
             debouncedDoCallbacks.cancel();
         };
     }, [formValues]);
+
+    /* istanbul ignore next */
+    // When a running callback finishes, re-trigger doCallbacks so that any pending form
+    // changes (that were skipped while isRunningCb was true) can now fire their callbacks.
+    const prevIsRunningCbRef = useRef(isRunningCb);
+    useEffect(() => {
+        if (prevIsRunningCbRef.current && !isRunningCb) {
+            debouncedDoCallbacksRef.current();
+        }
+        prevIsRunningCbRef.current = isRunningCb;
+    }, [isRunningCb]);
 
     /* istanbul ignore next */
     useEffect(() => {
