@@ -456,11 +456,16 @@ const callbackConnector: AppEpic = (action$, state, deps) => {
             const requestAttributeCallback = transformCallbackAttributeModelToDto(payload.requestAttributeCallback);
             const rootState: any = (state as any).value ?? (state as any);
             const connectorsState: any = rootState.connectors;
-            const connector = connectorsState?.connectors?.find((c: any) => c.uuid === payload.uuid) ?? connectorsState?.connector;
-            // If connector is not yet loaded in state, skip callback to avoid hitting wrong endpoint
-            if (!connector) {
-                return of(slice.actions.callbackFailure({ callbackId: action.payload.callbackId }));
-            }
+            // Look for the connector across all provider-type slices that store ConnectorResponseModel
+            const connector =
+                connectorsState?.connectors?.find((c: any) => c.uuid === payload.uuid) ??
+                connectorsState?.connector ??
+                rootState.tokens?.tokenProviders?.find((c: any) => c.uuid === payload.uuid) ??
+                rootState.authorities?.authorityProviders?.find((c: any) => c.uuid === payload.uuid) ??
+                rootState.discoveries?.discoveryProviders?.find((c: any) => c.uuid === payload.uuid) ??
+                rootState.entities?.entityProviders?.find((c: any) => c.uuid === payload.uuid) ??
+                rootState.credentials?.credentialProviders?.find((c: any) => c.uuid === payload.uuid) ??
+                rootState.notifications?.notificationInstanceProviders?.find((c: any) => c.uuid === payload.uuid);
             const isV2 = connector?.version === ConnectorVersion.V2;
             const api$ = isV2
                 ? deps.apiClients.callback.callbackV2({

@@ -833,6 +833,8 @@ describe('connectors epics', () => {
             callbackId: 'cb-1',
             callbackConnector: { uuid: 'c-1', requestAttributeCallback: { mappings: [] } } as any,
         });
+        // Put a V2 connector in state so the epic resolves it and calls callbackV2
+        const stateWithConnector = { connectors: { connectors: [{ uuid: 'c-1', version: ConnectorVersion.V2, functionGroups: [] }] } };
         const emitted = await runEpic(
             17,
             action,
@@ -844,8 +846,10 @@ describe('connectors epics', () => {
                 } as any,
             },
             1,
+            stateWithConnector,
         );
-        expect(emitted[0]).toEqual(slice.actions.callbackFailure({ callbackId: 'cb-1' }));
+        // The outer catchError uses an empty callbackId (it doesn't have access to the action's callbackId)
+        expect(emitted[0]).toEqual(slice.actions.callbackFailure({ callbackId: '' }));
     });
 
     test('callbackResource outer catchError emits callbackFailure and fetchError when resourceCallback throws', async () => {
