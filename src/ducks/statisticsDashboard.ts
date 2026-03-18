@@ -1,5 +1,4 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { createFeatureSelector } from 'utils/ducks';
 import { StatisticsDashboardModel } from '../types/statisticsDashboard';
 
 export type State = {
@@ -34,7 +33,7 @@ export const slice = createSlice({
     },
 });
 
-const selectState = createFeatureSelector<State>(slice.name);
+const selectState = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const statisticsDashboard = createSelector(selectState, (state) => state.statisticsDashboard);
 

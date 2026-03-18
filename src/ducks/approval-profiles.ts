@@ -6,7 +6,6 @@ import {
     ProfileApprovalResponseModel,
 } from 'types/approval-profiles';
 import { UuidDto } from 'types/openapi';
-import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     profileApprovalDetail?: ProfileApprovalDetailModel;
@@ -127,7 +126,7 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const profileApprovalDetail = createSelector(state, (state) => state.profileApprovalDetail);
 const profileApprovalList = createSelector(state, (state) => state.profileApprovalList);
