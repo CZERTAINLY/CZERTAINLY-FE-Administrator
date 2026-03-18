@@ -926,12 +926,11 @@ describe('connectors epics', () => {
         expect(emitted[0]).toEqual(slice.actions.callbackSuccess({ callbackId: 'res-cb-1', data }));
     });
 
-    test('callbackConnector outer catchError emits callbackFailure and fetchError when callback throws', async () => {
+    test('callbackConnector inner catchError emits callbackFailure and fetchError when callbackV2 throws synchronously', async () => {
         const action = slice.actions.callbackConnector({
             callbackId: 'cb-1',
             callbackConnector: { uuid: 'c-1', requestAttributeCallback: { mappings: [] } } as any,
         });
-        // Put a V2 connector in state so the epic resolves it and calls callbackV2
         const stateWithConnector = { connectors: { connectors: [{ uuid: 'c-1', version: ConnectorVersion.V2, functionGroups: [] }] } };
         const emitted = await runEpic(
             17,
@@ -951,6 +950,21 @@ describe('connectors epics', () => {
         expect(emitted[0]).toEqual(slice.actions.callbackFailure({ callbackId: 'cb-1' }));
         expect(emitted[1]).toEqual(
             appRedirectActions.fetchError({ error: new Error('sync callback error'), message: 'Connector callback failure' }),
+        );
+    });
+
+    test('callbackConnector outer catchError emits callbackFailure with empty id when mergeMap body throws', async () => {
+        // Trigger the outer catchError by passing a null payload that throws during destructuring
+        // before defer() is ever reached
+        const action = { type: slice.actions.callbackConnector.type, payload: null };
+        const deps = createDeps({});
+        const epic = connectorsEpics[17] as any;
+        const state$ = of({}) as any;
+        state$.value = {};
+        const emitted = await firstValueFrom(epic(of(action), state$, deps as any).pipe(take(2), toArray()));
+        expect(emitted[0]).toEqual(slice.actions.callbackFailure({ callbackId: '' }));
+        expect(emitted[1]).toEqual(
+            appRedirectActions.fetchError({ error: expect.any(Error), message: 'Failed to perform connector callback' }),
         );
     });
 
