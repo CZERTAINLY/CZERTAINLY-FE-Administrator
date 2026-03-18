@@ -1,5 +1,5 @@
 import { AppEpic } from 'ducks';
-import { of } from 'rxjs';
+import { defer, of } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { ConnectorVersion } from 'types/openapi';
@@ -456,10 +456,11 @@ const callbackConnector: AppEpic = (action$, state, deps) => {
             const requestAttributeCallback = transformCallbackAttributeModelToDto(payload.requestAttributeCallback);
             const rootState: any = (state as any).value ?? (state as any);
             const connectorsState: any = rootState.connectors;
-            // Look for the connector across all provider-type slices that store ConnectorResponseModel
+            // Look for the connector across all provider-type slices that store ConnectorResponseModel.
+            // connectorsState?.connector is the single-detail state — only use it when UUID matches.
             const connector =
                 connectorsState?.connectors?.find((c: any) => c.uuid === payload.uuid) ??
-                connectorsState?.connector ??
+                (connectorsState?.connector?.uuid === payload.uuid ? connectorsState.connector : undefined) ??
                 rootState.tokens?.tokenProviders?.find((c: any) => c.uuid === payload.uuid) ??
                 rootState.authorities?.authorityProviders?.find((c: any) => c.uuid === payload.uuid) ??
                 rootState.discoveries?.discoveryProviders?.find((c: any) => c.uuid === payload.uuid) ??
@@ -467,17 +468,21 @@ const callbackConnector: AppEpic = (action$, state, deps) => {
                 rootState.credentials?.credentialProviders?.find((c: any) => c.uuid === payload.uuid) ??
                 rootState.notifications?.notificationInstanceProviders?.find((c: any) => c.uuid === payload.uuid);
             const isV2 = connector?.version === ConnectorVersion.V2;
-            const api$ = isV2
-                ? deps.apiClients.callback.callbackV2({
-                      uuid: payload.uuid,
-                      requestAttributeCallback,
-                  })
-                : deps.apiClients.callback.callback({
-                      uuid: payload.uuid,
-                      functionGroup: payload.functionGroup,
-                      kind: payload.kind,
-                      requestAttributeCallback,
-                  });
+            // Wrap in defer so that synchronous throws from the API client are caught
+            // by the inner catchError (which has access to action.payload.callbackId).
+            const api$ = defer(() =>
+                isV2
+                    ? deps.apiClients.callback.callbackV2({
+                          uuid: payload.uuid,
+                          requestAttributeCallback,
+                      })
+                    : deps.apiClients.callback.callback({
+                          uuid: payload.uuid,
+                          functionGroup: payload.functionGroup,
+                          kind: payload.kind,
+                          requestAttributeCallback,
+                      }),
+            );
 
             return api$.pipe(
                 map((data) => {

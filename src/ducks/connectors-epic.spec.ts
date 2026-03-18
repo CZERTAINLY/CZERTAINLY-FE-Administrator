@@ -845,11 +845,15 @@ describe('connectors epics', () => {
                     },
                 } as any,
             },
-            1,
+            2,
             stateWithConnector,
         );
-        // The outer catchError uses an empty callbackId (it doesn't have access to the action's callbackId)
-        expect(emitted[0]).toEqual(slice.actions.callbackFailure({ callbackId: '' }));
+        // defer() wraps the API call so sync throws are caught by the inner catchError,
+        // which has access to action.payload.callbackId
+        expect(emitted[0]).toEqual(slice.actions.callbackFailure({ callbackId: 'cb-1' }));
+        expect(emitted[1]).toEqual(
+            appRedirectActions.fetchError({ error: new Error('sync callback error'), message: 'Connector callback failure' }),
+        );
     });
 
     test('callbackResource outer catchError emits callbackFailure and fetchError when resourceCallback throws', async () => {
