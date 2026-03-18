@@ -172,7 +172,7 @@ const handleVaultsContentUpdate = (
     const currentAttributes = getVaultCurrentAttributes(state, payload.resourceUuid);
     const currentCustomAttributes = getVaultCurrentCustomAttributes(state, payload.resourceUuid);
 
-    if (!currentVault || currentVault.uuid !== payload.resourceUuid || !currentAttributes || !currentCustomAttributes) {
+    if (currentVault?.uuid !== payload.resourceUuid || !currentAttributes || !currentCustomAttributes) {
         return of(
             createContentFailureAction(
                 operation,
@@ -232,7 +232,7 @@ const handleVaultProfilesContentUpdate = (
     const currentAttributes = getVaultProfileCurrentAttributes(state, payload.resourceUuid);
     const currentCustomAttributes = getVaultProfileCurrentCustomAttributes(state, payload.resourceUuid);
 
-    if (!currentVaultProfile || currentVaultProfile.uuid !== payload.resourceUuid || !currentAttributes || !currentCustomAttributes) {
+    if (currentVaultProfile?.uuid !== payload.resourceUuid || !currentAttributes || !currentCustomAttributes) {
         return of(
             createContentFailureAction(
                 operation,
