@@ -18,11 +18,9 @@ import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import LocationForm from '../form';
-import Select from 'react-select';
 import Badge from 'components/Badge';
 import { AttributeDescriptorModel } from 'types/attributes';
 import Button from 'components/Button';
-import Label from 'components/Label';
 import { buildValidationRules } from 'utils/validators-helper';
 import { collectFormAttributes, getAttributeContent } from 'utils/attributes/attributes';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
@@ -38,6 +36,8 @@ import { createWidgetDetailHeaders } from 'utils/widget';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import Container from 'components/Container';
 import Breadcrumb from 'components/Breadcrumb';
+import Select from 'components/Select';
+import { ArrowRight } from 'lucide-react';
 
 const PushCertificateForm = ({
     selectedCerts,
@@ -87,6 +87,10 @@ const PushCertificateForm = ({
         setPushDialog(false);
     };
 
+    const isDisabled = useMemo(() => {
+        return !formState.isDirty || formState.isSubmitting || !formState.isValid || selectedCerts.length === 0;
+    }, [formState.isDirty, formState.isSubmitting, formState.isValid, selectedCerts.length]);
+
     return (
         <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -98,22 +102,10 @@ const PushCertificateForm = ({
                 />
 
                 <Container className="flex-row justify-end modal-footer" gap={4}>
-                    <ProgressButton
-                        inProgress={isPushingCertificate}
-                        title="Push"
-                        type="submit"
-                        color="primary"
-                        disabled={!formState.isDirty || formState.isSubmitting || !formState.isValid || selectedCerts.length === 0}
-                    />
-                    <Button
-                        type="button"
-                        variant="outline"
-                        color="secondary"
-                        disabled={formState.isSubmitting}
-                        onClick={() => setPushDialog(false)}
-                    >
+                    <Button type="button" variant="outline" disabled={formState.isSubmitting} onClick={() => setPushDialog(false)}>
                         Cancel
                     </Button>
+                    <ProgressButton inProgress={isPushingCertificate} title="Push" type="submit" color="primary" disabled={isDisabled} />
                 </Container>
             </form>
         </FormProvider>
@@ -191,52 +183,40 @@ const IssueCertificateForm = ({
                     control={control}
                     rules={buildValidationRules([validateRequired()])}
                     render={({ field, fieldState }) => (
-                        <div>
-                            <Label htmlFor="certificateSelect">RA Profile</Label>
-                            <Select
-                                {...field}
-                                inputId="certificateSelect"
-                                maxMenuHeight={140}
-                                menuPlacement="auto"
-                                options={raProfiles.map((p) => ({
-                                    value: p.uuid + ':#' + p.authorityInstanceUuid,
-                                    label: p.name,
-                                }))}
-                                placeholder="Select RA profile"
-                                styles={{
-                                    control: (provided) =>
-                                        fieldState.isTouched && fieldState.invalid
-                                            ? {
-                                                  ...provided,
-                                                  border: 'solid 1px red',
-                                                  '&:hover': { border: 'solid 1px red' },
-                                              }
-                                            : { ...provided },
-                                }}
-                                onChange={(value) => {
-                                    field.onChange(value);
-                                    if (value) {
-                                        dispatch(
-                                            raActions.listIssuanceAttributeDescriptors({
-                                                authorityUuid: value.value.split(':#')[1],
-                                                uuid: value.value.split(':#')[0],
-                                            }),
-                                        );
-                                    }
-                                }}
-                            />
-                            {fieldState.error && fieldState.isTouched && (
-                                <p className="mt-1 text-sm text-red-600">
-                                    {typeof fieldState.error === 'string'
+                        <Select
+                            {...field}
+                            label="RA Profile"
+                            id="certificateSelect"
+                            placeholder="Select RA profile"
+                            options={raProfiles.map((p) => ({
+                                value: `${p.uuid}:#${p.authorityInstanceUuid}`,
+                                label: p.name,
+                            }))}
+                            error={
+                                fieldState.error && fieldState.isTouched
+                                    ? typeof fieldState.error === 'string'
                                         ? fieldState.error
-                                        : fieldState.error?.message || 'Required Field'}
-                                </p>
-                            )}
-                        </div>
+                                        : fieldState.error?.message || 'Required Field'
+                                    : undefined
+                            }
+                            onChange={(value) => {
+                                field.onChange(value);
+                                if (value) {
+                                    const [uuid, authorityInstanceUuid] = (value as string).split(':#');
+                                    dispatch(
+                                        raActions.listIssuanceAttributeDescriptors({
+                                            authorityUuid: authorityInstanceUuid,
+                                            uuid,
+                                        }),
+                                    );
+                                }
+                            }}
+                        />
                     )}
                 />
 
                 <TabLayout
+                    onlyActiveTabContent={false}
                     tabs={[
                         {
                             title: 'Certificate Signing Request Attributes',
@@ -268,13 +248,6 @@ const IssueCertificateForm = ({
                 />
 
                 <Container className="flex-row justify-end modal-footer" gap={4}>
-                    <ProgressButton
-                        inProgress={isPushingCertificate}
-                        title="Issue"
-                        type="submit"
-                        color="primary"
-                        disabled={!formState.isDirty || formState.isSubmitting || !formState.isValid}
-                    />
                     <Button
                         type="button"
                         variant="outline"
@@ -284,6 +257,13 @@ const IssueCertificateForm = ({
                     >
                         Cancel
                     </Button>
+                    <ProgressButton
+                        inProgress={isPushingCertificate}
+                        title="Issue"
+                        type="submit"
+                        color="primary"
+                        disabled={!formState.isDirty || formState.isSubmitting || !formState.isValid}
+                    />
                 </Container>
             </form>
         </FormProvider>
@@ -626,9 +606,20 @@ export default function LocationDetail() {
                 : location.certificates.map((cert) => ({
                       id: cert.certificateUuid,
                       columns: [
-                          <Link key={cert.certificateUuid} to={`../../../certificates/detail/${cert.certificateUuid}`}>
+                          <>
                               {cert.commonName || 'empty'}
-                          </Link>,
+                              <Link
+                                  key={cert.certificateUuid}
+                                  to={`../../../certificates/detail/${cert.certificateUuid}`}
+                                  onClick={(e) => {
+                                      e.stopPropagation();
+                                  }}
+                              >
+                                  <Button color="secondary" className="!rounded-full !p-0.5" title="View certificate details">
+                                      <ArrowRight size={10} strokeWidth={3} />
+                                  </Button>
+                              </Link>
+                          </>,
                           <CertificateStatusBadge status={cert.state} />,
                           <CertificateStatusBadge status={cert.validationStatus} />,
                           cert.withKey ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
@@ -651,11 +642,6 @@ export default function LocationDetail() {
                       ],
 
                       detailColumns: [
-                          <></>,
-                          <></>,
-                          <></>,
-                          <></>,
-                          <></>,
                           cert.metadata?.length ? (
                               <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT} metadata={cert.metadata} />
                           ) : (
@@ -755,35 +741,30 @@ export default function LocationDetail() {
                     toggle={() => setConfirmDelete(false)}
                     icon="delete"
                     buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                         { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     ]}
                 />
                 <Dialog
                     isOpen={confirmRemoveDialog}
                     caption={`Remove ${certCheckedRows.length === 1 ? 'certificate' : 'certificates'} from the location`}
+                    size="md"
                     body={
                         <>
                             You are about to remove certificates from the location:
-                            <br />
-                            {certCheckedRows.map((uuid) => {
-                                const cert = location?.certificates.find((c) => c.certificateUuid === uuid);
-                                return cert ? (
-                                    <React.Fragment key={uuid}>
-                                        {cert.commonName || 'empty'}
-                                        <br />
-                                    </React.Fragment>
-                                ) : null;
-                            })}
-                            <br />
-                            <br />
+                            <ul className="list-disc list-inside space-y-2 my-2">
+                                {certCheckedRows.map((uuid) => {
+                                    const cert = location?.certificates.find((c) => c.certificateUuid === uuid);
+                                    return cert ? <li key={uuid}>{cert.commonName || 'empty'}</li> : null;
+                                })}
+                            </ul>
                             Is this what you want to do?
                         </>
                     }
                     toggle={() => setConfirmRemoveDialog(false)}
                     buttons={[
-                        { color: 'danger', onClick: onRemoveConfirmed, body: 'Yes, remove' },
                         { color: 'secondary', variant: 'outline', onClick: () => setConfirmRemoveDialog(false), body: 'Cancel' },
+                        { color: 'danger', onClick: onRemoveConfirmed, body: 'Yes, remove' },
                     ]}
                 />
                 <Dialog
@@ -793,7 +774,7 @@ export default function LocationDetail() {
                     buttons={[]}
                     size="xl"
                     body={
-                        <>
+                        <div className="space-y-4">
                             <CertificateList
                                 selectCertsOnly={true}
                                 multiSelect={false}
@@ -812,7 +793,7 @@ export default function LocationDetail() {
                             />
 
                             <Spinner active={isPushingCertificate || isRemovingCertificate} />
-                        </>
+                        </div>
                     }
                 />
                 <Dialog
@@ -820,7 +801,7 @@ export default function LocationDetail() {
                     caption="Issue certificate for the location"
                     toggle={() => setIssueDialog(false)}
                     buttons={[]}
-                    size="lg"
+                    size="xl"
                     body={
                         <>
                             <IssueCertificateForm
