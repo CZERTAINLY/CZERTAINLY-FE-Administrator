@@ -458,9 +458,10 @@ const callbackConnector: AppEpic = (action$, state, deps) => {
             const connectorsState: any = rootState.connectors;
             // Look for the connector across all provider-type slices that store ConnectorResponseModel.
             // connectorsState?.connector is the single-detail state — only use it when UUID matches.
+            const singleDetailConnector = connectorsState?.connector?.uuid === payload.uuid ? connectorsState.connector : undefined;
             const connector =
                 connectorsState?.connectors?.find((c: any) => c.uuid === payload.uuid) ??
-                (connectorsState?.connector?.uuid === payload.uuid ? connectorsState.connector : undefined) ??
+                singleDetailConnector ??
                 rootState.tokens?.tokenProviders?.find((c: any) => c.uuid === payload.uuid) ??
                 rootState.authorities?.authorityProviders?.find((c: any) => c.uuid === payload.uuid) ??
                 rootState.discoveries?.discoveryProviders?.find((c: any) => c.uuid === payload.uuid) ??
