@@ -209,7 +209,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
         const vaultUuid = profile?.vaultInstance?.uuid;
         if (!vaultUuid) return;
         dispatch(
-            secretsActions.getSecretCreationAttributes({
+            secretsActions.listSecretAttributes({
                 vaultUuid,
                 vaultProfileUuid: watchedSourceVaultProfile,
                 secretType: watchedType as SecretType,
