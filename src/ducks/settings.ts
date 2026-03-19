@@ -1,4 +1,5 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createFeatureSelector } from 'utils/ducks';
 import {
     SettingsPlatformModel,
     SettingsLoggingModel,
@@ -121,7 +122,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore?.[slice.name];
+const state = createFeatureSelector<State>(slice.name);
 
 const platformSettings = createSelector(state, (state: State) => state.platformSettings);
 const isFetchingPlatform = createSelector(state, (state: State) => state.isFetchingPlatform);

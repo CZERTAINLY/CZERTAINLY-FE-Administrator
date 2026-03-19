@@ -1,6 +1,6 @@
 import { AppEpic } from 'ducks';
 import { of } from 'rxjs';
-import { catchError, filter, switchMap, mergeMap } from 'rxjs/operators';
+import { catchError, filter, switchMap, mergeMap, map } from 'rxjs/operators';
 import { extractError } from 'utils/net';
 import { slice } from './vault-profiles';
 import { actions as appRedirectActions } from './app-redirect';
@@ -10,6 +10,7 @@ import { EntityType } from './filters';
 import { actions as userInterfaceActions } from './user-interface';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { transformSearchRequestModelToDto } from './transform/certificates';
+import { transformAttributeDescriptorDtoToModel } from './transform/attributes';
 import { store } from '../App';
 
 const defaultSearch = { pageNumber: 1, itemsPerPage: 10, filters: [] };
@@ -240,6 +241,36 @@ const deleteVaultProfile: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const getVaultProfileAttributes: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getVaultProfileAttributes.match),
+        switchMap((action) => {
+            const { vaultUuid } = action.payload;
+            return deps.apiClients.vaults.listVaultProfileAttributes({ uuid: vaultUuid }).pipe(
+                map((attributes: unknown) => {
+                    const list = Array.isArray(attributes) ? attributes : [];
+                    return slice.actions.getVaultProfileAttributesSuccess({
+                        vaultUuid,
+                        attributes: list.map((attr: any) => transformAttributeDescriptorDtoToModel(attr)),
+                    });
+                }),
+                catchError((err) =>
+                    of(
+                        slice.actions.getVaultProfileAttributesFailure({
+                            vaultUuid,
+                            error: extractError(err, 'Failed to get Vault Profile Attribute Descriptor list'),
+                        }),
+                        appRedirectActions.fetchError({
+                            error: err,
+                            message: 'Failed to get Vault Profile Attribute Descriptor list',
+                        }),
+                    ),
+                ),
+            );
+        }),
+    );
+};
+
 const epics = [
     listVaultProfiles,
     getVaultProfileDetail,
@@ -248,6 +279,7 @@ const epics = [
     disableVaultProfile,
     updateVaultProfile,
     deleteVaultProfile,
+    getVaultProfileAttributes,
 ];
 
 export default epics;

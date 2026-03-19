@@ -1,6 +1,7 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AuditLogItemModel } from 'types/auditLogs';
 import { SearchRequestModel, SearchFilterModel } from 'types/certificate';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     auditLogs: AuditLogItemModel[];
@@ -72,7 +73,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore?.[slice.name];
+const state = createFeatureSelector<State>(slice.name);
 
 const auditLogs = createSelector(state, (state) => state.auditLogs);
 

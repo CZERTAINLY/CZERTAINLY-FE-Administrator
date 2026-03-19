@@ -28,7 +28,7 @@ export interface ApiKeySecretContent {
      */
     type: SecretType;
     /**
-     * API Key content encoded as Base64 string
+     * API Key content string
      * @type {string}
      * @memberof ApiKeySecretContent
      */

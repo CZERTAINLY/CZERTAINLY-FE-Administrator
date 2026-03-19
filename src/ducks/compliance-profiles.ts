@@ -14,6 +14,7 @@ import {
     Resource,
     ResourceObjectDto,
 } from 'types/openapi';
+import { createFeatureSelector } from 'utils/ducks';
 import { AppState } from 'ducks';
 
 export type State = {
@@ -487,7 +488,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore?.[slice.name];
+const state = createFeatureSelector<State>(slice.name);
 
 const complianceProfile = createSelector(state, (state) => state.complianceProfile);
 const complianceProfiles = createSelector(state, (state) => state.complianceProfiles);

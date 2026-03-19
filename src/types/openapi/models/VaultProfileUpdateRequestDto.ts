@@ -27,6 +27,12 @@ export interface VaultProfileUpdateRequestDto {
      */
     description?: string;
     /**
+     * List of attributes of the Vault profile
+     * @type {Array<RequestAttribute>}
+     * @memberof VaultProfileUpdateRequestDto
+     */
+    attributes: Array<RequestAttribute>;
+    /**
      * List of custom attributes of the Vault profile
      * @type {Array<RequestAttribute>}
      * @memberof VaultProfileUpdateRequestDto

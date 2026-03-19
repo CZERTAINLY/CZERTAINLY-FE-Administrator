@@ -565,7 +565,7 @@ export default function CryptographicKeyForm({ keyId, onSuccess, onCancel, usesG
                         />
                     )}
 
-                    <TabLayout tabs={attributeTabs(watchedTokenProfileUuid)} noBorder onlyActiveTabContent={false} />
+                    <TabLayout tabs={attributeTabs(watchedTokenProfileUuid)} noBorder />
 
                     <Container className="flex-row justify-end modal-footer mt-4" gap={4}>
                         <Button variant="outline" onClick={onCancelClick} disabled={isSubmitting} type="button">

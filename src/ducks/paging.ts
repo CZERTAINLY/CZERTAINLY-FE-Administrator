@@ -1,5 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { WritableDraft } from 'immer/dist/internal';
+import { createFeatureSelector } from 'utils/ducks';
 import { EntityType } from './filters';
 
 export type Paging = {
@@ -88,7 +89,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore?.[slice.name];
+const state = createFeatureSelector<State>(slice.name);
 
 const totalItems = (entity: EntityType) =>
     createSelector(state, (state) => (state.pagings.find((f) => f.entity === entity)?.paging ?? EMPTY_PAGING).totalItems);

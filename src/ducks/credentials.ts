@@ -2,6 +2,7 @@ import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AttributeDescriptorModel } from 'types/attributes';
 import { BulkActionModel, ConnectorResponseModel } from 'types/connectors';
 import { CredentialCreateRequestModel, CredentialEditRequestModel, CredentialResponseModel } from 'types/credentials';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     checkedRows: string[];
@@ -206,7 +207,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore?.[slice.name];
+const state = createFeatureSelector<State>(slice.name);
 
 const checkedRows = createSelector(state, (state) => state.checkedRows);
 

@@ -1,18 +1,21 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
 import AttributeEditor from 'components/Attributes/AttributeEditor';
 import Button from 'components/Button';
 import Container from 'components/Container';
+import TabLayout from 'components/Layout/TabLayout';
 import ProgressButton from 'components/ProgressButton';
 import TextArea from 'components/TextArea';
 
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions as vaultProfileActions, selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
+import { actions as vaultActions, selectors as vaultSelectors } from 'ducks/vaults';
 
-import { Resource } from 'types/openapi';
-import type { VaultProfileDetailDto } from 'types/openapi';
+import { AttributeDescriptorModel } from 'types/attributes';
+import { SearchRequestModel } from 'types/certificate';
+import { FunctionGroupCode, Resource, VaultInstanceDto, VaultProfileDetailDto } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
 interface VaultProfileEditFormProps {
@@ -27,15 +30,29 @@ interface FormValues {
     [key: string]: unknown;
 }
 
+const listVaultsPayload: SearchRequestModel = { itemsPerPage: 1000, pageNumber: 1, filters: [] };
+
 export default function VaultProfileEditForm({ profile, vaultUuid, onCancel, onSuccess }: VaultProfileEditFormProps) {
     const dispatch = useDispatch();
 
+    const vaults = useSelector(vaultSelectors.vaults);
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+    const vaultProfileAttributeDescriptors = useSelector(vaultProfileSelectors.vaultProfileAttributeDescriptors);
+    const isFetchingVaultProfileAttributes = useSelector(vaultProfileSelectors.isFetchingVaultProfileAttributes);
     const isUpdating = useSelector(vaultProfileSelectors.isUpdating);
+
+    const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
+
+    const connectorUuid = useMemo(
+        () => vaults.find((v: VaultInstanceDto) => v.uuid === profile.vaultInstance?.uuid)?.connector?.uuid,
+        [profile.vaultInstance.uuid, vaults],
+    );
 
     useEffect(() => {
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.VaultProfiles));
-    }, [dispatch]);
+        dispatch(vaultActions.listVaults(listVaultsPayload));
+        dispatch(vaultProfileActions.getVaultProfileAttributes({ vaultUuid: profile.vaultInstance.uuid }));
+    }, [dispatch, profile.vaultInstance.uuid]);
 
     const defaultValues: FormValues = useMemo(
         () => ({
@@ -65,13 +82,71 @@ export default function VaultProfileEditForm({ profile, vaultUuid, onCancel, onS
                     vaultProfileUuid: profile.uuid,
                     request: {
                         description: values.description ?? '',
+                        attributes: collectFormAttributes(
+                            'vaultProfile',
+                            [...vaultProfileAttributeDescriptors, ...groupAttributesCallbackAttributes],
+                            allValues,
+                        ),
                         customAttributes: collectFormAttributes('customVaultProfile', resourceCustomAttributes, allValues),
                     },
                 }),
             );
             onSuccess?.();
         },
-        [dispatch, getValues, onSuccess, profile.uuid, resourceCustomAttributes, vaultUuid],
+        [
+            dispatch,
+            getValues,
+            onSuccess,
+            profile.uuid,
+            resourceCustomAttributes,
+            vaultUuid,
+            vaultProfileAttributeDescriptors,
+            groupAttributesCallbackAttributes,
+        ],
+    );
+
+    const attributeTabs = useMemo(
+        () => [
+            {
+                title: 'Attributes',
+                content:
+                    vaultProfileAttributeDescriptors.length > 0 ? (
+                        <AttributeEditor
+                            id="vaultProfile"
+                            attributeDescriptors={vaultProfileAttributeDescriptors}
+                            attributes={profile.attributes ?? []}
+                            connectorUuid={connectorUuid}
+                            functionGroupCode={FunctionGroupCode.CredentialProvider}
+                            kind="vaultManagement"
+                            groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                            setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                        />
+                    ) : (
+                        <div className="text-sm text-gray-500">
+                            {isFetchingVaultProfileAttributes ? 'Loading attributes...' : 'No vault profile attributes configured.'}
+                        </div>
+                    ),
+            },
+            {
+                title: 'Custom Attributes',
+                content: (
+                    <AttributeEditor
+                        id="customVaultProfile"
+                        attributeDescriptors={resourceCustomAttributes}
+                        attributes={profile.customAttributes ?? []}
+                    />
+                ),
+            },
+        ],
+        [
+            connectorUuid,
+            groupAttributesCallbackAttributes,
+            isFetchingVaultProfileAttributes,
+            profile.attributes,
+            profile.customAttributes,
+            resourceCustomAttributes,
+            vaultProfileAttributeDescriptors,
+        ],
     );
 
     return (
@@ -92,11 +167,7 @@ export default function VaultProfileEditForm({ profile, vaultUuid, onCancel, onS
                             />
                         )}
                     />
-                    <AttributeEditor
-                        id="customVaultProfile"
-                        attributeDescriptors={resourceCustomAttributes}
-                        attributes={profile.customAttributes ?? []}
-                    />
+                    <TabLayout tabs={attributeTabs} onlyActiveTabContent={false} />
                     <Container className="flex-row justify-end modal-footer" gap={4}>
                         <Button variant="outline" onClick={onCancel} type="button">
                             Cancel
