@@ -32,7 +32,6 @@ describe('cbom slice', () => {
         expect(next).toEqual(initialState);
         expect((next as any).tempOnlyKey).toBeUndefined();
     });
-
     test('listCboms / success / failure update list flags and data', () => {
         let next = reducer(initialState, actions.listCboms({ filters: [], pageNumber: 1, itemsPerPage: 10 } as any));
         expect(next.cbomsData).toBeUndefined();
@@ -44,6 +43,27 @@ describe('cbom slice', () => {
         expect(next.isFetchingList).toBe(false);
 
         next = reducer({ ...next, isFetchingList: true }, actions.listCbomsFailure({ error: 'x' }));
+        expect(next.isFetchingList).toBe(false);
+    });
+
+    test('listCbomsSuccess stores payload as-is (filtering handled in epic)', () => {
+        const state = {
+            ...initialState,
+            deletedCbomUuids: ['cbom-deleted'],
+            isFetchingList: true,
+        } as any;
+
+        const payload = {
+            items: [{ uuid: 'cbom-deleted' }, { uuid: 'cbom-2' }],
+            totalItems: 2,
+            pageNumber: 1,
+            itemsPerPage: 10,
+            totalPages: 1,
+        } as any;
+
+        const next = reducer(state, actions.listCbomsSuccess({ data: payload }));
+
+        expect(next.cbomsData).toEqual(payload);
         expect(next.isFetchingList).toBe(false);
     });
 
@@ -140,6 +160,8 @@ describe('cbom slice', () => {
         next = reducer(next, actions.deleteCbomSuccess({ uuid: 'cbom-1' }));
         expect(next.isDeleting).toBe(false);
         expect(next.cbomsData!.items).toEqual([{ uuid: 'cbom-2' }]);
+        expect(next.cbomsData!.totalItems).toBe(1);
+        expect(next.deletedCbomUuids).toContain('cbom-1');
 
         next = reducer({ ...next, isDeleting: true }, actions.deleteCbomFailure({ error: 'err' }));
         expect(next.isDeleting).toBe(false);
@@ -163,6 +185,8 @@ describe('cbom slice', () => {
         next = reducer(next, actions.bulkDeleteCbomSuccess({ uuids: ['cbom-1', 'cbom-3'] }));
         expect(next.isBulkDeleting).toBe(false);
         expect(next.cbomsData!.items).toEqual([{ uuid: 'cbom-2' }]);
+        expect(next.cbomsData!.totalItems).toBe(1);
+        expect(next.deletedCbomUuids).toEqual(expect.arrayContaining(['cbom-1', 'cbom-3']));
 
         next = reducer({ ...next, isBulkDeleting: true }, actions.bulkDeleteCbomFailure({ error: 'err' }));
         expect(next.isBulkDeleting).toBe(false);
