@@ -1,4 +1,4 @@
-import React, { act } from 'react';
+import { act } from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { createRoot, Root } from 'react-dom/client';
 
@@ -256,5 +256,77 @@ describe('PagedList unit coverage', () => {
         await renderPagedList({ addHidden: false, onDeleteCallback: vi.fn(), hideWidgetButtons: true });
 
         expect(container.querySelector('[data-testid^="widget-btn-"]')).toBeNull();
+    });
+
+    it('renders additional buttons alongside built-in buttons', async () => {
+        const additionalButtons = [{ icon: 'sync', disabled: false, tooltip: 'Sync', onClick: vi.fn() }];
+        await renderPagedList({ addHidden: false, additionalButtons });
+
+        expect(container.querySelector('[data-testid="widget-btn-plus-0"]')).toBeTruthy();
+        expect(container.querySelector('[data-testid^="widget-btn-sync-"]')).toBeTruthy();
+    });
+
+    it('closes dialog when cancel button is clicked', async () => {
+        mockState.pagings.pagings[0].paging.checkedRows = ['row-1'];
+        await renderPagedList({ addHidden: true, onDeleteCallback: vi.fn() });
+
+        const deleteButton = container.querySelector('[data-testid="widget-btn-trash-0"]') as HTMLButtonElement;
+        await act(async () => {
+            deleteButton.click();
+        });
+
+        expect(container.querySelector('[data-testid="dialog"]')).toBeTruthy();
+
+        const cancelButton = container.querySelector('[data-testid="dialog-cancel"]') as HTMLButtonElement;
+        await act(async () => {
+            cancelButton.click();
+        });
+
+        expect(container.querySelector('[data-testid="dialog"]')).toBeNull();
+    });
+
+    it('closes dialog when toggle is called', async () => {
+        mockState.pagings.pagings[0].paging.checkedRows = ['row-1'];
+        await renderPagedList({ addHidden: true, onDeleteCallback: vi.fn() });
+
+        const deleteButton = container.querySelector('[data-testid="widget-btn-trash-0"]') as HTMLButtonElement;
+        await act(async () => {
+            deleteButton.click();
+        });
+
+        expect(container.querySelector('[data-testid="dialog"]')).toBeTruthy();
+
+        const toggleButton = container.querySelector('[data-testid="dialog-toggle"]') as HTMLButtonElement;
+        await act(async () => {
+            toggleButton.click();
+        });
+
+        expect(container.querySelector('[data-testid="dialog"]')).toBeNull();
+    });
+
+    it('uses singular entity name in dialog when one row is selected', async () => {
+        mockState.pagings.pagings[0].paging.checkedRows = ['row-1'];
+        await renderPagedList({ addHidden: true, onDeleteCallback: vi.fn() });
+
+        const deleteButton = container.querySelector('[data-testid="widget-btn-trash-0"]') as HTMLButtonElement;
+        await act(async () => {
+            deleteButton.click();
+        });
+
+        const dialog = container.querySelector('[data-testid="dialog"]') as HTMLElement;
+        expect(dialog.textContent).toContain('CBOM');
+    });
+
+    it('uses plural entity name in dialog when multiple rows are selected', async () => {
+        mockState.pagings.pagings[0].paging.checkedRows = ['row-1', 'row-2'];
+        await renderPagedList({ addHidden: true, onDeleteCallback: vi.fn() });
+
+        const deleteButton = container.querySelector('[data-testid="widget-btn-trash-0"]') as HTMLButtonElement;
+        await act(async () => {
+            deleteButton.click();
+        });
+
+        const dialog = container.querySelector('[data-testid="dialog"]') as HTMLElement;
+        expect(dialog.textContent).toContain('CBOMs');
     });
 });
