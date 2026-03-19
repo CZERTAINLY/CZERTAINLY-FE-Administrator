@@ -26,7 +26,7 @@ type EpicDeps = {
             removeVaultProfileFromSecret: (args: any) => any;
         };
         vaultProfiles: {
-            getAttributesForCreatingSecret: (args: any) => any;
+            listSecretAttributes: (args: any) => any;
         };
     };
 };
@@ -72,7 +72,7 @@ async function runEpic(
         removeVaultProfileFromSecret: () => of(null),
     };
     const defaultVaultProfiles = {
-        getAttributesForCreatingSecret: () => of([{ uuid: 'attr-1' }]),
+        listSecretAttributes: () => of([{ uuid: 'attr-1' }]),
     };
     const deps: EpicDeps = {
         apiClients: {
@@ -307,7 +307,7 @@ describe('secrets epics', () => {
             secretsActions.getSyncVaultProfileAttributes(payload),
             {
                 vaultProfiles: {
-                    getAttributesForCreatingSecret: () => throwError(() => err),
+                    listSecretAttributes: () => throwError(() => err),
                 } as any,
             },
             2,

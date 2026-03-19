@@ -256,19 +256,6 @@ function SecretDetail() {
                     ),
                     '',
                     <div key="action" className="flex">
-                        {profile.secretAttributes && profile.secretAttributes.length > 0 && (
-                            <Button
-                                variant="transparent"
-                                color="secondary"
-                                onClick={() => {
-                                    setSelectedSyncVaultProfile(profile);
-                                    setIsSyncVaultProfileAttributesOpen(true);
-                                }}
-                                title="Show Sync Vault Profile attributes"
-                            >
-                                <Info size={16} />
-                            </Button>
-                        )}
                         <Button
                             variant="transparent"
                             color="secondary"
@@ -284,6 +271,19 @@ function SecretDetail() {
                         >
                             <SquareMinus size={16} />
                         </Button>
+                        {profile.secretAttributes && profile.secretAttributes.length > 0 && (
+                            <Button
+                                variant="transparent"
+                                color="secondary"
+                                onClick={() => {
+                                    setSelectedSyncVaultProfile(profile);
+                                    setIsSyncVaultProfileAttributesOpen(true);
+                                }}
+                                title="Show Sync Vault Profile attributes"
+                            >
+                                <Info size={16} />
+                            </Button>
+                        )}
                     </div>,
                 ],
             };

@@ -288,12 +288,12 @@ const removeSyncVaultProfile: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const getSecretCreationAttributes: AppEpic = (action$, state$, deps) => {
+const listSecretAttributes: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(slice.actions.getSecretCreationAttributes.match),
-        switchMap((action: ReturnType<typeof slice.actions.getSecretCreationAttributes>) =>
+        filter(slice.actions.listSecretAttributes.match),
+        switchMap((action: ReturnType<typeof slice.actions.listSecretAttributes>) =>
             deps.apiClients.vaultProfiles
-                .getAttributesForCreatingSecret({
+                .listSecretAttributes({
                     vaultUuid: action.payload.vaultUuid,
                     vaultProfileUuid: action.payload.vaultProfileUuid,
                     secretType: action.payload.secretType,
@@ -302,14 +302,14 @@ const getSecretCreationAttributes: AppEpic = (action$, state$, deps) => {
                     mergeMap((list: unknown) => {
                         const arr = Array.isArray(list) ? list : [];
                         return of(
-                            slice.actions.getSecretCreationAttributesSuccess({
+                            slice.actions.listSecretAttributesSuccess({
                                 descriptors: arr.map((attr: unknown) =>
                                     transformAttributeDescriptorDtoToModel(attr as import('types/attributes').AttributeDescriptorDto),
                                 ),
                             }),
                         );
                     }),
-                    catchError(() => of(slice.actions.getSecretCreationAttributesFailure())),
+                    catchError(() => of(slice.actions.listSecretAttributesFailure())),
                 ),
         ),
     );
@@ -320,7 +320,7 @@ const getSyncVaultProfileAttributes: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.getSyncVaultProfileAttributes.match),
         switchMap((action: ReturnType<typeof slice.actions.getSyncVaultProfileAttributes>) =>
             deps.apiClients.vaultProfiles
-                .getAttributesForCreatingSecret({
+                .listSecretAttributes({
                     vaultUuid: action.payload.vaultUuid,
                     vaultProfileUuid: action.payload.vaultProfileUuid,
                     secretType: action.payload.secretType,
@@ -385,7 +385,7 @@ const epics = [
     listSecrets,
     getSecretDetail,
     getSecretVersions,
-    getSecretCreationAttributes,
+    listSecretAttributes,
     createSecret,
     deleteSecret,
     enableSecret,

@@ -113,20 +113,17 @@ export const slice = createSlice({
             state.isFetchingVersions = false;
         },
 
-        getSecretCreationAttributes: (
-            state,
-            _action: PayloadAction<{ vaultUuid: string; vaultProfileUuid: string; secretType: SecretType }>,
-        ) => {
+        listSecretAttributes: (state, _action: PayloadAction<{ vaultUuid: string; vaultProfileUuid: string; secretType: SecretType }>) => {
             state.secretCreationAttributeDescriptors = [];
             state.isFetchingSecretCreationAttributes = true;
         },
 
-        getSecretCreationAttributesSuccess: (state, action: PayloadAction<{ descriptors: AttributeDescriptorModel[] }>) => {
-            state.secretCreationAttributeDescriptors = action.payload.descriptors as typeof state.secretCreationAttributeDescriptors;
+        listSecretAttributesSuccess: (state, action: PayloadAction<{ descriptors: AttributeDescriptorModel[] }>) => {
+            state.secretCreationAttributeDescriptors = action.payload.descriptors;
             state.isFetchingSecretCreationAttributes = false;
         },
 
-        getSecretCreationAttributesFailure: (state) => {
+        listSecretAttributesFailure: (state) => {
             state.isFetchingSecretCreationAttributes = false;
         },
 

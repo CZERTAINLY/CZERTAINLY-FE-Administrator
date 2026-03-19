@@ -48,15 +48,15 @@ export interface EnableVaultProfileRequest {
     vaultProfileUuid: string;
 }
 
-export interface GetAttributesForCreatingSecretRequest {
-    vaultUuid: string;
-    vaultProfileUuid: string;
-    secretType: SecretType;
-}
-
 export interface GetVaultProfileDetailsRequest {
     vaultUuid: string;
     vaultProfileUuid: string;
+}
+
+export interface ListSecretAttributesRequest {
+    vaultUuid: string;
+    vaultProfileUuid: string;
+    secretType: SecretType;
 }
 
 export interface ListVaultProfilesRequest {
@@ -141,22 +141,6 @@ export class VaultProfileManagementApi extends BaseAPI {
     };
 
     /**
-     * List attributes for creating a secret in a Vault Profile
-     */
-    getAttributesForCreatingSecret({ vaultUuid, vaultProfileUuid, secretType }: GetAttributesForCreatingSecretRequest): Observable<Array<BaseAttributeDto>>
-    getAttributesForCreatingSecret({ vaultUuid, vaultProfileUuid, secretType }: GetAttributesForCreatingSecretRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BaseAttributeDto>>>
-    getAttributesForCreatingSecret({ vaultUuid, vaultProfileUuid, secretType }: GetAttributesForCreatingSecretRequest, opts?: OperationOpts): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
-        throwIfNullOrUndefined(vaultUuid, 'vaultUuid', 'getAttributesForCreatingSecret');
-        throwIfNullOrUndefined(vaultProfileUuid, 'vaultProfileUuid', 'getAttributesForCreatingSecret');
-        throwIfNullOrUndefined(secretType, 'secretType', 'getAttributesForCreatingSecret');
-
-        return this.request<Array<BaseAttributeDto>>({
-            url: '/v1/vaults/{vaultUuid}/vaultProfiles/{vaultProfileUuid}/secrets/{secretType}/attributes'.replace('{vaultUuid}', encodeURI(vaultUuid)).replace('{vaultProfileUuid}', encodeURI(vaultProfileUuid)).replace('{secretType}', encodeURI(secretType)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
-
-    /**
      * Get details of a Vault Profile
      */
     getVaultProfileDetails({ vaultUuid, vaultProfileUuid }: GetVaultProfileDetailsRequest): Observable<VaultProfileDetailDto>
@@ -179,6 +163,22 @@ export class VaultProfileManagementApi extends BaseAPI {
     getVaultProfileSearchableFields(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
         return this.request<Array<SearchFieldDataByGroupDto>>({
             url: '/v1/vaultProfiles/search',
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * List attributes for creating a secret in a Vault Profile
+     */
+    listSecretAttributes({ vaultUuid, vaultProfileUuid, secretType }: ListSecretAttributesRequest): Observable<Array<BaseAttributeDto>>
+    listSecretAttributes({ vaultUuid, vaultProfileUuid, secretType }: ListSecretAttributesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BaseAttributeDto>>>
+    listSecretAttributes({ vaultUuid, vaultProfileUuid, secretType }: ListSecretAttributesRequest, opts?: OperationOpts): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
+        throwIfNullOrUndefined(vaultUuid, 'vaultUuid', 'listSecretAttributes');
+        throwIfNullOrUndefined(vaultProfileUuid, 'vaultProfileUuid', 'listSecretAttributes');
+        throwIfNullOrUndefined(secretType, 'secretType', 'listSecretAttributes');
+
+        return this.request<Array<BaseAttributeDto>>({
+            url: '/v1/vaults/{vaultUuid}/vaultProfiles/{vaultProfileUuid}/secrets/{secretType}/attributes'.replace('{vaultUuid}', encodeURI(vaultUuid)).replace('{vaultProfileUuid}', encodeURI(vaultProfileUuid)).replace('{secretType}', encodeURI(secretType)),
             method: 'GET',
         }, opts?.responseOpts);
     };
