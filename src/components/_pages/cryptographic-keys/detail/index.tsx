@@ -29,7 +29,7 @@ export default function CryptographicKeyDetail() {
     const dispatch = useDispatch();
 
     const { id, keyItemUuid } = useParams();
-    const relativePath = '../..' + (keyItemUuid ? '/..' : '');
+    const keysListPath = '/keys';
 
     const cryptographicKey = useSelector(selectors.cryptographicKey);
     const state = useSelector(selectors.state);
@@ -106,11 +106,11 @@ export default function CryptographicKeyDetail() {
             actions.deleteCryptographicKey({
                 keyItemUuid: [],
                 uuid: cryptographicKey.uuid,
-                redirect: relativePath,
+                redirect: keysListPath,
             }),
         );
         setConfirmDelete(false);
-    }, [dispatch, cryptographicKey, relativePath]);
+    }, [dispatch, cryptographicKey, keysListPath]);
 
     const onCompromise = useCallback(() => {
         if (!cryptographicKey) return;
@@ -236,7 +236,7 @@ export default function CryptographicKeyDetail() {
                           item.resource !== Resource.Certificates ? (
                               item.name
                           ) : (
-                              <Link to={`${relativePath}/certificates/detail/${item.uuid}`}>{item.name}</Link>
+                              <Link to={`/certificates/detail/${item.uuid}`}>{item.name}</Link>
                           ),
 
                           item.uuid,
@@ -244,7 +244,7 @@ export default function CryptographicKeyDetail() {
                           item.resource,
                       ],
                   })),
-        [cryptographicKey, relativePath],
+        [cryptographicKey],
     );
 
     const detailData: TableDataRow[] = useMemo(
@@ -273,7 +273,7 @@ export default function CryptographicKeyDetail() {
                           columns: [
                               'Token Instance Name',
                               cryptographicKey.tokenInstanceUuid ? (
-                                  <Link to={`${relativePath}/tokens/detail/${cryptographicKey.tokenInstanceUuid}`}>
+                                  <Link to={`/tokens/detail/${cryptographicKey.tokenInstanceUuid}`}>
                                       {cryptographicKey.tokenInstanceName}
                                   </Link>
                               ) : (
@@ -291,7 +291,7 @@ export default function CryptographicKeyDetail() {
                               'Token Profile Name',
                               cryptographicKey.tokenInstanceUuid && cryptographicKey.tokenProfileUuid ? (
                                   <Link
-                                      to={`${relativePath}/tokenprofiles/detail/${cryptographicKey.tokenInstanceUuid}/${cryptographicKey.tokenProfileUuid}`}
+                                      to={`/tokenprofiles/detail/${cryptographicKey.tokenInstanceUuid}/${cryptographicKey.tokenProfileUuid}`}
                                   >
                                       {cryptographicKey.tokenProfileName}
                                   </Link>
@@ -309,9 +309,7 @@ export default function CryptographicKeyDetail() {
                           columns: [
                               'Owner',
                               cryptographicKey.ownerUuid ? (
-                                  <Link to={`${relativePath}/users/detail/${cryptographicKey.ownerUuid}`}>
-                                      {cryptographicKey.owner ?? 'Unassigned'}
-                                  </Link>
+                                  <Link to={`/users/detail/${cryptographicKey.ownerUuid}`}>{cryptographicKey.owner ?? 'Unassigned'}</Link>
                               ) : (
                                   cryptographicKey.owner || 'Unassigned'
                               ),
@@ -324,7 +322,7 @@ export default function CryptographicKeyDetail() {
                               cryptographicKey.groups?.length
                                   ? cryptographicKey.groups.map((group, i) => (
                                         <Fragment key={group.uuid}>
-                                            <Link to={`${relativePath}/groups/detail/${group.uuid}`}>{group.name}</Link>
+                                            <Link to={`/groups/detail/${group.uuid}`}>{group.name}</Link>
                                             {cryptographicKey?.groups?.length && i !== cryptographicKey.groups.length - 1 ? `, ` : ``}
                                         </Fragment>
                                     ))
@@ -332,7 +330,7 @@ export default function CryptographicKeyDetail() {
                           ],
                       },
                   ],
-        [cryptographicKey, relativePath],
+        [cryptographicKey],
     );
 
     const itemTabs = useMemo(() => {

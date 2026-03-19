@@ -549,8 +549,8 @@ function SecretDetail() {
                     toggle={() => setConfirmEnable(false)}
                     icon="check"
                     buttons={[
-                        { color: 'primary', onClick: onEnableConfirmed, body: 'Enable' },
                         { color: 'secondary', variant: 'outline', onClick: () => setConfirmEnable(false), body: 'Cancel' },
+                        { color: 'primary', onClick: onEnableConfirmed, body: 'Enable' },
                     ]}
                 />
 
@@ -561,8 +561,8 @@ function SecretDetail() {
                     toggle={() => setConfirmDisable(false)}
                     icon="warning"
                     buttons={[
-                        { color: 'danger', onClick: onDisableConfirmed, body: 'Disable' },
                         { color: 'secondary', variant: 'outline', onClick: () => setConfirmDisable(false), body: 'Cancel' },
+                        { color: 'danger', onClick: onDisableConfirmed, body: 'Disable' },
                     ]}
                 />
 
@@ -573,8 +573,8 @@ function SecretDetail() {
                     toggle={() => setConfirmDelete(false)}
                     icon="delete"
                     buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                         { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     ]}
                 />
 

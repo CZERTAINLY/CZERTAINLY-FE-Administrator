@@ -7,6 +7,7 @@ import {
     ScepProfileListResponseModel,
     ScepProfileResponseModel,
 } from 'types/scep-profiles';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     checkedRows: string[];
@@ -305,7 +306,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore?.[slice.name];
+const state = createFeatureSelector<State>(slice.name);
 
 const scepProfile = createSelector(state, (state) => state.scepProfile);
 const scepProfiles = createSelector(state, (state) => state.scepProfiles);

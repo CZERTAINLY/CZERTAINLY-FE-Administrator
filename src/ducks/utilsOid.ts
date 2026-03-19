@@ -1,4 +1,5 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createFeatureSelector } from 'utils/ducks';
 import { OidInfoResponseDto } from '../types/openapi/utils';
 
 export type State = {
@@ -30,7 +31,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore?.[slice.name];
+const state = createFeatureSelector<State>(slice.name);
 
 const oidInfo = createSelector(state, (state: State) => state.oidInfo);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);

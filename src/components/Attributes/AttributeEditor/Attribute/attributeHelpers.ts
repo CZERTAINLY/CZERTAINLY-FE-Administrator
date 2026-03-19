@@ -117,8 +117,17 @@ export function buildAttributeValidators(descriptor: DataAttributeModel | Custom
         return composeValidators.apply(undefined, validators);
     }
     if (descriptor.properties.required) validators.push(validateRequired());
-    if (descriptor.contentType === AttributeContentType.Integer) validators.push(validateInteger());
-    if (descriptor.contentType === AttributeContentType.Float) validators.push(validateFloat());
+
+    // For list/select attributes (like RSA key size) we trust backend-provided values
+    // and do not attach numeric validators on the frontend to avoid blocking the form
+    const isListAttribute = descriptor.properties.list === true;
+
+    if (!isListAttribute && descriptor.contentType === AttributeContentType.Integer) {
+        validators.push(validateInteger());
+    }
+    if (!isListAttribute && descriptor.contentType === AttributeContentType.Float) {
+        validators.push(validateFloat());
+    }
     if (isDataAttributeModel(descriptor)) {
         addDataAttributeConstraintValidators(descriptor, validators);
     }
