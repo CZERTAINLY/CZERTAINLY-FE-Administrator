@@ -1,9 +1,10 @@
 import { store } from '../App';
 import { createSelector } from 'reselect';
 import { MessageModel } from 'types/alerts';
+import { createFeatureSelector } from 'utils/ducks';
 import { alertsSlice, State } from './alert-slice';
 
-const selectState = (reduxStore: any): State => reduxStore?.[alertsSlice.name];
+const selectState = createFeatureSelector<State>(alertsSlice.name);
 
 const selectMessages = createSelector(selectState, (state) => state?.messages ?? []);
 

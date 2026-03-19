@@ -12,6 +12,7 @@ import {
     CmpProfileModel,
     CmpProfileRequestModel,
 } from 'types/cmp-profiles';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     checkedRows: string[];
@@ -308,7 +309,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore?.[slice.name];
+const state = createFeatureSelector<State>(slice.name);
 
 const cmpProfile = createSelector(state, (state) => state.cmpProfile);
 const cmpProfiles = createSelector(state, (state) => state.cmpProfiles);

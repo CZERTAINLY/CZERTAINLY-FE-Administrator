@@ -5,6 +5,7 @@ import {
     OAuth2ProviderSettingsResponseModel,
     OAuth2ProviderSettingsUpdateModel,
 } from 'types/auth-settings';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     authenticationSettings?: AuthenticationSettingsModel;
@@ -164,7 +165,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore?.[slice.name];
+const state = createFeatureSelector<State>(slice.name);
 
 const authenticationSettings = createSelector(state, (state) => state.authenticationSettings);
 const oauth2Provider = createSelector(state, (state) => state.oauth2Provider);

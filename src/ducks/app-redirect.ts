@@ -1,5 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AjaxError } from 'rxjs/ajax';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     unauthorized: boolean;
@@ -51,7 +52,7 @@ export const slice = createSlice({
     },
 });
 
-const selectState = (reduxStore: any): State => reduxStore?.[slice.name];
+const selectState = createFeatureSelector<State>(slice.name);
 
 const unauthorized = createSelector(selectState, (state) => state.unauthorized);
 const goBack = createSelector(selectState, (state) => state.goBack);

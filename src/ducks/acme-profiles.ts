@@ -6,6 +6,7 @@ import {
     AcmeProfileResponseModel,
 } from 'types/acme-profiles';
 import { BulkActionModel } from 'types/connectors';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     checkedRows: string[];
@@ -298,7 +299,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore?.[slice.name];
+const state = createFeatureSelector<State>(slice.name);
 
 const acmeProfile = createSelector(state, (state) => state.acmeProfile);
 const acmeProfiles = createSelector(state, (state) => state.acmeProfiles);

@@ -1,4 +1,5 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createFeatureSelector } from 'utils/ducks';
 import { SearchRequestModel } from 'types/certificate';
 import { VaultInstanceDetailDto, VaultInstanceDto, VaultInstanceUpdateRequestDto } from 'types/openapi';
 import type { AttributeDescriptorModel } from 'types/attributes';
@@ -166,7 +167,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore?.[slice.name];
+const state = createFeatureSelector<State>(slice.name);
 
 const vaults = createSelector(state, (state) => state.vaults);
 const vault = createSelector(state, (state) => state.vault);

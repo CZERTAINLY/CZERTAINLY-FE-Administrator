@@ -6,6 +6,7 @@ import {
     NotificationProfileRequestModel,
     NotificationProfileUpdateRequestModel,
 } from 'types/notification-profiles';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     notificationProfile?: NotificationProfileDetailModel;
@@ -138,7 +139,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore?.[slice.name];
+const state = createFeatureSelector<State>(slice.name);
 
 const notificationProfile = createSelector(state, (state: State) => state.notificationProfile);
 const notificationProfiles = createSelector(state, (state: State) => state.notificationProfiles);

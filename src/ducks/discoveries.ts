@@ -8,6 +8,7 @@ import {
     DiscoveryResponseDetailModel,
     DiscoveryResponseModel,
 } from 'types/discoveries';
+import { createFeatureSelector } from 'utils/ducks';
 import { GetDiscoveryCertificatesRequest } from '../types/openapi';
 
 export type State = {
@@ -201,7 +202,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore?.[slice.name];
+const state = createFeatureSelector<State>(slice.name);
 
 const discoveryProviders = createSelector(state, (state) => state.discoveryProviders);
 const discoveryProviderAttributeDescriptors = createSelector(state, (state) => state.discoveryProviderAttributeDescriptors);
