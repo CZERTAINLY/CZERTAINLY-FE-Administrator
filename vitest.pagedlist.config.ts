@@ -9,22 +9,8 @@ export default defineConfig({
     test: {
         globals: true,
         environment: 'happy-dom',
-        include: ['src/utils/**/*.spec.ts', 'src/ducks/**/*.spec.ts', 'src/components/**/*.unit.spec.{ts,tsx}'],
+        include: ['src/components/PagedList/PagedList.unit.spec.tsx'],
         exclude: ['node_modules', 'build', 'dist'],
-        coverage: {
-            provider: 'v8',
-            reporter: ['lcovonly', 'text-summary'],
-            reportsDirectory: './coverage-vitest',
-            include: ['src/utils/**/*.{ts,tsx}', 'src/ducks/**/*.{ts,tsx}', 'src/components/**/*.{ts,tsx}'],
-            exclude: [
-                'node_modules',
-                'src/**/*.spec.{ts,tsx}',
-                'src/types/**/*',
-                'src/utils/ct-window-shim.ts',
-                'src/utils/TestStoreConsumer.tsx',
-                'src/utils/TestRouteDisplay.tsx',
-            ],
-        },
     },
     resolve: {
         alias: [
