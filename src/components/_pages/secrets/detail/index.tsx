@@ -1,34 +1,37 @@
-import AttributeViewer from 'components/Attributes/AttributeViewer';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
-import Dialog from 'components/Dialog';
-import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
-import Container from 'components/Container';
-import Breadcrumb from 'components/Breadcrumb';
-import TabLayout from 'components/Layout/TabLayout';
-import EditIcon from 'components/icons/EditIcon';
-import Badge from 'components/Badge';
-import { SquareMinus } from 'lucide-react';
-
-import { actions as secretsActions, selectors as secretsSelectors } from 'ducks/secrets';
-import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { actions as userActions, selectors as userSelectors } from 'ducks/users';
-import { actions as groupActions, selectors as groupSelectors } from 'ducks/certificateGroups';
-import { actions as vaultProfileActions, selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
-
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
+import { Info, SquareMinus } from 'lucide-react';
+
+import AttributeViewer from 'components/Attributes/AttributeViewer';
+import Badge from 'components/Badge';
+import Breadcrumb from 'components/Breadcrumb';
+import Button from 'components/Button';
+import Container from 'components/Container';
+import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import EditIcon from 'components/icons/EditIcon';
+import Select from 'components/Select';
+import TabLayout from 'components/Layout/TabLayout';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+
+import { actions as groupActions, selectors as groupSelectors } from 'ducks/certificateGroups';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { actions as secretsActions, selectors as secretsSelectors } from 'ducks/secrets';
+import { actions as userActions, selectors as userSelectors } from 'ducks/users';
+import { actions as vaultProfileActions, selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { PlatformEnum, Resource } from 'types/openapi';
+import { PlatformEnum, Resource, SyncVaultProfileDto } from 'types/openapi';
+
+import { dateFormatter } from 'utils/dateUtil';
+import { createWidgetDetailHeaders } from 'utils/widget';
+
 import SecretForm from '../form';
 import SecretStateBadge from '../SecretStateBadge';
-import { dateFormatter } from 'utils/dateUtil';
-import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
-import { createWidgetDetailHeaders } from 'utils/widget';
-import Select from 'components/Select';
-import Button from 'components/Button';
+import { SyncVaultProfileDialog } from '../SyncVaultProfileDialog/SyncVaultProfileDialog';
 
 function SecretDetail() {
     const dispatch = useDispatch();
@@ -57,11 +60,12 @@ function SecretDetail() {
     const [isUpdateVaultProfileOpen, setIsUpdateVaultProfileOpen] = useState(false);
     const [isEditSecretOpen, setIsEditSecretOpen] = useState(false);
     const [isAddSyncVaultProfileOpen, setIsAddSyncVaultProfileOpen] = useState(false);
+    const [selectedSyncVaultProfile, setSelectedSyncVaultProfile] = useState<SyncVaultProfileDto | null>(null);
+    const [isSyncVaultProfileAttributesOpen, setIsSyncVaultProfileAttributesOpen] = useState(false);
 
     const [ownerUuid, setOwnerUuid] = useState('');
     const [selectedGroups, setSelectedGroups] = useState<{ value: string; label: string }[]>([]);
     const [selectedVaultProfileUuid, setSelectedVaultProfileUuid] = useState('');
-    const [selectedSyncVaultProfileUuid, setSelectedSyncVaultProfileUuid] = useState('');
 
     const getFreshSecretDetails = useCallback(() => {
         if (!id) return;
@@ -264,9 +268,24 @@ function SecretDetail() {
                                 );
                             }}
                             title="Remove Sync Vault Profile"
+                            aria-label="Remove Sync Vault Profile"
                         >
                             <SquareMinus size={16} />
                         </Button>
+                        {profile.secretAttributes && profile.secretAttributes.length > 0 && (
+                            <Button
+                                variant="transparent"
+                                color="secondary"
+                                onClick={() => {
+                                    setSelectedSyncVaultProfile(profile);
+                                    setIsSyncVaultProfileAttributesOpen(true);
+                                }}
+                                title="Show Sync Vault Profile attributes"
+                                aria-label="Show Sync Vault Profile attributes"
+                            >
+                                <Info size={16} />
+                            </Button>
+                        )}
                     </div>,
                 ],
             };
@@ -301,20 +320,6 @@ function SecretDetail() {
                 })),
         [vaultProfiles],
     );
-
-    const syncVaultProfileOptions = useMemo(() => {
-        const existing =
-            secret?.syncVaultProfiles?.reduce((set, profile) => {
-                set.add(profile.uuid);
-                return set;
-            }, new Set<string>()) ?? new Set<string>();
-
-        if (secret?.sourceVaultProfile?.uuid) {
-            existing.add(secret.sourceVaultProfile.uuid);
-        }
-
-        return vaultProfileOptions.filter((option) => !existing.has(option.value));
-    }, [secret, vaultProfileOptions]);
 
     const versionsHeaders: TableHeader[] = useMemo(
         () => [
@@ -544,8 +549,8 @@ function SecretDetail() {
                     toggle={() => setConfirmEnable(false)}
                     icon="check"
                     buttons={[
-                        { color: 'primary', onClick: onEnableConfirmed, body: 'Enable' },
                         { color: 'secondary', variant: 'outline', onClick: () => setConfirmEnable(false), body: 'Cancel' },
+                        { color: 'primary', onClick: onEnableConfirmed, body: 'Enable' },
                     ]}
                 />
 
@@ -556,8 +561,8 @@ function SecretDetail() {
                     toggle={() => setConfirmDisable(false)}
                     icon="warning"
                     buttons={[
-                        { color: 'danger', onClick: onDisableConfirmed, body: 'Disable' },
                         { color: 'secondary', variant: 'outline', onClick: () => setConfirmDisable(false), body: 'Cancel' },
+                        { color: 'danger', onClick: onDisableConfirmed, body: 'Disable' },
                     ]}
                 />
 
@@ -568,8 +573,8 @@ function SecretDetail() {
                     toggle={() => setConfirmDelete(false)}
                     icon="delete"
                     buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                         { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     ]}
                 />
 
@@ -673,46 +678,28 @@ function SecretDetail() {
                     <Dialog
                         isOpen={isAddSyncVaultProfileOpen}
                         caption="Add Sync Vault Profile"
-                        body={
-                            <>
-                                <Select
-                                    id="secret-sync-vault-profile-detail"
-                                    label="Vault Profile"
-                                    placeholder="Select vault profile"
-                                    options={syncVaultProfileOptions}
-                                    value={selectedSyncVaultProfileUuid || ''}
-                                    onChange={(value) => setSelectedSyncVaultProfileUuid(value as string)}
-                                />
-                                <Container className="flex-row justify-end modal-footer mt-4" gap={4}>
-                                    <Button variant="outline" onClick={() => setIsAddSyncVaultProfileOpen(false)} type="button">
-                                        Cancel
-                                    </Button>
-                                    <Button
-                                        color="primary"
-                                        onClick={() => {
-                                            if (!selectedSyncVaultProfileUuid) return;
-                                            dispatch(
-                                                secretsActions.addSyncVaultProfile({
-                                                    uuid: secret.uuid,
-                                                    vaultProfileUuid: selectedSyncVaultProfileUuid,
-                                                }),
-                                            );
-                                            setIsAddSyncVaultProfileOpen(false);
-                                            setSelectedSyncVaultProfileUuid('');
-                                        }}
-                                        type="button"
-                                        disabled={!selectedSyncVaultProfileUuid}
-                                    >
-                                        Add
-                                    </Button>
-                                </Container>
-                            </>
-                        }
+                        body={<SyncVaultProfileDialog secret={secret} onClose={() => setIsAddSyncVaultProfileOpen(false)} />}
                         toggle={() => setIsAddSyncVaultProfileOpen(false)}
                         size="md"
                         buttons={[]}
                     />
                 )}
+
+                <Dialog
+                    isOpen={isSyncVaultProfileAttributesOpen}
+                    caption={`Sync Vault Profile Attributes: ${selectedSyncVaultProfile?.name ?? ''}`}
+                    body={<AttributeViewer attributes={selectedSyncVaultProfile?.secretAttributes} />}
+                    toggle={() => setIsSyncVaultProfileAttributesOpen(false)}
+                    size="xl"
+                    buttons={[
+                        {
+                            color: 'secondary',
+                            variant: 'outline',
+                            onClick: () => setIsSyncVaultProfileAttributesOpen(false),
+                            body: 'Close',
+                        },
+                    ]}
+                />
             </div>
         </div>
     );

@@ -16,6 +16,7 @@ import {
     RaProfileResponseModel,
     RaProfileScepDetailResponseModel,
 } from 'types/ra-profiles';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     checkedRows: string[];
@@ -651,7 +652,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore?.[slice.name];
+const state = createFeatureSelector<State>(slice.name);
 
 const checkedRows = createSelector(state, (state: State) => state.checkedRows);
 

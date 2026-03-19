@@ -1,4 +1,5 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createFeatureSelector } from 'utils/ducks';
 
 export interface LoginMethod {
     name: string;
@@ -45,7 +46,7 @@ export const slice = createSlice({
     },
 });
 
-const selectState = (reduxStore: any): State => reduxStore?.[slice.name];
+const selectState = createFeatureSelector<State>(slice.name);
 
 export const selectors = {
     loginMethods: createSelector(selectState, (state) => state.loginMethods),

@@ -1,6 +1,7 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { SearchRequestModel } from 'types/certificate';
 import { OIDRequestModel, OIDResponseModel, OIDUpdateRequestModel } from 'types/oids';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     oid?: OIDResponseModel;
@@ -122,7 +123,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore?.[slice.name];
+const state = createFeatureSelector<State>(slice.name);
 
 const oids = createSelector(state, (state) => state.oids);
 const oid = createSelector(state, (state) => state.oid);

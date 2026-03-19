@@ -352,6 +352,35 @@ function connectorsTestReducer(state: ConnectorsTestState = connectorsTestInitia
     return state;
 }
 
+export type SecretsTestState = {
+    syncVaultProfileAttributeDescriptors: any[];
+    isFetchingSyncVaultProfileAttributes: boolean;
+};
+
+const secretsTestInitialState: SecretsTestState = {
+    syncVaultProfileAttributeDescriptors: [],
+    isFetchingSyncVaultProfileAttributes: false,
+};
+
+function secretsTestReducer(state: SecretsTestState = secretsTestInitialState, _action: UnknownAction): SecretsTestState {
+    return state;
+}
+
+export type VaultProfilesTestState = {
+    vaultProfiles: any[];
+};
+
+const vaultProfilesTestInitialState: VaultProfilesTestState = {
+    vaultProfiles: [],
+};
+
+function vaultProfilesTestReducer(
+    state: VaultProfilesTestState = vaultProfilesTestInitialState,
+    _action: UnknownAction,
+): VaultProfilesTestState {
+    return state;
+}
+
 export const testReducers = combineReducers({
     userInterface: userInterfaceTestReducer,
     enums: enumsTestReducer,
@@ -361,6 +390,8 @@ export const testReducers = combineReducers({
     auth: authTestReducer,
     customAttributes: customAttributesTestReducer,
     connectors: connectorsTestReducer,
+    secrets: secretsTestReducer,
+    vaultProfiles: vaultProfilesTestReducer,
 });
 
 export const testInitialState = {
@@ -372,4 +403,6 @@ export const testInitialState = {
     auth: authTestInitialState,
     customAttributes: customAttributesTestInitialState,
     connectors: connectorsTestInitialState,
+    secrets: secretsTestInitialState,
+    vaultProfiles: vaultProfilesTestInitialState,
 };

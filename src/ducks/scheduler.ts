@@ -1,6 +1,7 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { SearchRequestModel } from 'types/certificate';
 import { SchedulerJobDetailModel, SchedulerJobHistoryModel, SchedulerJobModel } from 'types/scheduler';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     schedulerJob?: SchedulerJobDetailModel;
@@ -182,7 +183,7 @@ export const slice = createSlice({
     },
 });
 
-const state = (reduxStore: any): State => reduxStore?.[slice.name];
+const state = createFeatureSelector<State>(slice.name);
 
 const schedulerJob = createSelector(state, (state) => state.schedulerJob);
 const schedulerJobs = createSelector(state, (state) => state.schedulerJobs);

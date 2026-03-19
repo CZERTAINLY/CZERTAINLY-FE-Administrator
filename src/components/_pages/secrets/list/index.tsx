@@ -50,6 +50,8 @@ export default function SecretsList() {
     const [isUpdateOwnerOpen, setIsUpdateOwnerOpen] = useState(false);
     const [isUpdateGroupsOpen, setIsUpdateGroupsOpen] = useState(false);
     const [isUpdateVaultProfileOpen, setIsUpdateVaultProfileOpen] = useState(false);
+    const [isEnableSecretsOpen, setIsEnableSecretsOpen] = useState(false);
+    const [isDisableSecretsOpen, setIsDisableSecretsOpen] = useState(false);
 
     const [ownerUuid, setOwnerUuid] = useState<string>('');
     const [selectedGroups, setSelectedGroups] = useState<{ value: string; label: string }[]>([]);
@@ -167,10 +169,12 @@ export default function SecretsList() {
 
     const handleEnableSecrets = useCallback(() => {
         checkedRows.forEach((uuid) => dispatch(actions.enableSecret({ uuid: String(uuid) })));
+        setIsEnableSecretsOpen(false);
     }, [dispatch, checkedRows]);
 
     const handleDisableSecrets = useCallback(() => {
         checkedRows.forEach((uuid) => dispatch(actions.disableSecret({ uuid: String(uuid) })));
+        setIsDisableSecretsOpen(false);
     }, [dispatch, checkedRows]);
 
     const buttons: WidgetButtonProps[] = useMemo(
@@ -185,13 +189,13 @@ export default function SecretsList() {
                 icon: 'check',
                 disabled: checkedRows.length === 0,
                 tooltip: 'Enable selected Secrets',
-                onClick: handleEnableSecrets,
+                onClick: () => setIsEnableSecretsOpen(true),
             },
             {
                 icon: 'times',
                 disabled: checkedRows.length === 0,
                 tooltip: 'Disable selected Secrets',
-                onClick: handleDisableSecrets,
+                onClick: () => setIsDisableSecretsOpen(true),
             },
             {
                 icon: 'user',
@@ -212,7 +216,7 @@ export default function SecretsList() {
                 onClick: () => setIsUpdateVaultProfileOpen(true),
             },
         ],
-        [checkedRows, handleDisableSecrets, handleEnableSecrets],
+        [checkedRows, setIsUpdateGroupsOpen, setIsUpdateOwnerOpen, setIsUpdateVaultProfileOpen],
     );
 
     const userOptions = useMemo(
@@ -347,6 +351,32 @@ export default function SecretsList() {
                 toggle={() => setIsUpdateOwnerOpen(false)}
                 size="md"
                 buttons={[]}
+            />
+
+            <Dialog
+                isOpen={isEnableSecretsOpen}
+                caption="Enable Secrets"
+                icon="check"
+                body="You are about to enable the selected Secrets. Is this what you want to do?"
+                toggle={() => setIsEnableSecretsOpen(false)}
+                size="md"
+                buttons={[
+                    { color: 'secondary', variant: 'outline', onClick: () => setIsEnableSecretsOpen(false), body: 'Cancel' },
+                    { color: 'primary', onClick: handleEnableSecrets, body: 'Enable' },
+                ]}
+            />
+
+            <Dialog
+                isOpen={isDisableSecretsOpen}
+                caption="Disable Secrets"
+                icon="warning"
+                body="You are about to disable the selected Secrets. Is this what you want to do?"
+                toggle={() => setIsDisableSecretsOpen(false)}
+                size="md"
+                buttons={[
+                    { color: 'secondary', variant: 'outline', onClick: () => setIsDisableSecretsOpen(false), body: 'Cancel' },
+                    { color: 'danger', onClick: handleDisableSecrets, body: 'Disable' },
+                ]}
             />
 
             <Dialog
