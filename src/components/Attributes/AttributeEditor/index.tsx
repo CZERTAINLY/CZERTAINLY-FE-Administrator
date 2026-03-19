@@ -573,7 +573,7 @@ function AttributeEditorInner({
 
             if (descriptor.properties.list && descriptor.properties.multiSelect) {
                 setMultiSelectListAttributeValue();
-            } else if (descriptor.properties.list) {
+            } else if (descriptor.properties.list || descriptor.contentType === AttributeContentType.Resource) {
                 setSelectListAttributeValue();
             } else if (appliedContent) {
                 const firstApplied = appliedContent[0] as any;
