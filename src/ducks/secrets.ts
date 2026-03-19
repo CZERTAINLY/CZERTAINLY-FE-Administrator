@@ -139,7 +139,7 @@ export const slice = createSlice({
         },
 
         getSyncVaultProfileAttributesSuccess: (state, action: PayloadAction<{ descriptors: AttributeDescriptorModel[] }>) => {
-            state.syncVaultProfileAttributeDescriptors = action.payload.descriptors as typeof state.syncVaultProfileAttributeDescriptors;
+            state.syncVaultProfileAttributeDescriptors = action.payload.descriptors;
             state.isFetchingSyncVaultProfileAttributes = false;
         },
 

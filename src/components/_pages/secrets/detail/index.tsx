@@ -23,7 +23,6 @@ import { actions as secretsActions, selectors as secretsSelectors } from 'ducks/
 import { actions as userActions, selectors as userSelectors } from 'ducks/users';
 import { actions as vaultProfileActions, selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
 
-import { AttributeResponseModel } from 'types/attributes';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource, SyncVaultProfileDto } from 'types/openapi';
 
