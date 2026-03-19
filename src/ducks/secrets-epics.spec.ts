@@ -113,7 +113,6 @@ describe('secrets epics', () => {
             request: {
                 name: 's1',
                 description: '',
-                sourceVaultProfileUuid: 'vp-1',
                 secret: { type: 'Generic', content: '' },
                 attributes: [],
             } as any,
