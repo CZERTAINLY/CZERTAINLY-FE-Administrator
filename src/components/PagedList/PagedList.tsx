@@ -111,7 +111,6 @@ function PagedList({
         [dispatch, entity, pageSize],
     );
 
-    /* istanbul ignore next */
     const onDeleteConfirmed = useCallback(() => {
         setConfirmDelete(false);
         onDeleteCallback!(checkedRows, currentFilters);
@@ -119,7 +118,6 @@ function PagedList({
         getFreshData();
     }, [checkedRows, onDeleteCallback, currentFilters, onCheckedRowsChanged, getFreshData]);
 
-    /* istanbul ignore next */
     useEffect(() => {
         const currentFiltersSnapshot = JSON.stringify(currentFilters ?? []);
 
@@ -145,7 +143,6 @@ function PagedList({
         getFreshData();
     }, [getFreshData]);
 
-    /* istanbul ignore next */
     const buttons: WidgetButtonProps[] = useMemo(() => {
         const result = [];
         if (!addHidden) {

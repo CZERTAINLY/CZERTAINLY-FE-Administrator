@@ -57,7 +57,8 @@ function renderPagedList(options?: {
     addHidden?: boolean;
     hideWidgetButtons?: boolean;
     isBusy?: boolean;
-    onDeleteCallback?: (uuids: string[]) => void;
+    onDeleteCallback?: (uuids: string[], filters: any[]) => void;
+    onListCallback?: (filters: any) => void;
     additionalButtons?: any[];
     filterTitle?: string;
     getAvailableFiltersApi?: any;
@@ -82,7 +83,7 @@ function renderPagedList(options?: {
                     isBusy={options?.isBusy ?? false}
                     filterTitle={options?.filterTitle}
                     getAvailableFiltersApi={options?.getAvailableFiltersApi}
-                    onListCallback={() => {}}
+                    onListCallback={options?.onListCallback ?? (() => {})}
                     onDeleteCallback={options?.onDeleteCallback as any}
                     additionalButtons={options?.additionalButtons as any}
                     hasCheckboxes={options?.hasCheckboxes ?? true}
@@ -138,7 +139,7 @@ test.describe('PagedList', () => {
         );
 
         await expect(component.locator('button:has(svg.lucide-plus)')).toHaveCount(0);
-        await expect(component.locator('button:has(svg.lucide-trash2)')).toHaveCount(0);
+        await expect(component.locator('button:has(svg[class*="lucide-trash"])')).toHaveCount(0);
     });
 
     test('mounts with preselected rows for delete flow', async ({ mount }) => {
