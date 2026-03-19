@@ -418,6 +418,24 @@ test.describe('CustomTable', () => {
         await expect(component.getByText(/Showing.*of.*entries/)).toBeVisible();
     });
 
+    test('should use custom itemsPerPageOptions when provided', async ({ mount }) => {
+        const manyRows = Array.from({ length: 50 }, (_, i) => ({
+            id: i + 1,
+            columns: [`Item ${i + 1}`, `x`, `y`],
+        }));
+        const component = await mount(
+            withProviders(
+                <CustomTable
+                    headers={mockHeaders}
+                    data={manyRows}
+                    hasPagination={true}
+                    itemsPerPageOptions={[10, 20, 50, 100, 200, 500, 1000]}
+                />,
+            ),
+        );
+        await expect(component.getByText(/Showing.*of.*entries/)).toBeVisible();
+    });
+
     test('should show paginationData range when loadedPageSize exceeds remaining items', async ({ mount }) => {
         const paginationData = {
             page: 2,

@@ -37,6 +37,7 @@ interface Props {
     onCheckedRowsChanged?: (checkedRows: (string | number)[]) => void;
     onPageSizeChanged?: (pageSize: number) => void;
     onPageChanged?: (page: number) => void;
+    itemsPerPageOptions?: number[];
     newRowWidgetProps?: NewRowWidgetProps;
     columnForDetail?: string;
     detailHeaders?: TableHeader[];
@@ -59,6 +60,7 @@ function CustomTable({
     onCheckedRowsChanged,
     onPageSizeChanged,
     onPageChanged,
+    itemsPerPageOptions,
     newRowWidgetProps,
     detailHeaders,
     columnForDetail,
@@ -533,10 +535,12 @@ function CustomTable({
                         {(paginationData ? paginationData.totalItems > 0 : (tblData?.length ?? 0) > 0) && (
                             <Select
                                 id="pageSize"
-                                options={(paginationData?.itemsPerPageOptions || [10, 20, 50, 100]).map((option: number) => ({
-                                    label: option.toString(),
-                                    value: option.toString(),
-                                }))}
+                                options={(paginationData?.itemsPerPageOptions || itemsPerPageOptions || [10, 20, 50, 100]).map(
+                                    (option: number) => ({
+                                        label: option.toString(),
+                                        value: option.toString(),
+                                    }),
+                                )}
                                 value={(paginationData ? paginationData.pageSize : pageSize).toString()}
                                 onChange={(v) => onPageSizeChange(v as string | number)}
                                 minWidth={90}
