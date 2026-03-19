@@ -49,6 +49,11 @@ const toAttributeRequestModel = (attribute: AttributeResponseModel): AttributeRe
     };
 };
 
+const getVaultProfileCurrentAttributes = (state: AppState, resourceUuid: string) => {
+    if (state.vaultProfiles.vaultProfile?.uuid !== resourceUuid) return undefined;
+    return state.vaultProfiles.vaultProfile.attributes.map(transformAttributeResponseDtoToModel);
+};
+
 const getVaultProfileCurrentCustomAttributes = (state: AppState, resourceUuid: string) => {
     const fromCache = state.customAttributes.resourceCustomAttributesContents.find(
         (entry) => entry.resource === Resource.VaultProfiles && entry.resourceUuid === resourceUuid,
@@ -167,7 +172,7 @@ const handleVaultsContentUpdate = (
     const currentAttributes = getVaultCurrentAttributes(state, payload.resourceUuid);
     const currentCustomAttributes = getVaultCurrentCustomAttributes(state, payload.resourceUuid);
 
-    if (!currentVault || currentVault.uuid !== payload.resourceUuid || !currentAttributes || !currentCustomAttributes) {
+    if (currentVault?.uuid !== payload.resourceUuid || !currentAttributes || !currentCustomAttributes) {
         return of(
             createContentFailureAction(
                 operation,
@@ -224,9 +229,10 @@ const handleVaultProfilesContentUpdate = (
     deps: any,
 ): Observable<AnyAction> => {
     const currentVaultProfile = state.vaultProfiles.vaultProfile;
-    const currentAttributes = getVaultProfileCurrentCustomAttributes(state, payload.resourceUuid);
+    const currentAttributes = getVaultProfileCurrentAttributes(state, payload.resourceUuid);
+    const currentCustomAttributes = getVaultProfileCurrentCustomAttributes(state, payload.resourceUuid);
 
-    if (!currentVaultProfile || currentVaultProfile.uuid !== payload.resourceUuid || !currentAttributes) {
+    if (currentVaultProfile?.uuid !== payload.resourceUuid || !currentAttributes || !currentCustomAttributes) {
         return of(
             createContentFailureAction(
                 operation,
@@ -237,7 +243,7 @@ const handleVaultProfilesContentUpdate = (
         );
     }
 
-    const nextAttributes = buildNextCustomAttributes(operation, state, payload.attributeUuid, payload.content, currentAttributes);
+    const nextAttributes = buildNextCustomAttributes(operation, state, payload.attributeUuid, payload.content, currentCustomAttributes);
 
     if (!nextAttributes) {
         return of(
@@ -256,6 +262,7 @@ const handleVaultProfilesContentUpdate = (
             vaultProfileUuid: payload.resourceUuid,
             vaultProfileUpdateRequestDto: {
                 description: currentVaultProfile.description ?? '',
+                attributes: currentAttributes.map(toAttributeRequestModel),
                 customAttributes: nextAttributes.map(toAttributeRequestModel),
             },
         })

@@ -329,7 +329,6 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                         request: {
                             name: values.name,
                             description: values.description ?? '',
-                            sourceVaultProfileUuid,
                             secret: secretContent,
                             attributes,
                             customAttributes,
