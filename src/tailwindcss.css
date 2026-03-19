@@ -200,6 +200,7 @@ table .preline-badge {
 }
 .preline-cron-wrapper .cron_builder_bordering .text_align_left {
     line-height: 2.5;
+    text-align: left;
 }
 .preline-cron-wrapper .cron_builder_bordering input:not([type='radio']),
 .preline-cron-wrapper .cron_builder_bordering input:not([type='checkbox']) {
