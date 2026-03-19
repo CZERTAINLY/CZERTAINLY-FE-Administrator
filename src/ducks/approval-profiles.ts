@@ -16,6 +16,8 @@ export type State = {
     isUpdating: boolean;
     isDeleting: boolean;
     isCreating: boolean;
+    createApprovalProfileSucceeded: boolean;
+    updateApprovalProfileSucceeded: boolean;
     deleteErrorMessage: string;
     totalItems?: number;
 };
@@ -28,6 +30,8 @@ export const initialState: State = {
     isFetchingDetail: false,
     isDeleting: false,
     isCreating: false,
+    createApprovalProfileSucceeded: false,
+    updateApprovalProfileSucceeded: false,
     deleteErrorMessage: '',
     totalItems: undefined,
 };
@@ -49,15 +53,18 @@ export const slice = createSlice({
         createApprovalProfile: (state, action: PayloadAction<ProfileApprovalRequestModel>) => {
             state.profileApprovalDetail = undefined;
             state.isCreating = true;
+            state.createApprovalProfileSucceeded = false;
         },
 
         createApprovalProfileSuccess: (state, action: PayloadAction<UuidDto>) => {
             state.isCreating = false;
+            state.createApprovalProfileSucceeded = true;
         },
 
         createApprovalProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.profileApprovalDetail = undefined;
             state.isCreating = false;
+            state.createApprovalProfileSucceeded = false;
         },
 
         getApprovalProfile: (state, action: PayloadAction<{ uuid: string; version?: number }>) => {
@@ -113,12 +120,15 @@ export const slice = createSlice({
         editApprovalProfile: (state, action: PayloadAction<{ uuid: string; editProfileApproval: ProfileApprovalRequestModel }>) => {
             state.profileApprovalDetail = undefined;
             state.isUpdating = true;
+            state.updateApprovalProfileSucceeded = false;
         },
         editApprovalProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isUpdating = false;
+            state.updateApprovalProfileSucceeded = true;
         },
         editApprovalProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateApprovalProfileSucceeded = false;
         },
 
         clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
@@ -132,11 +142,13 @@ const state = createFeatureSelector<State>(slice.name);
 const profileApprovalDetail = createSelector(state, (state) => state.profileApprovalDetail);
 const profileApprovalList = createSelector(state, (state) => state.profileApprovalList);
 const isCreating = createSelector(state, (state) => state.isCreating);
+const createApprovalProfileSucceeded = createSelector(state, (state) => state.createApprovalProfileSucceeded);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
 const totalItems = createSelector(state, (state) => state.totalItems);
 const isUpdating = createSelector(state, (state) => state.isUpdating);
+const updateApprovalProfileSucceeded = createSelector(state, (state) => state.updateApprovalProfileSucceeded);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 
 export const selectors = {
@@ -144,10 +156,12 @@ export const selectors = {
     profileApprovalDetail,
     profileApprovalList,
     isCreating,
+    createApprovalProfileSucceeded,
     isFetchingDetail,
     deleteErrorMessage,
     totalItems,
     isUpdating,
+    updateApprovalProfileSucceeded,
     isDeleting,
     isFetchingList,
 };

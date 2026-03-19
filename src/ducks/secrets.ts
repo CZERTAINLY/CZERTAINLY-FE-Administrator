@@ -27,7 +27,9 @@ export type State = {
     isFetchingVersions: boolean;
 
     isCreating: boolean;
+    createSecretSucceeded: boolean;
     isUpdating: boolean;
+    updateSecretSucceeded: boolean;
     isDeleting: boolean;
     isEnabling: boolean;
     isDisabling: boolean;
@@ -47,7 +49,9 @@ export const initialState: State = {
     isFetchingVersions: false,
 
     isCreating: false,
+    createSecretSucceeded: false,
     isUpdating: false,
+    updateSecretSucceeded: false,
     isDeleting: false,
     isEnabling: false,
     isDisabling: false,
@@ -147,40 +151,49 @@ export const slice = createSlice({
 
         createSecret: (state, action: PayloadAction<{ vaultUuid: string; vaultProfileUuid: string; request: SecretRequestDto }>) => {
             state.isCreating = true;
+            state.createSecretSucceeded = false;
         },
 
         createSecretSuccess: (state, action: PayloadAction<{ secret: SecretDetailDto }>) => {
             state.isCreating = false;
+            state.createSecretSucceeded = true;
             state.secret = action.payload.secret;
         },
 
         createSecretFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
+            state.createSecretSucceeded = false;
         },
 
         updateSecret: (state, action: PayloadAction<{ uuid: string; update: SecretUpdateRequestDto }>) => {
             state.isUpdating = true;
+            state.updateSecretSucceeded = false;
         },
 
         updateSecretSuccess: (state, action: PayloadAction<{ secret: SecretDetailDto }>) => {
             state.isUpdating = false;
+            state.updateSecretSucceeded = true;
             state.secret = action.payload.secret;
         },
 
         updateSecretFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateSecretSucceeded = false;
         },
 
         updateSecretObjects: (state, action: PayloadAction<{ uuid: string; update: SecretUpdateObjectsDto }>) => {
             state.isUpdating = true;
+            state.updateSecretSucceeded = false;
         },
 
         updateSecretObjectsSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isUpdating = false;
+            state.updateSecretSucceeded = true;
         },
 
         updateSecretObjectsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateSecretSucceeded = false;
         },
 
         addSyncVaultProfile: (
@@ -272,7 +285,9 @@ const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail
 const isFetchingVersions = createSelector(state, (state) => state.isFetchingVersions);
 
 const isCreating = createSelector(state, (state) => state.isCreating);
+const createSecretSucceeded = createSelector(state, (state) => state.createSecretSucceeded);
 const isUpdating = createSelector(state, (state) => state.isUpdating);
+const updateSecretSucceeded = createSelector(state, (state) => state.updateSecretSucceeded);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isEnabling = createSelector(state, (state) => state.isEnabling);
 const isDisabling = createSelector(state, (state) => state.isDisabling);
@@ -294,7 +309,9 @@ export const selectors = {
     isFetchingVersions,
 
     isCreating,
+    createSecretSucceeded,
     isUpdating,
+    updateSecretSucceeded,
     isDeleting,
     isEnabling,
     isDisabling,

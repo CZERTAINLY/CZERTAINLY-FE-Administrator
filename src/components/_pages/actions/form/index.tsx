@@ -2,7 +2,7 @@ import Widget from 'components/Widget';
 import { EntityType, actions as filterActions } from 'ducks/filters';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo } from 'react';
-import { useAreDefaultValuesSame, useRunOnFinished } from 'utils/common-hooks';
+import { useAreDefaultValuesSame, useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
@@ -36,6 +36,7 @@ const ActionsForm = ({ onCancel, onSuccess }: ActionsFormProps = {}) => {
 
     const executions = useSelector(rulesSelectors.executions);
     const isCreatingAction = useSelector(rulesSelectors.isCreatingAction);
+    const createActionSucceeded = useSelector(rulesSelectors.createActionSucceeded);
     const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
     const isBusy = useMemo(() => isCreatingAction || isFetchingResourcesList, [isCreatingAction, isFetchingResourcesList]);
@@ -90,7 +91,7 @@ const ActionsForm = ({ onCancel, onSuccess }: ActionsFormProps = {}) => {
         };
     }, [dispatch]);
 
-    useRunOnFinished(isCreatingAction, onSuccess);
+    useRunOnSuccessfulFinish(isCreatingAction, createActionSucceeded, onSuccess);
 
     const submitTitle = 'Create';
     const inProgressTitle = 'Creating...';

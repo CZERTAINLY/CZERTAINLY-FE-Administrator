@@ -17,7 +17,7 @@ import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired 
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import Select from 'components/Select';
 import Label from 'components/Label';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
 interface GlobalMetadataFormProps {
     globalMetadataId?: string;
@@ -36,6 +36,8 @@ export default function GlobalMetadataForm({ globalMetadataId, onCancel, onSucce
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const isCreating = useSelector(selectors.isCreating);
     const isUpdating = useSelector(selectors.isUpdating);
+    const createGlobalMetadataSucceeded = useSelector(selectors.createGlobalMetadataSucceeded);
+    const updateGlobalMetadataSucceeded = useSelector(selectors.updateGlobalMetadataSucceeded);
 
     const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
 
@@ -87,8 +89,8 @@ export default function GlobalMetadataForm({ globalMetadataId, onCancel, onSucce
         }
     }, [dispatch, editMode, id, globalMetadataDetail?.uuid]);
 
-    useRunOnFinished(isCreating, onSuccess);
-    useRunOnFinished(isUpdating, onSuccess);
+    useRunOnSuccessfulFinish(isCreating, createGlobalMetadataSucceeded, onSuccess);
+    useRunOnSuccessfulFinish(isUpdating, updateGlobalMetadataSucceeded, onSuccess);
 
     const contentTypeOptions = useMemo(
         () =>

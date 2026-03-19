@@ -7,7 +7,7 @@ import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions, selectors } from 'ducks/notification-profiles';
 import { actions as notificationActions, selectors as notificationSelectors } from 'ducks/notifications';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import NotificationProfileForm from '../form';
@@ -28,6 +28,7 @@ export default function NotificationProfileDetail() {
     const notificationProfile = useSelector(selectors.notificationProfile);
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const isUpdating = useSelector(selectors.isUpdating);
+    const updateNotificationProfileSucceeded = useSelector(selectors.updateNotificationProfileSucceeded);
 
     const notificationInstance = useSelector(notificationSelectors.notificationInstanceDetail);
     const isFetchingNotificationInstanceDetail = useSelector(notificationSelectors.isFetchingNotificationInstanceDetail);
@@ -52,7 +53,7 @@ export default function NotificationProfileDetail() {
         dispatch(notificationActions.getNotificationInstance({ uuid: notificationProfile.notificationInstance.uuid }));
     }, [dispatch, notificationProfile]);
 
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateNotificationProfileSucceeded, () => {
         setIsEditModalOpen(false);
         getFreshData();
     });

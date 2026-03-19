@@ -16,9 +16,10 @@ import { actions as customAttributesActions, selectors as customAttributesSelect
 import { actions as vaultActions, selectors as vaultSelectors } from 'ducks/vaults';
 import { actions as vaultProfileActions, selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
 
-import { collectFormAttributes } from 'utils/attributes/attributes';
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
+import { collectFormAttributes } from 'utils/attributes/attributes';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
 import { AttributeDescriptorModel } from 'types/attributes';
 import { SearchRequestModel } from 'types/certificate';
@@ -48,6 +49,7 @@ export default function VaultProfileForm({ onCancel, onSuccess }: VaultProfileFo
 
     const vaults = useSelector(vaultSelectors.vaults);
     const isCreating = useSelector(vaultProfileSelectors.isCreating);
+    const createVaultProfileSucceeded = useSelector(vaultProfileSelectors.createVaultProfileSucceeded);
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
     const vaultProfileAttributeDescriptors = useSelector(vaultProfileSelectors.vaultProfileAttributeDescriptors);
     const isFetchingVaultProfileAttributes = useSelector(vaultProfileSelectors.isFetchingVaultProfileAttributes);
@@ -130,14 +132,11 @@ export default function VaultProfileForm({ onCancel, onSuccess }: VaultProfileFo
         [dispatch, getValues, resourceCustomAttributes, vaultProfileAttributeDescriptors, groupAttributesCallbackAttributes],
     );
 
-    const wasCreatingRef = useRef(false);
+    const handleCreateSuccess = useCallback(() => {
+        onSuccess?.();
+    }, [onSuccess]);
 
-    useEffect(() => {
-        if (wasCreatingRef.current && !isCreating) {
-            onSuccess?.();
-        }
-        wasCreatingRef.current = isCreating;
-    }, [isCreating, onSuccess]);
+    useRunOnSuccessfulFinish(isCreating, createVaultProfileSucceeded, handleCreateSuccess);
 
     const handleCancel = useCallback(() => {
         onCancel?.();

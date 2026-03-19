@@ -391,6 +391,7 @@ export default function CertificateForm({ onCancel }: CertificateFormProps = {})
 
                                     {tokenProfileUuid ? (
                                         <TabLayout
+                                            onlyActiveTabContent={false}
                                             tabs={[
                                                 {
                                                     title: 'Request Attributes',
@@ -443,6 +444,7 @@ export default function CertificateForm({ onCancel }: CertificateFormProps = {})
                         <Widget busy={issuingCertificate || isFetchingResourceCustomAttributes}>
                             <TabLayout
                                 noBorder
+                                onlyActiveTabContent={false}
                                 tabs={[
                                     {
                                         title: 'Connector Attributes',

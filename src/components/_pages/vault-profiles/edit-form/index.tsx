@@ -17,6 +17,7 @@ import { AttributeDescriptorModel } from 'types/attributes';
 import { SearchRequestModel } from 'types/certificate';
 import { FunctionGroupCode, Resource, VaultInstanceDto, VaultProfileDetailDto } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
 interface VaultProfileEditFormProps {
     profile: VaultProfileDetailDto;
@@ -40,6 +41,7 @@ export default function VaultProfileEditForm({ profile, vaultUuid, onCancel, onS
     const vaultProfileAttributeDescriptors = useSelector(vaultProfileSelectors.vaultProfileAttributeDescriptors);
     const isFetchingVaultProfileAttributes = useSelector(vaultProfileSelectors.isFetchingVaultProfileAttributes);
     const isUpdating = useSelector(vaultProfileSelectors.isUpdating);
+    const updateVaultProfileSucceeded = useSelector(vaultProfileSelectors.updateVaultProfileSucceeded);
 
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
@@ -91,12 +93,10 @@ export default function VaultProfileEditForm({ profile, vaultUuid, onCancel, onS
                     },
                 }),
             );
-            onSuccess?.();
         },
         [
             dispatch,
             getValues,
-            onSuccess,
             profile.uuid,
             resourceCustomAttributes,
             vaultUuid,
@@ -148,6 +148,12 @@ export default function VaultProfileEditForm({ profile, vaultUuid, onCancel, onS
             vaultProfileAttributeDescriptors,
         ],
     );
+
+    const handleUpdateSuccess = useCallback(() => {
+        onSuccess?.();
+    }, [onSuccess]);
+
+    useRunOnSuccessfulFinish(isUpdating, updateVaultProfileSucceeded, handleUpdateSuccess);
 
     return (
         <FormProvider {...methods}>

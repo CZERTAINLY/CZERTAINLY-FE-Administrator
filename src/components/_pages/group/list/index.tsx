@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
@@ -23,6 +23,8 @@ export default function GroupList() {
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
     const isUpdating = useSelector(selectors.isUpdating);
     const isCreating = useSelector(selectors.isCreating);
+    const createGroupSucceeded = useSelector(selectors.createGroupSucceeded);
+    const updateGroupSucceeded = useSelector(selectors.updateGroupSucceeded);
 
     const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting;
 
@@ -39,11 +41,11 @@ export default function GroupList() {
         getFreshData();
     }, [getFreshData]);
 
-    useRunOnFinished(isCreating, () => {
+    useRunOnSuccessfulFinish(isCreating, createGroupSucceeded, () => {
         setIsAddModalOpen(false);
         getFreshData();
     });
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateGroupSucceeded, () => {
         setEditingGroupId(undefined);
         getFreshData();
     });

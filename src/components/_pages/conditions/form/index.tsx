@@ -2,7 +2,7 @@ import Widget from 'components/Widget';
 import { EntityType, actions as filterActions } from 'ducks/filters';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo } from 'react';
-import { useAreDefaultValuesSame, useRunOnFinished } from 'utils/common-hooks';
+import { useAreDefaultValuesSame, useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
@@ -38,6 +38,7 @@ const ConditionForm = ({ onCancel, onSuccess }: ConditionFormProps = {}) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const isCreatingCondition = useSelector(rulesSelectors.isCreatingCondition);
+    const createConditionSucceeded = useSelector(rulesSelectors.createConditionSucceeded);
     const conditionTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ConditionType));
     const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions({ includeAny: false });
 
@@ -49,7 +50,7 @@ const ConditionForm = ({ onCancel, onSuccess }: ConditionFormProps = {}) => {
         };
     }, [dispatch]);
 
-    useRunOnFinished(isCreatingCondition, onSuccess);
+    useRunOnSuccessfulFinish(isCreatingCondition, createConditionSucceeded, onSuccess);
 
     const defaultValues: ConditionFormValues = useMemo(() => {
         return {
@@ -242,7 +243,7 @@ const ConditionForm = ({ onCancel, onSuccess }: ConditionFormProps = {}) => {
                                     isSubmitting ||
                                     !isValid ||
                                     isBusy ||
-                                    !formValues.items.length
+                                    !(formValues.items?.length ?? 0)
                                 }
                                 type="submit"
                             />

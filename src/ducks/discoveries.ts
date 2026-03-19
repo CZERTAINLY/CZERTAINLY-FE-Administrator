@@ -26,6 +26,7 @@ export type State = {
 
     isFetchingDetail: boolean;
     isCreating: boolean;
+    createDiscoverySucceeded: boolean;
     isDeleting: boolean;
     isBulkDeleting: boolean;
 };
@@ -39,6 +40,7 @@ export const initialState: State = {
 
     isFetchingDetail: false,
     isCreating: false,
+    createDiscoverySucceeded: false,
     isDeleting: false,
     isBulkDeleting: false,
 };
@@ -148,14 +150,17 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isCreating = true;
+            state.createDiscoverySucceeded = false;
         },
 
         createDiscoverySuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isCreating = false;
+            state.createDiscoverySucceeded = true;
         },
 
         createDiscoveryFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
+            state.createDiscoverySucceeded = false;
         },
 
         deleteDiscovery: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -216,6 +221,7 @@ const isFetchingDiscoveryCertificates = createSelector(state, (state) => state.i
 
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isCreating = createSelector(state, (state) => state.isCreating);
+const createDiscoverySucceeded = createSelector(state, (state) => state.createDiscoverySucceeded);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isBulkDeleting = createSelector(state, (state) => state.isBulkDeleting);
 
@@ -236,6 +242,7 @@ export const selectors = {
 
     isFetchingDetail,
     isCreating,
+    createDiscoverySucceeded,
     isDeleting,
     isBulkDeleting,
 };

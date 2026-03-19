@@ -7,7 +7,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/credentials';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import CredentialForm from '../form';
@@ -29,6 +29,7 @@ function CredentialDetail() {
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
     const isUpdating = useSelector(selectors.isUpdating);
+    const updateCredentialSucceeded = useSelector(selectors.updateCredentialSucceeded);
 
     const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
@@ -45,7 +46,7 @@ function CredentialDetail() {
         getFreshCredentialDetails();
     }, [getFreshCredentialDetails, id]);
 
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateCredentialSucceeded, () => {
         setIsEditModalOpen(false);
         getFreshCredentialDetails();
     });

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
@@ -21,7 +21,9 @@ export default function ApprovalProfilesList() {
     const profileApprovalListTotalItems = useSelector(profileApprovalSelector.totalItems);
     const isFetchingList = useSelector(profileApprovalSelector.isFetchingList);
     const isCreating = useSelector(profileApprovalSelector.isCreating);
+    const createApprovalProfileSucceeded = useSelector(profileApprovalSelector.createApprovalProfileSucceeded);
     const isUpdating = useSelector(profileApprovalSelector.isUpdating);
+    const updateApprovalProfileSucceeded = useSelector(profileApprovalSelector.updateApprovalProfileSucceeded);
 
     const isBusy = useMemo(() => isFetchingList, [isFetchingList]);
 
@@ -36,11 +38,11 @@ export default function ApprovalProfilesList() {
         getFreshData();
     }, [getFreshData]);
 
-    useRunOnFinished(isCreating, () => {
+    useRunOnSuccessfulFinish(isCreating, createApprovalProfileSucceeded, () => {
         setIsAddModalOpen(false);
         getFreshData();
     });
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateApprovalProfileSucceeded, () => {
         setEditingApprovalProfileId(undefined);
         getFreshData();
     });

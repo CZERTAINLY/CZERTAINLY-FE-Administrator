@@ -200,19 +200,19 @@ export default function SecretsList() {
             {
                 icon: 'user',
                 disabled: checkedRows.length === 0,
-                tooltip: 'Update Owner',
+                tooltip: 'Override Owner',
                 onClick: () => setIsUpdateOwnerOpen(true),
             },
             {
                 icon: 'group',
                 disabled: checkedRows.length === 0,
-                tooltip: 'Update Groups',
+                tooltip: 'Override Groups',
                 onClick: () => setIsUpdateGroupsOpen(true),
             },
             {
                 icon: 'plug',
                 disabled: checkedRows.length === 0,
-                tooltip: 'Update Source Vault Profile',
+                tooltip: 'Override Source Vault Profile',
                 onClick: () => setIsUpdateVaultProfileOpen(true),
             },
         ],
@@ -324,33 +324,41 @@ export default function SecretsList() {
 
             <Dialog
                 isOpen={isUpdateOwnerOpen}
-                caption="Update Secret Owner"
+                caption="Override Secret Owner"
                 body={
-                    <>
-                        <Select
-                            id="secret-owner"
-                            label="Owner"
-                            placeholder="Select owner"
-                            options={userOptions}
-                            value={ownerUuid || ''}
-                            onChange={(value) => setOwnerUuid(value as string)}
-                        />
-                        <Container className="flex-row justify-end modal-footer mt-4" gap={4}>
-                            <Button variant="outline" onClick={() => setIsUpdateOwnerOpen(false)} type="button">
-                                Cancel
-                            </Button>
-                            <Button color="danger" onClick={handleRemoveOwner} type="button">
-                                Remove
-                            </Button>
-                            <Button color="primary" onClick={handleUpdateOwner} type="button" disabled={!ownerUuid}>
-                                Update
-                            </Button>
-                        </Container>
-                    </>
+                    <Select
+                        id="secret-owner"
+                        label="Owner"
+                        placeholder="Select owner"
+                        options={userOptions}
+                        value={ownerUuid || ''}
+                        onChange={(value) => setOwnerUuid(value as string)}
+                    />
                 }
                 toggle={() => setIsUpdateOwnerOpen(false)}
                 size="md"
-                buttons={[]}
+                buttons={[
+                    {
+                        key: 'cancel',
+                        color: 'secondary',
+                        variant: 'outline',
+                        body: 'Cancel',
+                        onClick: () => setIsUpdateOwnerOpen(false),
+                    },
+                    {
+                        key: 'remove',
+                        color: 'danger',
+                        body: 'Remove',
+                        onClick: handleRemoveOwner,
+                    },
+                    {
+                        key: 'update',
+                        color: 'primary',
+                        body: 'Update',
+                        disabled: !ownerUuid,
+                        onClick: handleUpdateOwner,
+                    },
+                ]}
             />
 
             <Dialog
@@ -381,62 +389,75 @@ export default function SecretsList() {
 
             <Dialog
                 isOpen={isUpdateGroupsOpen}
-                caption="Update Secret Groups"
+                caption="Override Secret Groups"
                 body={
-                    <>
-                        <Select
-                            id="secret-groups-update"
-                            label="Groups"
-                            placeholder="Select groups"
-                            options={groupOptions}
-                            value={selectedGroups}
-                            onChange={(value) => setSelectedGroups((value as { value: string; label: string }[]) || [])}
-                            isMulti
-                        />
-                        <Container className="flex-row justify-end modal-footer mt-4" gap={4}>
-                            <Button variant="outline" onClick={() => setIsUpdateGroupsOpen(false)} type="button">
-                                Cancel
-                            </Button>
-                            <Button color="danger" onClick={handleClearGroups} type="button">
-                                Clear
-                            </Button>
-                            <Button color="primary" onClick={handleUpdateGroups} type="button" disabled={selectedGroups.length === 0}>
-                                Update
-                            </Button>
-                        </Container>
-                    </>
+                    <Select
+                        id="secret-groups-update"
+                        label="Groups"
+                        placeholder="Select groups"
+                        options={groupOptions}
+                        value={selectedGroups}
+                        onChange={(value) => setSelectedGroups((value as { value: string; label: string }[]) || [])}
+                        isMulti
+                    />
                 }
                 toggle={() => setIsUpdateGroupsOpen(false)}
                 size="md"
-                buttons={[]}
+                buttons={[
+                    {
+                        key: 'cancel',
+                        color: 'secondary',
+                        variant: 'outline',
+                        body: 'Cancel',
+                        onClick: () => setIsUpdateGroupsOpen(false),
+                    },
+                    {
+                        key: 'clear',
+                        color: 'danger',
+                        body: 'Clear',
+                        onClick: handleClearGroups,
+                    },
+                    {
+                        key: 'update',
+                        color: 'primary',
+                        body: 'Update',
+                        disabled: selectedGroups.length === 0,
+                        onClick: handleUpdateGroups,
+                    },
+                ]}
             />
 
             <Dialog
                 isOpen={isUpdateVaultProfileOpen}
-                caption="Update Source Vault Profile"
+                caption="Override Source Vault Profile"
                 body={
-                    <>
-                        <Select
-                            id="secret-vault-profile"
-                            label="Source Vault Profile"
-                            placeholder="Select vault profile"
-                            options={vaultProfileOptions}
-                            value={selectedVaultProfileUuid || ''}
-                            onChange={(value) => setSelectedVaultProfileUuid(value as string)}
-                        />
-                        <Container className="flex-row justify-end modal-footer mt-4" gap={4}>
-                            <Button variant="outline" onClick={() => setIsUpdateVaultProfileOpen(false)} type="button">
-                                Cancel
-                            </Button>
-                            <Button color="primary" onClick={handleUpdateVaultProfile} type="button" disabled={!selectedVaultProfileUuid}>
-                                Update
-                            </Button>
-                        </Container>
-                    </>
+                    <Select
+                        id="secret-vault-profile"
+                        label="Source Vault Profile"
+                        placeholder="Select vault profile"
+                        options={vaultProfileOptions}
+                        value={selectedVaultProfileUuid || ''}
+                        onChange={(value) => setSelectedVaultProfileUuid(value as string)}
+                    />
                 }
                 toggle={() => setIsUpdateVaultProfileOpen(false)}
                 size="md"
-                buttons={[]}
+                buttons={[
+                    {
+                        key: 'cancel',
+                        color: 'secondary',
+                        variant: 'outline',
+                        body: 'Cancel',
+                        onClick: () => setIsUpdateVaultProfileOpen(false),
+                    },
+                    {
+                        key: 'update',
+                        color: 'primary',
+                        body: 'Update',
+                        disabled: !selectedVaultProfileUuid,
+                        onClick: handleUpdateVaultProfile,
+                    },
+                ]}
             />
         </>
     );

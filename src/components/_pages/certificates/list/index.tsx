@@ -76,7 +76,6 @@ export default function CertificateList({
     const [upload, setUpload] = useState<boolean>(false);
     const [updateGroup, setUpdateGroup] = useState<boolean>(false);
     const [updateOwner, setUpdateOwner] = useState<boolean>(false);
-    const [updateEntity, setUpdateEntity] = useState<boolean>(false);
     const [updateRaProfile, setUpdateRaProfile] = useState<boolean>(false);
     const [appliedFilters, setAppliedFilters] = useState<SearchRequestModel>();
 
@@ -181,7 +180,7 @@ export default function CertificateList({
                       {
                           icon: 'group',
                           disabled: checkedRows.length === 0,
-                          tooltip: 'Update Group',
+                          tooltip: 'Override Groups',
                           onClick: () => {
                               setUpdateGroup(true);
                           },
@@ -189,7 +188,7 @@ export default function CertificateList({
                       {
                           icon: 'user',
                           disabled: checkedRows.length === 0,
-                          tooltip: 'Update Owner',
+                          tooltip: 'Override Owner',
                           onClick: () => {
                               getUserList();
                               setUpdateOwner(true);
@@ -198,7 +197,7 @@ export default function CertificateList({
                       {
                           icon: 'plug',
                           disabled: checkedRows.length === 0,
-                          tooltip: 'Update RA Profile',
+                          tooltip: 'Override RA Profile',
                           onClick: () => {
                               setUpdateRaProfile(true);
                           },
@@ -391,7 +390,7 @@ export default function CertificateList({
 
             <Dialog
                 isOpen={updateGroup}
-                caption="Update Groups"
+                caption="Override Groups"
                 body={
                     <CertificateGroupDialog
                         uuids={checkedRows}
@@ -407,7 +406,7 @@ export default function CertificateList({
 
             <Dialog
                 isOpen={updateOwner}
-                caption="Update Owner"
+                caption="Override Owner"
                 body={
                     <CertificateOwnerDialog
                         users={users}
@@ -423,19 +422,8 @@ export default function CertificateList({
             />
 
             <Dialog
-                isOpen={updateEntity}
-                caption="Update Entity"
-                body="Update Entity"
-                toggle={() => setUpdateEntity(false)}
-                buttons={[
-                    { color: 'secondary', variant: 'outline', onClick: () => setUpdateEntity(false), body: 'Cancel' },
-                    { color: 'primary', onClick: () => {}, body: 'Update' },
-                ]}
-            />
-
-            <Dialog
                 isOpen={updateRaProfile}
-                caption="Update RA Profile"
+                caption="Override RA Profile"
                 body={
                     <CertificateRAProfileDialog
                         uuids={checkedRows}

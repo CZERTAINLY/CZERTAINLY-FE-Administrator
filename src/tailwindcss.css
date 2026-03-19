@@ -191,6 +191,12 @@ table .preline-badge {
     color: var(--dark-gray-color);
     @apply rounded-lg border-gray-200 border py-4 px-4 flex gap-2 items-center justify-center mb-4;
 }
+.preline-cron-wrapper .cron_builder_bordering .well.row {
+    @apply items-start;
+}
+.preline-cron-wrapper .cron_builder_bordering .well.row .col-sm-6 {
+    @apply px-1;
+}
 .preline-cron-wrapper .cron_builder_bordering .tab-content {
     @apply p-0 m-0;
 }
@@ -200,6 +206,7 @@ table .preline-badge {
 }
 .preline-cron-wrapper .cron_builder_bordering .text_align_left {
     line-height: 2.5;
+    text-align: left;
 }
 .preline-cron-wrapper .cron_builder_bordering input:not([type='radio']),
 .preline-cron-wrapper .cron_builder_bordering input:not([type='checkbox']) {
