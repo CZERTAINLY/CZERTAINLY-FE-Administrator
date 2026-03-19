@@ -268,6 +268,7 @@ function SecretDetail() {
                                 );
                             }}
                             title="Remove Sync Vault Profile"
+                            aria-label="Remove Sync Vault Profile"
                         >
                             <SquareMinus size={16} />
                         </Button>
@@ -280,6 +281,7 @@ function SecretDetail() {
                                     setIsSyncVaultProfileAttributesOpen(true);
                                 }}
                                 title="Show Sync Vault Profile attributes"
+                                aria-label="Show Sync Vault Profile attributes"
                             >
                                 <Info size={16} />
                             </Button>

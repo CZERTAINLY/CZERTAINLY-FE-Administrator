@@ -1,14 +1,18 @@
 import { AppEpic } from 'ducks';
-import { of } from 'rxjs';
-import { catchError, filter, mergeMap, switchMap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
+
+import { AttributeDescriptorDto, AttributeDescriptorModel } from 'types/attributes';
+import { SecretType, VaultProfileManagementApi } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { extractError } from 'utils/net';
-import { actions as appRedirectActions } from './app-redirect';
+
 import { actions as alertActions } from './alerts';
+import { actions as appRedirectActions } from './app-redirect';
+import { EntityType } from './filters';
+import { actions as pagingActions } from './paging';
 import { slice } from './secrets';
 import { actions as userInterfaceActions } from './user-interface';
-import { actions as pagingActions } from './paging';
-import { EntityType } from './filters';
 import { transformSearchRequestModelToDto } from './transform/certificates';
 import { transformAttributeDescriptorDtoToModel } from './transform/attributes';
 import { store } from '../App';
@@ -288,29 +292,32 @@ const removeSyncVaultProfile: AppEpic = (action$, state$, deps) => {
     );
 };
 
+function fetchSecretAttributes(
+    vaultProfilesApi: VaultProfileManagementApi,
+    params: { vaultUuid: string; vaultProfileUuid: string; secretType: SecretType },
+): Observable<AttributeDescriptorModel[]> {
+    return vaultProfilesApi
+        .listSecretAttributes({
+            vaultUuid: params.vaultUuid,
+            vaultProfileUuid: params.vaultProfileUuid,
+            secretType: params.secretType,
+        })
+        .pipe(
+            map((list: unknown) => {
+                const arr = Array.isArray(list) ? list : [];
+                return arr.map((attr: unknown) => transformAttributeDescriptorDtoToModel(attr as AttributeDescriptorDto));
+            }),
+        );
+}
+
 const listSecretAttributes: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listSecretAttributes.match),
         switchMap((action: ReturnType<typeof slice.actions.listSecretAttributes>) =>
-            deps.apiClients.vaultProfiles
-                .listSecretAttributes({
-                    vaultUuid: action.payload.vaultUuid,
-                    vaultProfileUuid: action.payload.vaultProfileUuid,
-                    secretType: action.payload.secretType,
-                })
-                .pipe(
-                    mergeMap((list: unknown) => {
-                        const arr = Array.isArray(list) ? list : [];
-                        return of(
-                            slice.actions.listSecretAttributesSuccess({
-                                descriptors: arr.map((attr: unknown) =>
-                                    transformAttributeDescriptorDtoToModel(attr as import('types/attributes').AttributeDescriptorDto),
-                                ),
-                            }),
-                        );
-                    }),
-                    catchError(() => of(slice.actions.listSecretAttributesFailure())),
-                ),
+            fetchSecretAttributes(deps.apiClients.vaultProfiles, action.payload).pipe(
+                mergeMap((descriptors) => of(slice.actions.listSecretAttributesSuccess({ descriptors }))),
+                catchError(() => of(slice.actions.listSecretAttributesFailure())),
+            ),
         ),
     );
 };
@@ -319,32 +326,17 @@ const getSyncVaultProfileAttributes: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.getSyncVaultProfileAttributes.match),
         switchMap((action: ReturnType<typeof slice.actions.getSyncVaultProfileAttributes>) =>
-            deps.apiClients.vaultProfiles
-                .listSecretAttributes({
-                    vaultUuid: action.payload.vaultUuid,
-                    vaultProfileUuid: action.payload.vaultProfileUuid,
-                    secretType: action.payload.secretType,
-                })
-                .pipe(
-                    mergeMap((list: unknown) => {
-                        const arr = Array.isArray(list) ? list : [];
-                        return of(
-                            slice.actions.getSyncVaultProfileAttributesSuccess({
-                                descriptors: arr.map((attr: unknown) =>
-                                    transformAttributeDescriptorDtoToModel(attr as import('types/attributes').AttributeDescriptorDto),
-                                ),
-                            }),
-                        );
-                    }),
-                    catchError((err) =>
-                        of(
-                            slice.actions.getSyncVaultProfileAttributesFailure({
-                                error: extractError(err, 'Failed to get Vault profile attributes for sync'),
-                            }),
-                            appRedirectActions.fetchError({ error: err, message: 'Failed to get Vault profile attributes for sync' }),
-                        ),
+            fetchSecretAttributes(deps.apiClients.vaultProfiles, action.payload).pipe(
+                mergeMap((descriptors) => of(slice.actions.getSyncVaultProfileAttributesSuccess({ descriptors }))),
+                catchError((err) =>
+                    of(
+                        slice.actions.getSyncVaultProfileAttributesFailure({
+                            error: extractError(err, 'Failed to get Vault profile attributes for sync'),
+                        }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to get Vault profile attributes for sync' }),
                     ),
                 ),
+            ),
         ),
     );
 };
