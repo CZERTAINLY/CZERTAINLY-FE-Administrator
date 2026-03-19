@@ -11,6 +11,7 @@ const __dirname = path.dirname(__filename);
 export default defineConfig({
     testDir: './src',
     testMatch: '**/*.spec.tsx',
+    testIgnore: ['**/*.unit.spec.ts', '**/*.unit.spec.tsx', '**/*.vitest.spec.ts', '**/*.vitest.spec.tsx'],
     timeout: 30 * 1000,
     fullyParallel: true,
     forbidOnly: !!process.env.CI,

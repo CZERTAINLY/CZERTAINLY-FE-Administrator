@@ -12,6 +12,7 @@ const __dirname = path.dirname(__filename);
 export default defineConfig({
     testDir: './src',
     testMatch: '**/*.spec.tsx',
+    testIgnore: ['**/*.unit.spec.ts', '**/*.unit.spec.tsx', '**/*.vitest.spec.ts', '**/*.vitest.spec.tsx'],
     use: {
         ctPort: 3100,
         ctViteConfig: {
