@@ -34,12 +34,6 @@ export interface SecretRequestDto {
      */
     description: string;
     /**
-     * UUID of the vault profile where the secret is stored
-     * @type {string}
-     * @memberof SecretRequestDto
-     */
-    sourceVaultProfileUuid: string;
-    /**
      * Content of the secret
      * @type {SecretContent}
      * @memberof SecretRequestDto
