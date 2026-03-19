@@ -1,7 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AcmeAccountListResponseModel, AcmeAccountResponseModel } from 'types/acme-accounts';
 import { AccountStatus } from 'types/openapi';
-import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     checkedRows: string[];
@@ -200,7 +199,7 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const checkedRows = createSelector(state, (state) => state.checkedRows);
 

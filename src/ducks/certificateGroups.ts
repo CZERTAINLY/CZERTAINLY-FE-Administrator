@@ -1,6 +1,5 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { CertificateGroupRequestModel, CertificateGroupResponseModel } from 'types/certificateGroups';
-import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     checkedRows: string[];
@@ -147,7 +146,7 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const checkedRows = createSelector(state, (state: State) => state.checkedRows);
 

@@ -1,5 +1,4 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { createFeatureSelector } from 'utils/ducks';
 import { ParseRequestRequestDtoParseTypeEnum, ParseRequestResponseDto } from '../types/openapi/utils';
 
 export type State = {
@@ -37,7 +36,7 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const parsedCertificateRequest = createSelector(state, (state: State) => state.parsedCertificateRequest);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);

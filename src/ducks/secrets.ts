@@ -1,5 +1,4 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { createFeatureSelector } from 'utils/ducks';
 import { SearchRequestModel } from 'types/certificate';
 import { AttributeDescriptorModel } from 'types/attributes';
 import {
@@ -253,7 +252,7 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const secrets = createSelector(state, (state) => state.secrets);
 const secret = createSelector(state, (state) => state.secret);

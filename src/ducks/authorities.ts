@@ -1,5 +1,4 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { createFeatureSelector } from 'utils/ducks';
 
 import { AttributeDescriptorModel } from 'types/attributes';
 import { AuthorityRequestModel, AuthorityResponseModel, AuthorityUpdateRequestModel } from 'types/authorities';
@@ -283,7 +282,7 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const checkedRows = createSelector(state, (state) => state.checkedRows);
 
