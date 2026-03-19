@@ -28,7 +28,7 @@ export interface JwtTokenSecretContent {
      */
     type: SecretType;
     /**
-     * JWT Token content encoded as Base64 string
+     * JWT Token content in compact (dot-separated) format specified in [RFC 7519](https://datatracker.ietf.org/doc/html/rfc7519#section-3)
      * @type {string}
      * @memberof JwtTokenSecretContent
      */
