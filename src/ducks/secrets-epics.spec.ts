@@ -18,8 +18,12 @@ type EpicDeps = {
     apiClients: {
         secrets: {
             listSecrets: (args: any) => any;
+            getSecretDetails: (args: any) => any;
+            getSecretVersions: (args: any) => any;
             createSecret: (args: any) => any;
             deleteSecret: (args: any) => any;
+            enableSecret: (args: any) => any;
+            disableSecret: (args: any) => any;
             updateSecret: (args: any) => any;
             updateSecretObjects: (args: any) => any;
             addVaultProfileToSecret: (args: any) => any;
@@ -64,8 +68,12 @@ async function runEpic(
                 itemsPerPage: 10,
                 totalPages: 1,
             }),
+        getSecretDetails: () => of({ uuid: 's-1', name: 'Secret' }),
+        getSecretVersions: () => of([{ version: 1 }]),
         createSecret: () => of({ uuid: 's-1', name: 'Secret' }),
         deleteSecret: () => of(null),
+        enableSecret: () => of(null),
+        disableSecret: () => of(null),
         updateSecret: () => of({ uuid: 's-1', name: 'Updated Secret' }),
         updateSecretObjects: () => of(null),
         addVaultProfileToSecret: () => of(null),
@@ -317,5 +325,149 @@ describe('secrets epics', () => {
         expect(emitted[1]).toEqual(
             appRedirectActions.fetchError({ error: err, message: 'Failed to get Vault profile attributes for sync' }),
         );
+    });
+
+    test('getSecretDetail success emits getSecretDetailSuccess and removeWidgetLock', async () => {
+        const emitted = await runEpic(SecretsEpicIndex.GetDetail, secretsActions.getSecretDetail({ uuid: 's-1' }), {}, 2);
+
+        expect(emitted[0].type).toBe(secretsActions.getSecretDetailSuccess.type);
+        expect(emitted[1]).toEqual(userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.SecretDetailsWidget));
+    });
+
+    test('getSecretDetail failure emits getSecretDetailFailure and insertWidgetLock', async () => {
+        const err = new Error('failed');
+        const emitted = await runEpic(
+            SecretsEpicIndex.GetDetail,
+            secretsActions.getSecretDetail({ uuid: 's-1' }),
+            {
+                secrets: {
+                    getSecretDetails: () => throwError(() => err),
+                } as any,
+            },
+            2,
+        );
+
+        expect(emitted[0].type).toBe(secretsActions.getSecretDetailFailure.type);
+        expect(emitted[1].type).toBe(userInterfaceActions.insertWidgetLock.type);
+    });
+
+    test('getSecretVersions success emits getSecretVersionsSuccess', async () => {
+        const emitted = await runEpic(SecretsEpicIndex.GetVersions, secretsActions.getSecretVersions({ uuid: 's-1' }), {}, 1);
+
+        expect(emitted[0].type).toBe(secretsActions.getSecretVersionsSuccess.type);
+        expect((emitted[0] as any).payload.versions).toHaveLength(1);
+    });
+
+    test('getSecretVersions failure emits getSecretVersionsFailure', async () => {
+        const err = new Error('failed');
+        const emitted = await runEpic(
+            SecretsEpicIndex.GetVersions,
+            secretsActions.getSecretVersions({ uuid: 's-1' }),
+            {
+                secrets: {
+                    getSecretVersions: () => throwError(() => err),
+                } as any,
+            },
+            1,
+        );
+
+        expect(emitted[0].type).toBe(secretsActions.getSecretVersionsFailure.type);
+    });
+
+    test('listSecretAttributes success emits listSecretAttributesSuccess', async () => {
+        const payload = { vaultUuid: 'v-1', vaultProfileUuid: 'vp-1', secretType: 'Generic' as any };
+        const emitted = await runEpic(SecretsEpicIndex.GetCreationAttributes, secretsActions.listSecretAttributes(payload), {}, 1);
+
+        expect(emitted[0].type).toBe(secretsActions.listSecretAttributesSuccess.type);
+        expect((emitted[0] as any).payload.descriptors).toHaveLength(1);
+    });
+
+    test('listSecretAttributes failure emits listSecretAttributesFailure', async () => {
+        const err = new Error('failed');
+        const payload = { vaultUuid: 'v-1', vaultProfileUuid: 'vp-1', secretType: 'Generic' as any };
+        const emitted = await runEpic(
+            SecretsEpicIndex.GetCreationAttributes,
+            secretsActions.listSecretAttributes(payload),
+            {
+                vaultProfiles: {
+                    listSecretAttributes: () => throwError(() => err),
+                } as any,
+            },
+            1,
+        );
+
+        expect(emitted[0].type).toBe(secretsActions.listSecretAttributesFailure.type);
+    });
+
+    test('createSecret failure emits createSecretFailure and fetchError', async () => {
+        const err = new Error('failed');
+        const payload = {
+            vaultUuid: 'v-1',
+            vaultProfileUuid: 'vp-1',
+            request: { name: 's1', description: '', secret: { type: 'Generic', content: '' }, attributes: [] } as any,
+        };
+        const emitted = await runEpic(
+            SecretsEpicIndex.Create,
+            secretsActions.createSecret(payload),
+            {
+                secrets: {
+                    createSecret: () => throwError(() => err),
+                } as any,
+            },
+            2,
+        );
+
+        expect(emitted[0].type).toBe(secretsActions.createSecretFailure.type);
+        expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to create Secret' }));
+    });
+
+    test('enableSecret success emits enableSecretSuccess, getSecretDetail and success alert', async () => {
+        const emitted = await runEpic(SecretsEpicIndex.Enable, secretsActions.enableSecret({ uuid: 's-1' }), {}, 3);
+
+        expect(emitted[0]).toEqual(secretsActions.enableSecretSuccess({ uuid: 's-1' }));
+        expect(emitted[1]).toEqual(secretsActions.getSecretDetail({ uuid: 's-1' }));
+        expect(emitted[2]).toEqual(alertActions.success('Secret enabled successfully.'));
+    });
+
+    test('enableSecret failure emits enableSecretFailure and fetchError', async () => {
+        const err = new Error('failed');
+        const emitted = await runEpic(
+            SecretsEpicIndex.Enable,
+            secretsActions.enableSecret({ uuid: 's-1' }),
+            {
+                secrets: {
+                    enableSecret: () => throwError(() => err),
+                } as any,
+            },
+            2,
+        );
+
+        expect(emitted[0].type).toBe(secretsActions.enableSecretFailure.type);
+        expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to enable Secret' }));
+    });
+
+    test('disableSecret success emits disableSecretSuccess, getSecretDetail and success alert', async () => {
+        const emitted = await runEpic(SecretsEpicIndex.Disable, secretsActions.disableSecret({ uuid: 's-1' }), {}, 3);
+
+        expect(emitted[0]).toEqual(secretsActions.disableSecretSuccess({ uuid: 's-1' }));
+        expect(emitted[1]).toEqual(secretsActions.getSecretDetail({ uuid: 's-1' }));
+        expect(emitted[2]).toEqual(alertActions.success('Secret disabled successfully.'));
+    });
+
+    test('disableSecret failure emits disableSecretFailure and fetchError', async () => {
+        const err = new Error('failed');
+        const emitted = await runEpic(
+            SecretsEpicIndex.Disable,
+            secretsActions.disableSecret({ uuid: 's-1' }),
+            {
+                secrets: {
+                    disableSecret: () => throwError(() => err),
+                } as any,
+            },
+            2,
+        );
+
+        expect(emitted[0].type).toBe(secretsActions.disableSecretFailure.type);
+        expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to disable Secret' }));
     });
 });
