@@ -182,37 +182,39 @@ const IssueCertificateForm = ({
                     name="raProfile"
                     control={control}
                     rules={buildValidationRules([validateRequired()])}
-                    render={({ field, fieldState }) => (
-                        <Select
-                            {...field}
-                            label="RA Profile"
-                            id="certificateSelect"
-                            placeholder="Select RA profile"
-                            options={raProfiles.map((p) => ({
-                                value: `${p.uuid}:#${p.authorityInstanceUuid}`,
-                                label: p.name,
-                            }))}
-                            error={
-                                fieldState.error && fieldState.isTouched
-                                    ? typeof fieldState.error === 'string'
-                                        ? fieldState.error
-                                        : fieldState.error?.message || 'Required Field'
-                                    : undefined
-                            }
-                            onChange={(value) => {
-                                field.onChange(value);
-                                if (value) {
-                                    const [uuid, authorityInstanceUuid] = (value as string).split(':#');
-                                    dispatch(
-                                        raActions.listIssuanceAttributeDescriptors({
-                                            authorityUuid: authorityInstanceUuid,
-                                            uuid,
-                                        }),
-                                    );
-                                }
-                            }}
-                        />
-                    )}
+                    render={({ field, fieldState }) => {
+                        const errorMessage =
+                            fieldState.error && fieldState.isTouched
+                                ? typeof fieldState.error === 'string'
+                                    ? fieldState.error
+                                    : fieldState.error?.message || 'Required Field'
+                                : undefined;
+                        return (
+                            <Select
+                                {...field}
+                                label="RA Profile"
+                                id="certificateSelect"
+                                placeholder="Select RA profile"
+                                options={raProfiles.map((p) => ({
+                                    value: `${p.uuid}:#${p.authorityInstanceUuid}`,
+                                    label: p.name,
+                                }))}
+                                error={errorMessage}
+                                onChange={(value) => {
+                                    field.onChange(value);
+                                    if (value) {
+                                        const [uuid, authorityInstanceUuid] = (value as string).split(':#');
+                                        dispatch(
+                                            raActions.listIssuanceAttributeDescriptors({
+                                                authorityUuid: authorityInstanceUuid,
+                                                uuid,
+                                            }),
+                                        );
+                                    }
+                                }}
+                            />
+                        );
+                    }}
                 />
 
                 <TabLayout

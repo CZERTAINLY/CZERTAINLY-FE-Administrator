@@ -44,7 +44,7 @@ function TextInput({
     const inputRef = useRef<HTMLInputElement>(null);
     const generatedId = useId();
     const [passwordVisible, setPasswordVisible] = useState(false);
-    const passwordToggleTargetId = type === 'password' ? id || `text-input-password-${generatedId.replace(/:/g, '')}` : null;
+    const passwordToggleTargetId = type === 'password' ? id || `text-input-password-${generatedId.replaceAll(':', '')}` : null;
 
     // Disable autofill by making field readOnly on mount, then removing it on focus
     useEffect(() => {
@@ -117,6 +117,8 @@ function TextInput({
         );
     }
 
+    const resolvedType = type === 'password' ? (passwordVisible ? 'text' : 'password') : type;
+
     return (
         <>
             {label && (
@@ -127,7 +129,7 @@ function TextInput({
             <div className="relative w-full">
                 <input
                     ref={inputRef}
-                    type={type === 'password' ? (passwordVisible ? 'text' : 'password') : type}
+                    type={resolvedType}
                     className={cn(
                         inputBaseClassName,
                         {
