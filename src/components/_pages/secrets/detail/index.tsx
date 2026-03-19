@@ -1,7 +1,7 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
-import { SquareMinus } from 'lucide-react';
+import { Info, SquareMinus } from 'lucide-react';
 
 import AttributeViewer from 'components/Attributes/AttributeViewer';
 import Badge from 'components/Badge';
@@ -23,8 +23,9 @@ import { actions as secretsActions, selectors as secretsSelectors } from 'ducks/
 import { actions as userActions, selectors as userSelectors } from 'ducks/users';
 import { actions as vaultProfileActions, selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
 
+import { AttributeResponseModel } from 'types/attributes';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { PlatformEnum, Resource } from 'types/openapi';
+import { PlatformEnum, Resource, SyncVaultProfileDto } from 'types/openapi';
 
 import { dateFormatter } from 'utils/dateUtil';
 import { createWidgetDetailHeaders } from 'utils/widget';
@@ -60,6 +61,8 @@ function SecretDetail() {
     const [isUpdateVaultProfileOpen, setIsUpdateVaultProfileOpen] = useState(false);
     const [isEditSecretOpen, setIsEditSecretOpen] = useState(false);
     const [isAddSyncVaultProfileOpen, setIsAddSyncVaultProfileOpen] = useState(false);
+    const [selectedSyncVaultProfile, setSelectedSyncVaultProfile] = useState<SyncVaultProfileDto | null>(null);
+    const [isSyncVaultProfileAttributesOpen, setIsSyncVaultProfileAttributesOpen] = useState(false);
 
     const [ownerUuid, setOwnerUuid] = useState('');
     const [selectedGroups, setSelectedGroups] = useState<{ value: string; label: string }[]>([]);
@@ -254,6 +257,19 @@ function SecretDetail() {
                     ),
                     '',
                     <div key="action" className="flex">
+                        {profile.secretAttributes && profile.secretAttributes.length > 0 && (
+                            <Button
+                                variant="transparent"
+                                color="secondary"
+                                onClick={() => {
+                                    setSelectedSyncVaultProfile(profile);
+                                    setIsSyncVaultProfileAttributesOpen(true);
+                                }}
+                                title="Show Sync Vault Profile attributes"
+                            >
+                                <Info size={16} />
+                            </Button>
+                        )}
                         <Button
                             variant="transparent"
                             color="secondary"
@@ -667,6 +683,22 @@ function SecretDetail() {
                         buttons={[]}
                     />
                 )}
+
+                <Dialog
+                    isOpen={isSyncVaultProfileAttributesOpen}
+                    caption={`Sync Vault Profile Attributes: ${selectedSyncVaultProfile?.name ?? ''}`}
+                    body={<AttributeViewer attributes={selectedSyncVaultProfile?.secretAttributes} />}
+                    toggle={() => setIsSyncVaultProfileAttributesOpen(false)}
+                    size="xl"
+                    buttons={[
+                        {
+                            color: 'secondary',
+                            variant: 'outline',
+                            onClick: () => setIsSyncVaultProfileAttributesOpen(false),
+                            body: 'Close',
+                        },
+                    ]}
+                />
             </div>
         </div>
     );
