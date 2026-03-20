@@ -24,7 +24,6 @@ import {
     UpdateRuleRequestModel,
     UpdateTriggerRequestModel,
 } from 'types/rules';
-import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     rules: RuleModel[];
@@ -543,7 +542,7 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const rules = createSelector(state, (state) => state.rules);
 const ruleDetails = createSelector(state, (state) => state.ruleDetails);

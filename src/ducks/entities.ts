@@ -3,7 +3,6 @@ import { AttributeDescriptorModel, AttributeRequestModel } from 'types/attribute
 import { SearchRequestModel } from 'types/certificate';
 import { ConnectorResponseModel } from 'types/connectors';
 import { EntityRequestModel, EntityResponseModel } from 'types/entities';
-import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     entity?: EntityResponseModel;
@@ -174,7 +173,7 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const entityProviders = createSelector(state, (state) => state.entityProviders);
 const entityProviderAttributeDescriptors = createSelector(state, (state) => state.entityProviderAttributeDescriptors);

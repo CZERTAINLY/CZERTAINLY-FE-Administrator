@@ -63,6 +63,24 @@ describe('validators', () => {
             expect(validator('')).toBeUndefined();
             expect(validator(undefined)).toBeUndefined();
         });
+
+        test('should validate each item in an array', () => {
+            const validator = validatePattern(/^\d+$/);
+            expect(validator(['1', '2', '3'])).toBeUndefined();
+            expect(validator(['1', 'abc', '3'])).toBeTruthy();
+        });
+
+        test('should unwrap {label, value} object before validating', () => {
+            const validator = validatePattern(/^\d+$/);
+            expect(validator({ label: '123', value: { data: '123' } })).toBeUndefined();
+            expect(validator({ label: 'abc', value: { data: 'abc' } })).toBeTruthy();
+        });
+
+        test('should unwrap {data, reference} attribute content object before validating', () => {
+            const validator = validatePattern(/^\d+$/);
+            expect(validator({ data: '2048', reference: 'RSA_2048' })).toBeUndefined();
+            expect(validator({ data: 'abc', reference: 'LABEL' })).toBeTruthy();
+        });
     });
 
     describe('validateInteger', () => {
@@ -155,6 +173,12 @@ describe('validators', () => {
             const validator = validateLength(2, 5);
             expect(validator('ab')).toBeUndefined();
             expect(validator('abcde')).toBeUndefined();
+        });
+
+        test('should accept empty or undefined value', () => {
+            const validator = validateLength(2, 5);
+            expect(validator('')).toBeUndefined();
+            expect(validator(undefined)).toBeUndefined();
         });
 
         test('should reject value too short', () => {
@@ -281,13 +305,106 @@ describe('validators', () => {
         test('returns empty string for empty value', () => {
             expect(validatePostgresPosixRegex('')).toBe('');
         });
+
         test('returns empty string for valid simple pattern', () => {
             expect(validatePostgresPosixRegex('^[a-z]+$')).toBe('');
         });
-        test('returns error message for invalid pattern', () => {
-            const result = validatePostgresPosixRegex('(unclosed');
+
+        test('returns error for gross syntax error (stray backslash)', () => {
+            const result = validatePostgresPosixRegex('abc\\');
             expect(result).toBeTruthy();
-            expect(typeof result).toBe('string');
+            expect(result).toContain('Invalid regex pattern');
+        });
+
+        test('returns empty string for valid pattern with balanced parens', () => {
+            expect(validatePostgresPosixRegex('(abc)(def)')).toBe('');
+        });
+
+        test('returns error for forbidden lookahead token (?=', () => {
+            const result = validatePostgresPosixRegex('abc(?=def)');
+            expect(result).toBeTruthy();
+            expect(result).toContain('Unsupported regex token');
+        });
+
+        test('returns error for forbidden non-capturing group (?:', () => {
+            const result = validatePostgresPosixRegex('(?:abc)');
+            expect(result).toBeTruthy();
+            expect(result).toContain('Unsupported regex token');
+        });
+
+        test(String.raw`returns error for forbidden backslash sequence \Q`, () => {
+            const result = validatePostgresPosixRegex(String.raw`\Qabc\E`);
+            expect(result).toBeTruthy();
+        });
+
+        test(String.raw`returns error for forbidden single-backslash escape \Z`, () => {
+            const result = validatePostgresPosixRegex(String.raw`abc\Z`);
+            expect(result).toBeTruthy();
+            expect(result).toContain('Unsupported escape sequence');
+        });
+
+        test('returns empty string for double-backslash (escaped backslash)', () => {
+            expect(validatePostgresPosixRegex(String.raw`abc\\Z`)).toBe('');
+        });
+
+        test('returns error for unbalanced closing paren (caught by JS parse)', () => {
+            expect(validatePostgresPosixRegex('abc)')).toBeTruthy();
+        });
+
+        test('returns error for unbalanced opening paren (caught by JS parse)', () => {
+            expect(validatePostgresPosixRegex('(abc')).toBeTruthy();
+        });
+
+        test('returns error for unterminated character class (caught by JS parse)', () => {
+            expect(validatePostgresPosixRegex('[abc')).toBeTruthy();
+        });
+
+        test('returns empty string for valid POSIX character class', () => {
+            expect(validatePostgresPosixRegex('[[:alpha:]]')).toBe('');
+            expect(validatePostgresPosixRegex('[[:digit:]]+')).toBe('');
+        });
+
+        test('returns error for unknown POSIX class', () => {
+            const result = validatePostgresPosixRegex('[[:unknown:]]');
+            expect(result).toBe('Unknown POSIX class [:unknown:].');
+        });
+
+        test('returns error for unterminated POSIX class', () => {
+            const result = validatePostgresPosixRegex('[[:alpha]');
+            expect(result).toBe('Unterminated POSIX character class.');
+        });
+
+        test('returns empty string for valid quantifier {m,n}', () => {
+            expect(validatePostgresPosixRegex('a{2,5}')).toBe('');
+            expect(validatePostgresPosixRegex('a{3}')).toBe('');
+            expect(validatePostgresPosixRegex('a{2,}')).toBe('');
+        });
+
+        test('returns error for unterminated quantifier', () => {
+            expect(validatePostgresPosixRegex('a{2')).toBe('Unterminated quantifier "{...}".');
+        });
+
+        test('returns error for invalid quantifier body', () => {
+            const result = validatePostgresPosixRegex('a{m,n}');
+            expect(result).toContain('Invalid quantifier');
+        });
+
+        test('returns error for invalid quantifier range where m > n (caught by JS parse)', () => {
+            expect(validatePostgresPosixRegex('a{5,2}')).toBeTruthy();
+        });
+
+        test('returns empty string for valid backreference', () => {
+            expect(validatePostgresPosixRegex(String.raw`(abc)\1`)).toBe('');
+        });
+
+        test('returns error for backreference to non-existent group', () => {
+            const result = validatePostgresPosixRegex(String.raw`abc\1`);
+            expect(result).toContain('Backreference');
+            expect(result).toContain('non-existent capturing group');
+        });
+
+        test('returns empty string for complex valid POSIX pattern', () => {
+            expect(validatePostgresPosixRegex(String.raw`^([[:alpha:]]+)\s[[:digit:]]{2,4}$`)).toBe('');
         });
     });
 });
