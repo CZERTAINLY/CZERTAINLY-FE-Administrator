@@ -77,53 +77,55 @@ export const ProxyForm = ({ onCancel, onSuccess }: ProxyFormProps = {}) => {
     return (
         <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <Widget noBorder busy={isBusy} className="space-y-4">
-                    <Controller
-                        name="name"
-                        rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
-                        control={control}
-                        render={({ field, fieldState }) => (
-                            <TextInput
-                                {...field}
-                                id="name"
-                                type="text"
-                                label="Proxy Name"
-                                required
-                                placeholder="Enter the Proxy Name"
-                                invalid={fieldState.error && fieldState.isTouched}
-                                error={getFieldErrorMessage(fieldState)}
-                            />
-                        )}
-                    />
-
-                    <Controller
-                        name="description"
-                        control={control}
-                        render={({ field, fieldState }) => (
-                            <TextArea
-                                {...field}
-                                id="description"
-                                label="Description"
-                                placeholder="Enter the Description"
-                                invalid={fieldState.error && fieldState.isTouched}
-                                error={getFieldErrorMessage(fieldState)}
-                                rows={4}
-                            />
-                        )}
-                    />
-
-                    <Container className="flex-row justify-end modal-footer" gap={4}>
-                        <Button variant="outline" onClick={handleCancel} disabled={isSubmitting} type="button">
-                            Cancel
-                        </Button>
-                        <ProgressButton
-                            title={'Create'}
-                            inProgressTitle={'Creating...'}
-                            inProgress={isSubmitting}
-                            disabled={areDefaultValuesSame(formValues) || isSubmitting || !isValid || isBusy}
-                            type="submit"
+                <Widget noBorder busy={isBusy}>
+                    <div className="space-y-4">
+                        <Controller
+                            name="name"
+                            rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
+                            control={control}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="name"
+                                    type="text"
+                                    label="Proxy Name"
+                                    required
+                                    placeholder="Enter the Proxy Name"
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={getFieldErrorMessage(fieldState)}
+                                />
+                            )}
                         />
-                    </Container>
+
+                        <Controller
+                            name="description"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                                <TextArea
+                                    {...field}
+                                    id="description"
+                                    label="Description"
+                                    placeholder="Enter the Description"
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={getFieldErrorMessage(fieldState)}
+                                    rows={4}
+                                />
+                            )}
+                        />
+
+                        <Container className="flex-row justify-end modal-footer" gap={4}>
+                            <Button variant="outline" onClick={handleCancel} disabled={isSubmitting} type="button">
+                                Cancel
+                            </Button>
+                            <ProgressButton
+                                title={'Create'}
+                                inProgressTitle={'Creating...'}
+                                inProgress={isSubmitting}
+                                disabled={areDefaultValuesSame(formValues) || isSubmitting || !isValid || isBusy}
+                                type="submit"
+                            />
+                        </Container>
+                    </div>
                 </Widget>
             </form>
         </FormProvider>
