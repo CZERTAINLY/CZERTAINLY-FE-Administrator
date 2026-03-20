@@ -8,6 +8,7 @@ import { actions as appRedirectActions } from './app-redirect';
 import { actions as userInterfaceActions } from './user-interface';
 import { actions as vaultActions } from './vaults';
 import { actions as vaultProfileActions } from './vault-profiles';
+import { actions as secretActions } from './secrets';
 import { actions as alertActions } from './alerts';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { AttributeVersion, Resource } from 'types/openapi';
@@ -50,6 +51,9 @@ type Clients = {
         bulkDisableCustomAttributes: (args: any) => any;
         enableCustomAttribute: (args: any) => any;
         disableCustomAttribute: (args: any) => any;
+    };
+    secrets: {
+        updateSecret: (args: any) => any;
     };
     vaults: {
         updateVaultInstance: (args: any) => any;
@@ -110,6 +114,21 @@ function createDeps(overrides: Partial<Clients> = {}) {
                     vaultInstance: { uuid: 'vault-1' },
                 }),
         },
+        secrets: {
+            updateSecret: () =>
+                of({
+                    uuid: 'sec-1',
+                    customAttributes: [
+                        {
+                            uuid: 'attr-1',
+                            name: 'Attr 1',
+                            contentType: 'text/plain',
+                            version: AttributeVersion.V2,
+                            content: [{ data: 'x' }],
+                        },
+                    ],
+                }),
+        },
     };
 
     return {
@@ -117,6 +136,7 @@ function createDeps(overrides: Partial<Clients> = {}) {
             customAttributes: { ...defaults.customAttributes, ...(overrides.customAttributes ?? {}) },
             vaults: { ...defaults.vaults, ...(overrides.vaults ?? {}) },
             vaultProfiles: { ...defaults.vaultProfiles, ...(overrides.vaultProfiles ?? {}) },
+            secrets: { ...defaults.secrets, ...(overrides.secrets ?? {}) },
         },
     };
 }
@@ -129,6 +149,7 @@ function createState(overrides: any = {}) {
         },
         vaults: { vault: undefined },
         vaultProfiles: { vaultProfile: undefined },
+        secrets: { secret: undefined },
         ...overrides,
     };
 }
@@ -158,7 +179,14 @@ function contentAction(operation: 'update' | 'remove', resource: Resource, attri
     if (operation === 'update') {
         return slice.actions.updateCustomAttributeContent({
             resource,
-            resourceUuid: resource === Resource.VaultProfiles ? 'vp-1' : 'vault-1',
+            resourceUuid:
+                resource === Resource.VaultProfiles
+                    ? 'vp-1'
+                    : resource === Resource.Vaults
+                      ? 'vault-1'
+                      : resource === Resource.Secrets
+                        ? 'sec-1'
+                        : 'obj-1',
             attributeUuid,
             content: baseContent,
         });
@@ -166,7 +194,14 @@ function contentAction(operation: 'update' | 'remove', resource: Resource, attri
 
     return slice.actions.removeCustomAttributeContent({
         resource,
-        resourceUuid: resource === Resource.VaultProfiles ? 'vp-1' : 'vault-1',
+        resourceUuid:
+            resource === Resource.VaultProfiles
+                ? 'vp-1'
+                : resource === Resource.Vaults
+                  ? 'vault-1'
+                  : resource === Resource.Secrets
+                    ? 'sec-1'
+                    : 'obj-1',
         attributeUuid,
     });
 }
@@ -239,6 +274,35 @@ function createVaultProfileReadyState(
             vaultProfile: {
                 uuid: 'vp-1',
                 vaultInstance: { uuid: 'vault-1' },
+                attributes: [],
+                customAttributes: custom,
+            },
+        },
+    });
+}
+
+function createSecretReadyState(
+    custom: any[] = [{ uuid: 'attr-1', name: 'Attr 1', contentType: 'text/plain', version: AttributeVersion.V2, content: [] }],
+) {
+    return createState({
+        customAttributes: {
+            resourceCustomAttributesContents: [{ resource: Resource.Secrets, resourceUuid: 'sec-1', customAttributes: custom }],
+            resourceCustomAttributes: [
+                {
+                    uuid: 'attr-1',
+                    name: 'Attr 1',
+                    type: 'string',
+                    contentType: 'text/plain',
+                    version: AttributeVersion.V2,
+                    properties: { label: 'Attr Label' },
+                },
+            ],
+        },
+        secrets: {
+            secret: {
+                uuid: 'sec-1',
+                description: 'Secret',
+                attributes: [],
                 customAttributes: custom,
             },
         },
@@ -476,6 +540,28 @@ describe('customAttributes epics', () => {
         );
 
         expect(emitted[0].type).toBe(slice.actions.updateCustomAttributeContentFailure.type);
+    });
+
+    test.each(['update', 'remove'] as const)('%s content for secrets context missing/success/api failure', async (operation) => {
+        const index = contentEpicIndex(operation);
+        const action = contentAction(operation, Resource.Secrets, 'attr-1');
+
+        const missing = await runEpic(index, action, { state: createState() });
+        expect(missing[0].type).toBe(failureActionType(operation));
+
+        const success = await runEpic(index, action, { state: createSecretReadyState(), takeCount: 2 });
+        expect(success[0].type).toBe(successActionType(operation));
+        expect(success[1].type).toBe(secretActions.updateSecretSuccess.type);
+
+        const err = new Error(`Secrets ${operation} failed`);
+        const failure = await runEpic(index, action, {
+            state: createSecretReadyState(),
+            depsOverrides: { secrets: { updateSecret: () => throwError(() => err) } as any },
+            takeCount: 2,
+        });
+
+        expect(failure[0].type).toBe(failureActionType(operation));
+        expect(failure[1]).toEqual(appRedirectActions.fetchError({ error: err, message: failureMessage(operation) }));
     });
 
     test('remove content for vault keeps v3 when attribute version is numeric 3', async () => {

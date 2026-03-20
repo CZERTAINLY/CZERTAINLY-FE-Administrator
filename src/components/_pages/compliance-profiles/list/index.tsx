@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import Container from 'components/Container';
@@ -28,6 +28,7 @@ export default function AdministratorsList() {
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
     const isBulkForceDeleting = useSelector(selectors.isBulkForceDeleting);
     const isCreating = useSelector(selectors.isCreating);
+    const createComplianceProfileSucceeded = useSelector(selectors.createComplianceProfileSucceeded);
 
     const isBusy = isFetching || isDeleting || isBulkDeleting || isBulkForceDeleting;
 
@@ -50,7 +51,7 @@ export default function AdministratorsList() {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
     }, [bulkDeleteErrorMessages]);
 
-    useRunOnFinished(isCreating, () => {
+    useRunOnSuccessfulFinish(isCreating, createComplianceProfileSucceeded, () => {
         setIsAddModalOpen(false);
         getFreshData();
     });

@@ -19,6 +19,7 @@ import {
     transformCustomAttributeUpdateRequestModelToDto,
 } from './transform/customAttributes';
 import { actions as vaultProfileActions } from './vault-profiles';
+import { actions as secretActions } from './secrets';
 import { actions as vaultActions } from './vaults';
 import { AttributeRequestModel, AttributeResponseDto, AttributeResponseModel } from 'types/attributes';
 
@@ -46,6 +47,11 @@ const toAttributeRequestModel = (attribute: AttributeResponseModel): AttributeRe
                   }))
                 : content,
     };
+};
+
+const getVaultProfileCurrentAttributes = (state: AppState, resourceUuid: string) => {
+    if (state.vaultProfiles.vaultProfile?.uuid !== resourceUuid) return undefined;
+    return state.vaultProfiles.vaultProfile.attributes.map(transformAttributeResponseDtoToModel);
 };
 
 const getVaultProfileCurrentCustomAttributes = (state: AppState, resourceUuid: string) => {
@@ -149,7 +155,11 @@ const createMissingContextError = (operation: ContentOperation, resource: Resour
         return new Error(`Vault context is not available for custom attribute ${operation === 'update' ? 'update' : 'removal'}`);
     }
 
-    return new Error(`Vault profile context is not available for custom attribute ${operation === 'update' ? 'update' : 'removal'}`);
+    if (resource === Resource.VaultProfiles) {
+        return new Error(`Vault profile context is not available for custom attribute ${operation === 'update' ? 'update' : 'removal'}`);
+    }
+
+    return new Error(`Secret context is not available for custom attribute ${operation === 'update' ? 'update' : 'removal'}`);
 };
 
 const handleVaultsContentUpdate = (
@@ -162,7 +172,7 @@ const handleVaultsContentUpdate = (
     const currentAttributes = getVaultCurrentAttributes(state, payload.resourceUuid);
     const currentCustomAttributes = getVaultCurrentCustomAttributes(state, payload.resourceUuid);
 
-    if (!currentVault || currentVault.uuid !== payload.resourceUuid || !currentAttributes || !currentCustomAttributes) {
+    if (currentVault?.uuid !== payload.resourceUuid || !currentAttributes || !currentCustomAttributes) {
         return of(
             createContentFailureAction(
                 operation,
@@ -196,6 +206,7 @@ const handleVaultsContentUpdate = (
         .updateVaultInstance({
             uuid: payload.resourceUuid,
             vaultInstanceUpdateRequestDto: {
+                description: currentVault.description ?? '',
                 attributes: currentAttributes.map(toAttributeRequestModel),
                 customAttributes: nextCustomAttributes.map(toAttributeRequestModel),
             },
@@ -218,9 +229,10 @@ const handleVaultProfilesContentUpdate = (
     deps: any,
 ): Observable<AnyAction> => {
     const currentVaultProfile = state.vaultProfiles.vaultProfile;
-    const currentAttributes = getVaultProfileCurrentCustomAttributes(state, payload.resourceUuid);
+    const currentAttributes = getVaultProfileCurrentAttributes(state, payload.resourceUuid);
+    const currentCustomAttributes = getVaultProfileCurrentCustomAttributes(state, payload.resourceUuid);
 
-    if (!currentVaultProfile || currentVaultProfile.uuid !== payload.resourceUuid || !currentAttributes) {
+    if (currentVaultProfile?.uuid !== payload.resourceUuid || !currentAttributes || !currentCustomAttributes) {
         return of(
             createContentFailureAction(
                 operation,
@@ -231,7 +243,7 @@ const handleVaultProfilesContentUpdate = (
         );
     }
 
-    const nextAttributes = buildNextCustomAttributes(operation, state, payload.attributeUuid, payload.content, currentAttributes);
+    const nextAttributes = buildNextCustomAttributes(operation, state, payload.attributeUuid, payload.content, currentCustomAttributes);
 
     if (!nextAttributes) {
         return of(
@@ -249,6 +261,8 @@ const handleVaultProfilesContentUpdate = (
             vaultUuid: currentVaultProfile.vaultInstance.uuid,
             vaultProfileUuid: payload.resourceUuid,
             vaultProfileUpdateRequestDto: {
+                description: currentVaultProfile.description ?? '',
+                attributes: currentAttributes.map(toAttributeRequestModel),
                 customAttributes: nextAttributes.map(toAttributeRequestModel),
             },
         })
@@ -284,6 +298,69 @@ const handleGenericContentUpdate = (operation: ContentOperation, payload: Conten
     );
 };
 
+const handleSecretsContentUpdate = (
+    operation: ContentOperation,
+    payload: ContentActionPayload,
+    state: AppState,
+    deps: any,
+): Observable<AnyAction> => {
+    const currentSecret = state.secrets.secret;
+
+    if (!currentSecret || currentSecret.uuid !== payload.resourceUuid) {
+        return of(
+            createContentFailureAction(
+                operation,
+                payload.resource,
+                payload.resourceUuid,
+                createMissingContextError(operation, payload.resource),
+            ),
+        );
+    }
+
+    const currentCustomAttributes =
+        state.customAttributes.resourceCustomAttributesContents.find(
+            (entry) => entry.resource === Resource.Secrets && entry.resourceUuid === payload.resourceUuid,
+        )?.customAttributes ?? (currentSecret.customAttributes ?? []).map(transformAttributeResponseDtoToModel);
+
+    const nextCustomAttributes = buildNextCustomAttributes(
+        operation,
+        state,
+        payload.attributeUuid,
+        payload.content,
+        currentCustomAttributes,
+    );
+
+    if (!nextCustomAttributes) {
+        return of(
+            createContentFailureAction(
+                operation,
+                payload.resource,
+                payload.resourceUuid,
+                new Error('Missing descriptor for selected custom attribute'),
+            ),
+        );
+    }
+
+    return deps.apiClients.secrets
+        .updateSecret({
+            uuid: payload.resourceUuid,
+            secretUpdateRequestDto: {
+                description: currentSecret.description ?? '',
+                attributes: (currentSecret.attributes ?? []).map(toAttributeRequestModel),
+                customAttributes: nextCustomAttributes.map(toAttributeRequestModel),
+            } as any,
+        })
+        .pipe(
+            mergeMap((secret: any) =>
+                of(
+                    createContentSuccessAction(operation, payload.resource, payload.resourceUuid, secret.customAttributes ?? []),
+                    secretActions.updateSecretSuccess({ secret }),
+                ),
+            ),
+            catchError((err) => createContentFailureWithRedirect(operation, payload.resource, payload.resourceUuid, err)),
+        );
+};
+
 const handleCustomAttributeContentUpdate = (
     operation: ContentOperation,
     payload: ContentActionPayload,
@@ -296,6 +373,10 @@ const handleCustomAttributeContentUpdate = (
 
     if (payload.resource === Resource.VaultProfiles) {
         return handleVaultProfilesContentUpdate(operation, payload, state, deps);
+    }
+
+    if (payload.resource === Resource.Secrets) {
+        return handleSecretsContentUpdate(operation, payload, state, deps);
     }
 
     return handleGenericContentUpdate(operation, payload, deps);

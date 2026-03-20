@@ -13,12 +13,14 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/connectors';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as userInterfaceActions } from 'ducks/user-interface';
+
 import { AttributeDescriptorModel } from 'types/attributes';
 import { FunctionGroupModel } from 'types/connectors';
 import { ConnectorStatus, ConnectorVersion, HealthStatus, PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { inventoryStatus } from 'utils/connector';
+
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import ConnectorForm from '../form';
 import FunctionGroupDetailsV1 from './FunctionGroupDetailsV1';
@@ -66,6 +68,7 @@ export default function ConnectorDetail() {
     const [confirmAuthorize, setConfirmAuthorize] = useState<boolean>(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
     const isUpdating = useSelector(selectors.isUpdating);
+    const updateConnectorSucceeded = useSelector(selectors.updateConnectorSucceeded);
 
     const getFreshConnectorDetails = useCallback(() => {
         if (!id) return;
@@ -121,7 +124,7 @@ export default function ConnectorDetail() {
         setCurrentFunctionGroupKindAttributes(attrs);
     }, [attributes, connector, currentFunctionGroup, currentFunctionGroupKind]);
 
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateConnectorSucceeded, () => {
         setIsEditModalOpen(false);
         getFreshConnectorDetails();
     });

@@ -1,5 +1,5 @@
 import { EntityType, selectors as filterSelectors } from 'ducks/filters';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
@@ -67,10 +67,11 @@ function PagedList({
     const totalItems = useSelector(selectors.totalItems(entity));
     const checkedRows = useSelector(selectors.checkedRows(entity));
     const isFetchingList = useSelector(selectors.isFetchingList(entity));
+    const pageNumber = useSelector(selectors.pageNumber(entity));
+    const pageSize = useSelector(selectors.pageSize(entity));
 
-    const [pageSize, setPageSize] = useState(10);
-    const [pageNumber, setPageNumber] = useState(1);
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const previousFiltersSnapshotRef = useRef<string | undefined>(undefined);
 
     const onCheckedRowsChanged = useCallback(
         (rows: (string | number)[]) => {
@@ -86,10 +87,28 @@ function PagedList({
 
     const onPageSizeChanged = useCallback(
         (pageSize: number) => {
-            setPageSize(pageSize);
-            setPageNumber(1);
+            dispatch(
+                actions.setPagination({
+                    entity,
+                    pageSize,
+                    pageNumber: 1,
+                }),
+            );
         },
-        [setPageSize, setPageNumber],
+        [dispatch, entity],
+    );
+
+    const onPageNumberChanged = useCallback(
+        (nextPageNumber: number) => {
+            dispatch(
+                actions.setPagination({
+                    entity,
+                    pageSize,
+                    pageNumber: nextPageNumber,
+                }),
+            );
+        },
+        [dispatch, entity, pageSize],
     );
 
     const onDeleteConfirmed = useCallback(() => {
@@ -100,8 +119,25 @@ function PagedList({
     }, [checkedRows, onDeleteCallback, currentFilters, onCheckedRowsChanged, getFreshData]);
 
     useEffect(() => {
-        setPageNumber(1);
-    }, [currentFilters]);
+        const currentFiltersSnapshot = JSON.stringify(currentFilters ?? []);
+
+        if (previousFiltersSnapshotRef.current === undefined) {
+            previousFiltersSnapshotRef.current = currentFiltersSnapshot;
+            return;
+        }
+
+        if (previousFiltersSnapshotRef.current !== currentFiltersSnapshot) {
+            dispatch(
+                actions.setPagination({
+                    entity,
+                    pageSize,
+                    pageNumber: 1,
+                }),
+            );
+        }
+
+        previousFiltersSnapshotRef.current = currentFiltersSnapshot;
+    }, [currentFilters, dispatch, entity, pageSize]);
 
     useEffect(() => {
         getFreshData();
@@ -172,7 +208,7 @@ function PagedList({
                     hasPagination
                     multiSelect={multiSelect}
                     paginationData={paginationData}
-                    onPageChanged={setPageNumber}
+                    onPageChanged={onPageNumberChanged}
                     onCheckedRowsChanged={onCheckedRowsChanged}
                     onPageSizeChanged={onPageSizeChanged}
                 />

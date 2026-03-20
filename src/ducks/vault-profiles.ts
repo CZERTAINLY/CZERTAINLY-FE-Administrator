@@ -2,29 +2,44 @@ import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { VaultProfileDetailDto, VaultProfileDto, VaultProfileRequestDto, VaultProfileUpdateRequestDto } from 'types/openapi';
 import { SearchRequestModel } from 'types/certificate';
 import { createFeatureSelector } from 'utils/ducks';
+import type { AttributeDescriptorModel } from 'types/attributes';
 
 export type State = {
     vaultProfiles: VaultProfileDto[];
     vaultProfile: VaultProfileDetailDto | null;
+
+    vaultProfileAttributeDescriptors: AttributeDescriptorModel[];
+    vaultProfileAttributesVaultUuid: string | null;
+    isFetchingVaultProfileAttributes: boolean;
+
     isFetchingList: boolean;
     isFetchingDetail: boolean;
     isCreating: boolean;
+    createVaultProfileSucceeded: boolean;
     isDeleting: boolean;
     isEnabling: boolean;
     isDisabling: boolean;
     isUpdating: boolean;
+    updateVaultProfileSucceeded: boolean;
 };
 
 export const initialState: State = {
     vaultProfiles: [],
     vaultProfile: null,
+
+    vaultProfileAttributeDescriptors: [],
+    vaultProfileAttributesVaultUuid: null,
+    isFetchingVaultProfileAttributes: false,
+
     isFetchingList: false,
     isFetchingDetail: false,
     isCreating: false,
+    createVaultProfileSucceeded: false,
     isDeleting: false,
     isEnabling: false,
     isDisabling: false,
     isUpdating: false,
+    updateVaultProfileSucceeded: false,
 };
 
 export const slice = createSlice({
@@ -39,6 +54,28 @@ export const slice = createSlice({
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
+        },
+
+        getVaultProfileAttributes: (state, action: PayloadAction<{ vaultUuid: string }>) => {
+            state.isFetchingVaultProfileAttributes = true;
+            state.vaultProfileAttributeDescriptors = [];
+            state.vaultProfileAttributesVaultUuid = action.payload.vaultUuid;
+        },
+
+        getVaultProfileAttributesSuccess: (state, action: PayloadAction<{ vaultUuid: string; attributes: AttributeDescriptorModel[] }>) => {
+            if (state.vaultProfileAttributesVaultUuid === action.payload.vaultUuid) {
+                state.vaultProfileAttributeDescriptors = action.payload.attributes as typeof state.vaultProfileAttributeDescriptors;
+                state.vaultProfileAttributesVaultUuid = action.payload.vaultUuid;
+                state.isFetchingVaultProfileAttributes = false;
+            }
+        },
+
+        getVaultProfileAttributesFailure: (state, action: PayloadAction<{ vaultUuid: string; error: string | undefined }>) => {
+            if (state.vaultProfileAttributesVaultUuid === action.payload.vaultUuid) {
+                state.vaultProfileAttributeDescriptors = [];
+                state.vaultProfileAttributesVaultUuid = null;
+                state.isFetchingVaultProfileAttributes = false;
+            }
         },
 
         listVaultProfiles: (state, _action: PayloadAction<SearchRequestModel | undefined>) => {
@@ -63,15 +100,18 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isCreating = true;
+            state.createVaultProfileSucceeded = false;
         },
 
         createVaultProfileSuccess: (state, action: PayloadAction<{ profile: VaultProfileDto }>) => {
             state.isCreating = false;
+            state.createVaultProfileSucceeded = true;
             state.vaultProfiles.push(action.payload.profile);
         },
 
         createVaultProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
+            state.createVaultProfileSucceeded = false;
         },
 
         deleteVaultProfile: (
@@ -146,10 +186,12 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isUpdating = true;
+            state.updateVaultProfileSucceeded = false;
         },
 
         updateVaultProfileSuccess: (state, action: PayloadAction<{ profile: VaultProfileDetailDto }>) => {
             state.isUpdating = false;
+            state.updateVaultProfileSucceeded = true;
             if (state.vaultProfile?.uuid === action.payload.profile.uuid) {
                 state.vaultProfile = action.payload.profile;
             }
@@ -157,6 +199,7 @@ export const slice = createSlice({
 
         updateVaultProfileFailure: (state, _action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateVaultProfileSucceeded = false;
         },
     },
 });
@@ -168,10 +211,16 @@ const vaultProfile = createSelector(state, (state: State) => state.vaultProfile)
 const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
 const isCreating = createSelector(state, (state: State) => state.isCreating);
+const createVaultProfileSucceeded = createSelector(state, (state: State) => state.createVaultProfileSucceeded);
 const isDeleting = createSelector(state, (state: State) => state.isDeleting);
 const isEnabling = createSelector(state, (state: State) => state.isEnabling);
 const isDisabling = createSelector(state, (state: State) => state.isDisabling);
 const isUpdating = createSelector(state, (state: State) => state.isUpdating);
+const updateVaultProfileSucceeded = createSelector(state, (state: State) => state.updateVaultProfileSucceeded);
+
+const vaultProfileAttributeDescriptors = createSelector(state, (state: State) => state.vaultProfileAttributeDescriptors);
+const vaultProfileAttributesVaultUuid = createSelector(state, (state: State) => state.vaultProfileAttributesVaultUuid);
+const isFetchingVaultProfileAttributes = createSelector(state, (state: State) => state.isFetchingVaultProfileAttributes);
 
 export const selectors = {
     state,
@@ -180,10 +229,15 @@ export const selectors = {
     isFetchingList,
     isFetchingDetail,
     isCreating,
+    createVaultProfileSucceeded,
     isDeleting,
     isEnabling,
     isDisabling,
     isUpdating,
+    updateVaultProfileSucceeded,
+    vaultProfileAttributeDescriptors,
+    vaultProfileAttributesVaultUuid,
+    isFetchingVaultProfileAttributes,
 };
 
 export const actions = slice.actions;

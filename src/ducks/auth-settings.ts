@@ -15,8 +15,10 @@ export type State = {
     isFetchingProvider: boolean;
     isUpdatingSettings: boolean;
     isUpdatingProvider: boolean;
+    updateProviderSucceeded: boolean;
     isRemovingProvider: boolean;
     isCreatingProvider: boolean;
+    createProviderSucceeded: boolean;
 };
 
 export const initialState: State = {
@@ -24,8 +26,10 @@ export const initialState: State = {
     isFetchingProvider: false,
     isUpdatingSettings: false,
     isUpdatingProvider: false,
+    updateProviderSucceeded: false,
     isRemovingProvider: false,
     isCreatingProvider: false,
+    createProviderSucceeded: false,
 };
 
 export const slice = createSlice({
@@ -113,14 +117,17 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isUpdatingProvider = true;
+            state.updateProviderSucceeded = false;
         },
 
         updateOAuth2ProviderSuccess: (state, action: PayloadAction<void>) => {
             state.isUpdatingProvider = false;
+            state.updateProviderSucceeded = true;
         },
 
         updateOAuth2ProviderFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdatingProvider = false;
+            state.updateProviderSucceeded = false;
         },
 
         createOAuth2Provider: (
@@ -131,14 +138,17 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isCreatingProvider = true;
+            state.createProviderSucceeded = false;
         },
 
         createOAuth2ProviderSuccess: (state, action: PayloadAction<void>) => {
             state.isCreatingProvider = false;
+            state.createProviderSucceeded = true;
         },
 
         createOAuth2ProviderFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreatingProvider = false;
+            state.createProviderSucceeded = false;
         },
 
         removeOAuth2Provider: (state, action: PayloadAction<{ providerName: string }>) => {
@@ -164,8 +174,10 @@ const isFetchingSettings = createSelector(state, (state) => state.isFetchingSett
 const isFetchingProvider = createSelector(state, (state) => state.isFetchingProvider);
 const isUpdatingSettings = createSelector(state, (state) => state.isUpdatingSettings);
 const isUpdatingProvider = createSelector(state, (state) => state.isUpdatingProvider);
+const updateProviderSucceeded = createSelector(state, (state) => state.updateProviderSucceeded);
 const isRemovingProvider = createSelector(state, (state) => state.isRemovingProvider);
 const isCreatingProvider = createSelector(state, (state) => state.isCreatingProvider);
+const createProviderSucceeded = createSelector(state, (state) => state.createProviderSucceeded);
 
 export const selectors = {
     state,
@@ -176,8 +188,10 @@ export const selectors = {
     isFetchingProvider,
     isUpdatingSettings,
     isUpdatingProvider,
+    updateProviderSucceeded,
     isRemovingProvider,
     isCreatingProvider,
+    createProviderSucceeded,
 };
 
 export const actions = slice.actions;

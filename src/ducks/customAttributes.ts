@@ -7,7 +7,7 @@ import {
 } from 'types/customAttributes';
 import { createFeatureSelector } from 'utils/ducks';
 import { AttributeResponseModel, BaseAttributeContentModel, CustomAttributeModel } from '../types/attributes';
-import { AttributeContentType, Resource } from '../types/openapi';
+import { AttributeContentType, AttributeVersion, Resource } from '../types/openapi';
 
 type ResourceCustomAttributesContents = {
     resource: Resource;
@@ -31,6 +31,7 @@ export type State = {
     isFetchingResourceCustomAttributes: boolean;
     isFetchingResourceSecondaryCustomAttributes: boolean;
     isCreating: boolean;
+    createCustomAttributeSucceeded: boolean;
     isDeleting: boolean;
     isBulkDeleting: boolean;
     isBulkEnabling: boolean;
@@ -38,6 +39,7 @@ export type State = {
     isBulkDisabling: boolean;
     isDisabling: boolean;
     isUpdating: boolean;
+    updateCustomAttributeSucceeded: boolean;
     isUpdatingContent: boolean;
 };
 
@@ -54,6 +56,7 @@ export const initialState: State = {
     isFetchingResourceCustomAttributes: false,
     isFetchingResourceSecondaryCustomAttributes: false,
     isCreating: false,
+    createCustomAttributeSucceeded: false,
     isDeleting: false,
     isBulkDeleting: false,
     isBulkEnabling: false,
@@ -61,6 +64,7 @@ export const initialState: State = {
     isBulkDisabling: false,
     isDisabling: false,
     isUpdating: false,
+    updateCustomAttributeSucceeded: false,
     isUpdatingContent: false,
 };
 
@@ -138,14 +142,17 @@ export const slice = createSlice({
 
         createCustomAttribute: (state, action: PayloadAction<CustomAttributeCreateRequestModel>) => {
             state.isCreating = true;
+            state.createCustomAttributeSucceeded = false;
         },
 
         createCustomAttributeSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isCreating = false;
+            state.createCustomAttributeSucceeded = true;
         },
 
         createCustomAttributeFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
+            state.createCustomAttributeSucceeded = false;
         },
 
         updateCustomAttribute: (
@@ -153,15 +160,18 @@ export const slice = createSlice({
             action: PayloadAction<{ uuid: string; customAttributeUpdateRequest: CustomAttributeUpdateRequestModel }>,
         ) => {
             state.isUpdating = true;
+            state.updateCustomAttributeSucceeded = false;
         },
 
         updateCustomAttributeSuccess: (state, action: PayloadAction<CustomAttributeDetailResponseModel>) => {
             state.isUpdating = false;
             // state.customAttribute = action.payload;
+            state.updateCustomAttributeSucceeded = true;
         },
 
         updateCustomAttributeFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateCustomAttributeSucceeded = false;
         },
 
         updateCustomAttributeContent: (
@@ -248,6 +258,13 @@ export const slice = createSlice({
             action.payload.forEach(({ resource, customAttributes }) => {
                 const index = state.resourceCustomAttributesContents.findIndex((r) => r.resource === resource && r.resourceUuid === '');
 
+                const convertVersion = (version: number): AttributeVersion => {
+                    // API models for custom attributes use numeric versions (2/3),
+                    // while response attribute models use enum versions ('v2'/'v3').
+                    if (version === 3) return AttributeVersion.V3;
+                    return AttributeVersion.V2;
+                };
+
                 if (index === -1) {
                     state.resourceCustomAttributesContents.push({
                         resource,
@@ -255,12 +272,14 @@ export const slice = createSlice({
                         customAttributes: customAttributes.map((attr) => ({
                             ...attr,
                             label: attr.name,
+                            version: convertVersion(attr.version),
                         })),
                     });
                 } else {
                     state.resourceCustomAttributesContents[index].customAttributes = customAttributes.map((attr) => ({
                         ...attr,
                         label: attr.name,
+                        version: convertVersion(attr.version),
                     }));
                 }
             });
@@ -443,6 +462,8 @@ const isEnabling = createSelector(state, (state: State) => state.isEnabling);
 const isBulkDisabling = createSelector(state, (state: State) => state.isBulkDisabling);
 const isDisabling = createSelector(state, (state: State) => state.isDisabling);
 const isUpdating = createSelector(state, (state: State) => state.isUpdating);
+const createCustomAttributeSucceeded = createSelector(state, (state: State) => state.createCustomAttributeSucceeded);
+const updateCustomAttributeSucceeded = createSelector(state, (state: State) => state.updateCustomAttributeSucceeded);
 const isUpdatingContent = createSelector(state, (state: State) => state.isUpdatingContent);
 
 export const selectors = {
@@ -471,6 +492,8 @@ export const selectors = {
     isBulkDisabling,
     isDisabling,
     isUpdating,
+    createCustomAttributeSucceeded,
+    updateCustomAttributeSucceeded,
     isUpdatingContent,
 };
 

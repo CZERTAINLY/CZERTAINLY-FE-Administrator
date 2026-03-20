@@ -8,7 +8,7 @@ import RoleUsersForm from '../RoleUsersForm';
 
 import { actions, selectors } from 'ducks/roles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router';
 
@@ -35,6 +35,7 @@ export default function UserDetail() {
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const isFetchingPermissions = useSelector(selectors.isFetchingPermissions);
     const isUpdating = useSelector(selectors.isUpdating);
+    const updateRoleSucceeded = useSelector(selectors.updateRoleSucceeded);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
@@ -64,7 +65,7 @@ export default function UserDetail() {
         getFreshPermissions();
     }, [getFreshPermissions]);
 
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateRoleSucceeded, () => {
         setIsEditModalOpen(false);
         getFreshDetails();
     });

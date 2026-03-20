@@ -13,7 +13,7 @@ import { actions as settingsActions, selectors as settingsSelectors } from 'duck
 import { actions as complianceProfileActions, selectors as complianceProfileSelectors } from 'ducks/compliance-profiles';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import RaProfileForm from '../form';
@@ -63,6 +63,7 @@ export default function RaProfileDetail() {
     const isEnabling = useSelector(raProfilesSelectors.isEnabling);
     const isDisabling = useSelector(raProfilesSelectors.isDisabling);
     const isUpdating = useSelector(raProfilesSelectors.isUpdating);
+    const updateRaProfileSucceeded = useSelector(raProfilesSelectors.updateRaProfileSucceeded);
     const isActivatingAcme = useSelector(raProfilesSelectors.isActivatingAcme);
     const isDeactivatingAcme = useSelector(raProfilesSelectors.isDeactivatingAcme);
     const isActivatingCmp = useSelector(raProfilesSelectors.isActivatingCmp);
@@ -199,7 +200,7 @@ export default function RaProfileDetail() {
         };
     }, [dispatch]);
 
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateRaProfileSucceeded, () => {
         setIsEditModalOpen(false);
         getFreshRaProfileDetail();
     });

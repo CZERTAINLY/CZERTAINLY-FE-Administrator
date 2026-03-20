@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/experimental-ct-react';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
@@ -12,6 +12,7 @@ const __dirname = path.dirname(__filename);
 export default defineConfig({
     testDir: './src',
     testMatch: '**/*.spec.tsx',
+    testIgnore: ['**/*.unit.spec.ts', '**/*.unit.spec.tsx', '**/*.vitest.spec.ts', '**/*.vitest.spec.tsx'],
     use: {
         ctPort: 3100,
         ctViteConfig: {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
@@ -17,12 +17,13 @@ import DiscoveryStatus from '../DiscoveryStatus';
 import Dialog from 'components/Dialog';
 import DiscoveryForm from '../form';
 import { WidgetButtonProps } from 'components/WidgetButtons';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
 function DiscoveryList() {
     const dispatch = useDispatch();
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [wasCreating, setWasCreating] = useState(false);
     const isCreating = useSelector(selectors.isCreating);
+    const createDiscoverySucceeded = useSelector(selectors.createDiscoverySucceeded);
 
     const discoveries = useSelector(selectors.discoveries);
     const isDeleting = useSelector(selectors.isDeleting);
@@ -123,16 +124,12 @@ function DiscoveryList() {
         onListCallback({ itemsPerPage: 10, pageNumber: 1, filters: [] });
     }, [handleCloseAddModal, onListCallback]);
 
-    // Track creation state and close modal on success
-    useEffect(() => {
-        if (isCreating) {
-            setWasCreating(true);
-        } else if (wasCreating && !isCreating && isAddModalOpen) {
-            // Creation completed (success or failure), close modal and refresh
-            handleFormSuccess();
-            setWasCreating(false);
-        }
-    }, [isCreating, wasCreating, isAddModalOpen, handleFormSuccess]);
+    const handleCreateSuccess = useCallback(() => {
+        if (!isAddModalOpen) return;
+        handleFormSuccess();
+    }, [handleFormSuccess, isAddModalOpen]);
+
+    useRunOnSuccessfulFinish(isCreating, createDiscoverySucceeded, handleCreateSuccess);
 
     const additionalButtons: WidgetButtonProps[] = useMemo(
         () => [

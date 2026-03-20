@@ -11,7 +11,7 @@ import { actions as certActions, selectors as certSelectors } from 'ducks/certif
 import { selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions, selectors } from 'ducks/users';
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import Badge from 'components/Badge';
@@ -34,6 +34,7 @@ export default function UserDetail() {
     const isDisabling = useSelector(selectors.isDisabling);
     const isEnabling = useSelector(selectors.isEnabling);
     const isUpdating = useSelector(selectors.isUpdating);
+    const updateUserSucceeded = useSelector(selectors.updateUserSucceeded);
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
     const isUpdatingContent = useSelector(customAttributesSelectors.isUpdatingContent);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
@@ -64,7 +65,7 @@ export default function UserDetail() {
         getFreshCertificateDetails();
     }, [getFreshCertificateDetails, id]);
 
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateUserSucceeded, () => {
         setIsEditModalOpen(false);
         getFreshUserDetails();
     });

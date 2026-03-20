@@ -52,6 +52,12 @@ export interface VaultProfileDetailDto {
      */
     enabled: boolean;
     /**
+     * List of attributes of the Vault profile
+     * @type {Array<ResponseAttribute>}
+     * @memberof VaultProfileDetailDto
+     */
+    attributes: Array<ResponseAttribute>;
+    /**
      * List of custom attributes of the Vault profile
      * @type {Array<ResponseAttribute>}
      * @memberof VaultProfileDetailDto

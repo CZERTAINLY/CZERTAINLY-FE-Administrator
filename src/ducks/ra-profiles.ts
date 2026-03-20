@@ -51,9 +51,11 @@ export type State = {
     isFetchingAssociatedComplianceProfiles: boolean;
 
     isCreating: boolean;
+    createRaProfileSucceeded: boolean;
     isDeleting: boolean;
     isBulkDeleting: boolean;
     isUpdating: boolean;
+    updateRaProfileSucceeded: boolean;
     isEnabling: boolean;
     isBulkEnabling: boolean;
     isDisabling: boolean;
@@ -92,9 +94,11 @@ export const initialState: State = {
     isFetchingCmpDetails: false,
     isFetchingAssociatedComplianceProfiles: false,
     isCreating: false,
+    createRaProfileSucceeded: false,
     isDeleting: false,
     isBulkDeleting: false,
     isUpdating: false,
+    updateRaProfileSucceeded: false,
     isEnabling: false,
     isDisabling: false,
     isBulkEnabling: false,
@@ -182,14 +186,17 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isCreating = true;
+            state.createRaProfileSucceeded = false;
         },
 
         createRaProfileSuccess: (state, action: PayloadAction<{ uuid: string; authorityInstanceUuid: string }>) => {
             state.isCreating = false;
+            state.createRaProfileSucceeded = true;
         },
 
         createRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
+            state.createRaProfileSucceeded = false;
         },
 
         updateRaProfile: (
@@ -202,15 +209,18 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isUpdating = true;
+            state.updateRaProfileSucceeded = false;
         },
 
         updateRaProfileSuccess: (state, action: PayloadAction<{ raProfile: RaProfileResponseModel; redirect?: string }>) => {
             state.isUpdating = false;
+            state.updateRaProfileSucceeded = true;
             state.raProfile = action.payload.raProfile;
         },
 
         updateRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateRaProfileSucceeded = false;
         },
 
         updateRaProfileCertificateValidation: (
@@ -677,9 +687,11 @@ const isFetchingAcmeDetails = createSelector(state, (state: State) => state.isFe
 const isFetchingScepDetails = createSelector(state, (state: State) => state.isFetchingScepDetails);
 const isFetchingCmpDetails = createSelector(state, (state: State) => state.isFetchingCmpDetails);
 const isCreating = createSelector(state, (state: State) => state.isCreating);
+const createRaProfileSucceeded = createSelector(state, (state: State) => state.createRaProfileSucceeded);
 const isDeleting = createSelector(state, (state: State) => state.isDeleting);
 const isBulkDeleting = createSelector(state, (state: State) => state.isBulkDeleting);
 const isUpdating = createSelector(state, (state: State) => state.isUpdating);
+const updateRaProfileSucceeded = createSelector(state, (state: State) => state.updateRaProfileSucceeded);
 const isEnabling = createSelector(state, (state: State) => state.isEnabling);
 const isBulkEnabling = createSelector(state, (state: State) => state.isBulkEnabling);
 const isDisabling = createSelector(state, (state: State) => state.isDisabling);
@@ -721,9 +733,11 @@ export const selectors = {
     isFetchingScepDetails,
     isFetchingCmpDetails,
     isCreating,
+    createRaProfileSucceeded,
     isDeleting,
     isBulkDeleting,
     isUpdating,
+    updateRaProfileSucceeded,
     isEnabling,
     isBulkEnabling,
     isDisabling,

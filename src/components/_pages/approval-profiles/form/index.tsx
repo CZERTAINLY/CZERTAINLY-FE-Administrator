@@ -4,7 +4,7 @@ import Widget from 'components/Widget';
 
 import { actions as profileApprovalActions, selectors as profileApprovalSelectors } from 'ducks/approval-profiles';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useAreDefaultValuesSame, useRunOnFinished } from 'utils/common-hooks';
+import { useAreDefaultValuesSame, useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -40,6 +40,8 @@ function ApprovalProfileForm({ approvalProfileId, onCancel, onSuccess }: Approva
 
     const isCreating = useSelector(profileApprovalSelectors.isCreating);
     const isUpdating = useSelector(profileApprovalSelectors.isUpdating);
+    const createApprovalProfileSucceeded = useSelector(profileApprovalSelectors.createApprovalProfileSucceeded);
+    const updateApprovalProfileSucceeded = useSelector(profileApprovalSelectors.updateApprovalProfileSucceeded);
     const isFetchingDetail = useSelector(profileApprovalSelectors.isFetchingDetail);
     const isBusy = useMemo(() => isCreating || isUpdating || isFetchingDetail, [isCreating, isUpdating, isFetchingDetail]);
 
@@ -125,8 +127,8 @@ function ApprovalProfileForm({ approvalProfileId, onCancel, onSuccess }: Approva
         }
     }, [editMode, profileApprovalDetail, id, reset, isFetchingDetail]);
 
-    useRunOnFinished(isCreating, onSuccess);
-    useRunOnFinished(isUpdating, onSuccess);
+    useRunOnSuccessfulFinish(isCreating, createApprovalProfileSucceeded, onSuccess);
+    useRunOnSuccessfulFinish(isUpdating, updateApprovalProfileSucceeded, onSuccess);
 
     const handleCancel = useCallback(() => {
         onCancel?.();

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useWindowSize, useDeviceType, useCopyToClipboard, useRunOnFinished, useAreDefaultValuesSame } from './common-hooks';
+import { useWindowSize, useDeviceType, useCopyToClipboard, useRunOnSuccessfulFinish, useAreDefaultValuesSame } from './common-hooks';
 
 export function UseWindowSizeHarness() {
     const { width, height } = useWindowSize();
@@ -25,17 +25,21 @@ export function UseCopyToClipboardHarness() {
     );
 }
 
-export function UseRunOnFinishedHarness() {
-    const [flag, setFlag] = useState(true);
+export function UseRunOnSuccessfulFinishHarness() {
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSucceeded, setIsSucceeded] = useState(false);
     const [callbackRan, setCallbackRan] = useState(false);
-    useRunOnFinished(flag, () => setCallbackRan(true));
+    useRunOnSuccessfulFinish(isLoading, isSucceeded, () => setCallbackRan(true));
 
     useEffect(() => {
-        const t = setTimeout(() => setFlag(false), 100);
+        const t = setTimeout(() => {
+            setIsLoading(false);
+            setIsSucceeded(true);
+        }, 100);
         return () => clearTimeout(t);
     }, []);
 
-    return <div data-testid="run-result">{callbackRan ? 'ran' : 'pending'}</div>;
+    return <div data-testid="successful-finish-result">{callbackRan ? 'ran' : 'pending'}</div>;
 }
 
 export function UseAreDefaultValuesSameHarness() {

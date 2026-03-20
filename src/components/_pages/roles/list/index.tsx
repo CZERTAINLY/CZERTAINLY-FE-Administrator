@@ -8,7 +8,7 @@ import RoleUsersForm from '../RoleUsersForm';
 
 import { actions, selectors } from 'ducks/roles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -25,6 +25,8 @@ export default function RolesList() {
     const isDeleting = useSelector(selectors.isDeleting);
     const isUpdating = useSelector(selectors.isUpdating);
     const isCreating = useSelector(selectors.isCreating);
+    const createRoleSucceeded = useSelector(selectors.createRoleSucceeded);
+    const updateRoleSucceeded = useSelector(selectors.updateRoleSucceeded);
 
     const isBusy = isFetching || isDeleting || isUpdating;
 
@@ -43,11 +45,11 @@ export default function RolesList() {
         getFreshData();
     }, [getFreshData]);
 
-    useRunOnFinished(isCreating, () => {
+    useRunOnSuccessfulFinish(isCreating, createRoleSucceeded, () => {
         setIsAddModalOpen(false);
         getFreshData();
     });
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateRoleSucceeded, () => {
         setEditingRoleId(undefined);
         getFreshData();
     });

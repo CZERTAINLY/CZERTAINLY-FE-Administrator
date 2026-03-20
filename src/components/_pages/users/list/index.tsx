@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
@@ -26,6 +26,8 @@ export default function UsersList() {
     const isEnabling = useSelector(selectors.isEnabling);
     const isDisabling = useSelector(selectors.isDisabling);
     const isCreating = useSelector(selectors.isCreating);
+    const createUserSucceeded = useSelector(selectors.createUserSucceeded);
+    const updateUserSucceeded = useSelector(selectors.updateUserSucceeded);
 
     const isBusy = isFetching || isDeleting || isUpdating || isEnabling || isDisabling;
 
@@ -43,11 +45,11 @@ export default function UsersList() {
         getFreshData();
     }, [getFreshData]);
 
-    useRunOnFinished(isCreating, () => {
+    useRunOnSuccessfulFinish(isCreating, createUserSucceeded, () => {
         setIsAddModalOpen(false);
         getFreshData();
     });
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateUserSucceeded, () => {
         setEditingUserId(undefined);
         getFreshData();
     });

@@ -123,7 +123,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             actions.deleteCryptographicKey({
                 keyItemUuid: [keyItem.uuid],
                 uuid: keyUuid,
-                redirect: totalKeyItems === 1 ? '../../../' : undefined,
+                redirect: totalKeyItems === 1 ? '/keys' : undefined,
             }),
         );
         setConfirmDelete(false);

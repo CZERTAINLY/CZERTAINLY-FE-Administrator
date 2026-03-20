@@ -5,7 +5,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as profileApprovalActions, selectors as profileApprovalSelectors } from 'ducks/approval-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import ApprovalProfileForm from '../form';
@@ -25,6 +25,7 @@ const ApprovalProfileDetails = () => {
     const deleteErrorMessage = useSelector(profileApprovalSelectors.deleteErrorMessage);
     const isDeleting = useSelector(profileApprovalSelectors.isDeleting);
     const isUpdating = useSelector(profileApprovalSelectors.isUpdating);
+    const updateApprovalProfileSucceeded = useSelector(profileApprovalSelectors.updateApprovalProfileSucceeded);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
@@ -47,7 +48,7 @@ const ApprovalProfileDetails = () => {
         setConfirmDelete(false);
     }, [profileApprovalDetail, dispatch]);
 
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateApprovalProfileSucceeded, () => {
         setIsEditModalOpen(false);
         getFreshData();
     });

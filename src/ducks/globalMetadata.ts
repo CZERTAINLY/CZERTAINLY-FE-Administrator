@@ -21,9 +21,11 @@ export type State = {
     isFetchingDetail: boolean;
     isFetchingConnectorMetadata: boolean;
     isCreating: boolean;
+    createGlobalMetadataSucceeded: boolean;
     isDeleting: boolean;
     isBulkDeleting: boolean;
     isUpdating: boolean;
+    updateGlobalMetadataSucceeded: boolean;
 };
 
 export const initialState: State = {
@@ -33,9 +35,11 @@ export const initialState: State = {
     isFetchingDetail: false,
     isFetchingConnectorMetadata: false,
     isCreating: false,
+    createGlobalMetadataSucceeded: false,
     isDeleting: false,
     isBulkDeleting: false,
     isUpdating: false,
+    updateGlobalMetadataSucceeded: false,
 };
 
 export const slice = createSlice({
@@ -62,14 +66,17 @@ export const slice = createSlice({
 
         createGlobalMetadata: (state, action: PayloadAction<GlobalMetadataCreateRequestModel>) => {
             state.isCreating = true;
+            state.createGlobalMetadataSucceeded = false;
         },
 
         createGlobalMetadataSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isCreating = false;
+            state.createGlobalMetadataSucceeded = true;
         },
 
         createGlobalMetadataFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
+            state.createGlobalMetadataSucceeded = false;
         },
 
         updateGlobalMetadata: (
@@ -77,15 +84,18 @@ export const slice = createSlice({
             action: PayloadAction<{ uuid: string; globalMetadataUpdateRequest: GlobalMetadataUpdateRequestModel }>,
         ) => {
             state.isUpdating = true;
+            state.updateGlobalMetadataSucceeded = false;
         },
 
         updateGlobalMetadataSuccess: (state, action: PayloadAction<GlobalMetadataDetailResponseModel>) => {
             state.isUpdating = false;
             state.globalMetadata = action.payload;
+            state.updateGlobalMetadataSucceeded = true;
         },
 
         updateGlobalMetadataFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateGlobalMetadataSucceeded = false;
         },
 
         getGlobalMetadata: (state, action: PayloadAction<string>) => {
@@ -193,9 +203,11 @@ const isFetchingList = createSelector(state, (state: State) => state.isFetchingL
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
 const isFetchingConnectorMetadata = createSelector(state, (state: State) => state.isFetchingConnectorMetadata);
 const isCreating = createSelector(state, (state: State) => state.isCreating);
+const createGlobalMetadataSucceeded = createSelector(state, (state: State) => state.createGlobalMetadataSucceeded);
 const isDeleting = createSelector(state, (state: State) => state.isDeleting);
 const isBulkDeleting = createSelector(state, (state: State) => state.isBulkDeleting);
 const isUpdating = createSelector(state, (state: State) => state.isUpdating);
+const updateGlobalMetadataSucceeded = createSelector(state, (state: State) => state.updateGlobalMetadataSucceeded);
 
 export const selectors = {
     state,
@@ -208,12 +220,14 @@ export const selectors = {
     connectorMetadata,
 
     isCreating,
+    createGlobalMetadataSucceeded,
     isFetchingList,
     isFetchingDetail,
     isFetchingConnectorMetadata,
     isDeleting,
     isBulkDeleting,
     isUpdating,
+    updateGlobalMetadataSucceeded,
 };
 
 export const actions = slice.actions;

@@ -457,6 +457,10 @@ const callbackConnector: AppEpic = (action$, state, deps) => {
             const rootState: any = (state as any).value ?? (state as any);
             const connectorsState: any = rootState.connectors;
             const connector = connectorsState?.connectors?.find((c: any) => c.uuid === payload.uuid) ?? connectorsState?.connector;
+            // If connector is not yet loaded in state, skip callback to avoid hitting wrong endpoint
+            if (!connector) {
+                return of(slice.actions.callbackFailure({ callbackId: action.payload.callbackId }));
+            }
             const isV2 = connector?.version === ConnectorVersion.V2;
             const api$ = isV2
                 ? deps.apiClients.callback.callbackV2({

@@ -47,6 +47,10 @@ export interface ListVaultInstancesRequest {
     searchRequestDto: SearchRequestDto;
 }
 
+export interface ListVaultProfileAttributesRequest {
+    uuid: string;
+}
+
 export interface UpdateVaultInstanceRequest {
     uuid: string;
     vaultInstanceUpdateRequestDto: VaultInstanceUpdateRequestDto;
@@ -148,6 +152,20 @@ export class VaultInstanceManagementApi extends BaseAPI {
             method: 'POST',
             headers,
             body: searchRequestDto,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * List Vault Profile Attributes
+     */
+    listVaultProfileAttributes({ uuid }: ListVaultProfileAttributesRequest): Observable<Array<BaseAttributeDto>>
+    listVaultProfileAttributes({ uuid }: ListVaultProfileAttributesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BaseAttributeDto>>>
+    listVaultProfileAttributes({ uuid }: ListVaultProfileAttributesRequest, opts?: OperationOpts): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
+        throwIfNullOrUndefined(uuid, 'uuid', 'listVaultProfileAttributes');
+
+        return this.request<Array<BaseAttributeDto>>({
+            url: '/v1/vaults/{uuid}/vaultProfiles/attributes'.replace('{uuid}', encodeURI(uuid)),
+            method: 'GET',
         }, opts?.responseOpts);
     };
 

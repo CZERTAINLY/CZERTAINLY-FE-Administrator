@@ -5,7 +5,7 @@ import { actions as connectorActions, actions as connectorsActions } from 'ducks
 
 import { actions, selectors } from 'ducks/credentials';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -60,6 +60,8 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
     const isFetchingAttributeDescriptors = useSelector(selectors.isFetchingCredentialProviderAttributeDescriptors);
     const isCreating = useSelector(selectors.isCreating);
     const isUpdating = useSelector(selectors.isUpdating);
+    const createCredentialSucceeded = useSelector(selectors.createCredentialSucceeded);
+    const updateCredentialSucceeded = useSelector(selectors.updateCredentialSucceeded);
 
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [attributeValuesMap] = useState<Record<string, Record<string, any>>>({});
@@ -323,8 +325,8 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
         );
     }, [resourceCustomAttributes, credential, isBusy]);
 
-    useRunOnFinished(isCreating, onSuccess);
-    useRunOnFinished(isUpdating, onSuccess);
+    useRunOnSuccessfulFinish(isCreating, createCredentialSucceeded, onSuccess);
+    useRunOnSuccessfulFinish(isUpdating, updateCredentialSucceeded, onSuccess);
 
     return (
         <FormProvider {...methods}>
@@ -434,6 +436,7 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
 
                         <TabLayout
                             noBorder
+                            onlyActiveTabContent={false}
                             tabs={[
                                 {
                                     title: 'Connector Attributes',

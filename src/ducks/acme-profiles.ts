@@ -20,8 +20,10 @@ export type State = {
     isFetchingList: boolean;
     isFetchingDetail: boolean;
     isCreating: boolean;
+    createAcmeProfileSucceeded: boolean;
     isDeleting: boolean;
     isUpdating: boolean;
+    updateAcmeProfileSucceeded: boolean;
     isEnabling: boolean;
     isDisabling: boolean;
     isBulkDeleting: boolean;
@@ -41,8 +43,10 @@ export const initialState: State = {
     isFetchingList: false,
     isFetchingDetail: false,
     isCreating: false,
+    createAcmeProfileSucceeded: false,
     isDeleting: false,
     isUpdating: false,
+    updateAcmeProfileSucceeded: false,
     isEnabling: false,
     isDisabling: false,
     isBulkDeleting: false,
@@ -111,14 +115,17 @@ export const slice = createSlice({
 
         createAcmeProfile: (state, action: PayloadAction<AcmeProfileAddRequestModel>) => {
             state.isCreating = true;
+            state.createAcmeProfileSucceeded = false;
         },
 
         createAcmeProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isCreating = false;
+            state.createAcmeProfileSucceeded = true;
         },
 
         createAcmeProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
+            state.createAcmeProfileSucceeded = false;
         },
 
         updateAcmeProfile: (
@@ -129,10 +136,12 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isUpdating = true;
+            state.updateAcmeProfileSucceeded = false;
         },
 
         updateAcmeProfileSuccess: (state, action: PayloadAction<{ acmeProfile: AcmeProfileResponseModel }>) => {
             state.isUpdating = false;
+            state.updateAcmeProfileSucceeded = true;
 
             const acmeProfileIndex = state.acmeProfiles.findIndex((acmeProfile) => acmeProfile.uuid === action.payload.acmeProfile.uuid);
 
@@ -147,6 +156,7 @@ export const slice = createSlice({
 
         updateAcmeProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateAcmeProfileSucceeded = false;
         },
 
         deleteAcmeProfile: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -302,8 +312,10 @@ const checkedRows = createSelector(state, (state) => state.checkedRows);
 const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isCreating = createSelector(state, (state) => state.isCreating);
+const createAcmeProfileSucceeded = createSelector(state, (state) => state.createAcmeProfileSucceeded);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isUpdating = createSelector(state, (state) => state.isUpdating);
+const updateAcmeProfileSucceeded = createSelector(state, (state) => state.updateAcmeProfileSucceeded);
 const isEnabling = createSelector(state, (state) => state.isEnabling);
 const isDisabling = createSelector(state, (state) => state.isDisabling);
 const isBulkDeleting = createSelector(state, (state) => state.isBulkDeleting);
@@ -325,8 +337,10 @@ export const selectors = {
     isFetchingList,
     isFetchingDetail,
     isCreating,
+    createAcmeProfileSucceeded,
     isDeleting,
     isUpdating,
+    updateAcmeProfileSucceeded,
     isEnabling,
     isDisabling,
     isBulkDeleting,

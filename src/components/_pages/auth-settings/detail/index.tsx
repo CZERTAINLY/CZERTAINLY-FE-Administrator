@@ -7,7 +7,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/auth-settings';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 
@@ -24,6 +24,7 @@ export default function OAuth2ProviderDetail() {
     const oauth2Provider = useSelector(selectors.oauth2Provider);
     const isFetchingProvider = useSelector(selectors.isFetchingProvider);
     const isUpdatingProvider = useSelector(selectors.isUpdatingProvider);
+    const updateProviderSucceeded = useSelector(selectors.updateProviderSucceeded);
 
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -51,7 +52,7 @@ export default function OAuth2ProviderDetail() {
         }
     }, [oauth2Provider, getFreshData]);
 
-    useRunOnFinished(isUpdatingProvider, () => {
+    useRunOnSuccessfulFinish(isUpdatingProvider, updateProviderSucceeded, () => {
         if (isEditDialogOpen) {
             handleCloseEditDialog();
             getFreshData();

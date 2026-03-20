@@ -38,18 +38,35 @@ const listCboms: AppEpic = (action$, state, deps) => {
             concat(
                 of(pagingActions.list(EntityType.CBOM)),
                 deps.apiClients.cbomManagement.listCboms({ searchRequestDto: action.payload }).pipe(
-                    mergeMap((response) =>
-                        of(
+                    mergeMap((response) => {
+                        const transformedResponse = transformPaginationResponseDtoToModel(response);
+                        const deletedCbomUuids: string[] = (state as any)?.value?.cbom?.deletedCbomUuids ?? [];
+                        const deletedCbomUuidsSet = new Set(deletedCbomUuids);
+                        const originalItems = transformedResponse.items ?? [];
+                        const filteredItems =
+                            deletedCbomUuidsSet.size === 0
+                                ? originalItems
+                                : originalItems.filter((item) => !deletedCbomUuidsSet.has(item.uuid));
+                        const removedItemsCount = originalItems.length - filteredItems.length;
+                        const baseTotalItems = transformedResponse.totalItems ?? originalItems.length;
+                        const adjustedTotalItems = Math.max(0, baseTotalItems - removedItemsCount);
+                        const adjustedResponse = {
+                            ...transformedResponse,
+                            items: filteredItems,
+                            totalItems: adjustedTotalItems,
+                        };
+
+                        return of(
                             slice.actions.listCbomsSuccess({
-                                data: transformPaginationResponseDtoToModel(response),
+                                data: adjustedResponse,
                             }),
                             pagingActions.listSuccess({
                                 entity: EntityType.CBOM,
-                                totalItems: response.totalItems ?? response.items?.length ?? 0,
+                                totalItems: adjustedTotalItems,
                             }),
                             userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfCboms),
-                        ),
-                    ),
+                        );
+                    }),
                     catchError((err) =>
                         of(
                             slice.actions.listCbomsFailure({ error: extractError(err, 'Failed to fetch CBOMs') }),

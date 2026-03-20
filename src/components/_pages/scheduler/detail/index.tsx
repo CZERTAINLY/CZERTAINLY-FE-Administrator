@@ -18,6 +18,7 @@ import { buildValidationRules } from 'utils/validators-helper';
 import TextInput from 'components/TextInput';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { Clock, Info } from 'lucide-react';
+import Tooltip from 'components/Tooltip';
 import SchedulerJobHistory from './SchedulerJobHistory';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import Breadcrumb from 'components/Breadcrumb';
@@ -259,9 +260,9 @@ export default function SchedulerJobDetail() {
                               'Cron Expression',
                               <>
                                   {schedulerJob.cronExpression}&nbsp;
-                                  <span title={getStrongFromCronExpression(schedulerJob.cronExpression)}>
+                                  <Tooltip content={getStrongFromCronExpression(schedulerJob.cronExpression)}>
                                       <Info size={16} className="inline-block" />
-                                  </span>
+                                  </Tooltip>
                               </>,
                           ],
                       },

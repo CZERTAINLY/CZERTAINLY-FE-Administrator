@@ -17,8 +17,10 @@ export type State = {
     isFetchingList: boolean;
     isFetchingDetail: boolean;
     isCreating: boolean;
+    createUserSucceeded: boolean;
     isDeleting: boolean;
     isUpdating: boolean;
+    updateUserSucceeded: boolean;
     isEnabling: boolean;
     isDisabling: boolean;
     isFetchingRoles: boolean;
@@ -38,8 +40,10 @@ export const initialState: State = {
     isFetchingDetail: false,
     isFetchingList: false,
     isCreating: false,
+    createUserSucceeded: false,
     isDeleting: false,
     isUpdating: false,
+    updateUserSucceeded: false,
     isEnabling: false,
     isDisabling: false,
     isFetchingRoles: false,
@@ -121,15 +125,18 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isCreating = true;
+            state.createUserSucceeded = false;
         },
 
         createSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
             state.users.push(action.payload.user);
             state.isCreating = false;
+            state.createUserSucceeded = true;
         },
 
         createFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
+            state.createUserSucceeded = false;
         },
 
         update: (
@@ -141,6 +148,7 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isUpdating = true;
+            state.updateUserSucceeded = false;
         },
 
         updateSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
@@ -156,10 +164,12 @@ export const slice = createSlice({
                 state.user = JSON.parse(JSON.stringify(action.payload.user));
             }
             state.isUpdating = false;
+            state.updateUserSucceeded = true;
         },
 
         updateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateUserSucceeded = false;
         },
 
         deleteUser: (state, action: PayloadAction<{ uuid: string; redirect?: string }>) => {
@@ -293,7 +303,9 @@ const users = createSelector(state, (state) => state.users);
 const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isCreating = createSelector(state, (state) => state.isCreating);
+const createUserSucceeded = createSelector(state, (state) => state.createUserSucceeded);
 const isUpdating = createSelector(state, (state) => state.isUpdating);
+const updateUserSucceeded = createSelector(state, (state) => state.updateUserSucceeded);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isEnabling = createSelector(state, (state) => state.isEnabling);
 const isDisabling = createSelector(state, (state) => state.isDisabling);
@@ -318,8 +330,10 @@ export const selectors = {
     isFetchingList,
     isFetchingDetail,
     isCreating,
+    createUserSucceeded,
     isDeleting,
     isUpdating,
+    updateUserSucceeded,
     isEnabling,
     isDisabling,
     isFetchingRoles,

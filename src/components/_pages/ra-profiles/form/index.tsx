@@ -310,6 +310,7 @@ export default function RaProfileForm({ raProfileId, authorityId: propAuthorityI
 
                         <TabLayout
                             noBorder
+                            onlyActiveTabContent={false}
                             tabs={[
                                 {
                                     title: 'Connector Attributes',

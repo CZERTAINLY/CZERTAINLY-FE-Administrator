@@ -27,6 +27,8 @@ export type State = {
     isFetchingNotificationInstances: boolean;
     isCreatingNotificationInstance: boolean;
     isEditingNotificationInstance: boolean;
+    createNotificationInstanceSucceeded: boolean;
+    updateNotificationInstanceSucceeded: boolean;
     isDeleting: boolean;
     isBulkDeleting: boolean;
     isMarking: boolean;
@@ -48,6 +50,8 @@ export const initialState: State = {
     isFetchingOverview: false,
     failedFetchingOverviewRemainingCount: MAX_FAILED_RETRY_COUNT,
     isEditingNotificationInstance: false,
+    createNotificationInstanceSucceeded: false,
+    updateNotificationInstanceSucceeded: false,
     isDeleting: false,
     isBulkDeleting: false,
     isMarking: false,
@@ -175,14 +179,17 @@ export const slice = createSlice({
 
         createNotificationInstance: (state, action: PayloadAction<NotificationInstanceRequestModel>) => {
             state.isCreatingNotificationInstance = true;
+            state.createNotificationInstanceSucceeded = false;
         },
 
         createNotificationInstanceSuccess: (state, action: PayloadAction<void>) => {
             state.isCreatingNotificationInstance = false;
+            state.createNotificationInstanceSucceeded = true;
         },
 
         createNotificationInstanceFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreatingNotificationInstance = false;
+            state.createNotificationInstanceSucceeded = false;
         },
 
         editNotificationInstance: (
@@ -190,14 +197,17 @@ export const slice = createSlice({
             action: PayloadAction<{ notificationInstance: NotificationInstanceRequestModel; uuid: string }>,
         ) => {
             state.isEditingNotificationInstance = true;
+            state.updateNotificationInstanceSucceeded = false;
         },
 
         editNotificationInstanceSuccess: (state, action: PayloadAction<void>) => {
             state.isEditingNotificationInstance = false;
+            state.updateNotificationInstanceSucceeded = true;
         },
 
         editNotificationInstanceFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isEditingNotificationInstance = false;
+            state.updateNotificationInstanceSucceeded = false;
         },
 
         deleteNotificationInstance: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -290,6 +300,8 @@ const isFetchingNotificationProviders = createSelector(state, (state) => state.i
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
 const isCreatingNotificationInstance = createSelector(state, (state) => state.isCreatingNotificationInstance);
 const isEditingNotificationInstance = createSelector(state, (state) => state.isEditingNotificationInstance);
+const createNotificationInstanceSucceeded = createSelector(state, (state) => state.createNotificationInstanceSucceeded);
+const updateNotificationInstanceSucceeded = createSelector(state, (state) => state.updateNotificationInstanceSucceeded);
 const isFetchingNotificationInstanceDetail = createSelector(state, (state) => state.isFetchingNotificationInstanceDetail);
 const isFetchingNotificationInstances = createSelector(state, (state) => state.isFetchingNotificationInstances);
 const isFetchingOverview = createSelector(state, (state) => state.isFetchingOverview);
@@ -312,7 +324,9 @@ export const selectors = {
     deleteErrorMessage,
     isFetchingNotificationProviders,
     isCreatingNotificationInstance,
+    createNotificationInstanceSucceeded,
     isEditingNotificationInstance,
+    updateNotificationInstanceSucceeded,
     isFetchingNotificationInstanceDetail,
     isFetchingNotificationInstances,
     isFetchingOverview,

@@ -28,8 +28,10 @@ export type State = {
     isFetchingCertificates: boolean;
     isFetchingDetail: boolean;
     isCreating: boolean;
+    createCmpProfileSucceeded: boolean;
     isDeleting: boolean;
     isUpdating: boolean;
+    updateCmpProfileSucceeded: boolean;
     isEnabling: boolean;
     isDisabling: boolean;
     isBulkDeleting: boolean;
@@ -50,8 +52,10 @@ export const initialState: State = {
     isFetchingCertificates: false,
     isFetchingDetail: false,
     isCreating: false,
+    createCmpProfileSucceeded: false,
     isDeleting: false,
     isUpdating: false,
+    updateCmpProfileSucceeded: false,
     isEnabling: false,
     isDisabling: false,
     isBulkDeleting: false,
@@ -131,14 +135,17 @@ export const slice = createSlice({
 
         createCmpProfile: (state, action: PayloadAction<CmpProfileRequestModel>) => {
             state.isCreating = true;
+            state.createCmpProfileSucceeded = false;
         },
 
         createCmpProfileSuccess: (state, action: PayloadAction<void>) => {
             state.isCreating = false;
+            state.createCmpProfileSucceeded = true;
         },
 
         createCmpProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
+            state.createCmpProfileSucceeded = false;
         },
 
         updateCmpProfile: (
@@ -149,14 +156,17 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isUpdating = true;
+            state.updateCmpProfileSucceeded = false;
         },
 
         updateCmpProfileSuccess: (state, action: PayloadAction<{ cmpProfile: CmpProfileDetailModel }>) => {
             state.isUpdating = false;
+            state.updateCmpProfileSucceeded = true;
         },
 
         updateCmpProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateCmpProfileSucceeded = false;
         },
 
         deleteCmpProfile: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -314,8 +324,10 @@ const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 const isFetchingCertificates = createSelector(state, (state) => state.isFetchingCertificates);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isCreating = createSelector(state, (state) => state.isCreating);
+const createCmpProfileSucceeded = createSelector(state, (state) => state.createCmpProfileSucceeded);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isUpdating = createSelector(state, (state) => state.isUpdating);
+const updateCmpProfileSucceeded = createSelector(state, (state) => state.updateCmpProfileSucceeded);
 const isEnabling = createSelector(state, (state) => state.isEnabling);
 const isDisabling = createSelector(state, (state) => state.isDisabling);
 const isBulkDeleting = createSelector(state, (state) => state.isBulkDeleting);
@@ -339,8 +351,10 @@ export const selectors = {
     isFetchingCertificates,
     isFetchingDetail,
     isCreating,
+    createCmpProfileSucceeded,
     isDeleting,
     isUpdating,
+    updateCmpProfileSucceeded,
     isEnabling,
     isDisabling,
     isBulkDeleting,
