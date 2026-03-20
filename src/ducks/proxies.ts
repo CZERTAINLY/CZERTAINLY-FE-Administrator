@@ -17,6 +17,7 @@ export type State = {
     isFetchingDetail: boolean;
     isFetchingInstructions: boolean;
     isCreating: boolean;
+    createProxySucceeded: boolean;
     isDeleting: boolean;
     isBulkDeleting: boolean;
     isUpdating: boolean;
@@ -34,6 +35,7 @@ export const initialState: State = {
     isFetchingDetail: false,
     isFetchingInstructions: false,
     isCreating: false,
+    createProxySucceeded: false,
     isDeleting: false,
     isBulkDeleting: false,
     isUpdating: false,
@@ -104,10 +106,12 @@ export const slice = createSlice({
 
         createProxy: (state, action: PayloadAction<ProxyRequestModel>) => {
             state.isCreating = true;
+            state.createProxySucceeded = false;
         },
 
         createProxySuccess: (state, action: PayloadAction<{ proxy: ProxyResponseModel }>) => {
             state.isCreating = false;
+            state.createProxySucceeded = true;
 
             const index = state.proxies.findIndex((proxy) => proxy.uuid === action.payload.proxy.uuid);
 
@@ -122,6 +126,7 @@ export const slice = createSlice({
 
         createProxyFailure: (state, action: PayloadAction<void>) => {
             state.isCreating = false;
+            state.createProxySucceeded = false;
         },
 
         updateProxy: (state, action: PayloadAction<{ uuid: string; proxyUpdateRequest: ProxyUpdateRequestModel }>) => {
@@ -193,6 +198,7 @@ const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isFetchingInstructions = createSelector(state, (state) => state.isFetchingInstructions);
 const isCreating = createSelector(state, (state) => state.isCreating);
+const createProxySucceeded = createSelector(state, (state) => state.createProxySucceeded);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isBulkDeleting = createSelector(state, (state) => state.isBulkDeleting);
 const isUpdating = createSelector(state, (state) => state.isUpdating);
@@ -209,6 +215,7 @@ export const selectors = {
     isFetchingInstructions,
     isCreating,
     isDeleting,
+    createProxySucceeded,
     isBulkDeleting,
     isUpdating,
 };

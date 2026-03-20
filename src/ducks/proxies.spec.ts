@@ -91,11 +91,13 @@ describe('proxies rxjs slice', () => {
     test('createProxy sets loading', () => {
         const next = reducer(initialState, actions.createProxy(proxyA as any));
         expect(next.isCreating).toBe(true);
+        expect(next.createProxySucceeded).toBe(false);
     });
 
     test('createProxySuccess stores proxy in list and detail', () => {
         const next = reducer(initialState, actions.createProxySuccess({ proxy: proxyA }));
         expect(next.isCreating).toBe(false);
+        expect(next.createProxySucceeded).toBe(true);
         expect(next.proxy).toEqual(proxyA);
         expect(next.proxies).toHaveLength(1);
     });
@@ -112,6 +114,7 @@ describe('proxies rxjs slice', () => {
         const startState = { ...initialState, isCreating: true };
         const next = reducer(startState, actions.createProxyFailure());
         expect(next.isCreating).toBe(false);
+        expect(next.createProxySucceeded).toBe(false);
     });
 
     test('updateProxy sets loading', () => {

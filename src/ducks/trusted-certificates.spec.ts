@@ -51,7 +51,22 @@ describe('trustedCertificates slice', () => {
         );
 
         expect(next.isDeleting).toBe(false);
+        expect(next.deleteTrustedCertificateSucceeded).toBe(true);
         expect(next.trustedCertificates).toEqual([{ uuid: 'tc-1', certificateContent: 'A' }]);
         expect(next.trustedCertificate).toBeUndefined();
+    });
+
+    test('deleteTrustedCertificate sets isDeleting and resets succeeded flag', () => {
+        const startState = { ...initialState, deleteTrustedCertificateSucceeded: true };
+        const next = reducer(startState, actions.deleteTrustedCertificate({ uuid: 'tc-1' }));
+        expect(next.isDeleting).toBe(true);
+        expect(next.deleteTrustedCertificateSucceeded).toBe(false);
+    });
+
+    test('deleteTrustedCertificateFailure clears isDeleting and resets succeeded flag', () => {
+        const startState = { ...initialState, isDeleting: true, deleteTrustedCertificateSucceeded: true };
+        const next = reducer(startState, actions.deleteTrustedCertificateFailure({ error: 'failed' }));
+        expect(next.isDeleting).toBe(false);
+        expect(next.deleteTrustedCertificateSucceeded).toBe(false);
     });
 });

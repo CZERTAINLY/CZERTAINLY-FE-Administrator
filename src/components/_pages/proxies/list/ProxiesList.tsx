@@ -12,7 +12,7 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import { ProxyStatus } from 'types/openapi';
 import { dateFormatter } from 'utils/dateUtil';
 import { PROXY_STATUS_OPTIONS } from 'utils/proxy';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { ProxyStatusBadge } from '../ProxyStatusBadge';
 import { ProxyForm } from '../form/ProxyForm';
 
@@ -26,6 +26,7 @@ export const ProxiesList = () => {
     const isDeleting = useSelector(selectors.isDeleting);
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
     const isCreating = useSelector(selectors.isCreating);
+    const createProxySucceeded = useSelector(selectors.createProxySucceeded);
     const isBusy = isFetching || isDeleting || isBulkDeleting;
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
@@ -41,7 +42,7 @@ export const ProxiesList = () => {
         getFreshData();
     }, [getFreshData]);
 
-    useRunOnFinished(isCreating, () => {
+    useRunOnSuccessfulFinish(isCreating, createProxySucceeded, () => {
         setIsAddModalOpen(false);
         getFreshData();
     });

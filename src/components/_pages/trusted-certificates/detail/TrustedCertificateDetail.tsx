@@ -11,7 +11,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/trusted-certificates';
 import { Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { formatTrustedCertificateDate, formatTrustedCertificateValue } from 'utils/trusted-certificate';
 import { createWidgetDetailHeaders } from 'utils/widget';
 
@@ -23,6 +23,7 @@ export const TrustedCertificateDetail = () => {
     const trustedCertificate = useSelector(selectors.trustedCertificate);
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
+    const deleteTrustedCertificateSucceeded = useSelector(selectors.deleteTrustedCertificateSucceeded);
 
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [deleteSubmitted, setDeleteSubmitted] = useState(false);
@@ -37,7 +38,7 @@ export const TrustedCertificateDetail = () => {
         getFreshTrustedCertificateDetails();
     }, [getFreshTrustedCertificateDetails]);
 
-    useRunOnFinished(isDeleting, () => {
+    useRunOnSuccessfulFinish(isDeleting, deleteTrustedCertificateSucceeded, () => {
         setConfirmDelete(false);
 
         if (deleteSubmitted && !trustedCertificate) {

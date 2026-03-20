@@ -1,6 +1,6 @@
 import Widget from 'components/Widget';
 import { useCallback, useMemo } from 'react';
-import { useAreDefaultValuesSame, useRunOnFinished } from 'utils/common-hooks';
+import { useAreDefaultValuesSame, useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
@@ -29,6 +29,7 @@ export const ProxyForm = ({ onCancel, onSuccess }: ProxyFormProps = {}) => {
     const navigate = useNavigate();
 
     const isCreatingProxy = useSelector(proxiesSelectors.isCreating);
+    const createProxySucceeded = useSelector(proxiesSelectors.createProxySucceeded);
 
     const isBusy = useMemo(() => isCreatingProxy, [isCreatingProxy]);
 
@@ -51,7 +52,7 @@ export const ProxyForm = ({ onCancel, onSuccess }: ProxyFormProps = {}) => {
 
     const formValues = useWatch({ control });
 
-    useRunOnFinished(isCreatingProxy, onSuccess);
+    useRunOnSuccessfulFinish(isCreatingProxy, createProxySucceeded, onSuccess);
 
     const handleCancel = useCallback(() => {
         if (onCancel) {

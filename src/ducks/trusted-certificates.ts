@@ -9,6 +9,7 @@ export type State = {
     isFetchingDetail: boolean;
     isCreating: boolean;
     isDeleting: boolean;
+    deleteTrustedCertificateSucceeded: boolean;
 };
 
 export const initialState: State = {
@@ -17,6 +18,7 @@ export const initialState: State = {
     isFetchingDetail: false,
     isCreating: false,
     isDeleting: false,
+    deleteTrustedCertificateSucceeded: false,
 };
 
 export const slice = createSlice({
@@ -75,10 +77,12 @@ export const slice = createSlice({
 
         deleteTrustedCertificate: (state, _action: PayloadAction<{ uuid: string }>) => {
             state.isDeleting = true;
+            state.deleteTrustedCertificateSucceeded = false;
         },
 
         deleteTrustedCertificateSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isDeleting = false;
+            state.deleteTrustedCertificateSucceeded = true;
             state.trustedCertificates = state.trustedCertificates.filter(
                 (trustedCertificate) => trustedCertificate.uuid !== action.payload.uuid,
             );
@@ -90,6 +94,7 @@ export const slice = createSlice({
 
         deleteTrustedCertificateFailure: (state, _action: PayloadAction<{ error: string | undefined }>) => {
             state.isDeleting = false;
+            state.deleteTrustedCertificateSucceeded = false;
         },
     },
 });
@@ -103,6 +108,7 @@ const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isCreating = createSelector(state, (state) => state.isCreating);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
+const deleteTrustedCertificateSucceeded = createSelector(state, (state) => state.deleteTrustedCertificateSucceeded);
 
 export const selectors = {
     state,
@@ -112,6 +118,7 @@ export const selectors = {
     isFetchingDetail,
     isCreating,
     isDeleting,
+    deleteTrustedCertificateSucceeded,
 };
 
 export const actions = slice.actions;
