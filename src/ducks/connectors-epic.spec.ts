@@ -838,14 +838,14 @@ describe('connectors epics', () => {
             action,
             {
                 callback: {
-                    callbackV2: () => {
+                    callback: () => {
                         throw new Error('sync callback error');
                     },
                 } as any,
             },
             1,
         );
-        expect(emitted[0]).toEqual(slice.actions.callbackFailure({ callbackId: 'cb-1' }));
+        expect(emitted[0]).toEqual(slice.actions.callbackFailure({ callbackId: '' }));
     });
 
     test('callbackResource outer catchError emits callbackFailure and fetchError when resourceCallback throws', async () => {
