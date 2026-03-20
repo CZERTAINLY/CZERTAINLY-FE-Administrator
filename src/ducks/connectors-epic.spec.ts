@@ -828,6 +828,17 @@ describe('connectors epics', () => {
         expect(emitted[0]).toEqual(slice.actions.callbackSuccess({ callbackId: 'res-cb-1', data }));
     });
 
+    test('callbackConnector with missing uuid emits callbackFailure immediately', async () => {
+        const action = slice.actions.callbackConnector({
+            callbackId: 'cb-missing',
+            callbackConnector: { uuid: undefined, requestAttributeCallback: { mappings: [] } } as any,
+        });
+        const callbackMock = vi.fn(() => of({}));
+        const emitted = await runEpic(17, action, { callback: { callback: callbackMock, callbackV2: callbackMock } as any }, 1);
+        expect(callbackMock).not.toHaveBeenCalled();
+        expect(emitted[0]).toEqual(slice.actions.callbackFailure({ callbackId: 'cb-missing' }));
+    });
+
     test('callbackConnector outer catchError emits callbackFailure and fetchError when callback throws', async () => {
         const action = slice.actions.callbackConnector({
             callbackId: 'cb-1',
