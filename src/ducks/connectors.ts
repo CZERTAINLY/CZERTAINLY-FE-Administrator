@@ -14,7 +14,6 @@ import {
     HealthModel,
 } from 'types/connectors';
 import { ConnectorStatus, FunctionGroupCode } from 'types/openapi';
-import { createFeatureSelector } from 'utils/ducks';
 import { SearchRequestModel } from 'types/certificate';
 
 export type State = {
@@ -492,7 +491,7 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const checkedRows = createSelector(state, (state) => state.checkedRows);
 
