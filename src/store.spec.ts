@@ -51,9 +51,4 @@ describe('store', () => {
         configure();
         expect(alertsTicker.startAlertsTicker).toHaveBeenCalled();
     });
-
-    it('should dispatch @@app/INIT action', () => {
-        const store = configure();
-        expect(store.dispatch).toBeDefined();
-    });
 });

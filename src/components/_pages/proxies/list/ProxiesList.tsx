@@ -84,7 +84,8 @@ export const ProxiesList = () => {
                         options={PROXY_STATUS_OPTIONS}
                         value={filterStatus ?? ''}
                         onChange={(value) => {
-                            setFilterStatus(value as ProxyStatus | undefined);
+                            const normalized = value === '' || value === undefined ? undefined : (value as ProxyStatus);
+                            setFilterStatus(normalized);
                         }}
                         isClearable
                     />

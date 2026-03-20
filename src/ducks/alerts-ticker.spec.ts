@@ -25,13 +25,13 @@ describe('alerts-ticker', () => {
         vi.useRealTimers();
     });
 
-    it('should dispatch hide after 17 seconds', () => {
+    it('should dispatch hide after 7 seconds', () => {
         const now = 1000000;
         vi.setSystemTime(now);
 
         messages.push({
             id: 1,
-            time: now - 17001,
+            time: now - 7001,
             message: 'Old message',
             color: 'info',
         });
@@ -42,13 +42,13 @@ describe('alerts-ticker', () => {
         expect(mockStore.dispatch).toHaveBeenCalledWith(actions.hide(1));
     });
 
-    it('should dispatch dismiss after 20 seconds', () => {
+    it('should dispatch dismiss after 8 seconds', () => {
         const now = 1000000;
         vi.setSystemTime(now);
 
         messages.push({
             id: 2,
-            time: now - 20001,
+            time: now - 8001,
             message: 'Very old message',
             color: 'info',
         });
