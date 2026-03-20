@@ -23,7 +23,7 @@
     font-style: normal;
     color: #1f2937;
 
-    --primary-blue-color: #0072cf;
+    --primary-blue-color: #0073cf;
     --header-height: 68px;
     --sidebar-width: 84px;
     --main-background-color: #f8fafc;
@@ -32,7 +32,7 @@
 
     --status-success-color: #14b8a6;
     --status-danger-color: #ef4444;
-    --status-secondary-color: #b3b3b3;
+    --status-secondary-color: #b4b4b4;
     --status-warning-color: #eab308;
     --status-dark-color: var(--dark-gray-color);
     --status-light-gray-color: var(--gray-300);
@@ -51,7 +51,7 @@
     --color-blue-300: #66b2ff;
     --color-blue-400: #3399ff;
     --color-blue-500: #0085e6;
-    --color-blue-600: #0072cf;
+    --color-blue-600: #0073cf;
     --color-blue-700: #005ba6;
     --color-blue-800: #004480;
     --color-blue-900: #002d59;
@@ -62,7 +62,7 @@
     --color-gray-300: #d4d4d4;
     --color-gray-400: #c7c7c7;
     --color-gray-500: #a8a8a8;
-    --color-gray-600: #b3b3b3;
+    --color-gray-600: #b4b4b4;
     --color-gray-700: #8c8c8c;
     --color-gray-800: #666666;
     --color-gray-900: #404040;

@@ -6,7 +6,7 @@ import NotificationsOverview from 'components/_pages/notifications/overview';
 
 import { selectors } from 'ducks/auth';
 
-import logo from '../../../resources/images/ilm-logo-white.svg';
+import logo from '../../../resources/images/ot-logo-white.svg';
 
 interface Props {
     sidebarToggle: () => void;
@@ -22,7 +22,7 @@ function Header({ sidebarToggle }: Props) {
             data-testid="header"
         >
             <Link to="/dashboard" data-testid="header-logo-link">
-                <img src={logo} alt="ILM Logo" className="h-9" data-testid="header-logo" />
+                <img src={logo} alt="OT Logo" className="h-9" data-testid="header-logo" />
             </Link>
             <div className="flex items-center gap-2">
                 {!!profile && (
