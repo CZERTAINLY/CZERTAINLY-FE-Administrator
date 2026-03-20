@@ -31,6 +31,7 @@ import {
     InternalNotificationApi,
     LocationManagementApi,
     NotificationProfileInventoryApi,
+    ProxyManagementApi,
     OAuth2LoginManagementV2Api,
     RAProfileManagementApi,
     ResourceManagementApi,
@@ -47,6 +48,7 @@ import {
     SecretManagementApi,
     VaultInstanceManagementApi,
     VaultProfileManagementApi,
+    TrustedCertificateManagementApi,
 } from 'types/openapi';
 import { TokenInstanceControllerApi } from 'types/openapi/apis/TokenInstanceControllerApi';
 import {
@@ -54,10 +56,10 @@ import {
     CertificateUtilsAPIApi,
     CertificationRequestUtilsAPIApi,
     Configuration as ConfigurationUtils,
+    OIDUtilsAPIApi,
 } from 'types/openapi/utils';
-import { OIDUtilsAPIApi } from './types/openapi/utils';
 
-const apiUrl = (window as any).__ENV__?.API_URL || '/api';
+const apiUrl = typeof window !== 'undefined' ? window?.__ENV__?.API_URL || '/api' : '/api';
 const configuration = new Configuration({ basePath: apiUrl });
 
 export interface ApiClients {
@@ -72,6 +74,7 @@ export interface ApiClients {
     credentials: CredentialManagementApi;
     connectors: ConnectorManagementApi;
     connectorsV2: ConnectorManagementV2Api;
+    proxies: ProxyManagementApi;
     callback: CallbackApi;
     statisticsDashboard: StatisticsDashboardApi;
     authorities: AuthorityManagementApi;
@@ -105,6 +108,7 @@ export interface ApiClients {
     tokenProfiles: TokenProfileManagementApi;
     cryptographicKeys: CryptographicKeyManagementApi;
     cryptographicOperations: CryptographicOperationsControllerApi;
+    trustedCertificates: TrustedCertificateManagementApi;
     utilsOid?: OIDUtilsAPIApi;
     utilsActuator?: ActuatorApi;
     utilsCertificate?: CertificateUtilsAPIApi;
@@ -134,6 +138,7 @@ export const backendClient: ApiClients = {
     login: new OAuth2LoginManagementV2Api(configuration),
     notificationProfiles: new NotificationProfileInventoryApi(configuration),
     connectors: new ConnectorManagementApi(configuration),
+    proxies: new ProxyManagementApi(configuration),
     callback: new CallbackApi(configuration),
     statisticsDashboard: new StatisticsDashboardApi(configuration),
     acmeAccounts: new ACMEAccountManagementApi(configuration),
@@ -161,6 +166,7 @@ export const backendClient: ApiClients = {
     cryptographicOperations: new CryptographicOperationsControllerApi(configuration),
     oids: new CustomOIDManagementApi(configuration),
     connectorsV2: new ConnectorManagementV2Api(configuration),
+    trustedCertificates: new TrustedCertificateManagementApi(configuration),
     vaults: new VaultInstanceManagementApi(configuration),
     vaultProfiles: new VaultProfileManagementApi(configuration),
     secrets: new SecretManagementApi(configuration),

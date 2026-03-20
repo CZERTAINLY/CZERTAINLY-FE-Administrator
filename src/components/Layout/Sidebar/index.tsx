@@ -20,6 +20,7 @@ import {
     FileJson2,
     Split,
     ArrowRightToLine,
+    Network,
     FileLock2,
 } from 'lucide-react';
 import Button from 'components/Button';
@@ -140,6 +141,14 @@ const menuItemMappings: MenuItemMapping[] = [
         headerLink: '/cboms',
         requiredResources: [Resource.Cboms],
     },
+    {
+        _key: '/proxies',
+        icon: <Network size={16} strokeWidth={1.5} />,
+        header: 'Proxies',
+        headerLink: '/proxies',
+        requiredResources: [Resource.Proxies],
+    },
+
     {
         _key: 'accessControl',
         icon: <CircleUser size={16} strokeWidth={1.5} />,
@@ -269,6 +278,12 @@ const menuItemMappings: MenuItemMapping[] = [
                 requiredResources: [Resource.Settings],
             },
             { _key: '/custom-oids', name: 'Custom OIDs', link: '/custom-oids', requiredResources: [Resource.Settings] },
+            {
+                _key: `/${Resource.TrustedCertificates.toLowerCase()}`,
+                name: 'Trusted Certificates',
+                link: `/${Resource.TrustedCertificates.toLowerCase()}`,
+                requiredResources: [Resource.Settings],
+            },
         ],
     },
 
