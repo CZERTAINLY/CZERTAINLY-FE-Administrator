@@ -1,6 +1,5 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { TrustedCertificateRequestModel, TrustedCertificateResponseModel } from 'types/trusted-certificates';
-import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     trustedCertificates: TrustedCertificateResponseModel[];
@@ -99,7 +98,7 @@ export const slice = createSlice({
     },
 });
 
-const state = createFeatureSelector<State>(slice.name);
+const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const trustedCertificates = createSelector(state, (state) => state.trustedCertificates);
 const trustedCertificate = createSelector(state, (state) => state.trustedCertificate);

@@ -454,13 +454,14 @@ const callbackConnector: AppEpic = (action$, state, deps) => {
         mergeMap((action) => {
             const { callbackConnector: payload } = action.payload;
             const requestAttributeCallback = transformCallbackAttributeModelToDto(payload.requestAttributeCallback);
+            // Guard against missing UUID (would produce /v1/connectors/undefined/... URLs)
+            if (!payload.uuid) {
+                return of(slice.actions.callbackFailure({ callbackId: action.payload.callbackId }));
+            }
             const rootState: any = (state as any).value ?? (state as any);
             const connectorsState: any = rootState.connectors;
             const connector = connectorsState?.connectors?.find((c: any) => c.uuid === payload.uuid) ?? connectorsState?.connector;
-            // If connector is not yet loaded in state, skip callback to avoid hitting wrong endpoint
-            if (!connector) {
-                return of(slice.actions.callbackFailure({ callbackId: action.payload.callbackId }));
-            }
+            // Fall back to v1 when the connector is not in connectors state (e.g. authority/credential providers)
             const isV2 = connector?.version === ConnectorVersion.V2;
             const api$ = isV2
                 ? deps.apiClients.callback.callbackV2({

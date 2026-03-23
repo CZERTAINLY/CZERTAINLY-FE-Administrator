@@ -8,7 +8,6 @@ import {
     LocationPushRequestModel,
     LocationResponseModel,
 } from 'types/locations';
-import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     location?: LocationResponseModel;
@@ -319,7 +318,7 @@ export const slice = createSlice({
     },
 });
 
-export const state = createFeatureSelector<State>(slice.name);
+export const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 export const location = createSelector(state, (state) => state.location);
 export const locations = createSelector(state, (state) => state.locations);
