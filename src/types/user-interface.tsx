@@ -99,12 +99,16 @@ export enum LockWidgetNameEnum {
     ListOfCboms,
     CbomDetail,
     CbomVersions,
+    ProxyStore,
+    ProxyDetails,
     ListOfSecrets,
     SecretDetailsWidget,
     ListOfVaults,
     ListOfVaultProfiles,
     VaultDetails,
     VaultProfileDetails,
+    ListOfTrustedCertificates,
+    TrustedCertificateDetails,
 }
 
 export interface WidgetLockModel {

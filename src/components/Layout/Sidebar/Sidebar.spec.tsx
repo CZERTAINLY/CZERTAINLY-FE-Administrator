@@ -124,4 +124,17 @@ test.describe('Sidebar', () => {
         const links = component.getByRole('link');
         await expect(links).toHaveCount(0);
     });
+
+    test('shows Trusted Certificates under Settings when Settings resource is allowed', async ({ mount }) => {
+        const store = createMockStore();
+        const component = await mount(
+            withProviders(<Sidebar allowedResources={[Resource.Settings]} />, {
+                store,
+                initialRoute: '/trusted-certificates',
+            }),
+        );
+
+        await expect(component.getByRole('button', { name: 'Settings' })).toBeVisible();
+        await expect(component.getByRole('link', { name: 'Trusted Certificates' })).toBeVisible();
+    });
 });
