@@ -138,6 +138,10 @@ import CbomVersionsHistory from 'components/_pages/cboms/versions';
 export default function AppRouter() {
     const profile = useSelector(selectors.profile);
 
+    // Get feature flags from environment
+    const isProxiesEnabled = typeof window !== 'undefined' ? window?.__ENV__?.ENABLE_PROXIES !== false : true;
+    const isTrustedCertificatesEnabled = typeof window !== 'undefined' ? window?.__ENV__?.ENABLE_TRUSTED_CERTIFICATES !== false : true;
+
     const appRoutes = useMemo(
         () => (
             <>
@@ -171,12 +175,16 @@ export default function AppRouter() {
                     />
                     <Route path={`/${Resource.Connectors.toLowerCase()}/detail/:id`} element={<ConnectorDetail />} />
 
-                    <Route path={`/${Resource.Proxies.toLowerCase()}`} element={<ProxiesList />} />
-                    <Route
-                        path={`/${Resource.Proxies.toLowerCase()}/list`}
-                        element={<Navigate to={`/${Resource.Proxies.toLowerCase()}`} />}
-                    />
-                    <Route path={`/${Resource.Proxies.toLowerCase()}/detail/:id`} element={<ProxyDetail />} />
+                    {isProxiesEnabled && (
+                        <>
+                            <Route path={`/${Resource.Proxies.toLowerCase()}`} element={<ProxiesList />} />
+                            <Route
+                                path={`/${Resource.Proxies.toLowerCase()}/list`}
+                                element={<Navigate to={`/${Resource.Proxies.toLowerCase()}`} />}
+                            />
+                            <Route path={`/${Resource.Proxies.toLowerCase()}/detail/:id`} element={<ProxyDetail />} />
+                        </>
+                    )}
 
                     <Route path={`/${Resource.Discoveries.toLowerCase()}`} element={<DiscoveriesList />} />
                     <Route
@@ -359,8 +367,15 @@ export default function AppRouter() {
                     <Route path={'/custom-oids'} element={<CustomOIDList />} />
                     <Route path={'/custom-oids/detail/:id'} element={<CustomOIDDetail />} />
 
-                    <Route path={`/${Resource.TrustedCertificates.toLowerCase()}`} element={<TrustedCertificatesList />} />
-                    <Route path={`/${Resource.TrustedCertificates.toLowerCase()}/detail/:id`} element={<TrustedCertificateDetail />} />
+                    {isTrustedCertificatesEnabled && (
+                        <>
+                            <Route path={`/${Resource.TrustedCertificates.toLowerCase()}`} element={<TrustedCertificatesList />} />
+                            <Route
+                                path={`/${Resource.TrustedCertificates.toLowerCase()}/detail/:id`}
+                                element={<TrustedCertificateDetail />}
+                            />
+                        </>
+                    )}
 
                     <Route path={`/${Resource.Cboms.toLowerCase()}`} element={<CbomsList />} />
                     <Route path={`/${Resource.Cboms.toLowerCase()}/detail/:id`} element={<CbomDetail />} />
@@ -374,7 +389,7 @@ export default function AppRouter() {
                 <Route path="*" element={<h1>404</h1>} />
             </>
         ),
-        [],
+        [isProxiesEnabled, isTrustedCertificatesEnabled],
     );
 
     return (

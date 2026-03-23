@@ -3,4 +3,6 @@ window.__ENV__ = {
     API_URL: '/api',
     LOGIN_URL: '/login',
     LOGOUT_URL: '/logout',
+    ENABLE_PROXIES: false,
+    ENABLE_TRUSTED_CERTIFICATES: false,
 };

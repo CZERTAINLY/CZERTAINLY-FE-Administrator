@@ -326,14 +326,29 @@ function getAllowedMenuItems(allowedResources?: Resource[]): MenuItemMapping[] {
     if (!allowedResources) return [];
     const allowedLinks: MenuItemMapping[] = [];
 
+    // Get feature flags from environment
+    const isProxiesEnabled = window?.__ENV__?.ENABLE_PROXIES !== false;
+    const isTrustedCertificatesEnabled = window?.__ENV__?.ENABLE_TRUSTED_CERTIFICATES !== false;
+    console.log(`Proxies: ${isProxiesEnabled}, Trusted Certificates: ${isTrustedCertificatesEnabled}`);
+
     // Filters menu items based on associated resources and allowed resources.
     // Menu item is shown if:
     // 1. It doesn't have children, and doesn't have associated resources array.
     // 2. It doesn't have children, and associated resources array contains item which is present in allowedResources.
     // 3. It has a child, which is shown based on rules 1 and 2.
+    // 4. Feature flags are enabled for Proxies and Trusted Certificates.
     for (const mapping of menuItemMappings) {
+        // Filter out Proxies if disabled
+        if (mapping._key === '/proxies' && !isProxiesEnabled) {
+            continue;
+        }
+
         if ('children' in mapping) {
             mapping.children = mapping.children.filter((el) => {
+                // Filter out Trusted Certificates if disabled
+                if (el._key === `/${Resource.TrustedCertificates.toLowerCase()}` && !isTrustedCertificatesEnabled) {
+                    return false;
+                }
                 return !!el.requiredResources?.some((resource) => allowedResources.includes(resource));
             });
             if (mapping.children.length > 0) {
