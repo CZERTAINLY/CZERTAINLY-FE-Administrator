@@ -59,7 +59,9 @@ const RenderTokenProfile = ({ type, name }: Props) => {
             rules={{ required: true }}
             render={({ field: { value, onChange }, fieldState: { error } }) => (
                 <div>
-                    <Label htmlFor={`${name}Select`}>{type === 'alt' ? 'Alternative Token Profile' : 'Token Profile'}</Label>
+                    <Label htmlFor={`${name}Select`} required>
+                        {type === 'alt' ? 'Alternative Token Profile' : 'Token Profile'}
+                    </Label>
                     <Select
                         id={name}
                         options={tokenProfileOptions}
