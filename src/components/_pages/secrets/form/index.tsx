@@ -559,7 +559,9 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                             </Label>
                                             <FileUpload
                                                 id="secret-secretkey-file"
-                                                onFileContentLoaded={(base64) => setValue('content', base64, { shouldDirty: true })}
+                                                onFileContentLoaded={(base64) =>
+                                                    setValue('content', base64, { shouldDirty: true, shouldValidate: true })
+                                                }
                                             />
                                         </div>
                                     </>
@@ -592,7 +594,9 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                             </Label>
                                             <FileUpload
                                                 id="secret-privatekey-file"
-                                                onFileContentLoaded={(base64) => setValue('content', base64, { shouldDirty: true })}
+                                                onFileContentLoaded={(base64) =>
+                                                    setValue('content', base64, { shouldDirty: true, shouldValidate: true })
+                                                }
                                             />
                                         </div>
                                     </>
@@ -616,19 +620,34 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                                 />
                                             )}
                                         />
-                                        <div>
-                                            <Label
-                                                htmlFor="secret-keystore-file__fileUpload__file"
-                                                className="mb-1 block text-sm font-medium"
-                                                required
-                                            >
-                                                Key Store
-                                            </Label>
-                                            <FileUpload
-                                                id="secret-keystore-file"
-                                                onFileContentLoaded={(base64) => setValue('keyStoreContent', base64, { shouldDirty: true })}
-                                            />
-                                        </div>
+                                        <Controller
+                                            name="keyStoreContent"
+                                            control={control}
+                                            rules={initialSecret ? undefined : buildValidationRules([validateRequired()])}
+                                            render={({ fieldState }) => (
+                                                <div>
+                                                    <Label
+                                                        htmlFor="secret-keystore-file__fileUpload__file"
+                                                        className="mb-1 block text-sm font-medium"
+                                                        required
+                                                    >
+                                                        Key Store
+                                                    </Label>
+                                                    <FileUpload
+                                                        id="secret-keystore-file"
+                                                        onFileContentLoaded={(base64) =>
+                                                            setValue('keyStoreContent', base64, {
+                                                                shouldDirty: true,
+                                                                shouldValidate: true,
+                                                            })
+                                                        }
+                                                    />
+                                                    {fieldState.error && (
+                                                        <p className="mt-1 text-sm text-red-600">{fieldState.error.message}</p>
+                                                    )}
+                                                </div>
+                                            )}
+                                        />
                                         <Controller
                                             name="keyStorePassword"
                                             control={control}

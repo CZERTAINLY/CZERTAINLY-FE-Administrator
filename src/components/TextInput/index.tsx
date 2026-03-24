@@ -160,9 +160,9 @@ function TextInput({
                         tabIndex={-1}
                     >
                         {passwordVisible ? (
-                            <EyeOff className="size-4 shrink-0" aria-hidden />
-                        ) : (
                             <Eye className="size-4 shrink-0" aria-hidden />
+                        ) : (
+                            <EyeOff className="size-4 shrink-0" aria-hidden />
                         )}
                     </button>
                 )}

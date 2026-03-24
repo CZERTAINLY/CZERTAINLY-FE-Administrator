@@ -83,6 +83,7 @@ export const slice = createSlice({
         getVaultInstanceAttributes: (state, action: PayloadAction<{ connectorUuid: string }>) => {
             state.isFetchingVaultInstanceAttributes = true;
             state.vaultInstanceAttributesConnectorUuid = action.payload.connectorUuid;
+            state.vaultInstanceAttributeDescriptors = [];
         },
 
         getVaultInstanceAttributesSuccess: (
