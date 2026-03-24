@@ -363,9 +363,9 @@ export default function SecretsList() {
 
             <Dialog
                 isOpen={isEnableSecretsOpen}
-                caption="Enable Secrets"
+                caption={`Enable ${checkedRows.length === 1 ? 'Secret' : 'Secrets'}`}
                 icon="check"
-                body="You are about to enable the selected Secrets. Is this what you want to do?"
+                body={`You are about to enable the selected ${checkedRows.length === 1 ? 'Secret' : 'Secrets'}. Is this what you want to do?`}
                 toggle={() => setIsEnableSecretsOpen(false)}
                 size="md"
                 buttons={[
@@ -376,9 +376,9 @@ export default function SecretsList() {
 
             <Dialog
                 isOpen={isDisableSecretsOpen}
-                caption="Disable Secrets"
+                caption={`Disable ${checkedRows.length === 1 ? 'Secret' : 'Secrets'}`}
                 icon="warning"
-                body="You are about to disable the selected Secrets. Is this what you want to do?"
+                body={`You are about to disable the selected ${checkedRows.length === 1 ? 'Secret' : 'Secrets'}. Is this what you want to do?`}
                 toggle={() => setIsDisableSecretsOpen(false)}
                 size="md"
                 buttons={[
