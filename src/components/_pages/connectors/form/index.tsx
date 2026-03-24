@@ -17,6 +17,7 @@ import { ConnectorResponseModel } from 'types/connectors';
 import { AuthType, ConnectorStatus, ConnectorVersion, PlatformEnum, Resource } from 'types/openapi';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
+import { featureFlags } from 'utils/feature-flags';
 
 import { validateAlphaNumericWithSpecialChars, validateRequired, validateRoutelessUrl } from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
@@ -330,30 +331,34 @@ export default function ConnectorForm({ connectorId, onCancel, onSuccess }: Conn
                             )}
                         />
 
-                        <Controller
-                            name="useProxy"
-                            control={control}
-                            render={({ field }) => (
-                                <Switch id="useProxy" label="Use proxy" checked={Boolean(field.value)} onChange={field.onChange} />
-                            )}
-                        />
+                        {featureFlags.isProxiesEnabled && (
+                            <>
+                                <Controller
+                                    name="useProxy"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Switch id="useProxy" label="Use proxy" checked={Boolean(field.value)} onChange={field.onChange} />
+                                    )}
+                                />
 
-                        {watchedUseProxy && (
-                            <Controller
-                                name="proxyUuid"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        id="proxySelect"
-                                        label="Proxy"
-                                        value={field.value || ''}
-                                        onChange={field.onChange}
-                                        options={[]}
-                                        placeholder="Proxy list will be loaded from backend"
-                                        placement="bottom"
+                                {watchedUseProxy && (
+                                    <Controller
+                                        name="proxyUuid"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Select
+                                                id="proxySelect"
+                                                label="Proxy"
+                                                value={field.value || ''}
+                                                onChange={field.onChange}
+                                                options={[]}
+                                                placeholder="Proxy list will be loaded from backend"
+                                                placement="bottom"
+                                            />
+                                        )}
                                     />
                                 )}
-                            />
+                            </>
                         )}
 
                         {watchedAuthType === AuthType.Basic && (

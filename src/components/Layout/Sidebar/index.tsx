@@ -1,8 +1,8 @@
-import { Resource } from 'types/openapi';
 import { useMemo, useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router';
-import { useLocalStorage } from 'usehooks-ts';
 import cn from 'classnames';
+import SimpleBar from 'simplebar-react';
+import { useLocalStorage } from 'usehooks-ts';
 import {
     Award,
     ChevronDown,
@@ -24,7 +24,8 @@ import {
     FileLock2,
 } from 'lucide-react';
 import Button from 'components/Button';
-import SimpleBar from 'simplebar-react';
+import { Resource } from 'types/openapi';
+import { featureFlags } from 'utils/feature-flags';
 
 type MenuItemMapping = {
     _key: string;
@@ -326,10 +327,7 @@ function getAllowedMenuItems(allowedResources?: Resource[]): MenuItemMapping[] {
     if (!allowedResources) return [];
     const allowedLinks: MenuItemMapping[] = [];
 
-    // Get feature flags from environment
-    const isProxiesEnabled = window?.__ENV__?.ENABLE_PROXIES !== false;
-    const isTrustedCertificatesEnabled = window?.__ENV__?.ENABLE_TRUSTED_CERTIFICATES !== false;
-    console.log(`Proxies: ${isProxiesEnabled}, Trusted Certificates: ${isTrustedCertificatesEnabled}`);
+    const { isProxiesEnabled, isTrustedCertificatesEnabled } = featureFlags;
 
     // Filters menu items based on associated resources and allowed resources.
     // Menu item is shown if:
