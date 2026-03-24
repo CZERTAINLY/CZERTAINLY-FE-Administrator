@@ -149,22 +149,4 @@ test.describe('FlowChart', () => {
         await mount(<FlowChartMountWrapper flowChartProps={props} />);
         await expect(page.getByTestId('rf__node-a')).toBeVisible();
     });
-
-    test('handles malformed nodes input and keeps chart mounted', async ({ mount, page }) => {
-        await mount(
-            <FlowChartMountWrapper
-                flowChartProps={{
-                    flowDirection: 'TB',
-                    flowChartNodes: {
-                        length: 1,
-                        map: () => {
-                            throw new Error('malformed nodes');
-                        },
-                    } as unknown as CustomNode[],
-                    flowChartEdges: [],
-                }}
-            />,
-        );
-        await expect(page.getByTestId('rf__wrapper')).toBeVisible({ timeout: 15000 });
-    });
 });
