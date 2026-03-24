@@ -1,12 +1,11 @@
 /**
  * Centralized feature-flag helpers.
  *
- * Flags are sourced from `window.__ENV__` which is injected at runtime before the application boots,
- * so reading them once at module-load time is safe and avoids scattering the raw `window?.__ENV__?.ENABLE_*`
- * expression across the codebase.
+ * Flags are sourced from `globalThis.__ENV__`, which is injected at runtime from `config.js` before the application boots
+ * (in browsers `window === globalThis`). Reading them once at module-load time is safe and avoids scattering the raw
+ * `globalThis?.__ENV__?.ENABLE_*` expression across the codebase.
  */
-
-const env = typeof window !== 'undefined' ? window?.__ENV__ : undefined;
+const env = (globalThis as any).__ENV__;
 
 export const featureFlags = {
     /** When `false`, all proxy-related UI (routes, sidebar, columns, forms) is hidden. */
