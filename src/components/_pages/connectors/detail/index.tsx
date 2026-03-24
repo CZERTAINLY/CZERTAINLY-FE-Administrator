@@ -20,6 +20,7 @@ import { ConnectorStatus, ConnectorVersion, HealthStatus, PlatformEnum, Resource
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { inventoryStatus } from 'utils/connector';
+import { featureFlags } from 'utils/feature-flags';
 
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import ConnectorForm from '../form';
@@ -237,13 +238,17 @@ export default function ConnectorDetail() {
                 id: 'url',
                 columns: ['URL', connector.url],
             },
-            {
-                id: 'proxy',
-                columns: [
-                    'Proxy',
-                    connector.proxy ? <Link to={`../proxies/detail/${connector.proxy.uuid}`}>{connector.proxy.name}</Link> : '-',
-                ],
-            },
+            ...(featureFlags.isProxiesEnabled
+                ? [
+                      {
+                          id: 'proxy',
+                          columns: [
+                              'Proxy',
+                              connector.proxy ? <Link to={`../proxies/detail/${connector.proxy.uuid}`}>{connector.proxy.name}</Link> : '-',
+                          ],
+                      },
+                  ]
+                : []),
             {
                 id: 'version',
                 columns: ['Version', connector.version],

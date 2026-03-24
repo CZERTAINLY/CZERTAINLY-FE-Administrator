@@ -1,4 +1,5 @@
 import { selectors } from 'ducks/auth';
+import { featureFlags } from 'utils/feature-flags';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { HashRouter, Navigate, Route, Routes } from 'react-router';
@@ -138,9 +139,7 @@ import CbomVersionsHistory from 'components/_pages/cboms/versions';
 export default function AppRouter() {
     const profile = useSelector(selectors.profile);
 
-    // Get feature flags from environment
-    const isProxiesEnabled = typeof window !== 'undefined' ? window?.__ENV__?.ENABLE_PROXIES !== false : true;
-    const isTrustedCertificatesEnabled = typeof window !== 'undefined' ? window?.__ENV__?.ENABLE_TRUSTED_CERTIFICATES !== false : true;
+    const { isProxiesEnabled, isTrustedCertificatesEnabled } = featureFlags;
 
     const appRoutes = useMemo(
         () => (

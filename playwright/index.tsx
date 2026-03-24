@@ -23,6 +23,8 @@ if (typeof window !== 'undefined') {
             API_URL: '/api',
             LOGIN_URL: '/login',
             LOGOUT_URL: '/logout',
+            ENABLE_PROXIES: true,
+            ENABLE_TRUSTED_CERTIFICATES: true,
         };
     }
 }
