@@ -604,7 +604,7 @@ function AttributeEditorInner({
                 setBooleanAttributeValue();
             }
 
-            setValue(formAttributeName, formAttributeValue);
+            setValue(formAttributeName, formAttributeValue, { shouldValidate: true });
         },
         [setValue],
     );
@@ -925,9 +925,9 @@ function AttributeEditorInner({
                 if (!first) return;
                 const value = first.reference ?? first.data;
                 if (typeof value === 'undefined') return;
-                setValue(callbackId, value);
+                setValue(callbackId, value, { shouldValidate: true });
             } else if (userInteractedRef.current) {
-                setValue(callbackId, undefined);
+                setValue(callbackId, undefined, { shouldValidate: true });
             }
         }
 

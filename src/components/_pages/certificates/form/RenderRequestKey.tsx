@@ -106,7 +106,9 @@ const RenderRequestKey = ({ type, name, tokenProfileField }: Props) => {
             render={({ field: { value, onChange }, fieldState: { error } }) => {
                 return (
                     <div>
-                        <Label htmlFor={`${name}Select`}>{isAltKey ? 'Alternative Key' : 'Key'}</Label>
+                        <Label htmlFor={`${name}Select`} required>
+                            {isAltKey ? 'Alternative Key' : 'Key'}
+                        </Label>
                         <Select
                             id={name}
                             options={keyOptions}

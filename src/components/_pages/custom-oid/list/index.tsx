@@ -137,7 +137,7 @@ export default function CustomOIDList() {
                 entity={EntityType.OID}
                 onListCallback={onListCallback}
                 onDeleteCallback={onDeleteCallback}
-                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.oids.getSearchableInformation(), [])}
+                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.oids.getCustomOidEntrySearchableFields(), [])}
                 headers={oidsRowHeaders}
                 data={oidsList}
                 isBusy={isBusy}
