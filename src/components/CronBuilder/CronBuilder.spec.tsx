@@ -80,49 +80,25 @@ test.describe('CronBuilder', () => {
         await expect(component.locator('code').last()).toContainText('0 06 09 * * ?');
     });
 
-    test('should switch to Minutes tab and emit minutes cron', async ({ mount }) => {
-        let emitted = '';
-        const component = await mount(
-            cron('0 00 12 * * ?', (v) => {
-                emitted = v;
-            }),
-        );
-        await component.getByRole('tab', { name: 'Minutes' }).click();
-        await expect.poll(() => emitted, { timeout: 2000 }).toMatch(/^0 \*\/\d+ \* \* \* \?$/);
-    });
+    const tabSwitchCases: [string, RegExp][] = [
+        ['Minutes', /^0 \*\/\d+ \* \* \* \?$/],
+        ['Hourly', /^0 \d+ \*\/\d+ \* \* \?$/],
+        ['Weekly', /^0 \d+ \d+ \? \* \w+$/],
+        ['Monthly', /^0 \d+ \d+ \d+ \* \?$/],
+    ];
 
-    test('should switch to Hourly tab and emit hourly cron', async ({ mount }) => {
-        let emitted = '';
-        const component = await mount(
-            cron('0 00 12 * * ?', (v) => {
-                emitted = v;
-            }),
-        );
-        await component.getByRole('tab', { name: 'Hourly' }).click();
-        await expect.poll(() => emitted, { timeout: 2000 }).toMatch(/^0 \d+ \*\/\d+ \* \* \?$/);
-    });
-
-    test('should switch to Weekly tab and emit weekly cron', async ({ mount }) => {
-        let emitted = '';
-        const component = await mount(
-            cron('0 00 12 * * ?', (v) => {
-                emitted = v;
-            }),
-        );
-        await component.getByRole('tab', { name: 'Weekly' }).click();
-        await expect.poll(() => emitted, { timeout: 2000 }).toMatch(/^0 \d+ \d+ \? \* \w+$/);
-    });
-
-    test('should switch to Monthly tab and emit monthly cron', async ({ mount }) => {
-        let emitted = '';
-        const component = await mount(
-            cron('0 00 12 * * ?', (v) => {
-                emitted = v;
-            }),
-        );
-        await component.getByRole('tab', { name: 'Monthly' }).click();
-        await expect.poll(() => emitted, { timeout: 2000 }).toMatch(/^0 \d+ \d+ \d+ \* \?$/);
-    });
+    for (const [tab, pattern] of tabSwitchCases) {
+        test(`should switch to ${tab} tab and emit cron`, async ({ mount }) => {
+            let emitted = '';
+            const component = await mount(
+                cron('0 00 12 * * ?', (v) => {
+                    emitted = v;
+                }),
+            );
+            await component.getByRole('tab', { name: tab }).click();
+            await expect.poll(() => emitted, { timeout: 2000 }).toMatch(pattern);
+        });
+    }
 
     test('should switch to Custom tab and populate expression from current state', async ({ mount }) => {
         let emitted = '';
@@ -144,25 +120,6 @@ test.describe('CronBuilder', () => {
         );
         await component.getByLabel('Increase').first().click();
         await expect.poll(() => emitted, { timeout: 2000 }).toBe('0 */6 * * * ?');
-    });
-
-    test('should emit weekdays cron when Every week day is selected', async ({ mount }) => {
-        let emitted = '';
-        const component = await mount(
-            cron('0 00 08 * * ?', (v) => {
-                emitted = v;
-            }),
-        );
-        await component.getByRole('tab', { name: 'Daily' }).click();
-        await component.getByRole('radio').nth(1).click();
-        await expect.poll(() => emitted, { timeout: 2000 }).toMatch(/^0 \d+ \d+ \? \* MON-FRI$/);
-    });
-
-    test('should stay on Daily tab after selecting Every week day', async ({ mount }) => {
-        const component = await mount(cron('0 00 08 * * ?'));
-        await component.getByRole('tab', { name: 'Daily' }).click();
-        await component.getByRole('radio').nth(1).click();
-        await expect(component.getByRole('tab', { name: 'Daily' })).toHaveClass(/\bactive\b/);
     });
 
     test('should display everyN hourly cron correctly', async ({ mount }) => {
@@ -188,6 +145,96 @@ test.describe('CronBuilder', () => {
         await expect(component.getByRole('tab', { name: 'Hourly' })).toHaveClass(/\bactive\b/);
     });
 
+    test('should switch back to everyN mode in Hourly and emit correct cron', async ({ mount }) => {
+        let emitted = '';
+        const component = await mount(
+            cron('0 06 09 * * ?', (v) => {
+                emitted = v;
+            }),
+        );
+        await component.getByRole('tab', { name: 'Hourly' }).click();
+        await component.getByRole('radio').nth(0).click();
+        await expect.poll(() => emitted, { timeout: 2000 }).toMatch(/^0 \d+ \*\/\d+ \* \* \?$/);
+    });
+
+    test('should emit correct cron after changing everyHours in Hourly everyN mode', async ({ mount }) => {
+        let emitted = '';
+        const component = await mount(
+            cron('0 00 */2 * * ?', (v) => {
+                emitted = v;
+            }),
+        );
+        await component.getByLabel('Increase').first().click();
+        await expect.poll(() => emitted, { timeout: 2000 }).toBe('0 00 */3 * * ?');
+    });
+
+    test('should emit correct cron after changing atHour in Hourly atTime mode', async ({ mount }) => {
+        let emitted = '';
+        const component = await mount(
+            cron('0 06 09 * * ?', (v) => {
+                emitted = v;
+            }),
+        );
+        await component.getByRole('tab', { name: 'Hourly' }).click();
+        await component.getByRole('radio').nth(1).click();
+        emitted = '';
+        // Hourly tab Increase buttons: nth(0)=everyHours, nth(1)=atMinute(everyN), nth(2)=atHour, nth(3)=atMinute(atTime)
+        await component.getByLabel('Increase').nth(2).click();
+        await expect.poll(() => emitted, { timeout: 2000 }).toMatch(/^0 06 \d+ \* \* \?$/);
+    });
+
+    test('should emit weekdays cron when Every week day is selected', async ({ mount }) => {
+        let emitted = '';
+        const component = await mount(
+            cron('0 00 08 * * ?', (v) => {
+                emitted = v;
+            }),
+        );
+        await component.getByRole('tab', { name: 'Daily' }).click();
+        await component.getByRole('radio').nth(1).click();
+        await expect.poll(() => emitted, { timeout: 2000 }).toMatch(/^0 \d+ \d+ \? \* MON-FRI$/);
+    });
+
+    test('should stay on Daily tab after selecting Every week day', async ({ mount }) => {
+        const component = await mount(cron('0 00 08 * * ?'));
+        await component.getByRole('tab', { name: 'Daily' }).click();
+        await component.getByRole('radio').nth(1).click();
+        await expect(component.getByRole('tab', { name: 'Daily' })).toHaveClass(/\bactive\b/);
+    });
+
+    test('should emit correct cron after switching Daily to everyN mode', async ({ mount }) => {
+        let emitted = '';
+        const component = await mount(
+            cron('0 00 08 ? * MON-FRI', (v) => {
+                emitted = v;
+            }),
+        );
+        await component.getByRole('radio').nth(0).click();
+        await expect.poll(() => emitted, { timeout: 2000 }).toMatch(/^0 \d+ \d+ \* \* \?$/);
+    });
+
+    test('should emit correct cron after incrementing daily everyN days', async ({ mount }) => {
+        let emitted = '';
+        const component = await mount(
+            cron('0 00 08 * * ?', (v) => {
+                emitted = v;
+            }),
+        );
+        await component.getByLabel('Increase').first().click();
+        await expect.poll(() => emitted, { timeout: 2000 }).toMatch(/^0 \d+ \d+ \*\/2 \* \?$/);
+    });
+
+    test('should emit correct cron after changing start time hour in Daily tab', async ({ mount }) => {
+        let emitted = '';
+        const component = await mount(
+            cron('0 00 12 * * ?', (v) => {
+                emitted = v;
+            }),
+        );
+        await component.getByLabel('Increase').nth(1).click();
+        await expect.poll(() => emitted, { timeout: 2000 }).toMatch(/^0 00 13 \* \* \?$/);
+    });
+
     test('should show weekday checkboxes on Weekly tab', async ({ mount }) => {
         const component = await mount(cron('0 00 09 ? * MON,WED'));
         await expect(component.getByText('Monday', { exact: true })).toBeVisible();
@@ -203,6 +250,28 @@ test.describe('CronBuilder', () => {
         );
         await component.getByLabel('Wednesday').click();
         await expect.poll(() => emitted, { timeout: 2000 }).toContain('MON,WED');
+    });
+
+    test('should keep last weekday when unchecking it', async ({ mount }) => {
+        let emitted = '';
+        const component = await mount(
+            cron('0 00 09 ? * MON', (v) => {
+                emitted = v;
+            }),
+        );
+        await component.getByLabel('Monday').click();
+        await expect.poll(() => emitted, { timeout: 2000 }).toContain('MON');
+    });
+
+    test('should emit correct cron after changing start time hour in Weekly tab', async ({ mount }) => {
+        let emitted = '';
+        const component = await mount(
+            cron('0 00 09 ? * MON', (v) => {
+                emitted = v;
+            }),
+        );
+        await component.getByLabel('Increase').first().click();
+        await expect.poll(() => emitted, { timeout: 2000 }).toMatch(/^0 00 10 \? \* MON$/);
     });
 
     test('should emit lastDay cron when Last day option is selected', async ({ mount }) => {
@@ -234,6 +303,65 @@ test.describe('CronBuilder', () => {
         await component.getByRole('tab', { name: 'Monthly' }).click();
         await component.getByRole('radio').nth(1).click();
         await expect(component.getByRole('tab', { name: 'Monthly' })).toHaveClass(/\bactive\b/);
+    });
+
+    test('should emit daysBeforeEnd cron when that option is selected', async ({ mount }) => {
+        let emitted = '';
+        const component = await mount(
+            cron('0 00 12 1 * ?', (v) => {
+                emitted = v;
+            }),
+        );
+        await component.getByRole('tab', { name: 'Monthly' }).click();
+        await component.getByRole('radio').nth(3).click();
+        await expect.poll(() => emitted, { timeout: 2000 }).toMatch(/^0 \d+ \d+ L-\d+ \* \?$/);
+    });
+
+    test('should emit everyN monthly cron when everyN option is selected', async ({ mount }) => {
+        let emitted = '';
+        const component = await mount(
+            cron('0 00 12 1 * ?', (v) => {
+                emitted = v;
+            }),
+        );
+        await component.getByRole('tab', { name: 'Monthly' }).click();
+        await component.getByRole('radio').nth(4).click();
+        await expect.poll(() => emitted, { timeout: 2000 }).toMatch(/^0 \d+ \d+ 1\/\d+ \* \?$/);
+    });
+
+    test('should emit correct cron after incrementing monthDay in Monthly tab', async ({ mount }) => {
+        let emitted = '';
+        const component = await mount(
+            cron('0 00 12 1 * ?', (v) => {
+                emitted = v;
+            }),
+        );
+        await component.getByLabel('Increase').first().click();
+        await expect.poll(() => emitted, { timeout: 2000 }).toBe('0 00 12 2 * ?');
+    });
+
+    test('should emit correct cron after incrementing daysBeforeEnd value', async ({ mount }) => {
+        let emitted = '';
+        const component = await mount(
+            cron('0 00 12 L-3 * ?', (v) => {
+                emitted = v;
+            }),
+        );
+        // Monthly tab Increase order: nth(0)=monthDay, nth(1)=daysBeforeEnd, nth(2)=monthlyEveryN, nth(3)=atHour, nth(4)=atMinute
+        await component.getByLabel('Increase').nth(1).click();
+        await expect.poll(() => emitted, { timeout: 2000 }).toBe('0 00 12 L-4 * ?');
+    });
+
+    test('should emit correct cron after incrementing monthlyEveryN value', async ({ mount }) => {
+        let emitted = '';
+        const component = await mount(
+            cron('0 00 12 1/5 * ?', (v) => {
+                emitted = v;
+            }),
+        );
+        // Monthly tab Increase order: nth(0)=monthDay, nth(1)=daysBeforeEnd, nth(2)=monthlyEveryN, nth(3)=atHour, nth(4)=atMinute
+        await component.getByLabel('Increase').nth(2).click();
+        await expect.poll(() => emitted, { timeout: 2000 }).toBe('0 00 12 1/6 * ?');
     });
 
     test('should allow editing expression manually in Custom tab', async ({ mount }) => {
