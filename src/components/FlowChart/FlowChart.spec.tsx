@@ -165,6 +165,6 @@ test.describe('FlowChart', () => {
                 }}
             />,
         );
-        await expect(page.locator('.react-flow')).toBeVisible({ timeout: 15000 });
+        await expect(page.getByTestId('rf__wrapper')).toBeVisible({ timeout: 15000 });
     });
 });
