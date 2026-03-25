@@ -236,9 +236,9 @@ const FlowChartContent = ({
             {flowChartTitle && <h5 className="text-lg font-bold mb-4">{flowChartTitle}</h5>}
             <div className="w-full h-[70vh]">
                 <ReactFlowLib.ReactFlow
-                    nodes={flowChartNodesState}
+                    nodes={flowChartNodesState ?? []}
                     proOptions={{ hideAttribution: true }}
-                    edges={flowChartEdgesState}
+                    edges={flowChartEdgesState ?? []}
                     onNodesChange={onNodesChange}
                     onEdgesChange={onEdgesChange}
                     nodeTypes={nodeTypes}

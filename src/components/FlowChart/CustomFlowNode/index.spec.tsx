@@ -558,7 +558,7 @@ test.describe('CustomFlowNode', () => {
         await expect(toggleWrap).toHaveAttribute('data-expanded', 'false');
     });
 
-    test.skip('add button toggles to Minus and hides content when clicked again', async ({ mount, page }) => {
+    test('add button toggles to Minus and hides content when clicked again', async ({ mount, page }) => {
         await mount(
             <CustomFlowNodeMountWrapper
                 nodeProps={buildProps({
@@ -571,9 +571,10 @@ test.describe('CustomFlowNode', () => {
             />,
         );
         const addBtn = page.getByTestId('flow-node-add');
-        await addBtn.click({ force: true });
+        await addBtn.waitFor({ state: 'visible' });
+        await addBtn.click();
         await expect(page.getByTestId('add-content')).toBeVisible();
-        await addBtn.click({ force: true });
+        await addBtn.click();
         await expect(page.getByTestId('add-content')).toBeHidden();
     });
 

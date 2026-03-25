@@ -20,16 +20,10 @@ export function getGlobalModalDialogProps(globalModal: GlobalModalModel, dispatc
     } = globalModal;
 
     const buttons = [] as DialogButton[];
-    if (showOkButton) {
-        buttons.push({
-            color: 'primary',
-            onClick: () => (okButtonCallback ? okButtonCallback() : dispatch(actions.resetState())),
-            body: 'OK',
-        });
-    }
     if (showCancelButton) {
         buttons.push({
-            color: 'secondary',
+            color: 'primary',
+            variant: 'outline',
             body: 'Cancel',
             onClick: () => {
                 cancelButtonCallback ? cancelButtonCallback() : dispatch(actions.resetState());
@@ -37,16 +31,9 @@ export function getGlobalModalDialogProps(globalModal: GlobalModalModel, dispatc
         });
     }
 
-    if (showSubmitButton) {
-        buttons.push({
-            color: 'primary',
-            onClick: () => (okButtonCallback ? okButtonCallback() : dispatch(actions.resetState())),
-            body: 'Submit',
-        });
-    }
     if (showCloseButton) {
         buttons.push({
-            color: 'secondary',
+            color: 'primary',
             variant: 'outline',
             onClick: () => {
                 if (cancelButtonCallback) {
@@ -56,6 +43,22 @@ export function getGlobalModalDialogProps(globalModal: GlobalModalModel, dispatc
                 }
             },
             body: 'Close',
+        });
+    }
+
+    if (showOkButton) {
+        buttons.push({
+            color: 'primary',
+            onClick: () => (okButtonCallback ? okButtonCallback() : dispatch(actions.resetState())),
+            body: 'OK',
+        });
+    }
+
+    if (showSubmitButton) {
+        buttons.push({
+            color: 'primary',
+            onClick: () => (okButtonCallback ? okButtonCallback() : dispatch(actions.resetState())),
+            body: 'Submit',
         });
     }
 
