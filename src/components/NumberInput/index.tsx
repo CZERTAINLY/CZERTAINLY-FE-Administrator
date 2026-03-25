@@ -29,8 +29,8 @@ export default function NumberInput({ value, onChange, min = 0, max = 999, step 
                     value={zeroPad ? String(value).padStart(2, '0') : String(value)}
                     disabled={disabled}
                     onChange={(e) => {
-                        const n = parseInt(e.target.value, 10);
-                        if (!isNaN(n) && n >= min && n <= max) onChange(n);
+                        const n = Number.parseInt(e.target.value, 10);
+                        if (!Number.isNaN(n) && n >= min && n <= max) onChange(n);
                     }}
                     aria-roledescription="Number field"
                     className="p-0 w-8 bg-transparent border-0 text-[var(--dark-gray-color)] text-center text-sm focus:ring-0 dark:text-white"

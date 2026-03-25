@@ -60,82 +60,105 @@ function stateFrom(partial: Partial<CronState>): CronState {
     return { ...DEFAULT_STATE, ...partial };
 }
 
+function parseIntSafe(s: string, fallback: number): number {
+    const n = Number.parseInt(s, 10);
+    return Number.isNaN(n) ? fallback : n;
+}
+
+function isWildcard(s: string): boolean {
+    return s === '*' || s === '?';
+}
+
+function parseMinuteHour(rawM: string, rawH: string): { atMinute: number; atHour: number } {
+    return { atMinute: parseIntSafe(rawM, 0), atHour: parseIntSafe(rawH, 0) };
+}
+
+function tryMinutes(s: string, rawM: string, rawH: string, dom: string, month: string): CronState | null {
+    if (s !== '0' || !rawM.startsWith('*/') || rawH !== '*' || !isWildcard(dom) || month !== '*') return null;
+    return stateFrom({ tab: 'minutes', everyMinutes: parseIntSafe(rawM.slice(2), 5) });
+}
+
+function tryHourlyEveryN(s: string, rawM: string, rawH: string, dom: string, month: string): CronState | null {
+    if (s !== '0' || rawM.startsWith('*/') || !rawH.startsWith('*/') || !isWildcard(dom) || month !== '*') return null;
+    return stateFrom({ tab: 'hourly', hourlyMode: 'everyN', everyHours: parseIntSafe(rawH.slice(2), 1), ...parseMinuteHour(rawM, rawH) });
+}
+
+function tryHourlyAtTime(s: string, rawM: string, rawH: string, dom: string, month: string, dow: string): CronState | null {
+    if (s !== '0' || rawM.startsWith('*/') || rawH.startsWith('*/') || dom !== '1/1' || month !== '*' || !isWildcard(dow)) return null;
+    return stateFrom({ tab: 'hourly', hourlyMode: 'atTime', ...parseMinuteHour(rawM, rawH) });
+}
+
+function tryDailyWeekdays(s: string, rawM: string, rawH: string, dom: string, month: string, dow: string): CronState | null {
+    if (s !== '0' || dom !== '?' || month !== '*' || dow !== 'MON-FRI') return null;
+    return stateFrom({ tab: 'daily', dailyMode: 'weekdays', ...parseMinuteHour(rawM, rawH) });
+}
+
+function tryWeekly(s: string, rawM: string, rawH: string, dom: string, month: string, dow: string): CronState | null {
+    if (s !== '0' || dom !== '?' || month !== '*' || dow === '*' || dow === '?' || dow === 'MON-FRI') return null;
+    const days = dow.split(',').filter((d) => DAYS_OF_WEEK.some((dw) => dw.value === d));
+    return stateFrom({ tab: 'weekly', ...parseMinuteHour(rawM, rawH), weekDays: days.length > 0 ? days : ['MON'] });
+}
+
+function tryMonthlyLastDay(s: string, rawM: string, rawH: string, dom: string, month: string, dow: string): CronState | null {
+    if (s !== '0' || dom !== 'L' || month !== '*' || !isWildcard(dow)) return null;
+    return stateFrom({ tab: 'monthly', monthlyMode: 'lastDay', ...parseMinuteHour(rawM, rawH) });
+}
+
+function tryMonthlyLastWeekday(s: string, rawM: string, rawH: string, dom: string, month: string, dow: string): CronState | null {
+    if (s !== '0' || dom !== 'LW' || month !== '*' || !isWildcard(dow)) return null;
+    return stateFrom({ tab: 'monthly', monthlyMode: 'lastWeekday', ...parseMinuteHour(rawM, rawH) });
+}
+
+function tryMonthlyDaysBeforeEnd(s: string, rawM: string, rawH: string, dom: string, month: string, dow: string): CronState | null {
+    if (s !== '0' || !dom.startsWith('L-') || month !== '*' || !isWildcard(dow)) return null;
+    return stateFrom({
+        tab: 'monthly',
+        monthlyMode: 'daysBeforeEnd',
+        ...parseMinuteHour(rawM, rawH),
+        daysBeforeEnd: parseIntSafe(dom.slice(2), 1),
+    });
+}
+
+function tryMonthlyEveryN(s: string, rawM: string, rawH: string, dom: string, month: string, dow: string): CronState | null {
+    if (s !== '0' || !/^\d+\/\d+$/.test(dom) || dom.startsWith('0/') || month !== '*' || !isWildcard(dow)) return null;
+    const [start, step] = dom.split('/').map(Number);
+    if (start >= 1 && step > 1) {
+        return stateFrom({ tab: 'monthly', monthlyMode: 'everyN', ...parseMinuteHour(rawM, rawH), monthlyEveryN: step });
+    }
+    return stateFrom({ tab: 'daily', dailyMode: 'everyN', ...parseMinuteHour(rawM, rawH), everyDays: step || 1 });
+}
+
+function tryDailyEveryN(s: string, rawM: string, rawH: string, dom: string, month: string, dow: string): CronState | null {
+    if (s !== '0' || (dom !== '*' && !dom.startsWith('*/')) || month !== '*' || !isWildcard(dow)) return null;
+    const n = dom === '*' ? 1 : parseIntSafe(dom.slice(2), 1);
+    return stateFrom({ tab: 'daily', dailyMode: 'everyN', ...parseMinuteHour(rawM, rawH), everyDays: n });
+}
+
+function tryMonthlySpecificDay(s: string, rawM: string, rawH: string, dom: string, month: string, dow: string): CronState | null {
+    if (s !== '0' || !/^\d+$/.test(dom) || month !== '*' || !isWildcard(dow)) return null;
+    return stateFrom({ tab: 'monthly', monthlyMode: 'dayN', ...parseMinuteHour(rawM, rawH), monthDay: parseIntSafe(dom, 1) });
+}
+
 export function parseCron(cron: string): CronState {
     if (!cron?.trim()) return stateFrom({});
     const parts = cron.trim().split(/\s+/);
     if (parts.length < 6) return stateFrom({ tab: 'custom', customExpression: cron });
 
     const [s, rawM, rawH, dom, month, dow] = parts;
-    const atMinute = isNaN(parseInt(rawM, 10)) ? 0 : parseInt(rawM, 10);
-    const atHour = isNaN(parseInt(rawH, 10)) ? 0 : parseInt(rawH, 10);
-
-    // Every N minutes: 0 */N * * * ?
-    if (s === '0' && rawM.startsWith('*/') && rawH === '*' && (dom === '*' || dom === '?') && month === '*') {
-        const n = parseInt(rawM.slice(2), 10);
-        return stateFrom({ tab: 'minutes', everyMinutes: isNaN(n) ? 5 : n });
-    }
-
-    // Hourly everyN: 0 M */N * * ?
-    if (s === '0' && !rawM.startsWith('*/') && rawH.startsWith('*/') && (dom === '*' || dom === '?') && month === '*') {
-        const n = parseInt(rawH.slice(2), 10);
-        return stateFrom({ tab: 'hourly', hourlyMode: 'everyN', everyHours: isNaN(n) ? 1 : n, atMinute });
-    }
-
-    // Hourly atTime (old react-cron-generator format): 0 M H 1/1 * ? [*]
-    if (s === '0' && !rawM.startsWith('*/') && !rawH.startsWith('*/') && dom === '1/1' && month === '*' && (dow === '?' || dow === '*')) {
-        return stateFrom({ tab: 'hourly', hourlyMode: 'atTime', atMinute, atHour });
-    }
-
-    // Daily weekdays: 0 M H ? * MON-FRI
-    if (s === '0' && dom === '?' && month === '*' && dow === 'MON-FRI') {
-        return stateFrom({ tab: 'daily', dailyMode: 'weekdays', atMinute, atHour });
-    }
-
-    // Weekly: 0 M H ? * DOW (with specific days)
-    if (s === '0' && dom === '?' && month === '*' && dow !== '*' && dow !== '?' && dow !== 'MON-FRI') {
-        const days = dow.split(',').filter((d) => DAYS_OF_WEEK.some((dw) => dw.value === d));
-        return stateFrom({ tab: 'weekly', atMinute, atHour, weekDays: days.length > 0 ? days : ['MON'] });
-    }
-
-    // Monthly last day: 0 M H L * ?
-    if (s === '0' && dom === 'L' && month === '*' && (dow === '?' || dow === '*')) {
-        return stateFrom({ tab: 'monthly', monthlyMode: 'lastDay', atMinute, atHour });
-    }
-
-    // Monthly last weekday: 0 M H LW * ?
-    if (s === '0' && dom === 'LW' && month === '*' && (dow === '?' || dow === '*')) {
-        return stateFrom({ tab: 'monthly', monthlyMode: 'lastWeekday', atMinute, atHour });
-    }
-
-    // Monthly L-N days before end: 0 M H L-N * ?
-    if (s === '0' && dom.startsWith('L-') && month === '*' && (dow === '?' || dow === '*')) {
-        const n = parseInt(dom.slice(2), 10);
-        return stateFrom({ tab: 'monthly', monthlyMode: 'daysBeforeEnd', atMinute, atHour, daysBeforeEnd: isNaN(n) ? 1 : n });
-    }
-
-    // Monthly every N days: 0 M H 1/N * ? (N > 1, use 1/ prefix to distinguish from daily */N)
-    if (s === '0' && /^\d+\/\d+$/.test(dom) && !dom.startsWith('0/') && month === '*' && (dow === '?' || dow === '*')) {
-        const [start, step] = dom.split('/').map(Number);
-        if (start >= 1 && step > 1) {
-            return stateFrom({ tab: 'monthly', monthlyMode: 'everyN', atMinute, atHour, monthlyEveryN: step });
-        }
-        // 1/1 or similar → daily everyN=1
-        return stateFrom({ tab: 'daily', dailyMode: 'everyN', everyDays: step || 1, atMinute, atHour });
-    }
-
-    // Daily every N days: 0 M H */N * ? or 0 M H * * ?
-    if (s === '0' && (dom === '*' || dom.startsWith('*/')) && month === '*' && (dow === '?' || dow === '*')) {
-        const n = dom === '*' ? 1 : parseInt(dom.slice(2), 10);
-        return stateFrom({ tab: 'daily', dailyMode: 'everyN', everyDays: isNaN(n) ? 1 : n, atMinute, atHour });
-    }
-
-    // Monthly specific day: 0 M H N * ?
-    if (s === '0' && /^\d+$/.test(dom) && month === '*' && (dow === '?' || dow === '*')) {
-        const day = parseInt(dom, 10);
-        return stateFrom({ tab: 'monthly', monthlyMode: 'dayN', atMinute, atHour, monthDay: isNaN(day) ? 1 : day });
-    }
-
-    return stateFrom({ tab: 'custom', customExpression: cron });
+    return (
+        tryMinutes(s, rawM, rawH, dom, month) ??
+        tryHourlyEveryN(s, rawM, rawH, dom, month) ??
+        tryHourlyAtTime(s, rawM, rawH, dom, month, dow) ??
+        tryDailyWeekdays(s, rawM, rawH, dom, month, dow) ??
+        tryWeekly(s, rawM, rawH, dom, month, dow) ??
+        tryMonthlyLastDay(s, rawM, rawH, dom, month, dow) ??
+        tryMonthlyLastWeekday(s, rawM, rawH, dom, month, dow) ??
+        tryMonthlyDaysBeforeEnd(s, rawM, rawH, dom, month, dow) ??
+        tryMonthlyEveryN(s, rawM, rawH, dom, month, dow) ??
+        tryDailyEveryN(s, rawM, rawH, dom, month, dow) ??
+        tryMonthlySpecificDay(s, rawM, rawH, dom, month, dow) ??
+        stateFrom({ tab: 'custom', customExpression: cron })
+    );
 }
 
 export function buildCron(state: CronState): string {
