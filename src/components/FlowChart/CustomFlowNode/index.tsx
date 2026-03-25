@@ -459,7 +459,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                         </div>
                     )}
 
-                    <div className={cn({ hidden: !addNodeContentCollapse })}>
+                    <div hidden={!addNodeContentCollapse}>
                         <div className="bg-white p-2 pb-[0.9rem] rounded-[10px] flex flex-col items-start w-[350px] min-h-[55px] text-left z-[2]">
                             {data.addButtonContent}
                         </div>

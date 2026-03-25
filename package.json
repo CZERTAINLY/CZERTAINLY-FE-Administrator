@@ -6,6 +6,7 @@
     "type": "module",
     "dependencies": {
         "@floating-ui/dom": "^1.7.5",
+        "@preline/input-number": "^4.1.3",
         "@preline/overlay": "^4.0.0",
         "@preline/select": "^4.0.0",
         "@preline/theme-switch": "^4.0.0",
@@ -32,7 +33,6 @@
         "preline": "^4.0.1",
         "react": "^19.2.4",
         "react-apexcharts": "^1.9.0",
-        "react-cron-generator": "^2.1.5",
         "react-dom": "^19.2.4",
         "react-hook-form": "^7.71.1",
         "react-redux": "^9.2.0",
