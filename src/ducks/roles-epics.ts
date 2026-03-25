@@ -161,9 +161,7 @@ const updateUsers: AppEpic = (action$, state, deps) => {
         filter(slice.actions.updateUsers.match),
         switchMap((action) =>
             deps.apiClients.roles.updateUsers({ roleUuid: action.payload.uuid, requestBody: action.payload.users }).pipe(
-                mergeMap((role) =>
-                    of(slice.actions.updateUsersSuccess({ role: transformRoleDetailDtoToModel(role) }), appRedirectActions.goBack()),
-                ),
+                map((role) => slice.actions.updateUsersSuccess({ role: transformRoleDetailDtoToModel(role) })),
 
                 catchError((err) =>
                     of(
@@ -206,14 +204,11 @@ const updatePermissions: AppEpic = (action$, state, deps) => {
             deps.apiClients.roles
                 .savePermissions({ roleUuid: action.payload.uuid, rolePermissionsRequestDto: action.payload.permissions })
                 .pipe(
-                    mergeMap((permissions) =>
-                        of(
-                            slice.actions.updatePermissionsSuccess({
-                                uuid: action.payload.uuid,
-                                permissions: transformSubjectPermissionsDtoToModel(permissions),
-                            }),
-                            appRedirectActions.goBack(),
-                        ),
+                    map((permissions) =>
+                        slice.actions.updatePermissionsSuccess({
+                            uuid: action.payload.uuid,
+                            permissions: transformSubjectPermissionsDtoToModel(permissions),
+                        }),
                     ),
 
                     catchError((err) =>

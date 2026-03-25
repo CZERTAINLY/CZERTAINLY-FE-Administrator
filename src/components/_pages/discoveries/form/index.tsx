@@ -7,16 +7,16 @@ import { actions as connectorActions } from 'ducks/connectors';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions as discoveryActions, selectors as discoverySelectors } from 'ducks/discoveries';
 import { actions as rulesActions } from 'ducks/rules';
+import { actions as userInterfaceActions } from 'ducks/user-interface';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
 import Label from 'components/Label';
-import Dialog from 'components/Dialog';
-import Cron from 'react-cron-generator';
+import CronBuilder from 'components/CronBuilder';
 import { Clock } from 'lucide-react';
 
 import { AttributeDescriptorModel } from 'types/attributes';
@@ -63,8 +63,7 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
     const [init, setInit] = useState(true);
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [discoveryProvider, setDiscoveryProvider] = useState<ConnectorResponseModel>();
-    const [cronModalOpen, setCronModalOpen] = useState(false);
-    const [originalCronExpression, setOriginalCronExpression] = useState<string | undefined>(undefined);
+    const cronBuilderValueRef = useRef<string>('');
 
     const isBusy = useMemo(
         () =>
@@ -212,20 +211,34 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
         }
     }, [watchedStoreKind, discoveryProvider, onKindChange]);
 
-    const handleCronSelectChange = useCallback(
-        (value: string) => {
-            setValue('cronExpression', value);
-        },
-        [setValue],
-    );
-
     const onOpenCronModal = useCallback(() => {
-        setOriginalCronExpression(watchedCronExpression);
-        if (!watchedCronExpression) {
-            setValue('cronExpression', DEFAULT_CRON_EXPRESSION);
-        }
-        setCronModalOpen(true);
-    }, [setValue, watchedCronExpression]);
+        const initialValue = watchedCronExpression || DEFAULT_CRON_EXPRESSION;
+        cronBuilderValueRef.current = initialValue;
+        dispatch(
+            userInterfaceActions.showGlobalModal({
+                isOpen: true,
+                size: 'xl',
+                title: 'Select CRON Expression',
+                content: (
+                    <CronBuilder
+                        value={initialValue}
+                        onChange={(v) => {
+                            cronBuilderValueRef.current = v;
+                        }}
+                    />
+                ),
+                showOkButton: true,
+                showCancelButton: true,
+                okButtonCallback: () => {
+                    setValue('cronExpression', cronBuilderValueRef.current);
+                    dispatch(userInterfaceActions.hideGlobalModal());
+                },
+                cancelButtonCallback: () => {
+                    dispatch(userInterfaceActions.hideGlobalModal());
+                },
+            }),
+        );
+    }, [dispatch, setValue, watchedCronExpression, cronBuilderValueRef]);
 
     return (
         <FormProvider {...methods}>
@@ -456,36 +469,6 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
                     />
                 </Container>
             </form>
-
-            <Dialog
-                size="xl"
-                isOpen={cronModalOpen}
-                caption="Select CRON Expression"
-                body={
-                    <div className="preline-cron-wrapper">
-                        <Cron value={watchedCronExpression || ''} onChange={handleCronSelectChange} showResultText showResultCron />
-                    </div>
-                }
-                toggle={() => setCronModalOpen(false)}
-                buttons={[
-                    {
-                        color: 'secondary',
-                        variant: 'outline',
-                        onClick: () => {
-                            setValue('cronExpression', originalCronExpression);
-                            setCronModalOpen(false);
-                        },
-                        body: 'Cancel',
-                    },
-                    {
-                        color: 'primary',
-                        onClick: () => {
-                            setCronModalOpen(false);
-                        },
-                        body: 'Ok',
-                    },
-                ]}
-            />
         </FormProvider>
     );
 }
