@@ -156,17 +156,24 @@ export default function CustomOIDForm({ oidId, onCancel, onSuccess }: CustomOIDF
                             control={control}
                             rules={buildValidationRules([validateRequired(), validateOid()])}
                             render={({ field, fieldState }) => (
-                                <TextInput
-                                    {...field}
-                                    id="oid"
-                                    type="text"
-                                    label="OID"
-                                    required
-                                    placeholder="Enter the OID"
-                                    disabled={editMode}
-                                    invalid={fieldState.error && fieldState.isTouched}
-                                    error={getFieldErrorMessage(fieldState)}
-                                />
+                                <>
+                                    <TextInput
+                                        {...field}
+                                        id="oid"
+                                        type="text"
+                                        label="OID"
+                                        required
+                                        placeholder="e.g. 1.2.840.113549.1.1.11"
+                                        disabled={editMode}
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={getFieldErrorMessage(fieldState)}
+                                    />
+                                    {!(fieldState.error && fieldState.isTouched) && (
+                                        <p className="mt-1 text-xs text-gray-500 dark:text-neutral-400">
+                                            Dot-separated numeric format, starting with 0, 1, or 2
+                                        </p>
+                                    )}
+                                </>
                             )}
                         />
                         <Controller

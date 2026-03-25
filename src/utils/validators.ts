@@ -114,7 +114,8 @@ export const validateQuartzCronExpression = (cronExpression: string | undefined)
     }
 };
 
-export const validateOid = () => validatePattern(/^[0-2](\.(0|[1-9]\d*)){1,50}$/, 'Value must be a valid OID');
+export const validateOid = () =>
+    validatePattern(/^[0-2](\.(0|[1-9]\d*)){1,50}$/, 'Must be a dot-separated numeric OID (e.g. 1.2.840.113549.1.1.11)');
 
 export const validateOidCode = () => validatePattern(/^[A-Za-z][A-Za-z0-9-]*$/, 'Value must be a valid OID code');
 
