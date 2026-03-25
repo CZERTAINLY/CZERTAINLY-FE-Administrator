@@ -1,7 +1,8 @@
-import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { jsxInnerText } from 'utils/jsxInnerText';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { actions as userInterfaceActions } from 'ducks/user-interface';
+import { actions as tablePaginationActions, selectors as tablePaginationSelectors } from 'ducks/table-pagination';
 
 import NewRowWidget, { NewRowWidgetProps } from './NewRowWidget';
 import { TableRowCell } from './TableRowCell';
@@ -12,6 +13,7 @@ import Checkbox from 'components/Checkbox';
 import Button from 'components/Button';
 import SimpleBar from 'simplebar-react';
 import cn from 'classnames';
+import { useLocation } from 'react-router';
 
 export type { TableDataRow, TableHeader } from './types';
 
@@ -41,6 +43,7 @@ interface Props {
     newRowWidgetProps?: NewRowWidgetProps;
     columnForDetail?: string;
     detailHeaders?: TableHeader[];
+    paginationStateKey?: string;
 }
 
 const emptyCheckedRows: (string | number)[] = [];
@@ -64,7 +67,9 @@ function CustomTable({
     newRowWidgetProps,
     detailHeaders,
     columnForDetail,
+    paginationStateKey,
 }: Props) {
+    const location = useLocation();
     const [tblHeaders, setTblHeaders] = useState<TableHeader[]>();
     const [tblData, setTblData] = useState<TableDataRow[]>(data);
     const [tblCheckedRows, setTblCheckedRows] = useState<(string | number)[]>(checkedRows || emptyCheckedRows);
@@ -77,7 +82,98 @@ function CustomTable({
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
     const [expandedRow, setExpandedRow] = useState<string | number>();
+    const internalPaginationHydratedKeyRef = useRef<string | undefined>(undefined);
+
+    const internalPaginationEnabled = hasPagination && !paginationData && !onPageChanged && !onPageSizeChanged;
+    const tableSignature = useMemo(() => {
+        if (paginationStateKey) {
+            return paginationStateKey;
+        }
+
+        const headerIds = headers.map((header) => header.id).join('|');
+        return `${headerIds}|${hasCheckboxes ? 'checkboxes' : 'no-checkboxes'}|${hasDetails ? 'details' : 'no-details'}`;
+    }, [paginationStateKey, headers, hasCheckboxes, hasDetails]);
+    const internalPaginationRouteKey = useMemo(() => {
+        if (typeof window !== 'undefined' && window.location.hash.startsWith('#/')) {
+            return window.location.hash.slice(1).split('?')[0];
+        }
+
+        return `${location.pathname}${location.search}`;
+    }, [location.pathname, location.search]);
+    const internalPaginationStorageKey = useMemo(
+        () => `custom-table-pagination:${internalPaginationRouteKey}:${tableSignature}`,
+        [internalPaginationRouteKey, tableSignature],
+    );
+    const currentRootRoute = useMemo(() => {
+        const normalizedRoute = internalPaginationRouteKey.startsWith('/')
+            ? internalPaginationRouteKey.slice(1)
+            : internalPaginationRouteKey;
+
+        return normalizedRoute.split('/')[0] || '';
+    }, [internalPaginationRouteKey]);
+    const selectInternalPagination = useMemo(
+        () => tablePaginationSelectors.pagination(internalPaginationStorageKey),
+        [internalPaginationStorageKey],
+    );
+    const persistedInternalPagination = useSelector(selectInternalPagination);
+    const activeRootRoute = useSelector(tablePaginationSelectors.activeRootRoute);
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (!currentRootRoute) {
+            return;
+        }
+
+        if (!activeRootRoute) {
+            dispatch(tablePaginationActions.setActiveRootRoute({ rootRoute: currentRootRoute }));
+            return;
+        }
+
+        if (activeRootRoute !== currentRootRoute) {
+            dispatch(tablePaginationActions.clearPaginationByRootRoute({ rootRoute: activeRootRoute }));
+            dispatch(tablePaginationActions.setActiveRootRoute({ rootRoute: currentRootRoute }));
+        }
+    }, [activeRootRoute, currentRootRoute, dispatch]);
+
+    useEffect(() => {
+        if (!internalPaginationEnabled) {
+            return;
+        }
+
+        if (internalPaginationHydratedKeyRef.current === internalPaginationStorageKey) {
+            return;
+        }
+
+        internalPaginationHydratedKeyRef.current = internalPaginationStorageKey;
+        setPage(persistedInternalPagination.page);
+        setPageSize(persistedInternalPagination.pageSize);
+    }, [internalPaginationEnabled, internalPaginationStorageKey, persistedInternalPagination.page, persistedInternalPagination.pageSize]);
+
+    useEffect(() => {
+        if (!internalPaginationEnabled) {
+            return;
+        }
+
+        if (persistedInternalPagination.page === page && persistedInternalPagination.pageSize === pageSize) {
+            return;
+        }
+
+        dispatch(
+            tablePaginationActions.setPagination({
+                key: internalPaginationStorageKey,
+                page,
+                pageSize,
+            }),
+        );
+    }, [
+        dispatch,
+        internalPaginationEnabled,
+        internalPaginationStorageKey,
+        page,
+        pageSize,
+        persistedInternalPagination.page,
+        persistedInternalPagination.pageSize,
+    ]);
 
     const handleRowDetailClick = useCallback(
         (rowId: string | number) => {
@@ -211,9 +307,16 @@ function CustomTable({
     );
 
     useEffect(() => {
-        const totalPages = Math.ceil(tblData.length / pageSize);
-        setTotalPages(totalPages);
-        if (page > totalPages) setPage(totalPages - 1 < 1 ? 1 : totalPages - 1);
+        const nextTotalPages = Math.ceil(tblData.length / pageSize);
+        setTotalPages(nextTotalPages);
+
+        if (nextTotalPages === 0) {
+            return;
+        }
+
+        if (page > nextTotalPages) {
+            setPage(nextTotalPages);
+        }
     }, [tblData, pageSize, page]);
 
     const onCheckAllCheckboxClick = useCallback(

@@ -1,6 +1,6 @@
 import { test, expect } from '../../../playwright/ct-test';
 import CustomTable, { TableHeader, TableDataRow } from './index';
-import { withProviders } from 'utils/test-helpers';
+import { createMockStore, withProviders } from 'utils/test-helpers';
 
 test.describe('CustomTable', () => {
     const mockHeaders: TableHeader[] = [
@@ -492,5 +492,76 @@ test.describe('CustomTable', () => {
         const headersWithWidth: TableHeader[] = [{ id: 'name', content: 'Name', sortable: false, width: '50%' }];
         const component = await mount(withProviders(<CustomTable headers={headersWithWidth} data={mockData} />));
         await expect(component.getByText('Name')).toBeVisible();
+    });
+
+    test('should reset previous root route pagination after switching to different root route', async ({ mount }) => {
+        const manyRows = Array.from({ length: 30 }, (_, i) => ({
+            id: i + 1,
+            columns: [`Row ${i + 1}`, `b`, `c`],
+        }));
+        const store = createMockStore();
+
+        const rolesTable = await mount(
+            withProviders(<CustomTable headers={mockHeaders} data={manyRows} hasPagination={true} />, {
+                store,
+                initialRoute: '/roles',
+            }),
+        );
+        await expect(rolesTable.getByText(/Showing 1 to 10/)).toBeVisible();
+        await rolesTable.getByTestId('pagination-next').click();
+        await expect(rolesTable.getByText(/Showing 11 to 20/)).toBeVisible();
+        await rolesTable.unmount();
+
+        const usersTable = await mount(
+            withProviders(<CustomTable headers={mockHeaders} data={manyRows} hasPagination={true} />, {
+                store,
+                initialRoute: '/users',
+            }),
+        );
+        await expect(usersTable.getByText(/Showing 1 to 10/)).toBeVisible();
+        await usersTable.unmount();
+
+        const rolesAfterSwitch = await mount(
+            withProviders(<CustomTable headers={mockHeaders} data={manyRows} hasPagination={true} />, {
+                store,
+                initialRoute: '/roles',
+            }),
+        );
+        await expect(rolesAfterSwitch.getByText(/Showing 1 to 10/)).toBeVisible();
+        await rolesAfterSwitch.unmount();
+    });
+
+    test('should keep separate internal pagination for different tables on same route', async ({ mount }) => {
+        const manyRows = Array.from({ length: 30 }, (_, i) => ({
+            id: i + 1,
+            columns: [`Row ${i + 1}`, `b`, `c`],
+        }));
+        const store = createMockStore();
+
+        const tableA = await mount(
+            withProviders(<CustomTable headers={mockHeaders} data={manyRows} hasPagination={true} />, {
+                store,
+                initialRoute: '/roles',
+            }),
+        );
+        await tableA.getByTestId('pagination-next').click();
+        await expect(tableA.getByText(/Showing 11 to 20/)).toBeVisible();
+        await tableA.unmount();
+
+        const tableBHeaders: TableHeader[] = [
+            { id: 'username', content: 'Username', sortable: true },
+            { id: 'mail', content: 'Mail' },
+            { id: 'state', content: 'State' },
+        ];
+
+        const tableB = await mount(
+            withProviders(<CustomTable headers={tableBHeaders} data={manyRows} hasPagination={true} />, {
+                store,
+                initialRoute: '/roles',
+            }),
+        );
+
+        await expect(tableB.getByText(/Showing 1 to 10/)).toBeVisible();
+        await tableB.unmount();
     });
 });
