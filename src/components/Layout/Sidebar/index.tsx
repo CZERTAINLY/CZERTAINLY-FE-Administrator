@@ -1,8 +1,8 @@
-import { Resource } from 'types/openapi';
 import { useMemo, useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router';
-import { useLocalStorage } from 'usehooks-ts';
 import cn from 'classnames';
+import SimpleBar from 'simplebar-react';
+import { useLocalStorage } from 'usehooks-ts';
 import {
     Award,
     ChevronDown,
@@ -20,10 +20,12 @@ import {
     FileJson2,
     Split,
     ArrowRightToLine,
+    Network,
     FileLock2,
 } from 'lucide-react';
 import Button from 'components/Button';
-import SimpleBar from 'simplebar-react';
+import { Resource } from 'types/openapi';
+import { featureFlags } from 'utils/feature-flags';
 
 type MenuItemMapping = {
     _key: string;
@@ -140,6 +142,14 @@ const menuItemMappings: MenuItemMapping[] = [
         headerLink: '/cboms',
         requiredResources: [Resource.Cboms],
     },
+    {
+        _key: '/proxies',
+        icon: <Network size={16} strokeWidth={1.5} />,
+        header: 'Proxies',
+        headerLink: '/proxies',
+        requiredResources: [Resource.Proxies],
+    },
+
     {
         _key: 'accessControl',
         icon: <CircleUser size={16} strokeWidth={1.5} />,
@@ -269,6 +279,12 @@ const menuItemMappings: MenuItemMapping[] = [
                 requiredResources: [Resource.Settings],
             },
             { _key: '/custom-oids', name: 'Custom OIDs', link: '/custom-oids', requiredResources: [Resource.Settings] },
+            {
+                _key: `/${Resource.TrustedCertificates.toLowerCase()}`,
+                name: 'Trusted Certificates',
+                link: `/${Resource.TrustedCertificates.toLowerCase()}`,
+                requiredResources: [Resource.Settings],
+            },
         ],
     },
 
@@ -311,14 +327,26 @@ function getAllowedMenuItems(allowedResources?: Resource[]): MenuItemMapping[] {
     if (!allowedResources) return [];
     const allowedLinks: MenuItemMapping[] = [];
 
+    const { isProxiesEnabled, isTrustedCertificatesEnabled } = featureFlags;
+
     // Filters menu items based on associated resources and allowed resources.
     // Menu item is shown if:
     // 1. It doesn't have children, and doesn't have associated resources array.
     // 2. It doesn't have children, and associated resources array contains item which is present in allowedResources.
     // 3. It has a child, which is shown based on rules 1 and 2.
+    // 4. Feature flags are enabled for Proxies and Trusted Certificates.
     for (const mapping of menuItemMappings) {
+        // Filter out Proxies if disabled
+        if (mapping._key === '/proxies' && !isProxiesEnabled) {
+            continue;
+        }
+
         if ('children' in mapping) {
             mapping.children = mapping.children.filter((el) => {
+                // Filter out Trusted Certificates if disabled
+                if (el._key === `/${Resource.TrustedCertificates.toLowerCase()}` && !isTrustedCertificatesEnabled) {
+                    return false;
+                }
                 return !!el.requiredResources?.some((resource) => allowedResources.includes(resource));
             });
             if (mapping.children.length > 0) {

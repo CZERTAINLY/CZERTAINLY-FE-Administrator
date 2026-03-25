@@ -26,6 +26,7 @@ export enum Resource {
     Connectors = 'connectors',
     Attributes = 'attributes',
     Jobs = 'jobs',
+    Proxies = 'proxies',
     Users = 'users',
     Roles = 'roles',
     AcmeAccounts = 'acmeAccounts',
@@ -73,6 +74,7 @@ export enum Resource {
     AuthenticationProviders = 'authenticationProviders',
     Vaults = 'vaults',
     VaultProfiles = 'vaultProfiles',
-    Secrets = 'secrets'
+    Secrets = 'secrets',
+    TrustedCertificates = 'trustedCertificates',
 }
 

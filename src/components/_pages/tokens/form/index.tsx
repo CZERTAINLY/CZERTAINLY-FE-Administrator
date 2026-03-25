@@ -9,7 +9,7 @@ import { actions as connectorActions } from 'ducks/connectors';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions as tokenActions, selectors as tokenSelectors } from 'ducks/tokens';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -59,6 +59,8 @@ export default function TokenForm({ tokenId, onCancel, onSuccess }: TokenFormPro
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
     const isCreating = useSelector(tokenSelectors.isCreating);
     const isUpdating = useSelector(tokenSelectors.isUpdating);
+    const createTokenSucceeded = useSelector(tokenSelectors.createTokenSucceeded);
+    const updateTokenSucceeded = useSelector(tokenSelectors.updateTokenSucceeded);
 
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
@@ -289,8 +291,8 @@ export default function TokenForm({ tokenId, onCancel, onSuccess }: TokenFormPro
         return <AttributeEditor id="customToken" attributeDescriptors={resourceCustomAttributes} attributes={token?.customAttributes} />;
     }, [resourceCustomAttributes, token?.customAttributes, isBusy]);
 
-    useRunOnFinished(isCreating, onSuccess);
-    useRunOnFinished(isUpdating, onSuccess);
+    useRunOnSuccessfulFinish(isCreating, createTokenSucceeded, onSuccess);
+    useRunOnSuccessfulFinish(isUpdating, updateTokenSucceeded, onSuccess);
 
     return (
         <FormProvider {...methods}>
@@ -404,6 +406,7 @@ export default function TokenForm({ tokenId, onCancel, onSuccess }: TokenFormPro
 
                         <TabLayout
                             noBorder
+                            onlyActiveTabContent={false}
                             tabs={[
                                 {
                                     title: 'Connector Attributes',

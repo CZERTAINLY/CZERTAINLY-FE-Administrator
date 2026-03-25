@@ -28,9 +28,10 @@ interface Props {
         certificate?: CertificateDetailResponseModel;
     }) => void;
     okButtonTitle?: string;
+    showCustomAttributes?: boolean;
 }
 
-export default function CertificateUploadDialog({ onCancel, onUpload, okButtonTitle = 'Upload' }: Props) {
+export default function CertificateUploadDialog({ onCancel, onUpload, okButtonTitle = 'Upload', showCustomAttributes = true }: Props) {
     const dispatch = useDispatch();
 
     const [certificate, setCertificate] = useState<CertificateDetailResponseModel | undefined>();
@@ -41,10 +42,12 @@ export default function CertificateUploadDialog({ onCancel, onUpload, okButtonTi
     const health = useSelector(utilsActuatorSelectors.health);
 
     useEffect(() => {
-        dispatch(customAttributesActions.listSecondaryResourceCustomAttributes(Resource.Certificates));
+        if (showCustomAttributes) {
+            dispatch(customAttributesActions.listSecondaryResourceCustomAttributes(Resource.Certificates));
+        }
         dispatch(utilsCertificateActions.reset());
         dispatch(utilsActuatorActions.health());
-    }, [dispatch]);
+    }, [dispatch, showCustomAttributes]);
 
     useEffect(() => {
         setCertificate(
@@ -63,7 +66,9 @@ export default function CertificateUploadDialog({ onCancel, onUpload, okButtonTi
     const onSubmit = (values: any) => {
         onUpload({
             fileContent: fileContent,
-            customAttributes: collectFormAttributes('customUploadCertificate', secondaryResourceCustomAttributes, allFormValues),
+            customAttributes: showCustomAttributes
+                ? collectFormAttributes('customUploadCertificate', secondaryResourceCustomAttributes, allFormValues)
+                : [],
             certificate: certificate,
         });
     };
@@ -90,20 +95,22 @@ export default function CertificateUploadDialog({ onCancel, onUpload, okButtonTi
 
                     {certificate && <CertificateAttributes certificate={certificate} />}
 
-                    <TabLayout
-                        noBorder
-                        tabs={[
-                            {
-                                title: 'Custom Attributes',
-                                content: (
-                                    <AttributeEditor
-                                        id="customUploadCertificate"
-                                        attributeDescriptors={secondaryResourceCustomAttributes}
-                                    />
-                                ),
-                            },
-                        ]}
-                    />
+                    {showCustomAttributes && (
+                        <TabLayout
+                            noBorder
+                            tabs={[
+                                {
+                                    title: 'Custom Attributes',
+                                    content: (
+                                        <AttributeEditor
+                                            id="customUploadCertificate"
+                                            attributeDescriptors={secondaryResourceCustomAttributes}
+                                        />
+                                    ),
+                                },
+                            ]}
+                        />
+                    )}
 
                     <Container className="flex-row justify-end modal-footer" gap={4}>
                         <Button variant="outline" onClick={onCancel} disabled={formState.isSubmitting} type="button">

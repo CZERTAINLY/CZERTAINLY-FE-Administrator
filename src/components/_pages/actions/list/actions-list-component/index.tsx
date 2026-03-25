@@ -6,7 +6,7 @@ import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { Link } from 'react-router';
 import { PlatformEnum, Resource } from 'types/openapi';
 
@@ -24,6 +24,7 @@ const ActionsList = () => {
     const isFetchingList = useSelector(rulesSelectors.isFetchingActions);
     const isDeleting = useSelector(rulesSelectors.isDeletingAction);
     const isCreatingAction = useSelector(rulesSelectors.isCreatingAction);
+    const createActionSucceeded = useSelector(rulesSelectors.createActionSucceeded);
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
@@ -39,7 +40,7 @@ const ActionsList = () => {
         dispatch(rulesActions.listActions({ resource: selectedResource }));
     }, [dispatch, selectedResource]);
 
-    useRunOnFinished(isCreatingAction, () => {
+    useRunOnSuccessfulFinish(isCreatingAction, createActionSucceeded, () => {
         setIsAddModalOpen(false);
         getFreshList();
     });

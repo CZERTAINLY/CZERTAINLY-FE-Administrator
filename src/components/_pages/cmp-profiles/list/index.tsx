@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import Container from 'components/Container';
@@ -31,6 +31,8 @@ export default function AdministratorsList() {
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
     const isUpdating = useSelector(selectors.isUpdating);
     const isCreating = useSelector(selectors.isCreating);
+    const createCmpProfileSucceeded = useSelector(selectors.createCmpProfileSucceeded);
+    const updateCmpProfileSucceeded = useSelector(selectors.updateCmpProfileSucceeded);
     const isBulkEnabling = useSelector(selectors.isBulkEnabling);
     const isBulkDisabling = useSelector(selectors.isBulkDisabling);
     const isBulkForceDeleting = useSelector(selectors.isBulkForceDeleting);
@@ -56,11 +58,11 @@ export default function AdministratorsList() {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
     }, [bulkDeleteErrorMessages]);
 
-    useRunOnFinished(isCreating, () => {
+    useRunOnSuccessfulFinish(isCreating, createCmpProfileSucceeded, () => {
         setIsAddModalOpen(false);
         getFreshData();
     });
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateCmpProfileSucceeded, () => {
         setEditingCmpProfileId(undefined);
         getFreshData();
     });

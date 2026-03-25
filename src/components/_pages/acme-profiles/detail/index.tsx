@@ -8,7 +8,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/acme-profiles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import AcmeProfileForm from '../form';
@@ -32,6 +32,7 @@ export default function AdministratorDetail() {
     const isDisabling = useSelector(selectors.isDisabling);
     const isEnabling = useSelector(selectors.isEnabling);
     const isUpdating = useSelector(selectors.isUpdating);
+    const updateAcmeProfileSucceeded = useSelector(selectors.updateAcmeProfileSucceeded);
     const users = useSelector(userSelectors.users);
     const groups = useSelector(groupsSelectors.certificateGroups);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
@@ -58,7 +59,7 @@ export default function AdministratorDetail() {
         dispatch(groupsActions.listGroups());
     }, [dispatch]);
 
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateAcmeProfileSucceeded, () => {
         setIsEditModalOpen(false);
         getFreshAcmeProfile();
     });

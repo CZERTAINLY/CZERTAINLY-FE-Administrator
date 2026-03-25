@@ -48,6 +48,7 @@ export type State = {
     isFetchingConditions: boolean;
     isFetchingTriggers: boolean;
     isCreatingAction: boolean;
+    createActionSucceeded: boolean;
     isFetchingActionDetails: boolean;
     isFetchingRuleDetails: boolean;
     isFetchingExecutionDetails: boolean;
@@ -55,11 +56,14 @@ export type State = {
     isFetchingTriggerDetail: boolean;
     isDeletingRule: boolean;
     isCreatingRule: boolean;
+    createRuleSucceeded: boolean;
     isCreatingExecution: boolean;
     isDeletingExecution: boolean;
     isCreatingCondition: boolean;
+    createConditionSucceeded: boolean;
     isDeletingCondition: boolean;
     isCreatingTrigger: boolean;
+    createTriggerSucceeded: boolean;
     isDeletingTrigger: boolean;
     isUpdatingCondition: boolean;
     isUpdatingRule: boolean;
@@ -90,15 +94,19 @@ export const initialState: State = {
     isFetchingConditions: false,
     isFetchingTriggers: false,
     isCreatingRule: false,
+    createRuleSucceeded: false,
     isFetchingRuleDetails: false,
 
     isUpdatingExecution: false,
     isCreatingExecution: false,
     isCreatingAction: false,
+    createActionSucceeded: false,
     isDeletingExecution: false,
     isCreatingCondition: false,
+    createConditionSucceeded: false,
     isDeletingCondition: false,
     isCreatingTrigger: false,
+    createTriggerSucceeded: false,
     isDeletingTrigger: false,
     isUpdatingCondition: false,
     isUpdatingRule: false,
@@ -204,52 +212,64 @@ export const slice = createSlice({
 
         createAction: (state, action: PayloadAction<{ action: ActionRequestModel }>) => {
             state.isCreatingAction = true;
+            state.createActionSucceeded = false;
         },
 
         createActionSuccess: (state, action: PayloadAction<{ action: ActionModel }>) => {
             state.actionsList.push(action.payload.action);
             state.isCreatingAction = false;
+            state.createActionSucceeded = true;
         },
 
         createActionFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreatingAction = false;
+            state.createActionSucceeded = false;
         },
 
         createCondition: (state, action: PayloadAction<{ conditionRequestModel: ConditionRequestModel }>) => {
             state.isCreatingCondition = true;
+            state.createConditionSucceeded = false;
         },
 
         createConditionSuccess: (state, action: PayloadAction<{ condition: ConditionModel }>) => {
             state.conditions.push(action.payload.condition);
             state.isCreatingCondition = false;
+            state.createConditionSucceeded = true;
         },
 
         createConditionFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreatingCondition = false;
+            state.createConditionSucceeded = false;
         },
 
         createRule: (state, action: PayloadAction<{ rule: RuleRequestModel }>) => {
             state.isCreatingRule = true;
+            state.createRuleSucceeded = false;
         },
         createRuleSuccess: (state, action: PayloadAction<{ rule: RuleModel }>) => {
             state.rules.push(action.payload.rule);
             state.isCreatingRule = false;
+            state.createRuleSucceeded = true;
         },
 
         createRuleFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreatingRule = false;
+            state.createRuleSucceeded = false;
         },
 
         createTrigger: (state, action: PayloadAction<{ trigger: TriggerRequestDto }>) => {
             state.isCreatingTrigger = true;
+            state.createTriggerSucceeded = false;
         },
 
         createTriggerSuccess: (state, action: PayloadAction<{ trigger: TriggerDetailModel }>) => {
             state.isCreatingTrigger = false;
+            state.createTriggerSucceeded = true;
         },
 
         createTriggerFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreatingTrigger = false;
+            state.createTriggerSucceeded = false;
         },
 
         deleteExecution: (state, action: PayloadAction<{ executionUuid: string }>) => {
@@ -543,13 +563,16 @@ const executions = createSelector(state, (state) => state.executions);
 const executionDetails = createSelector(state, (state) => state.executionDetails);
 
 const isCreatingCondition = createSelector(state, (state) => state.isCreatingCondition);
+const createConditionSucceeded = createSelector(state, (state) => state.createConditionSucceeded);
 const isUpdatingCondition = createSelector(state, (state) => state.isUpdatingCondition);
+
+const isCreatingRule = createSelector(state, (state) => state.isCreatingRule);
+const createRuleSucceeded = createSelector(state, (state) => state.createRuleSucceeded);
 
 const isFetchingTriggerHistorySummary = createSelector(state, (state) => state.isFetchingTriggerHistorySummary);
 const isFetchingEventTriggersAssociation = createSelector(state, (state) => state.isFetchingEventTriggersAssociation);
 const isUpdatingEventTriggersAssociation = createSelector(state, (state) => state.isUpdatingEventTriggersAssociation);
 const isFetchingTriggerHistories = createSelector(state, (state) => state.isFetchingTriggerHistories);
-const isCreatingRule = createSelector(state, (state) => state.isCreatingRule);
 const isUpdatingRule = createSelector(state, (state) => state.isUpdatingRule);
 const isDeletingRule = createSelector(state, (state) => state.isDeletingRule);
 const isFetchingRulesList = createSelector(state, (state) => state.isFetchingRulesList);
@@ -563,6 +586,7 @@ const isDeletingExecution = createSelector(state, (state) => state.isDeletingExe
 const isFetchingActionDetails = createSelector(state, (state) => state.isFetchingActionDetails);
 const isUpdatingAction = createSelector(state, (state) => state.isUpdatingAction);
 const isCreatingAction = createSelector(state, (state) => state.isCreatingAction);
+const createActionSucceeded = createSelector(state, (state) => state.createActionSucceeded);
 const isFetchingExecutionDetails = createSelector(state, (state) => state.isFetchingExecutionDetails);
 const isUpdatingExecution = createSelector(state, (state) => state.isUpdatingExecution);
 const isUpdatingTrigger = createSelector(state, (state) => state.isUpdatingTrigger);
@@ -570,6 +594,7 @@ const isFetchingTriggerDetail = createSelector(state, (state) => state.isFetchin
 const isDeletingTrigger = createSelector(state, (state) => state.isDeletingTrigger);
 const isFetchingTriggers = createSelector(state, (state) => state.isFetchingTriggers);
 const isCreatingTrigger = createSelector(state, (state) => state.isCreatingTrigger);
+const createTriggerSucceeded = createSelector(state, (state) => state.createTriggerSucceeded);
 const isFetchingActions = createSelector(state, (state) => state.isFetchingActions);
 const isDeletingAction = createSelector(state, (state) => state.isDeletingAction);
 
@@ -586,6 +611,7 @@ export const selectors = {
     eventTriggerAssociation,
 
     isCreatingAction,
+    createActionSucceeded,
     isFetchingActionDetails,
     isUpdatingAction,
     executionDetails,
@@ -596,7 +622,9 @@ export const selectors = {
     isDeletingCondition,
     isFetchingRulesList,
     isCreatingCondition,
+    createConditionSucceeded,
     isCreatingRule,
+    createRuleSucceeded,
     isUpdatingCondition,
     isFetchingConditionDetails,
     isUpdatingRule,
@@ -611,6 +639,7 @@ export const selectors = {
     isDeletingTrigger,
     isFetchingTriggers,
     isCreatingTrigger,
+    createTriggerSucceeded,
     isFetchingTriggerHistories,
     isFetchingTriggerHistorySummary,
     isFetchingEventTriggersAssociation,

@@ -15,7 +15,9 @@ export type State = {
     isFetchingDetail: boolean;
 
     isCreating: boolean;
+    createVaultSucceeded: boolean;
     isUpdating: boolean;
+    updateVaultSucceeded: boolean;
     isDeleting: boolean;
 };
 
@@ -30,7 +32,9 @@ export const initialState: State = {
     isFetchingDetail: false,
 
     isCreating: false,
+    createVaultSucceeded: false,
     isUpdating: false,
+    updateVaultSucceeded: false,
     isDeleting: false,
 };
 
@@ -79,6 +83,7 @@ export const slice = createSlice({
         getVaultInstanceAttributes: (state, action: PayloadAction<{ connectorUuid: string }>) => {
             state.isFetchingVaultInstanceAttributes = true;
             state.vaultInstanceAttributesConnectorUuid = action.payload.connectorUuid;
+            state.vaultInstanceAttributeDescriptors = [];
         },
 
         getVaultInstanceAttributesSuccess: (
@@ -114,28 +119,34 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isCreating = true;
+            state.createVaultSucceeded = false;
         },
 
         createVaultSuccess: (state, action: PayloadAction<{ vault: VaultInstanceDetailDto }>) => {
             state.isCreating = false;
+            state.createVaultSucceeded = true;
             state.vault = action.payload.vault;
         },
 
         createVaultFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
+            state.createVaultSucceeded = false;
         },
 
         updateVault: (state, action: PayloadAction<{ uuid: string; request: VaultInstanceUpdateRequestDto }>) => {
             state.isUpdating = true;
+            state.updateVaultSucceeded = false;
         },
 
         updateVaultSuccess: (state, action: PayloadAction<{ vault: VaultInstanceDetailDto }>) => {
             state.isUpdating = false;
+            state.updateVaultSucceeded = true;
             state.vault = action.payload.vault;
         },
 
         updateVaultFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateVaultSucceeded = false;
         },
 
         deleteVault: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -164,6 +175,8 @@ const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isCreating = createSelector(state, (state) => state.isCreating);
 const isUpdating = createSelector(state, (state) => state.isUpdating);
+const createVaultSucceeded = createSelector(state, (state) => state.createVaultSucceeded);
+const updateVaultSucceeded = createSelector(state, (state) => state.updateVaultSucceeded);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 
 const vaultInstanceAttributeDescriptors = createSelector(state, (state) => state.vaultInstanceAttributeDescriptors);
@@ -180,7 +193,9 @@ export const selectors = {
     vaultInstanceAttributesConnectorUuid,
     isFetchingVaultInstanceAttributes,
     isCreating,
+    createVaultSucceeded,
     isUpdating,
+    updateVaultSucceeded,
     isDeleting,
 };
 

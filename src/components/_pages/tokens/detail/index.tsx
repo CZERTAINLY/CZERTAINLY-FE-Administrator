@@ -9,7 +9,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as keyActions, selectors as keySelectors } from 'ducks/cryptographic-keys';
 import { actions, selectors } from 'ducks/tokens';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import TokenForm from '../form';
@@ -36,6 +36,7 @@ export default function TokenDetail() {
     const isDeactivating = useSelector(selectors.isDeactivating);
     const isReloading = useSelector(selectors.isReloading);
     const isUpdating = useSelector(selectors.isUpdating);
+    const updateTokenSucceeded = useSelector(selectors.updateTokenSucceeded);
 
     const isSyncing = useSelector(keySelectors.isSyncing);
 
@@ -66,7 +67,7 @@ export default function TokenDetail() {
         getFreshAttributes();
     }, [getFreshTokenDetails, getFreshAttributes, id]);
 
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateTokenSucceeded, () => {
         setIsEditModalOpen(false);
         getFreshTokenDetails();
     });

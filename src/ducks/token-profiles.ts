@@ -26,9 +26,11 @@ export type State = {
     isBulkUpdatingKeyUsage: boolean;
 
     isCreating: boolean;
+    createTokenProfileSucceeded: boolean;
     isDeleting: boolean;
     isBulkDeleting: boolean;
     isUpdating: boolean;
+    updateTokenProfileSucceeded: boolean;
     isEnabling: boolean;
     isBulkEnabling: boolean;
     isDisabling: boolean;
@@ -49,9 +51,11 @@ export const initialState: State = {
     isUpdatingKeyUsage: false,
     isBulkUpdatingKeyUsage: false,
     isCreating: false,
+    createTokenProfileSucceeded: false,
     isDeleting: false,
     isBulkDeleting: false,
     isUpdating: false,
+    updateTokenProfileSucceeded: false,
     isEnabling: false,
     isDisabling: false,
     isBulkEnabling: false,
@@ -118,14 +122,17 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isCreating = true;
+            state.createTokenProfileSucceeded = false;
         },
 
         createTokenProfileSuccess: (state, action: PayloadAction<{ uuid: string; tokenInstanceUuid: string }>) => {
             state.isCreating = false;
+            state.createTokenProfileSucceeded = true;
         },
 
         createTokenProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
+            state.createTokenProfileSucceeded = false;
         },
 
         updateTokenProfile: (
@@ -139,15 +146,18 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isUpdating = true;
+            state.updateTokenProfileSucceeded = false;
         },
 
         updateTokenProfileSuccess: (state, action: PayloadAction<{ tokenProfile: TokenProfileDetailResponseModel; redirect?: string }>) => {
             state.isUpdating = false;
+            state.updateTokenProfileSucceeded = true;
             state.tokenProfile = action.payload.tokenProfile;
         },
 
         updateTokenProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateTokenProfileSucceeded = false;
         },
 
         enableTokenProfile: (state, action: PayloadAction<{ tokenInstanceUuid: string; uuid: string }>) => {
@@ -301,9 +311,11 @@ const isFetchingList = createSelector(state, (state: State) => state.isFetchingL
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
 const isFetchingAttributes = createSelector(state, (state: State) => state.isFetchingAttributes);
 const isCreating = createSelector(state, (state: State) => state.isCreating);
+const createTokenProfileSucceeded = createSelector(state, (state: State) => state.createTokenProfileSucceeded);
 const isDeleting = createSelector(state, (state: State) => state.isDeleting);
 const isBulkDeleting = createSelector(state, (state: State) => state.isBulkDeleting);
 const isUpdating = createSelector(state, (state: State) => state.isUpdating);
+const updateTokenProfileSucceeded = createSelector(state, (state: State) => state.updateTokenProfileSucceeded);
 const isEnabling = createSelector(state, (state: State) => state.isEnabling);
 const isBulkEnabling = createSelector(state, (state: State) => state.isBulkEnabling);
 const isDisabling = createSelector(state, (state: State) => state.isDisabling);
@@ -323,9 +335,11 @@ export const selectors = {
     isFetchingDetail,
     isFetchingAttributes,
     isCreating,
+    createTokenProfileSucceeded,
     isDeleting,
     isBulkDeleting,
     isUpdating,
+    updateTokenProfileSucceeded,
     isEnabling,
     isBulkEnabling,
     isDisabling,

@@ -38,10 +38,12 @@ export type State = {
     isFetchingAttributes: boolean;
     isFetchingAllAttributes: boolean;
     isCreating: boolean;
+    createConnectorSucceeded: boolean;
     isDeleting: boolean;
     isBulkDeleting: boolean;
     isBulkForceDeleting: boolean;
     isUpdating: boolean;
+    updateConnectorSucceeded: boolean;
     isConnecting: boolean;
     isReconnecting: boolean;
     isBulkReconnecting: boolean;
@@ -82,10 +84,12 @@ export const initialState: State = {
     isFetchingAttributes: false,
     isFetchingAllAttributes: false,
     isCreating: false,
+    createConnectorSucceeded: false,
     isDeleting: false,
     isBulkDeleting: false,
     isBulkForceDeleting: false,
     isUpdating: false,
+    updateConnectorSucceeded: false,
     isConnecting: false,
     isReconnecting: false,
     isBulkReconnecting: false,
@@ -260,10 +264,12 @@ export const slice = createSlice({
 
         createConnector: (state, action: PayloadAction<ConnectorRequestModel>) => {
             state.isCreating = true;
+            state.createConnectorSucceeded = false;
         },
 
         createConnectorSuccess: (state, action: PayloadAction<{ connector: ConnectorResponseModel }>) => {
             state.isCreating = false;
+            state.createConnectorSucceeded = true;
 
             const index = state.connectors.findIndex((connector) => connector.uuid === action.payload.connector.uuid);
 
@@ -282,6 +288,7 @@ export const slice = createSlice({
 
         createConnectorFailure: (state, action: PayloadAction<void>) => {
             state.isCreating = false;
+            state.createConnectorSucceeded = false;
         },
 
         updateConnector: (
@@ -292,10 +299,12 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isUpdating = true;
+            state.updateConnectorSucceeded = false;
         },
 
         updateConnectorSuccess: (state, action: PayloadAction<{ connector: ConnectorResponseModel }>) => {
             state.isUpdating = false;
+            state.updateConnectorSucceeded = true;
 
             const index = state.connectors.findIndex((connector) => connector.uuid === action.payload.connector.uuid);
 
@@ -310,6 +319,7 @@ export const slice = createSlice({
 
         updateConnectorFailure: (state, action: PayloadAction<void>) => {
             state.isUpdating = false;
+            state.updateConnectorSucceeded = false;
         },
 
         deleteConnector: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -504,10 +514,12 @@ const isFetchingHealth = createSelector(state, (state) => state.isFetchingHealth
 const isFetchingAttributes = createSelector(state, (state) => state.isFetchingAttributes);
 const isFetchingAllAttributes = createSelector(state, (state) => state.isFetchingAllAttributes);
 const isCreating = createSelector(state, (state) => state.isCreating);
+const createConnectorSucceeded = createSelector(state, (state) => state.createConnectorSucceeded);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isBulkDeleting = createSelector(state, (state) => state.isBulkDeleting);
 const isBulkForceDeleting = createSelector(state, (state) => state.isBulkForceDeleting);
 const isUpdating = createSelector(state, (state) => state.isUpdating);
+const updateConnectorSucceeded = createSelector(state, (state) => state.updateConnectorSucceeded);
 const isConnecting = createSelector(state, (state) => state.isConnecting);
 const isBulkConnecting = createSelector(state, (state) => state.isBulkReconnecting);
 const isReconnecting = createSelector(state, (state) => state.isReconnecting);
@@ -539,10 +551,12 @@ export const selectors = {
     isFetchingAttributes,
     isFetchingAllAttributes,
     isCreating,
+    createConnectorSucceeded,
     isDeleting,
     isBulkDeleting,
     isBulkForceDeleting,
     isUpdating,
+    updateConnectorSucceeded,
     isConnecting,
     isBulkConnecting,
     isReconnecting,

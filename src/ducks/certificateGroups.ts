@@ -11,9 +11,11 @@ export type State = {
     isFetchingDetail: boolean;
 
     isCreating: boolean;
+    createGroupSucceeded: boolean;
     isDeleting: boolean;
     isBulkDeleting: boolean;
     isUpdating: boolean;
+    updateGroupSucceeded: boolean;
 };
 
 export const initialState: State = {
@@ -22,9 +24,11 @@ export const initialState: State = {
     isFetchingList: false,
     isFetchingDetail: false,
     isCreating: false,
+    createGroupSucceeded: false,
     isDeleting: false,
     isBulkDeleting: false,
     isUpdating: false,
+    updateGroupSucceeded: false,
 };
 
 export const slice = createSlice({
@@ -75,27 +79,33 @@ export const slice = createSlice({
 
         createGroup: (state, action: PayloadAction<CertificateGroupRequestModel>) => {
             state.isCreating = true;
+            state.createGroupSucceeded = false;
         },
 
         createGroupSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isCreating = false;
+            state.createGroupSucceeded = true;
         },
 
         createGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
+            state.createGroupSucceeded = false;
         },
 
         updateGroup: (state, action: PayloadAction<{ groupUuid: string; editGroupRequest: CertificateGroupRequestModel }>) => {
             state.isUpdating = true;
+            state.updateGroupSucceeded = false;
         },
 
         updateGroupSuccess: (state, action: PayloadAction<{ group: CertificateGroupResponseModel }>) => {
             state.isUpdating = false;
             state.certificateGroup = action.payload.group;
+            state.updateGroupSucceeded = true;
         },
 
         updateGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateGroupSucceeded = false;
         },
 
         deleteGroup: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -146,9 +156,11 @@ const certificateGroups = createSelector(state, (state: State) => state.certific
 const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
 const isCreating = createSelector(state, (state: State) => state.isCreating);
+const createGroupSucceeded = createSelector(state, (state: State) => state.createGroupSucceeded);
 const isDeleting = createSelector(state, (state: State) => state.isDeleting);
 const isBulkDeleting = createSelector(state, (state: State) => state.isBulkDeleting);
 const isUpdating = createSelector(state, (state: State) => state.isUpdating);
+const updateGroupSucceeded = createSelector(state, (state: State) => state.updateGroupSucceeded);
 
 export const selectors = {
     state,
@@ -159,11 +171,13 @@ export const selectors = {
     certificateGroups,
 
     isCreating,
+    createGroupSucceeded,
     isFetchingList,
     isFetchingDetail,
     isDeleting,
     isBulkDeleting,
     isUpdating,
+    updateGroupSucceeded,
 };
 
 export const actions = slice.actions;

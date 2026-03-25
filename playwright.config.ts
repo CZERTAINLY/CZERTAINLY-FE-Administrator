@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/experimental-ct-react';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11,6 +11,7 @@ const __dirname = path.dirname(__filename);
 export default defineConfig({
     testDir: './src',
     testMatch: '**/*.spec.tsx',
+    testIgnore: ['**/*.unit.spec.ts', '**/*.unit.spec.tsx', '**/*.vitest.spec.ts', '**/*.vitest.spec.tsx'],
     timeout: 30 * 1000,
     fullyParallel: true,
     forbidOnly: !!process.env.CI,

@@ -9,7 +9,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } from 'ducks/token-profiles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import TokenProfileForm from '../form';
@@ -34,6 +34,7 @@ export default function TokenProfileDetail() {
     const isFetchingProfile = useSelector(tokenProfilesSelectors.isFetchingDetail);
     const isUpdatingKeyUsage = useSelector(tokenProfilesSelectors.isUpdatingKeyUsage);
     const isUpdating = useSelector(tokenProfilesSelectors.isUpdating);
+    const updateTokenProfileSucceeded = useSelector(tokenProfilesSelectors.updateTokenProfileSucceeded);
 
     const isDeleting = useSelector(tokenProfilesSelectors.isDeleting);
     const isEnabling = useSelector(tokenProfilesSelectors.isEnabling);
@@ -61,7 +62,7 @@ export default function TokenProfileDetail() {
         getFreshTokenProfileDetails();
     }, [getFreshTokenProfileDetails, id, tokenId]);
 
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateTokenProfileSucceeded, () => {
         setIsEditModalOpen(false);
         getFreshTokenProfileDetails();
     });

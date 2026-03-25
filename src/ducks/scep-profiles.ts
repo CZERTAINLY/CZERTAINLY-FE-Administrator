@@ -22,8 +22,10 @@ export type State = {
     isFetchingCertificates: boolean;
     isFetchingDetail: boolean;
     isCreating: boolean;
+    createScepProfileSucceeded: boolean;
     isDeleting: boolean;
     isUpdating: boolean;
+    updateScepProfileSucceeded: boolean;
     isEnabling: boolean;
     isDisabling: boolean;
     isBulkDeleting: boolean;
@@ -44,8 +46,10 @@ export const initialState: State = {
     isFetchingCertificates: false,
     isFetchingDetail: false,
     isCreating: false,
+    createScepProfileSucceeded: false,
     isDeleting: false,
     isUpdating: false,
+    updateScepProfileSucceeded: false,
     isEnabling: false,
     isDisabling: false,
     isBulkDeleting: false,
@@ -127,14 +131,17 @@ export const slice = createSlice({
 
         createScepProfile: (state, action: PayloadAction<ScepProfileAddRequestModel>) => {
             state.isCreating = true;
+            state.createScepProfileSucceeded = false;
         },
 
         createScepProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isCreating = false;
+            state.createScepProfileSucceeded = true;
         },
 
         createScepProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
+            state.createScepProfileSucceeded = false;
         },
 
         updateScepProfile: (
@@ -145,10 +152,12 @@ export const slice = createSlice({
             }>,
         ) => {
             state.isUpdating = true;
+            state.updateScepProfileSucceeded = false;
         },
 
         updateScepProfileSuccess: (state, action: PayloadAction<{ scepProfile: ScepProfileResponseModel }>) => {
             state.isUpdating = false;
+            state.updateScepProfileSucceeded = true;
 
             const scepProfileIndex = state.scepProfiles.findIndex((scepProfile) => scepProfile.uuid === action.payload.scepProfile.uuid);
 
@@ -163,6 +172,7 @@ export const slice = createSlice({
 
         updateScepProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateScepProfileSucceeded = false;
         },
 
         deleteScepProfile: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -320,8 +330,10 @@ const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 const isFetchingCertificates = createSelector(state, (state) => state.isFetchingCertificates);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isCreating = createSelector(state, (state) => state.isCreating);
+const createScepProfileSucceeded = createSelector(state, (state) => state.createScepProfileSucceeded);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isUpdating = createSelector(state, (state) => state.isUpdating);
+const updateScepProfileSucceeded = createSelector(state, (state) => state.updateScepProfileSucceeded);
 const isEnabling = createSelector(state, (state) => state.isEnabling);
 const isDisabling = createSelector(state, (state) => state.isDisabling);
 const isBulkDeleting = createSelector(state, (state) => state.isBulkDeleting);
@@ -345,8 +357,10 @@ export const selectors = {
     isFetchingCertificates,
     isFetchingDetail,
     isCreating,
+    createScepProfileSucceeded,
     isDeleting,
     isUpdating,
+    updateScepProfileSucceeded,
     isEnabling,
     isDisabling,
     isBulkDeleting,

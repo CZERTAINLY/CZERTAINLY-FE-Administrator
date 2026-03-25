@@ -1,6 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { SearchRequestModel } from 'types/certificate';
-import { AttributeDescriptorModel } from 'types/attributes';
+import { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
 import {
     SecretDetailDto,
     SecretDto,
@@ -18,13 +18,17 @@ export type State = {
 
     secretCreationAttributeDescriptors: AttributeDescriptorModel[];
     isFetchingSecretCreationAttributes: boolean;
+    syncVaultProfileAttributeDescriptors: AttributeDescriptorModel[];
+    isFetchingSyncVaultProfileAttributes: boolean;
 
     isFetchingList: boolean;
     isFetchingDetail: boolean;
     isFetchingVersions: boolean;
 
     isCreating: boolean;
+    createSecretSucceeded: boolean;
     isUpdating: boolean;
+    updateSecretSucceeded: boolean;
     isDeleting: boolean;
     isEnabling: boolean;
     isDisabling: boolean;
@@ -36,13 +40,17 @@ export const initialState: State = {
 
     secretCreationAttributeDescriptors: [],
     isFetchingSecretCreationAttributes: false,
+    syncVaultProfileAttributeDescriptors: [],
+    isFetchingSyncVaultProfileAttributes: false,
 
     isFetchingList: false,
     isFetchingDetail: false,
     isFetchingVersions: false,
 
     isCreating: false,
+    createSecretSucceeded: false,
     isUpdating: false,
+    updateSecretSucceeded: false,
     isDeleting: false,
     isEnabling: false,
     isDisabling: false,
@@ -109,62 +117,88 @@ export const slice = createSlice({
             state.isFetchingVersions = false;
         },
 
-        getSecretCreationAttributes: (
-            state,
-            _action: PayloadAction<{ vaultUuid: string; vaultProfileUuid: string; secretType: SecretType }>,
-        ) => {
+        listSecretAttributes: (state, _action: PayloadAction<{ vaultUuid: string; vaultProfileUuid: string; secretType: SecretType }>) => {
             state.secretCreationAttributeDescriptors = [];
             state.isFetchingSecretCreationAttributes = true;
         },
 
-        getSecretCreationAttributesSuccess: (state, action: PayloadAction<{ descriptors: AttributeDescriptorModel[] }>) => {
-            state.secretCreationAttributeDescriptors = action.payload.descriptors as typeof state.secretCreationAttributeDescriptors;
+        listSecretAttributesSuccess: (state, action: PayloadAction<{ descriptors: AttributeDescriptorModel[] }>) => {
+            state.secretCreationAttributeDescriptors = action.payload.descriptors;
             state.isFetchingSecretCreationAttributes = false;
         },
 
-        getSecretCreationAttributesFailure: (state) => {
+        listSecretAttributesFailure: (state) => {
             state.isFetchingSecretCreationAttributes = false;
+        },
+
+        getSyncVaultProfileAttributes: (
+            state,
+            _action: PayloadAction<{ vaultUuid: string; vaultProfileUuid: string; secretType: SecretType }>,
+        ) => {
+            state.syncVaultProfileAttributeDescriptors = [];
+            state.isFetchingSyncVaultProfileAttributes = true;
+        },
+
+        getSyncVaultProfileAttributesSuccess: (state, action: PayloadAction<{ descriptors: AttributeDescriptorModel[] }>) => {
+            state.syncVaultProfileAttributeDescriptors = action.payload.descriptors;
+            state.isFetchingSyncVaultProfileAttributes = false;
+        },
+
+        getSyncVaultProfileAttributesFailure: (state, _action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingSyncVaultProfileAttributes = false;
         },
 
         createSecret: (state, action: PayloadAction<{ vaultUuid: string; vaultProfileUuid: string; request: SecretRequestDto }>) => {
             state.isCreating = true;
+            state.createSecretSucceeded = false;
         },
 
         createSecretSuccess: (state, action: PayloadAction<{ secret: SecretDetailDto }>) => {
             state.isCreating = false;
+            state.createSecretSucceeded = true;
             state.secret = action.payload.secret;
         },
 
         createSecretFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
+            state.createSecretSucceeded = false;
         },
 
         updateSecret: (state, action: PayloadAction<{ uuid: string; update: SecretUpdateRequestDto }>) => {
             state.isUpdating = true;
+            state.updateSecretSucceeded = false;
         },
 
         updateSecretSuccess: (state, action: PayloadAction<{ secret: SecretDetailDto }>) => {
             state.isUpdating = false;
+            state.updateSecretSucceeded = true;
             state.secret = action.payload.secret;
         },
 
         updateSecretFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateSecretSucceeded = false;
         },
 
         updateSecretObjects: (state, action: PayloadAction<{ uuid: string; update: SecretUpdateObjectsDto }>) => {
             state.isUpdating = true;
+            state.updateSecretSucceeded = false;
         },
 
         updateSecretObjectsSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isUpdating = false;
+            state.updateSecretSucceeded = true;
         },
 
         updateSecretObjectsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateSecretSucceeded = false;
         },
 
-        addSyncVaultProfile: (state, _action: PayloadAction<{ uuid: string; vaultProfileUuid: string }>) => {
+        addSyncVaultProfile: (
+            state,
+            _action: PayloadAction<{ uuid: string; vaultProfileUuid: string; attributes: AttributeRequestModel[] }>,
+        ) => {
             state.isUpdating = true;
         },
 
@@ -250,13 +284,17 @@ const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail
 const isFetchingVersions = createSelector(state, (state) => state.isFetchingVersions);
 
 const isCreating = createSelector(state, (state) => state.isCreating);
+const createSecretSucceeded = createSelector(state, (state) => state.createSecretSucceeded);
 const isUpdating = createSelector(state, (state) => state.isUpdating);
+const updateSecretSucceeded = createSelector(state, (state) => state.updateSecretSucceeded);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isEnabling = createSelector(state, (state) => state.isEnabling);
 const isDisabling = createSelector(state, (state) => state.isDisabling);
 
 const secretCreationAttributeDescriptors = createSelector(state, (state) => state.secretCreationAttributeDescriptors);
 const isFetchingSecretCreationAttributes = createSelector(state, (state) => state.isFetchingSecretCreationAttributes);
+const syncVaultProfileAttributeDescriptors = createSelector(state, (state) => state.syncVaultProfileAttributeDescriptors);
+const isFetchingSyncVaultProfileAttributes = createSelector(state, (state) => state.isFetchingSyncVaultProfileAttributes);
 
 export const selectors = {
     state,
@@ -270,13 +308,17 @@ export const selectors = {
     isFetchingVersions,
 
     isCreating,
+    createSecretSucceeded,
     isUpdating,
+    updateSecretSucceeded,
     isDeleting,
     isEnabling,
     isDisabling,
 
     secretCreationAttributeDescriptors,
     isFetchingSecretCreationAttributes,
+    syncVaultProfileAttributeDescriptors,
+    isFetchingSyncVaultProfileAttributes,
 };
 
 export const actions = slice.actions;

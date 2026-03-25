@@ -21,8 +21,10 @@ export type State = {
     isFetchingList: boolean;
     isFetchingDetail: boolean;
     isCreating: boolean;
+    createCredentialSucceeded: boolean;
     isDeleting: boolean;
     isUpdating: boolean;
+    updateCredentialSucceeded: boolean;
     isBulkDeleting: boolean;
 };
 
@@ -40,8 +42,10 @@ export const initialState: State = {
     isFetchingList: false,
     isFetchingDetail: false,
     isCreating: false,
+    createCredentialSucceeded: false,
     isDeleting: false,
     isUpdating: false,
+    updateCredentialSucceeded: false,
     isBulkDeleting: false,
 };
 
@@ -134,22 +138,27 @@ export const slice = createSlice({
             action: PayloadAction<{ credentialRequest: CredentialCreateRequestModel; usesGlobalModal?: boolean }>,
         ) => {
             state.isCreating = true;
+            state.createCredentialSucceeded = false;
         },
 
         createCredentialSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isCreating = false;
+            state.createCredentialSucceeded = true;
         },
 
         createCredentialFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
+            state.createCredentialSucceeded = false;
         },
 
         updateCredential: (state, action: PayloadAction<{ uuid: string; credentialRequest: CredentialEditRequestModel }>) => {
             state.isUpdating = true;
+            state.updateCredentialSucceeded = false;
         },
 
         updateCredentialSuccess: (state, action: PayloadAction<{ credential: CredentialResponseModel }>) => {
             state.isUpdating = false;
+            state.updateCredentialSucceeded = true;
 
             const index = state.credentials.findIndex((credential) => credential.uuid === action.payload.credential.uuid);
 
@@ -166,6 +175,7 @@ export const slice = createSlice({
 
         updateCredentialFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateCredentialSucceeded = false;
         },
 
         deleteCredential: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -228,8 +238,10 @@ const isFetchingCredentialProviderAttributeDescriptors = createSelector(
 const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isCreating = createSelector(state, (state) => state.isCreating);
+const createCredentialSucceeded = createSelector(state, (state) => state.createCredentialSucceeded);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isUpdating = createSelector(state, (state) => state.isUpdating);
+const updateCredentialSucceeded = createSelector(state, (state) => state.updateCredentialSucceeded);
 const isBulkDeleting = createSelector(state, (state) => state.isBulkDeleting);
 
 export const selectors = {
@@ -252,8 +264,10 @@ export const selectors = {
     isFetchingList,
     isFetchingDetail,
     isCreating,
+    createCredentialSucceeded,
     isDeleting,
     isUpdating,
+    updateCredentialSucceeded,
     isBulkDeleting,
 };
 

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import Badge from 'components/Badge';
@@ -24,6 +24,8 @@ function EntityList() {
     const isDeleting = useSelector(selectors.isDeleting);
     const isUpdating = useSelector(selectors.isUpdating);
     const isCreating = useSelector(selectors.isCreating);
+    const createEntitySucceeded = useSelector(selectors.createEntitySucceeded);
+    const updateEntitySucceeded = useSelector(selectors.updateEntitySucceeded);
 
     const isBusy = isDeleting || isUpdating;
 
@@ -76,11 +78,11 @@ function EntityList() {
 
     const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listEntities(filters)), [dispatch]);
 
-    useRunOnFinished(isCreating, () => {
+    useRunOnSuccessfulFinish(isCreating, createEntitySucceeded, () => {
         setIsAddModalOpen(false);
         onListCallback({ itemsPerPage: 10, pageNumber: 1, filters: [] });
     });
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateEntitySucceeded, () => {
         setEditingEntityId(undefined);
         onListCallback({ itemsPerPage: 10, pageNumber: 1, filters: [] });
     });

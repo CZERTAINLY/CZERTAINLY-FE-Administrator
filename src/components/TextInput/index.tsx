@@ -1,5 +1,6 @@
 import cn from 'classnames';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useId, useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import Label from 'components/Label';
 import DatePicker from 'components/DatePicker';
 import TextArea from 'components/TextArea';
@@ -41,6 +42,9 @@ function TextInput({
     dataTestId,
 }: Props) {
     const inputRef = useRef<HTMLInputElement>(null);
+    const generatedId = useId();
+    const [passwordVisible, setPasswordVisible] = useState(false);
+    const passwordToggleTargetId = type === 'password' ? id || `text-input-password-${generatedId.replaceAll(':', '')}` : null;
 
     // Disable autofill by making field readOnly on mount, then removing it on focus
     useEffect(() => {
@@ -113,6 +117,8 @@ function TextInput({
         );
     }
 
+    const resolvedType = type === 'password' ? (passwordVisible ? 'text' : 'password') : type;
+
     return (
         <>
             {label && (
@@ -123,7 +129,7 @@ function TextInput({
             <div className="relative w-full">
                 <input
                     ref={inputRef}
-                    type={type}
+                    type={resolvedType}
                     className={cn(
                         inputBaseClassName,
                         {
@@ -131,7 +137,7 @@ function TextInput({
                         },
                         {
                             'bg-[#F8FAFC]': disabled,
-                            'pr-10': !!buttonRight,
+                            'pr-10': !!buttonRight || type === 'password',
                         },
                         className,
                     )}
@@ -140,11 +146,26 @@ function TextInput({
                     onChange={(e) => onChange(e.target.value)}
                     onBlur={onBlur}
                     disabled={disabled}
-                    id={id}
+                    id={passwordToggleTargetId ?? id}
                     autoComplete={getAutoComplete()}
                     data-form-type="other"
                     data-testid={dataTestId ?? (id ? `text-input-${id}` : 'text-input')}
                 />
+                {type === 'password' && (
+                    <button
+                        type="button"
+                        onClick={() => setPasswordVisible((v) => !v)}
+                        className="absolute inset-y-0 end-0 flex items-center z-10 p-3.5 text-gray-400 hover:text-gray-600 focus:outline-none disabled:pointer-events-none"
+                        aria-label={passwordVisible ? 'Hide password' : 'Show password'}
+                        tabIndex={-1}
+                    >
+                        {passwordVisible ? (
+                            <Eye className="size-4 shrink-0" aria-hidden />
+                        ) : (
+                            <EyeOff className="size-4 shrink-0" aria-hidden />
+                        )}
+                    </button>
+                )}
                 {buttonRight && (
                     <div className="absolute right-0 top-[50%] translate-y-[-50%] h-full flex items-center justify-center w-[40px] border-l border-gray-200">
                         {buttonRight}

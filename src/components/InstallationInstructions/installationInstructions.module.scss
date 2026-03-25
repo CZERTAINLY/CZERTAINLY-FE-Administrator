@@ -1,0 +1,48 @@
+$color-border: #1c2740;
+$color-header-bg: #0e1728;
+$color-header-text: #a8a8a8;
+$color-body-bg: #0b1220;
+$color-body-text: #c0caf5;
+$color-scrollbar-thumb: #a8a8a8;
+
+.root {
+    border: 1px solid $color-border;
+    background-color: $color-header-bg;
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 2.5rem;
+    border-bottom: 1px solid $color-border;
+    color: $color-header-text;
+}
+
+.instructions {
+    padding: 1.25rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    background-color: $color-body-bg;
+    color: $color-body-text;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: $color-scrollbar-thumb $color-body-bg;
+
+    &::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: $color-scrollbar-thumb;
+        border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background-color: $color-body-bg;
+        border-radius: 4px;
+    }
+}

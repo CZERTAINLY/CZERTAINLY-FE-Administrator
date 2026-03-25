@@ -20,6 +20,7 @@ import groupsEpics from './certificateGroups-epics';
 import certificatesEpics from './certificates-epics';
 import complianceProfilesEpics from './compliance-profiles-epics';
 import connectorsEpics from './connectors-epic';
+import proxiesEpics from './proxies-epic';
 import credentialsEpics from './credentials-epics';
 import cryptographicKeyEpics from './cryptographic-keys-epics';
 import cryptographicOperationsEpics from './cryptographic-operations-epics';
@@ -45,6 +46,7 @@ import startupEpics from './startup-epics';
 import dashboardEpics from './statisticsDashboard-epics';
 import tokenProfileEpics from './token-profiles-epics';
 import tokenEpics from './tokens-epics';
+import trustedCertificatesEpics from './trusted-certificates-epics';
 import usersEpics from './users-epics';
 import utilsActuatorEpics from './utilsActuator-epics';
 import cbomActuatorEpics from './cbomActuator-epics';
@@ -73,6 +75,7 @@ export const epics = combineEpics(
     ...dashboardEpics,
     ...groupsEpics,
     ...connectorsEpics,
+    ...proxiesEpics,
     ...discoveriesEpics,
     ...usersEpics,
     ...rolesEpics,
@@ -103,6 +106,7 @@ export const epics = combineEpics(
     ...infoEpics,
     ...tokenEpics,
     ...tokenProfileEpics,
+    ...trustedCertificatesEpics,
     ...cryptographicKeyEpics,
     ...cryptographicOperationsEpics,
     ...utilsOidEpics,

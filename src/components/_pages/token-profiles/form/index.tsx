@@ -372,6 +372,7 @@ export default function TokenProfileForm({
 
                         <TabLayout
                             noBorder
+                            onlyActiveTabContent={false}
                             tabs={[
                                 {
                                     title: 'Connector Attributes',

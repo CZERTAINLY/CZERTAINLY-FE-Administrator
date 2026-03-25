@@ -27,5 +27,7 @@ WORKDIR /usr/share/nginx/html
 ENV API_URL=/api
 ENV LOGIN_URL=/login
 ENV LOGOUT_URL=/logout
+ENV ENABLE_PROXIES=true
+ENV ENABLE_TRUSTED_CERTIFICATES=true
 
 COPY --from=build /app/build .

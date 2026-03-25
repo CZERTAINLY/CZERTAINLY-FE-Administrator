@@ -6,7 +6,7 @@ import NotificationProfileForm from '../form';
 import { getEnumLabel, selectors as enumSelectors } from 'ducks/enums';
 import { actions, selectors } from 'ducks/notification-profiles';
 import { useCallback, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
@@ -22,7 +22,9 @@ const NotificationProfilesList = () => {
 
     const notificationProfiles = useSelector(selectors.notificationProfiles);
     const isCreating = useSelector(selectors.isCreating);
+    const createNotificationProfileSucceeded = useSelector(selectors.createNotificationProfileSucceeded);
     const isUpdating = useSelector(selectors.isUpdating);
+    const updateNotificationProfileSucceeded = useSelector(selectors.updateNotificationProfileSucceeded);
 
     const recipientTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RecipientType));
 
@@ -35,11 +37,11 @@ const NotificationProfilesList = () => {
         [dispatch],
     );
 
-    useRunOnFinished(isCreating, () => {
+    useRunOnSuccessfulFinish(isCreating, createNotificationProfileSucceeded, () => {
         setIsAddModalOpen(false);
         onListCallback({ itemsPerPage: 10, pageNumber: 1, filters: [] });
     });
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateNotificationProfileSucceeded, () => {
         setEditingNotificationProfileId(undefined);
         setEditingVersion(undefined);
         onListCallback({ itemsPerPage: 10, pageNumber: 1, filters: [] });

@@ -1,26 +1,29 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
-import Widget from 'components/Widget';
+import AttributeEditor from 'components/Attributes/AttributeEditor';
+import Button from 'components/Button';
 import Container from 'components/Container';
+import TabLayout from 'components/Layout/TabLayout';
+import ProgressButton from 'components/ProgressButton';
+import Select from 'components/Select';
 import TextInput from 'components/TextInput';
 import TextArea from 'components/TextArea';
-import Select from 'components/Select';
-import ProgressButton from 'components/ProgressButton';
-import Button from 'components/Button';
-import AttributeEditor from 'components/Attributes/AttributeEditor';
+import Widget from 'components/Widget';
 
-import { actions as vaultProfileActions, selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
-import { actions as vaultActions, selectors as vaultSelectors } from 'ducks/vaults';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
+import { actions as vaultActions, selectors as vaultSelectors } from 'ducks/vaults';
+import { actions as vaultProfileActions, selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
 
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { collectFormAttributes } from 'utils/attributes/attributes';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
-import { Resource, VaultInstanceDto } from 'types/openapi';
-import type { VaultProfileRequestDto } from 'types/openapi';
+import { AttributeDescriptorModel } from 'types/attributes';
+import { SearchRequestModel } from 'types/certificate';
+import { FunctionGroupCode, Resource, VaultInstanceDto, VaultProfileRequestDto } from 'types/openapi';
 
 interface VaultProfileFormProps {
     onCancel?: () => void;
@@ -38,7 +41,7 @@ interface FormValues {
     description: string;
 }
 
-const listVaultsPayload = { itemsPerPage: 1000, pageNumber: 1, filters: [] } as const;
+const listVaultsPayload: SearchRequestModel = { itemsPerPage: 1000, pageNumber: 1, filters: [] };
 
 export default function VaultProfileForm({ onCancel, onSuccess }: VaultProfileFormProps) {
     const dispatch = useDispatch();
@@ -46,12 +49,17 @@ export default function VaultProfileForm({ onCancel, onSuccess }: VaultProfileFo
 
     const vaults = useSelector(vaultSelectors.vaults);
     const isCreating = useSelector(vaultProfileSelectors.isCreating);
+    const createVaultProfileSucceeded = useSelector(vaultProfileSelectors.createVaultProfileSucceeded);
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+    const vaultProfileAttributeDescriptors = useSelector(vaultProfileSelectors.vaultProfileAttributeDescriptors);
+    const isFetchingVaultProfileAttributes = useSelector(vaultProfileSelectors.isFetchingVaultProfileAttributes);
+
+    const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
     useEffect(() => {
         if (hasLoadedRef.current) return;
         hasLoadedRef.current = true;
-        dispatch(vaultActions.listVaults(listVaultsPayload as any));
+        dispatch(vaultActions.listVaults(listVaultsPayload));
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.VaultProfiles));
     }, [dispatch]);
 
@@ -85,6 +93,19 @@ export default function VaultProfileForm({ onCancel, onSuccess }: VaultProfileFo
         getValues,
     } = methods;
 
+    const selectedVaultUuid = useWatch({ control, name: 'vaultUuid' });
+
+    const connectorUuid = useMemo(
+        () => vaults.find((v: VaultInstanceDto) => v.uuid === selectedVaultUuid)?.connector?.uuid,
+        [vaults, selectedVaultUuid],
+    );
+
+    useEffect(() => {
+        if (!selectedVaultUuid) return;
+        dispatch(vaultProfileActions.getVaultProfileAttributes({ vaultUuid: selectedVaultUuid }));
+        setGroupAttributesCallbackAttributes([]);
+    }, [dispatch, selectedVaultUuid]);
+
     const onSubmit = useCallback(
         (values: FormValues) => {
             if (!values.vaultUuid) return;
@@ -93,6 +114,11 @@ export default function VaultProfileForm({ onCancel, onSuccess }: VaultProfileFo
             const request: VaultProfileRequestDto = {
                 name: values.name,
                 description: values.description || undefined,
+                attributes: collectFormAttributes(
+                    'vaultProfile',
+                    [...vaultProfileAttributeDescriptors, ...groupAttributesCallbackAttributes],
+                    allValues,
+                ),
                 customAttributes: collectFormAttributes('customVaultProfile', resourceCustomAttributes, allValues),
             };
 
@@ -103,17 +129,14 @@ export default function VaultProfileForm({ onCancel, onSuccess }: VaultProfileFo
                 }),
             );
         },
-        [dispatch, getValues, resourceCustomAttributes],
+        [dispatch, getValues, resourceCustomAttributes, vaultProfileAttributeDescriptors, groupAttributesCallbackAttributes],
     );
 
-    const wasCreatingRef = useRef(false);
+    const handleCreateSuccess = useCallback(() => {
+        onSuccess?.();
+    }, [onSuccess]);
 
-    useEffect(() => {
-        if (wasCreatingRef.current && !isCreating) {
-            onSuccess?.();
-        }
-        wasCreatingRef.current = isCreating;
-    }, [isCreating, onSuccess]);
+    useRunOnSuccessfulFinish(isCreating, createVaultProfileSucceeded, handleCreateSuccess);
 
     const handleCancel = useCallback(() => {
         onCancel?.();
@@ -122,10 +145,48 @@ export default function VaultProfileForm({ onCancel, onSuccess }: VaultProfileFo
     const submitTitle = useMemo(() => 'Create', []);
     const inProgressTitle = useMemo(() => 'Creating...', []);
 
+    const attributeTabs = useMemo(
+        () => [
+            {
+                title: 'Attributes',
+                content:
+                    selectedVaultUuid && vaultProfileAttributeDescriptors.length > 0 ? (
+                        <AttributeEditor
+                            id="vaultProfile"
+                            attributeDescriptors={vaultProfileAttributeDescriptors}
+                            connectorUuid={connectorUuid}
+                            functionGroupCode={FunctionGroupCode.CredentialProvider}
+                            kind="vaultManagement"
+                            groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                            setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                        />
+                    ) : (
+                        <div className="text-sm text-gray-500">
+                            {selectedVaultUuid && isFetchingVaultProfileAttributes
+                                ? 'Loading attributes...'
+                                : 'No vault profile attributes configured.'}
+                        </div>
+                    ),
+            },
+            {
+                title: 'Custom Attributes',
+                content: <AttributeEditor id="customVaultProfile" attributeDescriptors={resourceCustomAttributes} />,
+            },
+        ],
+        [
+            connectorUuid,
+            groupAttributesCallbackAttributes,
+            isFetchingVaultProfileAttributes,
+            resourceCustomAttributes,
+            selectedVaultUuid,
+            vaultProfileAttributeDescriptors,
+        ],
+    );
+
     return (
         <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <Widget busy={isCreating} noBorder>
+                <Widget busy={isCreating || (!!selectedVaultUuid && isFetchingVaultProfileAttributes)} noBorder>
                     <div className="space-y-4">
                         <Controller
                             name="name"
@@ -178,9 +239,7 @@ export default function VaultProfileForm({ onCancel, onSuccess }: VaultProfileFo
                             )}
                         />
 
-                        <Widget title="Custom Attributes" titleSize="large">
-                            <AttributeEditor id="customVaultProfile" attributeDescriptors={resourceCustomAttributes} />
-                        </Widget>
+                        <TabLayout tabs={attributeTabs} />
 
                         <Container className="flex-row justify-end modal-footer" gap={4}>
                             <Button variant="outline" onClick={handleCancel} type="button">

@@ -8,7 +8,9 @@ export type State = {
 
     isFetching: boolean;
     isCreating: boolean;
+    createOidSucceeded: boolean;
     isUpdating: boolean;
+    updateOidSucceeded: boolean;
     isDeleting: boolean;
 };
 
@@ -17,8 +19,10 @@ export const initialState: State = {
 
     isFetching: false,
     isCreating: false,
+    createOidSucceeded: false,
     isDeleting: false,
     isUpdating: false,
+    updateOidSucceeded: false,
 };
 
 export const slice = createSlice({
@@ -63,28 +67,34 @@ export const slice = createSlice({
 
         createOID: (state, action: PayloadAction<{ oid: OIDRequestModel }>) => {
             state.isCreating = true;
+            state.createOidSucceeded = false;
         },
 
         createOIDSuccess: (state, action: PayloadAction<{ oid: OIDResponseModel }>) => {
             state.isCreating = false;
+            state.createOidSucceeded = true;
             state.oid = action.payload.oid;
         },
 
         createOIDFailure: (state, action: PayloadAction<{ error: string }>) => {
             state.isCreating = false;
+            state.createOidSucceeded = false;
         },
 
         updateOID: (state, action: PayloadAction<{ oid: string; data: OIDUpdateRequestModel }>) => {
             state.isUpdating = true;
+            state.updateOidSucceeded = false;
         },
 
         updateOIDSuccess: (state, action: PayloadAction<{ oid: OIDResponseModel }>) => {
             state.isUpdating = false;
+            state.updateOidSucceeded = true;
             state.oid = action.payload.oid;
         },
 
         updateOIDFailure: (state, action: PayloadAction<{ error: string }>) => {
             state.isUpdating = false;
+            state.updateOidSucceeded = false;
         },
 
         deleteOID: (state, action: PayloadAction<{ oid: string }>) => {
@@ -129,7 +139,9 @@ const oid = createSelector(state, (state) => state.oid);
 
 const isFetching = createSelector(state, (state) => state.isFetching);
 const isCreating = createSelector(state, (state) => state.isCreating);
+const createOidSucceeded = createSelector(state, (state) => state.createOidSucceeded);
 const isUpdating = createSelector(state, (state) => state.isUpdating);
+const updateOidSucceeded = createSelector(state, (state) => state.updateOidSucceeded);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 
 export const selectors = {
@@ -139,7 +151,9 @@ export const selectors = {
 
     isFetching,
     isCreating,
+    createOidSucceeded,
     isUpdating,
+    updateOidSucceeded,
     isDeleting,
 };
 

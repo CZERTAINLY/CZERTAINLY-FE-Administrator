@@ -6,7 +6,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/certificateGroups';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import GroupForm from '../form';
@@ -29,6 +29,7 @@ export default function GroupDetail() {
     const group = useSelector(selectors.certificateGroup);
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const isUpdating = useSelector(selectors.isUpdating);
+    const updateGroupSucceeded = useSelector(selectors.updateGroupSucceeded);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
@@ -42,7 +43,7 @@ export default function GroupDetail() {
         getFreshGroupDetails();
     }, [getFreshGroupDetails, id]);
 
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateGroupSucceeded, () => {
         setIsEditModalOpen(false);
         getFreshGroupDetails();
     });

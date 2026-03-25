@@ -27,6 +27,8 @@ import { keyWithoutTokenInstanceActionNotes } from './constants';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import Button from 'components/Button';
 import { Info } from 'lucide-react';
+import Container from 'components/Container';
+
 interface Props {
     keyUuid: string;
     tokenInstanceUuid?: string;
@@ -123,7 +125,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             actions.deleteCryptographicKey({
                 keyItemUuid: [keyItem.uuid],
                 uuid: keyUuid,
-                redirect: totalKeyItems === 1 ? '../../../' : undefined,
+                redirect: totalKeyItems === 1 ? '/keys' : undefined,
             }),
         );
         setConfirmDelete(false);
@@ -305,11 +307,13 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                           id: 'Usages',
                           columns: [
                               'Key Usages',
-                              keyItem.usage?.map((usage) => (
-                                  <Badge key={usage} color="secondary">
-                                      {usage}
-                                  </Badge>
-                              )) ?? 'None',
+                              <Container className="flex-row" gap={1}>
+                                  {keyItem.usage?.map((usage) => (
+                                      <Badge key={usage} color="secondary">
+                                          {usage}
+                                      </Badge>
+                                  )) ?? 'None'}
+                              </Container>,
                           ],
                       },
                       {
@@ -584,7 +588,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             <Dialog
                 isOpen={keyUsageUpdate}
                 caption="Update Key Usage"
-                body={<KeyUsageSelect value={keyUsages} onChange={setKeyUsages} keyUsageEnum={keyUsageEnum} />}
+                body={<KeyUsageSelect value={keyUsages} onChange={setKeyUsages} keyUsageEnum={keyUsageEnum} keyType={keyItem.type} />}
                 toggle={() => setKeyUsageUpdate(false)}
                 size="md"
                 buttons={[

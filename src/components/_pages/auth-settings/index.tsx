@@ -9,7 +9,7 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as authSettingsActions, selectors as authSettingsSelectors } from 'ducks/auth-settings';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useForm, Controller } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
@@ -34,6 +34,7 @@ const AuthenticationSettings = () => {
     const oauth2Provider = useSelector(authSettingsSelectors.oauth2Provider);
     const isFetchingProvider = useSelector(authSettingsSelectors.isFetchingProvider);
     const isCreatingProvider = useSelector(authSettingsSelectors.isCreatingProvider);
+    const createProviderSucceeded = useSelector(authSettingsSelectors.createProviderSucceeded);
 
     const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
     const [jwkSetKeysDialog, setJwkSetKeysDialog] = useState(false);
@@ -87,7 +88,7 @@ const AuthenticationSettings = () => {
         dispatch(authSettingsActions.resetOAuth2ProviderSettings());
     }, [dispatch]);
 
-    useRunOnFinished(isCreatingProvider, () => {
+    useRunOnSuccessfulFinish(isCreatingProvider, createProviderSucceeded, () => {
         if (isOAuth2FormDialogOpen) {
             handleCloseOAuth2FormDialog();
             getAuthenticationSettings();

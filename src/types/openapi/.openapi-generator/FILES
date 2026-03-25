@@ -35,6 +35,7 @@ apis/LocalOperationsApi.ts
 apis/LocationManagementApi.ts
 apis/NotificationProfileInventoryApi.ts
 apis/OAuth2LoginManagementV2Api.ts
+apis/ProxyManagementApi.ts
 apis/RAProfileManagementApi.ts
 apis/ResourceManagementApi.ts
 apis/RoleManagementApi.ts
@@ -45,6 +46,7 @@ apis/SettingsApi.ts
 apis/StatisticsDashboardApi.ts
 apis/TokenInstanceManagementApi.ts
 apis/TokenProfileManagementApi.ts
+apis/TrustedCertificateManagementApi.ts
 apis/UserManagementApi.ts
 apis/VaultInstanceManagementApi.ts
 apis/VaultProfileManagementApi.ts
@@ -401,6 +403,12 @@ models/ProtocolCertificateAssociationsDto.ts
 models/ProtocolCertificateAssociationsRequestDto.ts
 models/ProviderComplianceRulesDto.ts
 models/ProviderComplianceRulesRequestDto.ts
+models/ProxyDto.ts
+models/ProxyInstallInstructionsDto.ts
+models/ProxyListDto.ts
+models/ProxyRequestDto.ts
+models/ProxyStatus.ts
+models/ProxyUpdateRequestDto.ts
 models/PushToLocationRequestDto.ts
 models/RaProfileAcmeDetailResponseDto.ts
 models/RaProfileAssociationRequestDto.ts
@@ -511,6 +519,8 @@ models/TriggerHistoryRecordDto.ts
 models/TriggerHistorySummaryDto.ts
 models/TriggerRequestDto.ts
 models/TriggerType.ts
+models/TrustedCertificateDto.ts
+models/TrustedCertificateRequestDto.ts
 models/UpdateActionRequestDto.ts
 models/UpdateConditionRequestDto.ts
 models/UpdateExecutionRequestDto.ts

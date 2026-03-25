@@ -5,7 +5,7 @@ import {
     UseWindowSizeHarness,
     UseDeviceTypeHarness,
     UseCopyToClipboardHarness,
-    UseRunOnFinishedHarness,
+    UseRunOnSuccessfulFinishHarness,
     UseAreDefaultValuesSameHarness,
 } from './common-hooks-harness';
 import { withProviders, createMockStore } from './test-helpers';
@@ -45,10 +45,10 @@ test.describe('useCopyToClipboard', () => {
     });
 });
 
-test.describe('useRunOnFinished', () => {
-    test('runs callback when flag goes from true to false', async ({ mount, page }) => {
-        await mount(<UseRunOnFinishedHarness />);
-        await expect(page.getByTestId('run-result')).toHaveText('ran', { timeout: 5000 });
+test.describe('useRunOnSuccessfulFinish', () => {
+    test('runs callback when loading goes true to false and succeeded is true', async ({ mount, page }) => {
+        await mount(<UseRunOnSuccessfulFinishHarness />);
+        await expect(page.getByTestId('successful-finish-result')).toHaveText('ran', { timeout: 5000 });
     });
 });
 

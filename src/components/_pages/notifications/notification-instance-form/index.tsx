@@ -6,7 +6,7 @@ import { selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions as connectorActions } from 'ducks/connectors';
 import { selectors as notificationSelectors, actions as notificationsActions } from 'ducks/notifications';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
@@ -56,6 +56,8 @@ const NotificationInstanceForm = ({ notificationInstanceId, onCancel, onSuccess 
     const isFetchingNotificationInstanceDetail = useSelector(notificationSelectors.isFetchingNotificationInstanceDetail);
     const isEditingNotificationInstance = useSelector(notificationSelectors.isEditingNotificationInstance);
     const isCreatingNotificationInstance = useSelector(notificationSelectors.isCreatingNotificationInstance);
+    const createNotificationInstanceSucceeded = useSelector(notificationSelectors.createNotificationInstanceSucceeded);
+    const updateNotificationInstanceSucceeded = useSelector(notificationSelectors.updateNotificationInstanceSucceeded);
 
     const editMode = useMemo(() => !!id, [id]);
     const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
@@ -186,8 +188,8 @@ const NotificationInstanceForm = ({ notificationInstanceId, onCancel, onSuccess 
         onCancel?.();
     }, [clearNotificationInstanceDetail, onCancel]);
 
-    useRunOnFinished(isCreatingNotificationInstance, onSuccess);
-    useRunOnFinished(isEditingNotificationInstance, onSuccess);
+    useRunOnSuccessfulFinish(isCreatingNotificationInstance, createNotificationInstanceSucceeded, onSuccess);
+    useRunOnSuccessfulFinish(isEditingNotificationInstance, updateNotificationInstanceSucceeded, onSuccess);
 
     const optionsForNotificationProviders = useMemo(
         () =>

@@ -25,9 +25,11 @@ export type State = {
     isFetchingList: boolean;
     isFetchingDetail: boolean;
     isCreating: boolean;
+    createAuthoritySucceeded: boolean;
     isDeleting: boolean;
     isForceDeleting: boolean;
     isUpdating: boolean;
+    updateAuthoritySucceeded: boolean;
     isBulkDeleting: boolean;
     isBulkForceDeleting: boolean;
 };
@@ -47,9 +49,11 @@ export const initialState: State = {
     isFetchingList: false,
     isFetchingDetail: false,
     isCreating: false,
+    createAuthoritySucceeded: false,
     isDeleting: false,
     isForceDeleting: false,
     isUpdating: false,
+    updateAuthoritySucceeded: false,
     isBulkDeleting: false,
     isBulkForceDeleting: false,
 };
@@ -174,22 +178,27 @@ export const slice = createSlice({
 
         createAuthority: (state, action: PayloadAction<AuthorityRequestModel>) => {
             state.isCreating = true;
+            state.createAuthoritySucceeded = false;
         },
 
         createAuthoritySuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isCreating = false;
+            state.createAuthoritySucceeded = true;
         },
 
         createAuthorityFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
+            state.createAuthoritySucceeded = false;
         },
 
         updateAuthority: (state, action: PayloadAction<{ uuid: string; updateAuthority: AuthorityUpdateRequestModel }>) => {
             state.isUpdating = true;
+            state.updateAuthoritySucceeded = false;
         },
 
         updateAuthoritySuccess: (state, action: PayloadAction<{ authority: AuthorityResponseModel }>) => {
             state.isUpdating = false;
+            state.updateAuthoritySucceeded = true;
 
             const authorityIndex = state.authorities.findIndex((authority) => authority.uuid === action.payload.authority.uuid);
 
@@ -204,6 +213,7 @@ export const slice = createSlice({
 
         updateAuthorityFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateAuthoritySucceeded = false;
         },
 
         deleteAuthority: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -296,7 +306,9 @@ const isFetchingRAProfilesAttributesDescriptors = createSelector(state, (state) 
 const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isCreating = createSelector(state, (state) => state.isCreating);
+const createAuthoritySucceeded = createSelector(state, (state) => state.createAuthoritySucceeded);
 const isUpdating = createSelector(state, (state) => state.isUpdating);
+const updateAuthoritySucceeded = createSelector(state, (state) => state.updateAuthoritySucceeded);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isBulkDeleting = createSelector(state, (state) => state.isBulkDeleting);
 const isBulkForceDeleting = createSelector(state, (state) => state.isBulkForceDeleting);
@@ -323,7 +335,9 @@ export const selectors = {
     isFetchingList,
     isFetchingDetail,
     isCreating,
+    createAuthoritySucceeded,
     isUpdating,
+    updateAuthoritySucceeded,
     isDeleting,
     isBulkDeleting,
     isBulkForceDeleting,

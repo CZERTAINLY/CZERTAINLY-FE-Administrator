@@ -25,6 +25,7 @@ import { slice as initialCredentialsSlice } from './credentials';
 import { slice as cryptographicKeySlice } from './cryptographic-keys';
 import { slice as cryptographicOperationsSlice } from './cryptographic-operations';
 import { slice as customAttributesSlice } from './customAttributes';
+import { slice as proxiesSlice } from './proxies';
 import { slice as discoveriesSlice } from './discoveries';
 import { slice as initialEntitiesSlice } from './entities';
 import { slice as enumsSlice } from './enums';
@@ -45,6 +46,7 @@ import { slice as settingsSlice } from './settings';
 import { slice as dashboardSlice } from './statisticsDashboard';
 import { slice as tokenProfileSlice } from './token-profiles';
 import { slice as tokenSlice } from './tokens';
+import { slice as trustedCertificatesSlice } from './trusted-certificates';
 import { slice as usersSlice } from './users';
 import { slice as utilsActuatorSlice } from './utilsActuator';
 import { slice as cbomActuatorSlice } from './cbomActuator';
@@ -67,6 +69,7 @@ export const reducers = combineReducers({
     [dashboardSlice.name]: dashboardSlice.reducer,
     [groupsSlice.name]: groupsSlice.reducer,
     [connectorsSlice.name]: connectorsSlice.reducer,
+    [proxiesSlice.name]: proxiesSlice.reducer,
     [discoveriesSlice.name]: discoveriesSlice.reducer,
     [pagingSlice.name]: pagingSlice.reducer,
     [usersSlice.name]: usersSlice.reducer,
@@ -98,6 +101,7 @@ export const reducers = combineReducers({
     [infoSlice.name]: infoSlice.reducer,
     [tokenSlice.name]: tokenSlice.reducer,
     [tokenProfileSlice.name]: tokenProfileSlice.reducer,
+    [trustedCertificatesSlice.name]: trustedCertificatesSlice.reducer,
     [cryptographicKeySlice.name]: cryptographicKeySlice.reducer,
     [cryptographicOperationsSlice.name]: cryptographicOperationsSlice.reducer,
     [utilsOidSlice.name]: utilsOidSlice.reducer,

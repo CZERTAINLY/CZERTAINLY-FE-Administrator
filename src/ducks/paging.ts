@@ -11,6 +11,8 @@ type PagingObject = {
     totalItems: number;
     checkedRows: string[];
     isFetchingList: boolean;
+    pageNumber: number;
+    pageSize: number;
 };
 
 export type State = {
@@ -21,6 +23,15 @@ const EMPTY_PAGING: PagingObject = {
     totalItems: 0,
     checkedRows: [],
     isFetchingList: false,
+    pageNumber: 1,
+    pageSize: 10,
+};
+
+const normalizePositiveInteger = (value: number, fallback: number) => {
+    if (!Number.isFinite(value)) return fallback;
+
+    const normalized = Math.floor(value);
+    return normalized > 0 ? normalized : fallback;
 };
 
 export const initialState: State = {
@@ -67,6 +78,13 @@ export const slice = createSlice({
                 paging.checkedRows = action.payload.checkedRows;
             });
         },
+
+        setPagination: (state, action: PayloadAction<{ entity: EntityType; pageNumber: number; pageSize: number }>) => {
+            updatePagingState(state, action.payload.entity, (paging) => {
+                paging.pageNumber = normalizePositiveInteger(action.payload.pageNumber, paging.pageNumber || 1);
+                paging.pageSize = normalizePositiveInteger(action.payload.pageSize, paging.pageSize || 10);
+            });
+        },
     },
 });
 
@@ -78,6 +96,10 @@ const checkedRows = (entity: EntityType) =>
     createSelector(state, (state) => (state.pagings.find((f) => f.entity === entity)?.paging ?? EMPTY_PAGING).checkedRows);
 const isFetchingList = (entity: EntityType) =>
     createSelector(state, (state) => (state.pagings.find((f) => f.entity === entity)?.paging ?? EMPTY_PAGING).isFetchingList);
+const pageNumber = (entity: EntityType) =>
+    createSelector(state, (state) => (state.pagings.find((f) => f.entity === entity)?.paging ?? EMPTY_PAGING).pageNumber);
+const pageSize = (entity: EntityType) =>
+    createSelector(state, (state) => (state.pagings.find((f) => f.entity === entity)?.paging ?? EMPTY_PAGING).pageSize);
 
 export const selectors = {
     state,
@@ -85,6 +107,8 @@ export const selectors = {
     totalItems,
     checkedRows,
     isFetchingList,
+    pageNumber,
+    pageSize,
 };
 
 export const actions = slice.actions;

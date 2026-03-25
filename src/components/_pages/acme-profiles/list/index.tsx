@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
@@ -31,6 +31,8 @@ export default function AdministratorsList() {
     const isBulkDisabling = useSelector(selectors.isBulkDisabling);
     const isBulkForceDeleting = useSelector(selectors.isBulkForceDeleting);
     const isCreating = useSelector(selectors.isCreating);
+    const createAcmeProfileSucceeded = useSelector(selectors.createAcmeProfileSucceeded);
+    const updateAcmeProfileSucceeded = useSelector(selectors.updateAcmeProfileSucceeded);
 
     const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isBulkEnabling || isBulkDisabling || isBulkForceDeleting;
 
@@ -52,11 +54,11 @@ export default function AdministratorsList() {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
     }, [bulkDeleteErrorMessages]);
 
-    useRunOnFinished(isCreating, () => {
+    useRunOnSuccessfulFinish(isCreating, createAcmeProfileSucceeded, () => {
         setIsAddModalOpen(false);
         getFreshData();
     });
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateAcmeProfileSucceeded, () => {
         setEditingAcmeProfileId(undefined);
         getFreshData();
     });

@@ -16,7 +16,7 @@ import { actions as secretsActions, selectors as secretsSelectors } from 'ducks/
 import { actions as vaultProfileActions, selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -39,6 +39,7 @@ import { collectFormAttributes } from 'utils/attributes/attributes';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
 interface SelectOption {
     value: string;
@@ -73,7 +74,9 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
     const users = useSelector(userSelectors.users);
     const groups = useSelector(groupSelectors.certificateGroups);
     const isCreating = useSelector(secretsSelectors.isCreating);
+    const createSecretSucceeded = useSelector(secretsSelectors.createSecretSucceeded);
     const isUpdating = useSelector(secretsSelectors.isUpdating);
+    const updateSecretSucceeded = useSelector(secretsSelectors.updateSecretSucceeded);
     const secret = useSelector(secretsSelectors.secret);
     const vaultProfiles = useSelector(vaultProfileSelectors.vaultProfiles);
     const secretCreationAttributeDescriptors = useSelector(secretsSelectors.secretCreationAttributeDescriptors);
@@ -206,7 +209,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
         const vaultUuid = profile?.vaultInstance?.uuid;
         if (!vaultUuid) return;
         dispatch(
-            secretsActions.getSecretCreationAttributes({
+            secretsActions.listSecretAttributes({
                 vaultUuid,
                 vaultProfileUuid: watchedSourceVaultProfile,
                 secretType: watchedType as SecretType,
@@ -326,7 +329,6 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                         request: {
                             name: values.name,
                             description: values.description ?? '',
-                            sourceVaultProfileUuid,
                             secret: secretContent,
                             attributes,
                             customAttributes,
@@ -346,20 +348,16 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
         ],
     );
 
-    const wasCreatingRef = useRef(false);
-    const wasUpdatingRef = useRef(false);
+    const handleCreateSuccess = useCallback(() => {
+        if (!initialSecret && secret) onSuccess?.();
+    }, [initialSecret, secret, onSuccess]);
 
-    useEffect(() => {
-        const justFinishedCreate = wasCreatingRef.current && !isCreating;
-        const justFinishedUpdate = wasUpdatingRef.current && !isUpdating;
+    const handleUpdateSuccess = useCallback(() => {
+        if (initialSecret && secret) onSuccess?.();
+    }, [initialSecret, secret, onSuccess]);
 
-        if ((justFinishedCreate || justFinishedUpdate) && secret) {
-            onSuccess?.();
-        }
-
-        wasCreatingRef.current = isCreating;
-        wasUpdatingRef.current = isUpdating;
-    }, [isCreating, isUpdating, secret, onSuccess]);
+    useRunOnSuccessfulFinish(isCreating, createSecretSucceeded, handleCreateSuccess);
+    useRunOnSuccessfulFinish(isUpdating, updateSecretSucceeded, handleUpdateSuccess);
 
     const handleCancel = useCallback(() => {
         onCancel?.();
@@ -561,7 +559,9 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                             </Label>
                                             <FileUpload
                                                 id="secret-secretkey-file"
-                                                onFileContentLoaded={(base64) => setValue('content', base64, { shouldDirty: true })}
+                                                onFileContentLoaded={(base64) =>
+                                                    setValue('content', base64, { shouldDirty: true, shouldValidate: true })
+                                                }
                                             />
                                         </div>
                                     </>
@@ -594,7 +594,9 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                             </Label>
                                             <FileUpload
                                                 id="secret-privatekey-file"
-                                                onFileContentLoaded={(base64) => setValue('content', base64, { shouldDirty: true })}
+                                                onFileContentLoaded={(base64) =>
+                                                    setValue('content', base64, { shouldDirty: true, shouldValidate: true })
+                                                }
                                             />
                                         </div>
                                     </>
@@ -618,19 +620,34 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                                                 />
                                             )}
                                         />
-                                        <div>
-                                            <Label
-                                                htmlFor="secret-keystore-file__fileUpload__file"
-                                                className="mb-1 block text-sm font-medium"
-                                                required
-                                            >
-                                                Key Store
-                                            </Label>
-                                            <FileUpload
-                                                id="secret-keystore-file"
-                                                onFileContentLoaded={(base64) => setValue('keyStoreContent', base64, { shouldDirty: true })}
-                                            />
-                                        </div>
+                                        <Controller
+                                            name="keyStoreContent"
+                                            control={control}
+                                            rules={initialSecret ? undefined : buildValidationRules([validateRequired()])}
+                                            render={({ fieldState }) => (
+                                                <div>
+                                                    <Label
+                                                        htmlFor="secret-keystore-file__fileUpload__file"
+                                                        className="mb-1 block text-sm font-medium"
+                                                        required
+                                                    >
+                                                        Key Store
+                                                    </Label>
+                                                    <FileUpload
+                                                        id="secret-keystore-file"
+                                                        onFileContentLoaded={(base64) =>
+                                                            setValue('keyStoreContent', base64, {
+                                                                shouldDirty: true,
+                                                                shouldValidate: true,
+                                                            })
+                                                        }
+                                                    />
+                                                    {fieldState.error && (
+                                                        <p className="mt-1 text-sm text-red-600">{fieldState.error.message}</p>
+                                                    )}
+                                                </div>
+                                            )}
+                                        />
                                         <Controller
                                             name="keyStorePassword"
                                             control={control}
@@ -770,6 +787,7 @@ export default function SecretForm({ onCancel, onSuccess, initialSecret }: Secre
                         <Widget title="Attributes" noBorder>
                             <TabLayout
                                 noBorder
+                                onlyActiveTabContent={false}
                                 tabs={[
                                     {
                                         title: 'Attributes',

@@ -24,9 +24,11 @@ export type State = {
     isFetchingList: boolean;
     isFetchingDetail: boolean;
     isCreating: boolean;
+    createTokenSucceeded: boolean;
     isDeleting: boolean;
     isForceDeleting: boolean;
     isUpdating: boolean;
+    updateTokenSucceeded: boolean;
     isBulkDeleting: boolean;
 
     isActivating: boolean;
@@ -51,9 +53,11 @@ export const initialState: State = {
     isFetchingList: false,
     isFetchingDetail: false,
     isCreating: false,
+    createTokenSucceeded: false,
     isDeleting: false,
     isForceDeleting: false,
     isUpdating: false,
+    updateTokenSucceeded: false,
     isBulkDeleting: false,
 
     isActivating: false,
@@ -176,28 +180,34 @@ export const slice = createSlice({
 
         createToken: (state, action: PayloadAction<TokenRequestModel>) => {
             state.isCreating = true;
+            state.createTokenSucceeded = false;
         },
 
         createTokenSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isCreating = false;
+            state.createTokenSucceeded = true;
         },
 
         createTokenFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
+            state.createTokenSucceeded = false;
         },
 
         updateToken: (state, action: PayloadAction<{ uuid: string; updateToken: TokenRequestModel }>) => {
             state.isUpdating = true;
+            state.updateTokenSucceeded = false;
         },
 
         updateTokenSuccess: (state, action: PayloadAction<{ token: TokenDetailResponseModel }>) => {
             state.isUpdating = false;
+            state.updateTokenSucceeded = true;
 
             state.token = action.payload.token;
         },
 
         updateTokenFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+            state.updateTokenSucceeded = false;
         },
 
         listActivationAttributeDescriptors: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -326,7 +336,9 @@ const isFetchingTokenProfileAttributesDescriptors = createSelector(state, (state
 const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isCreating = createSelector(state, (state) => state.isCreating);
+const createTokenSucceeded = createSelector(state, (state) => state.createTokenSucceeded);
 const isUpdating = createSelector(state, (state) => state.isUpdating);
+const updateTokenSucceeded = createSelector(state, (state) => state.updateTokenSucceeded);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isActivating = createSelector(state, (state) => state.isActivating);
 const isDeactivating = createSelector(state, (state) => state.isDeactivating);
@@ -356,7 +368,9 @@ export const selectors = {
     isFetchingList,
     isFetchingDetail,
     isCreating,
+    createTokenSucceeded,
     isUpdating,
+    updateTokenSucceeded,
     isDeleting,
     isBulkDeleting,
     isActivating,

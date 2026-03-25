@@ -16,7 +16,7 @@ import type {
     ConnectorInterfaceDto,
     ConnectorStatus,
     ConnectorVersion,
-    FunctionGroupDto,
+    FunctionGroupDto, ProxyDto,
     ResponseAttribute,
 } from './';
 
@@ -85,6 +85,15 @@ export interface ConnectorDetailDtoV2 {
      * @memberof ConnectorDetailDtoV2
      */
     customAttributes?: Array<ResponseAttribute>;
+
+    /**
+     * Proxy for message queue routing.
+     * When set, connector communicates via message queue proxy.
+     * When null, connector uses direct REST communication.
+     * @type {ProxyDto}
+     * @memberof ConnectorDetailDtoV2
+     */
+    proxy?: ProxyDto;
 }
 
 

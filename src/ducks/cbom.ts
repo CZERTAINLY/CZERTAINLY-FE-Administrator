@@ -10,6 +10,7 @@ import {
 
 export type State = {
     cbomsData?: PaginationResponseDtoCbomDto;
+    deletedCbomUuids: string[];
     cbomDetail?: CbomDetailDto;
     cbomDetailError?: string;
     cbomDetailErrorStatusCode?: number;
@@ -25,9 +26,11 @@ export type State = {
     isDeleting: boolean;
     isBulkDeleting: boolean;
     isSyncing: boolean;
+    syncSucceeded: boolean;
 };
 
 export const initialState: State = {
+    deletedCbomUuids: [],
     cbomVersions: [],
     searchableFields: [],
 
@@ -40,6 +43,7 @@ export const initialState: State = {
     isDeleting: false,
     isBulkDeleting: false,
     isSyncing: false,
+    syncSucceeded: false,
 };
 
 export const slice = createSlice({
@@ -137,6 +141,7 @@ export const slice = createSlice({
         uploadCbomSuccess: (state, action: PayloadAction<{ cbom: CbomDto }>) => {
             state.isUploading = false;
             state.isUploadSuccess = true;
+            state.deletedCbomUuids = state.deletedCbomUuids.filter((uuid) => uuid !== action.payload.cbom.uuid);
             if (state.cbomsData) {
                 state.cbomsData.items.unshift(action.payload.cbom);
             }
@@ -154,10 +159,16 @@ export const slice = createSlice({
 
         deleteCbomSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isDeleting = false;
+            if (!state.deletedCbomUuids.includes(action.payload.uuid)) {
+                state.deletedCbomUuids.push(action.payload.uuid);
+            }
 
             if (state.cbomsData) {
                 const index = state.cbomsData.items.findIndex((cbom) => cbom.uuid === action.payload.uuid);
-                if (index !== -1) state.cbomsData.items.splice(index, 1);
+                if (index !== -1) {
+                    state.cbomsData.items.splice(index, 1);
+                    state.cbomsData.totalItems = Math.max(0, (state.cbomsData.totalItems ?? 0) - 1);
+                }
             }
         },
 
@@ -173,9 +184,18 @@ export const slice = createSlice({
         bulkDeleteCbomSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
             state.isBulkDeleting = false;
 
+            action.payload.uuids.forEach((uuid) => {
+                if (!state.deletedCbomUuids.includes(uuid)) {
+                    state.deletedCbomUuids.push(uuid);
+                }
+            });
+
             if (state.cbomsData) {
                 const uuidSet = new Set(action.payload.uuids);
+                const previousItemsCount = state.cbomsData.items.length;
                 state.cbomsData.items = state.cbomsData.items.filter((item) => !uuidSet.has(item.uuid));
+                const removedItemsCount = previousItemsCount - state.cbomsData.items.length;
+                state.cbomsData.totalItems = Math.max(0, (state.cbomsData.totalItems ?? 0) - removedItemsCount);
             }
         },
 
@@ -186,19 +206,22 @@ export const slice = createSlice({
         // Sync CBOMs
         syncCboms: (state, action: PayloadAction<void>) => {
             state.isSyncing = true;
+            state.syncSucceeded = false;
         },
 
         syncCbomsSuccess: (state, action: PayloadAction<void>) => {
             state.isSyncing = false;
+            state.syncSucceeded = true;
         },
 
         syncCbomsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isSyncing = false;
+            state.syncSucceeded = false;
         },
     },
 });
 
-const featureSelector = (reduxStore: any): State => reduxStore['cbom'];
+const featureSelector = (reduxStore: any): State => reduxStore?.['cbom'];
 
 export const selectCbomsData = createSelector(featureSelector, (state) => state.cbomsData);
 export const selectCbomList = createSelector(featureSelector, (state) => state.cbomsData?.items || []);
@@ -217,6 +240,7 @@ export const selectIsUploadSuccess = createSelector(featureSelector, (state) => 
 export const selectIsDeleting = createSelector(featureSelector, (state) => state.isDeleting);
 export const selectIsBulkDeleting = createSelector(featureSelector, (state) => state.isBulkDeleting);
 export const selectIsSyncing = createSelector(featureSelector, (state) => state.isSyncing);
+export const selectSyncSucceeded = createSelector(featureSelector, (state) => state.syncSucceeded);
 
 export const selectors = {
     selectCbomsData,
@@ -235,6 +259,7 @@ export const selectors = {
     selectIsDeleting,
     selectIsBulkDeleting,
     selectIsSyncing,
+    selectSyncSucceeded,
 };
 
 export const { actions } = slice;

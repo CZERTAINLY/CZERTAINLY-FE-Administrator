@@ -83,13 +83,14 @@ export default function CertificateForm({ onCancel }: CertificateFormProps = {})
     const attributeValuesRef = useRef<Record<string, any>>({});
 
     const methods = useForm<CertificateFormValues>({
+        mode: 'onChange',
         defaultValues: {
             raProfileUuid: '',
             includeAltKey: false,
         },
     });
 
-    const { control, handleSubmit, setValue } = methods;
+    const { control, handleSubmit, setValue, formState } = methods;
 
     const combinedAttributeValues = useMemo(
         () =>
@@ -391,6 +392,7 @@ export default function CertificateForm({ onCancel }: CertificateFormProps = {})
 
                                     {tokenProfileUuid ? (
                                         <TabLayout
+                                            onlyActiveTabContent={false}
                                             tabs={[
                                                 {
                                                     title: 'Request Attributes',
@@ -443,6 +445,7 @@ export default function CertificateForm({ onCancel }: CertificateFormProps = {})
                         <Widget busy={issuingCertificate || isFetchingResourceCustomAttributes}>
                             <TabLayout
                                 noBorder
+                                onlyActiveTabContent={false}
                                 tabs={[
                                     {
                                         title: 'Connector Attributes',
@@ -480,7 +483,12 @@ export default function CertificateForm({ onCancel }: CertificateFormProps = {})
                                 >
                                     Cancel
                                 </Button>
-                                <ProgressButton title="Create" inProgressTitle="Creating" inProgress={issuingCertificate} />
+                                <ProgressButton
+                                    title="Create"
+                                    inProgressTitle="Creating"
+                                    inProgress={issuingCertificate}
+                                    disabled={!formState.isValid}
+                                />
                             </div>
                         </Container>
                     </div>

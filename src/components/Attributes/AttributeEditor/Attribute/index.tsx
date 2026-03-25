@@ -110,7 +110,7 @@ export function Attribute({
         if (initiateAttributeCallback && attributeCallbackValue && options) {
             const newOption = options.find((option) => option.label === attributeCallbackValue);
             if (newOption) {
-                setValue(name, newOption);
+                setValue(name, newOption, { shouldValidate: true });
                 dispatch(userInterfaceActions.clearAttributeCallbackValue());
                 dispatch(userInterfaceActions.setInitiateAttributeCallback(false));
             }

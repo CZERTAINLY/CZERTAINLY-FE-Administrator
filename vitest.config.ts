@@ -1,6 +1,6 @@
 import { defineConfig } from 'vitest/config';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -9,13 +9,13 @@ export default defineConfig({
     test: {
         globals: true,
         environment: 'happy-dom',
-        include: ['src/utils/**/*.spec.ts', 'src/ducks/**/*.spec.ts'],
-        exclude: ['node_modules', 'build', 'dist', 'src/components/**/*'],
+        include: ['**/*.spec.ts', 'src/components/**/*.unit.spec.{ts,tsx}'],
+        exclude: ['node_modules', 'build', 'dist'],
         coverage: {
             provider: 'v8',
             reporter: ['lcovonly', 'text-summary'],
             reportsDirectory: './coverage-vitest',
-            include: ['src/utils/**/*.{ts,tsx}', 'src/ducks/**/*.{ts,tsx}'],
+            include: ['src/*.{ts,tsx}', 'src/utils/**/*.{ts,tsx}', 'src/ducks/**/*.{ts,tsx}', 'src/components/**/*.{ts,tsx}'],
             exclude: [
                 'node_modules',
                 'src/**/*.spec.{ts,tsx}',

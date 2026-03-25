@@ -37,6 +37,7 @@ export type State = {
     isFetchingList: boolean;
     isFetchingDetail: boolean;
     isCreating: boolean;
+    createComplianceProfileSucceeded: boolean;
     isDeleting: boolean;
     isAddingRule: boolean;
     isUpdatingRule: boolean;
@@ -74,6 +75,7 @@ export const initialState: State = {
     isFetchingList: false,
     isFetchingDetail: false,
     isCreating: false,
+    createComplianceProfileSucceeded: false,
     isDeleting: false,
     isAddingRule: false,
     isUpdatingRule: false,
@@ -136,14 +138,17 @@ export const slice = createSlice({
         ///////////////////////////////
         createComplianceProfile: (state, action: PayloadAction<ComplianceProfileRequestDtoV2>) => {
             state.isCreating = true;
+            state.createComplianceProfileSucceeded = false;
         },
 
         createComplianceProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isCreating = false;
+            state.createComplianceProfileSucceeded = true;
         },
 
         createComplianceProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
+            state.createComplianceProfileSucceeded = false;
         },
         ///////////////////////////////
         deleteComplianceProfile: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -500,6 +505,7 @@ const checkedRows = createSelector(state, (state) => state.checkedRows);
 const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isCreating = createSelector(state, (state) => state.isCreating);
+const createComplianceProfileSucceeded = createSelector(state, (state) => state.createComplianceProfileSucceeded);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isFetchingRules = createSelector(state, (state) => state.isFetchingRules);
 const isFetchingGroups = createSelector(state, (state) => state.isFetchingGroups);
@@ -555,6 +561,7 @@ export const selectors = {
     isFetchingList,
     isFetchingDetail,
     isCreating,
+    createComplianceProfileSucceeded,
     isDeleting,
     isFetchingRules,
     isFetchingGroups,

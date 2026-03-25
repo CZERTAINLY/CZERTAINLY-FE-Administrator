@@ -19,7 +19,9 @@ export type State = {
     isFetchingDetail: boolean;
     isFetchingLocationAttributeDescriptors: boolean;
     isCreating: boolean;
+    createEntitySucceeded: boolean;
     isUpdating: boolean;
+    updateEntitySucceeded: boolean;
     isDeleting: boolean;
 };
 
@@ -32,8 +34,10 @@ export const initialState: State = {
     isFetchingDetail: false,
     isFetchingLocationAttributeDescriptors: false,
     isCreating: false,
+    createEntitySucceeded: false,
     isDeleting: false,
     isUpdating: false,
+    updateEntitySucceeded: false,
 };
 
 export const slice = createSlice({
@@ -108,14 +112,17 @@ export const slice = createSlice({
 
         addEntity: (state, action: PayloadAction<EntityRequestModel>) => {
             state.isCreating = true;
+            state.createEntitySucceeded = false;
         },
 
         addEntitySuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isCreating = false;
+            state.createEntitySucceeded = true;
         },
 
         addEntityFailure: (state, action: PayloadAction<{ error: string }>) => {
             state.isCreating = false;
+            state.createEntitySucceeded = false;
         },
 
         deleteEntity: (state, action: PayloadAction<{ uuid: string; redirect?: string }>) => {
@@ -138,14 +145,17 @@ export const slice = createSlice({
             action: PayloadAction<{ uuid: string; attributes: AttributeRequestModel[]; customAttributes?: AttributeRequestModel[] }>,
         ) => {
             state.isUpdating = true;
+            state.updateEntitySucceeded = false;
         },
 
         updateEntitySuccess: (state, action: PayloadAction<{ entity: EntityResponseModel }>) => {
             state.isUpdating = false;
+            state.updateEntitySucceeded = true;
         },
 
         updateEntityFailure: (state, action: PayloadAction<{ error: string }>) => {
             state.isUpdating = false;
+            state.updateEntitySucceeded = false;
         },
 
         listLocationAttributeDescriptors: (state, action: PayloadAction<{ entityUuid: string }>) => {
@@ -178,8 +188,10 @@ const isFetchingEntityProviderAttributeDescriptors = createSelector(state, (stat
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isFetchingLocationAttributeDescriptors = createSelector(state, (state) => state.isFetchingLocationAttributeDescriptors);
 const isCreating = createSelector(state, (state) => state.isCreating);
+const createEntitySucceeded = createSelector(state, (state) => state.createEntitySucceeded);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isUpdating = createSelector(state, (state) => state.isUpdating);
+const updateEntitySucceeded = createSelector(state, (state) => state.updateEntitySucceeded);
 
 export const selectors = {
     state,
@@ -197,8 +209,10 @@ export const selectors = {
 
     isFetchingDetail,
     isCreating,
+    createEntitySucceeded,
     isDeleting,
     isUpdating,
+    updateEntitySucceeded,
 };
 
 export const actions = slice.actions;

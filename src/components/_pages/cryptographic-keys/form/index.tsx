@@ -10,7 +10,7 @@ import { actions as userActions, selectors as userSelectors } from 'ducks/users'
 
 import { actions as cryptographicKeysActions, selectors as cryptographicKeysSelectors } from 'ducks/cryptographic-keys';
 import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } from 'ducks/token-profiles';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
@@ -31,6 +31,7 @@ import { actions as customAttributesActions, selectors as customAttributesSelect
 import { KeyRequestType, PlatformEnum, Resource } from '../../../../types/openapi';
 import Container from 'components/Container';
 import Button from 'components/Button';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
 interface CryptographicKeyFormProps {
     usesGlobalModal?: boolean;
@@ -78,6 +79,8 @@ export default function CryptographicKeyForm({ keyId, onSuccess, onCancel, usesG
     const isFetchingDetail = useSelector(cryptographicKeysSelectors.isFetchingDetail);
     const isCreating = useSelector(cryptographicKeysSelectors.isCreating);
     const isUpdating = useSelector(cryptographicKeysSelectors.isUpdating);
+    const createCryptographicKeySucceeded = useSelector(cryptographicKeysSelectors.createCryptographicKeySucceeded);
+    const updateCryptographicKeySucceeded = useSelector(cryptographicKeysSelectors.updateCryptographicKeySucceeded);
 
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
@@ -269,20 +272,16 @@ export default function CryptographicKeyForm({ keyId, onSuccess, onCancel, usesG
         ],
     );
 
-    const wasCreatingRef = useRef(false);
-    const wasUpdatingRef = useRef(false);
+    const handleCreateSuccess = useCallback(() => {
+        if (!editMode) onSuccess?.();
+    }, [editMode, onSuccess]);
 
-    useEffect(() => {
-        const justFinishedCreate = wasCreatingRef.current && !isCreating;
-        const justFinishedUpdate = wasUpdatingRef.current && !isUpdating;
+    const handleUpdateSuccess = useCallback(() => {
+        if (editMode) onSuccess?.();
+    }, [editMode, onSuccess]);
 
-        if (justFinishedCreate || justFinishedUpdate) {
-            onSuccess?.();
-        }
-
-        wasCreatingRef.current = isCreating;
-        wasUpdatingRef.current = isUpdating;
-    }, [isCreating, isUpdating, onSuccess]);
+    useRunOnSuccessfulFinish(isCreating, createCryptographicKeySucceeded, handleCreateSuccess);
+    useRunOnSuccessfulFinish(isUpdating, updateCryptographicKeySucceeded, handleUpdateSuccess);
 
     const optionsForType = () => {
         let options: { value: string; label: string }[] = [];

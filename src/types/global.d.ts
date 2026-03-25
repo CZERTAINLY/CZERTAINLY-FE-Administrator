@@ -3,6 +3,8 @@ type Env = {
     API_URL: string;
     LOGIN_URL: string;
     LOGOUT_URL: string;
+    ENABLE_PROXIES?: boolean;
+    ENABLE_TRUSTED_CERTIFICATES?: boolean;
 };
 
 interface Window {

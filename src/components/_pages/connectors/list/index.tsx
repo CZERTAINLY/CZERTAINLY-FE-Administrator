@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
@@ -13,12 +13,14 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import ConnectorForm from '../form';
 import PagedList from 'components/PagedList/PagedList';
 
-import { LockWidgetNameEnum } from 'types/user-interface';
-import { inventoryStatus } from 'utils/connector';
 import { EntityType } from 'ducks/filters';
 import { selectors as pagingSelectors } from 'ducks/paging';
-import { ApiClients } from '../../../../api';
 import { SearchRequestModel } from 'types/certificate';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { inventoryStatus } from 'utils/connector';
+import { featureFlags } from 'utils/feature-flags';
+
+import { ApiClients } from '../../../../api';
 
 export default function ConnectorList() {
     const dispatch = useDispatch();
@@ -34,7 +36,9 @@ export default function ConnectorList() {
     const isBulkReconnecting = useSelector(selectors.isBulkReconnecting);
     const isBulkAuthorizing = useSelector(selectors.isBulkAuthorizing);
     const isCreating = useSelector(selectors.isCreating);
+    const createConnectorSucceeded = useSelector(selectors.createConnectorSucceeded);
     const isUpdating = useSelector(selectors.isUpdating);
+    const updateConnectorSucceeded = useSelector(selectors.updateConnectorSucceeded);
 
     const isBusy = isDeleting || isBulkDeleting || isForceDeleting || isBulkReconnecting || isBulkAuthorizing;
 
@@ -48,10 +52,10 @@ export default function ConnectorList() {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
     }, [bulkDeleteErrorMessages]);
 
-    useRunOnFinished(isCreating, () => {
+    useRunOnSuccessfulFinish(isCreating, createConnectorSucceeded, () => {
         setIsAddModalOpen(false);
     });
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateConnectorSucceeded, () => {
         setEditingConnectorId(undefined);
     });
 
@@ -153,12 +157,16 @@ export default function ConnectorList() {
                 align: 'center',
                 width: '5%',
             },
-            {
-                content: 'Proxy',
-                sortable: true,
-                id: 'connectorProxy',
-                width: '15%',
-            },
+            ...(featureFlags.isProxiesEnabled
+                ? [
+                      {
+                          content: 'Proxy',
+                          sortable: true,
+                          id: 'connectorProxy',
+                          width: '15%',
+                      } as TableHeader,
+                  ]
+                : []),
             {
                 content: 'URL',
                 sortable: true,
@@ -188,9 +196,17 @@ export default function ConnectorList() {
                         <span key="version" style={{ whiteSpace: 'nowrap' }}>
                             {connector.version || '-'}
                         </span>,
-                        <span key="status" style={{ whiteSpace: 'nowrap' }}>
-                            coming soon
-                        </span>,
+                        ...(featureFlags.isProxiesEnabled
+                            ? [
+                                  <span key="proxy" style={{ whiteSpace: 'nowrap' }}>
+                                      {connector.proxy ? (
+                                          <Link to={`../proxies/detail/${connector.proxy.uuid}`}>{connector.proxy.name}</Link>
+                                      ) : (
+                                          '-'
+                                      )}
+                                  </span>,
+                              ]
+                            : []),
                         <span key="url" style={{ whiteSpace: 'nowrap' }}>
                             {connector.url}
                         </span>,

@@ -1,6 +1,6 @@
 import { TableDataRow, TableHeader } from 'components/CustomTable';
 import { useCallback, useMemo, useState } from 'react';
-import { useRunOnFinished } from 'utils/common-hooks';
+import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions, selectors } from 'ducks/oids';
 import { EntityType } from 'ducks/filters';
@@ -23,6 +23,8 @@ export default function CustomOIDList() {
     const isDeleting = useSelector(selectors.isDeleting);
     const isUpdating = useSelector(selectors.isUpdating);
     const isCreating = useSelector(selectors.isCreating);
+    const createOidSucceeded = useSelector(selectors.createOidSucceeded);
+    const updateOidSucceeded = useSelector(selectors.updateOidSucceeded);
     const isBusy = isDeleting || isUpdating;
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -104,13 +106,13 @@ export default function CustomOIDList() {
         onListCallback({ itemsPerPage: 10, pageNumber: 1, filters: [] });
     }, [onListCallback]);
 
-    useRunOnFinished(isCreating, () => {
+    useRunOnSuccessfulFinish(isCreating, createOidSucceeded, () => {
         if (isAddModalOpen) {
             handleCloseAddModal();
             getFreshData();
         }
     });
-    useRunOnFinished(isUpdating, () => {
+    useRunOnSuccessfulFinish(isUpdating, updateOidSucceeded, () => {
         if (isAddModalOpen) {
             handleCloseAddModal();
             getFreshData();
@@ -135,7 +137,7 @@ export default function CustomOIDList() {
                 entity={EntityType.OID}
                 onListCallback={onListCallback}
                 onDeleteCallback={onDeleteCallback}
-                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.oids.getSearchableInformation(), [])}
+                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.oids.getCustomOidEntrySearchableFields(), [])}
                 headers={oidsRowHeaders}
                 data={oidsList}
                 isBusy={isBusy}

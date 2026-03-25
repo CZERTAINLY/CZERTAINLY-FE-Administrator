@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 import { firstValueFrom } from 'rxjs';
 import WidgetButtons, { WidgetButtonProps } from 'components/WidgetButtons';
 import Dialog from 'components/Dialog';
-import { useCopyToClipboard, useRunOnFinished } from 'utils/common-hooks';
+import { useCopyToClipboard, useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import CbomUploadDialog from '../CbomUploadDialog';
 import { actions as alertActions } from 'ducks/alerts';
 import { actions, selectors } from 'ducks/cbom';
@@ -157,13 +157,12 @@ function CbomsList() {
 
     const isUploading = useSelector(selectors.selectIsUploading);
     const isUploadSuccess = useSelector(selectors.selectIsUploadSuccess);
+    const syncSucceeded = useSelector(selectors.selectSyncSucceeded);
 
-    useRunOnFinished(isUploading, () => {
-        if (isUploadSuccess) {
-            setIsUploadOpen(false);
-            setHighlightedCbomUuid(cboms[0]?.uuid);
-            onList({ itemsPerPage: 10, pageNumber: 1, filters: [] });
-        }
+    useRunOnSuccessfulFinish(isUploading, isUploadSuccess, () => {
+        setIsUploadOpen(false);
+        setHighlightedCbomUuid(cboms[0]?.uuid);
+        onList({ itemsPerPage: 10, pageNumber: 1, filters: [] });
     });
 
     useEffect(() => {
@@ -175,7 +174,7 @@ function CbomsList() {
         return () => window.clearTimeout(timeoutId);
     }, [highlightedCbomUuid]);
 
-    useRunOnFinished(isSyncing, () => {
+    useRunOnSuccessfulFinish(isSyncing, syncSucceeded, () => {
         onList({ itemsPerPage: 10, pageNumber: 1, filters: [] });
     });
 
