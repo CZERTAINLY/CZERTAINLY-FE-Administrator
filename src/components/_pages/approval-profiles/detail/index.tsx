@@ -168,7 +168,7 @@ const ApprovalProfileDetails = () => {
             return <Link to={`../roles/detail/${approvalProfileStep.roleUuid}`}>{approvalProfileStep.roleName}</Link>;
         }
         if (approvalProfileStep.groupUuid) {
-            return <Link to={`../groups/detail/${approvalProfileStep.groupUuid}`}>{approvalProfileStep.roleName}</Link>;
+            return <Link to={`../groups/detail/${approvalProfileStep.groupUuid}`}>{approvalProfileStep.groupName}</Link>;
         }
     }, []);
 
