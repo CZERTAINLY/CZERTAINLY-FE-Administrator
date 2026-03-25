@@ -27,10 +27,6 @@ export default function PagedCustomTable({ headers, data, totalItems, onReloadDa
             return stateKey;
         }
 
-        if (typeof window !== 'undefined' && window.location.hash.startsWith('#/')) {
-            return window.location.hash.slice(1).split('?')[0];
-        }
-
         return `${location.pathname}${location.search}`;
     }, [location.pathname, location.search, stateKey]);
 

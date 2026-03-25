@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { jsxInnerText } from 'utils/jsxInnerText';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions as userInterfaceActions } from 'ducks/user-interface';
@@ -73,8 +73,6 @@ function CustomTable({
     const [tblHeaders, setTblHeaders] = useState<TableHeader[]>();
     const [tblData, setTblData] = useState<TableDataRow[]>(data);
     const [tblCheckedRows, setTblCheckedRows] = useState<(string | number)[]>(checkedRows || emptyCheckedRows);
-    const [page, setPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
 
     const [searchKey, setSearchKey] = useState<string>('');
@@ -94,10 +92,6 @@ function CustomTable({
         return `${headerIds}|${hasCheckboxes ? 'checkboxes' : 'no-checkboxes'}|${hasDetails ? 'details' : 'no-details'}`;
     }, [paginationStateKey, headers, hasCheckboxes, hasDetails]);
     const internalPaginationRouteKey = useMemo(() => {
-        if (typeof window !== 'undefined' && window.location.hash.startsWith('#/')) {
-            return window.location.hash.slice(1).split('?')[0];
-        }
-
         return `${location.pathname}${location.search}`;
     }, [location.pathname, location.search]);
     const internalPaginationStorageKey = useMemo(
@@ -116,6 +110,8 @@ function CustomTable({
         [internalPaginationStorageKey],
     );
     const persistedInternalPagination = useSelector(selectInternalPagination);
+    const [page, setPage] = useState(() => (internalPaginationEnabled ? persistedInternalPagination.page : 1));
+    const [pageSize, setPageSize] = useState(() => (internalPaginationEnabled ? persistedInternalPagination.pageSize : 10));
     const activeRootRoute = useSelector(tablePaginationSelectors.activeRootRoute);
     const dispatch = useDispatch();
 
@@ -135,7 +131,7 @@ function CustomTable({
         }
     }, [activeRootRoute, currentRootRoute, dispatch]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (!internalPaginationEnabled) {
             return;
         }
@@ -145,9 +141,20 @@ function CustomTable({
         }
 
         internalPaginationHydratedKeyRef.current = internalPaginationStorageKey;
-        setPage(persistedInternalPagination.page);
-        setPageSize(persistedInternalPagination.pageSize);
-    }, [internalPaginationEnabled, internalPaginationStorageKey, persistedInternalPagination.page, persistedInternalPagination.pageSize]);
+        if (page !== persistedInternalPagination.page) {
+            setPage(persistedInternalPagination.page);
+        }
+        if (pageSize !== persistedInternalPagination.pageSize) {
+            setPageSize(persistedInternalPagination.pageSize);
+        }
+    }, [
+        internalPaginationEnabled,
+        internalPaginationStorageKey,
+        page,
+        pageSize,
+        persistedInternalPagination.page,
+        persistedInternalPagination.pageSize,
+    ]);
 
     useEffect(() => {
         if (!internalPaginationEnabled) {
