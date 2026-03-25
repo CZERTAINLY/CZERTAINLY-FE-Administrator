@@ -73,7 +73,7 @@ export default function VaultEditForm({ vault, onCancel, onSuccess }: VaultEditF
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
+        formState: { isDirty, isSubmitting },
     } = methods;
 
     const onSubmit = useCallback(
@@ -175,7 +175,7 @@ export default function VaultEditForm({ vault, onCancel, onSuccess }: VaultEditF
                         </Button>
                         <ProgressButton
                             inProgress={isSubmitting || isUpdating}
-                            disabled={!isValid || isSubmitting || isUpdating}
+                            disabled={!isDirty || isSubmitting || isUpdating}
                             title="Save"
                             inProgressTitle="Saving..."
                             type="submit"

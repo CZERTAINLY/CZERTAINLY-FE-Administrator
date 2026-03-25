@@ -1,5 +1,5 @@
 import React from 'react';
-import { Controller, useFormContext } from 'react-hook-form';
+import { Controller, useFormContext, useFormState } from 'react-hook-form';
 import Label from 'components/Label';
 import TextInput from 'components/TextInput';
 import DatePicker from 'components/DatePicker';
@@ -10,8 +10,12 @@ import type { CustomAttributeModel, DataAttributeModel } from 'types/attributes'
 import { AttributeContentType } from 'types/openapi';
 import { getCodeBlockLanguage } from '../../../../utils/attributes/attributes';
 import { getHighLightedCode } from '../../CodeBlock';
-import { getFieldErrorMessage } from 'utils/validators-helper';
-import { transformInputValueForDescriptor, getFormTypeFromAttributeContentType, buildAttributeValidators } from './attributeHelpers';
+import {
+    transformInputValueForDescriptor,
+    getFormTypeFromAttributeContentType,
+    buildAttributeValidators,
+    getRegexpConstraint,
+} from './attributeHelpers';
 
 interface FieldStateLike {
     value: any;
@@ -39,6 +43,7 @@ function StandardInputControl({
     deleteButton,
     field,
     fieldState,
+    submitCount,
 }: {
     name: string;
     descriptor: DataAttributeModel | CustomAttributeModel;
@@ -46,11 +51,13 @@ function StandardInputControl({
     deleteButton?: React.ReactNode;
     field: FieldStateLike;
     fieldState: FieldStateError;
+    submitCount: number;
 }): React.ReactNode {
     const transformed = transformInputValueForDescriptor(field.value, descriptor);
+    const validationVisible = fieldState.isTouched || submitCount > 0;
     const inputClassName = cn(
         'py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600',
-        { 'border-red-500 focus:border-red-500 focus:ring-red-500': fieldState.isTouched && fieldState.invalid },
+        { 'border-red-500 focus:border-red-500 focus:ring-red-500': validationVisible && fieldState.invalid },
     );
 
     if (descriptor.contentType === AttributeContentType.Boolean) {
@@ -88,7 +95,7 @@ function StandardInputControl({
     if (descriptor.contentType === AttributeContentType.Datetime) {
         const dateValue = field.value ? (field.value.includes('T') ? field.value : field.value.replace(' ', 'T')) : undefined;
         let errorMessage: string | undefined;
-        if (!fieldState.isTouched || !fieldState.invalid) {
+        if (!validationVisible || !fieldState.invalid) {
             errorMessage = undefined;
         } else if (typeof fieldState.error === 'string') {
             errorMessage = fieldState.error;
@@ -103,7 +110,7 @@ function StandardInputControl({
                     onChange={(value) => field.onChange(value)}
                     onBlur={field.onBlur}
                     disabled={descriptor.properties.readOnly || busy}
-                    invalid={fieldState.isTouched && !!fieldState.invalid}
+                    invalid={validationVisible && !!fieldState.invalid}
                     error={errorMessage}
                     required={descriptor.properties.required}
                     timePicker
@@ -125,8 +132,8 @@ function StandardInputControl({
                 disabled={descriptor.properties.readOnly || busy}
                 value={transformed || ''}
                 onChange={(value) => field.onChange(value)}
-                invalid={fieldState.isTouched && !!fieldState.invalid}
-                error={getFieldErrorMessage(fieldState, undefined)}
+                onBlur={field.onBlur}
+                invalid={validationVisible && !!fieldState.invalid}
             />
             {deleteButton}
         </>
@@ -135,6 +142,7 @@ function StandardInputControl({
 
 export function AttributeFieldInput({ name, descriptor, busy, deleteButton }: AttributeFieldInputProps): React.ReactNode {
     const { setValue, control, watch } = useFormContext<Record<string, any>>();
+    const { submitCount } = useFormState({ control });
     const formValues = watch();
 
     // Attribute should not be rendered in form but its value should be sent to BE
@@ -183,6 +191,7 @@ export function AttributeFieldInput({ name, descriptor, busy, deleteButton }: At
 
     const showLabel = descriptor.properties.visible && descriptor.contentType !== AttributeContentType.Boolean;
     const showDescriptionAndError = descriptor.properties.visible;
+    const regexpConstraint = getRegexpConstraint(descriptor);
 
     return (
         <Controller
@@ -204,6 +213,7 @@ export function AttributeFieldInput({ name, descriptor, busy, deleteButton }: At
                             deleteButton={deleteButton}
                             field={field}
                             fieldState={fieldState}
+                            submitCount={submitCount}
                         />
                     </div>
                     {showDescriptionAndError && (
@@ -218,11 +228,18 @@ export function AttributeFieldInput({ name, descriptor, busy, deleteButton }: At
                                     {descriptor.description}
                                 </p>
                             )}
-                            {fieldState.isTouched && fieldState.invalid && descriptor.contentType !== AttributeContentType.Boolean && (
-                                <div className="mt-1 text-sm text-red-600">
-                                    {typeof fieldState.error === 'string' ? fieldState.error : fieldState.error?.message}
-                                </div>
-                            )}
+                            {descriptor.contentType !== AttributeContentType.Boolean &&
+                                fieldState.invalid &&
+                                (fieldState.isTouched || submitCount > 0) && (
+                                    <div className="mt-1 text-sm text-red-600">
+                                        {typeof fieldState.error === 'string' ? fieldState.error : fieldState.error?.message}
+                                        {regexpConstraint?.data && (
+                                            <div className="mt-1 text-xs font-mono text-gray-600 break-all dark:text-neutral-400">
+                                                Pattern: {regexpConstraint.data}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                         </>
                     )}
                 </>

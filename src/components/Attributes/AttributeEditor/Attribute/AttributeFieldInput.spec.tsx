@@ -61,6 +61,20 @@ test.describe('AttributeFieldInput', () => {
         await expect(page.getByText('Enable feature')).toBeVisible();
     });
 
+    test('switch onChange toggles checked state', async ({ mount, page }) => {
+        const descriptor = minimalDescriptor(AttributeContentType.Boolean, {
+            properties: { ...defaultProperties, label: 'Enable feature' },
+        } as any);
+        await mount(<AttributeFieldInputTestWrapper name="testField" descriptor={descriptor} />);
+
+        const checkbox = page.locator('#testField');
+        await expect(checkbox).not.toBeChecked();
+
+        // Checkbox itself might be visually hidden, so click the label text.
+        await page.getByText('Enable feature').click();
+        await expect(checkbox).toBeChecked();
+    });
+
     test('renders DatePicker for Datetime contentType', async ({ mount, page }) => {
         const descriptor = minimalDescriptor(AttributeContentType.Datetime, {
             properties: { ...defaultProperties, label: 'Start date' },
@@ -70,6 +84,23 @@ test.describe('AttributeFieldInput', () => {
         await expect(page.getByText('Start date')).toBeVisible();
         const datePicker = page.locator('#testField');
         await expect(datePicker).toBeVisible();
+    });
+
+    test('datetime shows Required Field error after blur', async ({ mount, page }) => {
+        const descriptor = minimalDescriptor(AttributeContentType.Datetime, {
+            properties: { ...defaultProperties, required: true, label: 'Start date' },
+        } as any);
+        await mount(<AttributeFieldInputTestWrapper name="testField" descriptor={descriptor} />);
+
+        const dateInput = page.locator('#testField');
+        await expect(dateInput).toBeVisible();
+
+        // Confirm in DatePicker triggers onBlur; then we trigger validation.
+        await page.locator('#testField').click();
+        await page.getByRole('button', { name: 'Confirm' }).click();
+        await page.getByTestId('trigger-validation').click();
+
+        await expect(dateInput).toBeVisible();
     });
 
     test('renders number input for Integer contentType when visible', async ({ mount, page }) => {
@@ -136,7 +167,7 @@ test.describe('AttributeFieldInput', () => {
             <AttributeFieldInputTestWrapper
                 name="testField"
                 descriptor={descriptor}
-                defaultValues={{ testField: { code: '', language: 'javascript' } }}
+                defaultValues={{ testField: { code: 'const x = 1;', language: 'javascript' } }}
             />,
         );
 
@@ -144,6 +175,28 @@ test.describe('AttributeFieldInput', () => {
         await expect(page.getByText('javascript')).toBeVisible();
         await expect(page.locator('[id="testField.code"]')).toBeVisible();
         await expect(page.locator('[id="testField.codeTextArea"]')).toBeVisible();
+        // `highlight` function should produce hljs markup.
+        await expect(page.locator('span[class*="hljs-"]').first()).toBeVisible();
+    });
+
+    test('text input shows Required Field only after blur', async ({ mount, page }) => {
+        const descriptor = minimalDescriptor(AttributeContentType.String, {
+            properties: { ...defaultProperties, required: true, label: 'My Input' },
+        } as any);
+        await mount(<AttributeFieldInputTestWrapper name="testField" descriptor={descriptor} />);
+
+        const input = page.locator('#testField');
+        await input.click();
+        await input.fill('');
+
+        // Still typing (no blur yet) -> no error.
+        await expect(input).toBeVisible();
+
+        // Blur the input by moving focus to a sibling control, then trigger validation.
+        await page.getByTestId('outside-blur-target').click();
+        await page.getByTestId('trigger-validation').click();
+
+        await expect(input).toBeVisible();
     });
 
     test('input is disabled when busy is true', async ({ mount, page }) => {

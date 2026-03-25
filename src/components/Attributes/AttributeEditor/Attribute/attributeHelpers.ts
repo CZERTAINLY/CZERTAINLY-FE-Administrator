@@ -93,6 +93,15 @@ export function getFormTypeFromAttributeContentType(
     }
 }
 
+/** RegExp constraint from connector (used for validation message + pattern hint in the UI). */
+export function getRegexpConstraint(
+    descriptor: DataAttributeModel | CustomAttributeModel | undefined,
+): RegexpAttributeConstraintModel | undefined {
+    if (!descriptor || !isDataAttributeModel(descriptor)) return undefined;
+    const regexValidator = descriptor.constraints?.find((c) => c.type === AttributeConstraintType.RegExp);
+    return regexValidator as RegexpAttributeConstraintModel | undefined;
+}
+
 function addDataAttributeConstraintValidators(descriptor: DataAttributeModel, validators: any[]): void {
     const regexValidator = descriptor.constraints?.find((c) => c.type === AttributeConstraintType.RegExp);
     if (regexValidator) {
