@@ -4,7 +4,8 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions, selectors } from 'ducks/scheduler';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { actions as userInterfaceActions } from 'ducks/user-interface';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import Badge from 'components/Badge';
@@ -12,7 +13,7 @@ import Switch from 'components/Switch';
 import { PlatformEnum, Resource, SchedulerJobExecutionStatus } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { getStrongFromCronExpression } from 'utils/dateUtil';
-import Cron from 'react-cron-generator';
+import CronBuilder from 'components/CronBuilder';
 import { validateQuartzCronExpression, validateRequired } from 'utils/validators';
 import { buildValidationRules } from 'utils/validators-helper';
 import TextInput from 'components/TextInput';
@@ -116,7 +117,7 @@ export default function SchedulerJobDetail() {
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [editCronOpen, setEditCronOpen] = useState(false);
     const [newCronExpression, setNewCronExpression] = useState('');
-    const [cronModalOpen, setCronModalOpen] = useState(false);
+    const cronBuilderValueRef = useRef<string>('');
 
     const isBusy = useMemo(
         () => isFetching || isDeleting || isEnabling || isUpdatingCron,
@@ -148,9 +149,36 @@ export default function SchedulerJobDetail() {
         [schedulerJob, dispatch],
     );
 
-    const handleCronSelectChange = (value: string) => {
-        setNewCronExpression(value);
-    };
+    const openCronBuilderModal = useCallback(
+        (currentValue: string) => {
+            cronBuilderValueRef.current = currentValue;
+            dispatch(
+                userInterfaceActions.showGlobalModal({
+                    isOpen: true,
+                    size: 'xl',
+                    title: 'Select CRON Expression',
+                    content: (
+                        <CronBuilder
+                            value={currentValue}
+                            onChange={(v) => {
+                                cronBuilderValueRef.current = v;
+                            }}
+                        />
+                    ),
+                    showOkButton: true,
+                    showCancelButton: true,
+                    okButtonCallback: () => {
+                        setNewCronExpression(cronBuilderValueRef.current);
+                        dispatch(userInterfaceActions.hideGlobalModal());
+                    },
+                    cancelButtonCallback: () => {
+                        dispatch(userInterfaceActions.hideGlobalModal());
+                    },
+                }),
+            );
+        },
+        [dispatch, cronBuilderValueRef],
+    );
 
     const openEditCronModal = useCallback(() => {
         if (schedulerJob) {
@@ -315,40 +343,10 @@ export default function SchedulerJobDetail() {
                                 setNewCronExpression(originalCronExpression);
                                 setEditCronOpen(false);
                             }}
-                            onOpenCronModal={() => setCronModalOpen(true)}
+                            onOpenCronModal={() => openCronBuilderModal(newCronExpression)}
                         />
                     }
                     toggle={() => setEditCronOpen(false)}
-                />
-
-                <Dialog
-                    size="xl"
-                    isOpen={cronModalOpen}
-                    caption="Select CRON Expression"
-                    body={
-                        <div className="preline-cron-wrapper">
-                            <Cron value={newCronExpression} onChange={handleCronSelectChange} showResultText showResultCron />
-                        </div>
-                    }
-                    toggle={() => setCronModalOpen(false)}
-                    buttons={[
-                        {
-                            color: 'secondary',
-                            variant: 'outline',
-                            onClick: () => {
-                                setNewCronExpression(originalCronExpression);
-                                setCronModalOpen(false);
-                            },
-                            body: 'Cancel',
-                        },
-                        {
-                            color: 'primary',
-                            onClick: () => {
-                                setCronModalOpen(false);
-                            },
-                            body: 'Ok',
-                        },
-                    ]}
                 />
             </Container>
         </div>
