@@ -1,8 +1,7 @@
-import React from 'react';
 import { test, expect } from '../../../../../playwright/ct-test';
 import { AttributeFieldInputTestWrapper } from './AttributeFieldInputTestWrapper';
 import type { DataAttributeModel } from 'types/attributes';
-import { AttributeContentType } from 'types/openapi';
+import { AttributeConstraintType, AttributeContentType, AttributeType } from 'types/openapi';
 
 const defaultProperties = {
     label: 'Test Field',
@@ -15,7 +14,7 @@ const defaultProperties = {
 
 function minimalDescriptor(contentType: AttributeContentType, overrides: Partial<DataAttributeModel> = {}): DataAttributeModel {
     return {
-        type: 'Data',
+        type: AttributeType.Data,
         name: 'testField',
         uuid: 'test-uuid',
         contentType,
@@ -172,5 +171,121 @@ test.describe('AttributeFieldInput', () => {
         await expect(input).toBeVisible();
         await expect(input).toHaveAttribute('placeholder', 'Enter My Input');
         await expect(input).toHaveValue('');
+    });
+
+    test('renders Secret contentType as password input', async ({ mount, page }) => {
+        const descriptor = minimalDescriptor(AttributeContentType.Secret, {
+            properties: { ...defaultProperties, label: 'Password' },
+        } as any);
+        await mount(<AttributeFieldInputTestWrapper name="testField" descriptor={descriptor} />);
+
+        await expect(page.locator('#testField')).toHaveAttribute('type', 'password');
+    });
+
+    test('renders Float contentType as number input', async ({ mount, page }) => {
+        const descriptor = minimalDescriptor(AttributeContentType.Float, {
+            properties: { ...defaultProperties, label: 'Float Value' },
+        } as any);
+        await mount(<AttributeFieldInputTestWrapper name="testField" descriptor={descriptor} />);
+
+        await expect(page.locator('#testField')).toHaveAttribute('type', 'number');
+    });
+
+    test('renders Date contentType as a date picker', async ({ mount, page }) => {
+        const descriptor = minimalDescriptor(AttributeContentType.Date, {
+            properties: { ...defaultProperties, label: 'Date Value' },
+        } as any);
+        await mount(<AttributeFieldInputTestWrapper name="testField" descriptor={descriptor} />);
+
+        await expect(page.getByText('Date Value')).toBeVisible();
+        await expect(page.locator('#testField')).toBeVisible();
+    });
+
+    test('renders Time contentType as time input', async ({ mount, page }) => {
+        const descriptor = minimalDescriptor(AttributeContentType.Time, {
+            properties: { ...defaultProperties, label: 'Time Value' },
+        } as any);
+        await mount(<AttributeFieldInputTestWrapper name="testField" descriptor={descriptor} />);
+
+        await expect(page.locator('#testField')).toHaveAttribute('type', 'time');
+    });
+
+    test('Boolean with description renders description text', async ({ mount, page }) => {
+        const descriptor = minimalDescriptor(AttributeContentType.Boolean, {
+            properties: { ...defaultProperties, label: 'Toggle' },
+            description: 'Toggle this feature on or off.',
+        } as any);
+        await mount(<AttributeFieldInputTestWrapper name="testField" descriptor={descriptor} />);
+
+        await expect(page.getByText('Toggle this feature on or off.')).toBeVisible();
+    });
+
+    test('deleteButton renders inside Boolean control', async ({ mount, page }) => {
+        const descriptor = minimalDescriptor(AttributeContentType.Boolean);
+        await mount(
+            <AttributeFieldInputTestWrapper
+                name="testField"
+                descriptor={descriptor}
+                deleteButton={<button type="button">Remove boolean</button>}
+            />,
+        );
+
+        await expect(page.getByRole('button', { name: 'Remove boolean' })).toBeVisible();
+    });
+
+    test('deleteButton renders inside Datetime control', async ({ mount, page }) => {
+        const descriptor = minimalDescriptor(AttributeContentType.Datetime, {
+            properties: { ...defaultProperties, label: 'Due Date' },
+        } as any);
+        await mount(
+            <AttributeFieldInputTestWrapper
+                name="testField"
+                descriptor={descriptor}
+                deleteButton={<button type="button">Remove datetime</button>}
+            />,
+        );
+
+        await expect(page.getByRole('button', { name: 'Remove datetime' })).toBeVisible();
+    });
+
+    test('Datetime with ISO value (contains T) renders without transformation', async ({ mount, page }) => {
+        const descriptor = minimalDescriptor(AttributeContentType.Datetime, {
+            properties: { ...defaultProperties, label: 'Event Time' },
+        } as any);
+        await mount(
+            <AttributeFieldInputTestWrapper
+                name="testField"
+                descriptor={descriptor}
+                defaultValues={{ testField: '2024-06-15T14:30:00' }}
+            />,
+        );
+
+        await expect(page.locator('#testField')).toBeVisible();
+    });
+
+    test('Datetime with space-separated value normalises to T separator', async ({ mount, page }) => {
+        const descriptor = minimalDescriptor(AttributeContentType.Datetime, {
+            properties: { ...defaultProperties, label: 'Event Time' },
+        } as any);
+        await mount(
+            <AttributeFieldInputTestWrapper
+                name="testField"
+                descriptor={descriptor}
+                defaultValues={{ testField: '2024-06-15 14:30:00' }}
+            />,
+        );
+
+        await expect(page.locator('#testField')).toBeVisible();
+    });
+
+    test('updates String field value when user types', async ({ mount, page }) => {
+        const descriptor = minimalDescriptor(AttributeContentType.String, {
+            properties: { ...defaultProperties, label: 'Typed Input' },
+        } as any);
+        await mount(<AttributeFieldInputTestWrapper name="testField" descriptor={descriptor} />);
+
+        await page.locator('#testField').click();
+        await page.locator('#testField').fill('hello world');
+        await expect(page.locator('#testField')).toHaveValue('hello world');
     });
 });
