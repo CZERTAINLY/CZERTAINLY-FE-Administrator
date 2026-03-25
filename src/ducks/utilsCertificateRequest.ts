@@ -4,6 +4,7 @@ import { ParseRequestRequestDtoParseTypeEnum, ParseRequestResponseDto } from '..
 export type State = {
     parsedCertificateRequest?: ParseRequestResponseDto;
     isFetchingDetail: boolean;
+    parseError?: string;
 };
 
 export const initialState: State = {
@@ -16,12 +17,14 @@ export const slice = createSlice({
     reducers: {
         reset: (state) => {
             state.parsedCertificateRequest = undefined;
+            state.parseError = undefined;
         },
         parseCertificateRequest: (
             state,
             action: PayloadAction<{ content: string; requestParseType: ParseRequestRequestDtoParseTypeEnum }>,
         ) => {
             state.parsedCertificateRequest = undefined;
+            state.parseError = undefined;
             state.isFetchingDetail = true;
         },
 
@@ -32,6 +35,7 @@ export const slice = createSlice({
 
         parseCertificateRequestFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingDetail = false;
+            state.parseError = action.payload.error ?? 'Failed to parse certificate request';
         },
     },
 });
@@ -40,11 +44,13 @@ const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const parsedCertificateRequest = createSelector(state, (state: State) => state.parsedCertificateRequest);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
+const parseError = createSelector(state, (state: State) => state.parseError);
 
 export const selectors = {
     state,
     parsedCertificateRequest,
     isFetchingDetail,
+    parseError,
 };
 
 export const actions = slice.actions;

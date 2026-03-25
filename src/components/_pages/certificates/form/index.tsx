@@ -16,7 +16,7 @@ import { useNavigate } from 'react-router';
 import Button from 'components/Button';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 
-import { AttributeDescriptorModel } from 'types/attributes';
+import { AttributeDescriptorModel, isDataAttributeModel } from 'types/attributes';
 import { CertificateDetailResponseModel } from '../../../../types/certificate';
 import { CertificateRequestFormat, Resource } from '../../../../types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
@@ -52,6 +52,17 @@ type CertificateFormValues = {
 
 const useDescriptorState = () => useState<AttributeDescriptorModel[]>(() => []);
 
+function tabTitle(title: string, descriptors: AttributeDescriptorModel[] | undefined | null) {
+    const hasRequired = descriptors?.some((d) => isDataAttributeModel(d) && d.properties.required);
+    if (!hasRequired) return title;
+    return (
+        <span>
+            {title}
+            <span className="text-red-500 ml-0.5">*</span>
+        </span>
+    );
+}
+
 interface CertificateFormProps {
     onCancel?: () => void;
 }
@@ -70,6 +81,7 @@ export default function CertificateForm({ onCancel }: CertificateFormProps = {})
 
     const issuingCertificate = useSelector(certificateSelectors.isIssuing);
     const parsedCertificateRequest = useSelector(utilsCertificateRequestSelectors.parsedCertificateRequest);
+    const parseError = useSelector(utilsCertificateRequestSelectors.parseError);
     const health = useSelector(utilsActuatorSelectors.health);
 
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useDescriptorState();
@@ -289,6 +301,7 @@ export default function CertificateForm({ onCancel }: CertificateFormProps = {})
                                             placeholder="Select RA Profile"
                                             value={value ?? ''}
                                             label="RA Profile"
+                                            required
                                             onChange={(selected) => {
                                                 const uuid = (selected ?? '') as string;
                                                 onChange(uuid);
@@ -339,7 +352,10 @@ export default function CertificateForm({ onCancel }: CertificateFormProps = {})
                                 <>
                                     <FileUpload
                                         editable
+                                        required
                                         fileType={'CSR'}
+                                        error={parseError}
+                                        onContentChange={() => dispatch(utilsCertificateRequestActions.reset())}
                                         onFileContentLoaded={(uploadedContent) => {
                                             setFileContent(uploadedContent);
                                             if (health) {
@@ -395,7 +411,7 @@ export default function CertificateForm({ onCancel }: CertificateFormProps = {})
                                             onlyActiveTabContent={false}
                                             tabs={[
                                                 {
-                                                    title: 'Request Attributes',
+                                                    title: tabTitle('Request Attributes', csrAttributeDescriptors),
                                                     content: (
                                                         <AttributeEditor
                                                             id="csrAttributes"
@@ -406,7 +422,7 @@ export default function CertificateForm({ onCancel }: CertificateFormProps = {})
                                                     ),
                                                 },
                                                 {
-                                                    title: 'Signature Attributes',
+                                                    title: tabTitle('Signature Attributes', signatureAttributeDescriptors),
                                                     content: (
                                                         <AttributeEditor
                                                             id="signatureAttributes"
@@ -419,7 +435,10 @@ export default function CertificateForm({ onCancel }: CertificateFormProps = {})
                                                 ...(includeAltKey && altTokenProfileUuid
                                                     ? [
                                                           {
-                                                              title: 'Alternative Signature Attributes',
+                                                              title: tabTitle(
+                                                                  'Alternative Signature Attributes',
+                                                                  altSignatureAttributeDescriptors,
+                                                              ),
                                                               content: (
                                                                   <AttributeEditor
                                                                       id="altSignatureAttributes"
@@ -448,7 +467,7 @@ export default function CertificateForm({ onCancel }: CertificateFormProps = {})
                                 onlyActiveTabContent={false}
                                 tabs={[
                                     {
-                                        title: 'Connector Attributes',
+                                        title: tabTitle('Connector Attributes', issuanceAttributeDescriptors[selectedRaProfileUuid || '']),
                                         content: (
                                             <AttributeEditor
                                                 id="issuance_attributes"
@@ -461,7 +480,7 @@ export default function CertificateForm({ onCancel }: CertificateFormProps = {})
                                         ),
                                     },
                                     {
-                                        title: 'Custom Attributes',
+                                        title: tabTitle('Custom Attributes', resourceCustomAttributes),
                                         content: (
                                             <AttributeEditor
                                                 id="customCertificate"

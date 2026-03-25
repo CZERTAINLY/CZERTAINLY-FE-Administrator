@@ -161,9 +161,7 @@ const updateUsers: AppEpic = (action$, state, deps) => {
         filter(slice.actions.updateUsers.match),
         switchMap((action) =>
             deps.apiClients.roles.updateUsers({ roleUuid: action.payload.uuid, requestBody: action.payload.users }).pipe(
-                mergeMap((role) =>
-                    of(slice.actions.updateUsersSuccess({ role: transformRoleDetailDtoToModel(role) }), appRedirectActions.goBack()),
-                ),
+                map((role) => slice.actions.updateUsersSuccess({ role: transformRoleDetailDtoToModel(role) })),
 
                 catchError((err) =>
                     of(
