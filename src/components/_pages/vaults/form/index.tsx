@@ -97,7 +97,7 @@ export default function VaultForm({ onCancel, onSuccess }: VaultFormProps) {
         handleSubmit,
         control,
         setValue,
-        formState: { isDirty, isSubmitting, isValid },
+        formState: { isDirty, isSubmitting },
     } = methods;
 
     const selectedConnectorUuid = useWatch({
@@ -288,7 +288,7 @@ export default function VaultForm({ onCancel, onSuccess }: VaultFormProps) {
                             </Button>
                             <ProgressButton
                                 inProgress={isSubmitting || isCreating}
-                                disabled={!isDirty || !isValid || isSubmitting || isCreating}
+                                disabled={!isDirty || isSubmitting || isCreating}
                                 title={submitTitle}
                                 inProgressTitle={inProgressTitle}
                                 type="submit"
