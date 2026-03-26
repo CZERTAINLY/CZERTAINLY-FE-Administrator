@@ -23,6 +23,7 @@ const ActionsList = () => {
     const [selectedResource, setSelectedResource] = useState<Resource>();
     const isFetchingList = useSelector(rulesSelectors.isFetchingActions);
     const isDeleting = useSelector(rulesSelectors.isDeletingAction);
+    const isBulkDeleting = useSelector(rulesSelectors.isBulkDeletingActions);
     const isCreatingAction = useSelector(rulesSelectors.isCreatingAction);
     const createActionSucceeded = useSelector(rulesSelectors.createActionSucceeded);
 
@@ -32,8 +33,8 @@ const ActionsList = () => {
     const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
     const isBusy = useMemo(
-        () => isFetchingList || isDeleting || isFetchingResourcesList,
-        [isFetchingList, isDeleting, isFetchingResourcesList],
+        () => isFetchingList || isDeleting || isBulkDeleting || isFetchingResourcesList,
+        [isFetchingList, isDeleting, isBulkDeleting, isFetchingResourcesList],
     );
 
     const getFreshList = useCallback(() => {
@@ -54,7 +55,7 @@ const ActionsList = () => {
     }, []);
 
     const onDeleteConfirmed = useCallback(() => {
-        dispatch(rulesActions.deleteAction({ actionUuid: checkedRows[0] }));
+        dispatch(rulesActions.bulkDeleteActions({ actionUuids: checkedRows }));
         setConfirmDelete(false);
         setCheckedRows([]);
     }, [dispatch, checkedRows]);
@@ -130,8 +131,7 @@ const ActionsList = () => {
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes
-                    hasAllCheckBox={false}
-                    multiSelect={false}
+                    multiSelect
                     data={rulesList}
                     headers={rulesTableHeader}
                     onCheckedRowsChanged={(checkedRows) => {
@@ -143,8 +143,12 @@ const ActionsList = () => {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete an Action`}
-                body={`You are about to delete an Action. Is this what you want to do?`}
+                caption={checkedRows.length > 1 ? `Delete Actions` : `Delete an Action`}
+                body={
+                    checkedRows.length > 1
+                        ? `You are about to delete ${checkedRows.length} Actions. Is this what you want to do?`
+                        : `You are about to delete an Action. Is this what you want to do?`
+                }
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[

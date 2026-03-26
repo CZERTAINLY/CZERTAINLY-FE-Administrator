@@ -23,6 +23,7 @@ const ConditionsList = () => {
     const [selectedResource, setSelectedResource] = useState<Resource>();
     const isFetchingList = useSelector(rulesSelectors.isFetchingConditions);
     const isDeleting = useSelector(rulesSelectors.isDeletingCondition);
+    const isBulkDeleting = useSelector(rulesSelectors.isBulkDeletingConditions);
     const isCreatingCondition = useSelector(rulesSelectors.isCreatingCondition);
     const createConditionSucceeded = useSelector(rulesSelectors.createConditionSucceeded);
 
@@ -32,8 +33,8 @@ const ConditionsList = () => {
     const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions({ includeAny: false });
 
     const isBusy = useMemo(
-        () => isFetchingList || isDeleting || isFetchingResourcesList,
-        [isFetchingList, isDeleting, isFetchingResourcesList],
+        () => isFetchingList || isDeleting || isBulkDeleting || isFetchingResourcesList,
+        [isFetchingList, isDeleting, isBulkDeleting, isFetchingResourcesList],
     );
 
     const getFreshListConditionGroups = useCallback(() => {
@@ -54,7 +55,7 @@ const ConditionsList = () => {
     }, []);
 
     const onDeleteConfirmed = useCallback(() => {
-        dispatch(rulesActions.deleteCondition({ conditionUuid: checkedRows[0] }));
+        dispatch(rulesActions.bulkDeleteConditions({ conditionUuids: checkedRows }));
         setConfirmDelete(false);
         setCheckedRows([]);
     }, [dispatch, checkedRows]);
@@ -137,8 +138,7 @@ const ConditionsList = () => {
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes
-                    hasAllCheckBox={false}
-                    multiSelect={false}
+                    multiSelect
                     data={conditionsData}
                     headers={conditionDataHeaders}
                     onCheckedRowsChanged={(checkedRows) => {
@@ -150,13 +150,17 @@ const ConditionsList = () => {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete a Condition`}
-                body={`You are about to delete a Condition. Is this what you want to do?`}
+                caption={checkedRows.length > 1 ? `Delete Conditions` : `Delete a Condition`}
+                body={
+                    checkedRows.length > 1
+                        ? `You are about to delete ${checkedRows.length} Conditions. Is this what you want to do?`
+                        : `You are about to delete a Condition. Is this what you want to do?`
+                }
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
 

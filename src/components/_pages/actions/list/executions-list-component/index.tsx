@@ -22,14 +22,15 @@ const ExecutionsList = () => {
     const [selectedResource, setSelectedResource] = useState<Resource>();
     const isFetchingList = useSelector(rulesSelectors.isFetchingExecutions);
     const isDeleting = useSelector(rulesSelectors.isDeletingExecution);
+    const isBulkDeleting = useSelector(rulesSelectors.isBulkDeletingExecutions);
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
 
-    const isBusy = useMemo(() => isFetchingList || isDeleting, [isFetchingList, isDeleting]);
+    const isBusy = useMemo(() => isFetchingList || isDeleting || isBulkDeleting, [isFetchingList, isDeleting, isBulkDeleting]);
 
     const onDeleteConfirmed = useCallback(() => {
-        dispatch(actionGroupsActions.deleteExecution({ executionUuid: checkedRows[0] }));
+        dispatch(actionGroupsActions.bulkDeleteExecutions({ executionUuids: checkedRows }));
         setConfirmDelete(false);
         setCheckedRows([]);
     }, [dispatch, checkedRows]);
@@ -147,8 +148,7 @@ const ExecutionsList = () => {
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes
-                    hasAllCheckBox={false}
-                    multiSelect={false}
+                    multiSelect
                     data={executionsData}
                     headers={executionsDataHeaders}
                     onCheckedRowsChanged={(checkedRows) => {
@@ -160,8 +160,12 @@ const ExecutionsList = () => {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete an Execution`}
-                body={`You are about to delete a Execution. Is this what you want to do?`}
+                caption={checkedRows.length > 1 ? `Delete Executions` : `Delete an Execution`}
+                body={
+                    checkedRows.length > 1
+                        ? `You are about to delete ${checkedRows.length} Executions. Is this what you want to do?`
+                        : `You are about to delete an Execution. Is this what you want to do?`
+                }
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[

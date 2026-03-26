@@ -26,6 +26,7 @@ const TriggerList = () => {
     const [selectedResource, setSelectedResource] = useState<Resource>();
     const isFetchingList = useSelector(rulesSelectors.isFetchingTriggers);
     const isDeleting = useSelector(rulesSelectors.isDeletingTrigger);
+    const isBulkDeleting = useSelector(rulesSelectors.isBulkDeletingTriggers);
     const isCreatingTrigger = useSelector(rulesSelectors.isCreatingTrigger);
     const createTriggerSucceeded = useSelector(rulesSelectors.createTriggerSucceeded);
 
@@ -46,7 +47,7 @@ const TriggerList = () => {
         }));
     }, [allResourceEvents, resourceTypeEnum]);
 
-    const isBusy = useMemo(() => isFetchingList || isDeleting, [isFetchingList, isDeleting]);
+    const isBusy = useMemo(() => isFetchingList || isDeleting || isBulkDeleting, [isFetchingList, isDeleting, isBulkDeleting]);
 
     const getFreshList = useCallback(() => {
         dispatch(rulesActions.listTriggers({ resource: selectedResource }));
@@ -66,7 +67,7 @@ const TriggerList = () => {
     }, []);
 
     const onDeleteConfirmed = useCallback(() => {
-        dispatch(rulesActions.deleteTrigger({ triggerUuid: checkedRows[0] }));
+        dispatch(rulesActions.bulkDeleteTriggers({ triggerUuids: checkedRows }));
         setConfirmDelete(false);
         setCheckedRows([]);
     }, [dispatch, checkedRows]);
@@ -192,8 +193,7 @@ const TriggerList = () => {
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes
-                    hasAllCheckBox={false}
-                    multiSelect={false}
+                    multiSelect
                     data={triggerListData}
                     headers={triggerTableHeader}
                     onCheckedRowsChanged={(checkedRows) => {
@@ -205,8 +205,12 @@ const TriggerList = () => {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete a Trigger`}
-                body={`You are about to delete a Trigger. Is this what you want to do?`}
+                caption={checkedRows.length > 1 ? `Delete Triggers` : `Delete a Trigger`}
+                body={
+                    checkedRows.length > 1
+                        ? `You are about to delete ${checkedRows.length} Triggers. Is this what you want to do?`
+                        : `You are about to delete a Trigger. Is this what you want to do?`
+                }
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
