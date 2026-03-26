@@ -1,5 +1,4 @@
-import debounce from 'lodash.debounce';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 
 import Label from 'components/Label';
 import TextInput from 'components/TextInput';
@@ -8,11 +7,14 @@ import Button from 'components/Button';
 
 interface Props {
     onFileContentLoaded: (fileContent: string) => void;
+    onContentChange?: () => void;
     id?: string;
     fileType?: string;
     showContent?: boolean;
     showFileInfo?: boolean;
     editable?: boolean;
+    required?: boolean;
+    error?: string;
     contentPlaceholderText?: string;
     dropZoneHintText?: string;
 }
@@ -22,12 +24,16 @@ export default function FileUpload({
     fileType = '',
     editable,
     onFileContentLoaded,
+    onContentChange,
     showContent = true,
     showFileInfo = true,
+    required,
+    error,
     contentPlaceholderText,
     dropZoneHintText,
 }: Props) {
     const [fileContent, setFileContent] = useState('');
+    const fileContentRef = useRef('');
     const [fileName, setFileName] = useState('');
     const [contentType, setContentType] = useState('');
 
@@ -81,15 +87,17 @@ export default function FileUpload({
 
     const onFileInputTextChanged = useCallback(
         (fileContentLatest: string) => {
+            fileContentRef.current = fileContentLatest;
             setFileContent(fileContentLatest);
-
-            if (!fileContentLatest.length || fileContentLatest === fileContent) return;
-
-            const base64Content = btoa(fileContentLatest);
-            debounce(() => onFileContentLoaded(base64Content), 1000)();
+            onContentChange?.();
         },
-        [onFileContentLoaded, fileContent],
+        [onContentChange],
     );
+
+    const onFileInputTextBlurred = useCallback(() => {
+        if (!fileContentRef.current) return;
+        onFileContentLoaded(btoa(fileContentRef.current));
+    }, [onFileContentLoaded]);
 
     const resolvedContentPlaceholderText =
         contentPlaceholderText || `Select or drag & drop ${fileType} file or paste file content in the text area.`;
@@ -134,8 +142,12 @@ export default function FileUpload({
                         rows={3}
                         placeholder={resolvedContentPlaceholderText}
                         disabled={!editable}
+                        required={required}
+                        invalid={!!error}
+                        error={error}
                         value={fileContent}
                         onChange={onFileInputTextChanged}
+                        onBlur={onFileInputTextBlurred}
                         className={editable ? '' : 'bg-gray-50 dark:bg-neutral-800'}
                     />
                 </div>
