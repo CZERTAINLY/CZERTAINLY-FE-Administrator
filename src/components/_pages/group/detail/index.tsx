@@ -105,72 +105,72 @@ export default function GroupDetail() {
                     { label: group?.name || 'Group Details', href: '' },
                 ]}
             />
-            <Container>
-                <TabLayout
-                    tabs={[
-                        {
-                            title: 'Details',
-                            content: (
-                                <Container>
-                                    <Widget
-                                        title="Group Details"
-                                        busy={isFetchingDetail}
-                                        widgetButtons={buttons}
-                                        titleSize="large"
-                                        refreshAction={getFreshGroupDetails}
-                                        widgetLockName={LockWidgetNameEnum.GroupDetails}
-                                    >
-                                        <CustomTable headers={detailHeaders} data={detailData} />
-                                    </Widget>
+            <Widget widgetLockName={LockWidgetNameEnum.GroupDetails} busy={isFetchingDetail} noBorder>
+                <Container>
+                    <TabLayout
+                        tabs={[
+                            {
+                                title: 'Details',
+                                content: (
+                                    <Container>
+                                        <Widget
+                                            title="Group Details"
+                                            widgetButtons={buttons}
+                                            titleSize="large"
+                                            refreshAction={getFreshGroupDetails}
+                                        >
+                                            <CustomTable headers={detailHeaders} data={detailData} />
+                                        </Widget>
 
-                                    {group && (
-                                        <CustomAttributeWidget
-                                            resource={Resource.Groups}
-                                            resourceUuid={group.uuid}
-                                            attributes={group.customAttributes}
-                                        />
-                                    )}
-                                </Container>
-                            ),
-                        },
-                        {
-                            title: 'Events',
-                            content: (
-                                <>
-                                    {group && (
-                                        <EventsTable
-                                            mode="association"
-                                            resource={Resource.Groups}
-                                            resourceUuid={group.uuid}
-                                            widgetLocks={[LockWidgetNameEnum.GroupDetails, LockWidgetNameEnum.EventSettings]}
-                                        />
-                                    )}
-                                </>
-                            ),
-                        },
-                    ]}
-                />
+                                        {group && (
+                                            <CustomAttributeWidget
+                                                resource={Resource.Groups}
+                                                resourceUuid={group.uuid}
+                                                attributes={group.customAttributes}
+                                            />
+                                        )}
+                                    </Container>
+                                ),
+                            },
+                            {
+                                title: 'Events',
+                                content: (
+                                    <>
+                                        {group && (
+                                            <EventsTable
+                                                mode="association"
+                                                resource={Resource.Groups}
+                                                resourceUuid={group.uuid}
+                                                widgetLocks={[LockWidgetNameEnum.GroupDetails, LockWidgetNameEnum.EventSettings]}
+                                            />
+                                        )}
+                                    </>
+                                ),
+                            },
+                        ]}
+                    />
+                </Container>
+            </Widget>
 
-                <Dialog
-                    isOpen={confirmDelete}
-                    caption="Delete Group"
-                    body="You are about to delete a Group. Is this what you want to do?"
-                    toggle={() => setConfirmDelete(false)}
-                    icon="delete"
-                    buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                    ]}
-                />
+            <Dialog
+                isOpen={confirmDelete}
+                caption="Delete Group"
+                body="You are about to delete a Group. Is this what you want to do?"
+                toggle={() => setConfirmDelete(false)}
+                icon="delete"
+                buttons={[
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                ]}
+            />
 
-                <Dialog
-                    isOpen={isEditModalOpen}
-                    toggle={handleCloseEditModal}
-                    caption="Edit Group"
-                    size="xl"
-                    body={<GroupForm groupId={group?.uuid} onCancel={handleCloseEditModal} onSuccess={handleCloseEditModal} />}
-                />
-            </Container>
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit Group"
+                size="xl"
+                body={<GroupForm groupId={group?.uuid} onCancel={handleCloseEditModal} onSuccess={handleCloseEditModal} />}
+            />
         </div>
     );
 }

@@ -128,9 +128,10 @@ function Widget({
         <section
             data-testid={dataTestId}
             className={cn(
-                'relative flex flex-col bg-white rounded-xl dark:bg-neutral-900 dark:text-neutral-400 w-full',
+                'relative flex flex-col rounded-xl dark:text-neutral-400 w-full',
                 {
-                    'border border-gray-200 dark:border-neutral-700 p-4 md:p-5 shadow-2xs': !noBorder,
+                    'border border-gray-200 dark:border-neutral-700 p-4 md:p-5 shadow-2xs bg-white dark:bg-neutral-900':
+                        !noBorder || widgetLock,
                 },
                 className,
             )}

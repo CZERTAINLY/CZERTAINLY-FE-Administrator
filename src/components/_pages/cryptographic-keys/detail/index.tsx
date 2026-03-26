@@ -367,47 +367,48 @@ export default function CryptographicKeyDetail() {
         }
     }, [cryptographicKey, keyItemUuid]);
 
-    return (
-        <>
-            <Breadcrumb
-                items={[
-                    { label: `${getEnumLabel(resourceEnum, Resource.Keys)} Inventory`, href: '/keys' },
-                    { label: cryptographicKey?.name || 'Key Details' },
-                ]}
-            />
-            <Container className="md:flex-row">
-                <Widget
-                    title="Key Details"
-                    busy={isBusy}
-                    widgetButtons={buttons}
-                    titleSize="large"
-                    refreshAction={getFreshCryptographicKeyDetails}
-                    widgetLockName={LockWidgetNameEnum.keyDetails}
-                    lockSize="large"
-                    className="w-full md:w-1/2"
-                >
-                    <CustomTable headers={detailHeaders} data={detailData} />
-                </Widget>
-                <Container className="w-full md:w-1/2">
-                    <Widget title="Key Attributes" busy={isBusy} titleSize="large">
-                        <AttributeViewer attributes={cryptographicKey?.attributes} />
-                    </Widget>
+    const breadcrumbItems = [
+        { label: `${getEnumLabel(resourceEnum, Resource.Keys)} Inventory`, href: '/keys' },
+        { label: cryptographicKey?.name || 'Key Details' },
+    ];
 
-                    {cryptographicKey && (
-                        <CustomAttributeWidget
-                            resource={Resource.Keys}
-                            resourceUuid={cryptographicKey.uuid}
-                            attributes={cryptographicKey.customAttributes}
-                        />
-                    )}
+    return (
+        <div>
+            <Breadcrumb items={breadcrumbItems} />
+            <Widget widgetLockName={LockWidgetNameEnum.keyDetails} busy={isBusy} noBorder>
+                <Container className="md:flex-row">
+                    <Widget
+                        title="Key Details"
+                        busy={isBusy}
+                        widgetButtons={buttons}
+                        titleSize="large"
+                        refreshAction={getFreshCryptographicKeyDetails}
+                        lockSize="large"
+                        className="w-full md:w-1/2"
+                    >
+                        <CustomTable headers={detailHeaders} data={detailData} />
+                    </Widget>
+                    <Container className="w-full md:w-1/2">
+                        <Widget title="Key Attributes" titleSize="large">
+                            <AttributeViewer attributes={cryptographicKey?.attributes} />
+                        </Widget>
+
+                        {cryptographicKey && (
+                            <CustomAttributeWidget
+                                resource={Resource.Keys}
+                                resourceUuid={cryptographicKey.uuid}
+                                attributes={cryptographicKey.customAttributes}
+                            />
+                        )}
+                    </Container>
                 </Container>
-            </Container>
-            <Container marginTop>
-                {itemTabs.tabs.length > 0 && <TabLayout tabs={itemTabs.tabs} selectedTab={selectedTab} />}
-                <Widget title="Key Associations" busy={isBusy} titleSize="large">
-                    <CustomTable headers={associationHeaders} data={associationBody} />
-                </Widget>
-            </Container>
+                <Container marginTop>
+                    {itemTabs.tabs.length > 0 && <TabLayout tabs={itemTabs.tabs} selectedTab={selectedTab} />}
+                    <Widget title="Key Associations" titleSize="large">
+                        <CustomTable headers={associationHeaders} data={associationBody} />
+                    </Widget>
+                </Container>
+            </Widget>
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Key"
@@ -480,6 +481,6 @@ export default function CryptographicKeyDetail() {
                 size="xl"
                 buttons={[]}
             />
-        </>
+        </div>
     );
 }

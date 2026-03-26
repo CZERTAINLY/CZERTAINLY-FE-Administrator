@@ -121,50 +121,47 @@ export default function EntityDetail() {
                     { label: entity?.name || 'Entity Details', href: '' },
                 ]}
             />
-            <Container>
-                <Widget
-                    title="Entity Details"
-                    busy={isBusy}
-                    widgetButtons={buttons}
-                    titleSize="large"
-                    refreshAction={getFreshEntityDetails}
-                    widgetLockName={LockWidgetNameEnum.EntityDetails}
-                >
-                    <br />
+            <Widget widgetLockName={LockWidgetNameEnum.EntityDetails} busy={isBusy} noBorder>
+                <Container>
+                    <Widget title="Entity Details" widgetButtons={buttons} titleSize="large" refreshAction={getFreshEntityDetails}>
+                        <CustomTable headers={detailHeaders} data={detailData} />
+                    </Widget>
 
-                    <CustomTable headers={detailHeaders} data={detailData} />
-                </Widget>
+                    <Widget title="Attributes" titleSize="large">
+                        <br />
+                        <Label>Entity Attributes</Label>
+                        <AttributeViewer attributes={entity?.attributes} />
+                    </Widget>
 
-                <Widget title="Attributes" titleSize="large">
-                    <br />
-                    <Label>Entity Attributes</Label>
-                    <AttributeViewer attributes={entity?.attributes} />
-                </Widget>
+                    {entity && (
+                        <CustomAttributeWidget
+                            resource={Resource.Entities}
+                            resourceUuid={entity.uuid}
+                            attributes={entity.customAttributes}
+                        />
+                    )}
+                </Container>
+            </Widget>
 
-                {entity && (
-                    <CustomAttributeWidget resource={Resource.Entities} resourceUuid={entity.uuid} attributes={entity.customAttributes} />
-                )}
+            <Dialog
+                isOpen={confirmDelete}
+                caption="Delete Entity"
+                body="You are about to delete Entity. Is this what you want to do?"
+                toggle={() => setConfirmDelete(false)}
+                icon="delete"
+                buttons={[
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                ]}
+            />
 
-                <Dialog
-                    isOpen={confirmDelete}
-                    caption="Delete Entity"
-                    body="You are about to delete Entity. Is this what you want to do?"
-                    toggle={() => setConfirmDelete(false)}
-                    icon="delete"
-                    buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                    ]}
-                />
-
-                <Dialog
-                    isOpen={isEditModalOpen}
-                    toggle={handleCloseEditModal}
-                    caption="Edit Entity"
-                    size="xl"
-                    body={<EntityForm entityId={entity?.uuid} onCancel={handleCloseEditModal} onSuccess={handleCloseEditModal} />}
-                />
-            </Container>
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit Entity"
+                size="xl"
+                body={<EntityForm entityId={entity?.uuid} onCancel={handleCloseEditModal} onSuccess={handleCloseEditModal} />}
+            />
         </div>
     );
 }

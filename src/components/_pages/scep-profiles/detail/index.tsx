@@ -360,112 +360,103 @@ export default function ScepProfileDetail() {
                     { label: scepProfile?.name || 'SCEP Profile Details', href: '' },
                 ]}
             />
-            <Container>
-                <Container className="md:grid grid-cols-2 items-start">
-                    <Widget
-                        title="SCEP Profile Details"
-                        busy={isBusy}
-                        widgetButtons={buttons}
-                        titleSize="large"
-                        refreshAction={getFreshScepProfile}
-                        widgetLockName={LockWidgetNameEnum.SCEPProfileDetails}
-                    >
-                        <CustomTable headers={tableHeader} data={scepProfileDetailData} />
+            <Widget widgetLockName={LockWidgetNameEnum.SCEPProfileDetails} busy={isBusy} noBorder>
+                <Container>
+                    <Container className="md:grid grid-cols-2 items-start">
+                        <Widget title="SCEP Profile Details" widgetButtons={buttons} titleSize="large" refreshAction={getFreshScepProfile}>
+                            <CustomTable headers={tableHeader} data={scepProfileDetailData} />
+                        </Widget>
+
+                        {scepProfile && (
+                            <CustomAttributeWidget
+                                resource={Resource.ScepProfiles}
+                                resourceUuid={scepProfile.uuid}
+                                attributes={scepProfile.customAttributes}
+                            />
+                        )}
+                    </Container>
+
+                    {scepProfile && scepProfile.enableIntune && (
+                        <Widget title={'Intune Configuration'}>
+                            <CustomTable headers={tableHeader} data={intuneDetailData} />
+                        </Widget>
+                    )}
+
+                    <Widget title={'CA Certificate Configuration'} titleSize="large">
+                        {certificateDetailData.length > 0 && <CustomTable headers={tableHeader} data={certificateDetailData} />}
                     </Widget>
 
-                    {scepProfile && (
-                        <CustomAttributeWidget
-                            resource={Resource.ScepProfiles}
-                            resourceUuid={scepProfile.uuid}
-                            attributes={scepProfile.customAttributes}
-                        />
-                    )}
+                    <Widget title={RAProfileDetailsTitle} titleSize="large">
+                        {raProfileDetailData.length > 0 && (
+                            <>
+                                <CustomTable headers={tableHeader} data={raProfileDetailData} />
+
+                                {scepProfile?.issueCertificateAttributes === undefined ||
+                                scepProfile.issueCertificateAttributes.length === 0 ? (
+                                    <></>
+                                ) : (
+                                    <Widget title="List of Attributes to Issue Certificate">
+                                        <AttributeViewer attributes={scepProfile?.issueCertificateAttributes} />
+                                    </Widget>
+                                )}
+                            </>
+                        )}
+                    </Widget>
+
+                    <Widget title="Default Certificate associations" titleSize="large">
+                        <CustomTable headers={tableHeader} data={defaultCertificateAssociationsData} />
+                        <Widget title="Certificate Custom Attributes" noBorder className="mt-2">
+                            <AttributeViewer attributes={scepProfile?.certificateAssociations?.customAttributes} />
+                        </Widget>
+                    </Widget>
                 </Container>
+            </Widget>
 
-                {scepProfile && scepProfile.enableIntune && (
-                    <Widget title={'Intune Configuration'} busy={isBusy}>
-                        <CustomTable headers={tableHeader} data={intuneDetailData} />
-                    </Widget>
-                )}
-
-                <Widget title={'CA Certificate Configuration'} busy={isBusy} titleSize="large">
-                    {certificateDetailData.length > 0 && <CustomTable headers={tableHeader} data={certificateDetailData} />}
-                </Widget>
-
-                <Widget title={RAProfileDetailsTitle} busy={isBusy} titleSize="large">
-                    {raProfileDetailData.length > 0 && (
-                        <>
-                            <CustomTable headers={tableHeader} data={raProfileDetailData} />
-
-                            {scepProfile?.issueCertificateAttributes === undefined ||
-                            scepProfile.issueCertificateAttributes.length === 0 ? (
-                                <></>
-                            ) : (
-                                <Widget title="List of Attributes to Issue Certificate" busy={isBusy}>
-                                    <AttributeViewer attributes={scepProfile?.issueCertificateAttributes} />
-                                </Widget>
-                            )}
-                        </>
-                    )}
-                </Widget>
-
-                <Widget title="Default Certificate associations" busy={isBusy} titleSize="large">
-                    <CustomTable headers={tableHeader} data={defaultCertificateAssociationsData} />
-                    <Widget title="Certificate Custom Attributes" busy={isBusy} noBorder className="mt-2">
-                        <AttributeViewer attributes={scepProfile?.certificateAssociations?.customAttributes} />
-                    </Widget>
-                </Widget>
-
-                <Dialog
-                    isOpen={confirmDelete}
-                    caption="Delete SCEP Profile"
-                    body="You are about to delete SCEP Profile which may have associated SCEP
+            <Dialog
+                isOpen={confirmDelete}
+                caption="Delete SCEP Profile"
+                body="You are about to delete SCEP Profile which may have associated SCEP
                   Account(s). When deleted the SCEP Account(s) will be revoked."
-                    toggle={() => setConfirmDelete(false)}
-                    icon="delete"
-                    buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                    ]}
-                />
+                toggle={() => setConfirmDelete(false)}
+                icon="delete"
+                buttons={[
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                ]}
+            />
 
-                <Dialog
-                    isOpen={deleteErrorMessage.length > 0}
-                    caption="Delete SCEP Profile"
-                    body={
-                        <>
-                            Failed to delete the SCEP Profile that has dependent objects. Please find the details below:
-                            <br />
-                            <br />
-                            {deleteErrorMessage}
-                        </>
-                    }
-                    toggle={() => dispatch(actions.clearDeleteErrorMessages())}
-                    buttons={[
-                        { color: 'danger', onClick: onForceDeleteScepProfile, body: 'Force' },
-                        {
-                            color: 'secondary',
-                            variant: 'outline',
-                            onClick: () => dispatch(actions.clearDeleteErrorMessages()),
-                            body: 'Cancel',
-                        },
-                    ]}
-                />
+            <Dialog
+                isOpen={deleteErrorMessage.length > 0}
+                caption="Delete SCEP Profile"
+                body={
+                    <>
+                        Failed to delete the SCEP Profile that has dependent objects. Please find the details below:
+                        <br />
+                        <br />
+                        {deleteErrorMessage}
+                    </>
+                }
+                toggle={() => dispatch(actions.clearDeleteErrorMessages())}
+                buttons={[
+                    { color: 'danger', onClick: onForceDeleteScepProfile, body: 'Force' },
+                    {
+                        color: 'secondary',
+                        variant: 'outline',
+                        onClick: () => dispatch(actions.clearDeleteErrorMessages()),
+                        body: 'Cancel',
+                    },
+                ]}
+            />
 
-                <Dialog
-                    isOpen={isEditModalOpen}
-                    toggle={handleCloseEditModal}
-                    caption="Edit SCEP Profile"
-                    size="xl"
-                    body={
-                        <ScepProfileForm
-                            scepProfileId={scepProfile?.uuid}
-                            onCancel={handleCloseEditModal}
-                            onSuccess={handleCloseEditModal}
-                        />
-                    }
-                />
-            </Container>
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit SCEP Profile"
+                size="xl"
+                body={
+                    <ScepProfileForm scepProfileId={scepProfile?.uuid} onCancel={handleCloseEditModal} onSuccess={handleCloseEditModal} />
+                }
+            />
         </div>
     );
 }

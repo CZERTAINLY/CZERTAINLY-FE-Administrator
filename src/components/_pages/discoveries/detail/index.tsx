@@ -236,79 +236,75 @@ export default function DiscoveryDetail() {
                     { label: discovery?.name || 'Discovery Details' },
                 ]}
             />
-            <TabLayout
-                tabs={[
-                    {
-                        title: 'Details',
-                        content: (
-                            <div>
-                                <Container className="md:flex-row items-start">
-                                    <Widget
-                                        title="Discovery Details"
-                                        busy={isBusy}
-                                        widgetButtons={buttons}
-                                        titleSize="large"
-                                        refreshAction={getFreshDiscoveryDetails}
-                                        widgetLockName={LockWidgetNameEnum.DiscoveryDetails}
-                                        className="w-full md:w-1/2"
-                                    >
-                                        <CustomTable headers={detailHeaders} data={detailData} />
-                                    </Widget>
-
-                                    <Widget title="Metadata" titleSize="large" className="w-full md:w-1/2">
-                                        <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={discovery?.metadata} />
-                                    </Widget>
-                                </Container>
-
-                                <Container marginTop>
-                                    <Widget
-                                        title="Assigned Triggers"
-                                        busy={isBusy}
-                                        titleSize="large"
-                                        widgetLockName={LockWidgetNameEnum.DiscoveryDetails}
-                                    >
-                                        <CustomTable headers={triggerHeaders} data={triggerTableData} />
-                                    </Widget>
-
-                                    {triggerHistorySummary?.associationObjectUuid === id && (
+            <Widget widgetLockName={LockWidgetNameEnum.DiscoveryDetails} busy={isBusy} noBorder>
+                <TabLayout
+                    noBorder
+                    tabs={[
+                        {
+                            title: 'Details',
+                            content: (
+                                <div>
+                                    <Container className="md:flex-row items-start">
                                         <Widget
-                                            title="Triggers summary"
+                                            title="Discovery Details"
+                                            widgetButtons={buttons}
                                             titleSize="large"
-                                            busy={isFetchingTriggerSummary}
-                                            refreshAction={getFreshTriggerHistorySummary}
+                                            refreshAction={getFreshDiscoveryDetails}
+                                            className="w-full md:w-1/2"
                                         >
-                                            <CustomTable headers={detailHeaders} data={triggersSummary} />
+                                            <CustomTable headers={detailHeaders} data={detailData} />
                                         </Widget>
-                                    )}
-                                    {discovery?.uuid && (
-                                        <DiscoveryCertificates id={discovery.uuid} triggerHistorySummary={triggerHistorySummary} />
+
+                                        <Widget title="Metadata" titleSize="large" className="w-full md:w-1/2">
+                                            <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={discovery?.metadata} />
+                                        </Widget>
+                                    </Container>
+
+                                    <Container marginTop>
+                                        <Widget title="Assigned Triggers" titleSize="large">
+                                            <CustomTable headers={triggerHeaders} data={triggerTableData} />
+                                        </Widget>
+
+                                        {triggerHistorySummary?.associationObjectUuid === id && (
+                                            <Widget
+                                                title="Triggers summary"
+                                                titleSize="large"
+                                                busy={isFetchingTriggerSummary}
+                                                refreshAction={getFreshTriggerHistorySummary}
+                                            >
+                                                <CustomTable headers={detailHeaders} data={triggersSummary} />
+                                            </Widget>
+                                        )}
+                                        {discovery?.uuid && (
+                                            <DiscoveryCertificates id={discovery.uuid} triggerHistorySummary={triggerHistorySummary} />
+                                        )}
+                                    </Container>
+                                </div>
+                            ),
+                        },
+                        {
+                            title: 'Attributes',
+                            content: (
+                                <Container className="md:flex-row items-start">
+                                    <Widget title="Attributes" titleSize="large" className="w-full md:w-1/2">
+                                        <br />
+                                        <Label>Discovery Attributes</Label>
+                                        <AttributeViewer attributes={discovery?.attributes} />
+                                    </Widget>
+                                    {discovery && (
+                                        <CustomAttributeWidget
+                                            resource={Resource.Discoveries}
+                                            resourceUuid={discovery.uuid}
+                                            attributes={discovery.customAttributes}
+                                            className="w-full md:w-1/2"
+                                        />
                                     )}
                                 </Container>
-                            </div>
-                        ),
-                    },
-                    {
-                        title: 'Attributes',
-                        content: (
-                            <Container className="md:flex-row items-start">
-                                <Widget title="Attributes" titleSize="large" className="w-full md:w-1/2">
-                                    <br />
-                                    <Label>Discovery Attributes</Label>
-                                    <AttributeViewer attributes={discovery?.attributes} />
-                                </Widget>
-                                {discovery && (
-                                    <CustomAttributeWidget
-                                        resource={Resource.Discoveries}
-                                        resourceUuid={discovery.uuid}
-                                        attributes={discovery.customAttributes}
-                                        className="w-full md:w-1/2"
-                                    />
-                                )}
-                            </Container>
-                        ),
-                    },
-                ]}
-            />
+                            ),
+                        },
+                    ]}
+                />
+            </Widget>
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Certification Discovery"
