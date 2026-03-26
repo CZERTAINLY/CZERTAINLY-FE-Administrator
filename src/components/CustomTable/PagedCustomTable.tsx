@@ -19,16 +19,20 @@ export default function PagedCustomTable({ headers, data, totalItems, onReloadDa
     const [pageSize, setPageSize] = useState(10);
     const [pageNumber, setPageNumber] = useState(1);
 
-    const prevPageNumber = useRef(0);
+    const onReloadDataRef = useRef(onReloadData);
     const paginationHydratedKeyRef = useRef<string | undefined>(undefined);
+
+    useEffect(() => {
+        onReloadDataRef.current = onReloadData;
+    }, [onReloadData]);
 
     const paginationStateRouteKey = useMemo(() => {
         if (stateKey) {
             return stateKey;
         }
 
-        return `${location.pathname}${location.search}`;
-    }, [location.pathname, location.search, stateKey]);
+        return location.pathname;
+    }, [location.pathname, stateKey]);
 
     const paginationStateStorageKey = useMemo(() => `paged-custom-table-pagination:${paginationStateRouteKey}`, [paginationStateRouteKey]);
     const selectPaginationState = useMemo(
@@ -62,13 +66,8 @@ export default function PagedCustomTable({ headers, data, totalItems, onReloadDa
     }, [dispatch, pageNumber, pageSize, paginationStateStorageKey, persistedPaginationState.page, persistedPaginationState.pageSize]);
 
     useEffect(() => {
-        if (pageNumber !== 1 && prevPageNumber.current === pageNumber) {
-            setPageNumber(1);
-        } else {
-            prevPageNumber.current = pageNumber;
-            onReloadData(pageSize, pageNumber);
-        }
-    }, [pageSize, pageNumber, onReloadData]);
+        onReloadDataRef.current(pageSize, pageNumber);
+    }, [pageSize, pageNumber]);
 
     const paginationData = useMemo(
         () => ({

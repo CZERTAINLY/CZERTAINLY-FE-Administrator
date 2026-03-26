@@ -92,8 +92,8 @@ function CustomTable({
         return `${headerIds}|${hasCheckboxes ? 'checkboxes' : 'no-checkboxes'}|${hasDetails ? 'details' : 'no-details'}`;
     }, [paginationStateKey, headers, hasCheckboxes, hasDetails]);
     const internalPaginationRouteKey = useMemo(() => {
-        return `${location.pathname}${location.search}`;
-    }, [location.pathname, location.search]);
+        return location.pathname;
+    }, [location.pathname]);
     const internalPaginationStorageKey = useMemo(
         () => `custom-table-pagination:${internalPaginationRouteKey}:${tableSignature}`,
         [internalPaginationRouteKey, tableSignature],
