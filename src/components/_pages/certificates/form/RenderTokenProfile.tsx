@@ -25,7 +25,7 @@ const RenderTokenProfile = ({ type, name }: Props) => {
                 value: tokenProfile.uuid,
             })),
             {
-                label: '+',
+                label: '+ Add new',
                 value: '__add_new__',
                 disabled: false,
             },
@@ -46,7 +46,7 @@ const RenderTokenProfile = ({ type, name }: Props) => {
             userInterfaceActions.showGlobalModal({
                 content: <TokenProfileForm usesGlobalModal />,
                 isOpen: true,
-                size: 'lg',
+                size: 'xl',
                 title: 'Add New Token Profile',
             }),
         );
@@ -69,6 +69,7 @@ const RenderTokenProfile = ({ type, name }: Props) => {
                         onChange={(selected) => {
                             if (selected === '__add_new__') {
                                 handleAddNew();
+                                onChange(undefined);
                                 return;
                             }
                             handleTokenProfileChange(selected as string);

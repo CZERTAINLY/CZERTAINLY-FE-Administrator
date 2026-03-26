@@ -64,6 +64,7 @@ function ListValueField({ descriptor, field, options, inputClassName }: ValueFie
             const raw = typeof v === 'object' && v !== null && 'value' in v ? v.value : v;
             if (raw === ADD_CUSTOM_OPTION_VALUE) {
                 setShowAddCustom(true);
+                field.onChange(undefined);
                 return;
             }
             const parsed = parseListValueByContentType(descriptor.contentType, v);

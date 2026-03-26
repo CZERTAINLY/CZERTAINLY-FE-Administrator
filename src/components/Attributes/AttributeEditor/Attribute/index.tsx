@@ -54,7 +54,7 @@ export function Attribute({
             userInterfaceActions.showGlobalModal({
                 content: addNewAttributeValue.content,
                 isOpen: true,
-                size: 'lg',
+                size: 'xl',
                 title: `Add New ${addNewAttributeValue.name}`,
             }),
         );
@@ -135,6 +135,7 @@ export function Attribute({
         (fieldOnChange: (v: any) => void) => (newValue: any) => {
             if (newValue === '__add_new__') {
                 handleAddNew();
+                fieldOnChange(undefined);
                 return;
             }
             fieldOnChange(newValue);
@@ -157,9 +158,7 @@ export function Attribute({
                     options={options}
                     busy={busy}
                     deleteButton={deleteButton}
-                    addNewAttributeValue={
-                        descriptor.properties.extensibleList && addNewAttributeValue ? { label: '+', value: '__add_new__' } : undefined
-                    }
+                    addNewAttributeValue={addNewAttributeValue ? { label: '+ Add new', value: '__add_new__' } : undefined}
                     onSelectChangeMulti={handleSelectChangeMulti}
                     onSelectChangeSingle={handleSelectChangeSingle}
                 />

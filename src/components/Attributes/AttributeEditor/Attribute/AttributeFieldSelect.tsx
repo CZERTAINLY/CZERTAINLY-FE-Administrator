@@ -55,7 +55,7 @@ export function AttributeFieldSelect({
                         : [];
                 const selectOptionsList = [...baseOptions, ...extra];
                 const selectOptions = addNewAttributeValue
-                    ? [...selectOptionsList, { label: '+', value: '__add_new__', disabled: false }]
+                    ? [...selectOptionsList, { label: '+ Add new', value: '__add_new__', disabled: false }]
                     : selectOptionsList;
 
                 return (
