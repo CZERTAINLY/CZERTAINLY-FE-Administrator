@@ -23,10 +23,28 @@ export function AttributeFieldInputTestWrapper({
             [name]: undefined,
             ...defaultValues,
         },
+        mode: 'onTouched',
     });
     return (
         <ReactHookForm.FormProvider {...methods}>
             <AttributeFieldInput name={name} descriptor={descriptor} busy={busy} deleteButton={deleteButton} />
+
+            <button type="button" data-testid="outside-blur-target">
+                Outside
+            </button>
+
+            <button
+                type="button"
+                data-testid="trigger-validation"
+                onClick={() => {
+                    void methods.setValue(name, '', {
+                        shouldTouch: true,
+                        shouldValidate: true,
+                    });
+                }}
+            >
+                Trigger validation
+            </button>
         </ReactHookForm.FormProvider>
     );
 }
