@@ -271,7 +271,7 @@ describe('validators', () => {
         });
 
         test('should reject invalid OID', () => {
-            expect(validateOid()('invalid')).toBe('Value must be a valid OID');
+            expect(validateOid()('invalid')).toBe('Must be a dot-separated numeric OID (e.g. 1.2.840.113549.1.1.11)');
         });
     });
 

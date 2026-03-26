@@ -381,6 +381,70 @@ function vaultProfilesTestReducer(
     return state;
 }
 
+export type TablePaginationTestState = {
+    byKey: Record<string, { page: number; pageSize: number }>;
+    activeRootRoute?: string;
+};
+
+const tablePaginationTestInitialState: TablePaginationTestState = {
+    byKey: {},
+    activeRootRoute: undefined,
+};
+
+function tablePaginationTestReducer(
+    state: TablePaginationTestState = tablePaginationTestInitialState,
+    action: UnknownAction,
+): TablePaginationTestState {
+    const a = action as { type: string; payload?: any };
+
+    if (a.type === 'tablePagination/setPagination' && a.payload?.key) {
+        return {
+            ...state,
+            byKey: {
+                ...state.byKey,
+                [a.payload.key]: {
+                    page: a.payload.page,
+                    pageSize: a.payload.pageSize,
+                },
+            },
+        };
+    }
+
+    if (a.type === 'tablePagination/clearPagination' && a.payload?.key) {
+        const nextByKey = { ...state.byKey };
+        delete nextByKey[a.payload.key];
+        return {
+            ...state,
+            byKey: nextByKey,
+        };
+    }
+
+    if (a.type === 'tablePagination/clearPaginationByRootRoute' && a.payload?.rootRoute) {
+        const rootRoutePrefix = `/${a.payload.rootRoute}`;
+        const byKey = Object.fromEntries(
+            Object.entries(state.byKey).filter(
+                ([key]) =>
+                    !key.startsWith(`custom-table-pagination:${rootRoutePrefix}`) &&
+                    !key.startsWith(`paged-custom-table-pagination:${rootRoutePrefix}`),
+            ),
+        );
+
+        return {
+            ...state,
+            byKey,
+        };
+    }
+
+    if (a.type === 'tablePagination/setActiveRootRoute' && a.payload?.rootRoute) {
+        return {
+            ...state,
+            activeRootRoute: a.payload.rootRoute,
+        };
+    }
+
+    return state;
+}
+
 export const testReducers = combineReducers({
     userInterface: userInterfaceTestReducer,
     enums: enumsTestReducer,
@@ -392,6 +456,7 @@ export const testReducers = combineReducers({
     connectors: connectorsTestReducer,
     secrets: secretsTestReducer,
     vaultProfiles: vaultProfilesTestReducer,
+    tablePagination: tablePaginationTestReducer,
 });
 
 export const testInitialState = {
@@ -405,4 +470,5 @@ export const testInitialState = {
     connectors: connectorsTestInitialState,
     secrets: secretsTestInitialState,
     vaultProfiles: vaultProfilesTestInitialState,
+    tablePagination: tablePaginationTestInitialState,
 };
