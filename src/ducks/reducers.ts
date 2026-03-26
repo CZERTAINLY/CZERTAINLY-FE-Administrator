@@ -46,6 +46,7 @@ import { slice as settingsSlice } from './settings';
 import { slice as dashboardSlice } from './statisticsDashboard';
 import { slice as tokenProfileSlice } from './token-profiles';
 import { slice as tokenSlice } from './tokens';
+import { slice as tablePaginationSlice } from './table-pagination';
 import { slice as trustedCertificatesSlice } from './trusted-certificates';
 import { slice as usersSlice } from './users';
 import { slice as utilsActuatorSlice } from './utilsActuator';
@@ -101,6 +102,7 @@ export const reducers = combineReducers({
     [infoSlice.name]: infoSlice.reducer,
     [tokenSlice.name]: tokenSlice.reducer,
     [tokenProfileSlice.name]: tokenProfileSlice.reducer,
+    [tablePaginationSlice.name]: tablePaginationSlice.reducer,
     [trustedCertificatesSlice.name]: trustedCertificatesSlice.reducer,
     [cryptographicKeySlice.name]: cryptographicKeySlice.reducer,
     [cryptographicOperationsSlice.name]: cryptographicOperationsSlice.reducer,

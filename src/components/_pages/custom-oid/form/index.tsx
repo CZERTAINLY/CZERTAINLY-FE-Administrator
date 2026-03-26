@@ -104,8 +104,15 @@ export default function CustomOIDForm({ oidId, onCancel, onSuccess }: CustomOIDF
     const {
         handleSubmit,
         control,
+        reset,
         formState: { isDirty, isSubmitting, isValid },
     } = methods;
+
+    useEffect(() => {
+        if (editMode && oid) {
+            reset(defaultValues);
+        }
+    }, [oid, reset, defaultValues, editMode]);
 
     const watchedCategory = useWatch({
         control,
