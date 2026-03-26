@@ -2,6 +2,7 @@ import { Provider } from 'react-redux';
 import { createMockStore } from 'utils/test-helpers';
 import PlatformInfoDialogLink from './index';
 import { slice as infoSlice } from 'ducks/info';
+import { useMemo } from 'react';
 
 export const defaultPlatformInfo = {
     app: { name: 'Core', version: '2.16.4-SNAPSHOT' },
@@ -17,13 +18,20 @@ const defaultPreloadedState = {
 
 export type PlatformInfoDialogButtonWithStoreProps = {
     preloadedState?: Parameters<typeof createMockStore>[0];
+    initiallyOpen?: boolean;
+    forceOpen?: boolean;
 };
 
-export default function PlatformInfoDialogButtonWithStore({ preloadedState }: PlatformInfoDialogButtonWithStoreProps) {
-    const store = createMockStore(preloadedState ?? defaultPreloadedState);
+export default function PlatformInfoDialogButtonWithStore({
+    preloadedState,
+    initiallyOpen = false,
+    forceOpen,
+}: PlatformInfoDialogButtonWithStoreProps) {
+    const store = useMemo(() => createMockStore(preloadedState ?? defaultPreloadedState), [preloadedState]);
+
     return (
         <Provider store={store}>
-            <PlatformInfoDialogLink />
+            <PlatformInfoDialogLink initiallyOpen={initiallyOpen} forceOpen={forceOpen} />
         </Provider>
     );
 }
