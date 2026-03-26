@@ -4,6 +4,7 @@ import {
     getSelectValueFromField,
     getFormTypeFromAttributeContentType,
     buildAttributeValidators,
+    getRegexpConstraint,
     getUpdatedOptionsForEditSelect,
     parseListValueByContentType,
 } from './attributeHelpers';
@@ -53,7 +54,7 @@ export default function AttributeHelpersCoverageRunner() {
         buildAttributeValidators({ type: 'info', contentType: AttributeContentType.String, properties: {} } as any);
         buildAttributeValidators(minimalDataDescriptor(AttributeContentType.String, true));
         buildAttributeValidators(minimalDataDescriptor(AttributeContentType.Float, true));
-        buildAttributeValidators({
+        const withRegexpConstraint = {
             type: 'data',
             contentType: AttributeContentType.Integer,
             properties: { required: true, label: 'L', readOnly: false, visible: true, list: false, multiSelect: false },
@@ -61,7 +62,9 @@ export default function AttributeHelpersCoverageRunner() {
                 { type: AttributeConstraintType.RegExp, data: '^[0-9]+$', errorMessage: 'Digits' },
                 { type: AttributeConstraintType.Range, data: { from: 1, to: 10 }, errorMessage: 'Range' },
             ],
-        } as any);
+        } as any;
+        buildAttributeValidators(withRegexpConstraint);
+        getRegexpConstraint(withRegexpConstraint);
 
         getUpdatedOptionsForEditSelect([], [{ label: 'A', value: 1 }]);
         getUpdatedOptionsForEditSelect(
