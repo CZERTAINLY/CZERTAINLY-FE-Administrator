@@ -309,13 +309,16 @@ function Select({
         };
 
         const applyAddNewStyling = (dropdown: Element | null) => {
-            dropdown?.querySelectorAll?.('.hs-select-option-row').forEach((row) => {
-                const titleEl = row.querySelector?.('[data-title]');
-                const text = titleEl instanceof HTMLElement ? titleEl.textContent?.trim() : undefined;
-                if (text === '+ Add new' || text === '+ Add custom') {
-                    titleEl!.classList.add('text-blue-600', 'font-medium');
-                }
-            });
+            dropdown
+                ?.querySelectorAll?.('.hs-select-option-row[data-value="__add_new__"], .hs-select-option-row[data-value="__add_custom__"]')
+                .forEach((row) => {
+                    const titleEl = row.querySelector?.('[data-title]');
+                    if (!(titleEl instanceof HTMLElement)) return;
+                    const text = titleEl.textContent?.trim();
+                    if (text === '+ Add new' || text === '+ Add custom') {
+                        titleEl.classList.add('text-blue-600', 'dark:text-blue-400', 'font-medium');
+                    }
+                });
         };
 
         const setTitlesAndTooltips = () => {

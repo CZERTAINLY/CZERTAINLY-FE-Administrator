@@ -69,7 +69,6 @@ const RenderTokenProfile = ({ type, name }: Props) => {
                         onChange={(selected) => {
                             if (selected === '__add_new__') {
                                 handleAddNew();
-                                onChange(undefined);
                                 return;
                             }
                             handleTokenProfileChange(selected as string);

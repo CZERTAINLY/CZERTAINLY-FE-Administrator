@@ -135,7 +135,6 @@ export function Attribute({
         (fieldOnChange: (v: any) => void) => (newValue: any) => {
             if (newValue === '__add_new__') {
                 handleAddNew();
-                fieldOnChange(undefined);
                 return;
             }
             fieldOnChange(newValue);
