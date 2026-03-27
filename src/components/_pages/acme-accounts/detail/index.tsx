@@ -211,33 +211,32 @@ export default function AcmeAccountDetail() {
                     { label: acmeAccount?.accountId || 'ACME Account Details', href: '' },
                 ]}
             />
-            <Container>
-                <Widget
-                    title="ACME Account Details"
-                    busy={isFetchingDetail || isEnabling || isDisabling || isRevoking}
-                    widgetButtons={buttons}
-                    titleSize="large"
-                    refreshAction={getFreshAcmeAccount}
-                    widgetLockName={LockWidgetNameEnum.ACMEAccountDetails}
-                >
-                    <CustomTable headers={detailHeaders} data={detailData} />
-                </Widget>
+            <Widget
+                widgetLockName={LockWidgetNameEnum.ACMEAccountDetails}
+                busy={isFetchingDetail || isEnabling || isDisabling || isRevoking}
+                noBorder
+            >
+                <Container>
+                    <Widget title="ACME Account Details" widgetButtons={buttons} titleSize="large" refreshAction={getFreshAcmeAccount}>
+                        <CustomTable headers={detailHeaders} data={detailData} />
+                    </Widget>
 
-                <Widget title="Order Summary" busy={isFetchingDetail || isEnabling || isDisabling || isRevoking} titleSize="large">
-                    <CustomTable headers={orderHeaders} data={orderData} />
-                </Widget>
+                    <Widget title="Order Summary" titleSize="large">
+                        <CustomTable headers={orderHeaders} data={orderData} />
+                    </Widget>
+                </Container>
+            </Widget>
 
-                <Dialog
-                    isOpen={confirmRevoke}
-                    caption="Revoke ACME Account"
-                    body="You are about to revoke an ACME Account. Is this what you want to do?"
-                    toggle={() => setConfirmRevoke(false)}
-                    buttons={[
-                        { color: 'danger', onClick: onRevokeConfirmed, body: 'Yes, revoke' },
-                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmRevoke(false), body: 'Cancel' },
-                    ]}
-                />
-            </Container>
+            <Dialog
+                isOpen={confirmRevoke}
+                caption="Revoke ACME Account"
+                body="You are about to revoke an ACME Account. Is this what you want to do?"
+                toggle={() => setConfirmRevoke(false)}
+                buttons={[
+                    { color: 'danger', onClick: onRevokeConfirmed, body: 'Yes, revoke' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmRevoke(false), body: 'Cancel' },
+                ]}
+            />
         </div>
     );
 }

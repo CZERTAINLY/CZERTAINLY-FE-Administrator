@@ -668,183 +668,181 @@ export default function LocationDetail() {
                     { label: location?.name || 'Location Details', href: '' },
                 ]}
             />
-            <Container>
-                <TabLayout
-                    tabs={[
-                        {
-                            title: 'Details',
-                            content: (
-                                <Container>
-                                    <Widget
-                                        title="Location Properties"
-                                        busy={isBusy}
-                                        widgetButtons={buttons}
-                                        titleSize="large"
-                                        refreshAction={getFreshLocationDetails}
-                                        widgetLockName={LockWidgetNameEnum.LocationDetails}
-                                    >
-                                        <CustomTable headers={detailHeaders} data={detailData} />
-                                    </Widget>
+            <Widget widgetLockName={LockWidgetNameEnum.LocationDetails} busy={isBusy} noBorder>
+                <Container>
+                    <TabLayout
+                        tabs={[
+                            {
+                                title: 'Details',
+                                content: (
+                                    <Container>
+                                        <Widget
+                                            title="Location Properties"
+                                            widgetButtons={buttons}
+                                            titleSize="large"
+                                            refreshAction={getFreshLocationDetails}
+                                        >
+                                            <CustomTable headers={detailHeaders} data={detailData} />
+                                        </Widget>
 
-                                    <Widget
-                                        title="Location Certificates"
-                                        titleSize="large"
-                                        widgetButtons={certButtons}
-                                        busy={
-                                            isRenewingCertificate ||
-                                            isPushingCertificate ||
-                                            isRemovingCertificate ||
-                                            isSyncing ||
-                                            isIssuingCertificate
-                                        }
-                                    >
-                                        <CustomTable
-                                            headers={certHeaders}
-                                            data={certData}
-                                            hasCheckboxes
-                                            multiSelect={false}
-                                            onCheckedRowsChanged={(rows) => {
-                                                setCertCheckedRows(rows as string[]);
-                                            }}
-                                            hasDetails
-                                        />
-                                    </Widget>
-                                </Container>
-                            ),
-                        },
-                        {
-                            title: 'Attributes',
-                            content: (
-                                <Container>
-                                    <Widget title="Location Attributes" titleSize="large">
-                                        <AttributeViewer attributes={location?.attributes} />
-                                    </Widget>
-                                    {location && (
-                                        <CustomAttributeWidget
-                                            resource={Resource.Locations}
-                                            resourceUuid={location.uuid}
-                                            attributes={location.customAttributes}
-                                        />
-                                    )}
-
-                                    <Widget title="Metadata" titleSize="large">
-                                        {location?.metadata && (
-                                            <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={location.metadata} />
+                                        <Widget
+                                            title="Location Certificates"
+                                            titleSize="large"
+                                            widgetButtons={certButtons}
+                                            busy={
+                                                isRenewingCertificate ||
+                                                isPushingCertificate ||
+                                                isRemovingCertificate ||
+                                                isSyncing ||
+                                                isIssuingCertificate
+                                            }
+                                        >
+                                            <CustomTable
+                                                headers={certHeaders}
+                                                data={certData}
+                                                hasCheckboxes
+                                                multiSelect={false}
+                                                onCheckedRowsChanged={(rows) => {
+                                                    setCertCheckedRows(rows as string[]);
+                                                }}
+                                                hasDetails
+                                            />
+                                        </Widget>
+                                    </Container>
+                                ),
+                            },
+                            {
+                                title: 'Attributes',
+                                content: (
+                                    <Container>
+                                        <Widget title="Location Attributes" titleSize="large">
+                                            <AttributeViewer attributes={location?.attributes} />
+                                        </Widget>
+                                        {location && (
+                                            <CustomAttributeWidget
+                                                resource={Resource.Locations}
+                                                resourceUuid={location.uuid}
+                                                attributes={location.customAttributes}
+                                            />
                                         )}
-                                    </Widget>
-                                </Container>
-                            ),
-                        },
-                    ]}
-                />
-                <Dialog
-                    isOpen={confirmDelete}
-                    caption="Delete Location"
-                    body="You are about to delete Location. Is this what you want to do?"
-                    toggle={() => setConfirmDelete(false)}
-                    icon="delete"
-                    buttons={[
-                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                    ]}
-                />
-                <Dialog
-                    isOpen={confirmRemoveDialog}
-                    caption={`Remove ${certCheckedRows.length === 1 ? 'certificate' : 'certificates'} from the location`}
-                    size="md"
-                    body={
-                        <>
-                            You are about to remove certificates from the location:
-                            <ul className="list-disc list-inside space-y-2 my-2">
-                                {certCheckedRows.map((uuid) => {
-                                    const cert = location?.certificates.find((c) => c.certificateUuid === uuid);
-                                    return cert ? <li key={uuid}>{cert.commonName || 'empty'}</li> : null;
-                                })}
-                            </ul>
-                            Is this what you want to do?
-                        </>
-                    }
-                    toggle={() => setConfirmRemoveDialog(false)}
-                    buttons={[
-                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmRemoveDialog(false), body: 'Cancel' },
-                        { color: 'danger', onClick: onRemoveConfirmed, body: 'Yes, remove' },
-                    ]}
-                />
-                <Dialog
-                    isOpen={pushDialog}
-                    caption="Push certificate to the location"
-                    toggle={() => setPushDialog(false)}
-                    buttons={[]}
-                    size="xl"
-                    body={
-                        <div className="space-y-4">
-                            <CertificateList
-                                selectCertsOnly={true}
-                                multiSelect={false}
-                                hideWidgetButtons
-                                onCheckedRowsChanged={(certs: (string | number)[]) => setSelectedCerts(certs as string[])}
-                            />
 
-                            <PushCertificateForm
-                                selectedCerts={selectedCerts}
-                                location={location}
-                                pushAttributeDescriptors={pushAttributeDescriptors || []}
-                                pushGroupAttributesCallbackAttributes={pushGroupAttributesCallbackAttributes}
-                                setPushGroupAttributesCallbackAttributes={setPushGroupAttributesCallbackAttributes}
-                                isPushingCertificate={isPushingCertificate}
-                                setPushDialog={setPushDialog}
-                            />
-
-                            <Spinner active={isPushingCertificate || isRemovingCertificate} />
-                        </div>
-                    }
-                />
-                <Dialog
-                    isOpen={issueDialog}
-                    caption="Issue certificate for the location"
-                    toggle={() => setIssueDialog(false)}
-                    buttons={[]}
-                    size="xl"
-                    body={
-                        <>
-                            <IssueCertificateForm
-                                location={location}
-                                issuanceAttributeDescriptors={issuanceAttributeDescriptors ?? []}
-                                issueGroupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
-                                setIssueGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
-                                csrAttributeDescriptors={csrAttributeDescriptors ?? []}
-                                csrGroupAttributesCallbackAttributes={csrGroupAttributesCallbackAttributes}
-                                setCsrGroupAttributesCallbackAttributes={setCsrGroupAttributesCallbackAttributes}
-                                resourceCustomAttributes={resourceCustomAttributes ?? []}
-                                raProfiles={raProfiles}
-                                isPushingCertificate={isPushingCertificate}
-                                setIssueDialog={setIssueDialog}
-                            />
-
-                            <Spinner
-                                active={
-                                    isFetchingRaProfiles || isFetchingIssuanceAttributes || isIssuingCertificate || isRemovingCertificate
-                                }
-                            />
-                        </>
-                    }
-                />
-
-                <Dialog
-                    isOpen={isEditModalOpen}
-                    toggle={handleCloseEditModal}
-                    caption="Edit Location"
-                    size="xl"
-                    body={
-                        <LocationForm
-                            locationId={location?.uuid}
-                            entityId={location?.entityInstanceUuid}
-                            onCancel={handleCloseEditModal}
-                            onSuccess={handleCloseEditModal}
+                                        <Widget title="Metadata" titleSize="large">
+                                            {location?.metadata && (
+                                                <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={location.metadata} />
+                                            )}
+                                        </Widget>
+                                    </Container>
+                                ),
+                            },
+                        ]}
+                    />
+                </Container>
+            </Widget>
+            <Dialog
+                isOpen={confirmDelete}
+                caption="Delete Location"
+                body="You are about to delete Location. Is this what you want to do?"
+                toggle={() => setConfirmDelete(false)}
+                icon="delete"
+                buttons={[
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                ]}
+            />
+            <Dialog
+                isOpen={confirmRemoveDialog}
+                caption={`Remove ${certCheckedRows.length === 1 ? 'certificate' : 'certificates'} from the location`}
+                size="md"
+                body={
+                    <>
+                        You are about to remove certificates from the location:
+                        <ul className="list-disc list-inside space-y-2 my-2">
+                            {certCheckedRows.map((uuid) => {
+                                const cert = location?.certificates.find((c) => c.certificateUuid === uuid);
+                                return cert ? <li key={uuid}>{cert.commonName || 'empty'}</li> : null;
+                            })}
+                        </ul>
+                        Is this what you want to do?
+                    </>
+                }
+                toggle={() => setConfirmRemoveDialog(false)}
+                buttons={[
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmRemoveDialog(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onRemoveConfirmed, body: 'Yes, remove' },
+                ]}
+            />
+            <Dialog
+                isOpen={pushDialog}
+                caption="Push certificate to the location"
+                toggle={() => setPushDialog(false)}
+                buttons={[]}
+                size="xl"
+                body={
+                    <div className="space-y-4">
+                        <CertificateList
+                            selectCertsOnly={true}
+                            multiSelect={false}
+                            hideWidgetButtons
+                            onCheckedRowsChanged={(certs: (string | number)[]) => setSelectedCerts(certs as string[])}
                         />
-                    }
-                />
-            </Container>
+
+                        <PushCertificateForm
+                            selectedCerts={selectedCerts}
+                            location={location}
+                            pushAttributeDescriptors={pushAttributeDescriptors || []}
+                            pushGroupAttributesCallbackAttributes={pushGroupAttributesCallbackAttributes}
+                            setPushGroupAttributesCallbackAttributes={setPushGroupAttributesCallbackAttributes}
+                            isPushingCertificate={isPushingCertificate}
+                            setPushDialog={setPushDialog}
+                        />
+
+                        <Spinner active={isPushingCertificate || isRemovingCertificate} />
+                    </div>
+                }
+            />
+            <Dialog
+                isOpen={issueDialog}
+                caption="Issue certificate for the location"
+                toggle={() => setIssueDialog(false)}
+                buttons={[]}
+                size="xl"
+                body={
+                    <>
+                        <IssueCertificateForm
+                            location={location}
+                            issuanceAttributeDescriptors={issuanceAttributeDescriptors ?? []}
+                            issueGroupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
+                            setIssueGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
+                            csrAttributeDescriptors={csrAttributeDescriptors ?? []}
+                            csrGroupAttributesCallbackAttributes={csrGroupAttributesCallbackAttributes}
+                            setCsrGroupAttributesCallbackAttributes={setCsrGroupAttributesCallbackAttributes}
+                            resourceCustomAttributes={resourceCustomAttributes ?? []}
+                            raProfiles={raProfiles}
+                            isPushingCertificate={isPushingCertificate}
+                            setIssueDialog={setIssueDialog}
+                        />
+
+                        <Spinner
+                            active={isFetchingRaProfiles || isFetchingIssuanceAttributes || isIssuingCertificate || isRemovingCertificate}
+                        />
+                    </>
+                }
+            />
+
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit Location"
+                size="xl"
+                body={
+                    <LocationForm
+                        locationId={location?.uuid}
+                        entityId={location?.entityInstanceUuid}
+                        onCancel={handleCloseEditModal}
+                        onSuccess={handleCloseEditModal}
+                    />
+                }
+            />
         </div>
     );
 }

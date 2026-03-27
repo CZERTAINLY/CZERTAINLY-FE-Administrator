@@ -227,92 +227,82 @@ export default function TokenDetail() {
                     { label: token?.name || 'Token Details', href: '' },
                 ]}
             />
-            <Container>
-                <Widget
-                    title="Token Details"
-                    busy={isBusy}
-                    widgetButtons={buttons}
-                    titleSize="large"
-                    refreshAction={getFreshTokenDetails}
-                    widgetLockName={LockWidgetNameEnum.TokenDetails}
-                >
-                    <CustomTable headers={detailHeaders} data={detailData} />
-                </Widget>
+            <Widget widgetLockName={LockWidgetNameEnum.TokenDetails} busy={isBusy} noBorder>
+                <Container>
+                    <Widget title="Token Details" widgetButtons={buttons} titleSize="large" refreshAction={getFreshTokenDetails}>
+                        <CustomTable headers={detailHeaders} data={detailData} />
+                    </Widget>
 
-                <Widget
-                    title="Token Attributes"
-                    titleSize="large"
-                    refreshAction={getFreshAttributes}
-                    widgetLockName={LockWidgetNameEnum.TokenDetails}
-                >
-                    <AttributeViewer attributes={token?.attributes} />
-                </Widget>
+                    <Widget title="Token Attributes" titleSize="large" refreshAction={getFreshAttributes}>
+                        <AttributeViewer attributes={token?.attributes} />
+                    </Widget>
 
-                {token && (
-                    <CustomAttributeWidget resource={Resource.Tokens} resourceUuid={token.uuid} attributes={token.customAttributes} />
-                )}
+                    {token && (
+                        <CustomAttributeWidget resource={Resource.Tokens} resourceUuid={token.uuid} attributes={token.customAttributes} />
+                    )}
 
-                <Widget title="Metadata" titleSize="large">
-                    <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={token?.metadata} />
-                </Widget>
+                    <Widget title="Metadata" titleSize="large">
+                        <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={token?.metadata} />
+                    </Widget>
+                </Container>
+            </Widget>
 
-                <Dialog
-                    isOpen={confirmDelete}
-                    caption="Delete Token"
-                    body="You are about to delete Token. If you continue, objects
+            <Dialog
+                isOpen={confirmDelete}
+                caption="Delete Token"
+                body="You are about to delete Token. If you continue, objects
                   related to the token will fail. Is this what you want to do?"
-                    toggle={() => setConfirmDelete(false)}
-                    icon="delete"
-                    buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                    ]}
-                />
+                toggle={() => setConfirmDelete(false)}
+                icon="delete"
+                buttons={[
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                ]}
+            />
 
-                <Dialog
-                    isOpen={confirmDeactivation}
-                    caption="Deactivate Token"
-                    body="You are about to deactivate Token. If you continue, objects
+            <Dialog
+                isOpen={confirmDeactivation}
+                caption="Deactivate Token"
+                body="You are about to deactivate Token. If you continue, objects
                   related to the token not work. Is this what you want to do?"
-                    toggle={() => setConfirmDeactivation(false)}
-                    buttons={[
-                        { color: 'danger', onClick: onDeactivationConfirmed, body: 'Deactivate' },
-                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDeactivation(false), body: 'Cancel' },
-                    ]}
-                />
+                toggle={() => setConfirmDeactivation(false)}
+                buttons={[
+                    { color: 'danger', onClick: onDeactivationConfirmed, body: 'Deactivate' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDeactivation(false), body: 'Cancel' },
+                ]}
+            />
 
-                <Dialog
-                    isOpen={activateToken}
-                    caption="Activate Token"
-                    body={TokenActivationDialogBody({
-                        visible: activateToken,
-                        onClose: () => setActivateToken(false),
-                        tokenUuid: token?.uuid,
-                    })}
-                    toggle={() => setActivateToken(false)}
-                    buttons={[]}
-                />
+            <Dialog
+                isOpen={activateToken}
+                caption="Activate Token"
+                body={TokenActivationDialogBody({
+                    visible: activateToken,
+                    onClose: () => setActivateToken(false),
+                    tokenUuid: token?.uuid,
+                })}
+                toggle={() => setActivateToken(false)}
+                buttons={[]}
+            />
 
-                <Dialog
-                    isOpen={randomDataGeneration}
-                    caption="Random Data Generation"
-                    body={RandomDataGeneration({
-                        visible: randomDataGeneration,
-                        onClose: () => setRandomDataGeneration(false),
-                        tokenUuid: token?.uuid,
-                    })}
-                    toggle={() => setRandomDataGeneration(false)}
-                    buttons={[]}
-                />
+            <Dialog
+                isOpen={randomDataGeneration}
+                caption="Random Data Generation"
+                body={RandomDataGeneration({
+                    visible: randomDataGeneration,
+                    onClose: () => setRandomDataGeneration(false),
+                    tokenUuid: token?.uuid,
+                })}
+                toggle={() => setRandomDataGeneration(false)}
+                buttons={[]}
+            />
 
-                <Dialog
-                    isOpen={isEditModalOpen}
-                    toggle={handleCloseEditModal}
-                    caption="Edit Token"
-                    size="xl"
-                    body={<TokenForm tokenId={token?.uuid} onCancel={handleCloseEditModal} onSuccess={handleCloseEditModal} />}
-                />
-            </Container>
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit Token"
+                size="xl"
+                body={<TokenForm tokenId={token?.uuid} onCancel={handleCloseEditModal} onSuccess={handleCloseEditModal} />}
+            />
         </div>
     );
 }

@@ -112,67 +112,67 @@ export default function AuthorityDetail() {
                     { label: authority?.name || 'Certification Authority Details', href: '' },
                 ]}
             />
-            <Container>
-                <Widget
-                    title="Certification Authority Details"
-                    busy={isBusy}
-                    widgetButtons={buttons}
-                    titleSize="large"
-                    refreshAction={getFreshAuthorityDetails}
-                    widgetLockName={LockWidgetNameEnum.CertificationAuthorityDetails}
-                >
-                    <CustomTable headers={detailHeaders} data={detailData} />
-                </Widget>
+            <Widget widgetLockName={LockWidgetNameEnum.CertificationAuthorityDetails} busy={isBusy} noBorder>
+                <Container>
+                    <Widget
+                        title="Certification Authority Details"
+                        widgetButtons={buttons}
+                        titleSize="large"
+                        refreshAction={getFreshAuthorityDetails}
+                    >
+                        <CustomTable headers={detailHeaders} data={detailData} />
+                    </Widget>
 
-                <Widget title="Attributes" titleSize="large">
-                    <Label>Certification Authority Attributes</Label>
-                    <AttributeViewer attributes={authority?.attributes} />
-                </Widget>
+                    <Widget title="Attributes" titleSize="large">
+                        <Label>Certification Authority Attributes</Label>
+                        <AttributeViewer attributes={authority?.attributes} />
+                    </Widget>
 
-                {authority && (
-                    <CustomAttributeWidget
-                        resource={Resource.Authorities}
-                        resourceUuid={authority.uuid}
-                        attributes={authority.customAttributes}
-                    />
-                )}
+                    {authority && (
+                        <CustomAttributeWidget
+                            resource={Resource.Authorities}
+                            resourceUuid={authority.uuid}
+                            attributes={authority.customAttributes}
+                        />
+                    )}
+                </Container>
+            </Widget>
 
-                <Dialog
-                    isOpen={confirmDelete}
-                    caption="Delete Certification Authority"
-                    body="You are about to delete Authority. If you continue, connectors
+            <Dialog
+                isOpen={confirmDelete}
+                caption="Delete Certification Authority"
+                body="You are about to delete Authority. If you continue, connectors
                   related to the authority will fail. Is this what you want to do?"
-                    toggle={() => setConfirmDelete(false)}
-                    icon="delete"
-                    buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                    ]}
-                />
+                toggle={() => setConfirmDelete(false)}
+                icon="delete"
+                buttons={[
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                ]}
+            />
 
-                <Dialog
-                    isOpen={deleteErrorMessage !== ''}
-                    caption="Delete Authority"
-                    body={
-                        <>
-                            Failed to delete the Authority Instance as it has dependent objects. Please find the details below:
-                            <br />
-                            <br />
-                            {deleteErrorMessage}
-                        </>
-                    }
-                    toggle={() => dispatch(actions.clearDeleteErrorMessages())}
-                    buttons={[
-                        { color: 'danger', onClick: onForceDeleteAuthority, body: 'Force' },
-                        {
-                            color: 'secondary',
-                            variant: 'outline',
-                            onClick: () => dispatch(actions.clearDeleteErrorMessages()),
-                            body: 'Cancel',
-                        },
-                    ]}
-                />
-            </Container>
+            <Dialog
+                isOpen={deleteErrorMessage !== ''}
+                caption="Delete Authority"
+                body={
+                    <>
+                        Failed to delete the Authority Instance as it has dependent objects. Please find the details below:
+                        <br />
+                        <br />
+                        {deleteErrorMessage}
+                    </>
+                }
+                toggle={() => dispatch(actions.clearDeleteErrorMessages())}
+                buttons={[
+                    { color: 'danger', onClick: onForceDeleteAuthority, body: 'Force' },
+                    {
+                        color: 'secondary',
+                        variant: 'outline',
+                        onClick: () => dispatch(actions.clearDeleteErrorMessages()),
+                        body: 'Cancel',
+                    },
+                ]}
+            />
         </div>
     );
 }

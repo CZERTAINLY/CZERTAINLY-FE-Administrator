@@ -456,251 +456,246 @@ function SecretDetail() {
                     { label: secret?.name || 'Secret Details', href: '' },
                 ]}
             />
+            <Widget widgetLockName={LockWidgetNameEnum.SecretDetailsWidget} busy={isFetchingDetail || isDeleting || isUpdating} noBorder>
+                <div className="space-y-4">
+                    <TabLayout
+                        tabs={[
+                            {
+                                title: 'Details',
+                                content: (
+                                    <div className="space-y-4">
+                                        <Widget
+                                            title="Secret Details"
+                                            busy={isFetchingDetail || isDeleting || isUpdating}
+                                            widgetButtons={widgetButtons}
+                                            titleSize="large"
+                                            refreshAction={getFreshSecretDetails}
+                                            lockSize="large"
+                                        >
+                                            <CustomTable headers={detailHeaders} data={detailData} />
+                                        </Widget>
 
-            <div className="space-y-4">
-                <TabLayout
-                    tabs={[
-                        {
-                            title: 'Details',
-                            content: (
-                                <div className="space-y-4">
-                                    <Widget
-                                        title="Secret Details"
-                                        busy={isFetchingDetail || isDeleting || isUpdating}
-                                        widgetButtons={widgetButtons}
-                                        titleSize="large"
-                                        refreshAction={getFreshSecretDetails}
-                                        widgetLockName={LockWidgetNameEnum.SecretDetailsWidget}
-                                        lockSize="large"
-                                    >
-                                        <CustomTable headers={detailHeaders} data={detailData} />
-                                    </Widget>
+                                        {secret && (
+                                            <Container className="grid gap-6 xl:grid-cols-2 items-start">
+                                                <Widget
+                                                    title="Sync Vault Profiles"
+                                                    titleSize="large"
+                                                    refreshAction={getFreshSecretDetails}
+                                                    widgetLockName={LockWidgetNameEnum.ListOfVaults}
+                                                    lockSize="large"
+                                                    widgetButtons={syncVaultProfilesButtons}
+                                                >
+                                                    <CustomTable headers={syncVaultProfilesHeaders} data={syncVaultProfilesData} />
+                                                </Widget>
 
-                                    {secret && (
-                                        <Container className="grid gap-6 xl:grid-cols-2 items-start">
-                                            <Widget
-                                                title="Sync Vault Profiles"
-                                                titleSize="large"
-                                                refreshAction={getFreshSecretDetails}
-                                                widgetLockName={LockWidgetNameEnum.ListOfVaults}
-                                                lockSize="large"
-                                                widgetButtons={syncVaultProfilesButtons}
-                                            >
-                                                <CustomTable headers={syncVaultProfilesHeaders} data={syncVaultProfilesData} />
-                                            </Widget>
+                                                <Widget title="Other Properties" titleSize="large">
+                                                    <CustomTable headers={otherPropertiesHeaders} data={otherPropertiesData} />
+                                                </Widget>
+                                            </Container>
+                                        )}
+                                    </div>
+                                ),
+                            },
+                            {
+                                title: 'Attributes',
+                                content: (
+                                    <div className="space-y-4">
+                                        {secret?.attributes && secret.attributes.length > 0 && (
+                                            <AttributeViewer attributes={secret.attributes} />
+                                        )}
 
-                                            <Widget title="Other Properties" titleSize="large">
-                                                <CustomTable headers={otherPropertiesHeaders} data={otherPropertiesData} />
-                                            </Widget>
-                                        </Container>
-                                    )}
-                                </div>
-                            ),
-                        },
-                        {
-                            title: 'Attributes',
-                            content: (
-                                <div className="space-y-4">
-                                    {secret?.attributes && secret.attributes.length > 0 && (
-                                        <AttributeViewer attributes={secret.attributes} />
-                                    )}
-
-                                    {secret && (
-                                        <CustomAttributeWidget
-                                            resource={Resource.Secrets}
-                                            resourceUuid={secret.uuid}
-                                            attributes={secret.customAttributes}
-                                            noBorder
-                                        />
-                                    )}
-                                </div>
-                            ),
-                        },
-                        {
-                            title: 'Versions',
-                            content: <CustomTable headers={versionsHeaders} data={versionsData} />,
-                        },
-                    ]}
-                />
-
-                <Dialog
-                    isOpen={isEditSecretOpen}
-                    caption={`Edit "${secret?.name}"`}
-                    size="xl"
-                    toggle={() => setIsEditSecretOpen(false)}
-                    body={
-                        secret && (
-                            <SecretForm
-                                initialSecret={secret}
-                                onCancel={() => setIsEditSecretOpen(false)}
-                                onSuccess={() => {
-                                    setIsEditSecretOpen(false);
-                                    getFreshSecretDetails();
-                                }}
-                            />
-                        )
-                    }
-                />
-
-                <Dialog
-                    isOpen={confirmEnable}
-                    caption="Enable Secret"
-                    body="You are about to enable a Secret. Is this what you want to do?"
-                    toggle={() => setConfirmEnable(false)}
-                    icon="check"
-                    buttons={[
-                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmEnable(false), body: 'Cancel' },
-                        { color: 'primary', onClick: onEnableConfirmed, body: 'Enable' },
-                    ]}
-                />
-
-                <Dialog
-                    isOpen={confirmDisable}
-                    caption="Disable Secret"
-                    body="You are about to disable a Secret. Is this what you want to do?"
-                    toggle={() => setConfirmDisable(false)}
-                    icon="warning"
-                    buttons={[
-                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDisable(false), body: 'Cancel' },
-                        { color: 'danger', onClick: onDisableConfirmed, body: 'Disable' },
-                    ]}
-                />
-
-                <Dialog
-                    isOpen={confirmDelete}
-                    caption="Delete Secret"
-                    body="You are about to delete a Secret. Is this what you want to do?"
-                    toggle={() => setConfirmDelete(false)}
-                    icon="delete"
-                    buttons={[
-                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                    ]}
-                />
-
-                <Dialog
-                    isOpen={isUpdateOwnerOpen}
-                    caption="Update Secret Owner"
-                    body={
-                        <>
-                            <Select
-                                id="secret-owner-detail"
-                                label="Owner"
-                                placeholder="Select owner"
-                                options={userOptions}
-                                value={ownerUuid || ''}
-                                onChange={(value) => setOwnerUuid(value as string)}
-                            />
-                            <Container className="flex-row justify-end modal-footer mt-4" gap={4}>
-                                <Button variant="outline" onClick={() => setIsUpdateOwnerOpen(false)} type="button">
-                                    Cancel
-                                </Button>
-                                <Button color="danger" onClick={handleRemoveOwner} type="button">
-                                    Remove
-                                </Button>
-                                <Button color="primary" onClick={handleUpdateOwner} type="button" disabled={!ownerUuid}>
-                                    Update
-                                </Button>
-                            </Container>
-                        </>
-                    }
-                    toggle={() => setIsUpdateOwnerOpen(false)}
-                    size="md"
-                    buttons={[]}
-                />
-
-                <Dialog
-                    isOpen={isUpdateGroupsOpen}
-                    caption="Update Secret Groups"
-                    body={
-                        <>
-                            <Select
-                                id="secret-groups-detail"
-                                label="Groups"
-                                placeholder="Select groups"
-                                options={groupOptions}
-                                value={selectedGroups}
-                                onChange={(value) => setSelectedGroups((value as { value: string; label: string }[]) || [])}
-                                isMulti
-                            />
-                            <Container className="flex-row justify-end modal-footer mt-4" gap={4}>
-                                <Button variant="outline" onClick={() => setIsUpdateGroupsOpen(false)} type="button">
-                                    Cancel
-                                </Button>
-                                <Button color="danger" onClick={handleClearGroups} type="button">
-                                    Clear
-                                </Button>
-                                <Button color="primary" onClick={handleUpdateGroups} type="button" disabled={selectedGroups.length === 0}>
-                                    Update
-                                </Button>
-                            </Container>
-                        </>
-                    }
-                    toggle={() => setIsUpdateGroupsOpen(false)}
-                    size="md"
-                    buttons={[]}
-                />
-
-                <Dialog
-                    isOpen={isUpdateVaultProfileOpen}
-                    caption="Update Source Vault Profile"
-                    body={
-                        <>
-                            <Select
-                                id="secret-vault-profile-detail"
-                                label="Source Vault Profile"
-                                placeholder="Select vault profile"
-                                options={vaultProfileOptions}
-                                value={selectedVaultProfileUuid || ''}
-                                onChange={(value) => setSelectedVaultProfileUuid(value as string)}
-                            />
-                            <Container className="flex-row justify-end modal-footer mt-4" gap={4}>
-                                <Button variant="outline" onClick={() => setIsUpdateVaultProfileOpen(false)} type="button">
-                                    Cancel
-                                </Button>
-                                <Button
-                                    color="primary"
-                                    onClick={handleUpdateVaultProfile}
-                                    type="button"
-                                    disabled={!selectedVaultProfileUuid}
-                                >
-                                    Update
-                                </Button>
-                            </Container>
-                        </>
-                    }
-                    toggle={() => setIsUpdateVaultProfileOpen(false)}
-                    size="md"
-                    buttons={[]}
-                />
-
-                {secret && (
-                    <Dialog
-                        isOpen={isAddSyncVaultProfileOpen}
-                        caption="Add Sync Vault Profile"
-                        body={<SyncVaultProfileDialog secret={secret} onClose={() => setIsAddSyncVaultProfileOpen(false)} />}
-                        toggle={() => setIsAddSyncVaultProfileOpen(false)}
-                        size="md"
-                        buttons={[]}
+                                        {secret && (
+                                            <CustomAttributeWidget
+                                                resource={Resource.Secrets}
+                                                resourceUuid={secret.uuid}
+                                                attributes={secret.customAttributes}
+                                                noBorder
+                                            />
+                                        )}
+                                    </div>
+                                ),
+                            },
+                            {
+                                title: 'Versions',
+                                content: <CustomTable headers={versionsHeaders} data={versionsData} />,
+                            },
+                        ]}
                     />
-                )}
+                </div>
+            </Widget>
 
+            <Dialog
+                isOpen={isEditSecretOpen}
+                caption={`Edit "${secret?.name}"`}
+                size="xl"
+                toggle={() => setIsEditSecretOpen(false)}
+                body={
+                    secret && (
+                        <SecretForm
+                            initialSecret={secret}
+                            onCancel={() => setIsEditSecretOpen(false)}
+                            onSuccess={() => {
+                                setIsEditSecretOpen(false);
+                                getFreshSecretDetails();
+                            }}
+                        />
+                    )
+                }
+            />
+
+            <Dialog
+                isOpen={confirmEnable}
+                caption="Enable Secret"
+                body="You are about to enable a Secret. Is this what you want to do?"
+                toggle={() => setConfirmEnable(false)}
+                icon="check"
+                buttons={[
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmEnable(false), body: 'Cancel' },
+                    { color: 'primary', onClick: onEnableConfirmed, body: 'Enable' },
+                ]}
+            />
+
+            <Dialog
+                isOpen={confirmDisable}
+                caption="Disable Secret"
+                body="You are about to disable a Secret. Is this what you want to do?"
+                toggle={() => setConfirmDisable(false)}
+                icon="warning"
+                buttons={[
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDisable(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDisableConfirmed, body: 'Disable' },
+                ]}
+            />
+
+            <Dialog
+                isOpen={confirmDelete}
+                caption="Delete Secret"
+                body="You are about to delete a Secret. Is this what you want to do?"
+                toggle={() => setConfirmDelete(false)}
+                icon="delete"
+                buttons={[
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                ]}
+            />
+
+            <Dialog
+                isOpen={isUpdateOwnerOpen}
+                caption="Update Secret Owner"
+                body={
+                    <>
+                        <Select
+                            id="secret-owner-detail"
+                            label="Owner"
+                            placeholder="Select owner"
+                            options={userOptions}
+                            value={ownerUuid || ''}
+                            onChange={(value) => setOwnerUuid(value as string)}
+                        />
+                        <Container className="flex-row justify-end modal-footer mt-4" gap={4}>
+                            <Button variant="outline" onClick={() => setIsUpdateOwnerOpen(false)} type="button">
+                                Cancel
+                            </Button>
+                            <Button color="danger" onClick={handleRemoveOwner} type="button">
+                                Remove
+                            </Button>
+                            <Button color="primary" onClick={handleUpdateOwner} type="button" disabled={!ownerUuid}>
+                                Update
+                            </Button>
+                        </Container>
+                    </>
+                }
+                toggle={() => setIsUpdateOwnerOpen(false)}
+                size="md"
+                buttons={[]}
+            />
+
+            <Dialog
+                isOpen={isUpdateGroupsOpen}
+                caption="Update Secret Groups"
+                body={
+                    <>
+                        <Select
+                            id="secret-groups-detail"
+                            label="Groups"
+                            placeholder="Select groups"
+                            options={groupOptions}
+                            value={selectedGroups}
+                            onChange={(value) => setSelectedGroups((value as { value: string; label: string }[]) || [])}
+                            isMulti
+                        />
+                        <Container className="flex-row justify-end modal-footer mt-4" gap={4}>
+                            <Button variant="outline" onClick={() => setIsUpdateGroupsOpen(false)} type="button">
+                                Cancel
+                            </Button>
+                            <Button color="danger" onClick={handleClearGroups} type="button">
+                                Clear
+                            </Button>
+                            <Button color="primary" onClick={handleUpdateGroups} type="button" disabled={selectedGroups.length === 0}>
+                                Update
+                            </Button>
+                        </Container>
+                    </>
+                }
+                toggle={() => setIsUpdateGroupsOpen(false)}
+                size="md"
+                buttons={[]}
+            />
+
+            <Dialog
+                isOpen={isUpdateVaultProfileOpen}
+                caption="Update Source Vault Profile"
+                body={
+                    <>
+                        <Select
+                            id="secret-vault-profile-detail"
+                            label="Source Vault Profile"
+                            placeholder="Select vault profile"
+                            options={vaultProfileOptions}
+                            value={selectedVaultProfileUuid || ''}
+                            onChange={(value) => setSelectedVaultProfileUuid(value as string)}
+                        />
+                        <Container className="flex-row justify-end modal-footer mt-4" gap={4}>
+                            <Button variant="outline" onClick={() => setIsUpdateVaultProfileOpen(false)} type="button">
+                                Cancel
+                            </Button>
+                            <Button color="primary" onClick={handleUpdateVaultProfile} type="button" disabled={!selectedVaultProfileUuid}>
+                                Update
+                            </Button>
+                        </Container>
+                    </>
+                }
+                toggle={() => setIsUpdateVaultProfileOpen(false)}
+                size="md"
+                buttons={[]}
+            />
+
+            {secret && (
                 <Dialog
-                    isOpen={isSyncVaultProfileAttributesOpen}
-                    caption={`Sync Vault Profile Attributes: ${selectedSyncVaultProfile?.name ?? ''}`}
-                    body={<AttributeViewer attributes={selectedSyncVaultProfile?.secretAttributes} />}
-                    toggle={() => setIsSyncVaultProfileAttributesOpen(false)}
-                    size="xl"
-                    buttons={[
-                        {
-                            color: 'secondary',
-                            variant: 'outline',
-                            onClick: () => setIsSyncVaultProfileAttributesOpen(false),
-                            body: 'Close',
-                        },
-                    ]}
+                    isOpen={isAddSyncVaultProfileOpen}
+                    caption="Add Sync Vault Profile"
+                    body={<SyncVaultProfileDialog secret={secret} onClose={() => setIsAddSyncVaultProfileOpen(false)} />}
+                    toggle={() => setIsAddSyncVaultProfileOpen(false)}
+                    size="md"
+                    buttons={[]}
                 />
-            </div>
+            )}
+
+            <Dialog
+                isOpen={isSyncVaultProfileAttributesOpen}
+                caption={`Sync Vault Profile Attributes: ${selectedSyncVaultProfile?.name ?? ''}`}
+                body={<AttributeViewer attributes={selectedSyncVaultProfile?.secretAttributes} />}
+                toggle={() => setIsSyncVaultProfileAttributesOpen(false)}
+                size="xl"
+                buttons={[
+                    {
+                        color: 'secondary',
+                        variant: 'outline',
+                        onClick: () => setIsSyncVaultProfileAttributesOpen(false),
+                        body: 'Close',
+                    },
+                ]}
+            />
         </div>
     );
 }

@@ -86,8 +86,16 @@ describe('net utils', () => {
             expect(result.lockDetails).toBe('Field X is required Field Y invalid');
         });
 
-        test('should return Client Error for 4xx (except 401, 403, 422)', () => {
+        test('should return Not Found for 404', () => {
             const err = createMockAjaxError({ status: 404, response: null });
+            const result = getLockWidgetObject(err);
+            expect(result.lockTitle).toBe('Not Found');
+            expect(result.lockText).toBe('The requested resource does not exist');
+            expect(result.lockType).toBe(LockTypeEnum.GENERIC);
+        });
+
+        test('should return Client Error for 4xx (except 401, 403, 404, 422)', () => {
+            const err = createMockAjaxError({ status: 409, response: null });
             const result = getLockWidgetObject(err);
             expect(result.lockTitle).toBe('Client Error');
             expect(result.lockText).toBe('There was some problem at the client side');

@@ -35,6 +35,8 @@ export default function CustomAttributeDetail() {
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
+    const isBusy = useMemo(() => isFetchingDetail || isEnabling || isDisabling, [isFetchingDetail, isEnabling, isDisabling]);
+
     const getFreshCustomAttribute = useCallback(() => {
         if (!id) return;
         dispatch(actions.getCustomAttribute(id));
@@ -233,15 +235,10 @@ export default function CustomAttributeDetail() {
                     { label: customAttribute?.name || 'Custom Attribute Details', href: '' },
                 ]}
             />
-            <Widget
-                title="Custom Attribute Details"
-                busy={isFetchingDetail || isEnabling || isDisabling}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshCustomAttribute}
-                widgetLockName={LockWidgetNameEnum.CustomAttributeDetails}
-            >
-                <CustomTable headers={detailHeaders} data={detailData} />
+            <Widget widgetLockName={LockWidgetNameEnum.CustomAttributeDetails} busy={isBusy} noBorder>
+                <Widget title="Custom Attribute Details" widgetButtons={buttons} titleSize="large" refreshAction={getFreshCustomAttribute}>
+                    <CustomTable headers={detailHeaders} data={detailData} />
+                </Widget>
             </Widget>
 
             <Dialog
