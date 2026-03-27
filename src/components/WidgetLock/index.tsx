@@ -1,7 +1,8 @@
-import cn from 'classnames';
 import Container from 'components/Container';
+import Tooltip from 'components/Tooltip';
 import { LockTypeEnum } from 'types/user-interface';
 import { Info, TriangleAlert, Home, Lock, Wifi, Database, Server } from 'lucide-react';
+
 interface Props {
     size?: 'small' | 'normal' | 'large';
     lockTitle?: string;
@@ -20,14 +21,10 @@ const WidgetLock = ({
     lockDetails,
     dataTestId,
 }: Props) => {
-    const getIcon = () => {
-        let iconSize = 48;
-        if (size === 'small') iconSize = 24;
-        else if (size === 'normal') iconSize = 32;
+    const iconSize = size === 'large' ? 48 : size === 'small' ? 24 : 32;
 
+    const getIcon = () => {
         switch (lockType) {
-            case LockTypeEnum.GENERIC:
-                return <TriangleAlert size={iconSize} />;
             case LockTypeEnum.CLIENT:
                 return <Home size={iconSize} />;
             case LockTypeEnum.PERMISSION:
@@ -43,47 +40,28 @@ const WidgetLock = ({
         }
     };
 
-    const renderPopOver = () => {
-        return (
-            <div className="hs-tooltip inline-block">
-                <button
-                    type="button"
-                    className="hs-tooltip-toggle inline-flex items-center gap-x-2 text-sm text-gray-500 hover:text-gray-800 dark:text-neutral-400 dark:hover:text-neutral-200"
-                >
-                    <Info size={16} className="ml-1" />
-                </button>
-                <div
-                    className="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 invisible transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded shadow-sm dark:bg-neutral-700"
-                    role="tooltip"
-                >
-                    <div className="text-center font-semibold mb-1">{lockTitle}</div>
-                    <div className="text-center">{lockDetails}</div>
-                </div>
-            </div>
-        );
-    };
-
-    const getMainColWidthLg = () => {
-        if (size === 'small') return 'md:col-start-3 md:col-span-5';
-        if (size === 'normal') return 'md:col-start-4 md:col-span-6';
-        return 'md:col-span-12';
-    };
+    const maxWidthClass = size === 'small' ? 'max-w-md' : size === 'normal' ? 'max-w-xl' : 'max-w-full';
 
     return (
         <Container>
-            <div className="grid grid-cols-12" data-testid={dataTestId || 'widget-lock'}>
-                <div className={`col-span-12 ${getMainColWidthLg()} text-center`}>
-                    <div className={cn('bg-gray-100 dark:bg-gray-800 rounded-lg p-6')}>
-                        <div className="grid grid-cols-12 gap-4">
-                            <div className="col-span-12 xl:col-start-2 xl:col-span-3 flex items-center justify-center">{getIcon()}</div>
-                            <div className="col-span-12 xl:col-span-8">
-                                <h5 className={cn('flex justify-center items-center gap-2')}>
-                                    {lockTitle}
-                                    {lockDetails && renderPopOver()}
-                                </h5>
-                                <p>{lockText}</p>
-                            </div>
-                        </div>
+            <div data-testid={dataTestId || 'widget-lock'} className={`${maxWidthClass} mx-auto`}>
+                <div className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-xl p-6 flex flex-col sm:flex-row items-center gap-4">
+                    <div className="shrink-0 text-[var(--status-danger-color)] dark:text-neutral-400">{getIcon()}</div>
+                    <div className="text-center sm:text-left">
+                        <h5 className="flex justify-center sm:justify-start items-center gap-1.5 font-semibold text-[var(--dark-gray-color)] dark:text-neutral-200">
+                            {lockTitle}
+                            {lockDetails && (
+                                <Tooltip content={lockDetails}>
+                                    <button
+                                        type="button"
+                                        className="inline-flex items-center text-[var(--gray-400)] hover:text-[var(--dark-gray-color)] dark:text-neutral-500 dark:hover:text-neutral-300"
+                                    >
+                                        <Info size={15} />
+                                    </button>
+                                </Tooltip>
+                            )}
+                        </h5>
+                        <p className="text-sm text-[var(--dark-gray-color)] dark:text-neutral-400 mt-1">{lockText}</p>
                     </div>
                 </div>
             </div>

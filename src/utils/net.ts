@@ -29,7 +29,13 @@ export function getLockWidgetObject(error: AjaxError): WidgetLockErrorModel {
         };
     }
 
-    if (error.status === 422)
+    if (error.status === 404)
+        return {
+            lockTitle: 'Not Found',
+            lockText: 'The requested resource does not exist',
+            lockType: LockTypeEnum.GENERIC,
+        };
+    else if (error.status === 422)
         return {
             lockTitle: 'Validation Error',
             lockText: 'There was a problem in validating the request',

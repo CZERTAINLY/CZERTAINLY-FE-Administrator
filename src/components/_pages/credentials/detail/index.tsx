@@ -144,77 +144,75 @@ function CredentialDetail() {
                     { label: credential?.name || 'Credential Details', href: '' },
                 ]}
             />
-            <Container>
-                <Widget
-                    title="Credential Details"
-                    busy={isFetching || isDeleting}
-                    widgetButtons={widgetButtons}
-                    titleSize="large"
-                    refreshAction={getFreshCredentialDetails}
-                    widgetLockName={LockWidgetNameEnum.CredentialDetails}
-                >
-                    <CustomTable headers={detailHeaders} data={detailData} />
-                </Widget>
-
-                {credential && credential.attributes && credential.attributes.length > 0 && (
-                    <Widget title="Credential Attributes" titleSize="large">
-                        <AttributeViewer attributes={credential?.attributes} />
+            <Widget widgetLockName={LockWidgetNameEnum.CredentialDetails} busy={isFetching || isDeleting} noBorder>
+                <Container>
+                    <Widget
+                        title="Credential Details"
+                        widgetButtons={widgetButtons}
+                        titleSize="large"
+                        refreshAction={getFreshCredentialDetails}
+                    >
+                        <CustomTable headers={detailHeaders} data={detailData} />
                     </Widget>
-                )}
 
-                {credential && (
-                    <CustomAttributeWidget
-                        resource={Resource.Credentials}
-                        resourceUuid={credential.uuid}
-                        attributes={credential.customAttributes}
-                    />
-                )}
+                    {credential && credential.attributes && credential.attributes.length > 0 && (
+                        <Widget title="Credential Attributes" titleSize="large">
+                            <AttributeViewer attributes={credential?.attributes} />
+                        </Widget>
+                    )}
 
-                <Dialog
-                    isOpen={confirmDelete}
-                    caption="Delete Credential"
-                    body="You are about to delete a Credential. Is this what you want to do?"
-                    toggle={() => setConfirmDelete(false)}
-                    icon="delete"
-                    buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                    ]}
-                />
+                    {credential && (
+                        <CustomAttributeWidget
+                            resource={Resource.Credentials}
+                            resourceUuid={credential.uuid}
+                            attributes={credential.customAttributes}
+                        />
+                    )}
+                </Container>
+            </Widget>
 
-                <Dialog
-                    isOpen={deleteErrorMessage !== ''}
-                    caption="Delete Connector"
-                    body={
-                        <>
-                            Failed to delete the Credential as the Credential has dependent objects. Please find the details below:
-                            <br />
-                            <br />
-                            {deleteErrorMessage}
-                        </>
-                    }
-                    toggle={() => dispatch(actions.clearDeleteErrorMessages())}
-                    buttons={[
-                        { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force' },
-                        {
-                            color: 'secondary',
-                            variant: 'outline',
-                            onClick: () => dispatch(actions.clearDeleteErrorMessages()),
-                            body: 'Cancel',
-                        },
-                    ]}
-                />
+            <Dialog
+                isOpen={confirmDelete}
+                caption="Delete Credential"
+                body="You are about to delete a Credential. Is this what you want to do?"
+                toggle={() => setConfirmDelete(false)}
+                icon="delete"
+                buttons={[
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                ]}
+            />
 
-                <Dialog
-                    isOpen={isEditModalOpen}
-                    toggle={handleCloseEditModal}
-                    caption="Edit Credential"
-                    size="xl"
-                    body={
-                        <CredentialForm credentialId={credential?.uuid} onCancel={handleCloseEditModal} onSuccess={handleCloseEditModal} />
-                    }
-                />
-            </Container>
+            <Dialog
+                isOpen={deleteErrorMessage !== ''}
+                caption="Delete Connector"
+                body={
+                    <>
+                        Failed to delete the Credential as the Credential has dependent objects. Please find the details below:
+                        <br />
+                        <br />
+                        {deleteErrorMessage}
+                    </>
+                }
+                toggle={() => dispatch(actions.clearDeleteErrorMessages())}
+                buttons={[
+                    { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force' },
+                    {
+                        color: 'secondary',
+                        variant: 'outline',
+                        onClick: () => dispatch(actions.clearDeleteErrorMessages()),
+                        body: 'Cancel',
+                    },
+                ]}
+            />
+
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit Credential"
+                size="xl"
+                body={<CredentialForm credentialId={credential?.uuid} onCancel={handleCloseEditModal} onSuccess={handleCloseEditModal} />}
+            />
         </div>
     );
 }

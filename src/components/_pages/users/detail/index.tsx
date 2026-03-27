@@ -99,8 +99,23 @@ export default function UserDetail() {
     }, [user, dispatch]);
 
     const isBusy = useMemo(
-        () => isFetchingDetail || isFetchingRoles || isFetchingResourceCustomAttributes || isUpdatingContent || isFetchingCertificateDetail,
-        [isFetchingDetail, isFetchingRoles, isFetchingResourceCustomAttributes, isUpdatingContent, isFetchingCertificateDetail],
+        () =>
+            isFetchingDetail ||
+            isFetchingRoles ||
+            isFetchingResourceCustomAttributes ||
+            isUpdatingContent ||
+            isFetchingCertificateDetail ||
+            isEnabling ||
+            isDisabling,
+        [
+            isFetchingDetail,
+            isFetchingRoles,
+            isFetchingResourceCustomAttributes,
+            isUpdatingContent,
+            isFetchingCertificateDetail,
+            isEnabling,
+            isDisabling,
+        ],
     );
 
     const buttons: WidgetButtonProps[] = useMemo(
@@ -209,29 +224,26 @@ export default function UserDetail() {
                     { label: user?.username || 'User Details', href: '' },
                 ]}
             />
-            <Container>
-                <Widget
-                    title="User Details"
-                    busy={isFetchingDetail || isFetchingRoles || isEnabling || isDisabling}
-                    widgetButtons={buttons}
-                    titleSize="large"
-                    refreshAction={getFreshUserDetails}
-                    widgetLockName={LockWidgetNameEnum.UserDetails}
-                >
-                    <CustomTable headers={detailHeaders} data={detailData} />
-                </Widget>
+            <Widget widgetLockName={LockWidgetNameEnum.UserDetails} busy={isBusy} noBorder>
+                <Container>
+                    <Widget title="User Details" widgetButtons={buttons} titleSize="large" refreshAction={getFreshUserDetails}>
+                        <CustomTable headers={detailHeaders} data={detailData} />
+                    </Widget>
 
-                <Widget
-                    title="User Certificate Details"
-                    busy={isFetchingDetail || isFetchingCertificateDetail}
-                    titleSize="large"
-                    refreshAction={user?.certificate?.uuid ? getFreshCertificateDetails : undefined}
-                >
-                    <CertificateAttributes certificate={certificate} />
-                </Widget>
+                    <Widget
+                        title="User Certificate Details"
+                        busy={isFetchingDetail || isFetchingCertificateDetail}
+                        titleSize="large"
+                        refreshAction={user?.certificate?.uuid ? getFreshCertificateDetails : undefined}
+                    >
+                        <CertificateAttributes certificate={certificate} />
+                    </Widget>
 
-                {user && <CustomAttributeWidget resource={Resource.Users} resourceUuid={user.uuid} attributes={user.customAttributes} />}
-            </Container>
+                    {user && (
+                        <CustomAttributeWidget resource={Resource.Users} resourceUuid={user.uuid} attributes={user.customAttributes} />
+                    )}
+                </Container>
+            </Widget>
 
             <Dialog
                 isOpen={confirmDelete}

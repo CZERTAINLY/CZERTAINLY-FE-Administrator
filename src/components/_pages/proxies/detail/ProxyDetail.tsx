@@ -252,36 +252,30 @@ export const ProxyDetail = () => {
                     { label: proxyDetails?.name || 'Proxy Details', href: '' },
                 ]}
             />
-            <Container>
-                <Widget
-                    refreshAction={getFreshDetails}
-                    busy={isBusy}
-                    title="Details"
-                    titleSize="large"
-                    widgetButtons={buttons}
-                    widgetLockName={LockWidgetNameEnum.ProxyDetails}
-                >
-                    <CustomTable data={proxyDetailData} headers={tableHeader} />
-                    {showManagedConnectors && (
-                        <Widget title="Managed Connectors" titleSize="large" busy={isBusy} noBorder={true} className="mt-6">
-                            <CustomTable headers={managedConnectorsTableHeaders} data={managedConnectorsData} />
-                        </Widget>
-                    )}
-                    {showInstallationInstructions && (
-                        <Widget
-                            title="Install proxy in your environment"
-                            titleSize="large"
-                            busy={isBusy}
-                            noBorder={true}
-                            className="mt-6"
-                            refreshAction={fetchInstallationInstructions}
-                        >
-                            <div className={'text-gray-500 mb-3'}>Run the Helm command below in the customer Kubernetes cluster.</div>
-                            <InstallationInstructions title={'Installation instructions'} instructions={installationInstructions} />
-                        </Widget>
-                    )}
-                </Widget>
-            </Container>
+            <Widget widgetLockName={LockWidgetNameEnum.ProxyDetails} busy={isBusy} noBorder>
+                <Container>
+                    <Widget refreshAction={getFreshDetails} title="Details" titleSize="large" widgetButtons={buttons}>
+                        <CustomTable data={proxyDetailData} headers={tableHeader} />
+                        {showManagedConnectors && (
+                            <Widget title="Managed Connectors" titleSize="large" noBorder={true} className="mt-6">
+                                <CustomTable headers={managedConnectorsTableHeaders} data={managedConnectorsData} />
+                            </Widget>
+                        )}
+                        {showInstallationInstructions && (
+                            <Widget
+                                title="Install proxy in your environment"
+                                titleSize="large"
+                                noBorder={true}
+                                className="mt-6"
+                                refreshAction={fetchInstallationInstructions}
+                            >
+                                <div className={'text-gray-500 mb-3'}>Run the Helm command below in the customer Kubernetes cluster.</div>
+                                <InstallationInstructions title={'Installation instructions'} instructions={installationInstructions} />
+                            </Widget>
+                        )}
+                    </Widget>
+                </Container>
+            </Widget>
             <Dialog
                 isOpen={confirmDelete}
                 caption={`Delete a Proxy`}

@@ -280,58 +280,53 @@ export default function UserDetail() {
                     { label: role?.name || 'Role Details', href: '' },
                 ]}
             />
-            <Container>
-                <Widget
-                    title="Role Details"
-                    busy={isFetchingDetail}
-                    widgetButtons={buttons}
-                    titleSize="large"
-                    refreshAction={getFreshDetails}
-                    widgetLockName={LockWidgetNameEnum.RoleDetails}
-                >
-                    <CustomTable headers={detailHeaders} data={detailData} />
-                </Widget>
+            <Widget widgetLockName={LockWidgetNameEnum.RoleDetails} busy={isFetchingDetail} noBorder>
+                <Container>
+                    <Widget title="Role Details" widgetButtons={buttons} titleSize="large" refreshAction={getFreshDetails}>
+                        <CustomTable headers={detailHeaders} data={detailData} />
+                    </Widget>
 
-                <Widget title="Assigned Users" busy={isFetchingDetail} titleSize="large">
-                    <CustomTable headers={usersHeaders} data={usersData} />
-                </Widget>
+                    <Widget title="Assigned Users" titleSize="large">
+                        <CustomTable headers={usersHeaders} data={usersData} />
+                    </Widget>
 
-                {memoizedRole && (
-                    <CustomAttributeWidget
-                        resource={Resource.Roles}
-                        resourceUuid={memoizedRole.uuid}
-                        attributes={memoizedRole.customAttributes}
-                    />
-                )}
-
-                <Widget
-                    title="Role Permissions"
-                    busy={isFetchingDetail || isFetchingPermissions}
-                    titleSize="large"
-                    refreshAction={role && getFreshPermissions}
-                >
-                    {!permissions ? (
-                        <></>
-                    ) : (
-                        <>
-                            <Checkbox
-                                checked={permissions.permissions.allowAllResources}
-                                disabled
-                                onChange={() => {}}
-                                label="All resources allowed"
-                            />
-                            {permissions.permissions.resources.length === 0 ? (
-                                <></>
-                            ) : (
-                                <>
-                                    <p className="text-sm mt-4 mb-2">List of allowed resources</p>
-                                    <CustomTable headers={permsHeaders} data={permsData} detailHeaders={permsHeaders} hasDetails />
-                                </>
-                            )}
-                        </>
+                    {memoizedRole && (
+                        <CustomAttributeWidget
+                            resource={Resource.Roles}
+                            resourceUuid={memoizedRole.uuid}
+                            attributes={memoizedRole.customAttributes}
+                        />
                     )}
-                </Widget>
-            </Container>
+
+                    <Widget
+                        title="Role Permissions"
+                        busy={isFetchingDetail || isFetchingPermissions}
+                        titleSize="large"
+                        refreshAction={role && getFreshPermissions}
+                    >
+                        {!permissions ? (
+                            <></>
+                        ) : (
+                            <>
+                                <Checkbox
+                                    checked={permissions.permissions.allowAllResources}
+                                    disabled
+                                    onChange={() => {}}
+                                    label="All resources allowed"
+                                />
+                                {permissions.permissions.resources.length === 0 ? (
+                                    <></>
+                                ) : (
+                                    <>
+                                        <p className="text-sm mt-4 mb-2">List of allowed resources</p>
+                                        <CustomTable headers={permsHeaders} data={permsData} detailHeaders={permsHeaders} hasDetails />
+                                    </>
+                                )}
+                            </>
+                        )}
+                    </Widget>
+                </Container>
+            </Widget>
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Role"
