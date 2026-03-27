@@ -61,6 +61,8 @@ export default function ConnectorDetail() {
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
 
+    const isBusy = isFetchingDetail || isBulkReconnecting || isReconnecting || isAuthorizing;
+
     const [currentFunctionGroup, setFunctionGroup] = useState<FunctionGroupModel | undefined>();
     const [currentFunctionGroupKind, setCurrentFunctionGroupKind] = useState<string>();
     const [currentFunctionGroupKindAttributes, setCurrentFunctionGroupKindAttributes] = useState<AttributeDescriptorModel[] | undefined>();
@@ -390,66 +392,65 @@ export default function ConnectorDetail() {
                     { label: connector?.name || 'Connector Details', href: '' },
                 ]}
             />
+            <Widget widgetLockName={LockWidgetNameEnum.ConnectorDetails} busy={isBusy} noBorder>
+                <div className="space-y-4">
+                    <Container className="grid xl:grid-cols-2 items-start">
+                        <Widget
+                            title="Connector Details"
+                            widgetButtons={widgetButtons}
+                            titleSize="large"
+                            refreshAction={getFreshConnectorDetails}
+                            lockSize="large"
+                        >
+                            <CustomTable headers={attributesHeaders} data={attributesData} />
+                        </Widget>
 
-            <div className="space-y-4">
-                <Container className="grid xl:grid-cols-2 items-start">
-                    <Widget
-                        title="Connector Details"
-                        busy={isFetchingDetail || isBulkReconnecting || isReconnecting || isAuthorizing}
-                        widgetButtons={widgetButtons}
-                        titleSize="large"
-                        refreshAction={getFreshConnectorDetails}
-                        widgetLockName={LockWidgetNameEnum.ConnectorDetails}
-                        lockSize="large"
-                    >
-                        <CustomTable headers={attributesHeaders} data={attributesData} />
-                    </Widget>
+                        {connector && (
+                            <CustomAttributeWidget
+                                resource={Resource.Connectors}
+                                resourceUuid={connector.uuid}
+                                attributes={connector.customAttributes}
+                            />
+                        )}
+                    </Container>
 
-                    {connector && (
-                        <CustomAttributeWidget
-                            resource={Resource.Connectors}
-                            resourceUuid={connector.uuid}
-                            attributes={connector.customAttributes}
+                    <Container className={connector?.version === ConnectorVersion.V2 ? 'grid gap-6 xl:grid-cols-2' : 'grid gap-6'}>
+                        {connector?.version === ConnectorVersion.V2 && connectorInfoData.length > 0 && (
+                            <Widget title="Connector Info" busy={isFetchingDetail} titleSize="large">
+                                <CustomTable headers={attributesHeaders} data={connectorInfoData} />
+                            </Widget>
+                        )}
+                        <Widget
+                            title="Connector Health"
+                            busy={isFetchingHealth}
+                            widgetExtraTopNode={healthButtonsNode}
+                            titleSize="large"
+                            refreshAction={getFreshConnectorHealth}
+                        >
+                            <CustomTable headers={healthHeaders} data={healthData} />
+                        </Widget>
+                    </Container>
+
+                    {connector?.version === ConnectorVersion.V1 && (
+                        <FunctionGroupDetailsV1
+                            functionGroups={connector.functionGroups}
+                            currentFunctionGroup={currentFunctionGroup}
+                            currentFunctionGroupKind={currentFunctionGroupKind}
+                            currentFunctionGroupKindAttributes={currentFunctionGroupKindAttributes}
+                            isFetchingDetail={isFetchingDetail}
+                            isReconnecting={isReconnecting}
+                            isFetchingAllAttributes={isFetchingAllAttributes}
+                            onFunctionGroupChange={onFunctionGroupChange}
+                            onFunctionGroupKindChange={onFunctionGroupKindChange}
+                            getFreshConnectorAttributesDesc={getFreshConnectorAttributesDesc}
                         />
                     )}
-                </Container>
 
-                <Container className={connector?.version === ConnectorVersion.V2 ? 'grid gap-6 xl:grid-cols-2' : 'grid gap-6'}>
-                    {connector?.version === ConnectorVersion.V2 && connectorInfoData.length > 0 && (
-                        <Widget title="Connector Info" busy={isFetchingDetail} titleSize="large">
-                            <CustomTable headers={attributesHeaders} data={connectorInfoData} />
-                        </Widget>
+                    {connector?.version === ConnectorVersion.V2 && (
+                        <SupportedInterfacesV2 interfaces={(connector as any)?.interfaces} isBusy={isFetchingDetail || isReconnecting} />
                     )}
-                    <Widget
-                        title="Connector Health"
-                        busy={isFetchingHealth}
-                        widgetExtraTopNode={healthButtonsNode}
-                        titleSize="large"
-                        refreshAction={getFreshConnectorHealth}
-                    >
-                        <CustomTable headers={healthHeaders} data={healthData} />
-                    </Widget>
-                </Container>
-
-                {connector?.version === ConnectorVersion.V1 && (
-                    <FunctionGroupDetailsV1
-                        functionGroups={connector.functionGroups}
-                        currentFunctionGroup={currentFunctionGroup}
-                        currentFunctionGroupKind={currentFunctionGroupKind}
-                        currentFunctionGroupKindAttributes={currentFunctionGroupKindAttributes}
-                        isFetchingDetail={isFetchingDetail}
-                        isReconnecting={isReconnecting}
-                        isFetchingAllAttributes={isFetchingAllAttributes}
-                        onFunctionGroupChange={onFunctionGroupChange}
-                        onFunctionGroupKindChange={onFunctionGroupKindChange}
-                        getFreshConnectorAttributesDesc={getFreshConnectorAttributesDesc}
-                    />
-                )}
-
-                {connector?.version === ConnectorVersion.V2 && (
-                    <SupportedInterfacesV2 interfaces={(connector as any)?.interfaces} isBusy={isFetchingDetail || isReconnecting} />
-                )}
-            </div>
+                </div>
+            </Widget>
 
             <Dialog
                 isOpen={confirmDelete}

@@ -306,49 +306,49 @@ export default function SchedulerJobDetail() {
                     { label: schedulerJob?.jobName || 'Scheduled Job Details', href: '' },
                 ]}
             />
-            <Container>
-                <Widget
-                    title="Scheduled Job Details"
-                    busy={isBusy}
-                    widgetButtons={buttons}
-                    titleSize="large"
-                    refreshAction={getFreshSchedulerJobDetails}
-                    widgetLockName={LockWidgetNameEnum.SchedulerJobDetail}
-                >
-                    <CustomTable headers={detailHeaders} data={detailData} />
-                </Widget>
-                {id && <SchedulerJobHistory uuid={id} />}
+            <Widget widgetLockName={LockWidgetNameEnum.SchedulerJobDetail} busy={isBusy} noBorder>
+                <Container>
+                    <Widget
+                        title="Scheduled Job Details"
+                        widgetButtons={buttons}
+                        titleSize="large"
+                        refreshAction={getFreshSchedulerJobDetails}
+                    >
+                        <CustomTable headers={detailHeaders} data={detailData} />
+                    </Widget>
+                    {id && <SchedulerJobHistory uuid={id} />}
+                </Container>
+            </Widget>
 
-                <Dialog
-                    isOpen={confirmDelete}
-                    caption="Delete Scheduled Job"
-                    body="You are about to delete this Scheduled Job. Is this what you want to do?"
-                    toggle={() => setConfirmDelete(false)}
-                    icon="delete"
-                    buttons={[
-                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                    ]}
-                />
-                <Dialog
-                    size="xl"
-                    isOpen={editCronOpen}
-                    caption="Edit CRON Expression"
-                    body={
-                        <CronExpressionForm
-                            newCronExpression={newCronExpression}
-                            originalCronExpression={originalCronExpression}
-                            onSave={handleCronSave}
-                            onCancel={() => {
-                                setNewCronExpression(originalCronExpression);
-                                setEditCronOpen(false);
-                            }}
-                            onOpenCronModal={() => openCronBuilderModal(newCronExpression)}
-                        />
-                    }
-                    toggle={() => setEditCronOpen(false)}
-                />
-            </Container>
+            <Dialog
+                isOpen={confirmDelete}
+                caption="Delete Scheduled Job"
+                body="You are about to delete this Scheduled Job. Is this what you want to do?"
+                toggle={() => setConfirmDelete(false)}
+                icon="delete"
+                buttons={[
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                ]}
+            />
+            <Dialog
+                size="xl"
+                isOpen={editCronOpen}
+                caption="Edit CRON Expression"
+                body={
+                    <CronExpressionForm
+                        newCronExpression={newCronExpression}
+                        originalCronExpression={originalCronExpression}
+                        onSave={handleCronSave}
+                        onCancel={() => {
+                            setNewCronExpression(originalCronExpression);
+                            setEditCronOpen(false);
+                        }}
+                        onOpenCronModal={() => openCronBuilderModal(newCronExpression)}
+                    />
+                }
+                toggle={() => setEditCronOpen(false)}
+            />
         </div>
     );
 }

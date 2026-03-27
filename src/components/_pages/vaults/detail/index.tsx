@@ -110,52 +110,56 @@ function VaultDetail() {
                 ]}
             />
 
-            <div className="space-y-4">
-                <Container className="grid gap-6 xl:grid-cols-2 items-start">
-                    <Widget
-                        title="Vault Details"
-                        busy={isFetchingDetail || isDeleting}
-                        widgetButtons={widgetButtons}
-                        titleSize="large"
-                        refreshAction={getFreshVaultDetails}
-                        widgetLockName={LockWidgetNameEnum.VaultDetails}
-                        lockSize="large"
-                    >
-                        <CustomTable headers={detailHeaders} data={detailData} />
-                    </Widget>
-
-                    {vault?.attributes && vault.attributes.length > 0 && (
-                        <Widget title="Attributes" titleSize="large">
-                            <AttributeViewer attributes={vault.attributes} />
+            <Widget widgetLockName={LockWidgetNameEnum.VaultDetails} busy={isFetchingDetail || isDeleting} noBorder>
+                <div className="space-y-4">
+                    <Container className="grid gap-6 xl:grid-cols-2 items-start">
+                        <Widget
+                            title="Vault Details"
+                            widgetButtons={widgetButtons}
+                            titleSize="large"
+                            refreshAction={getFreshVaultDetails}
+                            lockSize="large"
+                        >
+                            <CustomTable headers={detailHeaders} data={detailData} />
                         </Widget>
-                    )}
-                </Container>
 
-                {vault && (
-                    <Container>
-                        <CustomAttributeWidget resource={Resource.Vaults} resourceUuid={vault.uuid} attributes={vault.customAttributes} />
+                        {vault?.attributes && vault.attributes.length > 0 && (
+                            <Widget title="Attributes" titleSize="large">
+                                <AttributeViewer attributes={vault.attributes} />
+                            </Widget>
+                        )}
                     </Container>
-                )}
 
-                <Dialog
-                    isOpen={confirmDelete}
-                    caption="Delete Vault"
-                    body="You are about to delete a Vault. Is this what you want to do?"
-                    toggle={() => setConfirmDelete(false)}
-                    icon="delete"
-                    buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                    ]}
-                />
-                <Dialog
-                    isOpen={isEditOpen}
-                    toggle={handleCloseEdit}
-                    caption={`Edit "${vault?.name ?? ''}"`}
-                    size="xl"
-                    body={<VaultEditForm vault={vault} onCancel={handleCloseEdit} onSuccess={handleCloseEdit} />}
-                />
-            </div>
+                    {vault && (
+                        <Container>
+                            <CustomAttributeWidget
+                                resource={Resource.Vaults}
+                                resourceUuid={vault.uuid}
+                                attributes={vault.customAttributes}
+                            />
+                        </Container>
+                    )}
+                </div>
+            </Widget>
+
+            <Dialog
+                isOpen={confirmDelete}
+                caption="Delete Vault"
+                body="You are about to delete a Vault. Is this what you want to do?"
+                toggle={() => setConfirmDelete(false)}
+                icon="delete"
+                buttons={[
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                ]}
+            />
+            <Dialog
+                isOpen={isEditOpen}
+                toggle={handleCloseEdit}
+                caption={`Edit "${vault?.name ?? ''}"`}
+                size="xl"
+                body={<VaultEditForm vault={vault} onCancel={handleCloseEdit} onSuccess={handleCloseEdit} />}
+            />
         </div>
     );
 }

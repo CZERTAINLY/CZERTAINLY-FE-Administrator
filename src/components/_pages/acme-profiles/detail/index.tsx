@@ -336,114 +336,111 @@ export default function AdministratorDetail() {
                     { label: acmeProfile?.name || 'ACME Profile Details', href: '' },
                 ]}
             />
-            <Container>
-                <Container className="md:grid grid-cols-2 items-start">
-                    <Widget
-                        title="ACME Profile Details"
-                        busy={isBusy}
-                        widgetButtons={buttons}
-                        titleSize="large"
-                        refreshAction={getFreshAcmeProfile}
-                        widgetLockName={LockWidgetNameEnum.ACMEProfileDetails}
-                        lockSize="large"
-                    >
-                        <CustomTable headers={tableHeader} data={acmeProfileDetailData} />
-                    </Widget>
-                    <Container>
-                        <Widget title="DNS" busy={isBusy} titleSize="large">
-                            <CustomTable headers={tableHeader} data={dnsData} />
+            <Widget widgetLockName={LockWidgetNameEnum.ACMEProfileDetails} busy={isBusy} noBorder>
+                <Container>
+                    <Container className="md:grid grid-cols-2 items-start">
+                        <Widget
+                            title="ACME Profile Details"
+                            widgetButtons={buttons}
+                            titleSize="large"
+                            refreshAction={getFreshAcmeProfile}
+                            lockSize="large"
+                        >
+                            <CustomTable headers={tableHeader} data={acmeProfileDetailData} />
                         </Widget>
+                        <Container>
+                            <Widget title="DNS" titleSize="large">
+                                <CustomTable headers={tableHeader} data={dnsData} />
+                            </Widget>
+                        </Container>
                     </Container>
-                </Container>
-                <Widget title="Terms of Service" busy={isBusy} titleSize="large">
-                    <CustomTable headers={tableHeader} data={termsOfServiceData} />
-                </Widget>
-                {acmeProfile && (
-                    <CustomAttributeWidget
-                        resource={Resource.AcmeProfiles}
-                        resourceUuid={acmeProfile.uuid}
-                        attributes={acmeProfile.customAttributes}
-                    />
-                )}
-                <Widget title={raProfileText} busy={isBusy} titleSize="large">
-                    {raProfileDetailData.length > 0 && (
-                        <>
-                            <CustomTable headers={tableHeader} data={raProfileDetailData} />
-
-                            {acmeProfile?.issueCertificateAttributes === undefined ||
-                            acmeProfile.issueCertificateAttributes.length === 0 ? (
-                                <></>
-                            ) : (
-                                <Widget title="List of Attributes to Issue Certificate" busy={isBusy}>
-                                    <AttributeViewer attributes={acmeProfile?.issueCertificateAttributes} />
-                                </Widget>
-                            )}
-                            {acmeProfile?.revokeCertificateAttributes === undefined ||
-                            acmeProfile.revokeCertificateAttributes.length === 0 ? (
-                                <></>
-                            ) : (
-                                <Widget title="List of Attributes to Revoke Certificate" busy={isBusy}>
-                                    <AttributeViewer attributes={acmeProfile?.revokeCertificateAttributes} />
-                                </Widget>
-                            )}
-                        </>
-                    )}
-                </Widget>
-                <Widget title="Default Certificate associations" busy={isBusy} titleSize="large">
-                    <CustomTable headers={tableHeader} data={defaultCertificateAssociationsData} />
-                    <Widget title="Certificate Custom Attributes" busy={isBusy} noBorder className="mt-2" titleSize="large">
-                        <AttributeViewer attributes={acmeProfile?.certificateAssociations?.customAttributes} />
+                    <Widget title="Terms of Service" titleSize="large">
+                        <CustomTable headers={tableHeader} data={termsOfServiceData} />
                     </Widget>
-                </Widget>
-                <Dialog
-                    isOpen={confirmDelete}
-                    caption="Delete ACME Profile"
-                    body="You are about to delete ACME Profile which may have associated ACME
-                  Account(s). When deleted the ACME Account(s) will be revoked."
-                    toggle={() => setConfirmDelete(false)}
-                    icon="delete"
-                    buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                    ]}
-                />
-                <Dialog
-                    isOpen={deleteErrorMessage.length > 0}
-                    caption="Delete ACME Profile"
-                    body={
-                        <>
-                            Failed to delete the ACME Profile that has dependent objects. Please find the details below:
-                            <br />
-                            <br />
-                            {deleteErrorMessage}
-                        </>
-                    }
-                    toggle={() => dispatch(actions.clearDeleteErrorMessages())}
-                    buttons={[
-                        { color: 'danger', onClick: onForceDeleteAcmeProfile, body: 'Force' },
-                        {
-                            color: 'secondary',
-                            variant: 'outline',
-                            onClick: () => dispatch(actions.clearDeleteErrorMessages()),
-                            body: 'Cancel',
-                        },
-                    ]}
-                />
-
-                <Dialog
-                    isOpen={isEditModalOpen}
-                    toggle={handleCloseEditModal}
-                    caption="Edit ACME Profile"
-                    size="xl"
-                    body={
-                        <AcmeProfileForm
-                            acmeProfileId={acmeProfile?.uuid}
-                            onCancel={handleCloseEditModal}
-                            onSuccess={handleCloseEditModal}
+                    {acmeProfile && (
+                        <CustomAttributeWidget
+                            resource={Resource.AcmeProfiles}
+                            resourceUuid={acmeProfile.uuid}
+                            attributes={acmeProfile.customAttributes}
                         />
-                    }
-                />
-            </Container>
+                    )}
+                    <Widget title={raProfileText} titleSize="large">
+                        {raProfileDetailData.length > 0 && (
+                            <>
+                                <CustomTable headers={tableHeader} data={raProfileDetailData} />
+
+                                {acmeProfile?.issueCertificateAttributes === undefined ||
+                                acmeProfile.issueCertificateAttributes.length === 0 ? (
+                                    <></>
+                                ) : (
+                                    <Widget title="List of Attributes to Issue Certificate">
+                                        <AttributeViewer attributes={acmeProfile?.issueCertificateAttributes} />
+                                    </Widget>
+                                )}
+                                {acmeProfile?.revokeCertificateAttributes === undefined ||
+                                acmeProfile.revokeCertificateAttributes.length === 0 ? (
+                                    <></>
+                                ) : (
+                                    <Widget title="List of Attributes to Revoke Certificate">
+                                        <AttributeViewer attributes={acmeProfile?.revokeCertificateAttributes} />
+                                    </Widget>
+                                )}
+                            </>
+                        )}
+                    </Widget>
+                    <Widget title="Default Certificate associations" titleSize="large">
+                        <CustomTable headers={tableHeader} data={defaultCertificateAssociationsData} />
+                        <Widget title="Certificate Custom Attributes" noBorder className="mt-2" titleSize="large">
+                            <AttributeViewer attributes={acmeProfile?.certificateAssociations?.customAttributes} />
+                        </Widget>
+                    </Widget>
+                </Container>
+            </Widget>
+
+            <Dialog
+                isOpen={confirmDelete}
+                caption="Delete ACME Profile"
+                body="You are about to delete ACME Profile which may have associated ACME
+                  Account(s). When deleted the ACME Account(s) will be revoked."
+                toggle={() => setConfirmDelete(false)}
+                icon="delete"
+                buttons={[
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                ]}
+            />
+            <Dialog
+                isOpen={deleteErrorMessage.length > 0}
+                caption="Delete ACME Profile"
+                body={
+                    <>
+                        Failed to delete the ACME Profile that has dependent objects. Please find the details below:
+                        <br />
+                        <br />
+                        {deleteErrorMessage}
+                    </>
+                }
+                toggle={() => dispatch(actions.clearDeleteErrorMessages())}
+                buttons={[
+                    { color: 'danger', onClick: onForceDeleteAcmeProfile, body: 'Force' },
+                    {
+                        color: 'secondary',
+                        variant: 'outline',
+                        onClick: () => dispatch(actions.clearDeleteErrorMessages()),
+                        body: 'Cancel',
+                    },
+                ]}
+            />
+
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit ACME Profile"
+                size="xl"
+                body={
+                    <AcmeProfileForm acmeProfileId={acmeProfile?.uuid} onCancel={handleCloseEditModal} onSuccess={handleCloseEditModal} />
+                }
+            />
         </div>
     );
 }

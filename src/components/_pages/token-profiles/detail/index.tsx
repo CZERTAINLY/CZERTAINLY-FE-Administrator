@@ -230,34 +230,34 @@ export default function TokenProfileDetail() {
                     { label: tokenProfile?.name || 'Token Profile Details', href: '' },
                 ]}
             />
-            <Container className="md:flex-row">
-                <Widget
-                    title="Token Profile Details"
-                    busy={isBusy}
-                    widgetButtons={buttons}
-                    titleSize="large"
-                    refreshAction={getFreshTokenProfileDetails}
-                    widgetLockName={LockWidgetNameEnum.TokenProfileDetails}
-                    lockSize="large"
-                    className="w-full md:w-1/2"
-                >
-                    <CustomTable headers={detailHeaders} data={detailData} />
-                </Widget>
-                <Container className="w-full md:w-1/2 flex flex-col">
-                    <Widget title="Attributes" busy={isBusy} titleSize="large">
-                        <Label>Token Profile Attributes</Label>
-                        <AttributeViewer attributes={tokenProfile?.attributes} />
+            <Widget widgetLockName={LockWidgetNameEnum.TokenProfileDetails} busy={isBusy} noBorder>
+                <Container className="md:flex-row">
+                    <Widget
+                        title="Token Profile Details"
+                        widgetButtons={buttons}
+                        titleSize="large"
+                        refreshAction={getFreshTokenProfileDetails}
+                        lockSize="large"
+                        className="w-full md:w-1/2"
+                    >
+                        <CustomTable headers={detailHeaders} data={detailData} />
                     </Widget>
+                    <Container className="w-full md:w-1/2 flex flex-col">
+                        <Widget title="Attributes" titleSize="large">
+                            <Label>Token Profile Attributes</Label>
+                            <AttributeViewer attributes={tokenProfile?.attributes} />
+                        </Widget>
 
-                    {tokenProfile && (
-                        <CustomAttributeWidget
-                            resource={Resource.TokenProfiles}
-                            resourceUuid={tokenProfile.uuid}
-                            attributes={tokenProfile.customAttributes}
-                        />
-                    )}
+                        {tokenProfile && (
+                            <CustomAttributeWidget
+                                resource={Resource.TokenProfiles}
+                                resourceUuid={tokenProfile.uuid}
+                                attributes={tokenProfile.customAttributes}
+                            />
+                        )}
+                    </Container>
                 </Container>
-            </Container>
+            </Widget>
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Token Profile"

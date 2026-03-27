@@ -163,71 +163,75 @@ function VaultProfileDetail() {
                 ]}
             />
 
-            <div className="space-y-4">
-                <Container className="grid gap-6 xl:grid-cols-2 items-start">
-                    <Widget
-                        title="Vault Profile Details"
-                        busy={isFetchingDetail || isEnabling || isDisabling || isDeleting}
-                        widgetButtons={widgetButtons}
-                        titleSize="large"
-                        refreshAction={getFreshDetails}
-                        widgetLockName={LockWidgetNameEnum.VaultProfileDetails}
-                        lockSize="large"
-                    >
-                        <CustomTable headers={detailHeaders} data={detailData} />
-                    </Widget>
-
-                    {profile?.attributes && profile.attributes.length > 0 && (
-                        <Widget title="Attributes" titleSize="large">
-                            <AttributeViewer attributes={profile.attributes} />
+            <Widget
+                widgetLockName={LockWidgetNameEnum.VaultProfileDetails}
+                busy={isFetchingDetail || isEnabling || isDisabling || isDeleting}
+                noBorder
+            >
+                <div className="space-y-4">
+                    <Container className="grid gap-6 xl:grid-cols-2 items-start">
+                        <Widget
+                            title="Vault Profile Details"
+                            widgetButtons={widgetButtons}
+                            titleSize="large"
+                            refreshAction={getFreshDetails}
+                            lockSize="large"
+                        >
+                            <CustomTable headers={detailHeaders} data={detailData} />
                         </Widget>
-                    )}
-                </Container>
 
-                {profile && (
-                    <Container>
-                        <CustomAttributeWidget
-                            resource={Resource.VaultProfiles}
-                            resourceUuid={profile.uuid}
-                            attributes={profile.customAttributes}
-                        />
+                        {profile?.attributes && profile.attributes.length > 0 && (
+                            <Widget title="Attributes" titleSize="large">
+                                <AttributeViewer attributes={profile.attributes} />
+                            </Widget>
+                        )}
                     </Container>
-                )}
 
-                <Dialog
-                    isOpen={isEditOpen}
-                    caption="Edit Vault Profile"
-                    body={
-                        profile && vaultUuid ? (
-                            <VaultProfileEditForm
-                                profile={profile}
-                                vaultUuid={vaultUuid}
-                                onCancel={handleCloseEdit}
-                                onSuccess={handleCloseEdit}
+                    {profile && (
+                        <Container>
+                            <CustomAttributeWidget
+                                resource={Resource.VaultProfiles}
+                                resourceUuid={profile.uuid}
+                                attributes={profile.customAttributes}
                             />
-                        ) : null
-                    }
-                    toggle={handleCloseEdit}
-                    size="lg"
-                />
+                        </Container>
+                    )}
+                </div>
+            </Widget>
 
-                <Dialog
-                    isOpen={confirmDelete}
-                    caption="Delete Vault Profile"
-                    body="You are about to delete this Vault Profile. Is this what you want to do?"
-                    toggle={() => setConfirmDelete(false)}
-                    icon="delete"
-                    buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                        {
-                            color: 'secondary',
-                            variant: 'outline',
-                            onClick: () => setConfirmDelete(false),
-                            body: 'Cancel',
-                        },
-                    ]}
-                />
-            </div>
+            <Dialog
+                isOpen={isEditOpen}
+                caption="Edit Vault Profile"
+                body={
+                    profile && vaultUuid ? (
+                        <VaultProfileEditForm
+                            profile={profile}
+                            vaultUuid={vaultUuid}
+                            onCancel={handleCloseEdit}
+                            onSuccess={handleCloseEdit}
+                        />
+                    ) : null
+                }
+                toggle={handleCloseEdit}
+                size="lg"
+            />
+
+            <Dialog
+                isOpen={confirmDelete}
+                caption="Delete Vault Profile"
+                body="You are about to delete this Vault Profile. Is this what you want to do?"
+                toggle={() => setConfirmDelete(false)}
+                icon="delete"
+                buttons={[
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    {
+                        color: 'secondary',
+                        variant: 'outline',
+                        onClick: () => setConfirmDelete(false),
+                        body: 'Cancel',
+                    },
+                ]}
+            />
         </div>
     );
 }
