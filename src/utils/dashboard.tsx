@@ -6,6 +6,8 @@ import {
     CertificateValidationStatus,
     ComplianceRuleStatus,
     ComplianceStatus,
+    SecretState,
+    SecretType,
 } from 'types/openapi';
 import { DashboardDict } from 'types/statisticsDashboard';
 import { getCertificateStatusColor, useGetStatusText } from './certificate';
@@ -15,7 +17,9 @@ type Status =
     | CertificateValidationStatus
     | CertificateEventHistoryDtoStatusEnum
     | ComplianceStatus
-    | ComplianceRuleStatus;
+    | ComplianceRuleStatus
+    | SecretState
+    | SecretType;
 
 export function useGetLabels(data: DashboardDict) {
     const getStatusText = useGetStatusText();
