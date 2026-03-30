@@ -68,7 +68,10 @@ test.describe('Widget', () => {
                 { store },
             ),
         );
-        await expect(page.getByTestId('widget-busy-overlay')).toBeVisible();
+        const overlay = page.getByTestId('widget-busy-overlay');
+        await expect(overlay).toHaveCount(1);
+        await expect(overlay).toHaveClass(/absolute/);
+        await expect(overlay).toHaveClass(/inset-0/);
     });
 
     test('should show WidgetLock when widgetLocks match widgetLockName', async ({ mount, page }) => {
