@@ -60,9 +60,11 @@ test.describe('Widget', () => {
         const store = createMockStore();
         await mount(
             withProviders(
-                <Widget title="Busy Widget" dataTestId="busy-widget" busy={true} enableBusyOverlay={true}>
-                    <p>Content</p>
-                </Widget>,
+                <div style={{ width: '400px', minHeight: '120px' }}>
+                    <Widget title="Busy Widget" dataTestId="busy-widget" busy={true} enableBusyOverlay={true}>
+                        <p>Content</p>
+                    </Widget>
+                </div>,
                 { store },
             ),
         );
