@@ -16,19 +16,9 @@
  * @export
  * @enum {string}
  */
-export enum Module {
-    Approvals = 'approvals',
-    Auth = 'auth',
-    Certificates = 'certificates',
-    Keys = 'keys',
-    Compliance = 'compliance',
-    Core = 'core',
-    Discovery = 'discovery',
-    Entities = 'entities',
-    Protocols = 'protocols',
-    Scheduler = 'scheduler',
-    Secrets = 'secrets',
-    Signing = 'signing',
-    Workflows = 'workflows'
+export enum SigningProtocol {
+    CscApi = 'cscApi',
+    IlmSigningProtocol = 'ilmSigningProtocol',
+    Tsp = 'tsp'
 }
 

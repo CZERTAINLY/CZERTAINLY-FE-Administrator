@@ -16,19 +16,15 @@
  * @export
  * @enum {string}
  */
-export enum Module {
-    Approvals = 'approvals',
-    Auth = 'auth',
-    Certificates = 'certificates',
-    Keys = 'keys',
-    Compliance = 'compliance',
-    Core = 'core',
-    Discovery = 'discovery',
-    Entities = 'entities',
-    Protocols = 'protocols',
-    Scheduler = 'scheduler',
-    Secrets = 'secrets',
-    Signing = 'signing',
-    Workflows = 'workflows'
+export enum DigestAlgorithm {
+    Md5 = 'MD5',
+    Sha1 = 'SHA-1',
+    Sha224 = 'SHA-224',
+    Sha256 = 'SHA-256',
+    Sha384 = 'SHA-384',
+    Sha512 = 'SHA-512',
+    Sha3256 = 'SHA3-256',
+    Sha3384 = 'SHA3-384',
+    Sha3512 = 'SHA3-512'
 }
 

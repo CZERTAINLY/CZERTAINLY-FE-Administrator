@@ -16,19 +16,10 @@
  * @export
  * @enum {string}
  */
-export enum Module {
-    Approvals = 'approvals',
-    Auth = 'auth',
-    Certificates = 'certificates',
-    Keys = 'keys',
-    Compliance = 'compliance',
-    Core = 'core',
-    Discovery = 'discovery',
-    Entities = 'entities',
-    Protocols = 'protocols',
-    Scheduler = 'scheduler',
-    Secrets = 'secrets',
-    Signing = 'signing',
-    Workflows = 'workflows'
+export enum SigningWorkflowType {
+    CodeBinarySigning = 'code_binary_signing',
+    DocumentSigning = 'document_signing',
+    RawSigning = 'raw_signing',
+    Timestamping = 'timestamping'
 }
 
