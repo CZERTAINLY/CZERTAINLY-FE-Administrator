@@ -96,7 +96,13 @@ function Widget({
 
     const renderRefreshButton = () =>
         refreshAction ? (
-            <Button onClick={refreshAction} data-testid="refresh-icon" variant="transparent" title="Refresh">
+            <Button
+                onClick={refreshAction}
+                data-testid="refresh-icon"
+                variant="transparent"
+                title="Refresh"
+                disabled={busy || !!widgetLock}
+            >
                 <RefreshCw size={16} />
             </Button>
         ) : null;

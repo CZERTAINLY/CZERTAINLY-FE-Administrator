@@ -161,6 +161,24 @@ export const slice = createSlice({
             state.isDeleting = false;
         },
 
+        bulkDeleteLocations: (state, action: PayloadAction<{ locations: { entityUuid: string; uuid: string }[] }>) => {
+            state.isDeleting = true;
+        },
+
+        bulkDeleteLocationsSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.locations = state.locations.filter((location) => !action.payload.uuids.includes(location.uuid));
+
+            if (state.location && action.payload.uuids.includes(state.location.uuid)) {
+                state.location = undefined;
+            }
+
+            state.isDeleting = false;
+        },
+
+        bulkDeleteLocationsFailure: (state, action: PayloadAction<{ error: string }>) => {
+            state.isDeleting = false;
+        },
+
         enableLocation: (state, action: PayloadAction<{ entityUuid: string; uuid: string }>) => {
             state.isEnabling = true;
         },

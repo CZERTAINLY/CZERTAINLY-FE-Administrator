@@ -35,6 +35,14 @@ test.describe('Widget', () => {
         await expect(page.getByTestId('refresh-icon')).toBeVisible();
     });
 
+    test('should disable refresh button when busy', async ({ mount, page }) => {
+        const store = createMockStore();
+        await mount(
+            withProviders(<Widget title="Refreshable" dataTestId="refresh-widget" refreshAction={() => {}} busy={true} />, { store }),
+        );
+        await expect(page.getByTestId('refresh-icon')).toBeDisabled();
+    });
+
     test('should show WidgetLock when widgetLocks match widgetLockName', async ({ mount, page }) => {
         const lock = {
             widgetName: LockWidgetNameEnum.ListOfCertificates,

@@ -154,4 +154,18 @@ test.describe('Pagination', () => {
         const activePageButton = component.getByRole('button', { name: '2' });
         await expect(activePageButton).toHaveClass(/bg-gray-200/);
     });
+
+    test('should disable all navigation controls when disabled is true', async ({ mount }) => {
+        let newPage = 0;
+        const component = await mount(
+            <div>
+                <Pagination page={3} totalPages={5} onPageChange={(page) => (newPage = page)} disabled={true} />
+            </div>,
+        );
+
+        await expect(component.getByRole('button', { name: 'Previous' })).toBeDisabled();
+        await expect(component.getByRole('button', { name: 'Next' })).toBeDisabled();
+        await expect(component.getByRole('button', { name: '3' })).toBeDisabled();
+        expect(newPage).toBe(0);
+    });
 });

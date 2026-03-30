@@ -1,5 +1,5 @@
-import { iif, of } from 'rxjs';
-import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { from, iif, of } from 'rxjs';
+import { catchError, concatMap, filter, map, mergeMap, switchMap, toArray } from 'rxjs/operators';
 
 import { AppEpic } from 'ducks';
 import { extractError } from 'utils/net';
@@ -203,6 +203,48 @@ const deleteEntity: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const bulkDeleteEntities: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkDeleteEntities.match),
+        switchMap((action) =>
+            from(action.payload.uuids).pipe(
+                concatMap((uuid) =>
+                    deps.apiClients.entities.deleteEntityInstance({ entityUuid: uuid }).pipe(
+                        map(() => ({ uuid, ok: true })),
+                        catchError(() => of({ uuid, ok: false })),
+                    ),
+                ),
+                toArray(),
+                mergeMap((results) => {
+                    const deletedUuids = results.filter((result) => result.ok).map((result) => result.uuid);
+                    const failedDeletes = results.length - deletedUuids.length;
+
+                    if (failedDeletes === 0) {
+                        return of(slice.actions.bulkDeleteEntitiesSuccess({ uuids: deletedUuids }));
+                    }
+
+                    return of(
+                        slice.actions.bulkDeleteEntitiesSuccess({ uuids: deletedUuids }),
+                        slice.actions.bulkDeleteEntitiesFailure({
+                            error: `Failed to delete ${failedDeletes} entit${failedDeletes === 1 ? 'y' : 'ies'}`,
+                        }),
+                        appRedirectActions.fetchError({
+                            error: undefined,
+                            message: `Failed to delete ${failedDeletes} entit${failedDeletes === 1 ? 'y' : 'ies'}`,
+                        }),
+                    );
+                }),
+                catchError((error) =>
+                    of(
+                        slice.actions.bulkDeleteEntitiesFailure({ error: extractError(error, 'Failed to delete Entities') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to delete Entities' }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 const listLocationAttributeDescriptors: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listLocationAttributeDescriptors.match),
@@ -235,6 +277,7 @@ const epics = [
     addEntity,
     updateEntity,
     deleteEntity,
+    bulkDeleteEntities,
     listLocationAttributeDescriptors,
 ];
 

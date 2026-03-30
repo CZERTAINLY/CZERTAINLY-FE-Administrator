@@ -78,7 +78,7 @@ export default function UsersList() {
     const onDeleteConfirmed = useCallback(() => {
         setConfirmDelete(false);
 
-        checkedRows.forEach((uuid) => dispatch(actions.deleteUser({ uuid })));
+        dispatch(actions.bulkDeleteUsers({ uuids: checkedRows }));
     }, [checkedRows, dispatch]);
 
     const setCheckedRows = useCallback(
@@ -113,13 +113,13 @@ export default function UsersList() {
         () => [
             {
                 icon: 'plus',
-                disabled: false,
+                disabled: isBusy,
                 tooltip: 'Create',
                 onClick: handleOpenAddModal,
             },
             {
                 icon: 'trash',
-                disabled: checkedRows.length === 0 || isSystemUserSelected,
+                disabled: isBusy || checkedRows.length === 0 || isSystemUserSelected,
                 tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
@@ -127,7 +127,7 @@ export default function UsersList() {
             },
             {
                 icon: 'check',
-                disabled: isSystemUserSelected || !canEnable,
+                disabled: isBusy || isSystemUserSelected || !canEnable,
                 tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
@@ -135,14 +135,14 @@ export default function UsersList() {
             },
             {
                 icon: 'times',
-                disabled: isSystemUserSelected || !canDisable,
+                disabled: isBusy || isSystemUserSelected || !canDisable,
                 tooltip: 'Disable',
                 onClick: () => {
                     onDisableClick();
                 },
             },
         ],
-        [checkedRows.length, isSystemUserSelected, canEnable, canDisable, handleOpenAddModal, onEnableClick, onDisableClick],
+        [isBusy, checkedRows.length, isSystemUserSelected, canEnable, canDisable, handleOpenAddModal, onEnableClick, onDisableClick],
     );
 
     const userTableHeader: TableHeader[] = useMemo(
@@ -249,11 +249,14 @@ export default function UsersList() {
             >
                 <CustomTable
                     headers={userTableHeader}
-                    data={userTableData}
+                    data={isBusy ? [] : userTableData}
                     onCheckedRowsChanged={setCheckedRows}
                     canSearch={true}
                     hasCheckboxes={true}
                     hasPagination={true}
+                    disableSearchControls={isBusy}
+                    disableSelectionControls={isBusy}
+                    disablePaginationControls={isBusy}
                 />
             </Widget>
 

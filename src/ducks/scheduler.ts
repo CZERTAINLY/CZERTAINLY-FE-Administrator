@@ -94,6 +94,24 @@ export const slice = createSlice({
             state.isDeleting = false;
         },
 
+        bulkDeleteSchedulerJobs: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isDeleting = true;
+        },
+
+        bulkDeleteSchedulerJobsSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.schedulerJobs = state.schedulerJobs.filter((schedulerJob) => !action.payload.uuids.includes(schedulerJob.uuid));
+
+            if (state.schedulerJob && action.payload.uuids.includes(state.schedulerJob.uuid)) {
+                state.schedulerJob = undefined;
+            }
+
+            state.isDeleting = false;
+        },
+
+        bulkDeleteSchedulerJobsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isDeleting = false;
+        },
+
         bulkEnableSchedulerJobs: (state, action: PayloadAction<{ uuids: string[] }>) => {
             state.isEnabling = true;
         },

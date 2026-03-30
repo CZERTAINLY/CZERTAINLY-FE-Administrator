@@ -49,8 +49,18 @@ vi.mock('components/Widget', () => ({
 }));
 
 vi.mock('components/CustomTable', () => ({
-    default: ({ onPageChanged, onPageSizeChanged, onCheckedRowsChanged }: any) => (
+    default: ({
+        onPageChanged,
+        onPageSizeChanged,
+        onCheckedRowsChanged,
+        disablePaginationControls,
+        disableSelectionControls,
+        disableSearchControls,
+    }: any) => (
         <div data-testid="table">
+            <div data-testid="table-pagination-disabled">{disablePaginationControls ? 'true' : 'false'}</div>
+            <div data-testid="table-selection-disabled">{disableSelectionControls ? 'true' : 'false'}</div>
+            <div data-testid="table-search-disabled">{disableSearchControls ? 'true' : 'false'}</div>
             <button data-testid="table-page-change" onClick={() => onPageChanged?.(3)}>
                 page
             </button>
@@ -256,6 +266,27 @@ describe('PagedList unit coverage', () => {
         await renderPagedList({ addHidden: false, onDeleteCallback: vi.fn(), hideWidgetButtons: true });
 
         expect(container.querySelector('[data-testid^="widget-btn-"]')).toBeNull();
+    });
+
+    it('disables pagination controls when busy', async () => {
+        await renderPagedList({ isBusy: true });
+
+        const disabledState = container.querySelector('[data-testid="table-pagination-disabled"]') as HTMLElement;
+        expect(disabledState.textContent).toBe('true');
+    });
+
+    it('disables selection controls when busy', async () => {
+        await renderPagedList({ isBusy: true });
+
+        const disabledState = container.querySelector('[data-testid="table-selection-disabled"]') as HTMLElement;
+        expect(disabledState.textContent).toBe('true');
+    });
+
+    it('disables search controls when busy', async () => {
+        await renderPagedList({ isBusy: true });
+
+        const disabledState = container.querySelector('[data-testid="table-search-disabled"]') as HTMLElement;
+        expect(disabledState.textContent).toBe('true');
     });
 
     it('renders additional buttons alongside built-in buttons', async () => {

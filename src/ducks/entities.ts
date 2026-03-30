@@ -140,6 +140,24 @@ export const slice = createSlice({
             state.isDeleting = false;
         },
 
+        bulkDeleteEntities: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isDeleting = true;
+        },
+
+        bulkDeleteEntitiesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.entities = state.entities.filter((entity) => !action.payload.uuids.includes(entity.uuid));
+
+            if (state.entity && action.payload.uuids.includes(state.entity.uuid)) {
+                state.entity = undefined;
+            }
+
+            state.isDeleting = false;
+        },
+
+        bulkDeleteEntitiesFailure: (state, action: PayloadAction<{ error: string }>) => {
+            state.isDeleting = false;
+        },
+
         updateEntity: (
             state,
             action: PayloadAction<{ uuid: string; attributes: AttributeRequestModel[]; customAttributes?: AttributeRequestModel[] }>,

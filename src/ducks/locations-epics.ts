@@ -1,6 +1,6 @@
 import { AppEpic } from 'ducks';
-import { iif, of } from 'rxjs';
-import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { from, iif, of } from 'rxjs';
+import { catchError, concatMap, filter, map, mergeMap, switchMap, toArray } from 'rxjs/operators';
 
 import { extractError } from 'utils/net';
 
@@ -155,6 +155,48 @@ const deleteLocation: AppEpic = (action$, state, deps) => {
                     of(
                         slice.actions.deleteLocationFailure({ error: extractError(error, 'Failed to delete Location') }),
                         appRedirectActions.fetchError({ error, message: 'Failed to delete Location' }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const bulkDeleteLocations: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkDeleteLocations.match),
+        switchMap((action) =>
+            from(action.payload.locations).pipe(
+                concatMap((location) =>
+                    deps.apiClients.locations.deleteLocation({ entityUuid: location.entityUuid, locationUuid: location.uuid }).pipe(
+                        map(() => ({ uuid: location.uuid, ok: true })),
+                        catchError(() => of({ uuid: location.uuid, ok: false })),
+                    ),
+                ),
+                toArray(),
+                mergeMap((results) => {
+                    const deletedUuids = results.filter((result) => result.ok).map((result) => result.uuid);
+                    const failedDeletes = results.length - deletedUuids.length;
+
+                    if (failedDeletes === 0) {
+                        return of(slice.actions.bulkDeleteLocationsSuccess({ uuids: deletedUuids }));
+                    }
+
+                    return of(
+                        slice.actions.bulkDeleteLocationsSuccess({ uuids: deletedUuids }),
+                        slice.actions.bulkDeleteLocationsFailure({
+                            error: `Failed to delete ${failedDeletes} location${failedDeletes === 1 ? '' : 's'}`,
+                        }),
+                        appRedirectActions.fetchError({
+                            error: undefined,
+                            message: `Failed to delete ${failedDeletes} location${failedDeletes === 1 ? '' : 's'}`,
+                        }),
+                    );
+                }),
+                catchError((error) =>
+                    of(
+                        slice.actions.bulkDeleteLocationsFailure({ error: extractError(error, 'Failed to delete Locations') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to delete Locations' }),
                     ),
                 ),
             ),
@@ -385,6 +427,7 @@ const epics = [
     addLocation,
     editLocation,
     deleteLocation,
+    bulkDeleteLocations,
     enableLocation,
     disableLocation,
     getPushAttributes,

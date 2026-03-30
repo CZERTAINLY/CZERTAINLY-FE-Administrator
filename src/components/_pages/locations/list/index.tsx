@@ -54,7 +54,7 @@ function LocationList() {
         () => [
             {
                 icon: 'check',
-                disabled: checkedRows.length === 0,
+                disabled: isBusy || checkedRows.length === 0,
                 tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
@@ -62,14 +62,14 @@ function LocationList() {
             },
             {
                 icon: 'times',
-                disabled: checkedRows.length === 0,
+                disabled: isBusy || checkedRows.length === 0,
                 tooltip: 'Disable',
                 onClick: () => {
                     onDisableClick();
                 },
             },
         ],
-        [checkedRows.length, onDisableClick, onEnableClick],
+        [isBusy, checkedRows.length, onDisableClick, onEnableClick],
     );
 
     const locationsRowHeaders: TableHeader[] = useMemo(
@@ -163,11 +163,11 @@ function LocationList() {
     const createButton: WidgetButtonProps = useMemo(
         () => ({
             icon: 'plus',
-            disabled: false,
+            disabled: isBusy,
             tooltip: 'Create',
             onClick: handleOpenAddModal,
         }),
-        [handleOpenAddModal],
+        [isBusy, handleOpenAddModal],
     );
 
     const allButtons: WidgetButtonProps[] = useMemo(() => [createButton, ...buttons], [createButton, buttons]);
@@ -178,18 +178,18 @@ function LocationList() {
                 entity={EntityType.LOCATION}
                 onListCallback={onListCallback}
                 onDeleteCallback={(uuids) =>
-                    uuids.map((uuid) =>
-                        dispatch(
-                            actions.deleteLocation({
+                    dispatch(
+                        actions.bulkDeleteLocations({
+                            locations: uuids.map((uuid) => ({
                                 entityUuid: locations.find((data) => data.uuid === uuid)?.entityInstanceUuid || '',
                                 uuid,
-                            }),
-                        ),
+                            })),
+                        }),
                     )
                 }
                 getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.locations.getLocationSearchableFields(), [])}
                 headers={locationsRowHeaders}
-                data={locationList}
+                data={isBusy ? [] : locationList}
                 isBusy={isBusy}
                 title="Locations Store"
                 entityNameSingular="a Location"

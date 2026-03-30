@@ -211,6 +211,9 @@ function PagedList({
                     onPageChanged={onPageNumberChanged}
                     onCheckedRowsChanged={onCheckedRowsChanged}
                     onPageSizeChanged={onPageSizeChanged}
+                    disablePaginationControls={isBusy || isFetchingList}
+                    disableSelectionControls={isBusy || isFetchingList}
+                    disableSearchControls={isBusy || isFetchingList}
                 />
             </Widget>
             {onDeleteCallback && (
