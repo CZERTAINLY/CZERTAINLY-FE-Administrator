@@ -68,6 +68,69 @@ test.describe('FileUpload', () => {
         await expect(component.getByText('Select or drag & drop json file')).toBeVisible();
     });
 
+    test('should call onFileContentLoaded with base64 content on blur, not on every keystroke', async ({ mount }) => {
+        const calls: string[] = [];
+        const component = await mount(
+            <div>
+                <FileUpload onFileContentLoaded={(c) => calls.push(c)} showContent={true} editable={true} />
+            </div>,
+        );
+
+        const textarea = component.locator('textarea');
+        await textarea.fill('hello');
+        expect(calls).toHaveLength(0);
+
+        await textarea.blur();
+        expect(calls).toHaveLength(1);
+        expect(calls[0]).toBe(btoa('hello'));
+    });
+
+    test('should not call onFileContentLoaded on blur when textarea is empty', async ({ mount }) => {
+        const calls: string[] = [];
+        const component = await mount(
+            <div>
+                <FileUpload onFileContentLoaded={(c) => calls.push(c)} showContent={true} editable={true} />
+            </div>,
+        );
+
+        await component.locator('textarea').blur();
+        expect(calls).toHaveLength(0);
+    });
+
+    test('should show error message and invalid style when error prop is set', async ({ mount }) => {
+        const component = await mount(
+            <div>
+                <FileUpload onFileContentLoaded={() => {}} showContent={true} error="Invalid CSR" />
+            </div>,
+        );
+
+        await expect(component.getByText('Invalid CSR')).toBeVisible();
+        await expect(component.locator('textarea')).toHaveClass(/border-red-500/);
+    });
+
+    test('should show required indicator on label when required prop is true', async ({ mount }) => {
+        const component = await mount(
+            <div>
+                <FileUpload onFileContentLoaded={() => {}} showContent={true} required={true} />
+            </div>,
+        );
+
+        await expect(component.locator('span.text-red-500')).toBeVisible();
+    });
+
+    test('should call onContentChange on every keystroke', async ({ mount }) => {
+        let changeCount = 0;
+        const component = await mount(
+            <div>
+                <FileUpload onFileContentLoaded={() => {}} onContentChange={() => changeCount++} showContent={true} editable={true} />
+            </div>,
+        );
+
+        const textarea = component.locator('textarea');
+        await textarea.pressSequentially('abc');
+        expect(changeCount).toBe(3);
+    });
+
     test('should render custom placeholder and drop zone hint text from props', async ({ mount }) => {
         const placeholderText = 'Custom placeholder text';
         const hintText = 'Custom drop zone hint text';

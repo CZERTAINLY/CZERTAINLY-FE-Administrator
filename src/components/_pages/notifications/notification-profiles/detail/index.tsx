@@ -258,36 +258,31 @@ export default function NotificationProfileDetail() {
                     { label: notificationProfile?.name || 'Notification Profile Details', href: '' },
                 ]}
             />
-            <Container className="md:grid grid-cols-2">
-                <Widget
-                    title="Notification Profile Details"
-                    busy={isFetchingDetail}
-                    widgetLockName={LockWidgetNameEnum.NotificationProfileDetails}
-                    widgetButtons={notificationProfileWidgetButtons}
-                    titleSize="large"
-                    refreshAction={getFreshData}
-                >
-                    <CustomTable headers={headers} data={profileData} />
-                </Widget>
-                <Widget
-                    title="Notification Instance Details"
-                    busy={isFetchingDetail || isFetchingNotificationInstanceDetail}
-                    widgetLockName={LockWidgetNameEnum.NotificationProfileDetails}
-                    titleSize="large"
-                >
-                    <CustomTable headers={headers} data={notificationInstanceData} />
-                </Widget>
-            </Container>
-            {!!notificationProfile?.recipients?.length && (
-                <Widget
-                    title="Recipients"
-                    busy={isFetchingDetail || isFetchingNotificationInstanceDetail}
-                    widgetLockName={LockWidgetNameEnum.NotificationProfileDetails}
-                    titleSize="large"
-                >
-                    <CustomTable headers={recipientHeaders} data={recipientsData} />
-                </Widget>
-            )}
+            <Widget widgetLockName={LockWidgetNameEnum.NotificationProfileDetails} busy={isFetchingDetail} noBorder>
+                <Container className="md:grid grid-cols-2">
+                    <Widget
+                        title="Notification Profile Details"
+                        widgetButtons={notificationProfileWidgetButtons}
+                        titleSize="large"
+                        refreshAction={getFreshData}
+                    >
+                        <CustomTable headers={headers} data={profileData} />
+                    </Widget>
+                    <Widget
+                        title="Notification Instance Details"
+                        busy={isFetchingDetail || isFetchingNotificationInstanceDetail}
+                        titleSize="large"
+                    >
+                        <CustomTable headers={headers} data={notificationInstanceData} />
+                    </Widget>
+                </Container>
+                {!!notificationProfile?.recipients?.length && (
+                    <Widget title="Recipients" busy={isFetchingDetail || isFetchingNotificationInstanceDetail} titleSize="large">
+                        <CustomTable headers={recipientHeaders} data={recipientsData} />
+                    </Widget>
+                )}
+            </Widget>
+
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Notification Profile"

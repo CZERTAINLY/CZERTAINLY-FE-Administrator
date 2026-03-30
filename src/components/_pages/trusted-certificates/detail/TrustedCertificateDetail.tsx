@@ -97,30 +97,29 @@ export const TrustedCertificateDetail = () => {
                     { label: detailLabel, href: '' },
                 ]}
             />
-            <Container>
-                <Widget
-                    title="Trusted Certificate Details"
-                    busy={isFetching || isDeleting}
-                    widgetButtons={widgetButtons}
-                    titleSize="large"
-                    refreshAction={getFreshTrustedCertificateDetails}
-                    widgetLockName={LockWidgetNameEnum.TrustedCertificateDetails}
-                >
-                    <CustomTable headers={detailHeaders} data={detailData} hasPagination={false} />
-                </Widget>
-
-                <Dialog
-                    isOpen={confirmDelete}
-                    caption="Delete Trusted Certificate"
-                    body="You are about to delete a Trusted Certificate. Is this what you want to do?"
-                    toggle={() => setConfirmDelete(false)}
-                    icon="delete"
-                    buttons={[
-                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                    ]}
-                />
-            </Container>
+            <Widget widgetLockName={LockWidgetNameEnum.TrustedCertificateDetails} busy={isFetching || isDeleting} noBorder>
+                <Container>
+                    <Widget
+                        title="Trusted Certificate Details"
+                        widgetButtons={widgetButtons}
+                        titleSize="large"
+                        refreshAction={getFreshTrustedCertificateDetails}
+                    >
+                        <CustomTable headers={detailHeaders} data={detailData} hasPagination={false} />
+                    </Widget>
+                </Container>
+            </Widget>
+            <Dialog
+                isOpen={confirmDelete}
+                caption="Delete Trusted Certificate"
+                body="You are about to delete a Trusted Certificate. Is this what you want to do?"
+                toggle={() => setConfirmDelete(false)}
+                icon="delete"
+                buttons={[
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                ]}
+            />
         </div>
     );
 };

@@ -32,7 +32,6 @@ import useAttributeEditor, { buildGroups, buildOwner } from 'utils/widget';
 import CertificateAssociationsFormWidget from 'components/CertificateAssociationsFormWidget/CertificateAssociationsFormWidget';
 import { deepEqual } from 'utils/deep-equal';
 import TextInput from 'components/TextInput';
-import Label from 'components/Label';
 
 interface ScepProfileFormProps {
     scepProfileId?: string;
@@ -451,25 +450,22 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
                             )}
                         />
 
-                        <div>
-                            <Label htmlFor="challengePassword" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
-                                Challenge Password {requiresChallengePassword && <span className="text-red-500">*</span>}
-                            </Label>
-                            <Controller
-                                name="challengePassword"
-                                control={control}
-                                rules={requiresChallengePassword ? buildValidationRules([validateRequired()]) : buildValidationRules([])}
-                                render={({ field, fieldState }) => (
-                                    <TextInput
-                                        {...field}
-                                        id="challengePassword"
-                                        type="password"
-                                        invalid={fieldState.error && fieldState.isTouched}
-                                        error={getFieldErrorMessage(fieldState)}
-                                    />
-                                )}
-                            />
-                        </div>
+                        <Controller
+                            name="challengePassword"
+                            control={control}
+                            rules={requiresChallengePassword ? buildValidationRules([validateRequired()]) : buildValidationRules([])}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="challengePassword"
+                                    type="password"
+                                    label="Challenge Password"
+                                    required={requiresChallengePassword}
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={getFieldErrorMessage(fieldState)}
+                                />
+                            )}
+                        />
 
                         <div>
                             <p className="text-sm text-gray-500 mb-2">Minimum expiry days to allow renewal of certificate.</p>
@@ -524,68 +520,59 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
                             )}
                         />
 
-                        <div>
-                            <Label htmlFor="intuneTenant" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
-                                Intune Tenant {watchedEnableIntune && <span className="text-red-500">*</span>}
-                            </Label>
-                            <Controller
-                                name="intuneTenant"
-                                control={control}
-                                rules={watchedEnableIntune ? buildValidationRules([validateRequired()]) : buildValidationRules([])}
-                                render={({ field, fieldState }) => (
-                                    <TextInput
-                                        {...field}
-                                        id="intuneTenant"
-                                        type="text"
-                                        disabled={!watchedEnableIntune}
-                                        invalid={fieldState.error && fieldState.isTouched}
-                                        error={getFieldErrorMessage(fieldState)}
-                                    />
-                                )}
-                            />
-                        </div>
+                        <Controller
+                            name="intuneTenant"
+                            control={control}
+                            rules={watchedEnableIntune ? buildValidationRules([validateRequired()]) : buildValidationRules([])}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="intuneTenant"
+                                    type="text"
+                                    label="Intune Tenant"
+                                    required={watchedEnableIntune}
+                                    disabled={!watchedEnableIntune}
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={getFieldErrorMessage(fieldState)}
+                                />
+                            )}
+                        />
 
-                        <div>
-                            <Label htmlFor="intuneApplicationId" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
-                                Intune Application ID {watchedEnableIntune && <span className="text-red-500">*</span>}
-                            </Label>
-                            <Controller
-                                name="intuneApplicationId"
-                                control={control}
-                                rules={watchedEnableIntune ? buildValidationRules([validateRequired()]) : buildValidationRules([])}
-                                render={({ field, fieldState }) => (
-                                    <TextInput
-                                        {...field}
-                                        id="intuneApplicationId"
-                                        type="text"
-                                        disabled={!watchedEnableIntune}
-                                        invalid={fieldState.error && fieldState.isTouched}
-                                        error={getFieldErrorMessage(fieldState)}
-                                    />
-                                )}
-                            />
-                        </div>
+                        <Controller
+                            name="intuneApplicationId"
+                            control={control}
+                            rules={watchedEnableIntune ? buildValidationRules([validateRequired()]) : buildValidationRules([])}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="intuneApplicationId"
+                                    type="text"
+                                    label="Intune Application ID"
+                                    required={watchedEnableIntune}
+                                    disabled={!watchedEnableIntune}
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={getFieldErrorMessage(fieldState)}
+                                />
+                            )}
+                        />
 
-                        <div>
-                            <Label htmlFor="intuneApplicationKey" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
-                                Intune Application Key {watchedEnableIntune && <span className="text-red-500">*</span>}
-                            </Label>
-                            <Controller
-                                name="intuneApplicationKey"
-                                control={control}
-                                rules={watchedEnableIntune ? buildValidationRules([validateRequired()]) : buildValidationRules([])}
-                                render={({ field, fieldState }) => (
-                                    <TextInput
-                                        {...field}
-                                        id="intuneApplicationKey"
-                                        type="password"
-                                        disabled={!watchedEnableIntune}
-                                        invalid={fieldState.error && fieldState.isTouched}
-                                        error={getFieldErrorMessage(fieldState)}
-                                    />
-                                )}
-                            />
-                        </div>
+                        <Controller
+                            name="intuneApplicationKey"
+                            control={control}
+                            rules={watchedEnableIntune ? buildValidationRules([validateRequired()]) : buildValidationRules([])}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="intuneApplicationKey"
+                                    type="password"
+                                    label="Intune Application Key"
+                                    required={watchedEnableIntune}
+                                    disabled={!watchedEnableIntune}
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={getFieldErrorMessage(fieldState)}
+                                />
+                            )}
+                        />
 
                         <CertificateField certificates={certificates} />
 

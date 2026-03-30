@@ -118,44 +118,44 @@ export default function GlobalMetadataDetail() {
                 ]}
             />
 
-            <Container>
-                <Widget
-                    title="Global Metadata Details"
-                    busy={isFetchingDetail}
-                    widgetButtons={buttons}
-                    titleSize="large"
-                    refreshAction={getFreshGlobalMetadata}
-                    widgetLockName={LockWidgetNameEnum.GlobalMetadataDetails}
-                >
-                    <CustomTable headers={detailHeaders} data={detailData} />
-                </Widget>
+            <Widget widgetLockName={LockWidgetNameEnum.GlobalMetadataDetails} busy={isFetchingDetail} noBorder>
+                <Container>
+                    <Widget
+                        title="Global Metadata Details"
+                        widgetButtons={buttons}
+                        titleSize="large"
+                        refreshAction={getFreshGlobalMetadata}
+                    >
+                        <CustomTable headers={detailHeaders} data={detailData} />
+                    </Widget>
+                </Container>
+            </Widget>
 
-                <Dialog
-                    isOpen={confirmDelete}
-                    caption="Delete Global Metadata"
-                    body="You are about to delete a Global Metadata. Is this what you want to do?"
-                    toggle={() => setConfirmDelete(false)}
-                    icon="delete"
-                    buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                    ]}
-                />
+            <Dialog
+                isOpen={confirmDelete}
+                caption="Delete Global Metadata"
+                body="You are about to delete a Global Metadata. Is this what you want to do?"
+                toggle={() => setConfirmDelete(false)}
+                icon="delete"
+                buttons={[
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                ]}
+            />
 
-                <Dialog
-                    isOpen={isEditModalOpen}
-                    toggle={handleCloseEditModal}
-                    caption="Edit Global Metadata"
-                    size="xl"
-                    body={
-                        <GlobalMetadataForm
-                            globalMetadataId={globalMetadata?.uuid}
-                            onCancel={handleCloseEditModal}
-                            onSuccess={handleCloseEditModal}
-                        />
-                    }
-                />
-            </Container>
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit Global Metadata"
+                size="xl"
+                body={
+                    <GlobalMetadataForm
+                        globalMetadataId={globalMetadata?.uuid}
+                        onCancel={handleCloseEditModal}
+                        onSuccess={handleCloseEditModal}
+                    />
+                }
+            />
         </div>
     );
 }

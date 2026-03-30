@@ -9,9 +9,15 @@ import Button from 'components/Button';
 import { Copy } from 'lucide-react';
 import packageJson from '../../../../package.json';
 
-const PlatformInfoDialogLink = () => {
+type PlatformInfoDialogLinkProps = {
+    initiallyOpen?: boolean;
+    forceOpen?: boolean;
+};
+
+const PlatformInfoDialogLink = ({ initiallyOpen = false, forceOpen }: PlatformInfoDialogLinkProps) => {
     const dispatch = useDispatch();
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpenState, setIsOpenState] = useState(initiallyOpen);
+    const isOpen = forceOpen ?? isOpenState;
 
     const platformInfo = useSelector(selectors.platformInfo);
     const isFetching = useSelector(selectors.isFetching);
@@ -110,23 +116,24 @@ const PlatformInfoDialogLink = () => {
                 type="button"
                 className="text-blue-600 bg-transparent border-0 p-0 cursor-pointer font-inherit"
                 data-testid="footer-version-info-link"
-                onClick={() => setIsOpen(true)}
+                onClick={() => setIsOpenState(true)}
             >
                 Version Info
             </button>
             <Dialog
                 isOpen={isOpen}
                 caption="Platform versions info"
-                toggle={() => setIsOpen(false)}
+                toggle={() => setIsOpenState(false)}
                 body={isFetching ? <Spinner active /> : content}
                 size="lg"
                 icon="info"
+                dataTestId="platform-info-dialog"
                 buttons={[
                     {
                         color: 'secondary',
                         body: 'Close',
                         variant: 'outline',
-                        onClick: () => setIsOpen(false),
+                        onClick: () => setIsOpenState(false),
                     },
                 ]}
             />

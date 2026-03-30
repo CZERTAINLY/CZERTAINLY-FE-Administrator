@@ -395,44 +395,44 @@ export default function ComplianceProfileDetail() {
                     { label: profile?.name || 'Compliance Profile Details', href: '' },
                 ]}
             />
-            <Container className="md:grid grid-cols-2">
-                <Widget
-                    title="Compliance Profile Details"
-                    busy={isFetchingDetail}
-                    widgetButtons={buttons}
-                    titleSize="large"
-                    refreshAction={getFreshComplianceProfileDetails}
-                    widgetLockName={LockWidgetNameEnum.ComplianceProfileDetails}
-                    lockSize="large"
-                    dataTestId="compliance-profile-details-widget"
-                >
-                    <CustomTable headers={detailHeaders} data={detailData} />
-                </Widget>
-                <Container className="flex flex-col">
-                    <ProfileAssociations profile={profile} />
-                    {profile && (
-                        <CustomAttributeWidget
-                            resource={Resource.ComplianceProfiles}
-                            resourceUuid={profile.uuid}
-                            attributes={profile.customAttributes}
-                        />
-                    )}
+            <Widget widgetLockName={LockWidgetNameEnum.ComplianceProfileDetails} busy={isFetchingDetail} noBorder>
+                <Container className="md:grid grid-cols-2">
+                    <Widget
+                        title="Compliance Profile Details"
+                        widgetButtons={buttons}
+                        titleSize="large"
+                        refreshAction={getFreshComplianceProfileDetails}
+                        lockSize="large"
+                        dataTestId="compliance-profile-details-widget"
+                    >
+                        <CustomTable headers={detailHeaders} data={detailData} />
+                    </Widget>
+                    <Container className="flex flex-col">
+                        <ProfileAssociations profile={profile} />
+                        {profile && (
+                            <CustomAttributeWidget
+                                resource={Resource.ComplianceProfiles}
+                                resourceUuid={profile.uuid}
+                                attributes={profile.customAttributes}
+                            />
+                        )}
+                    </Container>
                 </Container>
-            </Container>
-            <Container className="md:grid grid-cols-2" marginTop>
-                <AssignedRulesAndGroup
-                    profile={profile}
-                    setSelectedEntityDetails={setSelectedEntityDetails}
-                    setIsEntityDetailMenuOpen={setIsEntityDetailMenuOpen}
-                    onReset={(resetFn) => setAssignedRulesResetFunction(() => resetFn)}
-                />
-                <AvailableRulesAndGroups
-                    profile={profile}
-                    setSelectedEntityDetails={setSelectedEntityDetails}
-                    setIsEntityDetailMenuOpen={setIsEntityDetailMenuOpen}
-                    onReset={(resetFn) => setAvailableRulesResetFunction(() => resetFn)}
-                />
-            </Container>
+                <Container className="md:grid grid-cols-2" marginTop>
+                    <AssignedRulesAndGroup
+                        profile={profile}
+                        setSelectedEntityDetails={setSelectedEntityDetails}
+                        setIsEntityDetailMenuOpen={setIsEntityDetailMenuOpen}
+                        onReset={(resetFn) => setAssignedRulesResetFunction(() => resetFn)}
+                    />
+                    <AvailableRulesAndGroups
+                        profile={profile}
+                        setSelectedEntityDetails={setSelectedEntityDetails}
+                        setIsEntityDetailMenuOpen={setIsEntityDetailMenuOpen}
+                        onReset={(resetFn) => setAvailableRulesResetFunction(() => resetFn)}
+                    />
+                </Container>
+            </Widget>
 
             <Dialog
                 isOpen={confirmDelete}

@@ -655,32 +655,26 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
                                         <Controller
                                             name="requestProtectionMethod"
                                             control={control}
+                                            rules={buildValidationRules([validateRequired()])}
                                             render={({ field, fieldState }) => (
-                                                <>
-                                                    <Select
-                                                        id="selectedRequestProtectionMethodSelect"
-                                                        label="Requested Protection Method"
-                                                        value={field.value || ''}
-                                                        onChange={(value) => {
-                                                            field.onChange(value);
-                                                            setValue('sharedSecret', '');
-                                                        }}
-                                                        options={protectionMethodOptions.map((opt) => ({
-                                                            value: opt.value,
-                                                            label: opt.label,
-                                                        }))}
-                                                        placeholder="Select Requested Protection Method"
-                                                        isClearable
-                                                        placement="bottom"
-                                                    />
-                                                    {fieldState.error && fieldState.isTouched && (
-                                                        <p className="mt-1 text-sm text-red-600">
-                                                            {typeof fieldState.error === 'string'
-                                                                ? fieldState.error
-                                                                : fieldState.error?.message || 'Invalid value'}
-                                                        </p>
-                                                    )}
-                                                </>
+                                                <Select
+                                                    id="selectedRequestProtectionMethodSelect"
+                                                    label="Requested Protection Method"
+                                                    required
+                                                    value={field.value || ''}
+                                                    onChange={(value) => {
+                                                        field.onChange(value);
+                                                        setValue('sharedSecret', '');
+                                                    }}
+                                                    options={protectionMethodOptions.map((opt) => ({
+                                                        value: opt.value,
+                                                        label: opt.label,
+                                                    }))}
+                                                    placeholder="Select Requested Protection Method"
+                                                    isClearable
+                                                    placement="bottom"
+                                                    error={getFieldErrorMessage(fieldState)}
+                                                />
                                             )}
                                         />
                                         {watchedRequestProtectionMethod === ProtectionMethod.SharedSecret && (
@@ -706,72 +700,57 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
                                 </Widget>
 
                                 <Widget title="Response Configuration">
-                                    <div>
+                                    <div className="space-y-4">
                                         <Controller
                                             name="responseProtectionMethod"
                                             control={control}
+                                            rules={buildValidationRules([validateRequired()])}
                                             render={({ field, fieldState }) => (
-                                                <>
-                                                    <Select
-                                                        id="selectedResponseProtectionMethodSelect"
-                                                        label="Response Protection Method"
-                                                        value={field.value || ''}
-                                                        onChange={(value) => {
-                                                            field.onChange(value);
-                                                            setValue('signingCertificateUuid', '');
-                                                        }}
-                                                        options={protectionMethodOptions.map((opt) => ({
-                                                            value: opt.value,
-                                                            label: opt.label,
-                                                        }))}
-                                                        placeholder="Select Response Protection Method"
-                                                        isClearable
-                                                        placement="bottom"
-                                                    />
-                                                    {fieldState.error && fieldState.isTouched && (
-                                                        <p className="mt-1 text-sm text-red-600">
-                                                            {typeof fieldState.error === 'string'
-                                                                ? fieldState.error
-                                                                : fieldState.error?.message || 'Invalid value'}
-                                                        </p>
-                                                    )}
-                                                </>
+                                                <Select
+                                                    id="selectedResponseProtectionMethodSelect"
+                                                    label="Response Protection Method"
+                                                    required
+                                                    value={field.value || ''}
+                                                    onChange={(value) => {
+                                                        field.onChange(value);
+                                                        setValue('signingCertificateUuid', '');
+                                                    }}
+                                                    options={protectionMethodOptions.map((opt) => ({
+                                                        value: opt.value,
+                                                        label: opt.label,
+                                                    }))}
+                                                    placeholder="Select Response Protection Method"
+                                                    isClearable
+                                                    placement="bottom"
+                                                    error={getFieldErrorMessage(fieldState)}
+                                                />
                                             )}
                                         />
-                                    </div>
 
-                                    {watchedResponseProtectionMethod === ProtectionMethod.Signature && (
-                                        <div>
+                                        {watchedResponseProtectionMethod === ProtectionMethod.Signature && (
                                             <Controller
                                                 name="signingCertificateUuid"
                                                 control={control}
                                                 rules={buildValidationRules([validateRequired()])}
                                                 render={({ field, fieldState }) => (
-                                                    <>
-                                                        <Select
-                                                            id="selectedSigningCertificate"
-                                                            label="Signing Certificate"
-                                                            value={field.value || ''}
-                                                            onChange={(value) => {
-                                                                field.onChange(value);
-                                                            }}
-                                                            options={signingCertificateOptions}
-                                                            placeholder="Select Signing Certificate"
-                                                            isClearable
-                                                            placement="bottom"
-                                                        />
-                                                        {fieldState.error && fieldState.isTouched && (
-                                                            <p className="mt-1 text-sm text-red-600">
-                                                                {typeof fieldState.error === 'string'
-                                                                    ? fieldState.error
-                                                                    : fieldState.error?.message || 'Invalid value'}
-                                                            </p>
-                                                        )}
-                                                    </>
+                                                    <Select
+                                                        id="selectedSigningCertificate"
+                                                        label="Signing Certificate"
+                                                        required
+                                                        value={field.value || ''}
+                                                        onChange={(value) => {
+                                                            field.onChange(value);
+                                                        }}
+                                                        options={signingCertificateOptions}
+                                                        placeholder="Select Signing Certificate"
+                                                        isClearable
+                                                        placement="bottom"
+                                                        error={getFieldErrorMessage(fieldState)}
+                                                    />
                                                 )}
                                             />
-                                        </div>
-                                    )}
+                                        )}
+                                    </div>
                                 </Widget>
                                 <Widget
                                     title="RA Profile Configuration"

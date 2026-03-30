@@ -201,21 +201,16 @@ const ApprovalProfileDetails = () => {
                     { label: profileApprovalDetail?.name || 'Approval Profile Details', href: '' },
                 ]}
             />
-            <Container className="md:grid grid-cols-2 items-start">
-                <Widget
-                    title="Approval Profile Details"
-                    busy={isBusy}
-                    titleSize="large"
-                    widgetButtons={buttons}
-                    refreshAction={getFreshData}
-                    widgetLockName={LockWidgetNameEnum.ApprovalProfileDetails}
-                >
-                    <CustomTable headers={detailHeaders} data={detailData} />
-                </Widget>
-                <Widget title="Approval Profile Steps" busy={isBusy} widgetLockName={LockWidgetNameEnum.ApprovalProfileDetails}>
-                    <CustomTable headers={stepsHeaders} data={stepsRows} />
-                </Widget>
-            </Container>
+            <Widget widgetLockName={LockWidgetNameEnum.ApprovalProfileDetails} busy={isBusy} noBorder>
+                <Container className="md:grid grid-cols-2 items-start">
+                    <Widget title="Approval Profile Details" titleSize="large" widgetButtons={buttons} refreshAction={getFreshData}>
+                        <CustomTable headers={detailHeaders} data={detailData} />
+                    </Widget>
+                    <Widget title="Approval Profile Steps">
+                        <CustomTable headers={stepsHeaders} data={stepsRows} />
+                    </Widget>
+                </Container>
+            </Widget>
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Approval Profile"
