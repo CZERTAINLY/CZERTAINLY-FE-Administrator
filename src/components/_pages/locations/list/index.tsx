@@ -189,7 +189,7 @@ function LocationList() {
                 }
                 getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.locations.getLocationSearchableFields(), [])}
                 headers={locationsRowHeaders}
-                data={isBusy ? [] : locationList}
+                data={locationList}
                 isBusy={isBusy}
                 title="Locations Store"
                 entityNameSingular="a Location"

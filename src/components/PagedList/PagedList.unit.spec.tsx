@@ -268,24 +268,14 @@ describe('PagedList unit coverage', () => {
         expect(container.querySelector('[data-testid^="widget-btn-"]')).toBeNull();
     });
 
-    it('disables pagination controls when busy', async () => {
+    it.each([
+        ['pagination', 'table-pagination-disabled'],
+        ['selection', 'table-selection-disabled'],
+        ['search', 'table-search-disabled'],
+    ])('disables %s controls when busy', async (_controlName, testId) => {
         await renderPagedList({ isBusy: true });
 
-        const disabledState = container.querySelector('[data-testid="table-pagination-disabled"]') as HTMLElement;
-        expect(disabledState.textContent).toBe('true');
-    });
-
-    it('disables selection controls when busy', async () => {
-        await renderPagedList({ isBusy: true });
-
-        const disabledState = container.querySelector('[data-testid="table-selection-disabled"]') as HTMLElement;
-        expect(disabledState.textContent).toBe('true');
-    });
-
-    it('disables search controls when busy', async () => {
-        await renderPagedList({ isBusy: true });
-
-        const disabledState = container.querySelector('[data-testid="table-search-disabled"]') as HTMLElement;
+        const disabledState = container.querySelector(`[data-testid="${testId}"]`) as HTMLElement;
         expect(disabledState.textContent).toBe('true');
     });
 

@@ -146,7 +146,7 @@ function SchedulerJobsList() {
             onListCallback={onListCallback}
             onDeleteCallback={(uuids) => dispatch(actions.bulkDeleteSchedulerJobs({ uuids }))}
             headers={schedulerJobsRowHeaders}
-            data={isBusy ? [] : schedulerJobList}
+            data={schedulerJobList}
             isBusy={isBusy}
             addHidden={true}
             title="Scheduled Jobs Store"

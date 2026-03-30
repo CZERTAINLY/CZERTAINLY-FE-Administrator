@@ -242,6 +242,7 @@ export default function UsersList() {
             <Widget
                 title="List of Users"
                 busy={isBusy}
+                enableBusyOverlay
                 widgetLockName={LockWidgetNameEnum.ListOfUsers}
                 widgetButtons={buttons}
                 titleSize="large"
@@ -249,7 +250,7 @@ export default function UsersList() {
             >
                 <CustomTable
                     headers={userTableHeader}
-                    data={isBusy ? [] : userTableData}
+                    data={userTableData}
                     onCheckedRowsChanged={setCheckedRows}
                     canSearch={true}
                     hasCheckboxes={true}

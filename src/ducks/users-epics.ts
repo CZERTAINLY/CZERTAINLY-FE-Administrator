@@ -1,5 +1,5 @@
 import { from, iif, of } from 'rxjs';
-import { catchError, concatMap, filter, map, mergeMap, switchMap, toArray } from 'rxjs/operators';
+import { catchError, concatMap, exhaustMap, filter, map, mergeMap, switchMap, toArray } from 'rxjs/operators';
 
 import { AppEpic } from 'ducks';
 import { extractError } from 'utils/net';
@@ -170,7 +170,7 @@ const deleteUser: AppEpic = (action$, state, deps) => {
 const bulkDeleteUsers: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.bulkDeleteUsers.match),
-        switchMap((action) =>
+        exhaustMap((action) =>
             from(action.payload.uuids).pipe(
                 concatMap((uuid) =>
                     deps.apiClients.users.deleteUser({ userUuid: uuid }).pipe(

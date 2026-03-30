@@ -200,6 +200,7 @@ export default function RolesList() {
             <Widget
                 title="List of Roles"
                 busy={isBusy}
+                enableBusyOverlay
                 widgetLockName={LockWidgetNameEnum.ListOfRoles}
                 widgetButtons={buttons}
                 titleSize="large"
@@ -207,7 +208,7 @@ export default function RolesList() {
             >
                 <CustomTable
                     headers={rolesTableHeader}
-                    data={isBusy ? [] : rolesTableData}
+                    data={rolesTableData}
                     onCheckedRowsChanged={setCheckedRows}
                     canSearch={true}
                     hasCheckboxes={true}

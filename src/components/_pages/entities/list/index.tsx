@@ -116,7 +116,7 @@ function EntityList() {
                 onDeleteCallback={(uuids) => dispatch(actions.bulkDeleteEntities({ uuids }))}
                 getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.entities.getEntitySearchableFields(), [])}
                 headers={entitiesRowHeaders}
-                data={isBusy ? [] : entityList}
+                data={entityList}
                 isBusy={isBusy}
                 title="Entity Store"
                 entityNameSingular="an Entity"

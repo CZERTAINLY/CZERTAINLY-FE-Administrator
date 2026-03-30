@@ -1,6 +1,6 @@
 import { AppEpic } from 'ducks';
 import { concat, from, iif, of } from 'rxjs';
-import { catchError, concatMap, filter, map, mergeMap, switchMap, toArray } from 'rxjs/operators';
+import { catchError, concatMap, exhaustMap, filter, map, mergeMap, switchMap, toArray } from 'rxjs/operators';
 import { extractError } from 'utils/net';
 import { actions as alertActions } from './alerts';
 import { actions as appRedirectActions } from './app-redirect';
@@ -129,7 +129,7 @@ const deleteSchedulerJob: AppEpic = (action$, state$, deps) => {
 const bulkDeleteSchedulerJobs: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.bulkDeleteSchedulerJobs.match),
-        switchMap((action) => {
+        exhaustMap((action) => {
             return from(action.payload.uuids).pipe(
                 concatMap((uuid) =>
                     deps.apiClients.scheduler.deleteScheduledJob({ uuid }).pipe(

@@ -43,6 +43,32 @@ test.describe('Widget', () => {
         await expect(page.getByTestId('refresh-icon')).toBeDisabled();
     });
 
+    test('should not render blocking overlay when busy and enableBusyOverlay is not provided', async ({ mount, page }) => {
+        const store = createMockStore();
+        await mount(
+            withProviders(
+                <Widget title="Busy Widget" dataTestId="busy-widget" busy={true}>
+                    <p>Content</p>
+                </Widget>,
+                { store },
+            ),
+        );
+        await expect(page.getByTestId('widget-busy-overlay')).toHaveCount(0);
+    });
+
+    test('should render blocking overlay when busy and enableBusyOverlay is true', async ({ mount, page }) => {
+        const store = createMockStore();
+        await mount(
+            withProviders(
+                <Widget title="Busy Widget" dataTestId="busy-widget" busy={true} enableBusyOverlay={true}>
+                    <p>Content</p>
+                </Widget>,
+                { store },
+            ),
+        );
+        await expect(page.getByTestId('widget-busy-overlay')).toBeVisible();
+    });
+
     test('should show WidgetLock when widgetLocks match widgetLockName', async ({ mount, page }) => {
         const lock = {
             widgetName: LockWidgetNameEnum.ListOfCertificates,

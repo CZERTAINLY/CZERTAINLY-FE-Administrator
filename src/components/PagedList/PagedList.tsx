@@ -193,6 +193,7 @@ function PagedList({
             <Widget
                 title={title}
                 busy={isBusy || isFetchingList}
+                enableBusyOverlay
                 widgetLockName={pageWidgetLockName}
                 refreshAction={getFreshData}
                 widgetButtons={buttons}
