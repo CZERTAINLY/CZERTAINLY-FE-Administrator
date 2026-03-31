@@ -15,7 +15,6 @@ import type {
     ManagedSigningType,
     OneTimeKeyManagedSigningRequestDto,
     RequestAttribute,
-    ResponseAttribute,
     SigningScheme,
     StaticKeyManagedSigningRequestDto,
 } from './';

@@ -98,7 +98,7 @@ export interface GetIlmSigningProtocolActivationDetailsRequest {
 
 export interface GetSigningProfileRequest {
     uuid: string;
-    version: number;
+    version?: number;
 }
 
 export interface GetTspActivationDetailsRequest {
@@ -373,11 +373,10 @@ export class SigningProfileManagementApi extends BaseAPI {
     getSigningProfile({ uuid, version }: GetSigningProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<SigningProfileDto>>
     getSigningProfile({ uuid, version }: GetSigningProfileRequest, opts?: OperationOpts): Observable<SigningProfileDto | AjaxResponse<SigningProfileDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getSigningProfile');
-        throwIfNullOrUndefined(version, 'version', 'getSigningProfile');
 
-        const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
-            'version': version,
-        };
+        const query: HttpQuery = {};
+
+        if (version != null) { query['version'] = version; }
 
         return this.request<SigningProfileDto>({
             url: '/v1/signingProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),

@@ -13,7 +13,7 @@
 
 import type {
     ManagedSigningType,
-    ResponseAttribute,
+    RequestAttribute,
     SigningScheme,
 } from './';
 
@@ -55,10 +55,10 @@ export interface OneTimeKeyManagedSigningRequestDto {
     tokenProfileUuid: string;
     /**
      * List of attributes required for signing operations (such as digest algorithm), provided by the Cryptography Provider Connector
-     * @type {Array<ResponseAttribute>}
+     * @type {Array<RequestAttribute>}
      * @memberof OneTimeKeyManagedSigningRequestDto
      */
-    attributes: Array<ResponseAttribute>;
+    signingOperationAttributes: Array<RequestAttribute>;
 }
 
 

@@ -59,7 +59,7 @@ export interface OneTimeKeyManagedSigningDto {
      * @type {Array<ResponseAttribute>}
      * @memberof OneTimeKeyManagedSigningDto
      */
-    attributes: Array<ResponseAttribute>;
+    signingOperationAttributes: Array<ResponseAttribute>;
 }
 
 

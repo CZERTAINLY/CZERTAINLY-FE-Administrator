@@ -49,6 +49,10 @@ import {
     VaultInstanceManagementApi,
     VaultProfileManagementApi,
     TrustedCertificateManagementApi,
+    ILMSigningProtocolConfigurationManagementApi,
+    SigningProfileManagementApi,
+    TSPConfigurationManagementApi,
+    TimeQualityConfigurationManagementApi,
 } from 'types/openapi';
 import { TokenInstanceControllerApi } from 'types/openapi/apis/TokenInstanceControllerApi';
 import {
@@ -117,6 +121,10 @@ export interface ApiClients {
     vaults: VaultInstanceManagementApi;
     vaultProfiles: VaultProfileManagementApi;
     secrets: SecretManagementApi;
+    ilmSigningProtocolConfigurations: ILMSigningProtocolConfigurationManagementApi;
+    signingProfiles: SigningProfileManagementApi;
+    tspConfigurations: TSPConfigurationManagementApi;
+    timeQualityConfigurations: TimeQualityConfigurationManagementApi;
 }
 
 export const backendClient: ApiClients = {
@@ -170,6 +178,10 @@ export const backendClient: ApiClients = {
     vaults: new VaultInstanceManagementApi(configuration),
     vaultProfiles: new VaultProfileManagementApi(configuration),
     secrets: new SecretManagementApi(configuration),
+    ilmSigningProtocolConfigurations: new ILMSigningProtocolConfigurationManagementApi(configuration),
+    signingProfiles: new SigningProfileManagementApi(configuration),
+    tspConfigurations: new TSPConfigurationManagementApi(configuration),
+    timeQualityConfigurations: new TimeQualityConfigurationManagementApi(configuration),
 };
 
 export const updateBackendUtilsClients = (url: string | undefined) => {
