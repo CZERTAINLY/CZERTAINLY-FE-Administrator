@@ -10,6 +10,7 @@ import { actions as certActions, selectors as certSelectors } from 'ducks/certif
 
 import { selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions, selectors } from 'ducks/users';
+import { selectors as authSelectors } from 'ducks/auth';
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
@@ -40,6 +41,7 @@ export default function UserDetail() {
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const certificate = useSelector(certSelectors.certificateDetail);
     const isFetchingCertificateDetail = useSelector(certSelectors.isFetchingDetail);
+    const profile = useSelector(authSelectors.profile);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
@@ -118,6 +120,8 @@ export default function UserDetail() {
         ],
     );
 
+    const isCurrentUser = useMemo(() => user?.uuid === profile?.uuid, [user, profile]);
+
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
@@ -130,30 +134,30 @@ export default function UserDetail() {
             },
             {
                 icon: 'trash',
-                disabled: user?.systemUser || false,
-                tooltip: 'Delete',
+                disabled: user?.systemUser || isCurrentUser || false,
+                tooltip: isCurrentUser ? 'You cannot delete your own account' : 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
                 icon: 'check',
-                disabled: user?.enabled || user?.systemUser || false,
-                tooltip: 'Enable',
+                disabled: user?.enabled || user?.systemUser || isCurrentUser || false,
+                tooltip: isCurrentUser ? 'You cannot enable your own account' : 'Enable',
                 onClick: () => {
                     onEnableClick();
                 },
             },
             {
                 icon: 'times',
-                disabled: !(user?.enabled || false) || user?.systemUser || false,
-                tooltip: 'Disable',
+                disabled: !(user?.enabled || false) || user?.systemUser || isCurrentUser || false,
+                tooltip: isCurrentUser ? 'You cannot disable your own account' : 'Disable',
                 onClick: () => {
                     onDisableClick();
                 },
             },
         ],
-        [user, onEditClick, onDisableClick, onEnableClick, isBusy, setConfirmDelete],
+        [user, onEditClick, onDisableClick, onEnableClick, isBusy, setConfirmDelete, isCurrentUser],
     );
 
     const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
