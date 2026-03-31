@@ -66,6 +66,10 @@ import ScepProfilesList from './_pages/scep-profiles/list';
 import CmpProfileDetails from './_pages/cmp-profiles/details';
 import CmpProfilesList from './_pages/cmp-profiles/list';
 
+import { TspConfigurationDetail } from './_pages/tsp-configurations/detail/TspConfigurationDetail';
+import { TspConfigurationForm } from './_pages/tsp-configurations/form/TspConfigurationForm';
+import { TspConfigurationsList } from './_pages/tsp-configurations/list/TspConfigurationsList';
+
 import GlobalMetadataDetail from './_pages/global-metadata/detail';
 import GlobalMetadataList from './_pages/global-metadata/list';
 
@@ -249,6 +253,15 @@ export default function AppRouter() {
                         element={<Navigate to={`/${Resource.CmpProfiles.toLowerCase()}`} />}
                     />
                     <Route path={`/${Resource.CmpProfiles.toLowerCase()}/detail/:id`} element={<CmpProfileDetails />} />
+
+                    <Route path={`/${Resource.TspConfigurations.toLowerCase()}`} element={<TspConfigurationsList />} />
+                    <Route
+                        path={`/${Resource.TspConfigurations.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.TspConfigurations.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.TspConfigurations.toLowerCase()}/add`} element={<TspConfigurationForm />} />
+                    <Route path={`/${Resource.TspConfigurations.toLowerCase()}/edit/:id`} element={<TspConfigurationForm />} />
+                    <Route path={`/${Resource.TspConfigurations.toLowerCase()}/detail/:id`} element={<TspConfigurationDetail />} />
 
                     <Route path={`/${Resource.Groups.toLowerCase()}`} element={<GroupList />} />
                     <Route
