@@ -56,13 +56,13 @@ export interface TimeQualityConfigurationUpdateRequestDto {
      * @type {number}
      * @memberof TimeQualityConfigurationUpdateRequestDto
      */
-    minReachable?: number;
+    ntpServersMinReachable?: number;
     /**
      * Maximum allowed clock drift from NTP reference time, in ISO 8601 duration format
      * @type {string}
      * @memberof TimeQualityConfigurationUpdateRequestDto
      */
-    maxDrift?: string;
+    maxClockDrift?: string;
     /**
      * Whether to guard against leap second anomalies
      * @type {boolean}
