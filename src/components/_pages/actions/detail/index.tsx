@@ -2,15 +2,18 @@ import { ApiClients } from '../../../../api';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import ConditionsExecutionsList from 'components/ExecutionConditionItemsList';
+import FilterWidgetRuleAction from 'components/FilterWidgetRuleAction';
+import { SendNotificationExecutionItems } from 'components/_pages/executions/SendNotificationExecutionItems';
 import Breadcrumb from 'components/Breadcrumb';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { EntityType } from 'ducks/filters';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
-import { PlatformEnum, Resource } from 'types/openapi';
+import { ExecutionType, PlatformEnum, Resource } from 'types/openapi';
 import Button from 'components/Button';
 import Container from 'components/Container';
 import TextInput from 'components/TextInput';
@@ -25,6 +28,7 @@ const RuleDetails = () => {
     const dispatch = useDispatch();
     const actionDetails = useSelector(rulesSelectors.actionDetails);
     const isUpdatingAction = useSelector(rulesSelectors.isUpdatingAction);
+    const isUpdatingExecution = useSelector(rulesSelectors.isUpdatingExecution);
     const isFetchingActionDetails = useSelector(rulesSelectors.isFetchingActionDetails);
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const executionTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ExecutionType));
@@ -33,6 +37,7 @@ const RuleDetails = () => {
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
     const [updatedDescription, setUpdatedDescription] = useState('');
+    const [editingExecutionUuid, setEditingExecutionUuid] = useState<string | null>(null);
 
     useEffect(() => {
         if (!actionDetails?.description || actionDetails.uuid !== id) return;
@@ -53,6 +58,11 @@ const RuleDetails = () => {
     }, [actionDetails, dispatch]);
 
     const isBusy = useMemo(() => isFetchingActionDetails || isUpdatingAction, [isFetchingActionDetails, isUpdatingAction]);
+
+    const executionToEdit = useMemo(
+        () => actionDetails?.executions.find((execution) => execution.uuid === editingExecutionUuid),
+        [actionDetails?.executions, editingExecutionUuid],
+    );
 
     const executionsOptions = useMemo(() => {
         if (executions === undefined) return [];
@@ -128,6 +138,14 @@ const RuleDetails = () => {
         },
         [dispatch, id, actionDetails?.executions, actionDetails?.description],
     );
+
+    const onCloseExecutionItemsEditor = useCallback(() => {
+        setEditingExecutionUuid(null);
+    }, []);
+
+    const onOpenExecutionItemsEditor = useCallback((executionUuid: string) => {
+        setEditingExecutionUuid(executionUuid);
+    }, []);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -306,6 +324,7 @@ const RuleDetails = () => {
             <ConditionsExecutionsList
                 listType="executionItems"
                 actionExecutions={actionDetails?.executions}
+                onEditExecutionItems={onOpenExecutionItemsEditor}
                 getAvailableFiltersApi={(apiClients: ApiClients) =>
                     apiClients.resources.listResourceRuleFilterFields({
                         resource: actionDetails.resource,
@@ -316,7 +335,70 @@ const RuleDetails = () => {
         ) : (
             <></>
         );
-    }, [actionDetails]);
+    }, [actionDetails, onOpenExecutionItemsEditor]);
+
+    const renderExecutionItemsEditor = (() => {
+        if (!executionToEdit || !actionDetails?.resource) return null;
+
+        switch (executionToEdit.type) {
+            case ExecutionType.SetField:
+                return (
+                    <FilterWidgetRuleAction
+                        entity={EntityType.ACTIONS}
+                        title="Execution Items"
+                        busyBadges={isUpdatingExecution}
+                        getAvailableFiltersApi={(apiClients: ApiClients) =>
+                            apiClients.resources.listResourceRuleFilterFields({
+                                resource: actionDetails.resource,
+                                settable: true,
+                            })
+                        }
+                        ExecutionsList={executionToEdit.items}
+                        onActionsUpdate={(currentExecutionItems) => {
+                            dispatch(
+                                rulesActions.updateExecution({
+                                    executionUuid: executionToEdit.uuid,
+                                    execution: {
+                                        items: currentExecutionItems,
+                                        description: executionToEdit.description,
+                                    },
+                                }),
+                            );
+                        }}
+                    />
+                );
+            case ExecutionType.SendNotification:
+                return (
+                    <SendNotificationExecutionItems
+                        mode="detail"
+                        isUpdating={isUpdatingExecution}
+                        notificationProfileItems={
+                            executionToEdit.items
+                                ?.filter((item) => item.notificationProfileUuid)
+                                .map((item) => ({
+                                    label: item.notificationProfileName || item.notificationProfileUuid || '',
+                                    value: item.notificationProfileUuid || '',
+                                })) || []
+                        }
+                        onNotificationProfileItemsChange={(newItems) => {
+                            dispatch(
+                                rulesActions.updateExecution({
+                                    executionUuid: executionToEdit.uuid,
+                                    execution: {
+                                        description: executionToEdit.description,
+                                        items: newItems.map((item) => ({
+                                            notificationProfileUuid: item.value,
+                                        })),
+                                    },
+                                }),
+                            );
+                        }}
+                    />
+                );
+            default:
+                return null;
+        }
+    })();
 
     return (
         <div>
@@ -372,6 +454,21 @@ const RuleDetails = () => {
                     buttons={[
                         { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                         { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    ]}
+                />
+                <Dialog
+                    isOpen={!!executionToEdit}
+                    size="xl"
+                    caption={executionToEdit ? `Edit Execution Items - ${executionToEdit.name}` : 'Edit Execution Items'}
+                    body={renderExecutionItemsEditor}
+                    toggle={onCloseExecutionItemsEditor}
+                    buttons={[
+                        {
+                            color: 'secondary',
+                            variant: 'outline',
+                            onClick: onCloseExecutionItemsEditor,
+                            body: 'Close',
+                        },
                     ]}
                 />
             </Container>

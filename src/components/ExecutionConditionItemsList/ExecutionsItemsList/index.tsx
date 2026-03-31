@@ -1,6 +1,8 @@
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { EntityType, selectors } from 'ducks/filters';
 import { selectors as rulesSelectors } from 'ducks/rules';
+import Button from 'components/Button';
+import EditIcon from 'components/icons/EditIcon';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import Spinner from 'components/Spinner';
@@ -15,6 +17,7 @@ interface ExecutionsItemsListProps {
     executionType: ExecutionType;
     executionUuid: string;
     smallerBadges?: boolean;
+    onEditExecutionItems?: () => void;
 }
 
 const ExecutionsItemsList = ({
@@ -23,6 +26,7 @@ const ExecutionsItemsList = ({
     executionType,
     executionUuid,
     smallerBadges,
+    onEditExecutionItems,
 }: ExecutionsItemsListProps) => {
     const searchGroupEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterFieldSource));
     const availableFilters = useSelector(selectors.availableFilters(EntityType.ACTIONS));
@@ -226,6 +230,11 @@ const ExecutionsItemsList = ({
     ) : (
         <div key={executionUuid} className="flex gap-2 items-center">
             <h6 className="text-gray-500">{`${executionName}`}</h6>
+            {onEditExecutionItems && (
+                <Button variant="transparent" color="secondary" title="Edit Execution Items" onClick={onEditExecutionItems}>
+                    <EditIcon size={14} />
+                </Button>
+            )}
             {renderActionBadges()}
         </div>
     );

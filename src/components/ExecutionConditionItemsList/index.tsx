@@ -18,6 +18,7 @@ interface ConditionsExecutionsListProps {
     actionExecutions?: ExecutionModel[];
     getAvailableFiltersApi: (apiClients: ApiClients) => Observable<Array<SearchFieldListModel>>;
     listType: ListType;
+    onEditExecutionItems?: (executionUuid: string) => void;
 }
 
 const ConditionsExecutionsList = ({
@@ -25,6 +26,7 @@ const ConditionsExecutionsList = ({
     actionExecutions,
     getAvailableFiltersApi,
     listType,
+    onEditExecutionItems,
 }: ConditionsExecutionsListProps) => {
     const isFetchingAvailableFiltersConditions = useSelector(selectors.isFetchingFilters(EntityType.CONDITIONS));
     const isFetchingAvailableFiltersActions = useSelector(selectors.isFetchingFilters(EntityType.ACTIONS));
@@ -70,12 +72,13 @@ const ConditionsExecutionsList = ({
                         executionUuid={execution.uuid}
                         executionType={execution.type}
                         executionItems={execution.items}
+                        onEditExecutionItems={() => onEditExecutionItems?.(execution.uuid)}
                         key={execution.uuid}
                     />
                 </React.Fragment>
             ));
         } else return <></>;
-    }, [ruleConditions, actionExecutions, isBusy]);
+    }, [ruleConditions, actionExecutions, isBusy, onEditExecutionItems]);
 
     return (
         <Widget title={widgetTitle} titleSize="large" busy={isBusy}>

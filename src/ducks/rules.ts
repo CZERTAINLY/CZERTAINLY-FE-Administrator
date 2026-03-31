@@ -396,6 +396,12 @@ export const slice = createSlice({
                 group.uuid === action.payload.execution.uuid ? action.payload.execution : group,
             );
 
+            if (state.actionDetails?.executions?.length) {
+                state.actionDetails.executions = state.actionDetails.executions.map((execution) =>
+                    execution.uuid === action.payload.execution.uuid ? action.payload.execution : execution,
+                );
+            }
+
             if (state.executionDetails?.uuid === action.payload.execution.uuid) {
                 state.executionDetails = action.payload.execution;
             }
