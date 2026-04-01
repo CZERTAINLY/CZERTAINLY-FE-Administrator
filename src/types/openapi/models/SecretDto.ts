@@ -12,6 +12,7 @@
  */
 
 import type {
+    ComplianceStatus,
     NameAndUuidDto,
     SecretState,
     SecretType,
@@ -82,6 +83,12 @@ export interface SecretDto {
      * @memberof SecretDto
      */
     groups?: Array<NameAndUuidDto>;
+    /**
+     * Secret compliance status
+     * @type {ComplianceStatus}
+     * @memberof SecretDto
+     */
+    complianceStatus: ComplianceStatus;
 }
 
 
