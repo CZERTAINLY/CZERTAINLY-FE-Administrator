@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import { Info, SquareMinus } from 'lucide-react';
 
-import AttributeViewer from 'components/Attributes/AttributeViewer';
+import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from 'components/Attributes/AttributeViewer';
 import Badge from 'components/Badge';
 import Breadcrumb from 'components/Breadcrumb';
 import Button from 'components/Button';
@@ -500,6 +500,10 @@ function SecretDetail() {
                                 title: 'Attributes',
                                 content: (
                                     <div className="space-y-4">
+                                        <Widget title="Metadata" titleSize="large">
+                                            <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={secret?.metadata} />
+                                        </Widget>
+
                                         {secret?.attributes && secret.attributes.length > 0 && (
                                             <AttributeViewer attributes={secret.attributes} />
                                         )}
