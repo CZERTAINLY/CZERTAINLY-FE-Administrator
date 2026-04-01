@@ -2,36 +2,42 @@ import { AppEpic } from 'ducks';
 import { of } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 import { extractError } from 'utils/net';
-import { SearchRequestDto } from 'types/openapi';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { slice } from './signing-profiles';
 import { actions as appRedirectActions } from './app-redirect';
 import { actions as alertActions } from './alerts';
 import { actions as userInterfaceActions } from './user-interface';
+import { EntityType } from './filters';
+import { actions as pagingActions } from './paging';
+import { transformSearchRequestModelToDto } from './transform/certificates';
+import { store } from '../App';
 
 const listSigningProfiles: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listSigningProfiles.match),
-        switchMap(() => {
-            const searchRequest: SearchRequestDto = { filters: [] };
-            return deps.apiClients.signingProfiles.listSigningProfiles({ searchRequestDto: searchRequest }).pipe(
-                switchMap((response) =>
-                    of(
-                        slice.actions.listSigningProfilesSuccess({
-                            signingProfiles: response.items ?? [],
-                            totalItems: response.totalItems ?? 0,
-                        }),
-                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfSigningProfiles),
+        switchMap((action) => {
+            store.dispatch(pagingActions.list(EntityType.SIGNING_PROFILE));
+            return deps.apiClients.signingProfiles
+                .listSigningProfiles({ searchRequestDto: transformSearchRequestModelToDto(action.payload) })
+                .pipe(
+                    switchMap((response) =>
+                        of(
+                            slice.actions.listSigningProfilesSuccess({
+                                signingProfiles: response.items ?? [],
+                            }),
+                            pagingActions.listSuccess({ entity: EntityType.SIGNING_PROFILE, totalItems: response.totalItems ?? 0 }),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfSigningProfiles),
+                        ),
                     ),
-                ),
-                catchError((error) =>
-                    of(
-                        slice.actions.listSigningProfilesFailure({ error: extractError(error, 'Failed to get Signing Profiles list') }),
-                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfSigningProfiles),
+                    catchError((error) =>
+                        of(
+                            slice.actions.listSigningProfilesFailure({ error: extractError(error, 'Failed to get Signing Profiles list') }),
+                            pagingActions.listFailure(EntityType.SIGNING_PROFILE),
+                            userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfSigningProfiles),
+                        ),
                     ),
-                ),
-            );
+                );
         }),
     );
 };

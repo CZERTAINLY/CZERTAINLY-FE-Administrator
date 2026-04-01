@@ -7,6 +7,8 @@ import { actions as signingProfileActions } from './signing-profiles';
 import { actions as appRedirectActions } from './app-redirect';
 import { actions as alertActions } from './alerts';
 import { actions as userInterfaceActions } from './user-interface';
+import { actions as pagingActions } from './paging';
+import { EntityType } from './filters';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
 type EpicDeps = {
@@ -119,33 +121,39 @@ async function runEpic(
 }
 
 describe('signingProfiles epics', () => {
-    test('listSigningProfiles success emits listSuccess and removeWidgetLock', async () => {
-        const emitted = await runEpic(SigningProfilesEpicIndex.List, signingProfileActions.listSigningProfiles(), {}, 2);
+    test('listSigningProfiles success emits listSuccess, pagingListSuccess and removeWidgetLock', async () => {
+        const emitted = await runEpic(
+            SigningProfilesEpicIndex.List,
+            signingProfileActions.listSigningProfiles({ itemsPerPage: 10, pageNumber: 1, filters: [] }),
+            {},
+            3,
+        );
 
         expect(emitted[0]).toEqual(
             signingProfileActions.listSigningProfilesSuccess({
                 signingProfiles: [{ uuid: 'p-1', name: 'Profile 1', enabled: true }] as any,
-                totalItems: 1,
             }),
         );
-        expect(emitted[1]).toEqual(userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfSigningProfiles));
+        expect(emitted[1]).toEqual(pagingActions.listSuccess({ entity: EntityType.SIGNING_PROFILE, totalItems: 1 }));
+        expect(emitted[2]).toEqual(userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfSigningProfiles));
     });
 
-    test('listSigningProfiles failure emits listFailure and insertWidgetLock', async () => {
+    test('listSigningProfiles failure emits listFailure, pagingListFailure and insertWidgetLock', async () => {
         const err = new Error('failed');
         const emitted = await runEpic(
             SigningProfilesEpicIndex.List,
-            signingProfileActions.listSigningProfiles(),
+            signingProfileActions.listSigningProfiles({ itemsPerPage: 10, pageNumber: 1, filters: [] }),
             {
                 signingProfiles: {
                     listSigningProfiles: () => throwError(() => err),
                 } as any,
             },
-            2,
+            3,
         );
 
         expect(emitted[0].type).toBe(signingProfileActions.listSigningProfilesFailure.type);
-        expect(emitted[1].type).toBe(userInterfaceActions.insertWidgetLock.type);
+        expect(emitted[1]).toEqual(pagingActions.listFailure(EntityType.SIGNING_PROFILE));
+        expect(emitted[2].type).toBe(userInterfaceActions.insertWidgetLock.type);
     });
 
     test('getSigningProfile success emits getSuccess and removeWidgetLock', async () => {

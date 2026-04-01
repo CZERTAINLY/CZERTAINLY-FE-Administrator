@@ -12,16 +12,14 @@ import {
     TspActivationDetailDto,
 } from 'types/openapi';
 import { BulkActionMessageDto } from 'types/openapi/models/BulkActionMessageDto';
+import { SearchRequestModel } from 'types/certificate';
 
 export type State = {
-    checkedRows: string[];
-
     deleteErrorMessage: string;
     bulkDeleteErrorMessages: BulkActionMessageDto[];
 
     signingProfile?: SigningProfileDto;
     signingProfiles: SigningProfileListDto[];
-    signingProfilesTotalItems: number;
 
     associatedApprovalProfiles: ApprovalProfileDto[];
     ilmActivationDetails?: IlmSigningProtocolActivationDetailDto;
@@ -31,7 +29,6 @@ export type State = {
 
     searchableFields?: SearchFieldDataByGroupDto[];
 
-    isFetchingList: boolean;
     isFetchingDetail: boolean;
     isFetchingSearchableFields: boolean;
     isFetchingAssociatedApprovalProfiles: boolean;
@@ -56,18 +53,14 @@ export type State = {
 };
 
 export const initialState: State = {
-    checkedRows: [],
-
     deleteErrorMessage: '',
     bulkDeleteErrorMessages: [],
 
     signingProfiles: [],
-    signingProfilesTotalItems: 0,
 
     associatedApprovalProfiles: [],
     supportedProtocols: [],
 
-    isFetchingList: false,
     isFetchingDetail: false,
     isFetchingSearchableFields: false,
     isFetchingAssociatedApprovalProfiles: false,
@@ -104,29 +97,19 @@ export const slice = createSlice({
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
         },
 
-        setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
-            state.checkedRows = action.payload.checkedRows;
-        },
-
         clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
             state.deleteErrorMessage = '';
             state.bulkDeleteErrorMessages = [];
         },
 
         // List
-        listSigningProfiles: (state, action: PayloadAction<void>) => {
-            state.isFetchingList = true;
-        },
+        listSigningProfiles: (state, action: PayloadAction<SearchRequestModel>) => {},
 
-        listSigningProfilesSuccess: (state, action: PayloadAction<{ signingProfiles: SigningProfileListDto[]; totalItems: number }>) => {
-            state.isFetchingList = false;
+        listSigningProfilesSuccess: (state, action: PayloadAction<{ signingProfiles: SigningProfileListDto[] }>) => {
             state.signingProfiles = action.payload.signingProfiles;
-            state.signingProfilesTotalItems = action.payload.totalItems;
         },
 
-        listSigningProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingList = false;
-        },
+        listSigningProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {},
 
         // Get detail
         getSigningProfile: (state, action: PayloadAction<{ uuid: string; version?: number }>) => {
@@ -487,18 +470,15 @@ const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const signingProfile = createSelector(state, (state) => state.signingProfile);
 const signingProfiles = createSelector(state, (state) => state.signingProfiles);
-const signingProfilesTotalItems = createSelector(state, (state) => state.signingProfilesTotalItems);
 const associatedApprovalProfiles = createSelector(state, (state) => state.associatedApprovalProfiles);
 const ilmActivationDetails = createSelector(state, (state) => state.ilmActivationDetails);
 const tspActivationDetails = createSelector(state, (state) => state.tspActivationDetails);
 const supportedProtocols = createSelector(state, (state) => state.supportedProtocols);
 const digitalSignatures = createSelector(state, (state) => state.digitalSignatures);
 const searchableFields = createSelector(state, (state) => state.searchableFields);
-const checkedRows = createSelector(state, (state) => state.checkedRows);
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
 const bulkDeleteErrorMessages = createSelector(state, (state) => state.bulkDeleteErrorMessages);
 
-const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isFetchingSearchableFields = createSelector(state, (state) => state.isFetchingSearchableFields);
 const isFetchingAssociatedApprovalProfiles = createSelector(state, (state) => state.isFetchingAssociatedApprovalProfiles);
@@ -523,19 +503,16 @@ const isDisassociatingApprovalProfile = createSelector(state, (state) => state.i
 
 export const selectors = {
     state,
-    checkedRows,
     deleteErrorMessage,
     bulkDeleteErrorMessages,
     signingProfile,
     signingProfiles,
-    signingProfilesTotalItems,
     associatedApprovalProfiles,
     ilmActivationDetails,
     tspActivationDetails,
     supportedProtocols,
     digitalSignatures,
     searchableFields,
-    isFetchingList,
     isFetchingDetail,
     isFetchingSearchableFields,
     isFetchingAssociatedApprovalProfiles,

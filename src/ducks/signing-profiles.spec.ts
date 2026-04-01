@@ -12,7 +12,6 @@ describe('signingProfiles slice', () => {
             ...initialState,
             signingProfile: { uuid: 'p-1' } as any,
             signingProfiles: [{ uuid: 'p-1' } as any],
-            isFetchingList: true,
             tempKey: 'gone',
         } as any;
 
@@ -20,11 +19,6 @@ describe('signingProfiles slice', () => {
 
         expect(next).toEqual(initialState);
         expect((next as any).tempKey).toBeUndefined();
-    });
-
-    test('setCheckedRows updates checkedRows', () => {
-        const next = reducer(initialState, actions.setCheckedRows({ checkedRows: ['p-1', 'p-2'] }));
-        expect(next.checkedRows).toEqual(['p-1', 'p-2']);
     });
 
     test('clearDeleteErrorMessages clears error fields', () => {
@@ -36,25 +30,20 @@ describe('signingProfiles slice', () => {
         expect(next.bulkDeleteErrorMessages).toEqual([]);
     });
 
-    test('listSigningProfiles sets isFetchingList', () => {
-        const next = reducer(initialState, actions.listSigningProfiles());
-        expect(next.isFetchingList).toBe(true);
+    test('listSigningProfiles is a no-op on state', () => {
+        const next = reducer(initialState, actions.listSigningProfiles({ itemsPerPage: 10, pageNumber: 1, filters: [] }));
+        expect(next).toEqual(initialState);
     });
 
-    test('listSigningProfilesSuccess updates list and totalItems', () => {
+    test('listSigningProfilesSuccess updates list', () => {
         const profiles = [{ uuid: 'p-1' }] as any[];
-        const next = reducer(
-            { ...initialState, isFetchingList: true },
-            actions.listSigningProfilesSuccess({ signingProfiles: profiles, totalItems: 1 }),
-        );
-        expect(next.isFetchingList).toBe(false);
+        const next = reducer(initialState, actions.listSigningProfilesSuccess({ signingProfiles: profiles }));
         expect(next.signingProfiles).toEqual(profiles);
-        expect(next.signingProfilesTotalItems).toBe(1);
     });
 
-    test('listSigningProfilesFailure clears isFetchingList', () => {
-        const next = reducer({ ...initialState, isFetchingList: true }, actions.listSigningProfilesFailure({ error: 'err' }));
-        expect(next.isFetchingList).toBe(false);
+    test('listSigningProfilesFailure is a no-op on state', () => {
+        const next = reducer(initialState, actions.listSigningProfilesFailure({ error: 'err' }));
+        expect(next).toEqual(initialState);
     });
 
     test('getSigningProfile sets isFetchingDetail', () => {
@@ -355,17 +344,14 @@ describe('signingProfiles selectors', () => {
             ...initialState,
             signingProfile: profile,
             signingProfiles: profiles,
-            signingProfilesTotalItems: 5,
             associatedApprovalProfiles: approvalProfiles,
             ilmActivationDetails: ilmDetails,
             tspActivationDetails: tspDetails,
             supportedProtocols: protocols,
             digitalSignatures: digitalSigs,
             searchableFields: fields,
-            checkedRows: ['p-1'],
             deleteErrorMessage: 'del err',
             bulkDeleteErrorMessages: bulkErrors,
-            isFetchingList: true,
             isFetchingDetail: true,
             isFetchingSearchableFields: true,
             isFetchingAssociatedApprovalProfiles: true,
@@ -393,17 +379,14 @@ describe('signingProfiles selectors', () => {
 
         expect(selectors.signingProfile(state)).toEqual(profile);
         expect(selectors.signingProfiles(state)).toEqual(profiles);
-        expect(selectors.signingProfilesTotalItems(state)).toBe(5);
         expect(selectors.associatedApprovalProfiles(state)).toEqual(approvalProfiles);
         expect(selectors.ilmActivationDetails(state)).toEqual(ilmDetails);
         expect(selectors.tspActivationDetails(state)).toEqual(tspDetails);
         expect(selectors.supportedProtocols(state)).toEqual(protocols);
         expect(selectors.digitalSignatures(state)).toEqual(digitalSigs);
         expect(selectors.searchableFields(state)).toEqual(fields);
-        expect(selectors.checkedRows(state)).toEqual(['p-1']);
         expect(selectors.deleteErrorMessage(state)).toBe('del err');
         expect(selectors.bulkDeleteErrorMessages(state)).toEqual(bulkErrors);
-        expect(selectors.isFetchingList(state)).toBe(true);
         expect(selectors.isFetchingDetail(state)).toBe(true);
         expect(selectors.isFetchingSearchableFields(state)).toBe(true);
         expect(selectors.isFetchingAssociatedApprovalProfiles(state)).toBe(true);

@@ -24,6 +24,7 @@ export const enum EntityType {
     OID,
     CONNECTOR,
     SECRET,
+    SIGNING_PROFILE,
 }
 
 export type Filter = {
