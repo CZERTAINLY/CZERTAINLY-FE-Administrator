@@ -1,6 +1,7 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
     ApprovalProfileDto,
+    CertificateDto,
     IlmSigningProtocolActivationDetailDto,
     PaginationResponseDtoDigitalSignatureListDto,
     SearchFieldDataByGroupDto,
@@ -25,6 +26,7 @@ export type State = {
     ilmActivationDetails?: IlmSigningProtocolActivationDetailDto;
     tspActivationDetails?: TspActivationDetailDto;
     supportedProtocols: SigningProtocol[];
+    signingCertificates: CertificateDto[];
     digitalSignatures?: PaginationResponseDtoDigitalSignatureListDto;
 
     searchableFields?: SearchFieldDataByGroupDto[];
@@ -35,6 +37,7 @@ export type State = {
     isFetchingIlmActivationDetails: boolean;
     isFetchingTspActivationDetails: boolean;
     isFetchingSupportedProtocols: boolean;
+    isFetchingSigningCertificates: boolean;
     isFetchingDigitalSignatures: boolean;
     isCreating: boolean;
     isDeleting: boolean;
@@ -60,6 +63,7 @@ export const initialState: State = {
 
     associatedApprovalProfiles: [],
     supportedProtocols: [],
+    signingCertificates: [],
 
     isFetchingDetail: false,
     isFetchingSearchableFields: false,
@@ -67,6 +71,7 @@ export const initialState: State = {
     isFetchingIlmActivationDetails: false,
     isFetchingTspActivationDetails: false,
     isFetchingSupportedProtocols: false,
+    isFetchingSigningCertificates: false,
     isFetchingDigitalSignatures: false,
     isCreating: false,
     isDeleting: false,
@@ -447,6 +452,20 @@ export const slice = createSlice({
             state.isFetchingSupportedProtocols = false;
         },
 
+        // Signing certificates
+        listSigningCertificates: (state, action: PayloadAction<{ workflowType: SigningWorkflowType }>) => {
+            state.isFetchingSigningCertificates = true;
+        },
+
+        listSigningCertificatesSuccess: (state, action: PayloadAction<{ signingCertificates: CertificateDto[] }>) => {
+            state.isFetchingSigningCertificates = false;
+            state.signingCertificates = action.payload.signingCertificates;
+        },
+
+        listSigningCertificatesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingSigningCertificates = false;
+        },
+
         // Digital signatures
         listDigitalSignaturesForSigningProfile: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isFetchingDigitalSignatures = true;
@@ -474,6 +493,7 @@ const associatedApprovalProfiles = createSelector(state, (state) => state.associ
 const ilmActivationDetails = createSelector(state, (state) => state.ilmActivationDetails);
 const tspActivationDetails = createSelector(state, (state) => state.tspActivationDetails);
 const supportedProtocols = createSelector(state, (state) => state.supportedProtocols);
+const signingCertificates = createSelector(state, (state) => state.signingCertificates);
 const digitalSignatures = createSelector(state, (state) => state.digitalSignatures);
 const searchableFields = createSelector(state, (state) => state.searchableFields);
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
@@ -485,6 +505,7 @@ const isFetchingAssociatedApprovalProfiles = createSelector(state, (state) => st
 const isFetchingIlmActivationDetails = createSelector(state, (state) => state.isFetchingIlmActivationDetails);
 const isFetchingTspActivationDetails = createSelector(state, (state) => state.isFetchingTspActivationDetails);
 const isFetchingSupportedProtocols = createSelector(state, (state) => state.isFetchingSupportedProtocols);
+const isFetchingSigningCertificates = createSelector(state, (state) => state.isFetchingSigningCertificates);
 const isFetchingDigitalSignatures = createSelector(state, (state) => state.isFetchingDigitalSignatures);
 const isCreating = createSelector(state, (state) => state.isCreating);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
@@ -511,6 +532,7 @@ export const selectors = {
     ilmActivationDetails,
     tspActivationDetails,
     supportedProtocols,
+    signingCertificates,
     digitalSignatures,
     searchableFields,
     isFetchingDetail,
@@ -519,6 +541,7 @@ export const selectors = {
     isFetchingIlmActivationDetails,
     isFetchingTspActivationDetails,
     isFetchingSupportedProtocols,
+    isFetchingSigningCertificates,
     isFetchingDigitalSignatures,
     isCreating,
     isDeleting,

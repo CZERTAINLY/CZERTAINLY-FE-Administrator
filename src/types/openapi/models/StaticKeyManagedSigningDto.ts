@@ -12,14 +12,14 @@
  */
 
 import type {
+    CertificateSimpleDto,
     ManagedSigningType,
-    NameAndUuidDto,
     ResponseAttribute,
     SigningScheme,
 } from './';
 
 /**
- * Managed signing using a pre-existing static cryptographic key
+ * Managed signing using a pre-existing static certificate and associated key(s)
  * @export
  * @interface StaticKeyManagedSigningDto
  */
@@ -37,17 +37,11 @@ export interface StaticKeyManagedSigningDto {
      */
     managedSigningType: ManagedSigningType;
     /**
-     * Token Profile used for signing
-     * @type {NameAndUuidDto}
+     * Certificate and the associated key(s) used for signing
+     * @type {CertificateSimpleDto}
      * @memberof StaticKeyManagedSigningDto
      */
-    tokenProfile: NameAndUuidDto;
-    /**
-     * Cryptographic Key used for signing
-     * @type {NameAndUuidDto}
-     * @memberof StaticKeyManagedSigningDto
-     */
-    cryptographicKey: NameAndUuidDto;
+    certificate: CertificateSimpleDto;
     /**
      * List of attributes required for signing operations (such as digest algorithm), provided by the Cryptography Provider Connector
      * @type {Array<ResponseAttribute>}

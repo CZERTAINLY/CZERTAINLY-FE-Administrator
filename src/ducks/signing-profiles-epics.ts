@@ -466,6 +466,24 @@ const listSupportedProtocols: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const listSigningCertificates: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.listSigningCertificates.match),
+        switchMap((action) =>
+            deps.apiClients.signingProfiles.listSigningCertificates({ signingWorkflowType: action.payload.workflowType }).pipe(
+                map((certificates) => slice.actions.listSigningCertificatesSuccess({ signingCertificates: certificates })),
+                catchError((error) =>
+                    of(
+                        slice.actions.listSigningCertificatesFailure({
+                            error: extractError(error, 'Failed to get signing certificates'),
+                        }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 const listDigitalSignaturesForSigningProfile: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listDigitalSignaturesForSigningProfile.match),
@@ -509,6 +527,7 @@ const epics = [
     associateWithApprovalProfile,
     disassociateFromApprovalProfile,
     listSupportedProtocols,
+    listSigningCertificates,
     listDigitalSignaturesForSigningProfile,
 ];
 

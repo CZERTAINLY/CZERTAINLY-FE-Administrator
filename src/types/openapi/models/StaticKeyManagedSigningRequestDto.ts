@@ -18,7 +18,7 @@ import type {
 } from './';
 
 /**
- * Request to configure managed signing with a static Token Profile and Cryptographic Key
+ * Request to configure managed signing with a static certificate and associated key(s)
  * @export
  * @interface StaticKeyManagedSigningRequestDto
  */
@@ -36,17 +36,11 @@ export interface StaticKeyManagedSigningRequestDto {
      */
     managedSigningType: ManagedSigningType;
     /**
-     * UUID of the Token Profile to use for signing
+     * UUID of the Certificate and associated key(s) to use for signing
      * @type {string}
      * @memberof StaticKeyManagedSigningRequestDto
      */
-    tokenProfileUuid: string;
-    /**
-     * UUID of the Cryptographic Key to use for signing
-     * @type {string}
-     * @memberof StaticKeyManagedSigningRequestDto
-     */
-    cryptographicKeyUuid: string;
+    certificateUuid: string;
     /**
      * List of attributes required for signing operations (such as digest algorithm), provided by the Cryptography Provider Connector
      * @type {Array<RequestAttribute>}

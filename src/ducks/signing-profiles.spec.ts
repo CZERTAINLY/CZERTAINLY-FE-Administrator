@@ -317,6 +317,29 @@ describe('signingProfiles slice', () => {
         expect(next.supportedProtocols).toEqual(protocols);
     });
 
+    test('listSigningCertificates sets isFetchingSigningCertificates', () => {
+        const next = reducer(initialState, actions.listSigningCertificates({ workflowType: 'SIGNING' as any }));
+        expect(next.isFetchingSigningCertificates).toBe(true);
+    });
+
+    test('listSigningCertificatesSuccess sets signingCertificates', () => {
+        const certs = [{ uuid: 'c-1' }] as any[];
+        const next = reducer(
+            { ...initialState, isFetchingSigningCertificates: true },
+            actions.listSigningCertificatesSuccess({ signingCertificates: certs }),
+        );
+        expect(next.isFetchingSigningCertificates).toBe(false);
+        expect(next.signingCertificates).toEqual(certs);
+    });
+
+    test('listSigningCertificatesFailure clears isFetchingSigningCertificates', () => {
+        const next = reducer(
+            { ...initialState, isFetchingSigningCertificates: true },
+            actions.listSigningCertificatesFailure({ error: 'err' }),
+        );
+        expect(next.isFetchingSigningCertificates).toBe(false);
+    });
+
     test('listDigitalSignaturesForSigningProfileSuccess sets digitalSignatures', () => {
         const sigs = { items: [{ uuid: 'ds-1' }], totalItems: 1 } as any;
         const next = reducer(
@@ -348,6 +371,7 @@ describe('signingProfiles selectors', () => {
             ilmActivationDetails: ilmDetails,
             tspActivationDetails: tspDetails,
             supportedProtocols: protocols,
+            signingCertificates: [{ uuid: 'c-1' }] as any[],
             digitalSignatures: digitalSigs,
             searchableFields: fields,
             deleteErrorMessage: 'del err',
@@ -358,6 +382,7 @@ describe('signingProfiles selectors', () => {
             isFetchingIlmActivationDetails: true,
             isFetchingTspActivationDetails: true,
             isFetchingSupportedProtocols: true,
+            isFetchingSigningCertificates: true,
             isFetchingDigitalSignatures: true,
             isCreating: true,
             isDeleting: true,
@@ -383,6 +408,7 @@ describe('signingProfiles selectors', () => {
         expect(selectors.ilmActivationDetails(state)).toEqual(ilmDetails);
         expect(selectors.tspActivationDetails(state)).toEqual(tspDetails);
         expect(selectors.supportedProtocols(state)).toEqual(protocols);
+        expect(selectors.signingCertificates(state)).toEqual([{ uuid: 'c-1' }]);
         expect(selectors.digitalSignatures(state)).toEqual(digitalSigs);
         expect(selectors.searchableFields(state)).toEqual(fields);
         expect(selectors.deleteErrorMessage(state)).toBe('del err');
@@ -393,6 +419,7 @@ describe('signingProfiles selectors', () => {
         expect(selectors.isFetchingIlmActivationDetails(state)).toBe(true);
         expect(selectors.isFetchingTspActivationDetails(state)).toBe(true);
         expect(selectors.isFetchingSupportedProtocols(state)).toBe(true);
+        expect(selectors.isFetchingSigningCertificates(state)).toBe(true);
         expect(selectors.isFetchingDigitalSignatures(state)).toBe(true);
         expect(selectors.isCreating(state)).toBe(true);
         expect(selectors.isDeleting(state)).toBe(true);

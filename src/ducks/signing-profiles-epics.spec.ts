@@ -35,6 +35,7 @@ type EpicDeps = {
             associateWithApprovalProfile: (args: any) => any;
             disassociateFromApprovalProfile: (args: any) => any;
             listSupportedProtocols: (args: any) => any;
+            listSigningCertificates: (args: any) => any;
             listDigitalSignaturesForSigningProfile: (args: any) => any;
         };
     };
@@ -62,7 +63,8 @@ enum SigningProfilesEpicIndex {
     AssociateWithApprovalProfile = 18,
     DisassociateFromApprovalProfile = 19,
     ListSupportedProtocols = 20,
-    ListDigitalSignatures = 21,
+    ListSigningCertificates = 21,
+    ListDigitalSignatures = 22,
 }
 
 vi.mock('../App', () => ({
@@ -106,6 +108,7 @@ async function runEpic(
         associateWithApprovalProfile: () => of(undefined),
         disassociateFromApprovalProfile: () => of(undefined),
         listSupportedProtocols: () => of(['ILM', 'TSP']),
+        listSigningCertificates: () => of([{ uuid: 'c-1' }]),
         listDigitalSignaturesForSigningProfile: () => of({ items: [], totalItems: 0 }),
     };
 
@@ -663,6 +666,38 @@ describe('signingProfiles epics', () => {
         );
 
         expect(emitted[0].type).toBe(signingProfileActions.listSupportedProtocolsFailure.type);
+    });
+
+    test('listSigningCertificates success emits listSigningCertificatesSuccess', async () => {
+        const certs = [{ uuid: 'c-1' }];
+        const emitted = await runEpic(
+            SigningProfilesEpicIndex.ListSigningCertificates,
+            signingProfileActions.listSigningCertificates({ workflowType: 'SIGNING' as any }),
+            {
+                signingProfiles: {
+                    listSigningCertificates: () => of(certs),
+                } as any,
+            },
+            1,
+        );
+
+        expect(emitted[0]).toEqual(signingProfileActions.listSigningCertificatesSuccess({ signingCertificates: certs as any }));
+    });
+
+    test('listSigningCertificates failure emits listSigningCertificatesFailure', async () => {
+        const err = new Error('certs failed');
+        const emitted = await runEpic(
+            SigningProfilesEpicIndex.ListSigningCertificates,
+            signingProfileActions.listSigningCertificates({ workflowType: 'SIGNING' as any }),
+            {
+                signingProfiles: {
+                    listSigningCertificates: () => throwError(() => err),
+                } as any,
+            },
+            1,
+        );
+
+        expect(emitted[0].type).toBe(signingProfileActions.listSigningCertificatesFailure.type);
     });
 
     test('listDigitalSignaturesForSigningProfile success emits listDigitalSignaturesSuccess', async () => {

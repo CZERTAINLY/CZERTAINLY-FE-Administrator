@@ -19,6 +19,7 @@ import type {
     ApprovalProfileDto,
     AuthenticationServiceExceptionDto,
     BulkActionMessageDto,
+    CertificateDto,
     ErrorMessageDto,
     IlmSigningProtocolActivationDetailDto,
     PaginationResponseDtoDigitalSignatureListDto,
@@ -108,6 +109,10 @@ export interface GetTspActivationDetailsRequest {
 export interface ListDigitalSignaturesForSigningProfileRequest {
     uuid: string;
     searchRequestDto: SearchRequestDto;
+}
+
+export interface ListSigningCertificatesRequest {
+    signingWorkflowType: SigningWorkflowType;
 }
 
 export interface ListSigningProfilesRequest {
@@ -418,6 +423,25 @@ export class SigningProfileManagementApi extends BaseAPI {
             method: 'POST',
             headers,
             body: searchRequestDto,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Get list of certificates eligible to be used for digital signing
+     */
+    listSigningCertificates({ signingWorkflowType }: ListSigningCertificatesRequest): Observable<Array<CertificateDto>>
+    listSigningCertificates({ signingWorkflowType }: ListSigningCertificatesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<CertificateDto>>>
+    listSigningCertificates({ signingWorkflowType }: ListSigningCertificatesRequest, opts?: OperationOpts): Observable<Array<CertificateDto> | AjaxResponse<Array<CertificateDto>>> {
+        throwIfNullOrUndefined(signingWorkflowType, 'signingWorkflowType', 'listSigningCertificates');
+
+        const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
+            'signingWorkflowType': signingWorkflowType,
+        };
+
+        return this.request<Array<CertificateDto>>({
+            url: '/v1/signingProfiles/signingCertificates',
+            method: 'GET',
+            query,
         }, opts?.responseOpts);
     };
 

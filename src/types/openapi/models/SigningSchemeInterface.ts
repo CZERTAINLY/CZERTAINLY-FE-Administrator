@@ -12,6 +12,7 @@
  */
 
 import type {
+    CertificateSimpleDto,
     DelegatedSigningDto,
     ManagedSigningSchemeInterface,
     ManagedSigningType,
