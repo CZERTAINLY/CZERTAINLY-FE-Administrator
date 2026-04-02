@@ -9,6 +9,7 @@ import {
 } from 'types/openapi';
 import { DashboardDict } from 'types/statisticsDashboard';
 import { getCertificateStatusColor, useGetStatusText } from './certificate';
+import { getSecretStatusColor, useGetSecretStatusText } from './secret';
 
 type Status =
     | CertificateState
@@ -19,21 +20,28 @@ type Status =
 
 export function useGetLabels(data: DashboardDict) {
     const getStatusText = useGetStatusText();
+    const getSecretStatusText = useGetSecretStatusText();
 
     const labels = useMemo(() => {
         let result: string[] = [];
 
         for (let i of Object.entries(data)) {
-            if (getStatusText(i[0] as Status) === 'Unknown') {
-                const splitValue = i[0].split('=');
-                result.push(splitValue[splitValue.length - 1]);
+            const certLabel = getStatusText(i[0] as Status);
+            if (certLabel !== 'Unknown') {
+                result.push(certLabel);
             } else {
-                result.push(getStatusText(i[0] as Status));
+                const secretLabel = getSecretStatusText(i[0] as Parameters<typeof getSecretStatusText>[0]);
+                if (secretLabel !== 'Unknown') {
+                    result.push(secretLabel);
+                } else {
+                    const splitValue = i[0].split('=');
+                    result.push(splitValue[splitValue.length - 1]);
+                }
             }
         }
 
         return result;
-    }, [data, getStatusText]);
+    }, [data, getStatusText, getSecretStatusText]);
 
     return labels;
 }
@@ -78,6 +86,17 @@ export function getCertificateDonutChartColors(certificateStatByStatus?: { [key:
     const updatedColorObject = arrayOfStatuses.reduce((acc, { status }) => updateColorObject(status as Status, acc), colorsObject);
 
     return updatedColorObject;
+}
+
+export function getSecretDonutChartColors(secretStatByStatus?: { [key: string]: number }): ColorOptions {
+    const colorsObject: ColorOptions = { colors: [] };
+
+    if (!secretStatByStatus) return colorsObject;
+
+    return Object.keys(secretStatByStatus).reduce((acc, status) => {
+        acc.colors.push(getSecretStatusColor(status as Parameters<typeof getSecretStatusColor>[0]));
+        return acc;
+    }, colorsObject);
 }
 
 const colorMapByDaysOfExpiration: { [key: string]: string } = {
