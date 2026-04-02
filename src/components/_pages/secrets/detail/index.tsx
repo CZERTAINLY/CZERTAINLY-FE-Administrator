@@ -16,15 +16,20 @@ import Select from 'components/Select';
 import TabLayout from 'components/Layout/TabLayout';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
+import ComplianceCheckResultWidget from 'components/_pages/certificates/ComplianceCheckResultWidget/ComplianceCheckResultWidget';
+import CertificateStatus from 'components/_pages/certificates/CertificateStatus';
 
+import { actions as approvalActions, selectors as approvalSelectors } from 'ducks/approvals';
 import { actions as groupActions, selectors as groupSelectors } from 'ducks/certificateGroups';
+import { actions as complianceProfileActions } from 'ducks/compliance-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as secretsActions, selectors as secretsSelectors } from 'ducks/secrets';
 import { actions as userActions, selectors as userSelectors } from 'ducks/users';
 import { actions as vaultProfileActions, selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { PlatformEnum, Resource, SyncVaultProfileDto } from 'types/openapi';
+import { ComplianceStatus, PlatformEnum, Resource, SecretState, SyncVaultProfileDto } from 'types/openapi';
+import { AttributeResponseModel } from 'types/attributes';
 
 import { dateFormatter } from 'utils/dateUtil';
 import { createWidgetDetailHeaders } from 'utils/widget';
@@ -43,6 +48,8 @@ function SecretDetail() {
     const isFetchingDetail = useSelector(secretsSelectors.isFetchingDetail);
     const isDeleting = useSelector(secretsSelectors.isDeleting);
     const isUpdating = useSelector(secretsSelectors.isUpdating);
+    const approvals = useSelector(approvalSelectors.approvals);
+    const isFetchingApprovals = useSelector(approvalSelectors.isFetchingList);
 
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const secretTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.SecretType));
@@ -55,6 +62,7 @@ function SecretDetail() {
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [confirmEnable, setConfirmEnable] = useState(false);
     const [confirmDisable, setConfirmDisable] = useState(false);
+    const [complianceCheck, setComplianceCheck] = useState(false);
     const [isUpdateOwnerOpen, setIsUpdateOwnerOpen] = useState(false);
     const [isUpdateGroupsOpen, setIsUpdateGroupsOpen] = useState(false);
     const [isUpdateVaultProfileOpen, setIsUpdateVaultProfileOpen] = useState(false);
@@ -62,6 +70,7 @@ function SecretDetail() {
     const [isAddSyncVaultProfileOpen, setIsAddSyncVaultProfileOpen] = useState(false);
     const [selectedSyncVaultProfile, setSelectedSyncVaultProfile] = useState<SyncVaultProfileDto | null>(null);
     const [isSyncVaultProfileAttributesOpen, setIsSyncVaultProfileAttributesOpen] = useState(false);
+    const [selectedAttributesInfo, setSelectedAttributesInfo] = useState<AttributeResponseModel[] | null>(null);
 
     const [ownerUuid, setOwnerUuid] = useState('');
     const [selectedGroups, setSelectedGroups] = useState<{ value: string; label: string }[]>([]);
@@ -77,10 +86,22 @@ function SecretDetail() {
         dispatch(vaultProfileActions.listVaultProfiles({ pageNumber: 1, itemsPerPage: 100, filters: [] }));
     }, [dispatch, id]);
 
+    const getFreshSecretApprovals = useCallback(() => {
+        dispatch(
+            approvalActions.listApprovals({
+                pageNumber: 1,
+                itemsPerPage: 100,
+            }),
+        );
+    }, [dispatch]);
+
+    useEffect(() => {
+        getFreshSecretApprovals();
+    }, [getFreshSecretApprovals]);
+
     useEffect(() => {
         getFreshSecretDetails();
     }, [getFreshSecretDetails]);
-
     const onDeleteConfirmed = useCallback(() => {
         if (!secret) return;
         dispatch(secretsActions.deleteSecret({ uuid: secret.uuid }));
@@ -97,6 +118,18 @@ function SecretDetail() {
         if (!secret) return;
         dispatch(secretsActions.disableSecret({ uuid: secret.uuid }));
         setConfirmDisable(false);
+    }, [dispatch, secret]);
+
+    const onComplianceCheck = useCallback(() => {
+        if (!secret?.uuid) return;
+
+        dispatch(
+            complianceProfileActions.checkResourceObjectCompliance({
+                resource: Resource.Secrets,
+                objectUuid: secret.uuid,
+            }),
+        );
+        setComplianceCheck(false);
     }, [dispatch, secret]);
 
     const handleUpdateOwner = useCallback(() => {
@@ -140,6 +173,9 @@ function SecretDetail() {
         setSelectedVaultProfileUuid('');
     }, [dispatch, secret, selectedVaultProfileUuid]);
 
+    const handleSelectedAttributesInfo = useCallback((attributes: AttributeResponseModel[]) => {
+        setSelectedAttributesInfo(attributes);
+    }, []);
     const widgetButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
@@ -155,8 +191,14 @@ function SecretDetail() {
                 onClick: () => setConfirmDisable(true),
             },
             {
-                icon: 'pencil',
+                icon: 'gavel',
                 disabled: !secret,
+                tooltip: 'Check Compliance',
+                onClick: () => setComplianceCheck(true),
+            },
+            {
+                icon: 'pencil',
+                disabled: !secret || secret.state === SecretState.PendingApproval,
                 tooltip: 'Edit',
                 onClick: () => {
                     setIsEditSecretOpen(true);
@@ -218,6 +260,13 @@ function SecretDetail() {
                     <Badge key="status" color={secret.enabled ? 'success' : 'danger'}>
                         {secret.enabled ? 'Enabled' : 'Disabled'}
                     </Badge>,
+                ],
+            },
+            {
+                id: 'complianceStatus',
+                columns: [
+                    'Compliance Status',
+                    <CertificateStatus key="compliance-status" status={secret.complianceStatus || ComplianceStatus.Na} />,
                 ],
             },
             {
@@ -337,6 +386,50 @@ function SecretDetail() {
                 columns: [v.version.toString(), v.createdAt ? dateFormatter(v.createdAt) : '', v.fingerprint ?? ''],
             })),
         [versions],
+    );
+
+    const approvalsHeaders: TableHeader[] = useMemo(
+        () => [
+            { id: 'approvalUUID', content: 'Approval UUID' },
+            { id: 'approvalProfile', content: 'Approval Profile' },
+            { id: 'status', content: 'Status' },
+            { id: 'requestedBy', content: 'Requested By' },
+            { id: 'resource', content: 'Resource' },
+            { id: 'action', content: 'Action' },
+            { id: 'createdAt', content: 'Created At' },
+            { id: 'closedAt', content: 'Closed At' },
+        ],
+        [],
+    );
+
+    const approvalsData: TableDataRow[] = useMemo(
+        () =>
+            approvals
+                .filter((approval) => approval.resource === Resource.Secrets && approval.objectUuid === id)
+                .map((approval) => ({
+                    id: approval.approvalUuid,
+                    columns: [
+                        <Link key="uuid" to={`/${Resource.Approvals.toLowerCase()}/detail/${approval.approvalUuid}`}>
+                            {approval.approvalUuid}
+                        </Link>,
+                        <Link key="profile" to={`/${Resource.ApprovalProfiles.toLowerCase()}/detail/${approval.approvalProfileUuid}`}>
+                            {approval.approvalProfileName}
+                        </Link>,
+                        approval.status,
+                        approval.creatorUsername ? (
+                            <Link key="creator" to={`/${Resource.Users.toLowerCase()}/detail/${approval.creatorUuid}`}>
+                                {approval.creatorUsername}
+                            </Link>
+                        ) : (
+                            'Unassigned'
+                        ),
+                        getEnumLabel(resourceEnum, approval.resource),
+                        approval.resourceAction || '',
+                        approval.createdAt ? dateFormatter(approval.createdAt) : '',
+                        approval.closedAt ? dateFormatter(approval.closedAt) : '',
+                    ],
+                })),
+        [approvals, id, resourceEnum],
     );
 
     const otherPropertiesHeaders: TableHeader[] = useMemo(
@@ -523,6 +616,34 @@ function SecretDetail() {
                                 title: 'Versions',
                                 content: <CustomTable headers={versionsHeaders} data={versionsData} />,
                             },
+                            {
+                                title: 'Approvals',
+                                content: (
+                                    <Widget
+                                        title="Secret Approvals"
+                                        titleSize="large"
+                                        busy={isFetchingApprovals}
+                                        refreshAction={getFreshSecretApprovals}
+                                    >
+                                        <CustomTable headers={approvalsHeaders} data={approvalsData} />
+                                    </Widget>
+                                ),
+                            },
+                            {
+                                title: 'Validation',
+                                content: (
+                                    <>
+                                        {secret?.uuid && (
+                                            <ComplianceCheckResultWidget
+                                                resource={Resource.Secrets}
+                                                widgetLockName={LockWidgetNameEnum.SecretDetailsWidget}
+                                                objectUuid={secret.uuid}
+                                                setSelectedAttributesInfo={handleSelectedAttributesInfo}
+                                            />
+                                        )}
+                                    </>
+                                ),
+                            },
                         ]}
                     />
                 </div>
@@ -580,6 +701,18 @@ function SecretDetail() {
                 buttons={[
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                ]}
+            />
+
+            <Dialog
+                isOpen={complianceCheck}
+                caption="Initiate Compliance Check"
+                body="Initiate the compliance check for this Secret?"
+                toggle={() => setComplianceCheck(false)}
+                noBorder
+                buttons={[
+                    { color: 'primary', variant: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
+                    { color: 'primary', onClick: onComplianceCheck, body: 'Yes' },
                 ]}
             />
 
@@ -699,6 +832,15 @@ function SecretDetail() {
                         body: 'Close',
                     },
                 ]}
+            />
+
+            <Dialog
+                isOpen={!!selectedAttributesInfo}
+                caption="Attributes Info"
+                body={<AttributeViewer attributes={selectedAttributesInfo ?? []} />}
+                toggle={() => setSelectedAttributesInfo(null)}
+                buttons={[]}
+                size="xl"
             />
         </div>
     );
