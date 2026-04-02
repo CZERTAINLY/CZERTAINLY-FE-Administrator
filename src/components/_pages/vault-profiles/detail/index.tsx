@@ -59,14 +59,14 @@ function VaultProfileDetail() {
     }, [getFreshDetails]);
 
     const getFreshComplianceDetails = useCallback(() => {
-        if (!profile?.uuid) return;
+        if (!vaultProfileUuid) return;
         dispatch(
             complianceProfileActions.getAssociatedComplianceProfiles({
                 resource: Resource.VaultProfiles,
-                associationObjectUuid: profile.uuid,
+                associationObjectUuid: vaultProfileUuid,
             }),
         );
-    }, [dispatch, profile]);
+    }, [dispatch, vaultProfileUuid]);
 
     useEffect(() => {
         getFreshComplianceDetails();

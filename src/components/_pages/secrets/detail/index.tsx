@@ -27,7 +27,7 @@ import { actions as userActions, selectors as userSelectors } from 'ducks/users'
 import { actions as vaultProfileActions, selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { PlatformEnum, Resource, SyncVaultProfileDto } from 'types/openapi';
+import { ComplianceStatus, PlatformEnum, Resource, SyncVaultProfileDto } from 'types/openapi';
 import { AttributeResponseModel } from 'types/attributes';
 
 import { dateFormatter } from 'utils/dateUtil';
@@ -250,7 +250,10 @@ function SecretDetail() {
             },
             {
                 id: 'complianceStatus',
-                columns: ['Compliance Status', <CertificateStatus key="compliance-status" status={secret.complianceStatus} />],
+                columns: [
+                    'Compliance Status',
+                    <CertificateStatus key="compliance-status" status={secret.complianceStatus || ComplianceStatus.Na} />,
+                ],
             },
             {
                 id: 'lastUpdate',

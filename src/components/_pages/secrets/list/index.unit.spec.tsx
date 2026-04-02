@@ -4,24 +4,30 @@ import { createRoot, Root } from 'react-dom/client';
 
 import SecretsList from './index';
 import { EntityType } from 'ducks/filters';
+import { COMMON_GROUPS_STATE, COMMON_USERS_STATE, COMMON_VAULT_PROFILES_STATE } from '../../test-utils/mockModules';
+import { clickByTestId, clickByText, clickByTitle } from '../../test-utils/domActions';
 
 (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
 
-const useDispatchMock = vi.fn();
-const useSelectorMock = vi.fn();
-
-vi.mock('react-redux', () => ({
-    useDispatch: () => useDispatchMock(),
-    useSelector: (selector: any) => useSelectorMock(selector),
+const { useDispatchMock, useSelectorMock } = vi.hoisted(() => ({
+    useDispatchMock: vi.fn(),
+    useSelectorMock: vi.fn(),
 }));
 
-vi.mock('react-router', () => ({
-    Link: ({ to, children }: any) => <a href={to}>{children}</a>,
-}));
+vi.mock('react-redux', async () => {
+    const { reduxHooksMockModule } = await import('../../test-utils/mockModules');
+    return reduxHooksMockModule(useDispatchMock, useSelectorMock);
+});
 
-vi.mock('components/Badge', () => ({
-    default: ({ children }: any) => <span>{children}</span>,
-}));
+vi.mock('react-router', async () => {
+    const { routerLinkMockModule } = await import('../../test-utils/mockModules');
+    return routerLinkMockModule();
+});
+
+vi.mock('components/Badge', async () => {
+    const { badgeMockModule } = await import('../../test-utils/mockModules');
+    return badgeMockModule();
+});
 
 vi.mock('components/_pages/certificates/CertificateStatus', () => ({
     default: ({ status }: any) => <span data-testid="compliance-status">{status}</span>,
@@ -52,48 +58,20 @@ vi.mock('components/PagedList/PagedList', () => ({
     ),
 }));
 
-vi.mock('components/Dialog', () => ({
-    default: ({ isOpen, caption, body, buttons, toggle }: any) =>
-        isOpen ? (
-            <div data-testid="dialog">
-                <div>{caption}</div>
-                <div>{body}</div>
-                <button onClick={toggle}>toggle</button>
-                {(buttons || []).map((button: any, i: number) => (
-                    <button key={i} onClick={button.onClick} disabled={button.disabled}>
-                        {button.body}
-                    </button>
-                ))}
-            </div>
-        ) : null,
-}));
+vi.mock('components/Dialog', async () => {
+    const { dialogMockModule } = await import('../../test-utils/mockModules');
+    return dialogMockModule();
+});
 
-vi.mock('components/Select', () => ({
-    default: ({ id, onChange, isMulti }: any) => (
-        <button
-            data-testid={`select-${id}`}
-            onClick={() => {
-                if (isMulti) {
-                    onChange([{ value: 'group-1', label: 'Group 1' }]);
-                    return;
-                }
+vi.mock('components/Select', async () => {
+    const { createSelectMockModule } = await import('../../test-utils/mockModules');
+    return createSelectMockModule({ 'secret-vault-profile': 'vp-2' });
+});
 
-                if (id === 'secret-vault-profile') {
-                    onChange('vp-2');
-                    return;
-                }
-
-                onChange('user-1');
-            }}
-        >
-            select
-        </button>
-    ),
-}));
-
-vi.mock('components/Container', () => ({
-    default: ({ children }: any) => <div>{children}</div>,
-}));
+vi.mock('components/Container', async () => {
+    const { containerMockModule } = await import('../../test-utils/mockModules');
+    return containerMockModule();
+});
 
 vi.mock('../form', () => ({
     default: () => <div data-testid="secret-form">form</div>,
@@ -156,14 +134,9 @@ describe('SecretsList compliance integration', () => {
                     SecretState: { active: { label: 'Active' } },
                 },
             },
-            users: { users: [{ uuid: 'user-1', username: 'owner1' }] },
-            certificateGroups: { certificateGroups: [{ uuid: 'group-1', name: 'Group 1' }] },
-            vaultProfiles: {
-                vaultProfiles: [
-                    { uuid: 'vp-1', name: 'Vault Profile One', enabled: true, vaultInstance: { uuid: 'vault-1' } },
-                    { uuid: 'vp-2', name: 'Vault Profile Two', enabled: true, vaultInstance: { uuid: 'vault-2' } },
-                ],
-            },
+            users: COMMON_USERS_STATE,
+            certificateGroups: COMMON_GROUPS_STATE,
+            vaultProfiles: COMMON_VAULT_PROFILES_STATE,
         } as any;
 
         useSelectorMock.mockImplementation((selector: any) => selector(state));
@@ -184,34 +157,11 @@ describe('SecretsList compliance integration', () => {
             root.render(<SecretsList />);
         });
 
-        const enableButton = container.querySelector('button[title="Enable selected Secrets"]') as HTMLButtonElement;
-        await act(async () => {
-            enableButton.click();
-        });
-
-        const enableConfirm = Array.from(container.querySelectorAll('button')).find(
-            (el) => el.textContent === 'Enable',
-        ) as HTMLButtonElement;
-        await act(async () => {
-            enableConfirm.click();
-        });
-
-        const disableButton = container.querySelector('button[title="Disable selected Secrets"]') as HTMLButtonElement;
-        await act(async () => {
-            disableButton.click();
-        });
-
-        const disableConfirm = Array.from(container.querySelectorAll('button')).find(
-            (el) => el.textContent === 'Disable',
-        ) as HTMLButtonElement;
-        await act(async () => {
-            disableConfirm.click();
-        });
-
-        const deleteButton = container.querySelector('button[title="Delete Selected"]') as HTMLButtonElement;
-        await act(async () => {
-            deleteButton.click();
-        });
+        await clickByTitle(container, 'Enable selected Secrets');
+        await clickByText(container, 'Enable');
+        await clickByTitle(container, 'Disable selected Secrets');
+        await clickByText(container, 'Disable');
+        await clickByTitle(container, 'Delete Selected');
 
         expect(dispatch).toHaveBeenCalledWith(expect.objectContaining({ type: 'secrets/enableSecret' }));
         expect(dispatch).toHaveBeenCalledWith(expect.objectContaining({ type: 'secrets/disableSecret' }));
@@ -223,52 +173,23 @@ describe('SecretsList compliance integration', () => {
             root.render(<SecretsList />);
         });
 
-        const ownerButton = container.querySelector('button[title="Override Owner"]') as HTMLButtonElement;
-        await act(async () => {
-            ownerButton.click();
-        });
-        await act(async () => {
-            (container.querySelector('[data-testid="select-secret-owner"]') as HTMLButtonElement).click();
-        });
-        await act(async () => {
-            (Array.from(container.querySelectorAll('button')).find((el) => el.textContent === 'Update') as HTMLButtonElement).click();
-        });
+        await clickByTitle(container, 'Override Owner');
+        await clickByTestId(container, 'select-secret-owner');
+        await clickByText(container, 'Update');
 
-        await act(async () => {
-            ownerButton.click();
-        });
-        await act(async () => {
-            (Array.from(container.querySelectorAll('button')).find((el) => el.textContent === 'Remove') as HTMLButtonElement).click();
-        });
+        await clickByTitle(container, 'Override Owner');
+        await clickByText(container, 'Remove');
 
-        const groupsButton = container.querySelector('button[title="Override Groups"]') as HTMLButtonElement;
-        await act(async () => {
-            groupsButton.click();
-        });
-        await act(async () => {
-            (container.querySelector('[data-testid="select-secret-groups-update"]') as HTMLButtonElement).click();
-        });
-        await act(async () => {
-            (Array.from(container.querySelectorAll('button')).find((el) => el.textContent === 'Update') as HTMLButtonElement).click();
-        });
+        await clickByTitle(container, 'Override Groups');
+        await clickByTestId(container, 'select-secret-groups-update');
+        await clickByText(container, 'Update');
 
-        await act(async () => {
-            groupsButton.click();
-        });
-        await act(async () => {
-            (Array.from(container.querySelectorAll('button')).find((el) => el.textContent === 'Clear') as HTMLButtonElement).click();
-        });
+        await clickByTitle(container, 'Override Groups');
+        await clickByText(container, 'Clear');
 
-        const vaultProfileButton = container.querySelector('button[title="Override Source Vault Profile"]') as HTMLButtonElement;
-        await act(async () => {
-            vaultProfileButton.click();
-        });
-        await act(async () => {
-            (container.querySelector('[data-testid="select-secret-vault-profile"]') as HTMLButtonElement).click();
-        });
-        await act(async () => {
-            (Array.from(container.querySelectorAll('button')).find((el) => el.textContent === 'Update') as HTMLButtonElement).click();
-        });
+        await clickByTitle(container, 'Override Source Vault Profile');
+        await clickByTestId(container, 'select-secret-vault-profile');
+        await clickByText(container, 'Update');
 
         expect(dispatch).toHaveBeenCalledWith(
             expect.objectContaining({

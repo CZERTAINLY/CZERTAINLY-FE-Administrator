@@ -22,7 +22,7 @@ import { actions as vaultProfileActions, selectors as vaultProfileSelectors } fr
 
 import { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { PlatformEnum, Resource } from 'types/openapi';
+import { ComplianceStatus, PlatformEnum, Resource } from 'types/openapi';
 
 import SecretForm from '../form';
 import SecretStateBadge from '../SecretStateBadge';
@@ -90,7 +90,7 @@ export default function SecretsList() {
                 content: 'Compliance',
                 width: '10%',
                 align: 'center',
-                sortable: true,
+                sortable: false,
             },
             {
                 id: 'vaultProfile',
@@ -140,7 +140,7 @@ export default function SecretsList() {
                     <SecretStateBadge key="state" state={secret.state}>
                         {getEnumLabel(secretStateEnum, secret.state)}
                     </SecretStateBadge>,
-                    secret.complianceStatus ? <CertificateStatus key="compliance" status={secret.complianceStatus} asIcon={true} /> : '',
+                    <CertificateStatus key="compliance" status={secret.complianceStatus || ComplianceStatus.Na} asIcon={true} />,
                     secret.sourceVaultProfile
                         ? (() => {
                               const profile = vaultProfiles.find((p) => p.uuid === secret.sourceVaultProfile?.uuid);
