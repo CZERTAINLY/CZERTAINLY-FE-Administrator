@@ -168,5 +168,34 @@ describe('secret utils', () => {
 
             expect(resolved).toBe('Unknown');
         });
+
+        test('returns Unknown when enum maps are undefined', async () => {
+            container = document.createElement('div');
+            document.body.appendChild(container);
+            root = createRoot(container);
+
+            let resolved = '';
+            const store = createMockStore({
+                enums: {
+                    platformEnums: {},
+                },
+            } as any);
+
+            await act(async () => {
+                root?.render(
+                    withProviders(
+                        createElement(UseGetSecretStatusTextHarness, {
+                            status: SecretType.ApiKey,
+                            onResolved: (text: string) => {
+                                resolved = text;
+                            },
+                        }),
+                        { store },
+                    ),
+                );
+            });
+
+            expect(resolved).toBe('Unknown');
+        });
     });
 });

@@ -1,6 +1,6 @@
 import { act, createElement, useEffect } from 'react';
 import { createRoot, Root } from 'react-dom/client';
-import { afterEach, describe, expect, test } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import { CertificateState, PlatformEnum, SecretState, SecretType } from 'types/openapi';
 import {
     getCertificateDonutChartColors,
@@ -130,6 +130,26 @@ describe('dashboard utils', () => {
 
             expect(result.colors).toEqual(['#14B8A6', '#EF4444', '#3782a5']);
         });
+
+        test('handles falsey color branch in updateColorObject', async () => {
+            vi.resetModules();
+
+            vi.doMock('./certificate', async () => {
+                const actual = await vi.importActual<typeof import('./certificate')>('./certificate');
+                return {
+                    ...actual,
+                    getCertificateStatusColor: vi.fn(() => undefined),
+                };
+            });
+
+            const mod = await import('./dashboard');
+            const result = mod.getCertificateDonutChartColors({ [CertificateState.Issued]: 1 });
+
+            expect(result.colors).toEqual([]);
+
+            vi.resetModules();
+            vi.doUnmock('./certificate');
+        });
     });
 
     describe('useGetLabels', () => {
@@ -179,6 +199,49 @@ describe('dashboard utils', () => {
             });
 
             expect(capturedLabels).toEqual(['Issued Label', 'Active Secret Label', 'valueFromSplit']);
+        });
+
+        test('supports secret type label and split fallback without delimiter', async () => {
+            container = document.createElement('div');
+            document.body.appendChild(container);
+            root = createRoot(container);
+
+            let capturedLabels: string[] = [];
+
+            const store = createMockStore({
+                enums: {
+                    platformEnums: {
+                        [PlatformEnum.CertificateState]: {},
+                        [PlatformEnum.CertificateValidationStatus]: {},
+                        [PlatformEnum.ComplianceStatus]: {},
+                        [PlatformEnum.ComplianceRuleStatus]: {},
+                        [PlatformEnum.CertificateSubjectType]: {},
+                        [PlatformEnum.SecretState]: {},
+                        [PlatformEnum.SecretType]: {
+                            [SecretType.Generic]: { label: 'Generic Secret Type' },
+                        },
+                    },
+                },
+            } as any);
+
+            await act(async () => {
+                root?.render(
+                    withProviders(
+                        createElement(UseGetLabelsHarness, {
+                            data: {
+                                [SecretType.Generic]: 1,
+                                plainFallback: 2,
+                            },
+                            onLabels: (labels: string[]) => {
+                                capturedLabels = labels;
+                            },
+                        }),
+                        { store },
+                    ),
+                );
+            });
+
+            expect(capturedLabels).toEqual(['Generic Secret Type', 'plainFallback']);
         });
     });
 
