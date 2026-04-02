@@ -17,6 +17,35 @@ function UseGetSecretStatusTextHarness({ status, onResolved }: { status: SecretS
     return createElement('div');
 }
 
+async function resolveSecretStatusText(status: SecretState | SecretType, platformEnums: { [key: string]: any }): Promise<string> {
+    container = document.createElement('div');
+    document.body.appendChild(container);
+    root = createRoot(container);
+
+    let resolved = '';
+    const store = createMockStore({
+        enums: {
+            platformEnums,
+        },
+    } as any);
+
+    await act(async () => {
+        root?.render(
+            withProviders(
+                createElement(UseGetSecretStatusTextHarness, {
+                    status,
+                    onResolved: (text: string) => {
+                        resolved = text;
+                    },
+                }),
+                { store },
+            ),
+        );
+    });
+
+    return resolved;
+}
+
 let container: HTMLDivElement | null = null;
 let root: Root | null = null;
 
@@ -68,132 +97,40 @@ describe('secret utils', () => {
 
     describe('useGetSecretStatusText', () => {
         test('returns label from SecretState enum', async () => {
-            container = document.createElement('div');
-            document.body.appendChild(container);
-            root = createRoot(container);
-
-            let resolved = '';
-            const store = createMockStore({
-                enums: {
-                    platformEnums: {
-                        [PlatformEnum.SecretState]: {
-                            [SecretState.Active]: { label: 'Active Label' },
-                        },
-                        [PlatformEnum.SecretType]: {
-                            [SecretType.Generic]: { label: 'Generic Label' },
-                        },
-                    },
+            const resolved = await resolveSecretStatusText(SecretState.Active, {
+                [PlatformEnum.SecretState]: {
+                    [SecretState.Active]: { label: 'Active Label' },
                 },
-            } as any);
-
-            await act(async () => {
-                root?.render(
-                    withProviders(
-                        createElement(UseGetSecretStatusTextHarness, {
-                            status: SecretState.Active,
-                            onResolved: (text: string) => {
-                                resolved = text;
-                            },
-                        }),
-                        { store },
-                    ),
-                );
+                [PlatformEnum.SecretType]: {
+                    [SecretType.Generic]: { label: 'Generic Label' },
+                },
             });
 
             expect(resolved).toBe('Active Label');
         });
 
         test('returns label from SecretType enum when state label is missing', async () => {
-            container = document.createElement('div');
-            document.body.appendChild(container);
-            root = createRoot(container);
-
-            let resolved = '';
-            const store = createMockStore({
-                enums: {
-                    platformEnums: {
-                        [PlatformEnum.SecretState]: {},
-                        [PlatformEnum.SecretType]: {
-                            [SecretType.Generic]: { label: 'Generic Label' },
-                        },
-                    },
+            const resolved = await resolveSecretStatusText(SecretType.Generic, {
+                [PlatformEnum.SecretState]: {},
+                [PlatformEnum.SecretType]: {
+                    [SecretType.Generic]: { label: 'Generic Label' },
                 },
-            } as any);
-
-            await act(async () => {
-                root?.render(
-                    withProviders(
-                        createElement(UseGetSecretStatusTextHarness, {
-                            status: SecretType.Generic,
-                            onResolved: (text: string) => {
-                                resolved = text;
-                            },
-                        }),
-                        { store },
-                    ),
-                );
             });
 
             expect(resolved).toBe('Generic Label');
         });
 
         test('returns Unknown when no enum label exists', async () => {
-            container = document.createElement('div');
-            document.body.appendChild(container);
-            root = createRoot(container);
-
-            let resolved = '';
-            const store = createMockStore({
-                enums: {
-                    platformEnums: {
-                        [PlatformEnum.SecretState]: {},
-                        [PlatformEnum.SecretType]: {},
-                    },
-                },
-            } as any);
-
-            await act(async () => {
-                root?.render(
-                    withProviders(
-                        createElement(UseGetSecretStatusTextHarness, {
-                            status: SecretState.Inactive,
-                            onResolved: (text: string) => {
-                                resolved = text;
-                            },
-                        }),
-                        { store },
-                    ),
-                );
+            const resolved = await resolveSecretStatusText(SecretState.Inactive, {
+                [PlatformEnum.SecretState]: {},
+                [PlatformEnum.SecretType]: {},
             });
 
             expect(resolved).toBe('Unknown');
         });
 
         test('returns Unknown when enum maps are undefined', async () => {
-            container = document.createElement('div');
-            document.body.appendChild(container);
-            root = createRoot(container);
-
-            let resolved = '';
-            const store = createMockStore({
-                enums: {
-                    platformEnums: {},
-                },
-            } as any);
-
-            await act(async () => {
-                root?.render(
-                    withProviders(
-                        createElement(UseGetSecretStatusTextHarness, {
-                            status: SecretType.ApiKey,
-                            onResolved: (text: string) => {
-                                resolved = text;
-                            },
-                        }),
-                        { store },
-                    ),
-                );
-            });
+            const resolved = await resolveSecretStatusText(SecretType.ApiKey, {});
 
             expect(resolved).toBe('Unknown');
         });
