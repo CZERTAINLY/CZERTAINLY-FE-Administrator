@@ -17,13 +17,22 @@ import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
 import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
 import type {
     ApprovalProfileDetailDto,
+    ApprovalProfileDto,
     ApprovalProfileRequestDto,
     ApprovalProfileResponseDto,
     ApprovalProfileUpdateRequestDto,
     AuthenticationServiceExceptionDto,
     ErrorMessageDto,
+    Resource,
+    ResourceObjectDto,
     UuidDto,
 } from '../models';
+
+export interface AssociateApprovalProfileRequest {
+    uuid: string;
+    resource: Resource;
+    associationObjectUuid: string;
+}
 
 export interface CreateApprovalProfileRequest {
     approvalProfileRequestDto: ApprovalProfileRequestDto;
@@ -31,6 +40,12 @@ export interface CreateApprovalProfileRequest {
 
 export interface DeleteApprovalProfileRequest {
     uuid: string;
+}
+
+export interface DisassociateApprovalProfileRequest {
+    uuid: string;
+    resource: Resource;
+    associationObjectUuid: string;
 }
 
 export interface EditApprovalProfileRequest {
@@ -43,6 +58,15 @@ export interface GetApprovalProfileRequest {
     version?: number;
 }
 
+export interface GetAssociatedApprovalProfiles1Request {
+    resource: Resource;
+    associationObjectUuid: string;
+}
+
+export interface GetAssociationsRequest {
+    uuid: string;
+}
+
 export interface ListApprovalProfilesRequest {
     itemsPerPage?: number;
     pageNumber?: number;
@@ -52,6 +76,22 @@ export interface ListApprovalProfilesRequest {
  * no description
  */
 export class ApprovalProfileInventoryApi extends BaseAPI {
+
+    /**
+     * Associate Approval Profile to specified resource object
+     */
+    associateApprovalProfile({ uuid, resource, associationObjectUuid }: AssociateApprovalProfileRequest): Observable<void>
+    associateApprovalProfile({ uuid, resource, associationObjectUuid }: AssociateApprovalProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    associateApprovalProfile({ uuid, resource, associationObjectUuid }: AssociateApprovalProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(uuid, 'uuid', 'associateApprovalProfile');
+        throwIfNullOrUndefined(resource, 'resource', 'associateApprovalProfile');
+        throwIfNullOrUndefined(associationObjectUuid, 'associationObjectUuid', 'associateApprovalProfile');
+
+        return this.request<void>({
+            url: '/v1/approvalProfiles/{uuid}/associations/{resource}/{associationObjectUuid}'.replace('{uuid}', encodeURI(uuid)).replace('{resource}', encodeURI(resource)).replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
+            method: 'PATCH',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Create a Approval profile
@@ -83,6 +123,22 @@ export class ApprovalProfileInventoryApi extends BaseAPI {
 
         return this.request<void>({
             url: '/v1/approvalProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'DELETE',
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Disassociate Approval Profile from specified resource object
+     */
+    disassociateApprovalProfile({ uuid, resource, associationObjectUuid }: DisassociateApprovalProfileRequest): Observable<void>
+    disassociateApprovalProfile({ uuid, resource, associationObjectUuid }: DisassociateApprovalProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    disassociateApprovalProfile({ uuid, resource, associationObjectUuid }: DisassociateApprovalProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(uuid, 'uuid', 'disassociateApprovalProfile');
+        throwIfNullOrUndefined(resource, 'resource', 'disassociateApprovalProfile');
+        throwIfNullOrUndefined(associationObjectUuid, 'associationObjectUuid', 'disassociateApprovalProfile');
+
+        return this.request<void>({
+            url: '/v1/approvalProfiles/{uuid}/associations/{resource}/{associationObjectUuid}'.replace('{uuid}', encodeURI(uuid)).replace('{resource}', encodeURI(resource)).replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
             method: 'DELETE',
         }, opts?.responseOpts);
     };
@@ -124,6 +180,35 @@ export class ApprovalProfileInventoryApi extends BaseAPI {
             url: '/v1/approvalProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
             method: 'GET',
             query,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Get associated Approval Profiles for resource object
+     */
+    getAssociatedApprovalProfiles1({ resource, associationObjectUuid }: GetAssociatedApprovalProfiles1Request): Observable<Array<ApprovalProfileDto>>
+    getAssociatedApprovalProfiles1({ resource, associationObjectUuid }: GetAssociatedApprovalProfiles1Request, opts?: OperationOpts): Observable<AjaxResponse<Array<ApprovalProfileDto>>>
+    getAssociatedApprovalProfiles1({ resource, associationObjectUuid }: GetAssociatedApprovalProfiles1Request, opts?: OperationOpts): Observable<Array<ApprovalProfileDto> | AjaxResponse<Array<ApprovalProfileDto>>> {
+        throwIfNullOrUndefined(resource, 'resource', 'getAssociatedApprovalProfiles1');
+        throwIfNullOrUndefined(associationObjectUuid, 'associationObjectUuid', 'getAssociatedApprovalProfiles1');
+
+        return this.request<Array<ApprovalProfileDto>>({
+            url: '/v1/approvalProfiles/associations/{resource}/{associationObjectUuid}'.replace('{resource}', encodeURI(resource)).replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Get associations of Approval Profile
+     */
+    getAssociations({ uuid }: GetAssociationsRequest): Observable<Array<ResourceObjectDto>>
+    getAssociations({ uuid }: GetAssociationsRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<ResourceObjectDto>>>
+    getAssociations({ uuid }: GetAssociationsRequest, opts?: OperationOpts): Observable<Array<ResourceObjectDto> | AjaxResponse<Array<ResourceObjectDto>>> {
+        throwIfNullOrUndefined(uuid, 'uuid', 'getAssociations');
+
+        return this.request<Array<ResourceObjectDto>>({
+            url: '/v1/approvalProfiles/{uuid}/associations'.replace('{uuid}', encodeURI(uuid)),
+            method: 'GET',
         }, opts?.responseOpts);
     };
 
