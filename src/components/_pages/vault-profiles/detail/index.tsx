@@ -10,8 +10,10 @@ import Container from 'components/Container';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
+import WidgetButtons from 'components/WidgetButtons';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
+import { actions as complianceProfileActions, selectors as complianceProfileSelectors } from 'ducks/compliance-profiles';
 import { actions as vaultProfileActions, selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 
@@ -19,6 +21,7 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import VaultProfileEditForm from '../edit-form';
+import AssociateComplianceProfileDialogBody from '../AssociateComplianceProfileDialogBody';
 
 function VaultProfileDetail() {
     const dispatch = useDispatch();
@@ -30,11 +33,15 @@ function VaultProfileDetail() {
     const isEnabling = useSelector(vaultProfileSelectors.isEnabling);
     const isDisabling = useSelector(vaultProfileSelectors.isDisabling);
     const isDeleting = useSelector(vaultProfileSelectors.isDeleting);
+    const associatedComplianceProfiles = useSelector(complianceProfileSelectors.associatedComplianceProfiles);
+    const isFetchingAssociatedComplianceProfiles = useSelector(complianceProfileSelectors.isFetchingAssociatedComplianceProfiles);
 
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
 
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
+    const [associateComplianceProfile, setAssociateComplianceProfile] = useState(false);
+    const [complianceCheck, setComplianceCheck] = useState(false);
 
     const getFreshDetails = useCallback(() => {
         if (!vaultUuid || !vaultProfileUuid) return;
@@ -50,6 +57,20 @@ function VaultProfileDetail() {
     useEffect(() => {
         getFreshDetails();
     }, [getFreshDetails]);
+
+    const getFreshComplianceDetails = useCallback(() => {
+        if (!profile?.uuid) return;
+        dispatch(
+            complianceProfileActions.getAssociatedComplianceProfiles({
+                resource: Resource.VaultProfiles,
+                associationObjectUuid: profile.uuid,
+            }),
+        );
+    }, [dispatch, profile]);
+
+    useEffect(() => {
+        getFreshComplianceDetails();
+    }, [getFreshComplianceDetails]);
 
     const onApprove = useCallback(() => {
         if (!vaultUuid || !vaultProfileUuid) return;
@@ -84,6 +105,33 @@ function VaultProfileDetail() {
 
     const handleCloseEdit = useCallback(() => setIsEditOpen(false), []);
 
+    const onComplianceCheck = useCallback(() => {
+        if (!profile?.uuid) return;
+
+        dispatch(
+            complianceProfileActions.checkResourceObjectCompliance({
+                resource: Resource.VaultProfiles,
+                objectUuid: profile.uuid,
+            }),
+        );
+        setComplianceCheck(false);
+    }, [dispatch, profile]);
+
+    const onDissociateComplianceProfile = useCallback(
+        (uuid: string) => {
+            if (!profile?.uuid) return;
+
+            dispatch(
+                complianceProfileActions.dissociateComplianceProfile({
+                    uuid,
+                    resource: Resource.VaultProfiles,
+                    associationObjectUuid: profile.uuid,
+                }),
+            );
+        },
+        [dispatch, profile],
+    );
+
     const widgetButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
@@ -110,11 +158,74 @@ function VaultProfileDetail() {
                 tooltip: 'Delete',
                 onClick: () => setConfirmDelete(true),
             },
+            {
+                icon: 'gavel',
+                disabled: !profile,
+                tooltip: 'Check Compliance',
+                onClick: () => setComplianceCheck(true),
+            },
         ],
         [profile, onApprove, onDisapprove],
     );
 
+    const complianceProfileButtons: WidgetButtonProps[] = useMemo(
+        () => [
+            {
+                icon: 'plus',
+                disabled: !profile,
+                tooltip: 'Associate Compliance Profile',
+                onClick: () => setAssociateComplianceProfile(true),
+                id: 'associate-compliance-profile',
+            },
+        ],
+        [profile],
+    );
+
     const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
+
+    const complianceProfileHeaders: TableHeader[] = useMemo(
+        () => [
+            {
+                id: 'complianceProfileName',
+                content: 'Name',
+            },
+            {
+                id: 'description',
+                content: 'Description',
+            },
+            {
+                id: 'action',
+                content: 'Action',
+            },
+        ],
+        [],
+    );
+
+    const complianceProfileData: TableDataRow[] = useMemo(
+        () =>
+            !associatedComplianceProfiles
+                ? []
+                : associatedComplianceProfiles.map((complianceProfile) => ({
+                      id: complianceProfile.uuid,
+                      columns: [
+                          <Link to={`/${Resource.ComplianceProfiles.toLowerCase()}/detail/${complianceProfile.uuid}`}>
+                              {complianceProfile.name}
+                          </Link>,
+                          complianceProfile.description || '',
+                          <WidgetButtons
+                              buttons={[
+                                  {
+                                      icon: 'minus-square',
+                                      disabled: false,
+                                      tooltip: 'Remove',
+                                      onClick: () => onDissociateComplianceProfile(complianceProfile.uuid),
+                                  },
+                              ]}
+                          />,
+                      ],
+                  })),
+        [associatedComplianceProfiles, onDissociateComplianceProfile],
+    );
 
     const detailData: TableDataRow[] = useMemo(
         () =>
@@ -180,11 +291,25 @@ function VaultProfileDetail() {
                             <CustomTable headers={detailHeaders} data={detailData} />
                         </Widget>
 
-                        {profile?.attributes && profile.attributes.length > 0 && (
-                            <Widget title="Attributes" titleSize="large">
-                                <AttributeViewer attributes={profile.attributes} />
+                        <Container className="w-full xl:w-auto flex flex-col">
+                            <Widget
+                                title="Compliance Profiles"
+                                busy={isFetchingAssociatedComplianceProfiles}
+                                widgetButtons={complianceProfileButtons}
+                                titleSize="large"
+                                refreshAction={getFreshComplianceDetails}
+                                widgetLockName={LockWidgetNameEnum.ComplianceProfileAssociations}
+                                lockSize="large"
+                            >
+                                <CustomTable headers={complianceProfileHeaders} data={complianceProfileData} />
                             </Widget>
-                        )}
+
+                            {profile?.attributes && profile.attributes.length > 0 && (
+                                <Widget title="Attributes" titleSize="large">
+                                    <AttributeViewer attributes={profile.attributes} />
+                                </Widget>
+                            )}
+                        </Container>
                     </Container>
 
                     {profile && (
@@ -230,6 +355,42 @@ function VaultProfileDetail() {
                         onClick: () => setConfirmDelete(false),
                         body: 'Cancel',
                     },
+                ]}
+            />
+
+            <Dialog
+                isOpen={associateComplianceProfile}
+                caption="Associate Compliance Profile"
+                body={
+                    <AssociateComplianceProfileDialogBody
+                        visible={associateComplianceProfile}
+                        onClose={() => setAssociateComplianceProfile(false)}
+                        resource={Resource.VaultProfiles}
+                        resourceObject={
+                            profile
+                                ? {
+                                      uuid: profile.uuid,
+                                      name: profile.name,
+                                  }
+                                : undefined
+                        }
+                        availableComplianceProfileUuids={associatedComplianceProfiles.map((p) => p.uuid)}
+                    />
+                }
+                toggle={() => setAssociateComplianceProfile(false)}
+                buttons={[]}
+                dataTestId="associate-compliance-profile-dialog"
+            />
+
+            <Dialog
+                isOpen={complianceCheck}
+                caption="Initiate Compliance Check"
+                body="Initiate the compliance check for this Vault Profile?"
+                toggle={() => setComplianceCheck(false)}
+                noBorder
+                buttons={[
+                    { color: 'primary', variant: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
+                    { color: 'primary', onClick: onComplianceCheck, body: 'Yes' },
                 ]}
             />
         </div>

@@ -26,6 +26,7 @@ import { PlatformEnum, Resource } from 'types/openapi';
 
 import SecretForm from '../form';
 import SecretStateBadge from '../SecretStateBadge';
+import CertificateStatus from 'components/_pages/certificates/CertificateStatus';
 
 export default function SecretsList() {
     const dispatch = useDispatch();
@@ -85,6 +86,13 @@ export default function SecretsList() {
                 sortable: true,
             },
             {
+                id: 'compliance',
+                content: 'Compliance',
+                width: '10%',
+                align: 'center',
+                sortable: true,
+            },
+            {
                 id: 'vaultProfile',
                 content: 'Vault Profile',
                 width: '15%',
@@ -132,6 +140,7 @@ export default function SecretsList() {
                     <SecretStateBadge key="state" state={secret.state}>
                         {getEnumLabel(secretStateEnum, secret.state)}
                     </SecretStateBadge>,
+                    secret.complianceStatus ? <CertificateStatus key="compliance" status={secret.complianceStatus} asIcon={true} /> : '',
                     secret.sourceVaultProfile
                         ? (() => {
                               const profile = vaultProfiles.find((p) => p.uuid === secret.sourceVaultProfile?.uuid);
