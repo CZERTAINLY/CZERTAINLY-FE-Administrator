@@ -12,6 +12,7 @@
  */
 
 import type {
+    ComplianceStatus,
     MetadataResponseDto,
     NameAndUuidDto,
     ResponseAttribute,
@@ -85,6 +86,12 @@ export interface SecretDetailDto {
      * @memberof SecretDetailDto
      */
     groups?: Array<NameAndUuidDto>;
+    /**
+     * Secret compliance status
+     * @type {ComplianceStatus}
+     * @memberof SecretDetailDto
+     */
+    complianceStatus: ComplianceStatus;
     /**
      * List of vault profiles where the secret is stored
      * @type {Array<SyncVaultProfileDto>}
