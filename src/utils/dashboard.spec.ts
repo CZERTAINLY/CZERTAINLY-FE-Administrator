@@ -1,12 +1,43 @@
-import { describe, expect, test } from 'vitest';
-import { SecretState } from 'types/openapi';
+import { act, createElement, useEffect } from 'react';
+import { createRoot, Root } from 'react-dom/client';
+import { afterEach, describe, expect, test } from 'vitest';
+import { CertificateState, PlatformEnum, SecretState, SecretType } from 'types/openapi';
 import {
+    getCertificateDonutChartColors,
     getDefaultColors,
     getValues,
     getCertificateDonutChartColorsByDaysOfExpiration,
     getDonutChartColorsByRandomNumberOfOptions,
     getSecretDonutChartColors,
+    useGetLabels,
 } from './dashboard';
+import { createMockStore, withProviders } from './test-helpers';
+
+(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
+
+function UseGetLabelsHarness({ data, onLabels }: { data: Record<string, number>; onLabels: (labels: string[]) => void }) {
+    const labels = useGetLabels(data as any);
+
+    useEffect(() => {
+        onLabels(labels);
+    }, [labels, onLabels]);
+
+    return createElement('div', null, labels.join('|'));
+}
+
+let container: HTMLDivElement | null = null;
+let root: Root | null = null;
+
+afterEach(() => {
+    if (root) {
+        act(() => {
+            root?.unmount();
+        });
+    }
+    root = null;
+    container?.remove();
+    container = null;
+});
 
 describe('dashboard utils', () => {
     describe('getDefaultColors', () => {
@@ -78,6 +109,76 @@ describe('dashboard utils', () => {
         test('falls back to default gray for unknown status', () => {
             const result = getSecretDonutChartColors({ unknown: 1 });
             expect(result.colors).toEqual(['#6B7280']);
+        });
+    });
+
+    describe('getCertificateDonutChartColors', () => {
+        test('returns empty colors for undefined input', () => {
+            expect(getCertificateDonutChartColors(undefined)).toEqual({ colors: [] });
+        });
+
+        test('returns empty colors for empty object', () => {
+            expect(getCertificateDonutChartColors({})).toEqual({ colors: [] });
+        });
+
+        test('maps certificate statuses to colors in key order', () => {
+            const result = getCertificateDonutChartColors({
+                [CertificateState.Issued]: 2,
+                [CertificateState.Rejected]: 1,
+                [CertificateState.PendingIssue]: 3,
+            });
+
+            expect(result.colors).toEqual(['#14B8A6', '#EF4444', '#3782a5']);
+        });
+    });
+
+    describe('useGetLabels', () => {
+        test('prefers certificate labels, then secret labels, then key split fallback', async () => {
+            container = document.createElement('div');
+            document.body.appendChild(container);
+            root = createRoot(container);
+
+            let capturedLabels: string[] = [];
+
+            const store = createMockStore({
+                enums: {
+                    platformEnums: {
+                        [PlatformEnum.CertificateState]: {
+                            [CertificateState.Issued]: { label: 'Issued Label' },
+                        },
+                        [PlatformEnum.CertificateValidationStatus]: {},
+                        [PlatformEnum.ComplianceStatus]: {},
+                        [PlatformEnum.ComplianceRuleStatus]: {},
+                        [PlatformEnum.CertificateSubjectType]: {},
+                        [PlatformEnum.SecretState]: {
+                            [SecretState.Active]: { label: 'Active Secret Label' },
+                        },
+                        [PlatformEnum.SecretType]: {
+                            [SecretType.Generic]: { label: 'Generic Secret Type' },
+                        },
+                    },
+                },
+            } as any);
+
+            await act(async () => {
+                root?.render(
+                    withProviders(
+                        createElement(UseGetLabelsHarness, {
+                            data: {
+                                [CertificateState.Issued]: 1,
+                                [SecretState.Active]: 2,
+                                'unknown=valueFromSplit': 3,
+                            },
+                            onLabels: (labels: string[]) => {
+                                capturedLabels = labels;
+                            },
+                        }),
+                        { store },
+                    ),
+                );
+            });
+
+            expect(capturedLabels).toEqual(['Issued Label', 'Active Secret Label', 'valueFromSplit']);
         });
     });
 
