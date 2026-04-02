@@ -156,7 +156,7 @@ function SecretsDashboard() {
                                       {
                                           fieldSource: FilterFieldSource.Property,
                                           condition: FilterConditionOperator.Empty,
-                                          fieldIdentifier: 'GROUP_NAME',
+                                          fieldIdentifier: 'SECRET_GROUP_NAME',
                                           value: [''],
                                       },
                                   ]
@@ -164,7 +164,7 @@ function SecretsDashboard() {
                                       {
                                           fieldSource: FilterFieldSource.Property,
                                           condition: FilterConditionOperator.Equals,
-                                          fieldIdentifier: 'GROUP_NAME',
+                                          fieldIdentifier: 'SECRET_GROUP_NAME',
                                           value: [labels[index]],
                                       },
                                   ]
