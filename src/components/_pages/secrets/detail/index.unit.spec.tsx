@@ -6,29 +6,22 @@ import SecretDetail from './index';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { COMMON_GROUPS_STATE, COMMON_USERS_STATE, COMMON_VAULT_PROFILES_STATE } from '../../test-utils/mockModules';
 import { clickByText, clickByTitle } from '../../test-utils/domActions';
+import { setupReactActEnvironment } from '../../test-utils/reactActEnvironment';
+import { useDispatchMock, useSelectorMock } from '../../test-utils/reactReduxMockModule';
 import {
     expectSecretOwnerGroupVaultDispatchCalls,
     runSecretOwnerGroupVaultUpdateActions,
 } from '../../test-utils/secretOwnerGroupVaultActions';
 
-(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
-
-const { useDispatchMock, useSelectorMock } = vi.hoisted(() => ({
-    useDispatchMock: vi.fn(),
-    useSelectorMock: vi.fn(),
-}));
+setupReactActEnvironment();
 
 vi.mock('react-redux', async () => {
-    const { reduxHooksMockModule } = await import('../../test-utils/mockModules');
-    return reduxHooksMockModule(useDispatchMock, useSelectorMock);
+    return await import('../../test-utils/reactReduxMockModule');
 });
 
 vi.mock('react-router', async () => {
-    const { routerLinkMockModule } = await import('../../test-utils/mockModules');
-    return {
-        ...routerLinkMockModule(),
-        useParams: () => ({ id: 'sec-1' }),
-    };
+    const { secretDetailRouterMockModule } = await import('../../test-utils/reactRouterMockModules');
+    return secretDetailRouterMockModule;
 });
 
 vi.mock('components/Breadcrumb', () => ({

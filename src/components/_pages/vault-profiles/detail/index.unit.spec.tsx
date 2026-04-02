@@ -6,25 +6,18 @@ import VaultProfileDetail from './index';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { COMMON_USERS_STATE } from '../../test-utils/mockModules';
 import { clickByText, clickByTitle } from '../../test-utils/domActions';
+import { setupReactActEnvironment } from '../../test-utils/reactActEnvironment';
+import { useDispatchMock, useSelectorMock } from '../../test-utils/reactReduxMockModule';
 
-(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
-
-const { useDispatchMock, useSelectorMock } = vi.hoisted(() => ({
-    useDispatchMock: vi.fn(),
-    useSelectorMock: vi.fn(),
-}));
+setupReactActEnvironment();
 
 vi.mock('react-redux', async () => {
-    const { reduxHooksMockModule } = await import('../../test-utils/mockModules');
-    return reduxHooksMockModule(useDispatchMock, useSelectorMock);
+    return await import('../../test-utils/reactReduxMockModule');
 });
 
 vi.mock('react-router', async () => {
-    const { routerLinkMockModule } = await import('../../test-utils/mockModules');
-    return {
-        ...routerLinkMockModule(),
-        useParams: () => ({ vaultUuid: 'vault-1', id: 'vp-1' }),
-    };
+    const { vaultProfileDetailRouterMockModule } = await import('../../test-utils/reactRouterMockModules');
+    return vaultProfileDetailRouterMockModule;
 });
 
 vi.mock('components/Breadcrumb', () => ({
