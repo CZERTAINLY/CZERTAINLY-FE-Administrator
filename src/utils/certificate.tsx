@@ -11,8 +11,6 @@ import {
     ComplianceRuleStatus,
     ComplianceStatus,
     PlatformEnum,
-    SecretState,
-    SecretType,
 } from 'types/openapi';
 
 export const emptyCertificate: CertificateDetailResponseModel = {
@@ -158,9 +156,6 @@ export function useGetStatusText() {
     const complianceStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ComplianceStatus));
     const complianceRuleStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ComplianceRuleStatus));
     const certificateSubjectTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateSubjectType));
-    const secretStateEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.SecretState));
-    const secretTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.SecretType));
-
     return useCallback(
         (
             status:
@@ -169,9 +164,7 @@ export function useGetStatusText() {
                 | CertificateEventHistoryDtoStatusEnum
                 | ComplianceStatus
                 | ComplianceRuleStatus
-                | CertificateSubjectType
-                | SecretState
-                | SecretType,
+                | CertificateSubjectType,
         ) => {
             switch (status) {
                 case CertificateValidationStatus.Valid:
@@ -215,22 +208,6 @@ export function useGetStatusText() {
                 case CertificateSubjectType.RootCa:
                     return getEnumLabel(certificateSubjectTypeEnum, status);
 
-                case SecretState.Inactive:
-                case SecretState.Active:
-                case SecretState.Expired:
-                case SecretState.Revoked:
-                    return getEnumLabel(secretStateEnum, status);
-
-                case SecretType.BasicAuth:
-                case SecretType.ApiKey:
-                case SecretType.JwtToken:
-                case SecretType.PrivateKey:
-                case SecretType.SecretKey:
-                case SecretType.KeyStore:
-                case SecretType.KeyValue:
-                case SecretType.Generic:
-                    return getEnumLabel(secretTypeEnum, status);
-
                 default:
                     return 'Unknown';
             }
@@ -241,8 +218,6 @@ export function useGetStatusText() {
             complianceStatusEnum,
             complianceRuleStatusEnum,
             certificateSubjectTypeEnum,
-            secretStateEnum,
-            secretTypeEnum,
         ],
     );
 }

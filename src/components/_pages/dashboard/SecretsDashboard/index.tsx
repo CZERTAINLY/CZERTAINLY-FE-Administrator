@@ -5,7 +5,7 @@ import { EntityType } from 'ducks/filters';
 import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { FilterConditionOperator, FilterFieldSource } from 'types/openapi';
-import { getDonutChartColorsByRandomNumberOfOptions, getCertificateDonutChartColors } from 'utils/dashboard';
+import { getCertificateDonutChartColors, getDonutChartColorsByRandomNumberOfOptions, getSecretDonutChartColors } from 'utils/dashboard';
 import CountBadge from '../DashboardItem/CountBadge';
 import DonutChart from '../DashboardItem/DonutChart';
 
@@ -21,7 +21,7 @@ function SecretsDashboard() {
     }, [dispatch]);
 
     const secretStateColorOptions = useMemo(() => {
-        return getCertificateDonutChartColors(dashboard?.secretStatByState);
+        return getSecretDonutChartColors(dashboard?.secretStatByState);
     }, [dashboard?.secretStatByState]);
 
     const secretComplianceColorOptions = useMemo(() => {
