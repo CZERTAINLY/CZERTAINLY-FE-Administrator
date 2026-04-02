@@ -176,7 +176,6 @@ function SecretDetail() {
     const handleSelectedAttributesInfo = useCallback((attributes: AttributeResponseModel[]) => {
         setSelectedAttributesInfo(attributes);
     }, []);
-
     const widgetButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
