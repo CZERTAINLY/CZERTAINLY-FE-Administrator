@@ -100,13 +100,13 @@ const menuItemMappings: MenuItemMapping[] = [
         children: [
             {
                 _key: '/dashboard/certificates',
-                name: 'Certificates dashboard',
+                name: 'Certificates Dashboard',
                 link: '/dashboard/certificates',
                 requiredResources: [Resource.Certificates, Resource.RaProfiles, Resource.Discoveries, Resource.Groups],
             },
             {
                 _key: '/dashboard/secrets',
-                name: 'Secrets dashboard',
+                name: 'Secrets Dashboard',
                 link: '/dashboard/secrets',
                 requiredResources: [Resource.Secrets],
             },
