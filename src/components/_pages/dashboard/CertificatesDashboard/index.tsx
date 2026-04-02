@@ -45,7 +45,8 @@ function CertificatesDashboard() {
     }, [dashboard?.certificateStatByExpiry]);
 
     function isEmpty(obj?: object) {
-        return typeof obj === 'object' && Object.keys(obj).length === 0;
+        if (!obj) return true;
+        return Object.keys(obj).length === 0;
     }
 
     return (
@@ -98,7 +99,7 @@ function CertificatesDashboard() {
                                 },
                             ];
                         }}
-                        redirect="../certificates"
+                        redirect="/certificates"
                     />
                 )}
                 {!isEmpty(dashboard?.certificateStatByValidationStatus) && (
@@ -124,7 +125,7 @@ function CertificatesDashboard() {
                                 },
                             ];
                         }}
-                        redirect="../certificates"
+                        redirect="/certificates"
                     />
                 )}
                 {!isEmpty(dashboard?.certificateStatByComplianceStatus) && (
@@ -146,7 +147,7 @@ function CertificatesDashboard() {
                                 },
                             ];
                         }}
-                        redirect="../certificates"
+                        redirect="/certificates"
                     />
                 )}
                 {!isEmpty(dashboard?.certificateStatByType) && (
@@ -158,7 +159,7 @@ function CertificatesDashboard() {
                             dispatch(filterActions.setPreservedFilters({ entity: EntityType.CERTIFICATE, preservedFilters: [] }));
                             return [];
                         }}
-                        redirect="../certificates"
+                        redirect="/certificates"
                     />
                 )}
                 {!isEmpty(dashboard?.certificateStatByExpiry) && (
@@ -228,7 +229,7 @@ function CertificatesDashboard() {
                                 },
                             ];
                         }}
-                        redirect="../certificates"
+                        redirect="/certificates"
                     />
                 )}
                 {!isEmpty(dashboard?.certificateStatByKeySize) && (
@@ -247,7 +248,7 @@ function CertificatesDashboard() {
                                 value: [Number(labels[index])],
                             },
                         ]}
-                        redirect="../certificates"
+                        redirect="/certificates"
                     />
                 )}
                 {!isEmpty(dashboard?.raProfileStatByCertificateCount) && (
@@ -277,7 +278,7 @@ function CertificatesDashboard() {
                                       },
                                   ]
                         }
-                        redirect="../certificates"
+                        redirect="/certificates"
                     />
                 )}
                 {!isEmpty(dashboard?.groupStatByCertificateCount) && (
@@ -307,7 +308,7 @@ function CertificatesDashboard() {
                                       },
                                   ];
                         }}
-                        redirect="../certificates"
+                        redirect="/certificates"
                     />
                 )}
                 {!isEmpty(dashboard?.certificateStatBySubjectType) && (
@@ -332,7 +333,7 @@ function CertificatesDashboard() {
                                 },
                             ];
                         }}
-                        redirect="../certificates"
+                        redirect="/certificates"
                     />
                 )}
             </div>

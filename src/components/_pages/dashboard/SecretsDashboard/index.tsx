@@ -29,7 +29,8 @@ function SecretsDashboard() {
     }, [dashboard?.secretStatByComplianceStatus]);
 
     function isEmpty(obj?: object) {
-        return typeof obj === 'object' && Object.keys(obj).length === 0;
+        if (!obj) return true;
+        return Object.keys(obj).length === 0;
     }
 
     return (
@@ -66,7 +67,7 @@ function SecretsDashboard() {
                                 },
                             ];
                         }}
-                        redirect="../secrets"
+                        redirect="/secrets"
                     />
                 )}
                 {!isEmpty(dashboard?.secretStatByType) && (
@@ -88,7 +89,7 @@ function SecretsDashboard() {
                                 },
                             ];
                         }}
-                        redirect="../secrets"
+                        redirect="/secrets"
                     />
                 )}
                 {!isEmpty(dashboard?.secretStatByComplianceStatus) && (
@@ -110,7 +111,7 @@ function SecretsDashboard() {
                                 },
                             ];
                         }}
-                        redirect="../secrets"
+                        redirect="/secrets"
                     />
                 )}
                 {!isEmpty(dashboard?.secretStatByVaultProfile) && (
@@ -140,7 +141,7 @@ function SecretsDashboard() {
                                       },
                                   ]
                         }
-                        redirect="../secrets"
+                        redirect="/secrets"
                     />
                 )}
                 {!isEmpty(dashboard?.secretStatByGroup) && (
@@ -168,7 +169,7 @@ function SecretsDashboard() {
                                       },
                                   ]
                         }
-                        redirect="../secrets"
+                        redirect="/secrets"
                     />
                 )}
             </div>
