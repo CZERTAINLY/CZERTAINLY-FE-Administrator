@@ -39,7 +39,7 @@ function SecretsDashboard() {
                     <CountBadge data={dashboard?.totalSecrets} title="Secrets" link="../secrets" />
                 </div>
                 <div className="flex-1">
-                    <CountBadge data={dashboard?.totalVaults} title="Vaults" link="../vaults" />
+                    <CountBadge data={dashboard?.totalVaultInstances} title="Vaults" link="../vaults" />
                 </div>
                 <div className="flex-1">
                     <CountBadge data={dashboard?.totalVaultProfiles} title="Vault Profiles" link="../vaultprofiles" />

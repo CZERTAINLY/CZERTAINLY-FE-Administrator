@@ -85,8 +85,6 @@ export function getCertificateStatusColor(
     switch (status) {
         case CertificateState.Requested:
             return '#3754a5';
-        case CertificateState.Archived:
-            return '#6c757d';
         case CertificateState.Rejected:
             return '#EF4444';
         case CertificateState.Issued:
@@ -187,7 +185,6 @@ export function useGetStatusText() {
                     return getEnumLabel(certificateValidationStatusEnum, status);
 
                 case CertificateState.Revoked:
-                case CertificateState.Archived:
                 case CertificateState.Requested:
                 case CertificateState.Rejected:
                 case CertificateState.Issued:
