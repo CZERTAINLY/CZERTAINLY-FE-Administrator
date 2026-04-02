@@ -169,17 +169,44 @@ describe('SecretDetail compliance integration', () => {
             users: COMMON_USERS_STATE,
             certificateGroups: COMMON_GROUPS_STATE,
             vaultProfiles: COMMON_VAULT_PROFILES_STATE,
+            approvals: {
+                approvals: [
+                    {
+                        approvalUuid: 'apr-1',
+                        approvalProfileUuid: 'ap-1',
+                        approvalProfileName: 'Approval One',
+                        status: 'PENDING',
+                        creatorUuid: 'user-1',
+                        creatorUsername: 'owner1',
+                        resource: Resource.Secrets,
+                        resourceAction: 'UPDATE',
+                        objectUuid: 'sec-1',
+                        createdAt: '2026-01-02T00:00:00Z',
+                        closedAt: null,
+                    },
+                ],
+                approvalsTotalItems: 1,
+                userApprovals: [],
+                userApprovalsTotalItems: 0,
+                isApproving: false,
+                isRejecting: false,
+                isFetchingDetail: false,
+                isFetchingList: false,
+                isFetchingUserList: false,
+            },
         } as any;
 
         useSelectorMock.mockImplementation((selector: any) => selector(state));
     });
 
-    it('shows compliance status in details and renders validation tab compliance widget', async () => {
+    it('shows compliance status, approvals tab, and renders validation tab compliance widget', async () => {
         await act(async () => {
             root.render(<SecretDetail />);
         });
 
         expect(container.querySelector('[data-testid="row-complianceStatus"]')?.textContent).toContain('Compliance Status');
+        expect(container.querySelector('[data-testid="tab-Approvals"]')?.textContent).toContain('apr-1');
+        expect(container.querySelector('[data-testid="tab-Approvals"]')?.textContent).toContain('Approval One');
         expect(container.querySelector('[data-testid="tab-Validation"]')?.textContent).toContain('resource:secrets');
     });
 

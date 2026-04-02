@@ -19,6 +19,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import ComplianceCheckResultWidget from 'components/_pages/certificates/ComplianceCheckResultWidget/ComplianceCheckResultWidget';
 import CertificateStatus from 'components/_pages/certificates/CertificateStatus';
 
+import { actions as approvalActions, selectors as approvalSelectors } from 'ducks/approvals';
 import { actions as groupActions, selectors as groupSelectors } from 'ducks/certificateGroups';
 import { actions as complianceProfileActions } from 'ducks/compliance-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -27,7 +28,7 @@ import { actions as userActions, selectors as userSelectors } from 'ducks/users'
 import { actions as vaultProfileActions, selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { ComplianceStatus, PlatformEnum, Resource, SyncVaultProfileDto } from 'types/openapi';
+import { ComplianceStatus, PlatformEnum, Resource, SecretState, SyncVaultProfileDto } from 'types/openapi';
 import { AttributeResponseModel } from 'types/attributes';
 
 import { dateFormatter } from 'utils/dateUtil';
@@ -47,6 +48,8 @@ function SecretDetail() {
     const isFetchingDetail = useSelector(secretsSelectors.isFetchingDetail);
     const isDeleting = useSelector(secretsSelectors.isDeleting);
     const isUpdating = useSelector(secretsSelectors.isUpdating);
+    const approvals = useSelector(approvalSelectors.approvals);
+    const isFetchingApprovals = useSelector(approvalSelectors.isFetchingList);
 
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const secretTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.SecretType));
@@ -83,10 +86,22 @@ function SecretDetail() {
         dispatch(vaultProfileActions.listVaultProfiles({ pageNumber: 1, itemsPerPage: 100, filters: [] }));
     }, [dispatch, id]);
 
+    const getFreshSecretApprovals = useCallback(() => {
+        dispatch(
+            approvalActions.listApprovals({
+                pageNumber: 1,
+                itemsPerPage: 100,
+            }),
+        );
+    }, [dispatch]);
+
+    useEffect(() => {
+        getFreshSecretApprovals();
+    }, [getFreshSecretApprovals]);
+
     useEffect(() => {
         getFreshSecretDetails();
     }, [getFreshSecretDetails]);
-
     const onDeleteConfirmed = useCallback(() => {
         if (!secret) return;
         dispatch(secretsActions.deleteSecret({ uuid: secret.uuid }));
@@ -177,8 +192,14 @@ function SecretDetail() {
                 onClick: () => setConfirmDisable(true),
             },
             {
-                icon: 'pencil',
+                icon: 'gavel',
                 disabled: !secret,
+                tooltip: 'Check Compliance',
+                onClick: () => setComplianceCheck(true),
+            },
+            {
+                icon: 'pencil',
+                disabled: !secret || secret.state === SecretState.PendingApproval,
                 tooltip: 'Edit',
                 onClick: () => {
                     setIsEditSecretOpen(true);
@@ -189,12 +210,6 @@ function SecretDetail() {
                 disabled: !secret,
                 tooltip: 'Delete',
                 onClick: () => setConfirmDelete(true),
-            },
-            {
-                icon: 'gavel',
-                disabled: !secret,
-                tooltip: 'Check Compliance',
-                onClick: () => setComplianceCheck(true),
             },
         ],
         [secret],
@@ -372,6 +387,50 @@ function SecretDetail() {
                 columns: [v.version.toString(), v.createdAt ? dateFormatter(v.createdAt) : '', v.fingerprint ?? ''],
             })),
         [versions],
+    );
+
+    const approvalsHeaders: TableHeader[] = useMemo(
+        () => [
+            { id: 'approvalUUID', content: 'Approval UUID' },
+            { id: 'approvalProfile', content: 'Approval Profile' },
+            { id: 'status', content: 'Status' },
+            { id: 'requestedBy', content: 'Requested By' },
+            { id: 'resource', content: 'Resource' },
+            { id: 'action', content: 'Action' },
+            { id: 'createdAt', content: 'Created At' },
+            { id: 'closedAt', content: 'Closed At' },
+        ],
+        [],
+    );
+
+    const approvalsData: TableDataRow[] = useMemo(
+        () =>
+            approvals
+                .filter((approval) => approval.resource === Resource.Secrets && approval.objectUuid === id)
+                .map((approval) => ({
+                    id: approval.approvalUuid,
+                    columns: [
+                        <Link key="uuid" to={`/${Resource.Approvals.toLowerCase()}/detail/${approval.approvalUuid}`}>
+                            {approval.approvalUuid}
+                        </Link>,
+                        <Link key="profile" to={`/${Resource.ApprovalProfiles.toLowerCase()}/detail/${approval.approvalProfileUuid}`}>
+                            {approval.approvalProfileName}
+                        </Link>,
+                        approval.status,
+                        approval.creatorUsername ? (
+                            <Link key="creator" to={`/${Resource.Users.toLowerCase()}/detail/${approval.creatorUuid}`}>
+                                {approval.creatorUsername}
+                            </Link>
+                        ) : (
+                            'Unassigned'
+                        ),
+                        getEnumLabel(resourceEnum, approval.resource),
+                        approval.resourceAction || '',
+                        approval.createdAt ? dateFormatter(approval.createdAt) : '',
+                        approval.closedAt ? dateFormatter(approval.closedAt) : '',
+                    ],
+                })),
+        [approvals, id, resourceEnum],
     );
 
     const otherPropertiesHeaders: TableHeader[] = useMemo(
@@ -557,6 +616,19 @@ function SecretDetail() {
                             {
                                 title: 'Versions',
                                 content: <CustomTable headers={versionsHeaders} data={versionsData} />,
+                            },
+                            {
+                                title: 'Approvals',
+                                content: (
+                                    <Widget
+                                        title="Secret Approvals"
+                                        titleSize="large"
+                                        busy={isFetchingApprovals}
+                                        refreshAction={getFreshSecretApprovals}
+                                    >
+                                        <CustomTable headers={approvalsHeaders} data={approvalsData} />
+                                    </Widget>
+                                ),
                             },
                             {
                                 title: 'Validation',

@@ -104,6 +104,10 @@ describe('VaultProfileDetail compliance integration', () => {
                 associatedComplianceProfiles: [{ uuid: 'cp-1', name: 'Compliance A', description: 'A' }],
                 isFetchingAssociatedComplianceProfiles: false,
             },
+            approvalProfiles: {
+                associatedApprovalProfiles: [{ uuid: 'ap-1', name: 'Approval A', description: 'A', expiry: 24 }],
+                isFetchingAssociatedApprovalProfiles: false,
+            },
             users: COMMON_USERS_STATE,
             enums: {
                 platformEnums: {

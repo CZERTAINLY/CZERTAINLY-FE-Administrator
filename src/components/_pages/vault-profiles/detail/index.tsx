@@ -13,6 +13,7 @@ import Widget from 'components/Widget';
 import WidgetButtons from 'components/WidgetButtons';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
+import { actions as approvalProfileActions, selectors as approvalProfileSelectors } from 'ducks/approval-profiles';
 import { actions as complianceProfileActions, selectors as complianceProfileSelectors } from 'ducks/compliance-profiles';
 import { actions as vaultProfileActions, selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -21,6 +22,7 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import VaultProfileEditForm from '../edit-form';
+import AssociateApprovalProfileDialogBody from '../AssociateApprovalProfileDialogBody';
 import AssociateComplianceProfileDialogBody from '../AssociateComplianceProfileDialogBody';
 
 function VaultProfileDetail() {
@@ -33,6 +35,8 @@ function VaultProfileDetail() {
     const isEnabling = useSelector(vaultProfileSelectors.isEnabling);
     const isDisabling = useSelector(vaultProfileSelectors.isDisabling);
     const isDeleting = useSelector(vaultProfileSelectors.isDeleting);
+    const associatedApprovalProfiles = useSelector(approvalProfileSelectors.associatedApprovalProfiles);
+    const isFetchingAssociatedApprovalProfiles = useSelector(approvalProfileSelectors.isFetchingAssociatedApprovalProfiles);
     const associatedComplianceProfiles = useSelector(complianceProfileSelectors.associatedComplianceProfiles);
     const isFetchingAssociatedComplianceProfiles = useSelector(complianceProfileSelectors.isFetchingAssociatedComplianceProfiles);
 
@@ -40,6 +44,7 @@ function VaultProfileDetail() {
 
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
+    const [associateApprovalProfile, setAssociateApprovalProfile] = useState(false);
     const [associateComplianceProfile, setAssociateComplianceProfile] = useState(false);
     const [complianceCheck, setComplianceCheck] = useState(false);
 
@@ -57,6 +62,20 @@ function VaultProfileDetail() {
     useEffect(() => {
         getFreshDetails();
     }, [getFreshDetails]);
+
+    const getFreshAssociatedApprovalProfiles = useCallback(() => {
+        if (!vaultProfileUuid) return;
+        dispatch(
+            approvalProfileActions.getAssociatedApprovalProfilesForResource({
+                resource: Resource.VaultProfiles,
+                associationObjectUuid: vaultProfileUuid,
+            }),
+        );
+    }, [dispatch, vaultProfileUuid]);
+
+    useEffect(() => {
+        getFreshAssociatedApprovalProfiles();
+    }, [getFreshAssociatedApprovalProfiles]);
 
     const getFreshComplianceDetails = useCallback(() => {
         if (!vaultProfileUuid) return;
@@ -132,6 +151,21 @@ function VaultProfileDetail() {
         [dispatch, profile],
     );
 
+    const onDissociateApprovalProfile = useCallback(
+        (uuid: string) => {
+            if (!vaultProfileUuid) return;
+
+            dispatch(
+                approvalProfileActions.dissociateApprovalProfileFromResource({
+                    uuid,
+                    resource: Resource.VaultProfiles,
+                    associationObjectUuid: vaultProfileUuid,
+                }),
+            );
+        },
+        [dispatch, vaultProfileUuid],
+    );
+
     const widgetButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
@@ -147,6 +181,12 @@ function VaultProfileDetail() {
                 onClick: onDisapprove,
             },
             {
+                icon: 'gavel',
+                disabled: !profile,
+                tooltip: 'Check Compliance',
+                onClick: () => setComplianceCheck(true),
+            },
+            {
                 icon: 'pencil',
                 disabled: !profile,
                 tooltip: 'Edit',
@@ -157,12 +197,6 @@ function VaultProfileDetail() {
                 disabled: !profile,
                 tooltip: 'Delete',
                 onClick: () => setConfirmDelete(true),
-            },
-            {
-                icon: 'gavel',
-                disabled: !profile,
-                tooltip: 'Check Compliance',
-                onClick: () => setComplianceCheck(true),
             },
         ],
         [profile, onApprove, onDisapprove],
@@ -176,6 +210,19 @@ function VaultProfileDetail() {
                 tooltip: 'Associate Compliance Profile',
                 onClick: () => setAssociateComplianceProfile(true),
                 id: 'associate-compliance-profile',
+            },
+        ],
+        [profile],
+    );
+
+    const approvalProfileButtons: WidgetButtonProps[] = useMemo(
+        () => [
+            {
+                icon: 'plus',
+                disabled: !profile,
+                tooltip: 'Associate Approval Profile',
+                onClick: () => setAssociateApprovalProfile(true),
+                id: 'associate-approval-profile',
             },
         ],
         [profile],
@@ -225,6 +272,55 @@ function VaultProfileDetail() {
                       ],
                   })),
         [associatedComplianceProfiles, onDissociateComplianceProfile],
+    );
+
+    const approvalProfileHeaders: TableHeader[] = useMemo(
+        () => [
+            {
+                id: 'approvalProfileName',
+                content: 'Name',
+            },
+            {
+                id: 'description',
+                content: 'Description',
+            },
+            {
+                id: 'expiry',
+                content: 'Expiry (in hours)',
+            },
+            {
+                id: 'action',
+                content: 'Action',
+            },
+        ],
+        [],
+    );
+
+    const approvalProfileData: TableDataRow[] = useMemo(
+        () =>
+            !associatedApprovalProfiles
+                ? []
+                : associatedApprovalProfiles.map((approvalProfile) => ({
+                      id: approvalProfile.uuid,
+                      columns: [
+                          <Link to={`/${Resource.ApprovalProfiles.toLowerCase()}/detail/${approvalProfile.uuid}`}>
+                              {approvalProfile.name}
+                          </Link>,
+                          approvalProfile.description || '',
+                          approvalProfile.expiry ? approvalProfile.expiry.toString() : '',
+                          <WidgetButtons
+                              buttons={[
+                                  {
+                                      icon: 'minus-square',
+                                      disabled: false,
+                                      tooltip: 'Remove',
+                                      onClick: () => onDissociateApprovalProfile(approvalProfile.uuid),
+                                  },
+                              ]}
+                          />,
+                      ],
+                  })),
+        [associatedApprovalProfiles, onDissociateApprovalProfile],
     );
 
     const detailData: TableDataRow[] = useMemo(
@@ -303,13 +399,25 @@ function VaultProfileDetail() {
                             >
                                 <CustomTable headers={complianceProfileHeaders} data={complianceProfileData} />
                             </Widget>
-
-                            {profile?.attributes && profile.attributes.length > 0 && (
-                                <Widget title="Attributes" titleSize="large">
-                                    <AttributeViewer attributes={profile.attributes} />
-                                </Widget>
-                            )}
                         </Container>
+                    </Container>
+
+                    <Container className="grid gap-6 xl:grid-cols-2 items-start">
+                        <Widget title="Attributes" titleSize="large">
+                            <AttributeViewer attributes={profile?.attributes ?? []} />
+                        </Widget>
+
+                        <Widget
+                            title="Approval Profiles"
+                            busy={isFetchingAssociatedApprovalProfiles}
+                            widgetButtons={approvalProfileButtons}
+                            titleSize="large"
+                            refreshAction={getFreshAssociatedApprovalProfiles}
+                            widgetLockName={LockWidgetNameEnum.ListOfApprovalProfiles}
+                            lockSize="large"
+                        >
+                            <CustomTable headers={approvalProfileHeaders} data={approvalProfileData} />
+                        </Widget>
                     </Container>
 
                     {profile && (
@@ -380,6 +488,30 @@ function VaultProfileDetail() {
                 toggle={() => setAssociateComplianceProfile(false)}
                 buttons={[]}
                 dataTestId="associate-compliance-profile-dialog"
+            />
+
+            <Dialog
+                isOpen={associateApprovalProfile}
+                caption="Associate Approval Profile"
+                body={
+                    <AssociateApprovalProfileDialogBody
+                        visible={associateApprovalProfile}
+                        onClose={() => setAssociateApprovalProfile(false)}
+                        resource={Resource.VaultProfiles}
+                        resourceObject={
+                            profile
+                                ? {
+                                      uuid: profile.uuid,
+                                      name: profile.name,
+                                  }
+                                : undefined
+                        }
+                        availableApprovalProfileUuids={associatedApprovalProfiles.map((p) => p.uuid)}
+                    />
+                }
+                toggle={() => setAssociateApprovalProfile(false)}
+                buttons={[]}
+                dataTestId="associate-approval-profile-dialog"
             />
 
             <Dialog
