@@ -5,7 +5,11 @@ import { createRoot, Root } from 'react-dom/client';
 import SecretDetail from './index';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { COMMON_GROUPS_STATE, COMMON_USERS_STATE, COMMON_VAULT_PROFILES_STATE } from '../../test-utils/mockModules';
-import { clickByTestId, clickByText, clickByTitle } from '../../test-utils/domActions';
+import { clickByText, clickByTitle } from '../../test-utils/domActions';
+import {
+    expectSecretOwnerGroupVaultDispatchCalls,
+    runSecretOwnerGroupVaultUpdateActions,
+} from '../../test-utils/secretOwnerGroupVaultActions';
 
 (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -232,54 +236,19 @@ describe('SecretDetail compliance integration', () => {
             root.render(<SecretDetail />);
         });
 
-        await clickByTitle(container, 'Update Owner');
-        await clickByTestId(container, 'select-secret-owner-detail');
-        await clickByText(container, 'Update');
+        await runSecretOwnerGroupVaultUpdateActions(container, {
+            ownerTitle: 'Update Owner',
+            ownerSelectTestId: 'select-secret-owner-detail',
+            groupsTitle: 'Update Groups',
+            groupsSelectTestId: 'select-secret-groups-detail',
+            sourceVaultTitle: 'Update Source Vault Profile',
+            sourceVaultSelectTestId: 'select-secret-vault-profile-detail',
+        });
 
-        await clickByTitle(container, 'Update Owner');
-        await clickByText(container, 'Remove');
-
-        await clickByTitle(container, 'Update Groups');
-        await clickByTestId(container, 'select-secret-groups-detail');
-        await clickByText(container, 'Update');
-
-        await clickByTitle(container, 'Update Groups');
-        await clickByText(container, 'Clear');
-
-        await clickByTitle(container, 'Update Source Vault Profile');
-        await clickByTestId(container, 'select-secret-vault-profile-detail');
-        await clickByText(container, 'Update');
-
-        expect(dispatch).toHaveBeenCalledWith(
-            expect.objectContaining({
-                type: 'secrets/updateSecretObjects',
-                payload: { uuid: 'sec-1', update: { ownerUuid: 'user-1' } },
-            }),
-        );
-        expect(dispatch).toHaveBeenCalledWith(
-            expect.objectContaining({
-                type: 'secrets/updateSecretObjects',
-                payload: { uuid: 'sec-1', update: { ownerUuid: '' } },
-            }),
-        );
-        expect(dispatch).toHaveBeenCalledWith(
-            expect.objectContaining({
-                type: 'secrets/updateSecretObjects',
-                payload: { uuid: 'sec-1', update: { groupUuids: ['group-1'] } },
-            }),
-        );
-        expect(dispatch).toHaveBeenCalledWith(
-            expect.objectContaining({
-                type: 'secrets/updateSecretObjects',
-                payload: { uuid: 'sec-1', update: { groupUuids: [] } },
-            }),
-        );
-        expect(dispatch).toHaveBeenCalledWith(
-            expect.objectContaining({
-                type: 'secrets/updateSecretObjects',
-                payload: { uuid: 'sec-1', update: { sourceVaultProfileUuid: 'vp-2' } },
-            }),
-        );
+        expectSecretOwnerGroupVaultDispatchCalls(dispatch, {
+            uuid: 'sec-1',
+            sourceVaultProfileUuid: 'vp-2',
+        });
     });
 
     it('dispatches enable action when secret is disabled and opens add sync vault profile dialog', async () => {

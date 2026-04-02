@@ -13,7 +13,7 @@ import { actions, selectors } from 'ducks/compliance-profiles';
 import cn from 'classnames';
 
 import { Resource } from 'types/openapi';
-import { buildValidationRules } from 'utils/validators-helper';
+import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { validateRequired } from 'utils/validators';
 
 interface ResourceObject {
@@ -96,44 +96,40 @@ export default function AssociateComplianceProfileDialogBody({
                         name="complianceProfileUuid"
                         control={control}
                         rules={buildValidationRules([validateRequired()])}
-                        render={({ field, fieldState }) => (
-                            <div className="mb-4">
-                                <Label htmlFor="complianceProfile" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
-                                    Select Compliance profile
-                                </Label>
+                        render={({ field, fieldState }) => {
+                            const fieldError = getFieldErrorMessage(fieldState, 'Required Field');
 
-                                <Select
-                                    id="associate-compliance-profile-select"
-                                    options={optionsForComplianceProfiles}
-                                    value={field.value || ''}
-                                    onChange={(value) => field.onChange(value as string | undefined)}
-                                    placeholder="Select Compliance profile to be associated"
-                                    className={cn({
-                                        'border-red-500': fieldState.error && fieldState.isTouched,
-                                    })}
-                                />
+                            return (
+                                <div className="mb-4">
+                                    <Label
+                                        htmlFor="complianceProfile"
+                                        className="block text-sm font-medium mb-2 text-gray-700 dark:text-white"
+                                    >
+                                        Select Compliance profile
+                                    </Label>
 
-                                {fieldState.error && fieldState.isTouched && (
-                                    <p className="mt-1 text-sm text-red-600">
-                                        {typeof fieldState.error === 'string'
-                                            ? fieldState.error
-                                            : fieldState.error?.message || 'Required Field'}
-                                    </p>
-                                )}
-                            </div>
-                        )}
+                                    <Select
+                                        id="associate-compliance-profile-select"
+                                        options={optionsForComplianceProfiles}
+                                        value={field.value || ''}
+                                        onChange={(value) => field.onChange(value as string | undefined)}
+                                        placeholder="Select Compliance profile to be associated"
+                                        className={cn({
+                                            'border-red-500': !!fieldError,
+                                        })}
+                                    />
+
+                                    {fieldError && <p className="mt-1 text-sm text-red-600">{fieldError}</p>}
+                                </div>
+                            );
+                        }}
                     />
 
                     <Container className="flex-row justify-end modal-footer" gap={4}>
                         <Button type="button" variant="outline" color="secondary" disabled={formState.isSubmitting} onClick={onClose}>
                             Cancel
                         </Button>
-                        <Button
-                            type="submit"
-                            color="primary"
-                            disabled={formState.isSubmitting || !formState.isValid}
-                            onClick={handleSubmit(onSubmit)}
-                        >
+                        <Button type="submit" color="primary" disabled={formState.isSubmitting || !formState.isValid}>
                             Associate
                         </Button>
                     </Container>

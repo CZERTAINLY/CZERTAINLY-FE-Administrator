@@ -5,7 +5,11 @@ import { createRoot, Root } from 'react-dom/client';
 import SecretsList from './index';
 import { EntityType } from 'ducks/filters';
 import { COMMON_GROUPS_STATE, COMMON_USERS_STATE, COMMON_VAULT_PROFILES_STATE } from '../../test-utils/mockModules';
-import { clickByTestId, clickByText, clickByTitle } from '../../test-utils/domActions';
+import { clickByText, clickByTitle } from '../../test-utils/domActions';
+import {
+    expectSecretOwnerGroupVaultDispatchCalls,
+    runSecretOwnerGroupVaultUpdateActions,
+} from '../../test-utils/secretOwnerGroupVaultActions';
 
 (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -173,68 +177,18 @@ describe('SecretsList compliance integration', () => {
             root.render(<SecretsList />);
         });
 
-        await clickByTitle(container, 'Override Owner');
-        await clickByTestId(container, 'select-secret-owner');
-        await clickByText(container, 'Update');
+        await runSecretOwnerGroupVaultUpdateActions(container, {
+            ownerTitle: 'Override Owner',
+            ownerSelectTestId: 'select-secret-owner',
+            groupsTitle: 'Override Groups',
+            groupsSelectTestId: 'select-secret-groups-update',
+            sourceVaultTitle: 'Override Source Vault Profile',
+            sourceVaultSelectTestId: 'select-secret-vault-profile',
+        });
 
-        await clickByTitle(container, 'Override Owner');
-        await clickByText(container, 'Remove');
-
-        await clickByTitle(container, 'Override Groups');
-        await clickByTestId(container, 'select-secret-groups-update');
-        await clickByText(container, 'Update');
-
-        await clickByTitle(container, 'Override Groups');
-        await clickByText(container, 'Clear');
-
-        await clickByTitle(container, 'Override Source Vault Profile');
-        await clickByTestId(container, 'select-secret-vault-profile');
-        await clickByText(container, 'Update');
-
-        expect(dispatch).toHaveBeenCalledWith(
-            expect.objectContaining({
-                type: 'secrets/updateSecretObjects',
-                payload: {
-                    uuid: 'sec-1',
-                    update: { ownerUuid: 'user-1' },
-                },
-            }),
-        );
-        expect(dispatch).toHaveBeenCalledWith(
-            expect.objectContaining({
-                type: 'secrets/updateSecretObjects',
-                payload: {
-                    uuid: 'sec-1',
-                    update: { ownerUuid: '' },
-                },
-            }),
-        );
-        expect(dispatch).toHaveBeenCalledWith(
-            expect.objectContaining({
-                type: 'secrets/updateSecretObjects',
-                payload: {
-                    uuid: 'sec-1',
-                    update: { groupUuids: ['group-1'] },
-                },
-            }),
-        );
-        expect(dispatch).toHaveBeenCalledWith(
-            expect.objectContaining({
-                type: 'secrets/updateSecretObjects',
-                payload: {
-                    uuid: 'sec-1',
-                    update: { groupUuids: [] },
-                },
-            }),
-        );
-        expect(dispatch).toHaveBeenCalledWith(
-            expect.objectContaining({
-                type: 'secrets/updateSecretObjects',
-                payload: {
-                    uuid: 'sec-1',
-                    update: { sourceVaultProfileUuid: 'vp-2' },
-                },
-            }),
-        );
+        expectSecretOwnerGroupVaultDispatchCalls(dispatch, {
+            uuid: 'sec-1',
+            sourceVaultProfileUuid: 'vp-2',
+        });
     });
 });
