@@ -250,10 +250,9 @@ export default function TokenForm({ tokenId, onCancel, onSuccess }: TokenFormPro
                     tokenActions.updateToken({
                         uuid: id!,
                         updateToken: {
-                            name: '',
-                            kind: '',
-                            connectorUuid: '',
-                            description: values.name,
+                            name: token?.name || '',
+                            kind: tokenDetail?.kind || '',
+                            connectorUuid: token?.connectorUuid || '',
                             attributes: collectFormAttributes(
                                 'token',
                                 [...(tokenProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
@@ -279,7 +278,16 @@ export default function TokenForm({ tokenId, onCancel, onSuccess }: TokenFormPro
                 );
             }
         },
-        [editMode, dispatch, id, tokenProviderAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes],
+        [
+            editMode,
+            dispatch,
+            id,
+            token,
+            tokenDetail,
+            tokenProviderAttributeDescriptors,
+            groupAttributesCallbackAttributes,
+            resourceCustomAttributes,
+        ],
     );
 
     const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
