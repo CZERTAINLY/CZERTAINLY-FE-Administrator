@@ -4,9 +4,12 @@ import { SecretState } from 'types/openapi';
 
 const stateColorMap: Record<SecretState, BadgeColor> = {
     [SecretState.Active]: 'success',
-    [SecretState.Inactive]: 'danger',
+    [SecretState.Inactive]: 'gray',
     [SecretState.Revoked]: 'secondary',
     [SecretState.Expired]: 'transparent',
+    [SecretState.Failed]: 'danger',
+    [SecretState.PendingApproval]: 'info',
+    [SecretState.Rejected]: 'danger',
 };
 
 interface Props {

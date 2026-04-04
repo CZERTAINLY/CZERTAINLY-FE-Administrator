@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
 import { actions, selectors } from 'ducks/users';
+import { selectors as authSelectors } from 'ducks/auth';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
@@ -19,6 +20,7 @@ export default function UsersList() {
 
     const checkedRows = useSelector(selectors.usersListCheckedRows);
     const users = useSelector(selectors.users);
+    const profile = useSelector(authSelectors.profile);
 
     const isFetching = useSelector(selectors.isFetchingList);
     const isDeleting = useSelector(selectors.isDeleting);
@@ -95,19 +97,25 @@ export default function UsersList() {
         });
     }, [checkedRows, users]);
 
+    const isCurrentUserSelected = useMemo(() => {
+        return checkedRows.some((uuid) => uuid === profile?.uuid);
+    }, [checkedRows, profile]);
+
     const canEnable: boolean = useMemo(() => {
         if (checkedRows.length === 0) return false;
+        if (isCurrentUserSelected) return false;
         if (checkedRows.length > 1) return true;
         const user = users.find((user) => user.uuid === checkedRows[0]);
         if (user && !user.enabled) return true;
         return false;
-    }, [checkedRows, users]);
+    }, [checkedRows, users, isCurrentUserSelected]);
 
     const canDisable: boolean = useMemo(() => {
+        if (isCurrentUserSelected) return false;
         if (checkedRows.length > 1) return true;
         const user = users.find((user) => user.uuid === checkedRows[0]);
         return (user && user.enabled) || false;
-    }, [checkedRows, users]);
+    }, [checkedRows, users, isCurrentUserSelected]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -119,30 +127,39 @@ export default function UsersList() {
             },
             {
                 icon: 'trash',
-                disabled: checkedRows.length === 0 || isSystemUserSelected,
-                tooltip: 'Delete',
+                disabled: checkedRows.length === 0 || isSystemUserSelected || isCurrentUserSelected,
+                tooltip: isCurrentUserSelected ? 'You cannot delete your own account' : 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
                 icon: 'check',
-                disabled: isSystemUserSelected || !canEnable,
-                tooltip: 'Enable',
+                disabled: isSystemUserSelected || isCurrentUserSelected || !canEnable,
+                tooltip: isCurrentUserSelected ? 'You cannot enable your own account' : 'Enable',
                 onClick: () => {
                     onEnableClick();
                 },
             },
             {
                 icon: 'times',
-                disabled: isSystemUserSelected || !canDisable,
-                tooltip: 'Disable',
+                disabled: isSystemUserSelected || isCurrentUserSelected || !canDisable,
+                tooltip: isCurrentUserSelected ? 'You cannot disable your own account' : 'Disable',
                 onClick: () => {
                     onDisableClick();
                 },
             },
         ],
-        [checkedRows.length, isSystemUserSelected, canEnable, canDisable, handleOpenAddModal, onEnableClick, onDisableClick],
+        [
+            checkedRows.length,
+            isSystemUserSelected,
+            isCurrentUserSelected,
+            canEnable,
+            canDisable,
+            handleOpenAddModal,
+            onEnableClick,
+            onDisableClick,
+        ],
     );
 
     const userTableHeader: TableHeader[] = useMemo(
