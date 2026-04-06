@@ -9,6 +9,7 @@ import { extractError } from 'utils/net';
 import { slice } from './approval-profiles';
 import {
     transformProfileApprovalDetailDtoToModel,
+    transformProfileApprovalDtoToModel,
     transformProfileApprovalRequestDtoToModel,
     transformProfileApprovalUpdateRequestDtoToModel,
 } from './transform/approval-profiles';
@@ -145,6 +146,112 @@ const editApprovalProfile: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const epics = [getApprovalProfile, createApprovalProfile, listApprovalProfiles, deleteApprovalProfile, editApprovalProfile];
+const getAssociatedApprovalProfilesForResource: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getAssociatedApprovalProfilesForResource.match),
+        switchMap((action) =>
+            deps.apiClients.approvalProfiles
+                .getAssociatedApprovalProfiles1({
+                    resource: action.payload.resource,
+                    associationObjectUuid: action.payload.associationObjectUuid,
+                })
+                .pipe(
+                    switchMap((approvalProfiles) =>
+                        of(
+                            slice.actions.getAssociatedApprovalProfilesForResourceSuccess({
+                                approvalProfiles: approvalProfiles.map(transformProfileApprovalDtoToModel),
+                            }),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfApprovalProfiles),
+                        ),
+                    ),
+                    catchError((err) =>
+                        of(
+                            userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfApprovalProfiles),
+                            slice.actions.getAssociatedApprovalProfilesForResourceFailure({
+                                error: extractError(err, 'Failed to get associated Approval Profiles'),
+                            }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const associateApprovalProfileToResource: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.associateApprovalProfileToResource.match),
+        switchMap((action) =>
+            deps.apiClients.approvalProfiles
+                .associateApprovalProfile({
+                    uuid: action.payload.uuid,
+                    resource: action.payload.resource,
+                    associationObjectUuid: action.payload.associationObjectUuid,
+                })
+                .pipe(
+                    switchMap(() =>
+                        of(
+                            slice.actions.associateApprovalProfileToResourceSuccess(action.payload),
+                            slice.actions.getAssociatedApprovalProfilesForResource({
+                                resource: action.payload.resource,
+                                associationObjectUuid: action.payload.associationObjectUuid,
+                            }),
+                        ),
+                    ),
+                    catchError((err) =>
+                        of(
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to associate Approval Profile' }),
+                            slice.actions.associateApprovalProfileToResourceFailure({
+                                error: extractError(err, 'Failed to associate Approval Profile'),
+                            }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const dissociateApprovalProfileFromResource: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.dissociateApprovalProfileFromResource.match),
+        switchMap((action) =>
+            deps.apiClients.approvalProfiles
+                .disassociateApprovalProfile({
+                    uuid: action.payload.uuid,
+                    resource: action.payload.resource,
+                    associationObjectUuid: action.payload.associationObjectUuid,
+                })
+                .pipe(
+                    switchMap(() =>
+                        of(
+                            slice.actions.dissociateApprovalProfileFromResourceSuccess(action.payload),
+                            slice.actions.getAssociatedApprovalProfilesForResource({
+                                resource: action.payload.resource,
+                                associationObjectUuid: action.payload.associationObjectUuid,
+                            }),
+                        ),
+                    ),
+                    catchError((err) =>
+                        of(
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to disassociate Approval Profile' }),
+                            slice.actions.dissociateApprovalProfileFromResourceFailure({
+                                error: extractError(err, 'Failed to disassociate Approval Profile'),
+                            }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const epics = [
+    getApprovalProfile,
+    createApprovalProfile,
+    listApprovalProfiles,
+    deleteApprovalProfile,
+    editApprovalProfile,
+    getAssociatedApprovalProfilesForResource,
+    associateApprovalProfileToResource,
+    dissociateApprovalProfileFromResource,
+];
 
 export default epics;
