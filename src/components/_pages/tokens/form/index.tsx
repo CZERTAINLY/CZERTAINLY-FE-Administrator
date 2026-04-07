@@ -246,14 +246,17 @@ export default function TokenForm({ tokenId, onCancel, onSuccess }: TokenFormPro
     const onSubmit = useCallback(
         (values: FormValues) => {
             if (editMode) {
+                if (!tokenDetail?.name || !tokenDetail?.kind || !tokenDetail?.connectorUuid) {
+                    dispatch(alertActions.error('Token detail is incomplete. Please reload the page and try again.'));
+                    return;
+                }
                 dispatch(
                     tokenActions.updateToken({
                         uuid: id!,
                         updateToken: {
-                            name: '',
-                            kind: '',
-                            connectorUuid: '',
-                            description: values.name,
+                            name: tokenDetail.name,
+                            kind: tokenDetail.kind,
+                            connectorUuid: tokenDetail.connectorUuid,
                             attributes: collectFormAttributes(
                                 'token',
                                 [...(tokenProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
@@ -279,7 +282,15 @@ export default function TokenForm({ tokenId, onCancel, onSuccess }: TokenFormPro
                 );
             }
         },
-        [editMode, dispatch, id, tokenProviderAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes],
+        [
+            editMode,
+            dispatch,
+            id,
+            tokenDetail,
+            tokenProviderAttributeDescriptors,
+            groupAttributesCallbackAttributes,
+            resourceCustomAttributes,
+        ],
     );
 
     const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);

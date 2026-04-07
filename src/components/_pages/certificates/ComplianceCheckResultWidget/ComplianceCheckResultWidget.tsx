@@ -90,7 +90,6 @@ export default function ComplianceCheckResultWidget({ widgetLockName, objectUuid
         >
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span>Status:</span>
                     <CertificateStatus badgeSize="medium" status={(complianceCheckResult?.status as ComplianceStatus) || ''} />
                 </div>
                 {complianceCheckResult?.timestamp && (

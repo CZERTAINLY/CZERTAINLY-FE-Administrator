@@ -23,7 +23,7 @@ test.describe('Sidebar', () => {
     test('with allowedResources shows matching headerLink item', async ({ mount }) => {
         const store = createMockStore();
         const component = await mount(withProviders(<Sidebar allowedResources={[Resource.Certificates]} />, { store, initialRoute: '/' }));
-        await expect(component.getByRole('link', { name: 'Certificates' })).toBeVisible();
+        await expect(component.getByRole('link', { name: 'Certificates', exact: true })).toBeVisible();
     });
 
     test('with allowedResources shows section with children', async ({ mount }) => {
@@ -70,7 +70,7 @@ test.describe('Sidebar', () => {
         await component.getByRole('button', { name: 'Access Control' }).click();
         const flying = component.getByRole('region', { name: 'Sidebar menu' });
         await expect(flying).toBeAttached();
-        await flying.getByRole('link', { name: 'Certificates' }).click();
+        await flying.getByRole('link', { name: 'Certificates', exact: true }).click();
         await expect(flying).not.toBeAttached();
     });
 
@@ -100,8 +100,8 @@ test.describe('Sidebar', () => {
                 initialRoute: '/',
             }),
         );
-        await expect(component.getByRole('link', { name: 'Certificates' })).toBeVisible();
-        await expect(component.getByRole('link', { name: 'Keys' })).toBeVisible();
+        await expect(component.getByRole('link', { name: 'Certificates', exact: true })).toBeVisible();
+        await expect(component.getByRole('link', { name: 'Keys', exact: true })).toBeVisible();
         await expect(component.getByRole('button', { name: 'Access Control' })).toBeVisible();
     });
 
@@ -109,7 +109,7 @@ test.describe('Sidebar', () => {
         const store = createMockStore();
         const component = await mount(withProviders(<Sidebar allowedResources={[Resource.Secrets]} />, { store, initialRoute: '/' }));
 
-        const secretsLink = component.getByRole('link', { name: 'Secrets' });
+        const secretsLink = component.getByRole('link', { name: 'Secrets', exact: true });
         await expect(secretsLink).toBeVisible();
 
         // custom icon rendered inside the link as an SVG

@@ -17,9 +17,12 @@
  * @enum {string}
  */
 export enum SecretState {
-    Inactive = 'INACTIVE',
-    Active = 'ACTIVE',
-    Expired = 'EXPIRED',
-    Revoked = 'REVOKED'
+    Inactive = 'inactive',
+    Active = 'active',
+    Expired = 'expired',
+    Revoked = 'revoked',
+    PendingApproval = 'pendingApproval',
+    Rejected = 'rejected',
+    Failed = 'failed'
 }
 

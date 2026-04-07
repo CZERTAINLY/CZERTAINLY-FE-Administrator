@@ -97,8 +97,20 @@ const menuItemMappings: MenuItemMapping[] = [
         _key: '/dashboard',
         icon: <HomeIcon size={16} strokeWidth={1.5} />,
         header: 'Dashboard',
-        headerLink: '/dashboard',
-        requiredResources: [Resource.Certificates, Resource.RaProfiles, Resource.Discoveries, Resource.Groups],
+        children: [
+            {
+                _key: '/dashboard/certificates',
+                name: 'Certificates Dashboard',
+                link: '/dashboard/certificates',
+                requiredResources: [Resource.Certificates, Resource.RaProfiles, Resource.Discoveries, Resource.Groups],
+            },
+            {
+                _key: '/dashboard/secrets',
+                name: 'Secrets Dashboard',
+                link: '/dashboard/secrets',
+                requiredResources: [Resource.Secrets],
+            },
+        ],
     },
     {
         _key: '/certificates',

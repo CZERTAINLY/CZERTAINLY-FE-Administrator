@@ -5,7 +5,8 @@ import { useSelector } from 'react-redux';
 import { HashRouter, Navigate, Route, Routes } from 'react-router';
 
 import AuditLogs from './_pages/auditLogs';
-import Dashboard from './_pages/dashboard';
+import CertificatesDashboard from './_pages/dashboard/CertificatesDashboard';
+import SecretsDashboard from './_pages/dashboard/SecretsDashboard';
 import AuthenticationSettings from './_pages/auth-settings';
 import OAuth2ProviderDetail from './_pages/auth-settings/detail';
 
@@ -156,7 +157,12 @@ export default function AppRouter() {
                     <Route path="" element={<Navigate to={`/${Resource.Dashboard.toLowerCase()}`} />} />
                     <Route path={`/`} element={<Navigate to={`/${Resource.Dashboard.toLowerCase()}`} />} />
 
-                    <Route path={`/${Resource.Dashboard.toLowerCase()}`} element={<Dashboard />} />
+                    <Route
+                        path={`/${Resource.Dashboard.toLowerCase()}`}
+                        element={<Navigate to={`/${Resource.Dashboard.toLowerCase()}/certificates`} />}
+                    />
+                    <Route path={`/${Resource.Dashboard.toLowerCase()}/certificates`} element={<CertificatesDashboard />} />
+                    <Route path={`/${Resource.Dashboard.toLowerCase()}/secrets`} element={<SecretsDashboard />} />
 
                     <Route path={`/${Resource.Users.toLowerCase()}`} element={<UsersList />} />
                     <Route path={`/${Resource.Users.toLowerCase()}/list`} element={<Navigate to={`/${Resource.Users.toLowerCase()}`} />} />
