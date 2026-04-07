@@ -125,6 +125,54 @@ export interface StatisticsDto {
      */
     certificateStatByComplianceStatus?: { [key: string]: number; };
     /**
+     * Number of Secrets
+     * @type {number}
+     * @memberof StatisticsDto
+     */
+    totalSecrets?: number;
+    /**
+     * Number of Vault Instances
+     * @type {number}
+     * @memberof StatisticsDto
+     */
+    totalVaultInstances?: number;
+    /**
+     * Number of Vault Profiles
+     * @type {number}
+     * @memberof StatisticsDto
+     */
+    totalVaultProfiles?: number;
+    /**
+     * Map of Secret count by type
+     * @type {{ [key: string]: number; }}
+     * @memberof StatisticsDto
+     */
+    secretStatByType?: { [key: string]: number; };
+    /**
+     * Map of Secret count by state
+     * @type {{ [key: string]: number; }}
+     * @memberof StatisticsDto
+     */
+    secretStatByState?: { [key: string]: number; };
+    /**
+     * Map of Secret count by compliance status
+     * @type {{ [key: string]: number; }}
+     * @memberof StatisticsDto
+     */
+    secretStatByComplianceStatus?: { [key: string]: number; };
+    /**
+     * Map of Secret count by vault profile
+     * @type {{ [key: string]: number; }}
+     * @memberof StatisticsDto
+     */
+    secretStatByVaultProfile?: { [key: string]: number; };
+    /**
+     * Map of Secret count by group
+     * @type {{ [key: string]: number; }}
+     * @memberof StatisticsDto
+     */
+    secretStatByGroup?: { [key: string]: number; };
+    /**
      * Map of Connector count by status
      * @type {{ [key: string]: number; }}
      * @memberof StatisticsDto

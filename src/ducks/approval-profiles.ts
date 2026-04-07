@@ -5,15 +5,19 @@ import {
     ProfileApprovalRequestModel,
     ProfileApprovalResponseModel,
 } from 'types/approval-profiles';
-import { UuidDto } from 'types/openapi';
+import { Resource, UuidDto } from 'types/openapi';
 
 export type State = {
     profileApprovalDetail?: ProfileApprovalDetailModel;
     profileApprovalList: ProfileApprovalModel[];
+    associatedApprovalProfiles: ProfileApprovalModel[];
     isFetchingList: boolean;
     isFetchingDetail: boolean;
+    isFetchingAssociatedApprovalProfiles: boolean;
     isUpdating: boolean;
     isDeleting: boolean;
+    isAssociatingApprovalProfile: boolean;
+    isDissociatingApprovalProfile: boolean;
     isCreating: boolean;
     createApprovalProfileSucceeded: boolean;
     updateApprovalProfileSucceeded: boolean;
@@ -25,9 +29,13 @@ export const initialState: State = {
     profileApprovalDetail: undefined,
     isUpdating: false,
     profileApprovalList: [],
+    associatedApprovalProfiles: [],
     isFetchingList: false,
     isFetchingDetail: false,
+    isFetchingAssociatedApprovalProfiles: false,
     isDeleting: false,
+    isAssociatingApprovalProfile: false,
+    isDissociatingApprovalProfile: false,
     isCreating: false,
     createApprovalProfileSucceeded: false,
     updateApprovalProfileSucceeded: false,
@@ -97,6 +105,58 @@ export const slice = createSlice({
             state.isFetchingList = false;
         },
 
+        getAssociatedApprovalProfilesForResource: (state, action: PayloadAction<{ resource: Resource; associationObjectUuid: string }>) => {
+            state.associatedApprovalProfiles = [];
+            state.isFetchingAssociatedApprovalProfiles = true;
+        },
+
+        getAssociatedApprovalProfilesForResourceSuccess: (state, action: PayloadAction<{ approvalProfiles: ProfileApprovalModel[] }>) => {
+            state.associatedApprovalProfiles = action.payload.approvalProfiles;
+            state.isFetchingAssociatedApprovalProfiles = false;
+        },
+
+        getAssociatedApprovalProfilesForResourceFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.associatedApprovalProfiles = [];
+            state.isFetchingAssociatedApprovalProfiles = false;
+        },
+
+        associateApprovalProfileToResource: (
+            state,
+            action: PayloadAction<{ uuid: string; resource: Resource; associationObjectUuid: string }>,
+        ) => {
+            state.isAssociatingApprovalProfile = true;
+        },
+
+        associateApprovalProfileToResourceSuccess: (
+            state,
+            action: PayloadAction<{ uuid: string; resource: Resource; associationObjectUuid: string }>,
+        ) => {
+            state.isAssociatingApprovalProfile = false;
+        },
+
+        associateApprovalProfileToResourceFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isAssociatingApprovalProfile = false;
+        },
+
+        dissociateApprovalProfileFromResource: (
+            state,
+            action: PayloadAction<{ uuid: string; resource: Resource; associationObjectUuid: string }>,
+        ) => {
+            state.isDissociatingApprovalProfile = true;
+        },
+
+        dissociateApprovalProfileFromResourceSuccess: (
+            state,
+            action: PayloadAction<{ uuid: string; resource: Resource; associationObjectUuid: string }>,
+        ) => {
+            state.isDissociatingApprovalProfile = false;
+            state.associatedApprovalProfiles = state.associatedApprovalProfiles.filter((profile) => profile.uuid !== action.payload.uuid);
+        },
+
+        dissociateApprovalProfileFromResourceFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isDissociatingApprovalProfile = false;
+        },
+
         deleteApprovalProfile: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isDeleting = true;
         },
@@ -140,28 +200,36 @@ const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const profileApprovalDetail = createSelector(state, (state) => state.profileApprovalDetail);
 const profileApprovalList = createSelector(state, (state) => state.profileApprovalList);
+const associatedApprovalProfiles = createSelector(state, (state) => state.associatedApprovalProfiles);
 const isCreating = createSelector(state, (state) => state.isCreating);
 const createApprovalProfileSucceeded = createSelector(state, (state) => state.createApprovalProfileSucceeded);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isFetchingList = createSelector(state, (state) => state.isFetchingList);
+const isFetchingAssociatedApprovalProfiles = createSelector(state, (state) => state.isFetchingAssociatedApprovalProfiles);
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
 const totalItems = createSelector(state, (state) => state.totalItems);
 const isUpdating = createSelector(state, (state) => state.isUpdating);
 const updateApprovalProfileSucceeded = createSelector(state, (state) => state.updateApprovalProfileSucceeded);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
+const isAssociatingApprovalProfile = createSelector(state, (state) => state.isAssociatingApprovalProfile);
+const isDissociatingApprovalProfile = createSelector(state, (state) => state.isDissociatingApprovalProfile);
 
 export const selectors = {
     state,
     profileApprovalDetail,
     profileApprovalList,
+    associatedApprovalProfiles,
     isCreating,
     createApprovalProfileSucceeded,
     isFetchingDetail,
+    isFetchingAssociatedApprovalProfiles,
     deleteErrorMessage,
     totalItems,
     isUpdating,
     updateApprovalProfileSucceeded,
     isDeleting,
+    isAssociatingApprovalProfile,
+    isDissociatingApprovalProfile,
     isFetchingList,
 };
 

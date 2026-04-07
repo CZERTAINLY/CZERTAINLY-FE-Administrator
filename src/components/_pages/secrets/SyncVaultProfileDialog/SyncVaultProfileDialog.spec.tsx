@@ -2,7 +2,7 @@ import { JSX } from 'react';
 import type { Locator, Page } from '@playwright/test';
 
 import type { AttributeDescriptorModel } from 'types/attributes';
-import { AttributeContentType, AttributeType, SecretState, SecretType } from 'types/openapi';
+import { AttributeContentType, AttributeType, ComplianceStatus, SecretState, SecretType } from 'types/openapi';
 import type { SecretDetailDto, VaultProfileDto } from 'types/openapi';
 import { test, expect } from '../../../../../playwright/ct-test';
 import { SyncVaultProfileDialogTestWrapper, type SyncVaultProfileDialogTestWrapperProps } from './SyncVaultProfileDialogTestWrapper';
@@ -14,6 +14,7 @@ const SECRET: SecretDetailDto = {
     name: 'My Secret',
     type: SecretType.Generic,
     state: SecretState.Active,
+    complianceStatus: ComplianceStatus.NotChecked,
     version: 1,
     enabled: true,
     sourceVaultProfile: { uuid: 'src-vp-uuid', name: 'Source Profile' },
