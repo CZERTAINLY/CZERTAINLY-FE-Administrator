@@ -136,6 +136,10 @@ import VaultDetail from './_pages/vaults/detail';
 import VaultProfilesList from './_pages/vault-profiles/list';
 import VaultProfileDetail from './_pages/vault-profiles/detail';
 
+import SigningProfilesList from './_pages/signing-profiles/list/SigningProfilesList';
+import SigningProfileForm from './_pages/signing-profiles/form/SigningProfileForm';
+import SigningProfileDetail from './_pages/signing-profiles/detail/SigningProfileDetail';
+
 import CbomsList from './_pages/cboms/list';
 import CbomDetail from 'components/_pages/cboms/detail';
 import CbomVersionsHistory from 'components/_pages/cboms/versions';
@@ -297,6 +301,15 @@ export default function AppRouter() {
                         element={<Navigate to={`/${Resource.VaultProfiles.toLowerCase()}`} />}
                     />
                     <Route path={`/${Resource.VaultProfiles.toLowerCase()}/detail/:vaultUuid/:id`} element={<VaultProfileDetail />} />
+
+                    <Route path={`/${Resource.SigningProfiles.toLowerCase()}`} element={<SigningProfilesList />} />
+                    <Route
+                        path={`/${Resource.SigningProfiles.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.SigningProfiles.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.SigningProfiles.toLowerCase()}/add`} element={<SigningProfileForm />} />
+                    <Route path={`/${Resource.SigningProfiles.toLowerCase()}/edit/:id`} element={<SigningProfileForm />} />
+                    <Route path={`/${Resource.SigningProfiles.toLowerCase()}/detail/:id`} element={<SigningProfileDetail />} />
 
                     <Route path={`/${Resource.Locations.toLowerCase()}`} element={<LocationsList />} />
                     <Route

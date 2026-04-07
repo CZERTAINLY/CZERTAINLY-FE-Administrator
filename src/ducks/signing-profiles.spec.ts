@@ -30,20 +30,21 @@ describe('signingProfiles slice', () => {
         expect(next.bulkDeleteErrorMessages).toEqual([]);
     });
 
-    test('listSigningProfiles is a no-op on state', () => {
+    test('listSigningProfiles sets isFetchingList', () => {
         const next = reducer(initialState, actions.listSigningProfiles({ itemsPerPage: 10, pageNumber: 1, filters: [] }));
-        expect(next).toEqual(initialState);
+        expect(next.isFetchingList).toBe(true);
     });
 
-    test('listSigningProfilesSuccess updates list', () => {
+    test('listSigningProfilesSuccess updates list and clears isFetchingList', () => {
         const profiles = [{ uuid: 'p-1' }] as any[];
-        const next = reducer(initialState, actions.listSigningProfilesSuccess({ signingProfiles: profiles }));
+        const next = reducer({ ...initialState, isFetchingList: true }, actions.listSigningProfilesSuccess({ signingProfiles: profiles }));
         expect(next.signingProfiles).toEqual(profiles);
+        expect(next.isFetchingList).toBe(false);
     });
 
-    test('listSigningProfilesFailure is a no-op on state', () => {
-        const next = reducer(initialState, actions.listSigningProfilesFailure({ error: 'err' }));
-        expect(next).toEqual(initialState);
+    test('listSigningProfilesFailure clears isFetchingList', () => {
+        const next = reducer({ ...initialState, isFetchingList: true }, actions.listSigningProfilesFailure({ error: 'err' }));
+        expect(next.isFetchingList).toBe(false);
     });
 
     test('getSigningProfile sets isFetchingDetail', () => {

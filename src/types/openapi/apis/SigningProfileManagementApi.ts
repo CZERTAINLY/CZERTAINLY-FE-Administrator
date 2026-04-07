@@ -18,6 +18,7 @@ import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
 import type {
     ApprovalProfileDto,
     AuthenticationServiceExceptionDto,
+    BaseAttributeDto,
     BulkActionMessageDto,
     CertificateDto,
     ErrorMessageDto,
@@ -109,6 +110,10 @@ export interface GetTspActivationDetailsRequest {
 export interface ListDigitalSignaturesForSigningProfileRequest {
     uuid: string;
     searchRequestDto: SearchRequestDto;
+}
+
+export interface ListSignatureAttributesForCertificateRequest {
+    certificateUuid: string;
 }
 
 export interface ListSigningCertificatesRequest {
@@ -423,6 +428,21 @@ export class SigningProfileManagementApi extends BaseAPI {
             method: 'POST',
             headers,
             body: searchRequestDto,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Returns the signing operation attribute descriptors (e.g. signature scheme, digest algorithm) derived from the key algorithm of the given certificate. Intended for use during Signing Profile creation to populate the signingOperationAttributes field.
+     * Get signing operation attribute descriptors for a certificate
+     */
+    listSignatureAttributesForCertificate({ certificateUuid }: ListSignatureAttributesForCertificateRequest): Observable<Array<BaseAttributeDto>>
+    listSignatureAttributesForCertificate({ certificateUuid }: ListSignatureAttributesForCertificateRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BaseAttributeDto>>>
+    listSignatureAttributesForCertificate({ certificateUuid }: ListSignatureAttributesForCertificateRequest, opts?: OperationOpts): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
+        throwIfNullOrUndefined(certificateUuid, 'certificateUuid', 'listSignatureAttributesForCertificate');
+
+        return this.request<Array<BaseAttributeDto>>({
+            url: '/v1/signingProfiles/certificates/{certificateUuid}/signatureAttributes'.replace('{certificateUuid}', encodeURI(certificateUuid)),
+            method: 'GET',
         }, opts?.responseOpts);
     };
 

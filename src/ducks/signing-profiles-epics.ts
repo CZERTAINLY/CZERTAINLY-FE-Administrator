@@ -4,13 +4,13 @@ import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 import { extractError } from 'utils/net';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { slice } from './signing-profiles';
-import { actions as appRedirectActions } from './app-redirect';
 import { actions as alertActions } from './alerts';
-import { actions as userInterfaceActions } from './user-interface';
+import { actions as appRedirectActions } from './app-redirect';
 import { EntityType } from './filters';
 import { actions as pagingActions } from './paging';
+import { slice } from './signing-profiles';
 import { transformSearchRequestModelToDto } from './transform/certificates';
+import { actions as userInterfaceActions } from './user-interface';
 import { store } from '../App';
 
 const listSigningProfiles: AppEpic = (action$, state$, deps) => {
@@ -19,7 +19,7 @@ const listSigningProfiles: AppEpic = (action$, state$, deps) => {
         switchMap((action) => {
             store.dispatch(pagingActions.list(EntityType.SIGNING_PROFILE));
             return deps.apiClients.signingProfiles
-                .listSigningProfiles({ searchRequestDto: transformSearchRequestModelToDto(action.payload) })
+                .listSigningProfiles({ searchRequestDto: action.payload ? transformSearchRequestModelToDto(action.payload) : {} })
                 .pipe(
                     switchMap((response) =>
                         of(
@@ -484,6 +484,24 @@ const listSigningCertificates: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const listSignatureAttributesForCertificate: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.listSignatureAttributesForCertificate.match),
+        switchMap((action) =>
+            deps.apiClients.signingProfiles.listSignatureAttributesForCertificate({ certificateUuid: action.payload.certificateUuid }).pipe(
+                map((descriptors) => slice.actions.listSignatureAttributesForCertificateSuccess({ attributeDescriptors: descriptors })),
+                catchError((error) =>
+                    of(
+                        slice.actions.listSignatureAttributesForCertificateFailure({
+                            error: extractError(error, 'Failed to get signature attributes for certificate'),
+                        }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 const listDigitalSignaturesForSigningProfile: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listDigitalSignaturesForSigningProfile.match),
@@ -528,6 +546,7 @@ const epics = [
     disassociateFromApprovalProfile,
     listSupportedProtocols,
     listSigningCertificates,
+    listSignatureAttributesForCertificate,
     listDigitalSignaturesForSigningProfile,
 ];
 
