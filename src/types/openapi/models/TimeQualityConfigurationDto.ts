@@ -34,6 +34,12 @@ export interface TimeQualityConfigurationDto {
      */
     name: string;
     /**
+     * Declared accuracy of the profile, in ISO 8601 duration format
+     * @type {string}
+     * @memberof TimeQualityConfigurationDto
+     */
+    accuracy: string;
+    /**
      * List of NTP server addresses
      * @type {Array<string>}
      * @memberof TimeQualityConfigurationDto

@@ -123,16 +123,7 @@ export const TspConfigurationDetail = () => {
                       },
                       {
                           id: 'signingUrl',
-                          columns: [
-                              'TSP Service URL',
-                              tspConfiguration.signingUrl ? (
-                                  <a href={tspConfiguration.signingUrl} target="_blank" rel="noreferrer">
-                                      {tspConfiguration.signingUrl}
-                                  </a>
-                              ) : (
-                                  'N/A'
-                              ),
-                          ],
+                          columns: ['TSP Signing URL', tspConfiguration.signingUrl ? tspConfiguration.signingUrl : '-'],
                       },
                   ],
         [tspConfiguration],

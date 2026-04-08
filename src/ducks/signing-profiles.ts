@@ -328,6 +328,12 @@ export const slice = createSlice({
         ) => {
             state.isActivatingIlm = false;
             state.ilmActivationDetails = action.payload.ilmActivationDetails;
+            if (state.signingProfile && !state.signingProfile.enabledProtocols?.includes(SigningProtocol.IlmSigningProtocol)) {
+                state.signingProfile.enabledProtocols = [
+                    ...(state.signingProfile.enabledProtocols ?? []),
+                    SigningProtocol.IlmSigningProtocol,
+                ];
+            }
         },
 
         activateIlmSigningProtocolFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -341,6 +347,11 @@ export const slice = createSlice({
         deactivateIlmSigningProtocolSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isDeactivatingIlm = false;
             state.ilmActivationDetails = undefined;
+            if (state.signingProfile) {
+                state.signingProfile.enabledProtocols = state.signingProfile.enabledProtocols?.filter(
+                    (p) => p !== SigningProtocol.IlmSigningProtocol,
+                );
+            }
         },
 
         deactivateIlmSigningProtocolFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -373,6 +384,9 @@ export const slice = createSlice({
         activateTspSuccess: (state, action: PayloadAction<{ tspActivationDetails: TspActivationDetailDto }>) => {
             state.isActivatingTsp = false;
             state.tspActivationDetails = action.payload.tspActivationDetails;
+            if (state.signingProfile && !state.signingProfile.enabledProtocols?.includes(SigningProtocol.Tsp)) {
+                state.signingProfile.enabledProtocols = [...(state.signingProfile.enabledProtocols ?? []), SigningProtocol.Tsp];
+            }
         },
 
         activateTspFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -386,6 +400,9 @@ export const slice = createSlice({
         deactivateTspSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isDeactivatingTsp = false;
             state.tspActivationDetails = undefined;
+            if (state.signingProfile) {
+                state.signingProfile.enabledProtocols = state.signingProfile.enabledProtocols?.filter((p) => p !== SigningProtocol.Tsp);
+            }
         },
 
         deactivateTspFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {

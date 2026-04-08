@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router';
 
 import Breadcrumb from 'components/Breadcrumb';
 import Button from 'components/Button';
+import ProgressButton from 'components/ProgressButton';
 import Container from 'components/Container';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
@@ -442,16 +443,7 @@ export default function SigningProfileDetail() {
             },
             {
                 id: 'tspUrl',
-                columns: [
-                    'TSP URL',
-                    tspActivationDetails.signingUrl ? (
-                        <a href={tspActivationDetails.signingUrl} target="_blank" rel="noreferrer">
-                            {tspActivationDetails.signingUrl}
-                        </a>
-                    ) : (
-                        '—'
-                    ),
-                ],
+                columns: ['TSP URL', tspActivationDetails.signingUrl ? tspActivationDetails.signingUrl : '—'],
             },
         ];
     }, [tspActivationDetails]);
@@ -474,33 +466,28 @@ export default function SigningProfileDetail() {
                 columns: [
                     'ILM Signing Protocol',
                     <StatusBadge enabled={ilmActivationDetails?.available ?? false} />,
-                    ilmActivationDetails?.available ? (
-                        <Button variant="outline" color="danger" onClick={() => setConfirmDeactivateIlm(true)}>
-                            Deactivate
-                        </Button>
-                    ) : (
-                        <Button
-                            variant="outline"
-                            color="primary"
-                            onClick={() => {
+                    <ProgressButton
+                        type="button"
+                        title={ilmActivationDetails?.available ? 'Deactivate' : 'Activate'}
+                        inProgressTitle={ilmActivationDetails?.available ? 'Deactivating...' : 'Activating...'}
+                        inProgress={isActivatingIlm || isDeactivatingIlm}
+                        onClick={() => {
+                            if (ilmActivationDetails?.available) {
+                                setConfirmDeactivateIlm(true);
+                            } else {
                                 setSelectedIlmConfigUuid(undefined);
                                 dispatch(ilmConfigActions.listIlmSigningProtocolConfigurations());
                                 setActivateIlmDialog(true);
-                            }}
-                        >
-                            Activate
-                        </Button>
-                    ),
+                            }
+                        }}
+                    />,
                 ],
                 detailColumns: [
                     <></>,
                     <></>,
                     <></>,
                     !ilmActivationDetails?.available ? (
-                        <>
-                            ILM Signing Protocol is not activated on this profile. Activate it from the ILM Signing Protocol Configurations
-                            page.
-                        </>
+                        <>ILM Signing Protocol is not activated on this profile.</>
                     ) : (
                         <>
                             <b>Protocol settings</b>
@@ -514,32 +501,30 @@ export default function SigningProfileDetail() {
             {
                 id: 'tsp',
                 columns: [
-                    'TSP (RFC 3161)',
+                    'Timestamping Protocol (TSP)',
                     <StatusBadge enabled={tspActivationDetails?.available ?? false} />,
-                    tspActivationDetails?.available ? (
-                        <Button variant="outline" color="danger" onClick={() => setConfirmDeactivateTsp(true)}>
-                            Deactivate
-                        </Button>
-                    ) : (
-                        <Button
-                            variant="outline"
-                            color="primary"
-                            onClick={() => {
+                    <ProgressButton
+                        type="button"
+                        title={tspActivationDetails?.available ? 'Deactivate' : 'Activate'}
+                        inProgressTitle={tspActivationDetails?.available ? 'Deactivating...' : 'Activating...'}
+                        inProgress={isActivatingTsp || isDeactivatingTsp}
+                        onClick={() => {
+                            if (tspActivationDetails?.available) {
+                                setConfirmDeactivateTsp(true);
+                            } else {
                                 setSelectedTspConfigUuid(undefined);
                                 dispatch(tspConfigActions.listTspConfigurations());
                                 setActivateTspDialog(true);
-                            }}
-                        >
-                            Activate
-                        </Button>
-                    ),
+                            }
+                        }}
+                    />,
                 ],
                 detailColumns: [
                     <></>,
                     <></>,
                     <></>,
                     !tspActivationDetails?.available ? (
-                        <>TSP Protocol is not activated on this profile. Activate it from the TSP Configurations page.</>
+                        <>Timestamping Protocol is not activated on this profile.</>
                     ) : (
                         <>
                             <b>Protocol settings</b>
@@ -551,7 +536,18 @@ export default function SigningProfileDetail() {
                 ],
             },
         ],
-        [ilmActivationDetails?.available, detailHeaders, ilmActivationData, tspActivationDetails?.available, tspActivationData, dispatch],
+        [
+            ilmActivationDetails?.available,
+            isActivatingIlm,
+            isDeactivatingIlm,
+            detailHeaders,
+            ilmActivationData,
+            tspActivationDetails?.available,
+            isActivatingTsp,
+            isDeactivatingTsp,
+            tspActivationData,
+            dispatch,
+        ],
     );
 
     // ── Approval profiles ──────────────────────────────────────────────────────

@@ -28,6 +28,12 @@ export interface TimeQualityConfigurationCreateRequestDto {
      */
     name: string;
     /**
+     * Desired accuracy for the time quality, in ISO 8601 duration format
+     * @type {string}
+     * @memberof TimeQualityConfigurationCreateRequestDto
+     */
+    accuracy: string;
+    /**
      * List of NTP server addresses
      * @type {Array<string>}
      * @memberof TimeQualityConfigurationCreateRequestDto

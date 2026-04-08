@@ -71,6 +71,12 @@ export interface TimestampingWorkflowRequestDto {
      * @memberof TimestampingWorkflowRequestDto
      */
     allowedDigestAlgorithms?: Array<DigestAlgorithm>;
+    /**
+     * Whether to validate the timestamp token after it was issued.
+     * @type {boolean}
+     * @memberof TimestampingWorkflowRequestDto
+     */
+    validateTokenSignature?: boolean;
 }
 
 
