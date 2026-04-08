@@ -27,6 +27,7 @@ import {
     SigningWorkflowType,
     TimestampingWorkflowRequestDto,
     StaticKeyManagedSigningRequestDto,
+    StaticKeyManagedSigningDto,
 } from 'types/openapi';
 import { collectFormAttributes, mapProfileAttribute, transformAttributes } from 'utils/attributes/attributes';
 import { validateAlphaNumericWithoutAccents, validateLength, validateRequired } from 'utils/validators';
@@ -39,6 +40,12 @@ const workflowTypeLabels: Record<SigningWorkflowType, string> = {
     [SigningWorkflowType.Timestamping]: 'Timestamping',
     [SigningWorkflowType.ContentSigning]: 'Content Signing (coming soon)',
     [SigningWorkflowType.RawSigning]: 'Raw Signing (coming soon)',
+};
+
+const workflowTypeTabLabels: Record<SigningWorkflowType, string> = {
+    [SigningWorkflowType.Timestamping]: 'Timestamping',
+    [SigningWorkflowType.ContentSigning]: 'Content Signing',
+    [SigningWorkflowType.RawSigning]: 'Raw Signing',
 };
 
 const signingSchemeLabels: Record<SigningScheme, string> = {
@@ -111,6 +118,7 @@ export default function SigningProfileForm() {
     // ── Local State ────────────────────────────────────────────────────────────
 
     const [activeTab, setActiveTab] = useState(0);
+    const [selectedWorkflowType, setSelectedWorkflowType] = useState<SigningWorkflowType>(WORKFLOW_TYPE);
     const [signingScheme, setSigningScheme] = useState<SigningScheme>(SigningScheme.Managed);
     const [managedSigningType, setManagedSigningType] = useState<ManagedSigningType>(ManagedSigningType.StaticKey);
     const [allowedPolicyIds, setAllowedPolicyIds] = useState<AllowedPolicyIdEntry[]>([]);
@@ -248,12 +256,12 @@ export default function SigningProfileForm() {
             {
                 name: signingProfile.name || '',
                 description: signingProfile.description || '',
-                signatureFormatterConnectorUuid: (wf as any)?.signatureFormatterConnectorUuid || '',
-                qualifiedTimestamp: (wf as any)?.qualifiedTimestamp ?? false,
-                timeQualityConfigurationUuid: (wf as any)?.timeQualityConfigurationUuid || '',
-                defaultPolicyId: (wf as any)?.defaultPolicyId || '',
-                allowedDigestAlgorithms: (wf as any)?.allowedDigestAlgorithms?.map((d: DigestAlgorithm) => ({ value: d, label: d })) ?? [],
-                certificateUuid: (sc as any)?.certificateUuid || (sc as any)?.certificate?.uuid || '',
+                signatureFormatterConnectorUuid: wf?.signatureFormatterConnectorUuid || '',
+                qualifiedTimestamp: wf?.qualifiedTimestamp ?? false,
+                timeQualityConfigurationUuid: wf?.timeQualityConfigurationUuid || '',
+                defaultPolicyId: wf?.defaultPolicyId || '',
+                allowedDigestAlgorithms: wf?.allowedDigestAlgorithms?.map((d: DigestAlgorithm) => ({ value: d, label: d })) ?? [],
+                certificateUuid: sc?.certificateUuid || (sc as StaticKeyManagedSigningDto)?.certificate?.uuid || '',
                 ...transformAttributes(attrInitial ?? []),
             },
             { keepDefaultValues: false },
@@ -266,6 +274,7 @@ export default function SigningProfileForm() {
         // Restore signing scheme selections
         if ((sc as any)?.signingScheme) setSigningScheme((sc as any).signingScheme);
         if ((sc as any)?.managedSigningType) setManagedSigningType((sc as any).managedSigningType);
+        if ((wf as any)?.type) setSelectedWorkflowType((wf as any).type);
 
         lastResetIdRef.current = id;
     }, [editMode, id, signingProfile, isFetchingDetail, multipleResourceCustomAttributes, reset]);
@@ -407,10 +416,10 @@ export default function SigningProfileForm() {
                                     type="radio"
                                     name="workflowType"
                                     value={wt}
-                                    defaultChecked={wt === WORKFLOW_TYPE}
+                                    checked={wt === selectedWorkflowType}
                                     disabled={!isSupported}
                                     className="accent-blue-600"
-                                    readOnly
+                                    onChange={() => setSelectedWorkflowType(wt)}
                                 />
                                 <span className="text-sm font-medium">{workflowTypeLabels[wt]}</span>
                             </label>
@@ -739,7 +748,7 @@ export default function SigningProfileForm() {
                                     content: tab1Content,
                                 },
                                 {
-                                    title: '2 · Workflow Properties',
+                                    title: `2 · ${workflowTypeTabLabels[selectedWorkflowType] ?? 'Signing Workflow'} Properties`,
                                     content: tab2Content,
                                 },
                                 {

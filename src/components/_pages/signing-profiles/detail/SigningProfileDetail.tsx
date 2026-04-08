@@ -117,6 +117,11 @@ export default function SigningProfileDetail() {
         return wf?.type === SigningWorkflowType.Timestamping ? wf : undefined;
     }, [signingProfile]);
 
+    const workflowTabTitle = useMemo((): string => {
+        const type = signingProfile?.workflow?.type;
+        return type ? `${workflowTypeLabels[type] ?? 'Signing Workflow'} Properties` : 'Signing Workflow Properties';
+    }, [signingProfile]);
+
     const staticKeyScheme = useMemo((): StaticKeyManagedSigningDto | undefined => {
         if (!signingProfile) return undefined;
         const sc = signingProfile.signingScheme as StaticKeyManagedSigningDto;
@@ -225,7 +230,7 @@ export default function SigningProfileDetail() {
                       {
                           id: 'workflowType',
                           columns: [
-                              'Workflow Type',
+                              'Signing Workflow Type',
                               <span className="inline-flex items-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-medium text-indigo-800">
                                   {workflowTypeLabels[(signingProfile.workflow as TimestampingWorkflowDto)?.type] ??
                                       (signingProfile.workflow as TimestampingWorkflowDto)?.type ??
@@ -648,7 +653,7 @@ export default function SigningProfileDetail() {
                             ),
                         },
                         {
-                            title: 'Workflow',
+                            title: workflowTabTitle,
                             content: (
                                 <Widget title="Timestamping Workflow Configuration" titleSize="large">
                                     {workflowData.length > 0 ? (
