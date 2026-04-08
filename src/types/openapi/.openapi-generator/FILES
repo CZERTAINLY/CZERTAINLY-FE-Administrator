@@ -185,8 +185,6 @@ models/CmpProfileDetailDto.ts
 models/CmpProfileDto.ts
 models/CmpProfileEditRequestDto.ts
 models/CmpProfileRequestDto.ts
-models/CodeBinarySigningWorkflowDto.ts
-models/CodeBinarySigningWorkflowRequestDto.ts
 models/CodeBlockAttributeContentData.ts
 models/CodeBlockAttributeContentV2.ts
 models/CodeBlockAttributeContentV3.ts
@@ -251,6 +249,8 @@ models/ConnectorStatus.ts
 models/ConnectorUpdateRequestDto.ts
 models/ConnectorUpdateRequestDtoV2.ts
 models/ConnectorVersion.ts
+models/ContentSigningWorkflowDto.ts
+models/ContentSigningWorkflowRequestDto.ts
 models/CoreInfoResponseDto.ts
 models/CredentialAttributeContentData.ts
 models/CredentialAttributeContentV2.ts

@@ -37,8 +37,7 @@ import { deepEqual } from 'utils/deep-equal';
 
 const workflowTypeLabels: Record<SigningWorkflowType, string> = {
     [SigningWorkflowType.Timestamping]: 'Timestamping',
-    [SigningWorkflowType.DocumentSigning]: 'Document Signing (coming soon)',
-    [SigningWorkflowType.CodeBinarySigning]: 'Code & Binary Signing (coming soon)',
+    [SigningWorkflowType.ContentSigning]: 'Content Signing (coming soon)',
     [SigningWorkflowType.RawSigning]: 'Raw Signing (coming soon)',
 };
 

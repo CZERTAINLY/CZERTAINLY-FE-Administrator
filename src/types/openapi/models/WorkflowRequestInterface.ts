@@ -12,9 +12,8 @@
  */
 
 import type {
-    CodeBinarySigningWorkflowRequestDto,
+    ContentSigningWorkflowRequestDto,
     DigestAlgorithm,
-    DocumentSigningWorkflowRequestDto,
     RawSigningWorkflowRequestDto,
     RequestAttribute,
     SigningWorkflowType,
@@ -26,4 +25,4 @@ import type {
  * Workflow configuration request specific to the signing workflow type
  * @export
  */
-export type WorkflowRequestInterface = CodeBinarySigningWorkflowRequestDto | DocumentSigningWorkflowRequestDto | RawSigningWorkflowRequestDto | TimestampingWorkflowRequestDto;
+export type WorkflowRequestInterface = ContentSigningWorkflowRequestDto | RawSigningWorkflowRequestDto | TimestampingWorkflowRequestDto;

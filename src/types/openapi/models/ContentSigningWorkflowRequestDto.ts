@@ -17,27 +17,27 @@ import type {
 } from './';
 
 /**
- * Code & Binary signing workflow configuration request
+ * Content signing workflow configuration request
  * @export
- * @interface CodeBinarySigningWorkflowRequestDto
+ * @interface ContentSigningWorkflowRequestDto
  */
-export interface CodeBinarySigningWorkflowRequestDto {
+export interface ContentSigningWorkflowRequestDto {
     /**
      * Signing workflow type
      * @type {SigningWorkflowType}
-     * @memberof CodeBinarySigningWorkflowRequestDto
+     * @memberof ContentSigningWorkflowRequestDto
      */
     type: SigningWorkflowType;
     /**
-     * UUID of the Signature Formatter Connector that constructs the data-to-be-signed (DTBS) for Code & Binary signing. Required for ILM-managed signing; must be omitted for delegated signing.
+     * UUID of the Signature Formatter Connector that constructs the data-to-be-signed (DTBS) for Content signing. Required for ILM-managed signing; must be omitted for delegated signing.
      * @type {string}
-     * @memberof CodeBinarySigningWorkflowRequestDto
+     * @memberof ContentSigningWorkflowRequestDto
      */
     signatureFormatterConnectorUuid?: string;
     /**
-     * Attributes for the Signature Formatter Connector that control DTBS construction for the code and binary signing workflow. Applicable only when ILM-managed signing is used.
+     * Attributes for the Signature Formatter Connector that control DTBS construction for the content signing workflow. Applicable only when ILM-managed signing is used.
      * @type {Array<RequestAttribute>}
-     * @memberof CodeBinarySigningWorkflowRequestDto
+     * @memberof ContentSigningWorkflowRequestDto
      */
     signatureFormatterConnectorAttributes?: Array<RequestAttribute>;
 }
