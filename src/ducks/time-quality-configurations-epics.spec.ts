@@ -7,6 +7,8 @@ import { actions as timeQualityConfigurationActions } from './time-quality-confi
 import { actions as appRedirectActions } from './app-redirect';
 import { actions as alertActions } from './alerts';
 import { actions as userInterfaceActions } from './user-interface';
+import { actions as pagingActions } from './paging';
+import { EntityType } from './filters';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
 type EpicDeps = {
@@ -76,24 +78,24 @@ async function runEpic(
 }
 
 describe('timeQualityConfigurations epics', () => {
-    test('listTimeQualityConfigurations success emits listSuccess and removeWidgetLock', async () => {
+    test('listTimeQualityConfigurations success emits listSuccess, pagingListSuccess and removeWidgetLock', async () => {
         const emitted = await runEpic(
             TimeQualityConfigurationsEpicIndex.List,
             timeQualityConfigurationActions.listTimeQualityConfigurations(),
             {},
-            2,
+            3,
         );
 
         expect(emitted[0]).toEqual(
             timeQualityConfigurationActions.listTimeQualityConfigurationsSuccess({
                 timeQualityConfigurations: [{ uuid: 'c-1', name: 'TQ Config 1' }] as any,
-                totalItems: 1,
             }),
         );
-        expect(emitted[1]).toEqual(userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfTimeQualityConfigurations));
+        expect(emitted[1]).toEqual(pagingActions.listSuccess({ entity: EntityType.TIME_QUALITY_CONFIGURATION, totalItems: 1 }));
+        expect(emitted[2]).toEqual(userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfTimeQualityConfigurations));
     });
 
-    test('listTimeQualityConfigurations failure emits listFailure and insertWidgetLock', async () => {
+    test('listTimeQualityConfigurations failure emits listFailure, pagingListFailure and insertWidgetLock', async () => {
         const err = new Error('failed');
         const emitted = await runEpic(
             TimeQualityConfigurationsEpicIndex.List,
@@ -103,11 +105,12 @@ describe('timeQualityConfigurations epics', () => {
                     listTimeQualityConfigurations: () => throwError(() => err),
                 } as any,
             },
-            2,
+            3,
         );
 
         expect(emitted[0].type).toBe(timeQualityConfigurationActions.listTimeQualityConfigurationsFailure.type);
-        expect(emitted[1].type).toBe(userInterfaceActions.insertWidgetLock.type);
+        expect(emitted[1].type).toBe(pagingActions.listFailure.type);
+        expect(emitted[2].type).toBe(userInterfaceActions.insertWidgetLock.type);
     });
 
     test('getTimeQualityConfiguration success emits getSuccess and removeWidgetLock', async () => {

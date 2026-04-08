@@ -7,6 +7,7 @@ import {
     TimeQualityConfigurationUpdateRequestDto,
 } from 'types/openapi';
 import { BulkActionMessageDto } from 'types/openapi/models/BulkActionMessageDto';
+import { SearchRequestModel } from 'types/certificate';
 
 export type State = {
     checkedRows: string[];
@@ -16,7 +17,6 @@ export type State = {
 
     timeQualityConfiguration?: TimeQualityConfigurationDto;
     timeQualityConfigurations: TimeQualityConfigurationListDto[];
-    timeQualityConfigurationsTotalItems: number;
 
     searchableFields?: SearchFieldDataByGroupDto[];
 
@@ -36,7 +36,6 @@ export const initialState: State = {
     bulkDeleteErrorMessages: [],
 
     timeQualityConfigurations: [],
-    timeQualityConfigurationsTotalItems: 0,
 
     isFetchingList: false,
     isFetchingDetail: false,
@@ -69,17 +68,16 @@ export const slice = createSlice({
             state.bulkDeleteErrorMessages = [];
         },
 
-        listTimeQualityConfigurations: (state, action: PayloadAction<void>) => {
+        listTimeQualityConfigurations: (state, action: PayloadAction<SearchRequestModel | undefined>) => {
             state.isFetchingList = true;
         },
 
         listTimeQualityConfigurationsSuccess: (
             state,
-            action: PayloadAction<{ timeQualityConfigurations: TimeQualityConfigurationListDto[]; totalItems: number }>,
+            action: PayloadAction<{ timeQualityConfigurations: TimeQualityConfigurationListDto[] }>,
         ) => {
             state.isFetchingList = false;
             state.timeQualityConfigurations = action.payload.timeQualityConfigurations;
-            state.timeQualityConfigurationsTotalItems = action.payload.totalItems;
         },
 
         listTimeQualityConfigurationsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -219,7 +217,6 @@ const state = (reduxStore: any): State => reduxStore?.[slice.name];
 
 const timeQualityConfiguration = createSelector(state, (state) => state.timeQualityConfiguration);
 const timeQualityConfigurations = createSelector(state, (state) => state.timeQualityConfigurations);
-const timeQualityConfigurationsTotalItems = createSelector(state, (state) => state.timeQualityConfigurationsTotalItems);
 const searchableFields = createSelector(state, (state) => state.searchableFields);
 const checkedRows = createSelector(state, (state) => state.checkedRows);
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
@@ -240,7 +237,6 @@ export const selectors = {
     bulkDeleteErrorMessages,
     timeQualityConfiguration,
     timeQualityConfigurations,
-    timeQualityConfigurationsTotalItems,
     searchableFields,
     isFetchingList,
     isFetchingDetail,

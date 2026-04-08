@@ -71,6 +71,10 @@ import { TspConfigurationDetail } from './_pages/tsp-configurations/detail/TspCo
 import { TspConfigurationForm } from './_pages/tsp-configurations/form/TspConfigurationForm';
 import { TspConfigurationsList } from './_pages/tsp-configurations/list/TspConfigurationsList';
 
+import { TimeQualityConfigurationDetail } from './_pages/time-quality-configurations/detail/TimeQualityConfigurationDetail';
+import { TimeQualityConfigurationForm } from './_pages/time-quality-configurations/form/TimeQualityConfigurationForm';
+import { TimeQualityConfigurationsList } from './_pages/time-quality-configurations/list/TimeQualityConfigurationsList';
+
 import GlobalMetadataDetail from './_pages/global-metadata/detail';
 import GlobalMetadataList from './_pages/global-metadata/list';
 
@@ -272,6 +276,21 @@ export default function AppRouter() {
                     <Route path={`/${Resource.TspConfigurations.toLowerCase()}/add`} element={<TspConfigurationForm />} />
                     <Route path={`/${Resource.TspConfigurations.toLowerCase()}/edit/:id`} element={<TspConfigurationForm />} />
                     <Route path={`/${Resource.TspConfigurations.toLowerCase()}/detail/:id`} element={<TspConfigurationDetail />} />
+
+                    <Route path={`/${Resource.TimeQualityConfigurations.toLowerCase()}`} element={<TimeQualityConfigurationsList />} />
+                    <Route
+                        path={`/${Resource.TimeQualityConfigurations.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.TimeQualityConfigurations.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.TimeQualityConfigurations.toLowerCase()}/add`} element={<TimeQualityConfigurationForm />} />
+                    <Route
+                        path={`/${Resource.TimeQualityConfigurations.toLowerCase()}/edit/:id`}
+                        element={<TimeQualityConfigurationForm />}
+                    />
+                    <Route
+                        path={`/${Resource.TimeQualityConfigurations.toLowerCase()}/detail/:id`}
+                        element={<TimeQualityConfigurationDetail />}
+                    />
 
                     <Route path={`/${Resource.Groups.toLowerCase()}`} element={<GroupList />} />
                     <Route

@@ -25,6 +25,7 @@ export const enum EntityType {
     CONNECTOR,
     SECRET,
     SIGNING_PROFILE,
+    TIME_QUALITY_CONFIGURATION,
 }
 
 export type Filter = {

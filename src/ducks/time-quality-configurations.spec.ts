@@ -41,15 +41,14 @@ describe('timeQualityConfigurations slice', () => {
         expect(next.isFetchingList).toBe(true);
     });
 
-    test('listTimeQualityConfigurationsSuccess updates list and totalItems', () => {
+    test('listTimeQualityConfigurationsSuccess updates list', () => {
         const configs = [{ uuid: 'c-1' }] as any[];
         const next = reducer(
             { ...initialState, isFetchingList: true },
-            actions.listTimeQualityConfigurationsSuccess({ timeQualityConfigurations: configs, totalItems: 1 }),
+            actions.listTimeQualityConfigurationsSuccess({ timeQualityConfigurations: configs }),
         );
         expect(next.isFetchingList).toBe(false);
         expect(next.timeQualityConfigurations).toEqual(configs);
-        expect(next.timeQualityConfigurationsTotalItems).toBe(1);
     });
 
     test('listTimeQualityConfigurationsFailure clears isFetchingList', () => {
@@ -205,7 +204,6 @@ describe('timeQualityConfigurations selectors', () => {
             ...initialState,
             timeQualityConfiguration: config,
             timeQualityConfigurations: configs,
-            timeQualityConfigurationsTotalItems: 5,
             searchableFields: fields,
             checkedRows: ['c-1'],
             deleteErrorMessage: 'del err',
@@ -223,7 +221,6 @@ describe('timeQualityConfigurations selectors', () => {
 
         expect(selectors.timeQualityConfiguration(state)).toEqual(config);
         expect(selectors.timeQualityConfigurations(state)).toEqual(configs);
-        expect(selectors.timeQualityConfigurationsTotalItems(state)).toBe(5);
         expect(selectors.searchableFields(state)).toEqual(fields);
         expect(selectors.checkedRows(state)).toEqual(['c-1']);
         expect(selectors.deleteErrorMessage(state)).toBe('del err');

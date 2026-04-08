@@ -1,39 +1,50 @@
 import { AppEpic } from 'ducks';
 import { of } from 'rxjs';
-import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { catchError, filter, mergeMap, switchMap } from 'rxjs/operators';
 import { extractError } from 'utils/net';
-import { SearchRequestDto } from 'types/openapi';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { slice } from './time-quality-configurations';
 import { actions as appRedirectActions } from './app-redirect';
 import { actions as alertActions } from './alerts';
 import { actions as userInterfaceActions } from './user-interface';
+import { actions as pagingActions } from './paging';
+import { EntityType } from './filters';
+import { transformSearchRequestModelToDto } from './transform/certificates';
+import { store } from '../App';
 
 const listTimeQualityConfigurations: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listTimeQualityConfigurations.match),
-        switchMap(() => {
-            const searchRequest: SearchRequestDto = { filters: [] };
-            return deps.apiClients.timeQualityConfigurations.listTimeQualityConfigurations({ searchRequestDto: searchRequest }).pipe(
-                switchMap((response) =>
-                    of(
-                        slice.actions.listTimeQualityConfigurationsSuccess({
-                            timeQualityConfigurations: response.items ?? [],
-                            totalItems: response.totalItems ?? 0,
-                        }),
-                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfTimeQualityConfigurations),
+        switchMap((action) => {
+            store.dispatch(pagingActions.list(EntityType.TIME_QUALITY_CONFIGURATION));
+            return deps.apiClients.timeQualityConfigurations
+                .listTimeQualityConfigurations({
+                    searchRequestDto: action.payload ? transformSearchRequestModelToDto(action.payload) : {},
+                })
+                .pipe(
+                    switchMap((response) =>
+                        of(
+                            slice.actions.listTimeQualityConfigurationsSuccess({
+                                timeQualityConfigurations: response.items ?? [],
+                            }),
+                            pagingActions.listSuccess({
+                                entity: EntityType.TIME_QUALITY_CONFIGURATION,
+                                totalItems: response.totalItems ?? 0,
+                            }),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfTimeQualityConfigurations),
+                        ),
                     ),
-                ),
-                catchError((error) =>
-                    of(
-                        slice.actions.listTimeQualityConfigurationsFailure({
-                            error: extractError(error, 'Failed to get Time Quality Configurations list'),
-                        }),
-                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfTimeQualityConfigurations),
+                    catchError((error) =>
+                        of(
+                            slice.actions.listTimeQualityConfigurationsFailure({
+                                error: extractError(error, 'Failed to get Time Quality Configurations list'),
+                            }),
+                            pagingActions.listFailure(EntityType.TIME_QUALITY_CONFIGURATION),
+                            userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfTimeQualityConfigurations),
+                        ),
                     ),
-                ),
-            );
+                );
         }),
     );
 };
@@ -68,7 +79,7 @@ const listTimeQualityConfigurationSearchableFields: AppEpic = (action$, state$, 
         filter(slice.actions.listTimeQualityConfigurationSearchableFields.match),
         switchMap(() =>
             deps.apiClients.timeQualityConfigurations.listTimeQualityConfigurationSearchableFields().pipe(
-                map((fields) => slice.actions.listTimeQualityConfigurationSearchableFieldsSuccess({ searchableFields: fields })),
+                switchMap((fields) => of(slice.actions.listTimeQualityConfigurationSearchableFieldsSuccess({ searchableFields: fields }))),
                 catchError((error) =>
                     of(
                         slice.actions.listTimeQualityConfigurationSearchableFieldsFailure({
