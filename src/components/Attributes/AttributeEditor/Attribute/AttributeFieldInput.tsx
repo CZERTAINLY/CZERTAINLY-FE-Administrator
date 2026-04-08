@@ -233,10 +233,12 @@ export function AttributeFieldInput({ name, descriptor, busy, deleteButton }: At
                                 (fieldState.isTouched || submitCount > 0) && (
                                     <div className="mt-1 text-sm text-red-600">
                                         {typeof fieldState.error === 'string' ? fieldState.error : fieldState.error?.message}
-                                        {regexpConstraint?.description && (
+                                        {(regexpConstraint?.description || regexpConstraint?.data) && (
                                             <div className="mt-1 text-xs text-gray-600 dark:text-neutral-400">
-                                                {regexpConstraint.description}
-                                                {regexpConstraint?.data ? ` (Pattern: ${regexpConstraint.data})` : ''}
+                                                {regexpConstraint.description && <div>{regexpConstraint.description}</div>}
+                                                {regexpConstraint?.data && (
+                                                    <div className="font-mono break-all">Pattern: ${regexpConstraint.data}</div>
+                                                )}
                                             </div>
                                         )}
                                     </div>
