@@ -327,6 +327,7 @@ export default function TokenProfileForm({
                                             options={optionsForTokens}
                                             placeholder="Select to change Token if needed"
                                             placement="bottom"
+                                            required
                                         />
                                         {fieldState.error && fieldState.isTouched && (
                                             <p className="mt-1 text-sm text-red-600">
