@@ -51,7 +51,7 @@ import {
     TrustedCertificateManagementApi,
     ILMSigningProtocolConfigurationManagementApi,
     SigningProfileManagementApi,
-    TSPConfigurationManagementApi,
+    TSPProfileManagementApi,
     TimeQualityConfigurationManagementApi,
 } from 'types/openapi';
 import { TokenInstanceControllerApi } from 'types/openapi/apis/TokenInstanceControllerApi';
@@ -123,7 +123,7 @@ export interface ApiClients {
     secrets: SecretManagementApi;
     ilmSigningProtocolConfigurations: ILMSigningProtocolConfigurationManagementApi;
     signingProfiles: SigningProfileManagementApi;
-    tspConfigurations: TSPConfigurationManagementApi;
+    tspProfiles: TSPProfileManagementApi;
     timeQualityConfigurations: TimeQualityConfigurationManagementApi;
 }
 
@@ -180,7 +180,7 @@ export const backendClient: ApiClients = {
     secrets: new SecretManagementApi(configuration),
     ilmSigningProtocolConfigurations: new ILMSigningProtocolConfigurationManagementApi(configuration),
     signingProfiles: new SigningProfileManagementApi(configuration),
-    tspConfigurations: new TSPConfigurationManagementApi(configuration),
+    tspProfiles: new TSPProfileManagementApi(configuration),
     timeQualityConfigurations: new TimeQualityConfigurationManagementApi(configuration),
 };
 

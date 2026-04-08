@@ -62,7 +62,7 @@ import { slice as vaultProfilesSlice } from './vault-profiles';
 import { slice as vaultsSlice } from './vaults';
 import { slice as ilmSigningProtocolConfigurationsSlice } from './ilm-signing-protocol-configurations';
 import { slice as signingProfilesSlice } from './signing-profiles';
-import { slice as tspConfigurationsSlice } from './tsp-configurations';
+import { slice as tspProfilesSlice } from './tsp-profiles';
 import { slice as timeQualityConfigurationsSlice } from './time-quality-configurations';
 
 export const reducers = combineReducers({
@@ -123,6 +123,6 @@ export const reducers = combineReducers({
     [vaultsSlice.name]: vaultsSlice.reducer,
     [ilmSigningProtocolConfigurationsSlice.name]: ilmSigningProtocolConfigurationsSlice.reducer,
     [signingProfilesSlice.name]: signingProfilesSlice.reducer,
-    [tspConfigurationsSlice.name]: tspConfigurationsSlice.reducer,
+    [tspProfilesSlice.name]: tspProfilesSlice.reducer,
     [timeQualityConfigurationsSlice.name]: timeQualityConfigurationsSlice.reducer,
 });

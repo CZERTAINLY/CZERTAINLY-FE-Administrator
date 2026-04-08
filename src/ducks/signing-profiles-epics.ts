@@ -316,7 +316,7 @@ const activateTsp: AppEpic = (action$, state$, deps) => {
             deps.apiClients.signingProfiles
                 .activateTsp({
                     signingProfileUuid: action.payload.signingProfileUuid,
-                    tspConfigurationUuid: action.payload.tspConfigurationUuid,
+                    tspProfileUuid: action.payload.tspProfileUuid,
                 })
                 .pipe(
                     map((details) => slice.actions.activateTspSuccess({ tspActivationDetails: details })),

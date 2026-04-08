@@ -17,51 +17,51 @@ import type {
 } from './';
 
 /**
- * TSP (Timestamping Protocol) configuration details
+ * TSP (Timestamping Protocol) profile details
  * @export
- * @interface TspConfigurationDto
+ * @interface TspProfileDto
  */
-export interface TspConfigurationDto {
+export interface TspProfileDto {
     /**
      * Object identifier
      * @type {string}
-     * @memberof TspConfigurationDto
+     * @memberof TspProfileDto
      */
     uuid: string;
     /**
      * Object Name
      * @type {string}
-     * @memberof TspConfigurationDto
+     * @memberof TspProfileDto
      */
     name: string;
     /**
-     * Description of the TSP Configuration
+     * Description of the TSP Profile
      * @type {string}
-     * @memberof TspConfigurationDto
+     * @memberof TspProfileDto
      */
     description?: string;
     /**
-     * Enabled flag of the TSP Configuration
+     * Enabled flag of the TSP Profile
      * @type {boolean}
-     * @memberof TspConfigurationDto
+     * @memberof TspProfileDto
      */
     enabled: boolean;
     /**
      * Default Signing Profile
      * @type {SimplifiedSigningProfileDto}
-     * @memberof TspConfigurationDto
+     * @memberof TspProfileDto
      */
     defaultSigningProfile?: SimplifiedSigningProfileDto;
     /**
      * TSP URL for signing
      * @type {string}
-     * @memberof TspConfigurationDto
+     * @memberof TspProfileDto
      */
     signingUrl?: string;
     /**
      * List of Custom Attributes
      * @type {Array<ResponseAttribute>}
-     * @memberof TspConfigurationDto
+     * @memberof TspProfileDto
      */
     customAttributes?: Array<ResponseAttribute>;
 }

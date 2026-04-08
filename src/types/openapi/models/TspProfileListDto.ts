@@ -16,39 +16,39 @@ import type {
 } from './';
 
 /**
- * TSP (Timestamping Protocol) configuration details for listing
+ * TSP (Timestamping Protocol) profile details for listing
  * @export
- * @interface TspConfigurationListDto
+ * @interface TspProfileListDto
  */
-export interface TspConfigurationListDto {
+export interface TspProfileListDto {
     /**
      * Object identifier
      * @type {string}
-     * @memberof TspConfigurationListDto
+     * @memberof TspProfileListDto
      */
     uuid: string;
     /**
      * Object Name
      * @type {string}
-     * @memberof TspConfigurationListDto
+     * @memberof TspProfileListDto
      */
     name: string;
     /**
-     * Description of the TSP Configuration
+     * Description of the TSP Profile
      * @type {string}
-     * @memberof TspConfigurationListDto
+     * @memberof TspProfileListDto
      */
     description?: string;
     /**
      * Default Signing Profile
      * @type {SimplifiedSigningProfileDto}
-     * @memberof TspConfigurationListDto
+     * @memberof TspProfileListDto
      */
     defaultSigningProfile?: SimplifiedSigningProfileDto;
     /**
-     * Enabled flag of the TSP Configuration
+     * Enabled flag of the TSP Profile
      * @type {boolean}
-     * @memberof TspConfigurationListDto
+     * @memberof TspProfileListDto
      */
     enabled: boolean;
 }

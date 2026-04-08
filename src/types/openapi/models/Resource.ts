@@ -80,6 +80,6 @@ export enum Resource {
     IlmSigningProtocolConfigurations = 'ilmSigningProtocolConfigurations',
     SigningProfiles = 'signingProfiles',
     TimeQualityConfigurations = 'timeQualityConfigurations',
-    TspConfigurations = 'tspConfigurations'
+    TspProfiles = 'tspProfiles'
 }
 

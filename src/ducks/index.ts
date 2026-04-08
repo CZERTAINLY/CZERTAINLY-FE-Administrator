@@ -60,7 +60,7 @@ import vaultProfilesEpics from './vault-profiles-epics';
 import vaultsEpics from './vaults-epics';
 import ilmSigningProtocolConfigurationsEpics from './ilm-signing-protocol-configurations-epics';
 import signingProfilesEpics from './signing-profiles-epics';
-import tspConfigurationsEpics from './tsp-configurations-epics';
+import tspProfilesEpics from './tsp-profiles-epics';
 import timeQualityConfigurationsEpics from './time-quality-configurations-epics';
 
 export interface EpicDependencies {
@@ -126,6 +126,6 @@ export const epics = combineEpics(
     ...vaultsEpics,
     ...ilmSigningProtocolConfigurationsEpics,
     ...signingProfilesEpics,
-    ...tspConfigurationsEpics,
+    ...tspProfilesEpics,
     ...timeQualityConfigurationsEpics,
 );

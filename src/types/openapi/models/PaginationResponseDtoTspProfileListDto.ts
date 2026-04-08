@@ -12,42 +12,42 @@
  */
 
 import type {
-    TspConfigurationListDto,
+    TspProfileListDto,
 } from './';
 
 /**
  * @export
- * @interface PaginationResponseDtoTspConfigurationListDto
+ * @interface PaginationResponseDtoTspProfileListDto
  */
-export interface PaginationResponseDtoTspConfigurationListDto {
+export interface PaginationResponseDtoTspProfileListDto {
     /**
      * Items returned
-     * @type {Array<TspConfigurationListDto>}
-     * @memberof PaginationResponseDtoTspConfigurationListDto
+     * @type {Array<TspProfileListDto>}
+     * @memberof PaginationResponseDtoTspProfileListDto
      */
-    items: Array<TspConfigurationListDto>;
+    items: Array<TspProfileListDto>;
     /**
      * Number of entries per page
      * @type {number}
-     * @memberof PaginationResponseDtoTspConfigurationListDto
+     * @memberof PaginationResponseDtoTspProfileListDto
      */
     itemsPerPage: number;
     /**
      * Page number for the request
      * @type {number}
-     * @memberof PaginationResponseDtoTspConfigurationListDto
+     * @memberof PaginationResponseDtoTspProfileListDto
      */
     pageNumber: number;
     /**
      * Number of pages available
      * @type {number}
-     * @memberof PaginationResponseDtoTspConfigurationListDto
+     * @memberof PaginationResponseDtoTspProfileListDto
      */
     totalPages: number;
     /**
      * Number of items available
      * @type {number}
-     * @memberof PaginationResponseDtoTspConfigurationListDto
+     * @memberof PaginationResponseDtoTspProfileListDto
      */
     totalItems: number;
 }

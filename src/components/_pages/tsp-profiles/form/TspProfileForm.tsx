@@ -15,7 +15,7 @@ import Widget from 'components/Widget';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as signingProfileActions, selectors as signingProfileSelectors } from 'ducks/signing-profiles';
-import { actions as tspActions, selectors as tspSelectors } from 'ducks/tsp-configurations';
+import { actions as tspActions, selectors as tspSelectors } from 'ducks/tsp-profiles';
 
 import { PlatformEnum, Resource } from 'types/openapi';
 import { collectFormAttributes, mapProfileAttribute, transformAttributes } from 'utils/attributes/attributes';
@@ -29,7 +29,7 @@ interface FormValues {
     defaultSigningProfile: string;
 }
 
-export const TspConfigurationForm = () => {
+export const TspProfileForm = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -38,7 +38,7 @@ export const TspConfigurationForm = () => {
 
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
 
-    const tspConfiguration = useSelector(tspSelectors.tspConfiguration);
+    const tspProfile = useSelector(tspSelectors.tspProfile);
     const isFetchingDetail = useSelector(tspSelectors.isFetchingDetail);
     const isCreating = useSelector(tspSelectors.isCreating);
     const isUpdating = useSelector(tspSelectors.isUpdating);
@@ -48,7 +48,7 @@ export const TspConfigurationForm = () => {
 
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
     const multipleResourceCustomAttributes = useSelector(
-        customAttributesSelectors.multipleResourceCustomAttributes([Resource.TspConfigurations]),
+        customAttributesSelectors.multipleResourceCustomAttributes([Resource.TspProfiles]),
     );
 
     const isBusy = useMemo(
@@ -58,14 +58,12 @@ export const TspConfigurationForm = () => {
 
     useEffect(() => {
         dispatch(signingProfileActions.listSigningProfiles());
-        dispatch(
-            customAttributesActions.loadMultipleResourceCustomAttributes([{ resource: Resource.TspConfigurations, customAttributes: [] }]),
-        );
+        dispatch(customAttributesActions.loadMultipleResourceCustomAttributes([{ resource: Resource.TspProfiles, customAttributes: [] }]));
     }, [dispatch]);
 
     useEffect(() => {
         if (editMode && id) {
-            dispatch(tspActions.getTspConfiguration({ uuid: id }));
+            dispatch(tspActions.getTspProfile({ uuid: id }));
         }
     }, [dispatch, editMode, id]);
 
@@ -81,11 +79,11 @@ export const TspConfigurationForm = () => {
     const initialCustomAttributes = useMemo(
         () =>
             mapProfileAttribute(
-                tspConfiguration,
+                tspProfile,
                 multipleResourceCustomAttributes,
-                Resource.TspConfigurations,
+                Resource.TspProfiles,
                 'customAttributes',
-                '__attributes__customTspConfiguration__',
+                '__attributes__customTspProfile__',
             ),
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [],
@@ -116,23 +114,22 @@ export const TspConfigurationForm = () => {
     const lastResetIdRef = useRef<string | undefined>(undefined);
 
     useEffect(() => {
-        if (editMode && id && tspConfiguration && tspConfiguration.uuid === id && !isFetchingDetail) {
+        if (editMode && id && tspProfile && tspProfile.uuid === id && !isFetchingDetail) {
             if (lastResetIdRef.current !== id) {
                 const attributeInitialValues = mapProfileAttribute(
-                    tspConfiguration,
+                    tspProfile,
                     multipleResourceCustomAttributes,
-                    Resource.TspConfigurations,
+                    Resource.TspProfiles,
                     'customAttributes',
-                    '__attributes__customTspConfiguration__',
+                    '__attributes__customTspProfile__',
                 );
 
                 reset(
                     {
-                        name: tspConfiguration.name || '',
-                        description: tspConfiguration.description || '',
+                        name: tspProfile.name || '',
+                        description: tspProfile.description || '',
                         defaultSigningProfile:
-                            optionsForSigningProfiles.find((opt) => opt.value === tspConfiguration.defaultSigningProfile?.uuid)?.value ||
-                            '',
+                            optionsForSigningProfiles.find((opt) => opt.value === tspProfile.defaultSigningProfile?.uuid)?.value || '',
                         ...transformAttributes(attributeInitialValues ?? []),
                     },
                     { keepDefaultValues: false },
@@ -141,7 +138,7 @@ export const TspConfigurationForm = () => {
                 lastResetIdRef.current = id;
             }
         }
-    }, [editMode, id, tspConfiguration, isFetchingDetail, optionsForSigningProfiles, multipleResourceCustomAttributes, reset]);
+    }, [editMode, id, tspProfile, isFetchingDetail, optionsForSigningProfiles, multipleResourceCustomAttributes, reset]);
 
     const onSubmit = useCallback(
         (values: FormValues) => {
@@ -149,17 +146,13 @@ export const TspConfigurationForm = () => {
                 name: values.name,
                 description: values.description || undefined,
                 defaultSigningProfileUuid: values.defaultSigningProfile || undefined,
-                customAttributes: collectFormAttributes(
-                    'customTspConfiguration',
-                    multipleResourceCustomAttributes[Resource.TspConfigurations],
-                    values,
-                ),
+                customAttributes: collectFormAttributes('customTspProfile', multipleResourceCustomAttributes[Resource.TspProfiles], values),
             };
 
             if (editMode && id) {
-                dispatch(tspActions.updateTspConfiguration({ uuid: id, tspConfigurationRequestDto: requestDto }));
+                dispatch(tspActions.updateTspProfile({ uuid: id, tspProfileRequestDto: requestDto }));
             } else {
-                dispatch(tspActions.createTspConfiguration({ tspConfigurationRequestDto: requestDto }));
+                dispatch(tspActions.createTspProfile({ tspProfileRequestDto: requestDto }));
             }
         },
         [dispatch, editMode, id, multipleResourceCustomAttributes],
@@ -180,11 +173,11 @@ export const TspConfigurationForm = () => {
             <Breadcrumb
                 items={[
                     {
-                        label: `${getEnumLabel(resourceEnum, Resource.TspConfigurations)} Inventory`,
-                        href: `/${Resource.TspConfigurations.toLowerCase()}`,
+                        label: `${getEnumLabel(resourceEnum, Resource.TspProfiles)} Inventory`,
+                        href: `/${Resource.TspProfiles.toLowerCase()}`,
                     },
                     {
-                        label: editMode ? tspConfiguration?.name || 'Edit TSP Configuration' : 'Create TSP Configuration',
+                        label: editMode ? tspProfile?.name || 'Edit TSP Profile' : 'Create TSP Profile',
                         href: '',
                     },
                 ]}
@@ -192,7 +185,7 @@ export const TspConfigurationForm = () => {
 
             <FormProvider {...methods}>
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <Widget title={editMode ? 'Edit TSP Configuration' : 'Create TSP Configuration'} busy={isBusy} titleSize="large">
+                    <Widget title={editMode ? 'Edit TSP Profile' : 'Create TSP Profile'} busy={isBusy} titleSize="large">
                         <div className="space-y-4">
                             <Controller
                                 name="name"
@@ -203,7 +196,7 @@ export const TspConfigurationForm = () => {
                                         {...field}
                                         id="name"
                                         type="text"
-                                        label="TSP Configuration Name"
+                                        label="TSP Profile Name"
                                         required
                                         invalid={fieldState.error && fieldState.isTouched}
                                         error={getFieldErrorMessage(fieldState)}
@@ -246,9 +239,9 @@ export const TspConfigurationForm = () => {
 
                             <Widget title="Custom Attributes" noBorder busy={isFetchingResourceCustomAttributes}>
                                 <AttributeEditor
-                                    id="customTspConfiguration"
-                                    attributeDescriptors={multipleResourceCustomAttributes[Resource.TspConfigurations] || []}
-                                    attributes={editMode ? tspConfiguration?.customAttributes : undefined}
+                                    id="customTspProfile"
+                                    attributeDescriptors={multipleResourceCustomAttributes[Resource.TspProfiles] || []}
+                                    attributes={editMode ? tspProfile?.customAttributes : undefined}
                                 />
                             </Widget>
 

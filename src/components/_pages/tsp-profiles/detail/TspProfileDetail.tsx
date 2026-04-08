@@ -11,19 +11,19 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
 
-import { actions, selectors } from 'ducks/tsp-configurations';
+import { actions, selectors } from 'ducks/tsp-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { createWidgetDetailHeaders } from 'utils/widget';
 
-export const TspConfigurationDetail = () => {
+export const TspProfileDetail = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const { id } = useParams();
 
-    const tspConfiguration = useSelector(selectors.tspConfiguration);
+    const tspProfile = useSelector(selectors.tspProfile);
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
     const isEnabling = useSelector(selectors.isEnabling);
@@ -40,7 +40,7 @@ export const TspConfigurationDetail = () => {
 
     const getFreshData = useCallback(() => {
         if (!id) return;
-        dispatch(actions.getTspConfiguration({ uuid: id }));
+        dispatch(actions.getTspProfile({ uuid: id }));
     }, [dispatch, id]);
 
     useEffect(() => {
@@ -48,25 +48,25 @@ export const TspConfigurationDetail = () => {
     }, [getFreshData]);
 
     const onEditClick = useCallback(() => {
-        if (!tspConfiguration) return;
-        navigate(`../${Resource.TspConfigurations.toLowerCase()}/edit/${tspConfiguration.uuid}`);
-    }, [tspConfiguration, navigate]);
+        if (!tspProfile) return;
+        navigate(`../${Resource.TspProfiles.toLowerCase()}/edit/${tspProfile.uuid}`);
+    }, [tspProfile, navigate]);
 
     const onEnableClick = useCallback(() => {
-        if (!tspConfiguration) return;
-        dispatch(actions.enableTspConfiguration({ uuid: tspConfiguration.uuid }));
-    }, [tspConfiguration, dispatch]);
+        if (!tspProfile) return;
+        dispatch(actions.enableTspProfile({ uuid: tspProfile.uuid }));
+    }, [tspProfile, dispatch]);
 
     const onDisableClick = useCallback(() => {
-        if (!tspConfiguration) return;
-        dispatch(actions.disableTspConfiguration({ uuid: tspConfiguration.uuid }));
-    }, [tspConfiguration, dispatch]);
+        if (!tspProfile) return;
+        dispatch(actions.disableTspProfile({ uuid: tspProfile.uuid }));
+    }, [tspProfile, dispatch]);
 
     const onDeleteConfirmed = useCallback(() => {
-        if (!tspConfiguration) return;
-        dispatch(actions.deleteTspConfiguration({ uuid: tspConfiguration.uuid }));
+        if (!tspProfile) return;
+        dispatch(actions.deleteTspProfile({ uuid: tspProfile.uuid }));
         setConfirmDelete(false);
-    }, [tspConfiguration, dispatch]);
+    }, [tspProfile, dispatch]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -84,77 +84,75 @@ export const TspConfigurationDetail = () => {
             },
             {
                 icon: 'check',
-                disabled: tspConfiguration?.enabled ?? true,
+                disabled: tspProfile?.enabled ?? true,
                 tooltip: 'Enable',
                 onClick: onEnableClick,
             },
             {
                 icon: 'times',
-                disabled: !(tspConfiguration?.enabled ?? false),
+                disabled: !(tspProfile?.enabled ?? false),
                 tooltip: 'Disable',
                 onClick: onDisableClick,
             },
         ],
-        [tspConfiguration, onEditClick, onEnableClick, onDisableClick],
+        [tspProfile, onEditClick, onEnableClick, onDisableClick],
     );
 
     const tableHeader: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const detailData: TableDataRow[] = useMemo(
         () =>
-            !tspConfiguration
+            !tspProfile
                 ? []
                 : [
                       {
                           id: 'uuid',
-                          columns: ['UUID', tspConfiguration.uuid],
+                          columns: ['UUID', tspProfile.uuid],
                       },
                       {
                           id: 'name',
-                          columns: ['Name', tspConfiguration.name],
+                          columns: ['Name', tspProfile.name],
                       },
                       {
                           id: 'description',
-                          columns: ['Description', tspConfiguration.description || ''],
+                          columns: ['Description', tspProfile.description || ''],
                       },
                       {
                           id: 'status',
-                          columns: ['Status', <StatusBadge enabled={tspConfiguration.enabled} />],
+                          columns: ['Status', <StatusBadge enabled={tspProfile.enabled} />],
                       },
                       {
                           id: 'signingUrl',
-                          columns: ['TSP Signing URL', tspConfiguration.signingUrl ? tspConfiguration.signingUrl : '-'],
+                          columns: ['TSP Signing URL', tspProfile.signingUrl ? tspProfile.signingUrl : '-'],
                       },
                   ],
-        [tspConfiguration],
+        [tspProfile],
     );
 
     const signingProfileData: TableDataRow[] = useMemo(
         () =>
-            !tspConfiguration?.defaultSigningProfile
+            !tspProfile?.defaultSigningProfile
                 ? []
                 : [
                       {
                           id: 'uuid',
-                          columns: ['UUID', tspConfiguration.defaultSigningProfile.uuid],
+                          columns: ['UUID', tspProfile.defaultSigningProfile.uuid],
                       },
                       {
                           id: 'name',
                           columns: [
                               'Name',
-                              <Link
-                                  to={`../../${Resource.SigningProfiles.toLowerCase()}/detail/${tspConfiguration.defaultSigningProfile.uuid}`}
-                              >
-                                  {tspConfiguration.defaultSigningProfile.name}
+                              <Link to={`../../${Resource.SigningProfiles.toLowerCase()}/detail/${tspProfile.defaultSigningProfile.uuid}`}>
+                                  {tspProfile.defaultSigningProfile.name}
                               </Link>,
                           ],
                       },
                       {
                           id: 'status',
-                          columns: ['Status', <StatusBadge enabled={tspConfiguration.defaultSigningProfile.enabled} />],
+                          columns: ['Status', <StatusBadge enabled={tspProfile.defaultSigningProfile.enabled} />],
                       },
                   ],
-        [tspConfiguration],
+        [tspProfile],
     );
 
     const signingProfileTitle = useMemo(
@@ -167,25 +165,25 @@ export const TspConfigurationDetail = () => {
             <Breadcrumb
                 items={[
                     {
-                        label: `${getEnumLabel(resourceEnum, Resource.TspConfigurations)} Inventory`,
-                        href: `/${Resource.TspConfigurations.toLowerCase()}`,
+                        label: `${getEnumLabel(resourceEnum, Resource.TspProfiles)} Inventory`,
+                        href: `/${Resource.TspProfiles.toLowerCase()}`,
                     },
-                    { label: tspConfiguration?.name || 'TSP Configuration Details', href: '' },
+                    { label: tspProfile?.name || 'TSP Profile Details', href: '' },
                 ]}
             />
 
-            <Widget widgetLockName={LockWidgetNameEnum.TspConfigurationDetails} busy={isBusy} noBorder>
+            <Widget widgetLockName={LockWidgetNameEnum.TspProfileDetails} busy={isBusy} noBorder>
                 <Container>
                     <Container className="md:grid grid-cols-2 items-start">
-                        <Widget title="TSP Configuration Details" widgetButtons={buttons} titleSize="large" refreshAction={getFreshData}>
+                        <Widget title="TSP Profile Details" widgetButtons={buttons} titleSize="large" refreshAction={getFreshData}>
                             <CustomTable headers={tableHeader} data={detailData} />
                         </Widget>
 
-                        {tspConfiguration && (
+                        {tspProfile && (
                             <CustomAttributeWidget
-                                resource={Resource.TspConfigurations}
-                                resourceUuid={tspConfiguration.uuid}
-                                attributes={tspConfiguration.customAttributes}
+                                resource={Resource.TspProfiles}
+                                resourceUuid={tspProfile.uuid}
+                                attributes={tspProfile.customAttributes}
                             />
                         )}
                     </Container>
@@ -198,8 +196,8 @@ export const TspConfigurationDetail = () => {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption="Delete TSP Configuration"
-                body="You are about to delete this TSP Configuration. Is this what you want to do?"
+                caption="Delete TSP Profile"
+                body="You are about to delete this TSP Profile. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
@@ -210,10 +208,10 @@ export const TspConfigurationDetail = () => {
 
             <Dialog
                 isOpen={deleteErrorMessage.length > 0}
-                caption="Delete TSP Configuration"
+                caption="Delete TSP Profile"
                 body={
                     <>
-                        Failed to delete the TSP Configuration. Please find the details below:
+                        Failed to delete the TSP Profile. Please find the details below:
                         <br />
                         <br />
                         {deleteErrorMessage}

@@ -500,7 +500,7 @@ describe('signingProfiles epics', () => {
         const details = { uuid: 'tsp-1' };
         const emitted = await runEpic(
             SigningProfilesEpicIndex.ActivateTsp,
-            signingProfileActions.activateTsp({ signingProfileUuid: 'p-1', tspConfigurationUuid: 'tsp-1' }),
+            signingProfileActions.activateTsp({ signingProfileUuid: 'p-1', tspProfileUuid: 'tsp-1' }),
             {
                 signingProfiles: {
                     activateTsp: () => of(details),
@@ -516,7 +516,7 @@ describe('signingProfiles epics', () => {
         const err = new Error('activate TSP failed');
         const emitted = await runEpic(
             SigningProfilesEpicIndex.ActivateTsp,
-            signingProfileActions.activateTsp({ signingProfileUuid: 'p-1', tspConfigurationUuid: 'tsp-1' }),
+            signingProfileActions.activateTsp({ signingProfileUuid: 'p-1', tspProfileUuid: 'tsp-1' }),
             {
                 signingProfiles: {
                     activateTsp: () => throwError(() => err),

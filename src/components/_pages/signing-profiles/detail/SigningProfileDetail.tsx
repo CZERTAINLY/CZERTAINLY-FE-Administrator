@@ -17,7 +17,7 @@ import TabLayout from 'components/Layout/TabLayout';
 import { actions, selectors } from 'ducks/signing-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as ilmConfigActions, selectors as ilmConfigSelectors } from 'ducks/ilm-signing-protocol-configurations';
-import { actions as tspConfigActions, selectors as tspConfigSelectors } from 'ducks/tsp-configurations';
+import { actions as tspProfileActions, selectors as tspProfileSelectors } from 'ducks/tsp-profiles';
 import Select from 'components/Select';
 import AssociateApprovalProfileDialogBody from '../AssociateApprovalProfileDialogBody';
 
@@ -85,7 +85,7 @@ export default function SigningProfileDetail() {
     const isDeactivatingTsp = useSelector(selectors.isDeactivatingTsp);
 
     const ilmConfigurations = useSelector(ilmConfigSelectors.ilmSigningProtocolConfigurations);
-    const tspConfigurations = useSelector(tspConfigSelectors.tspConfigurations);
+    const tspProfiles = useSelector(tspProfileSelectors.tspProfiles);
 
     const associatedApprovalProfiles = useSelector(selectors.associatedApprovalProfiles);
     const isFetchingAssociatedApprovalProfiles = useSelector(selectors.isFetchingAssociatedApprovalProfiles);
@@ -101,7 +101,7 @@ export default function SigningProfileDetail() {
     const [activateIlmDialog, setActivateIlmDialog] = useState(false);
     const [activateTspDialog, setActivateTspDialog] = useState(false);
     const [selectedIlmConfigUuid, setSelectedIlmConfigUuid] = useState<string | undefined>(undefined);
-    const [selectedTspConfigUuid, setSelectedTspConfigUuid] = useState<string | undefined>(undefined);
+    const [selectedTspProfileUuid, setSelectedTspConfigUuid] = useState<string | undefined>(undefined);
     const [associateApprovalProfileDialog, setAssociateApprovalProfileDialog] = useState(false);
 
     // ── Derived ────────────────────────────────────────────────────────────────
@@ -512,7 +512,7 @@ export default function SigningProfileDetail() {
                                 setConfirmDeactivateTsp(true);
                             } else {
                                 setSelectedTspConfigUuid(undefined);
-                                dispatch(tspConfigActions.listTspConfigurations());
+                                dispatch(tspProfileActions.listTspProfiles());
                                 setActivateTspDialog(true);
                             }
                         }}
@@ -806,11 +806,11 @@ export default function SigningProfileDetail() {
                 caption="Activate TSP Protocol"
                 body={
                     <div>
-                        <p className="mb-3">Select a TSP Configuration to activate on this Signing Profile.</p>
+                        <p className="mb-3">Select a TSP Profile to activate on this Signing Profile.</p>
                         <Select
                             id="tspConfigSelect"
-                            options={tspConfigurations.map((c) => ({ value: c.uuid, label: c.name }))}
-                            value={selectedTspConfigUuid ?? ''}
+                            options={tspProfiles.map((c) => ({ value: c.uuid, label: c.name }))}
+                            value={selectedTspProfileUuid ?? ''}
                             onChange={(value) => setSelectedTspConfigUuid(value as string | undefined)}
                             placeholder="Select TSP configuration"
                         />
@@ -820,10 +820,10 @@ export default function SigningProfileDetail() {
                 buttons={[
                     {
                         color: 'primary',
-                        disabled: !selectedTspConfigUuid,
+                        disabled: !selectedTspProfileUuid,
                         onClick: () => {
-                            if (id && selectedTspConfigUuid) {
-                                dispatch(actions.activateTsp({ signingProfileUuid: id, tspConfigurationUuid: selectedTspConfigUuid }));
+                            if (id && selectedTspProfileUuid) {
+                                dispatch(actions.activateTsp({ signingProfileUuid: id, tspProfileUuid: selectedTspProfileUuid }));
                             }
                             setActivateTspDialog(false);
                         },

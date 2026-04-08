@@ -41,7 +41,7 @@ export interface ActivateIlmSigningProtocolRequest {
 
 export interface ActivateTspRequest {
     signingProfileUuid: string;
-    tspConfigurationUuid: string;
+    tspProfileUuid: string;
 }
 
 export interface AssociateWithApprovalProfileRequest {
@@ -156,14 +156,14 @@ export class SigningProfileManagementApi extends BaseAPI {
     /**
      * Activate TSP for Signing Profile
      */
-    activateTsp({ signingProfileUuid, tspConfigurationUuid }: ActivateTspRequest): Observable<TspActivationDetailDto>
-    activateTsp({ signingProfileUuid, tspConfigurationUuid }: ActivateTspRequest, opts?: OperationOpts): Observable<AjaxResponse<TspActivationDetailDto>>
-    activateTsp({ signingProfileUuid, tspConfigurationUuid }: ActivateTspRequest, opts?: OperationOpts): Observable<TspActivationDetailDto | AjaxResponse<TspActivationDetailDto>> {
+    activateTsp({ signingProfileUuid, tspProfileUuid }: ActivateTspRequest): Observable<TspActivationDetailDto>
+    activateTsp({ signingProfileUuid, tspProfileUuid }: ActivateTspRequest, opts?: OperationOpts): Observable<AjaxResponse<TspActivationDetailDto>>
+    activateTsp({ signingProfileUuid, tspProfileUuid }: ActivateTspRequest, opts?: OperationOpts): Observable<TspActivationDetailDto | AjaxResponse<TspActivationDetailDto>> {
         throwIfNullOrUndefined(signingProfileUuid, 'signingProfileUuid', 'activateTsp');
-        throwIfNullOrUndefined(tspConfigurationUuid, 'tspConfigurationUuid', 'activateTsp');
+        throwIfNullOrUndefined(tspProfileUuid, 'tspProfileUuid', 'activateTsp');
 
         return this.request<TspActivationDetailDto>({
-            url: '/v1/signingProfiles/{signingProfileUuid}/protocols/tsp/activate/{tspConfigurationUuid}'.replace('{signingProfileUuid}', encodeURI(signingProfileUuid)).replace('{tspConfigurationUuid}', encodeURI(tspConfigurationUuid)),
+            url: '/v1/signingProfiles/{signingProfileUuid}/protocols/tsp/activate/{tspProfileUuid}'.replace('{signingProfileUuid}', encodeURI(signingProfileUuid)).replace('{tspProfileUuid}', encodeURI(tspProfileUuid)),
             method: 'PATCH',
         }, opts?.responseOpts);
     };

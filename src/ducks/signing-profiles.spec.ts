@@ -255,7 +255,7 @@ describe('signingProfiles slice', () => {
     });
 
     test('activateTsp sets isActivatingTsp', () => {
-        const next = reducer(initialState, actions.activateTsp({ signingProfileUuid: 'p-1', tspConfigurationUuid: 'tsp-1' }));
+        const next = reducer(initialState, actions.activateTsp({ signingProfileUuid: 'p-1', tspProfileUuid: 'tsp-1' }));
         expect(next.isActivatingTsp).toBe(true);
     });
 

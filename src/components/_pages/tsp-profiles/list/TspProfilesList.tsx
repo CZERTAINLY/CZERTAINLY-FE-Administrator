@@ -10,16 +10,16 @@ import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { actions, selectors } from 'ducks/tsp-configurations';
+import { actions, selectors } from 'ducks/tsp-profiles';
 import { Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
-export const TspConfigurationsList = () => {
+export const TspProfilesList = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const checkedRows = useSelector(selectors.checkedRows);
-    const tspConfigurations = useSelector(selectors.tspConfigurations);
+    const tspProfiles = useSelector(selectors.tspProfiles);
     const bulkDeleteErrorMessages = useSelector(selectors.bulkDeleteErrorMessages);
 
     const isFetching = useSelector(selectors.isFetchingList);
@@ -35,7 +35,7 @@ export const TspConfigurationsList = () => {
 
     const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
-        dispatch(actions.listTspConfigurations());
+        dispatch(actions.listTspProfiles());
     }, [dispatch]);
 
     useEffect(() => {
@@ -53,15 +53,15 @@ export const TspConfigurationsList = () => {
     }, [navigate]);
 
     const onEnableClick = useCallback(() => {
-        dispatch(actions.bulkEnableTspConfigurations({ uuids: checkedRows }));
+        dispatch(actions.bulkEnableTspProfiles({ uuids: checkedRows }));
     }, [checkedRows, dispatch]);
 
     const onDisableClick = useCallback(() => {
-        dispatch(actions.bulkDisableTspConfigurations({ uuids: checkedRows }));
+        dispatch(actions.bulkDisableTspProfiles({ uuids: checkedRows }));
     }, [checkedRows, dispatch]);
 
     const onDeleteConfirmed = useCallback(() => {
-        dispatch(actions.bulkDeleteTspConfigurations({ uuids: checkedRows }));
+        dispatch(actions.bulkDeleteTspProfiles({ uuids: checkedRows }));
         setConfirmDelete(false);
     }, [checkedRows, dispatch]);
 
@@ -142,7 +142,7 @@ export const TspConfigurationsList = () => {
 
     const tableData: TableDataRow[] = useMemo(
         () =>
-            tspConfigurations.map((config) => ({
+            tspProfiles.map((config) => ({
                 id: config.uuid,
                 columns: [
                     <span style={{ whiteSpace: 'nowrap' }}>
@@ -162,15 +162,15 @@ export const TspConfigurationsList = () => {
                     <StatusBadge enabled={config.enabled} />,
                 ],
             })),
-        [tspConfigurations],
+        [tspProfiles],
     );
 
     return (
         <Container>
             <Widget
-                title="List of TSP Configurations"
+                title="List of TSP Profiles"
                 busy={isBusy}
-                widgetLockName={LockWidgetNameEnum.ListOfTspConfigurations}
+                widgetLockName={LockWidgetNameEnum.ListOfTspProfiles}
                 widgetButtons={buttons}
                 titleSize="large"
                 refreshAction={getFreshData}
@@ -187,8 +187,8 @@ export const TspConfigurationsList = () => {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete ${checkedRows.length > 1 ? 'TSP Configurations' : 'a TSP Configuration'}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? 'TSP Configurations' : 'a TSP Configuration'}. Is this what you want to do?`}
+                caption={`Delete ${checkedRows.length > 1 ? 'TSP Profiles' : 'a TSP Profile'}`}
+                body={`You are about to delete ${checkedRows.length > 1 ? 'TSP Profiles' : 'a TSP Profile'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
@@ -199,12 +199,12 @@ export const TspConfigurationsList = () => {
 
             <Dialog
                 isOpen={showDeleteErrors}
-                caption="Delete TSP Configurations"
+                caption="Delete TSP Profiles"
                 body={
                     <ForceDeleteErrorTable
                         items={bulkDeleteErrorMessages}
-                        entityNameSingular="a TSP Configuration"
-                        entityNamePlural="TSP Configurations"
+                        entityNameSingular="a TSP Profile"
+                        entityNamePlural="TSP Profiles"
                         itemsCount={checkedRows.length}
                     />
                 }

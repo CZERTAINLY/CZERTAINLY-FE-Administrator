@@ -16,33 +16,33 @@ import type {
 } from './';
 
 /**
- * Request to create or update a TSP (Timestamping Protocol) Configuration
+ * Request to create or update a TSP (Timestamping Protocol) Profile
  * @export
- * @interface TspConfigurationRequestDto
+ * @interface TspProfileRequestDto
  */
-export interface TspConfigurationRequestDto {
+export interface TspProfileRequestDto {
     /**
-     * Name of the TSP Configuration
+     * Name of the TSP Profile
      * @type {string}
-     * @memberof TspConfigurationRequestDto
+     * @memberof TspProfileRequestDto
      */
     name: string;
     /**
-     * Description of the TSP Configuration
+     * Description of the TSP Profile
      * @type {string}
-     * @memberof TspConfigurationRequestDto
+     * @memberof TspProfileRequestDto
      */
     description?: string;
     /**
      * UUID of the default Signing Profile
      * @type {string}
-     * @memberof TspConfigurationRequestDto
+     * @memberof TspProfileRequestDto
      */
     defaultSigningProfileUuid?: string;
     /**
      * List of Custom Attributes
      * @type {Array<RequestAttribute>}
-     * @memberof TspConfigurationRequestDto
+     * @memberof TspProfileRequestDto
      */
     customAttributes?: Array<RequestAttribute>;
 }

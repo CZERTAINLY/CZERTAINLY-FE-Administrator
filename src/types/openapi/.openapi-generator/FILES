@@ -46,7 +46,7 @@ apis/SecretManagementApi.ts
 apis/SettingsApi.ts
 apis/SigningProfileManagementApi.ts
 apis/StatisticsDashboardApi.ts
-apis/TSPConfigurationManagementApi.ts
+apis/TSPProfileManagementApi.ts
 apis/TimeQualityConfigurationManagementApi.ts
 apis/TokenInstanceManagementApi.ts
 apis/TokenProfileManagementApi.ts
@@ -296,8 +296,6 @@ models/DiscoveryHistoryDetailDto.ts
 models/DiscoveryHistoryDto.ts
 models/DiscoveryResponseDto.ts
 models/DiscoveryStatus.ts
-models/DocumentSigningWorkflowDto.ts
-models/DocumentSigningWorkflowRequestDto.ts
 models/EditKeyItemDto.ts
 models/EditKeyRequestDto.ts
 models/EditLocationRequestDto.ts
@@ -415,7 +413,7 @@ models/PaginationResponseDtoIlmSigningProtocolConfigurationListDto.ts
 models/PaginationResponseDtoSecretDto.ts
 models/PaginationResponseDtoSigningProfileListDto.ts
 models/PaginationResponseDtoTimeQualityConfigurationListDto.ts
-models/PaginationResponseDtoTspConfigurationListDto.ts
+models/PaginationResponseDtoTspProfileListDto.ts
 models/PaginationResponseDtoVaultInstanceDto.ts
 models/PaginationResponseDtoVaultProfileDto.ts
 models/PlatformEnum.ts
@@ -567,9 +565,9 @@ models/TriggerType.ts
 models/TrustedCertificateDto.ts
 models/TrustedCertificateRequestDto.ts
 models/TspActivationDetailDto.ts
-models/TspConfigurationDto.ts
-models/TspConfigurationListDto.ts
-models/TspConfigurationRequestDto.ts
+models/TspProfileDto.ts
+models/TspProfileListDto.ts
+models/TspProfileRequestDto.ts
 models/UpdateActionRequestDto.ts
 models/UpdateConditionRequestDto.ts
 models/UpdateExecutionRequestDto.ts

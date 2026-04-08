@@ -377,7 +377,7 @@ export const slice = createSlice({
         },
 
         // TSP activation
-        activateTsp: (state, action: PayloadAction<{ signingProfileUuid: string; tspConfigurationUuid: string }>) => {
+        activateTsp: (state, action: PayloadAction<{ signingProfileUuid: string; tspProfileUuid: string }>) => {
             state.isActivatingTsp = true;
         },
 

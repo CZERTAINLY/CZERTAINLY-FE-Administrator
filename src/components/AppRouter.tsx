@@ -67,9 +67,9 @@ import ScepProfilesList from './_pages/scep-profiles/list';
 import CmpProfileDetails from './_pages/cmp-profiles/details';
 import CmpProfilesList from './_pages/cmp-profiles/list';
 
-import { TspConfigurationDetail } from './_pages/tsp-configurations/detail/TspConfigurationDetail';
-import { TspConfigurationForm } from './_pages/tsp-configurations/form/TspConfigurationForm';
-import { TspConfigurationsList } from './_pages/tsp-configurations/list/TspConfigurationsList';
+import { TspProfileDetail } from './_pages/tsp-profiles/detail/TspProfileDetail';
+import { TspProfileForm } from './_pages/tsp-profiles/form/TspProfileForm';
+import { TspProfilesList } from './_pages/tsp-profiles/list/TspProfilesList';
 
 import { TimeQualityConfigurationDetail } from './_pages/time-quality-configurations/detail/TimeQualityConfigurationDetail';
 import { TimeQualityConfigurationForm } from './_pages/time-quality-configurations/form/TimeQualityConfigurationForm';
@@ -268,14 +268,14 @@ export default function AppRouter() {
                     />
                     <Route path={`/${Resource.CmpProfiles.toLowerCase()}/detail/:id`} element={<CmpProfileDetails />} />
 
-                    <Route path={`/${Resource.TspConfigurations.toLowerCase()}`} element={<TspConfigurationsList />} />
+                    <Route path={`/${Resource.TspProfiles.toLowerCase()}`} element={<TspProfilesList />} />
                     <Route
-                        path={`/${Resource.TspConfigurations.toLowerCase()}/list`}
-                        element={<Navigate to={`/${Resource.TspConfigurations.toLowerCase()}`} />}
+                        path={`/${Resource.TspProfiles.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.TspProfiles.toLowerCase()}`} />}
                     />
-                    <Route path={`/${Resource.TspConfigurations.toLowerCase()}/add`} element={<TspConfigurationForm />} />
-                    <Route path={`/${Resource.TspConfigurations.toLowerCase()}/edit/:id`} element={<TspConfigurationForm />} />
-                    <Route path={`/${Resource.TspConfigurations.toLowerCase()}/detail/:id`} element={<TspConfigurationDetail />} />
+                    <Route path={`/${Resource.TspProfiles.toLowerCase()}/add`} element={<TspProfileForm />} />
+                    <Route path={`/${Resource.TspProfiles.toLowerCase()}/edit/:id`} element={<TspProfileForm />} />
+                    <Route path={`/${Resource.TspProfiles.toLowerCase()}/detail/:id`} element={<TspProfileDetail />} />
 
                     <Route path={`/${Resource.TimeQualityConfigurations.toLowerCase()}`} element={<TimeQualityConfigurationsList />} />
                     <Route
