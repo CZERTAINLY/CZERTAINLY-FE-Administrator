@@ -21,7 +21,6 @@ import { PlatformEnum, Resource } from 'types/openapi';
 import { collectFormAttributes, mapProfileAttribute, transformAttributes } from 'utils/attributes/attributes';
 import { validateAlphaNumericWithoutAccents, validateLength, validateRequired } from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
-import { deepEqual } from 'utils/deep-equal';
 
 interface FormValues {
     name: string;
@@ -107,38 +106,38 @@ export const TspProfileForm = () => {
     const {
         handleSubmit,
         control,
-        formState: { isSubmitting, isValid },
+        formState: { isSubmitting, isValid, isDirty },
         reset,
     } = methods;
 
     const lastResetIdRef = useRef<string | undefined>(undefined);
 
+    const valuesToReset = useMemo<FormValues | undefined>(() => {
+        if (!editMode || !id || !tspProfile || tspProfile.uuid !== id || isFetchingDetail) return undefined;
+
+        const attributeInitialValues = mapProfileAttribute(
+            tspProfile,
+            multipleResourceCustomAttributes,
+            Resource.TspProfiles,
+            'customAttributes',
+            '__attributes__customTspProfile__',
+        );
+
+        return {
+            name: tspProfile.name || '',
+            description: tspProfile.description || '',
+            defaultSigningProfile:
+                optionsForSigningProfiles.find((opt) => opt.value === tspProfile.defaultSigningProfile?.uuid)?.value || '',
+            ...transformAttributes(attributeInitialValues ?? []),
+        };
+    }, [editMode, id, tspProfile, isFetchingDetail, optionsForSigningProfiles, multipleResourceCustomAttributes]);
+
     useEffect(() => {
-        if (editMode && id && tspProfile && tspProfile.uuid === id && !isFetchingDetail) {
-            if (lastResetIdRef.current !== id) {
-                const attributeInitialValues = mapProfileAttribute(
-                    tspProfile,
-                    multipleResourceCustomAttributes,
-                    Resource.TspProfiles,
-                    'customAttributes',
-                    '__attributes__customTspProfile__',
-                );
-
-                reset(
-                    {
-                        name: tspProfile.name || '',
-                        description: tspProfile.description || '',
-                        defaultSigningProfile:
-                            optionsForSigningProfiles.find((opt) => opt.value === tspProfile.defaultSigningProfile?.uuid)?.value || '',
-                        ...transformAttributes(attributeInitialValues ?? []),
-                    },
-                    { keepDefaultValues: false },
-                );
-
-                lastResetIdRef.current = id;
-            }
+        if (valuesToReset && lastResetIdRef.current !== id) {
+            reset(valuesToReset);
+            lastResetIdRef.current = id;
         }
-    }, [editMode, id, tspProfile, isFetchingDetail, optionsForSigningProfiles, multipleResourceCustomAttributes, reset]);
+    }, [valuesToReset, id, reset]);
 
     const onSubmit = useCallback(
         (values: FormValues) => {
@@ -161,12 +160,6 @@ export const TspProfileForm = () => {
     const onCancel = useCallback(() => {
         navigate(-1);
     }, [navigate]);
-
-    const allFormValues = useWatch({ control });
-    const isEqual = useMemo(
-        () => deepEqual(defaultValues as unknown as Record<string, unknown>, allFormValues as unknown as Record<string, unknown>),
-        [defaultValues, allFormValues],
-    );
 
     return (
         <Container>
@@ -253,7 +246,7 @@ export const TspProfileForm = () => {
                                     title={editMode ? 'Update' : 'Create'}
                                     inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                     inProgress={isSubmitting || isCreating || isUpdating}
-                                    disabled={isEqual || isSubmitting || !isValid}
+                                    disabled={!isDirty || isSubmitting || !isValid}
                                     type="submit"
                                 />
                             </Container>

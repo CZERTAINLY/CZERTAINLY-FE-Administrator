@@ -19,34 +19,8 @@ import { actions as tqcActions, selectors as tqcSelectors } from 'ducks/time-qua
 
 import { Resource } from 'types/openapi';
 import { collectFormAttributes, mapProfileAttribute, transformAttributes } from 'utils/attributes/attributes';
-import { validateAlphaNumericWithoutAccents, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithoutAccents, validateIso8601Duration, validateNtpServers, validateRequired } from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
-import { deepEqual } from 'utils/deep-equal';
-
-/**
- * Validates an ISO 8601 duration string (e.g. "PT1H30M", "P1DT2H").
- * Returns undefined when valid or an error message when invalid.
- */
-const validateIso8601Duration = () => (value: string) => {
-    if (!value?.trim()) return undefined;
-    return /^P(\d+D)?(T(\d+H)?(\d+M)?(\d+S)?)?$/.test(value) && value !== 'P'
-        ? undefined
-        : 'Invalid duration. Use format like 1d 2h 30m 45s.';
-};
-
-/**
- * Validates that every item in the ntpServers array is a valid hostname or IPv4 address.
- */
-const validateNtpServers = (servers: string[]) => {
-    if (!servers || servers.length === 0) return 'At least one NTP server is required';
-    const hostnameOrIpRegex =
-        /^(([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}|[a-zA-Z0-9\-]+|(25[0-5]|2[0-4]\d|[01]?\d\d?)(\.(25[0-5]|2[0-4]\d|[01]?\d\d?)){3})$/;
-    const invalid = servers.filter((s) => !hostnameOrIpRegex.test(s.trim()));
-    if (invalid.length > 0) {
-        return `Invalid server address${invalid.length > 1 ? 'es' : ''}: ${invalid.join(', ')}`;
-    }
-    return undefined;
-};
 
 interface FormValues {
     name: string;
@@ -133,49 +107,47 @@ export const TimeQualityConfigurationForm = () => {
     const {
         handleSubmit,
         control,
-        formState: { isSubmitting, isValid },
+        formState: { isSubmitting, isValid, isDirty },
         reset,
     } = methods;
 
     const lastResetIdRef = useRef<string | undefined>(undefined);
 
+    const valuesToReset = useMemo<FormValues | undefined>(() => {
+        if (!editMode || !id || !timeQualityConfiguration || timeQualityConfiguration.uuid !== id || isFetchingDetail) return undefined;
+
+        const attributeInitialValues = mapProfileAttribute(
+            timeQualityConfiguration,
+            multipleResourceCustomAttributes,
+            Resource.TimeQualityConfigurations,
+            'customAttributes',
+            '__attributes__customTimeQualityConfiguration__',
+        );
+
+        return {
+            name: timeQualityConfiguration.name || '',
+            accuracy: timeQualityConfiguration.accuracy || '',
+            ntpServers: timeQualityConfiguration.ntpServers || [],
+            ntpCheckInterval: timeQualityConfiguration.ntpCheckInterval || '',
+            ntpCheckTimeout: timeQualityConfiguration.ntpCheckTimeout || '',
+            ntpSamplesPerServer:
+                timeQualityConfiguration.ntpSamplesPerServer !== undefined ? String(timeQualityConfiguration.ntpSamplesPerServer) : '',
+            ntpServersMinReachable:
+                timeQualityConfiguration.ntpServersMinReachable !== undefined
+                    ? String(timeQualityConfiguration.ntpServersMinReachable)
+                    : '',
+            maxClockDrift: timeQualityConfiguration.maxClockDrift || '',
+            leapSecondGuard: timeQualityConfiguration.leapSecondGuard ?? false,
+            ...transformAttributes(attributeInitialValues ?? []),
+        };
+    }, [editMode, id, timeQualityConfiguration, isFetchingDetail, multipleResourceCustomAttributes]);
+
     useEffect(() => {
-        if (editMode && id && timeQualityConfiguration && timeQualityConfiguration.uuid === id && !isFetchingDetail) {
-            if (lastResetIdRef.current !== id) {
-                const attributeInitialValues = mapProfileAttribute(
-                    timeQualityConfiguration,
-                    multipleResourceCustomAttributes,
-                    Resource.TimeQualityConfigurations,
-                    'customAttributes',
-                    '__attributes__customTimeQualityConfiguration__',
-                );
-
-                reset(
-                    {
-                        name: timeQualityConfiguration.name || '',
-                        accuracy: timeQualityConfiguration.accuracy || '',
-                        ntpServers: timeQualityConfiguration.ntpServers || [],
-                        ntpCheckInterval: timeQualityConfiguration.ntpCheckInterval || '',
-                        ntpCheckTimeout: timeQualityConfiguration.ntpCheckTimeout || '',
-                        ntpSamplesPerServer:
-                            timeQualityConfiguration.ntpSamplesPerServer !== undefined
-                                ? String(timeQualityConfiguration.ntpSamplesPerServer)
-                                : '',
-                        ntpServersMinReachable:
-                            timeQualityConfiguration.ntpServersMinReachable !== undefined
-                                ? String(timeQualityConfiguration.ntpServersMinReachable)
-                                : '',
-                        maxClockDrift: timeQualityConfiguration.maxClockDrift || '',
-                        leapSecondGuard: timeQualityConfiguration.leapSecondGuard ?? false,
-                        ...transformAttributes(attributeInitialValues ?? []),
-                    },
-                    { keepDefaultValues: false },
-                );
-
-                lastResetIdRef.current = id;
-            }
+        if (valuesToReset && lastResetIdRef.current !== id) {
+            reset(valuesToReset);
+            lastResetIdRef.current = id;
         }
-    }, [editMode, id, timeQualityConfiguration, isFetchingDetail, multipleResourceCustomAttributes, reset]);
+    }, [valuesToReset, id, reset]);
 
     const onSubmit = useCallback(
         (values: FormValues) => {
@@ -208,12 +180,6 @@ export const TimeQualityConfigurationForm = () => {
     const onCancel = useCallback(() => {
         navigate(-1);
     }, [navigate]);
-
-    const allFormValues = useWatch({ control });
-    const isEqual = useMemo(
-        () => deepEqual(defaultValues as unknown as Record<string, unknown>, allFormValues as unknown as Record<string, unknown>),
-        [defaultValues, allFormValues],
-    );
 
     return (
         <Container>
@@ -308,7 +274,7 @@ export const TimeQualityConfigurationForm = () => {
                                     <Controller
                                         name="ntpServers"
                                         control={control}
-                                        rules={{ validate: validateNtpServers }}
+                                        rules={{ validate: validateNtpServers() }}
                                         render={({ field, fieldState }) => (
                                             <>
                                                 <MultipleValueTextInput
@@ -432,7 +398,7 @@ export const TimeQualityConfigurationForm = () => {
                                 title={editMode ? 'Update' : 'Create'}
                                 inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                 inProgress={isSubmitting || isCreating || isUpdating}
-                                disabled={isEqual || isSubmitting || !isValid}
+                                disabled={!isDirty || isSubmitting || !isValid}
                                 type="submit"
                             />
                         </Container>

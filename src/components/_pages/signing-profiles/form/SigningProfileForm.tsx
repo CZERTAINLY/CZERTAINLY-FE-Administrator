@@ -27,12 +27,11 @@ import {
     SigningWorkflowType,
     TimestampingWorkflowRequestDto,
     StaticKeyManagedSigningRequestDto,
-    StaticKeyManagedSigningDto,
 } from 'types/openapi';
+import { isStaticKeyManagedSigning, isTimestampingWorkflow } from 'utils/type-guards';
 import { collectFormAttributes, mapProfileAttribute, transformAttributes } from 'utils/attributes/attributes';
 import { validateAlphaNumericWithoutAccents, validateLength, validateRequired } from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
-import { deepEqual } from 'utils/deep-equal';
 
 // ─── Label Helpers ────────────────────────────────────────────────────────────
 
@@ -70,6 +69,8 @@ interface AllowedPolicyIdEntry {
 interface FormValues {
     name: string;
     description: string;
+    // Tab 1 – Workflow type
+    workflowType: SigningWorkflowType;
     // Tab 2 – Timestamping workflow
     signatureFormatterConnectorUuid: string;
     qualifiedTimestamp: boolean;
@@ -77,6 +78,8 @@ interface FormValues {
     defaultPolicyId: string;
     allowedDigestAlgorithms: { value: DigestAlgorithm; label: string }[];
     // Tab 3 – Signing scheme
+    signingScheme: SigningScheme;
+    managedSigningType: ManagedSigningType;
     certificateUuid: string;
     // Tab 4 – custom attributes are handled by AttributeEditor / collectFormAttributes
     [key: string]: unknown;
@@ -116,11 +119,7 @@ export default function SigningProfileForm() {
     );
 
     // ── Local State ────────────────────────────────────────────────────────────
-
     const [activeTab, setActiveTab] = useState(0);
-    const [selectedWorkflowType, setSelectedWorkflowType] = useState<SigningWorkflowType>(WORKFLOW_TYPE);
-    const [signingScheme, setSigningScheme] = useState<SigningScheme>(SigningScheme.Managed);
-    const [managedSigningType, setManagedSigningType] = useState<ManagedSigningType>(ManagedSigningType.StaticKey);
     const [allowedPolicyIds, setAllowedPolicyIds] = useState<AllowedPolicyIdEntry[]>([]);
     const [policyIdInput, setPolicyIdInput] = useState('');
     const nextPolicyIdKey = useRef(0);
@@ -205,11 +204,14 @@ export default function SigningProfileForm() {
         () => ({
             name: '',
             description: '',
+            workflowType: WORKFLOW_TYPE,
             signatureFormatterConnectorUuid: '',
             qualifiedTimestamp: false,
             timeQualityConfigurationUuid: '',
             defaultPolicyId: '',
             allowedDigestAlgorithms: [],
+            signingScheme: SigningScheme.Managed,
+            managedSigningType: ManagedSigningType.StaticKey,
             certificateUuid: '',
             ...transformAttributes(initialCustomAttributes ?? []),
         }),
@@ -224,19 +226,23 @@ export default function SigningProfileForm() {
     const {
         handleSubmit,
         control,
-        formState: { isSubmitting, isValid },
+        formState: { isSubmitting, isValid, isDirty },
         reset,
         setValue,
         watch,
     } = methods;
 
+    const workflowTypeValue = useWatch({ control, name: 'workflowType' });
+    const signingSchemeValue = useWatch({ control, name: 'signingScheme' });
+    const managedSigningTypeValue = useWatch({ control, name: 'managedSigningType' });
     const qualifiedTimestampValue = useWatch({ control, name: 'qualifiedTimestamp' });
     const certificateUuidValue = useWatch({ control, name: 'certificateUuid' });
     const signingOperationAttributes = useMemo(
         () =>
             editMode
-                ? ((signingProfile?.signingScheme as StaticKeyManagedSigningRequestDto | undefined)?.signingOperationAttributes ??
-                  undefined)
+                ? isStaticKeyManagedSigning(signingProfile?.signingScheme || {})
+                    ? signingProfile?.signingScheme.signingOperationAttributes
+                    : undefined
                 : undefined,
         [editMode, signingProfile?.signingScheme],
     );
@@ -250,12 +256,11 @@ export default function SigningProfileForm() {
 
     const lastResetIdRef = useRef<string | undefined>(undefined);
 
-    useEffect(() => {
-        if (!editMode || !id || !signingProfile || signingProfile.uuid !== id || isFetchingDetail) return;
-        if (lastResetIdRef.current === id) return;
+    const valuesToReset = useMemo<FormValues | undefined>(() => {
+        if (!editMode || !id || !signingProfile || signingProfile.uuid !== id || isFetchingDetail) return undefined;
 
-        const wf = signingProfile.workflow as TimestampingWorkflowRequestDto | undefined;
-        const sc = signingProfile.signingScheme as StaticKeyManagedSigningRequestDto | undefined;
+        const wf = signingProfile.workflow;
+        const sc = signingProfile.signingScheme;
 
         const attrInitial = mapProfileAttribute(
             signingProfile,
@@ -265,32 +270,37 @@ export default function SigningProfileForm() {
             '__attributes__customSigningProfile__',
         );
 
-        reset(
-            {
-                name: signingProfile.name || '',
-                description: signingProfile.description || '',
-                signatureFormatterConnectorUuid: wf?.signatureFormatterConnectorUuid || '',
-                qualifiedTimestamp: wf?.qualifiedTimestamp ?? false,
-                timeQualityConfigurationUuid: wf?.timeQualityConfigurationUuid || '',
-                defaultPolicyId: wf?.defaultPolicyId || '',
-                allowedDigestAlgorithms: wf?.allowedDigestAlgorithms?.map((d: DigestAlgorithm) => ({ value: d, label: d })) ?? [],
-                certificateUuid: sc?.certificateUuid || (sc as StaticKeyManagedSigningDto)?.certificate?.uuid || '',
-                ...transformAttributes(attrInitial ?? []),
-            },
-            { keepDefaultValues: false },
-        );
+        return {
+            name: signingProfile.name || '',
+            description: signingProfile.description || '',
+            workflowType: wf?.type || WORKFLOW_TYPE,
+            signatureFormatterConnectorUuid: isTimestampingWorkflow(wf) ? wf.signatureFormatterConnectorUuid || '' : '',
+            qualifiedTimestamp: isTimestampingWorkflow(wf) ? (wf.qualifiedTimestamp ?? false) : false,
+            timeQualityConfigurationUuid: isTimestampingWorkflow(wf) ? wf.timeQualityConfigurationUuid || '' : '',
+            defaultPolicyId: isTimestampingWorkflow(wf) ? wf.defaultPolicyId || '' : '',
+            allowedDigestAlgorithms:
+                isTimestampingWorkflow(wf) && wf.allowedDigestAlgorithms
+                    ? wf.allowedDigestAlgorithms.map((d: DigestAlgorithm) => ({ value: d, label: d }))
+                    : [],
+            signingScheme: sc?.signingScheme || SigningScheme.Managed,
+            managedSigningType: isStaticKeyManagedSigning(sc) ? sc.managedSigningType : ManagedSigningType.StaticKey,
+            certificateUuid: isStaticKeyManagedSigning(sc) ? sc.certificateUuid || (sc as any).certificate?.uuid || '' : '',
+            ...transformAttributes(attrInitial ?? []),
+        };
+    }, [editMode, id, signingProfile, isFetchingDetail, multipleResourceCustomAttributes]);
 
-        // Restore policy IDs
-        const existingPolicies: string[] = (wf as any)?.allowedPolicyIds ?? [];
-        setAllowedPolicyIds(existingPolicies.map((p) => ({ id: nextPolicyIdKey.current++, value: p })));
+    useEffect(() => {
+        if (valuesToReset && lastResetIdRef.current !== id) {
+            reset(valuesToReset);
 
-        // Restore signing scheme selections
-        if ((sc as any)?.signingScheme) setSigningScheme((sc as any).signingScheme);
-        if ((sc as any)?.managedSigningType) setManagedSigningType((sc as any).managedSigningType);
-        if ((wf as any)?.type) setSelectedWorkflowType((wf as any).type);
+            // Restore policy IDs
+            const wf = signingProfile?.workflow;
+            const existingPolicies: string[] = isTimestampingWorkflow(wf) ? (wf.allowedPolicyIds ?? []) : [];
+            setAllowedPolicyIds(existingPolicies.map((p) => ({ id: nextPolicyIdKey.current++, value: p })));
 
-        lastResetIdRef.current = id;
-    }, [editMode, id, signingProfile, isFetchingDetail, multipleResourceCustomAttributes, reset]);
+            lastResetIdRef.current = id;
+        }
+    }, [valuesToReset, id, reset, signingProfile]);
 
     // ── Fetch signature attribute descriptors when certificate changes ─────────
 
@@ -322,10 +332,10 @@ export default function SigningProfileForm() {
                 values,
             );
 
-            const signingOpAttrs = collectFormAttributes('signingOperationAttrs', signingOperationAttributeDescriptors as any, values);
+            const signingOpAttrs = collectFormAttributes('signingOperationAttrs', signingOperationAttributeDescriptors, values);
 
             const workflowRequest: TimestampingWorkflowRequestDto = {
-                type: WORKFLOW_TYPE,
+                type: values.workflowType,
                 signatureFormatterConnectorUuid: values.signatureFormatterConnectorUuid || undefined,
                 signatureFormatterConnectorAttributes: [],
                 qualifiedTimestamp: values.qualifiedTimestamp,
@@ -336,8 +346,8 @@ export default function SigningProfileForm() {
             };
 
             const schemeRequest: StaticKeyManagedSigningRequestDto = {
-                signingScheme: SigningScheme.Managed,
-                managedSigningType: ManagedSigningType.StaticKey,
+                signingScheme: values.signingScheme,
+                managedSigningType: values.managedSigningType,
                 certificateUuid: values.certificateUuid,
                 signingOperationAttributes: signingOpAttrs,
             };
@@ -362,12 +372,6 @@ export default function SigningProfileForm() {
     const onCancel = useCallback(() => {
         navigate(-1);
     }, [navigate]);
-
-    const allFormValues = useWatch({ control });
-    const isEqual = useMemo(
-        () => deepEqual(defaultValues as unknown as Record<string, unknown>, allFormValues as unknown as Record<string, unknown>),
-        [defaultValues, allFormValues],
-    );
 
     // ─────────────────────────────────────────────────────────────────────────
     // Tab content
@@ -429,10 +433,10 @@ export default function SigningProfileForm() {
                                     type="radio"
                                     name="workflowType"
                                     value={wt}
-                                    checked={wt === selectedWorkflowType}
+                                    checked={wt === workflowTypeValue}
                                     disabled={!isSupported}
                                     className="accent-blue-600"
-                                    onChange={() => setSelectedWorkflowType(wt)}
+                                    onChange={() => setValue('workflowType', wt, { shouldDirty: true })}
                                 />
                                 <span className="text-sm font-medium">{workflowTypeLabels[wt]}</span>
                             </label>
@@ -609,7 +613,7 @@ export default function SigningProfileForm() {
                                 key={scheme}
                                 className={`flex items-center gap-x-3 p-3 border rounded-lg cursor-pointer ${
                                     isSupported
-                                        ? signingScheme === scheme
+                                        ? signingSchemeValue === scheme
                                             ? 'border-blue-500 bg-blue-50 text-gray-900'
                                             : 'border-gray-300 bg-white text-gray-900 hover:border-blue-300'
                                         : 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed opacity-60'
@@ -619,9 +623,9 @@ export default function SigningProfileForm() {
                                     type="radio"
                                     name="signingScheme"
                                     value={scheme}
-                                    checked={signingScheme === scheme}
+                                    checked={signingSchemeValue === scheme}
                                     disabled={!isSupported}
-                                    onChange={() => isSupported && setSigningScheme(scheme)}
+                                    onChange={() => isSupported && setValue('signingScheme', scheme, { shouldDirty: true })}
                                     className="accent-blue-600"
                                 />
                                 <span className="text-sm font-medium">{signingSchemeLabels[scheme]}</span>
@@ -632,7 +636,7 @@ export default function SigningProfileForm() {
             </div>
 
             {/* Level 2: Managed signing type (only for Managed) */}
-            {signingScheme === SigningScheme.Managed && (
+            {signingSchemeValue === SigningScheme.Managed && (
                 <div>
                     <p className="block text-sm font-medium text-gray-700 mb-2">
                         Managed Signing Type <span className="text-red-500">*</span>
@@ -645,7 +649,7 @@ export default function SigningProfileForm() {
                                     key={mst}
                                     className={`flex items-center gap-x-3 p-3 border rounded-lg cursor-pointer ${
                                         isSupported
-                                            ? managedSigningType === mst
+                                            ? managedSigningTypeValue === mst
                                                 ? 'border-blue-500 bg-blue-50 text-gray-900'
                                                 : 'border-gray-300 bg-white text-gray-900 hover:border-blue-300'
                                             : 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed opacity-60'
@@ -655,9 +659,9 @@ export default function SigningProfileForm() {
                                         type="radio"
                                         name="managedSigningType"
                                         value={mst}
-                                        checked={managedSigningType === mst}
+                                        checked={managedSigningTypeValue === mst}
                                         disabled={!isSupported}
-                                        onChange={() => isSupported && setManagedSigningType(mst)}
+                                        onChange={() => isSupported && setValue('managedSigningType', mst, { shouldDirty: true })}
                                         className="accent-blue-600"
                                     />
                                     <span className="text-sm font-medium">{managedSigningTypeLabels[mst]}</span>
@@ -669,7 +673,7 @@ export default function SigningProfileForm() {
             )}
 
             {/* Certificate select – Static Key + Managed */}
-            {signingScheme === SigningScheme.Managed && managedSigningType === ManagedSigningType.StaticKey && (
+            {signingSchemeValue === SigningScheme.Managed && managedSigningTypeValue === ManagedSigningType.StaticKey && (
                 <>
                     <Controller
                         name="certificateUuid"
@@ -757,7 +761,7 @@ export default function SigningProfileForm() {
                                     content: tab1Content,
                                 },
                                 {
-                                    title: `2 · ${workflowTypeTabLabels[selectedWorkflowType] ?? 'Signing Workflow'} Properties`,
+                                    title: `2 · ${workflowTypeTabLabels[workflowTypeValue] ?? 'Signing Workflow'} Properties`,
                                     content: tab2Content,
                                 },
                                 {
@@ -779,7 +783,7 @@ export default function SigningProfileForm() {
                                 title={editMode ? 'Update' : 'Create'}
                                 inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                 inProgress={isSubmitting || isCreating || isUpdating}
-                                disabled={isEqual || isSubmitting || !isValid}
+                                disabled={!isDirty || isSubmitting || !isValid}
                                 type="submit"
                             />
                         </Container>

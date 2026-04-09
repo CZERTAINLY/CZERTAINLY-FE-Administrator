@@ -32,6 +32,7 @@ import {
     StaticKeyManagedSigningDto,
     TimestampingWorkflowDto,
 } from 'types/openapi';
+import { isStaticKeyManagedSigning, isTimestampingWorkflow } from 'utils/type-guards';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { createWidgetDetailHeaders } from 'utils/widget';
 
@@ -112,9 +113,8 @@ export default function SigningProfileDetail() {
     );
 
     const timestampingWorkflow = useMemo((): TimestampingWorkflowDto | undefined => {
-        if (!signingProfile) return undefined;
-        const wf = signingProfile.workflow as TimestampingWorkflowDto;
-        return wf?.type === SigningWorkflowType.Timestamping ? wf : undefined;
+        if (!signingProfile || !isTimestampingWorkflow(signingProfile.workflow)) return undefined;
+        return signingProfile.workflow;
     }, [signingProfile]);
 
     const workflowTabTitle = useMemo((): string => {
@@ -123,9 +123,8 @@ export default function SigningProfileDetail() {
     }, [signingProfile]);
 
     const staticKeyScheme = useMemo((): StaticKeyManagedSigningDto | undefined => {
-        if (!signingProfile) return undefined;
-        const sc = signingProfile.signingScheme as StaticKeyManagedSigningDto;
-        return sc?.signingScheme === SigningScheme.Managed && sc?.managedSigningType === ManagedSigningType.StaticKey ? sc : undefined;
+        if (!signingProfile || !isStaticKeyManagedSigning(signingProfile.signingScheme)) return undefined;
+        return signingProfile.signingScheme;
     }, [signingProfile]);
 
     // ── Data fetching ──────────────────────────────────────────────────────────
