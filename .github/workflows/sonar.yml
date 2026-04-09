@@ -42,7 +42,7 @@ jobs:
 
       - name: Create GitHub Check (in_progress)
         id: create_check
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ steps.app_token.outputs.token }}
           script: |
@@ -108,7 +108,7 @@ jobs:
 
       - name: Finalize GitHub Check
         if: always()
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ steps.app_token.outputs.token }}
           script: |

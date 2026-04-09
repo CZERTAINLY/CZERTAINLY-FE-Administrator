@@ -33,7 +33,7 @@ jobs:
           echo "base_ref=$(jq -r '.base_ref' pr_context/pr-context.json)" >> $GITHUB_OUTPUT
 
       - name: Dispatch build preview docker workflow with inputs
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             await github.rest.actions.createWorkflowDispatch({
