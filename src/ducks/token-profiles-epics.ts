@@ -89,6 +89,8 @@ const createTokenProfile: AppEpic = (action$, state$, deps) => {
                                 }),
                                 userInterfaceActions.hideGlobalModal(),
                                 slice.actions.listTokenProfiles({ enabled: true }),
+                                userInterfaceActions.setFormCallbackValue(action.payload.tokenProfileAddRequest.name),
+                                userInterfaceActions.setInitiateFormCallback(true),
                             ),
                             of(
                                 slice.actions.createTokenProfileSuccess({

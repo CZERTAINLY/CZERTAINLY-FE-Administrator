@@ -308,6 +308,19 @@ function Select({
             });
         };
 
+        const applyAddNewStyling = (dropdown: Element | null) => {
+            dropdown
+                ?.querySelectorAll?.('.hs-select-option-row[data-value="__add_new__"], .hs-select-option-row[data-value="__add_custom__"]')
+                .forEach((row) => {
+                    const titleEl = row.querySelector?.('[data-title]');
+                    if (!(titleEl instanceof HTMLElement)) return;
+                    const text = titleEl.textContent?.trim();
+                    if (text === '+ Add new' || text === '+ Add custom') {
+                        titleEl.classList.add('text-blue-600', 'dark:text-blue-400', 'font-medium');
+                    }
+                });
+        };
+
         const setTitlesAndTooltips = () => {
             const container = select.closest('[data-testid]')?.parentElement ?? select.parentNode;
             const root = container as Element;
@@ -317,6 +330,7 @@ function Select({
             // Try to get dropdown from HSSelect instance (works also when dropdownScope === 'window')
             const hsInstance = (window as any).HSSelect?.getInstance?.(select);
             const dropdown: Element | null = (hsInstance && hsInstance.dropdown) || root.querySelector?.('.hs-select-dropdown');
+            applyAddNewStyling(dropdown);
             applyDropdownOptionDescriptions(dropdown);
 
             dropdown?.querySelectorAll?.('.hs-select-option-row').forEach((row) => {
