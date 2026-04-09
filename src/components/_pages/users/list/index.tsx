@@ -128,19 +128,19 @@ export default function UsersList() {
             },
             {
                 icon: 'trash',
-                disabled: checkedRows.length === 0 || isRestricted,
+                disabled: checkedRows.length === 0 || isRestricted || isBusy,
                 tooltip: isCurrentUserSelected ? 'You cannot delete your own account' : 'Delete',
                 onClick: () => setConfirmDelete(true),
             },
             {
                 icon: 'check',
-                disabled: isRestricted || !canEnable,
+                disabled: isRestricted || !canEnable || isBusy,
                 tooltip: isCurrentUserSelected ? 'You cannot enable your own account' : 'Enable',
                 onClick: onEnableClick,
             },
             {
                 icon: 'times',
-                disabled: isRestricted || !canDisable,
+                disabled: isRestricted || !canDisable || isBusy,
                 tooltip: isCurrentUserSelected ? 'You cannot disable your own account' : 'Disable',
                 onClick: onDisableClick,
             },
