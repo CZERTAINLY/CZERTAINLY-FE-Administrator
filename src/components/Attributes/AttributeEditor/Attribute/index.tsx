@@ -54,7 +54,7 @@ export function Attribute({
             userInterfaceActions.showGlobalModal({
                 content: addNewAttributeValue.content,
                 isOpen: true,
-                size: 'lg',
+                size: 'xl',
                 title: `Add New ${addNewAttributeValue.name}`,
             }),
         );
@@ -72,9 +72,9 @@ export function Attribute({
             const fileInfo = data.target!.result as string;
             const contentType = fileInfo.split(',')[0].split(':')[1].split(';')[0];
             const fileContent = fileInfo.split(',')[1];
-            setValue(`${name}.content`, fileContent);
-            setValue(`${name}.fileName`, fileName);
-            setValue(`${name}.mimeType`, contentType);
+            setValue(`${name}.content`, fileContent, { shouldValidate: true, shouldDirty: true });
+            setValue(`${name}.fileName`, fileName, { shouldDirty: true });
+            setValue(`${name}.mimeType`, contentType, { shouldDirty: true });
         },
         [setValue, name],
     );
@@ -157,9 +157,7 @@ export function Attribute({
                     options={options}
                     busy={busy}
                     deleteButton={deleteButton}
-                    addNewAttributeValue={
-                        descriptor.properties.extensibleList && addNewAttributeValue ? { label: '+', value: '__add_new__' } : undefined
-                    }
+                    addNewAttributeValue={addNewAttributeValue ? { label: '+ Add new', value: '__add_new__' } : undefined}
                     onSelectChangeMulti={handleSelectChangeMulti}
                     onSelectChangeSingle={handleSelectChangeSingle}
                 />
