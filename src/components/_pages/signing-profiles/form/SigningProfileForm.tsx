@@ -232,6 +232,19 @@ export default function SigningProfileForm() {
 
     const qualifiedTimestampValue = useWatch({ control, name: 'qualifiedTimestamp' });
     const certificateUuidValue = useWatch({ control, name: 'certificateUuid' });
+    const signingOperationAttributes = useMemo(
+        () =>
+            editMode
+                ? ((signingProfile?.signingScheme as StaticKeyManagedSigningRequestDto | undefined)?.signingOperationAttributes ??
+                  undefined)
+                : undefined,
+        [editMode, signingProfile?.signingScheme],
+    );
+
+    const customAttributes = useMemo(
+        () => (editMode ? signingProfile?.customAttributes : undefined),
+        [editMode, signingProfile?.customAttributes],
+    );
 
     // ── Populate form in edit mode ────────────────────────────────────────────
 
@@ -685,12 +698,7 @@ export default function SigningProfileForm() {
                                 <AttributeEditor
                                     id="signingOperationAttrs"
                                     attributeDescriptors={signingOperationAttributeDescriptors as any}
-                                    attributes={
-                                        editMode
-                                            ? ((signingProfile?.signingScheme as StaticKeyManagedSigningRequestDto | undefined)
-                                                  ?.signingOperationAttributes ?? undefined)
-                                            : undefined
-                                    }
+                                    attributes={signingOperationAttributes}
                                 />
                             ) : (
                                 !isFetchingSignatureAttributes && (
@@ -712,7 +720,7 @@ export default function SigningProfileForm() {
             <AttributeEditor
                 id="customSigningProfile"
                 attributeDescriptors={multipleResourceCustomAttributes[Resource.SigningProfiles] || []}
-                attributes={editMode ? signingProfile?.customAttributes : undefined}
+                attributes={customAttributes}
             />
         </Widget>
     );
@@ -742,6 +750,7 @@ export default function SigningProfileForm() {
                         <TabLayout
                             selectedTab={activeTab}
                             onTabChange={setActiveTab}
+                            onlyActiveTabContent={false}
                             tabs={[
                                 {
                                     title: '1 · General',
