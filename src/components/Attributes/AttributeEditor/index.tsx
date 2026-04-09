@@ -890,6 +890,13 @@ function AttributeEditorInner({
             if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
                 const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
 
+                // Clear the callback cache for credential-type attributes so the callback is
+                // re-executed and the options list is refreshed after a new credential is created.
+                if (isDataAttributeModel(descriptor) && descriptor.contentType === AttributeContentType.Credential) {
+                    const key = `${connectorUuid ?? 'global'}:${descriptor.uuid}:${formAttributeName}`;
+                    initialCallbackRunRef.current.delete(key);
+                }
+
                 getAttributeStaticOptions(descriptor, formAttributeName);
             }
         });
