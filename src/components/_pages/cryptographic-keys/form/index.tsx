@@ -125,10 +125,12 @@ export default function CryptographicKeyForm({ keyId, onSuccess, onCancel, usesG
 
     const optionsForKeys = useMemo(
         () =>
-            tokenProfiles.map((token) => ({
-                value: token.uuid,
-                label: token.name,
-            })),
+            tokenProfiles
+                .filter((token) => token.enabled)
+                .map((token) => ({
+                    value: token.uuid,
+                    label: token.name,
+                })),
         [tokenProfiles],
     );
 
