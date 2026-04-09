@@ -72,9 +72,9 @@ export function Attribute({
             const fileInfo = data.target!.result as string;
             const contentType = fileInfo.split(',')[0].split(':')[1].split(';')[0];
             const fileContent = fileInfo.split(',')[1];
-            setValue(`${name}.content`, fileContent);
-            setValue(`${name}.fileName`, fileName);
-            setValue(`${name}.mimeType`, contentType);
+            setValue(`${name}.content`, fileContent, { shouldValidate: true, shouldDirty: true });
+            setValue(`${name}.fileName`, fileName, { shouldDirty: true });
+            setValue(`${name}.mimeType`, contentType, { shouldDirty: true });
         },
         [setValue, name],
     );
