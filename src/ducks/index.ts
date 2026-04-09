@@ -58,7 +58,6 @@ import loginEpics from './login-epics';
 import secretsEpics from './secrets-epics';
 import vaultProfilesEpics from './vault-profiles-epics';
 import vaultsEpics from './vaults-epics';
-import ilmSigningProtocolConfigurationsEpics from './ilm-signing-protocol-configurations-epics';
 import signingProfilesEpics from './signing-profiles-epics';
 import tspProfilesEpics from './tsp-profiles-epics';
 import timeQualityConfigurationsEpics from './time-quality-configurations-epics';
@@ -124,7 +123,6 @@ export const epics = combineEpics(
     ...secretsEpics,
     ...vaultProfilesEpics,
     ...vaultsEpics,
-    ...ilmSigningProtocolConfigurationsEpics,
     ...signingProfilesEpics,
     ...tspProfilesEpics,
     ...timeQualityConfigurationsEpics,

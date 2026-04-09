@@ -213,47 +213,6 @@ describe('signingProfiles slice', () => {
         expect(next.signingProfiles[1].enabled).toBe(true);
     });
 
-    test('activateIlmSigningProtocol sets isActivatingIlm', () => {
-        const next = reducer(
-            initialState,
-            actions.activateIlmSigningProtocol({
-                signingProfileUuid: 'p-1',
-                ilmSigningProtocolConfigurationUuid: 'ilm-1',
-            }),
-        );
-        expect(next.isActivatingIlm).toBe(true);
-    });
-
-    test('activateIlmSigningProtocolSuccess sets ilmActivationDetails', () => {
-        const details = { uuid: 'ilm-1' } as any;
-        const next = reducer(
-            { ...initialState, isActivatingIlm: true },
-            actions.activateIlmSigningProtocolSuccess({ ilmActivationDetails: details }),
-        );
-        expect(next.isActivatingIlm).toBe(false);
-        expect(next.ilmActivationDetails).toEqual(details);
-    });
-
-    test('deactivateIlmSigningProtocolSuccess clears ilmActivationDetails', () => {
-        const details = { uuid: 'ilm-1' } as any;
-        const next = reducer(
-            { ...initialState, isDeactivatingIlm: true, ilmActivationDetails: details },
-            actions.deactivateIlmSigningProtocolSuccess({ uuid: 'p-1' }),
-        );
-        expect(next.isDeactivatingIlm).toBe(false);
-        expect(next.ilmActivationDetails).toBeUndefined();
-    });
-
-    test('getIlmSigningProtocolActivationDetailsSuccess sets ilmActivationDetails', () => {
-        const details = { uuid: 'ilm-1' } as any;
-        const next = reducer(
-            { ...initialState, isFetchingIlmActivationDetails: true },
-            actions.getIlmSigningProtocolActivationDetailsSuccess({ ilmActivationDetails: details }),
-        );
-        expect(next.isFetchingIlmActivationDetails).toBe(false);
-        expect(next.ilmActivationDetails).toEqual(details);
-    });
-
     test('activateTsp sets isActivatingTsp', () => {
         const next = reducer(initialState, actions.activateTsp({ signingProfileUuid: 'p-1', tspProfileUuid: 'tsp-1' }));
         expect(next.isActivatingTsp).toBe(true);
@@ -309,7 +268,7 @@ describe('signingProfiles slice', () => {
     });
 
     test('listSupportedProtocolsSuccess sets supportedProtocols', () => {
-        const protocols = ['ILM', 'TSP'] as any[];
+        const protocols = ['TSP'] as any[];
         const next = reducer(
             { ...initialState, isFetchingSupportedProtocols: true },
             actions.listSupportedProtocolsSuccess({ supportedProtocols: protocols }),
@@ -357,9 +316,8 @@ describe('signingProfiles selectors', () => {
         const profile = { uuid: 'p-1' } as any;
         const profiles = [profile];
         const approvalProfiles = [{ uuid: 'ap-1' }] as any[];
-        const ilmDetails = { uuid: 'ilm-1' } as any;
         const tspDetails = { uuid: 'tsp-1' } as any;
-        const protocols = ['ILM'] as any[];
+        const protocols = ['TSP'] as any[];
         const digitalSigs = { items: [], totalItems: 0 } as any;
         const fields = [{ searchGroupEnum: 'g-1' }] as any[];
         const bulkErrors = [{ message: 'err' }] as any[];
@@ -369,7 +327,6 @@ describe('signingProfiles selectors', () => {
             signingProfile: profile,
             signingProfiles: profiles,
             associatedApprovalProfiles: approvalProfiles,
-            ilmActivationDetails: ilmDetails,
             tspActivationDetails: tspDetails,
             supportedProtocols: protocols,
             signingCertificates: [{ uuid: 'c-1' }] as any[],
@@ -380,7 +337,6 @@ describe('signingProfiles selectors', () => {
             isFetchingDetail: true,
             isFetchingSearchableFields: true,
             isFetchingAssociatedApprovalProfiles: true,
-            isFetchingIlmActivationDetails: true,
             isFetchingTspActivationDetails: true,
             isFetchingSupportedProtocols: true,
             isFetchingSigningCertificates: true,
@@ -393,8 +349,6 @@ describe('signingProfiles selectors', () => {
             isBulkDeleting: true,
             isBulkEnabling: true,
             isBulkDisabling: true,
-            isActivatingIlm: true,
-            isDeactivatingIlm: true,
             isActivatingTsp: true,
             isDeactivatingTsp: true,
             isAssociatingApprovalProfile: true,
@@ -406,7 +360,6 @@ describe('signingProfiles selectors', () => {
         expect(selectors.signingProfile(state)).toEqual(profile);
         expect(selectors.signingProfiles(state)).toEqual(profiles);
         expect(selectors.associatedApprovalProfiles(state)).toEqual(approvalProfiles);
-        expect(selectors.ilmActivationDetails(state)).toEqual(ilmDetails);
         expect(selectors.tspActivationDetails(state)).toEqual(tspDetails);
         expect(selectors.supportedProtocols(state)).toEqual(protocols);
         expect(selectors.signingCertificates(state)).toEqual([{ uuid: 'c-1' }]);
@@ -417,7 +370,6 @@ describe('signingProfiles selectors', () => {
         expect(selectors.isFetchingDetail(state)).toBe(true);
         expect(selectors.isFetchingSearchableFields(state)).toBe(true);
         expect(selectors.isFetchingAssociatedApprovalProfiles(state)).toBe(true);
-        expect(selectors.isFetchingIlmActivationDetails(state)).toBe(true);
         expect(selectors.isFetchingTspActivationDetails(state)).toBe(true);
         expect(selectors.isFetchingSupportedProtocols(state)).toBe(true);
         expect(selectors.isFetchingSigningCertificates(state)).toBe(true);
@@ -430,8 +382,6 @@ describe('signingProfiles selectors', () => {
         expect(selectors.isBulkDeleting(state)).toBe(true);
         expect(selectors.isBulkEnabling(state)).toBe(true);
         expect(selectors.isBulkDisabling(state)).toBe(true);
-        expect(selectors.isActivatingIlm(state)).toBe(true);
-        expect(selectors.isDeactivatingIlm(state)).toBe(true);
         expect(selectors.isActivatingTsp(state)).toBe(true);
         expect(selectors.isDeactivatingTsp(state)).toBe(true);
         expect(selectors.isAssociatingApprovalProfile(state)).toBe(true);

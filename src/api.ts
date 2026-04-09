@@ -49,7 +49,6 @@ import {
     VaultInstanceManagementApi,
     VaultProfileManagementApi,
     TrustedCertificateManagementApi,
-    ILMSigningProtocolConfigurationManagementApi,
     SigningProfileManagementApi,
     TSPProfileManagementApi,
     TimeQualityConfigurationManagementApi,
@@ -121,7 +120,6 @@ export interface ApiClients {
     vaults: VaultInstanceManagementApi;
     vaultProfiles: VaultProfileManagementApi;
     secrets: SecretManagementApi;
-    ilmSigningProtocolConfigurations: ILMSigningProtocolConfigurationManagementApi;
     signingProfiles: SigningProfileManagementApi;
     tspProfiles: TSPProfileManagementApi;
     timeQualityConfigurations: TimeQualityConfigurationManagementApi;
@@ -178,7 +176,6 @@ export const backendClient: ApiClients = {
     vaults: new VaultInstanceManagementApi(configuration),
     vaultProfiles: new VaultProfileManagementApi(configuration),
     secrets: new SecretManagementApi(configuration),
-    ilmSigningProtocolConfigurations: new ILMSigningProtocolConfigurationManagementApi(configuration),
     signingProfiles: new SigningProfileManagementApi(configuration),
     tspProfiles: new TSPProfileManagementApi(configuration),
     timeQualityConfigurations: new TimeQualityConfigurationManagementApi(configuration),

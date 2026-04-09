@@ -28,7 +28,6 @@ export * from './EnumsApi';
 export * from './ExternalNotificationManagementApi';
 export * from './GlobalMetadataApi';
 export * from './GroupManagementApi';
-export * from './ILMSigningProtocolConfigurationManagementApi';
 export * from './InfoApi';
 export * from './InternalNotificationApi';
 export * from './LocalOperationsApi';

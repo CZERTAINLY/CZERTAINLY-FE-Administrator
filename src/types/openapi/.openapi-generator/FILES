@@ -29,7 +29,6 @@ apis/EnumsApi.ts
 apis/ExternalNotificationManagementApi.ts
 apis/GlobalMetadataApi.ts
 apis/GroupManagementApi.ts
-apis/ILMSigningProtocolConfigurationManagementApi.ts
 apis/InfoApi.ts
 apis/InternalNotificationApi.ts
 apis/LocalOperationsApi.ts
@@ -339,10 +338,6 @@ models/HealthDto.ts
 models/HealthInfo.ts
 models/HealthInfoComponent.ts
 models/HealthStatus.ts
-models/IlmSigningProtocolActivationDetailDto.ts
-models/IlmSigningProtocolConfigurationDto.ts
-models/IlmSigningProtocolConfigurationListDto.ts
-models/IlmSigningProtocolConfigurationRequestDto.ts
 models/InfoAttributeProperties.ts
 models/InfoAttributeV2.ts
 models/InfoAttributeV3.ts
@@ -409,7 +404,6 @@ models/PaginationRequestDto.ts
 models/PaginationResponseDtoCbomDto.ts
 models/PaginationResponseDtoConnectorDtoV2.ts
 models/PaginationResponseDtoDigitalSignatureListDto.ts
-models/PaginationResponseDtoIlmSigningProtocolConfigurationListDto.ts
 models/PaginationResponseDtoSecretDto.ts
 models/PaginationResponseDtoSigningProfileListDto.ts
 models/PaginationResponseDtoTimeQualityConfigurationListDto.ts

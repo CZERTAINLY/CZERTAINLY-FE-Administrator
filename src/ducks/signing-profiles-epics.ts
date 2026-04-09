@@ -248,67 +248,6 @@ const bulkDisableSigningProfiles: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const activateIlmSigningProtocol: AppEpic = (action$, state$, deps) => {
-    return action$.pipe(
-        filter(slice.actions.activateIlmSigningProtocol.match),
-        switchMap((action) =>
-            deps.apiClients.signingProfiles
-                .activateIlmSigningProtocol({
-                    signingProfileUuid: action.payload.signingProfileUuid,
-                    ilmSigningProtocolConfigurationUuid: action.payload.ilmSigningProtocolConfigurationUuid,
-                })
-                .pipe(
-                    map((details) => slice.actions.activateIlmSigningProtocolSuccess({ ilmActivationDetails: details })),
-                    catchError((error) =>
-                        of(
-                            slice.actions.activateIlmSigningProtocolFailure({
-                                error: extractError(error, 'Failed to activate ILM Signing Protocol'),
-                            }),
-                            appRedirectActions.fetchError({ error, message: 'Failed to activate ILM Signing Protocol' }),
-                        ),
-                    ),
-                ),
-        ),
-    );
-};
-
-const deactivateIlmSigningProtocol: AppEpic = (action$, state$, deps) => {
-    return action$.pipe(
-        filter(slice.actions.deactivateIlmSigningProtocol.match),
-        switchMap((action) =>
-            deps.apiClients.signingProfiles.deactivateIlmSigningProtocol({ uuid: action.payload.uuid }).pipe(
-                map(() => slice.actions.deactivateIlmSigningProtocolSuccess({ uuid: action.payload.uuid })),
-                catchError((error) =>
-                    of(
-                        slice.actions.deactivateIlmSigningProtocolFailure({
-                            error: extractError(error, 'Failed to deactivate ILM Signing Protocol'),
-                        }),
-                        appRedirectActions.fetchError({ error, message: 'Failed to deactivate ILM Signing Protocol' }),
-                    ),
-                ),
-            ),
-        ),
-    );
-};
-
-const getIlmSigningProtocolActivationDetails: AppEpic = (action$, state$, deps) => {
-    return action$.pipe(
-        filter(slice.actions.getIlmSigningProtocolActivationDetails.match),
-        switchMap((action) =>
-            deps.apiClients.signingProfiles.getIlmSigningProtocolActivationDetails({ uuid: action.payload.uuid }).pipe(
-                map((details) => slice.actions.getIlmSigningProtocolActivationDetailsSuccess({ ilmActivationDetails: details })),
-                catchError((error) =>
-                    of(
-                        slice.actions.getIlmSigningProtocolActivationDetailsFailure({
-                            error: extractError(error, 'Failed to get ILM Signing Protocol activation details'),
-                        }),
-                    ),
-                ),
-            ),
-        ),
-    );
-};
-
 const activateTsp: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.activateTsp.match),
@@ -535,9 +474,6 @@ const epics = [
     bulkDeleteSigningProfiles,
     bulkEnableSigningProfiles,
     bulkDisableSigningProfiles,
-    activateIlmSigningProtocol,
-    deactivateIlmSigningProtocol,
-    getIlmSigningProtocolActivationDetails,
     activateTsp,
     deactivateTsp,
     getTspActivationDetails,

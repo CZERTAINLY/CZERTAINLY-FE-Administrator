@@ -18,7 +18,6 @@
  */
 export enum SigningProtocol {
     CscApi = 'cscApi',
-    IlmSigningProtocol = 'ilmSigningProtocol',
     Tsp = 'tsp'
 }
 

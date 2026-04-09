@@ -25,9 +25,6 @@ type EpicDeps = {
             bulkDeleteSigningProfiles: (args: any) => any;
             bulkEnableSigningProfiles: (args: any) => any;
             bulkDisableSigningProfiles: (args: any) => any;
-            activateIlmSigningProtocol: (args: any) => any;
-            deactivateIlmSigningProtocol: (args: any) => any;
-            getIlmSigningProtocolActivationDetails: (args: any) => any;
             activateTsp: (args: any) => any;
             deactivateTsp: (args: any) => any;
             getTspActivationDetails: (args: any) => any;
@@ -53,19 +50,16 @@ enum SigningProfilesEpicIndex {
     BulkDelete = 8,
     BulkEnable = 9,
     BulkDisable = 10,
-    ActivateIlm = 11,
-    DeactivateIlm = 12,
-    GetIlmActivationDetails = 13,
-    ActivateTsp = 14,
-    DeactivateTsp = 15,
-    GetTspActivationDetails = 16,
-    GetAssociatedApprovalProfiles = 17,
-    AssociateWithApprovalProfile = 18,
-    DisassociateFromApprovalProfile = 19,
-    ListSupportedProtocols = 20,
-    ListSigningCertificates = 21,
-    ListSignatureAttributes = 22,
-    ListDigitalSignatures = 23,
+    ActivateTsp = 11,
+    DeactivateTsp = 12,
+    GetTspActivationDetails = 13,
+    GetAssociatedApprovalProfiles = 14,
+    AssociateWithApprovalProfile = 15,
+    DisassociateFromApprovalProfile = 16,
+    ListSupportedProtocols = 17,
+    ListSigningCertificates = 18,
+    ListSignatureAttributes = 19,
+    ListDigitalSignatures = 20,
 }
 
 vi.mock('../App', () => ({
@@ -99,16 +93,13 @@ async function runEpic(
         bulkDeleteSigningProfiles: () => of([]),
         bulkEnableSigningProfiles: () => of(undefined),
         bulkDisableSigningProfiles: () => of(undefined),
-        activateIlmSigningProtocol: () => of({ uuid: 'ilm-1' }),
-        deactivateIlmSigningProtocol: () => of(undefined),
-        getIlmSigningProtocolActivationDetails: () => of({ uuid: 'ilm-1' }),
         activateTsp: () => of({ uuid: 'tsp-1' }),
         deactivateTsp: () => of(undefined),
         getTspActivationDetails: () => of({ uuid: 'tsp-1' }),
         getAssociatedApprovalProfiles: () => of([{ uuid: 'ap-1' }]),
         associateWithApprovalProfile: () => of(undefined),
         disassociateFromApprovalProfile: () => of(undefined),
-        listSupportedProtocols: () => of(['ILM', 'TSP']),
+        listSupportedProtocols: () => of(['TSP']),
         listSigningCertificates: () => of([{ uuid: 'c-1' }]),
         listDigitalSignaturesForSigningProfile: () => of({ items: [], totalItems: 0 }),
     };
@@ -411,91 +402,6 @@ describe('signingProfiles epics', () => {
         expect(emitted[0]).toEqual(signingProfileActions.bulkDisableSigningProfilesSuccess({ uuids: ['p-1', 'p-2'] }));
     });
 
-    test('activateIlmSigningProtocol success emits activateIlmSuccess', async () => {
-        const details = { uuid: 'ilm-1' };
-        const emitted = await runEpic(
-            SigningProfilesEpicIndex.ActivateIlm,
-            signingProfileActions.activateIlmSigningProtocol({
-                signingProfileUuid: 'p-1',
-                ilmSigningProtocolConfigurationUuid: 'ilm-1',
-            }),
-            {
-                signingProfiles: {
-                    activateIlmSigningProtocol: () => of(details),
-                } as any,
-            },
-            1,
-        );
-
-        expect(emitted[0]).toEqual(signingProfileActions.activateIlmSigningProtocolSuccess({ ilmActivationDetails: details as any }));
-    });
-
-    test('activateIlmSigningProtocol failure emits activateIlmFailure and fetchError', async () => {
-        const err = new Error('activate ILM failed');
-        const emitted = await runEpic(
-            SigningProfilesEpicIndex.ActivateIlm,
-            signingProfileActions.activateIlmSigningProtocol({
-                signingProfileUuid: 'p-1',
-                ilmSigningProtocolConfigurationUuid: 'ilm-1',
-            }),
-            {
-                signingProfiles: {
-                    activateIlmSigningProtocol: () => throwError(() => err),
-                } as any,
-            },
-            2,
-        );
-
-        expect(emitted[0].type).toBe(signingProfileActions.activateIlmSigningProtocolFailure.type);
-        expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to activate ILM Signing Protocol' }));
-    });
-
-    test('deactivateIlmSigningProtocol success emits deactivateIlmSuccess', async () => {
-        const emitted = await runEpic(
-            SigningProfilesEpicIndex.DeactivateIlm,
-            signingProfileActions.deactivateIlmSigningProtocol({ uuid: 'p-1' }),
-            {},
-            1,
-        );
-
-        expect(emitted[0]).toEqual(signingProfileActions.deactivateIlmSigningProtocolSuccess({ uuid: 'p-1' }));
-    });
-
-    test('deactivateIlmSigningProtocol failure emits deactivateIlmFailure and fetchError', async () => {
-        const err = new Error('deactivate ILM failed');
-        const emitted = await runEpic(
-            SigningProfilesEpicIndex.DeactivateIlm,
-            signingProfileActions.deactivateIlmSigningProtocol({ uuid: 'p-1' }),
-            {
-                signingProfiles: {
-                    deactivateIlmSigningProtocol: () => throwError(() => err),
-                } as any,
-            },
-            2,
-        );
-
-        expect(emitted[0].type).toBe(signingProfileActions.deactivateIlmSigningProtocolFailure.type);
-        expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to deactivate ILM Signing Protocol' }));
-    });
-
-    test('getIlmSigningProtocolActivationDetails success emits getIlmDetailsSuccess', async () => {
-        const details = { uuid: 'ilm-1' };
-        const emitted = await runEpic(
-            SigningProfilesEpicIndex.GetIlmActivationDetails,
-            signingProfileActions.getIlmSigningProtocolActivationDetails({ uuid: 'p-1' }),
-            {
-                signingProfiles: {
-                    getIlmSigningProtocolActivationDetails: () => of(details),
-                } as any,
-            },
-            1,
-        );
-
-        expect(emitted[0]).toEqual(
-            signingProfileActions.getIlmSigningProtocolActivationDetailsSuccess({ ilmActivationDetails: details as any }),
-        );
-    });
-
     test('activateTsp success emits activateTspSuccess', async () => {
         const details = { uuid: 'tsp-1' };
         const emitted = await runEpic(
@@ -638,7 +544,7 @@ describe('signingProfiles epics', () => {
     });
 
     test('listSupportedProtocols success emits listSupportedProtocolsSuccess', async () => {
-        const protocols = ['ILM', 'TSP'];
+        const protocols = ['TSP'];
         const emitted = await runEpic(
             SigningProfilesEpicIndex.ListSupportedProtocols,
             signingProfileActions.listSupportedProtocols({ workflowType: 'SIGNING' as any }),

@@ -77,7 +77,6 @@ export enum Resource {
     Secrets = 'secrets',
     TrustedCertificates = 'trustedCertificates',
     DigitalSignatures = 'digitalSignatures',
-    IlmSigningProtocolConfigurations = 'ilmSigningProtocolConfigurations',
     SigningProfiles = 'signingProfiles',
     TimeQualityConfigurations = 'timeQualityConfigurations',
     TspProfiles = 'tspProfiles'

@@ -109,8 +109,6 @@ export enum LockWidgetNameEnum {
     VaultProfileDetails,
     ListOfTrustedCertificates,
     TrustedCertificateDetails,
-    ListOfIlmSigningProtocolConfigurations,
-    IlmSigningProtocolConfigurationDetails,
     ListOfTspProfiles,
     TspProfileDetails,
     ListOfTimeQualityConfigurations,

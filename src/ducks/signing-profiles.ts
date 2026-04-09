@@ -3,7 +3,6 @@ import {
     ApprovalProfileDto,
     BaseAttributeDto,
     CertificateDto,
-    IlmSigningProtocolActivationDetailDto,
     PaginationResponseDtoDigitalSignatureListDto,
     SearchFieldDataByGroupDto,
     SigningProfileDto,
@@ -24,7 +23,6 @@ export type State = {
     signingProfiles: SigningProfileListDto[];
 
     associatedApprovalProfiles: ApprovalProfileDto[];
-    ilmActivationDetails?: IlmSigningProtocolActivationDetailDto;
     tspActivationDetails?: TspActivationDetailDto;
     supportedProtocols: SigningProtocol[];
     signingCertificates: CertificateDto[];
@@ -37,7 +35,6 @@ export type State = {
     isFetchingDetail: boolean;
     isFetchingSearchableFields: boolean;
     isFetchingAssociatedApprovalProfiles: boolean;
-    isFetchingIlmActivationDetails: boolean;
     isFetchingTspActivationDetails: boolean;
     isFetchingSupportedProtocols: boolean;
     isFetchingSigningCertificates: boolean;
@@ -51,8 +48,6 @@ export type State = {
     isBulkDeleting: boolean;
     isBulkEnabling: boolean;
     isBulkDisabling: boolean;
-    isActivatingIlm: boolean;
-    isDeactivatingIlm: boolean;
     isActivatingTsp: boolean;
     isDeactivatingTsp: boolean;
     isAssociatingApprovalProfile: boolean;
@@ -74,7 +69,6 @@ export const initialState: State = {
     isFetchingDetail: false,
     isFetchingSearchableFields: false,
     isFetchingAssociatedApprovalProfiles: false,
-    isFetchingIlmActivationDetails: false,
     isFetchingTspActivationDetails: false,
     isFetchingSupportedProtocols: false,
     isFetchingSigningCertificates: false,
@@ -88,8 +82,6 @@ export const initialState: State = {
     isBulkDeleting: false,
     isBulkEnabling: false,
     isBulkDisabling: false,
-    isActivatingIlm: false,
-    isDeactivatingIlm: false,
     isActivatingTsp: false,
     isDeactivatingTsp: false,
     isAssociatingApprovalProfile: false,
@@ -314,68 +306,6 @@ export const slice = createSlice({
             state.isBulkDisabling = false;
         },
 
-        // ILM activation
-        activateIlmSigningProtocol: (
-            state,
-            action: PayloadAction<{ signingProfileUuid: string; ilmSigningProtocolConfigurationUuid: string }>,
-        ) => {
-            state.isActivatingIlm = true;
-        },
-
-        activateIlmSigningProtocolSuccess: (
-            state,
-            action: PayloadAction<{ ilmActivationDetails: IlmSigningProtocolActivationDetailDto }>,
-        ) => {
-            state.isActivatingIlm = false;
-            state.ilmActivationDetails = action.payload.ilmActivationDetails;
-            if (state.signingProfile && !state.signingProfile.enabledProtocols?.includes(SigningProtocol.IlmSigningProtocol)) {
-                state.signingProfile.enabledProtocols = [
-                    ...(state.signingProfile.enabledProtocols ?? []),
-                    SigningProtocol.IlmSigningProtocol,
-                ];
-            }
-        },
-
-        activateIlmSigningProtocolFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isActivatingIlm = false;
-        },
-
-        deactivateIlmSigningProtocol: (state, action: PayloadAction<{ uuid: string }>) => {
-            state.isDeactivatingIlm = true;
-        },
-
-        deactivateIlmSigningProtocolSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
-            state.isDeactivatingIlm = false;
-            state.ilmActivationDetails = undefined;
-            if (state.signingProfile) {
-                state.signingProfile.enabledProtocols = state.signingProfile.enabledProtocols?.filter(
-                    (p) => p !== SigningProtocol.IlmSigningProtocol,
-                );
-            }
-        },
-
-        deactivateIlmSigningProtocolFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isDeactivatingIlm = false;
-        },
-
-        getIlmSigningProtocolActivationDetails: (state, action: PayloadAction<{ uuid: string }>) => {
-            state.isFetchingIlmActivationDetails = true;
-            state.ilmActivationDetails = undefined;
-        },
-
-        getIlmSigningProtocolActivationDetailsSuccess: (
-            state,
-            action: PayloadAction<{ ilmActivationDetails: IlmSigningProtocolActivationDetailDto }>,
-        ) => {
-            state.isFetchingIlmActivationDetails = false;
-            state.ilmActivationDetails = action.payload.ilmActivationDetails;
-        },
-
-        getIlmSigningProtocolActivationDetailsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingIlmActivationDetails = false;
-            state.ilmActivationDetails = undefined;
-        },
-
         // TSP activation
         activateTsp: (state, action: PayloadAction<{ signingProfileUuid: string; tspProfileUuid: string }>) => {
             state.isActivatingTsp = true;
@@ -538,7 +468,6 @@ const state = (reduxStore: any): State => reduxStore?.[slice.name];
 const signingProfile = createSelector(state, (state) => state.signingProfile);
 const signingProfiles = createSelector(state, (state) => state.signingProfiles);
 const associatedApprovalProfiles = createSelector(state, (state) => state.associatedApprovalProfiles);
-const ilmActivationDetails = createSelector(state, (state) => state.ilmActivationDetails);
 const tspActivationDetails = createSelector(state, (state) => state.tspActivationDetails);
 const supportedProtocols = createSelector(state, (state) => state.supportedProtocols);
 const signingCertificates = createSelector(state, (state) => state.signingCertificates);
@@ -552,7 +481,6 @@ const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isFetchingSearchableFields = createSelector(state, (state) => state.isFetchingSearchableFields);
 const isFetchingAssociatedApprovalProfiles = createSelector(state, (state) => state.isFetchingAssociatedApprovalProfiles);
-const isFetchingIlmActivationDetails = createSelector(state, (state) => state.isFetchingIlmActivationDetails);
 const isFetchingTspActivationDetails = createSelector(state, (state) => state.isFetchingTspActivationDetails);
 const isFetchingSupportedProtocols = createSelector(state, (state) => state.isFetchingSupportedProtocols);
 const isFetchingSigningCertificates = createSelector(state, (state) => state.isFetchingSigningCertificates);
@@ -566,8 +494,6 @@ const isDisabling = createSelector(state, (state) => state.isDisabling);
 const isBulkDeleting = createSelector(state, (state) => state.isBulkDeleting);
 const isBulkEnabling = createSelector(state, (state) => state.isBulkEnabling);
 const isBulkDisabling = createSelector(state, (state) => state.isBulkDisabling);
-const isActivatingIlm = createSelector(state, (state) => state.isActivatingIlm);
-const isDeactivatingIlm = createSelector(state, (state) => state.isDeactivatingIlm);
 const isActivatingTsp = createSelector(state, (state) => state.isActivatingTsp);
 const isDeactivatingTsp = createSelector(state, (state) => state.isDeactivatingTsp);
 const isAssociatingApprovalProfile = createSelector(state, (state) => state.isAssociatingApprovalProfile);
@@ -580,7 +506,6 @@ export const selectors = {
     signingProfile,
     signingProfiles,
     associatedApprovalProfiles,
-    ilmActivationDetails,
     tspActivationDetails,
     supportedProtocols,
     signingCertificates,
@@ -591,7 +516,6 @@ export const selectors = {
     isFetchingDetail,
     isFetchingSearchableFields,
     isFetchingAssociatedApprovalProfiles,
-    isFetchingIlmActivationDetails,
     isFetchingTspActivationDetails,
     isFetchingSupportedProtocols,
     isFetchingSigningCertificates,
@@ -605,8 +529,6 @@ export const selectors = {
     isBulkDeleting,
     isBulkEnabling,
     isBulkDisabling,
-    isActivatingIlm,
-    isDeactivatingIlm,
     isActivatingTsp,
     isDeactivatingTsp,
     isAssociatingApprovalProfile,

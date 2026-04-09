@@ -16,7 +16,6 @@ import TabLayout from 'components/Layout/TabLayout';
 
 import { actions, selectors } from 'ducks/signing-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { actions as ilmConfigActions, selectors as ilmConfigSelectors } from 'ducks/ilm-signing-protocol-configurations';
 import { actions as tspProfileActions, selectors as tspProfileSelectors } from 'ducks/tsp-profiles';
 import Select from 'components/Select';
 import AssociateApprovalProfileDialogBody from '../AssociateApprovalProfileDialogBody';
@@ -44,9 +43,8 @@ const workflowTypeLabels: Record<SigningWorkflowType, string> = {
     [SigningWorkflowType.RawSigning]: 'Raw Signing',
 };
 
-const protocolLabels: Record<SigningProtocol, string> = {
+const protocolLabels: Partial<Record<SigningProtocol, string>> = {
     [SigningProtocol.Tsp]: 'TSP (RFC 3161)',
-    [SigningProtocol.IlmSigningProtocol]: 'ILM Signing Protocol',
     [SigningProtocol.CscApi]: 'CSC API v2',
 };
 
@@ -76,16 +74,11 @@ export default function SigningProfileDetail() {
     const isDisabling = useSelector(selectors.isDisabling);
     const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
 
-    const ilmActivationDetails = useSelector(selectors.ilmActivationDetails);
     const tspActivationDetails = useSelector(selectors.tspActivationDetails);
-    const isFetchingIlmActivationDetails = useSelector(selectors.isFetchingIlmActivationDetails);
     const isFetchingTspActivationDetails = useSelector(selectors.isFetchingTspActivationDetails);
-    const isActivatingIlm = useSelector(selectors.isActivatingIlm);
-    const isDeactivatingIlm = useSelector(selectors.isDeactivatingIlm);
     const isActivatingTsp = useSelector(selectors.isActivatingTsp);
     const isDeactivatingTsp = useSelector(selectors.isDeactivatingTsp);
 
-    const ilmConfigurations = useSelector(ilmConfigSelectors.ilmSigningProtocolConfigurations);
     const tspProfiles = useSelector(tspProfileSelectors.tspProfiles);
 
     const associatedApprovalProfiles = useSelector(selectors.associatedApprovalProfiles);
@@ -97,11 +90,8 @@ export default function SigningProfileDetail() {
     // ── Local state ────────────────────────────────────────────────────────────
 
     const [confirmDelete, setConfirmDelete] = useState(false);
-    const [confirmDeactivateIlm, setConfirmDeactivateIlm] = useState(false);
     const [confirmDeactivateTsp, setConfirmDeactivateTsp] = useState(false);
-    const [activateIlmDialog, setActivateIlmDialog] = useState(false);
     const [activateTspDialog, setActivateTspDialog] = useState(false);
-    const [selectedIlmConfigUuid, setSelectedIlmConfigUuid] = useState<string | undefined>(undefined);
     const [selectedTspProfileUuid, setSelectedTspConfigUuid] = useState<string | undefined>(undefined);
     const [associateApprovalProfileDialog, setAssociateApprovalProfileDialog] = useState(false);
 
@@ -133,7 +123,6 @@ export default function SigningProfileDetail() {
         if (!id) return;
         dispatch(actions.getSigningProfile({ uuid: id }));
         dispatch(actions.getAssociatedApprovalProfiles({ uuid: id }));
-        dispatch(actions.getIlmSigningProtocolActivationDetails({ uuid: id }));
         dispatch(actions.getTspActivationDetails({ uuid: id }));
     }, [dispatch, id]);
 
@@ -410,31 +399,6 @@ export default function SigningProfileDetail() {
 
     // ── Protocol activation ────────────────────────────────────────────────────
 
-    const ilmActivationData: TableDataRow[] = useMemo(() => {
-        if (!ilmActivationDetails) return [];
-        return [
-            { id: 'ilmUuid', columns: ['UUID', ilmActivationDetails.uuid] },
-            { id: 'ilmName', columns: ['Name', ilmActivationDetails.name] },
-            {
-                id: 'ilmAvailable',
-                columns: ['Available', <StatusBadge enabled={ilmActivationDetails.available} />],
-            },
-            {
-                id: 'ilmUrl',
-                columns: [
-                    'Signing URL',
-                    ilmActivationDetails.signingUrl ? (
-                        <a href={ilmActivationDetails.signingUrl} target="_blank" rel="noreferrer">
-                            {ilmActivationDetails.signingUrl}
-                        </a>
-                    ) : (
-                        '—'
-                    ),
-                ],
-            },
-        ];
-    }, [ilmActivationDetails]);
-
     const tspActivationData: TableDataRow[] = useMemo(() => {
         if (!tspActivationDetails) return [];
         return [
@@ -464,43 +428,6 @@ export default function SigningProfileDetail() {
 
     const availableProtocolsData: TableDataRow[] = useMemo(
         () => [
-            {
-                id: 'ilm',
-                columns: [
-                    'ILM Signing Protocol',
-                    <StatusBadge enabled={ilmActivationDetails?.available ?? false} />,
-                    <ProgressButton
-                        type="button"
-                        title={ilmActivationDetails?.available ? 'Deactivate' : 'Activate'}
-                        inProgressTitle={ilmActivationDetails?.available ? 'Deactivating...' : 'Activating...'}
-                        inProgress={isActivatingIlm || isDeactivatingIlm}
-                        onClick={() => {
-                            if (ilmActivationDetails?.available) {
-                                setConfirmDeactivateIlm(true);
-                            } else {
-                                setSelectedIlmConfigUuid(undefined);
-                                dispatch(ilmConfigActions.listIlmSigningProtocolConfigurations());
-                                setActivateIlmDialog(true);
-                            }
-                        }}
-                    />,
-                ],
-                detailColumns: [
-                    <></>,
-                    <></>,
-                    <></>,
-                    !ilmActivationDetails?.available ? (
-                        <>ILM Signing Protocol is not activated on this profile.</>
-                    ) : (
-                        <>
-                            <b>Protocol settings</b>
-                            <br />
-                            <br />
-                            <CustomTable hasHeader={false} headers={detailHeaders} data={ilmActivationData} />
-                        </>
-                    ),
-                ],
-            },
             {
                 id: 'tsp',
                 columns: [
@@ -539,18 +466,7 @@ export default function SigningProfileDetail() {
                 ],
             },
         ],
-        [
-            ilmActivationDetails?.available,
-            isActivatingIlm,
-            isDeactivatingIlm,
-            detailHeaders,
-            ilmActivationData,
-            tspActivationDetails?.available,
-            isActivatingTsp,
-            isDeactivatingTsp,
-            tspActivationData,
-            dispatch,
-        ],
+        [tspActivationDetails?.available, isActivatingTsp, isDeactivatingTsp, detailHeaders, tspActivationData, dispatch],
     );
 
     // ── Approval profiles ──────────────────────────────────────────────────────
@@ -676,14 +592,7 @@ export default function SigningProfileDetail() {
                             content: (
                                 <Widget
                                     title="Available Protocols"
-                                    busy={
-                                        isFetchingIlmActivationDetails ||
-                                        isFetchingTspActivationDetails ||
-                                        isActivatingIlm ||
-                                        isDeactivatingIlm ||
-                                        isActivatingTsp ||
-                                        isDeactivatingTsp
-                                    }
+                                    busy={isFetchingTspActivationDetails || isActivatingTsp || isDeactivatingTsp}
                                     titleSize="large"
                                     refreshAction={getFreshData}
                                 >
@@ -731,25 +640,6 @@ export default function SigningProfileDetail() {
             />
 
             <Dialog
-                isOpen={confirmDeactivateIlm}
-                caption="Deactivate ILM Signing Protocol"
-                body="Are you sure you want to deactivate the ILM Signing Protocol on this Signing Profile?"
-                toggle={() => setConfirmDeactivateIlm(false)}
-                icon="warning"
-                buttons={[
-                    {
-                        color: 'danger',
-                        onClick: () => {
-                            if (id) dispatch(actions.deactivateIlmSigningProtocol({ uuid: id }));
-                            setConfirmDeactivateIlm(false);
-                        },
-                        body: 'Deactivate',
-                    },
-                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDeactivateIlm(false), body: 'Cancel' },
-                ]}
-            />
-
-            <Dialog
                 isOpen={confirmDeactivateTsp}
                 caption="Deactivate TSP Protocol"
                 body="Are you sure you want to deactivate the TSP Protocol on this Signing Profile?"
@@ -765,43 +655,6 @@ export default function SigningProfileDetail() {
                         body: 'Deactivate',
                     },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDeactivateTsp(false), body: 'Cancel' },
-                ]}
-            />
-
-            <Dialog
-                isOpen={activateIlmDialog}
-                caption="Activate ILM Signing Protocol"
-                body={
-                    <div>
-                        <p className="mb-3">Select an ILM Signing Protocol Configuration to activate on this Signing Profile.</p>
-                        <Select
-                            id="ilmConfigSelect"
-                            options={ilmConfigurations.map((c) => ({ value: c.uuid, label: c.name }))}
-                            value={selectedIlmConfigUuid ?? ''}
-                            onChange={(value) => setSelectedIlmConfigUuid(value as string | undefined)}
-                            placeholder="Select ILM configuration"
-                        />
-                    </div>
-                }
-                toggle={() => setActivateIlmDialog(false)}
-                buttons={[
-                    {
-                        color: 'primary',
-                        disabled: !selectedIlmConfigUuid,
-                        onClick: () => {
-                            if (id && selectedIlmConfigUuid) {
-                                dispatch(
-                                    actions.activateIlmSigningProtocol({
-                                        signingProfileUuid: id,
-                                        ilmSigningProtocolConfigurationUuid: selectedIlmConfigUuid,
-                                    }),
-                                );
-                            }
-                            setActivateIlmDialog(false);
-                        },
-                        body: 'Activate',
-                    },
-                    { color: 'secondary', variant: 'outline', onClick: () => setActivateIlmDialog(false), body: 'Cancel' },
                 ]}
             />
 
