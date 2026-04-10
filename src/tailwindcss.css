@@ -72,6 +72,14 @@
 /* stylelint-disable-next-line at-rule-no-unknown */
 @source "../src/**/*.{ts,tsx,js,jsx,html}";
 
+/*
+ * Safelist: classes used inside long JSX strings / template literals that Tailwind v4's
+ * oxc scanner misses due to per-segment length limits.
+ * These come from Select/index.tsx data-hs-select JSON config strings.
+ */
+/* stylelint-disable-next-line at-rule-no-unknown */
+@source inline("z-[100] z-[110] w-[400px] text-[var(--dark-gray-color)] bg-[var(--tooltip-background-color)] hs-selected:block focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 dark:hover:bg-neutral-800");
+
 /* Light mode by default, dark mode with .dark class */
 /* stylelint-disable-next-line at-rule-no-unknown */
 @custom-variant dark (&:where(.dark, .dark *));
