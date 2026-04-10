@@ -5,7 +5,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import 'reactflow/dist/style.css';
 import reportWebVitals from './reportWebVitals';
-import 'preline/dist/preline.js';
+import 'preline/dist/index.js';
 import './tailwindcss.css';
 import App from './App';
 import '@preline/tooltip';
