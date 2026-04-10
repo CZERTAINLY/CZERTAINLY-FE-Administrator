@@ -28,11 +28,11 @@ export default defineConfig({
     },
     resolve: {
         alias: [
-            { find: /^utils([\\/].*)/, replacement: path.resolve(__dirname, './src/utils/') + '$1' },
-            { find: /^types([\\/].*)/, replacement: path.resolve(__dirname, './src/types/') + '$1' },
-            { find: /^components([\\/].*)/, replacement: path.resolve(__dirname, './src/components/') + '$1' },
-            { find: /^ducks$/, replacement: path.resolve(__dirname, './src/ducks') },
-            { find: /^ducks([\\/].*)/, replacement: path.resolve(__dirname, './src/ducks/') + '$1' },
+            { find: 'utils/', replacement: path.resolve(__dirname, './src/utils/') + '/' },
+            { find: 'types/', replacement: path.resolve(__dirname, './src/types/') + '/' },
+            { find: 'components/', replacement: path.resolve(__dirname, './src/components/') + '/' },
+            { find: 'ducks/', replacement: path.resolve(__dirname, './src/ducks/') + '/' },
+            { find: 'ducks', replacement: path.resolve(__dirname, './src/ducks') },
         ],
     },
     define: {

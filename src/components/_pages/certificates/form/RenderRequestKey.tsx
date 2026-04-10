@@ -77,7 +77,7 @@ const RenderRequestKey = ({ type, name, tokenProfileField }: Props) => {
             userInterfaceActions.showGlobalModal({
                 content: <CryptographicKeyForm usesGlobalModal />,
                 isOpen: true,
-                size: 'lg',
+                size: 'xl',
                 title: 'Add New Key',
             }),
         );
