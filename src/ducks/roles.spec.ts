@@ -118,6 +118,28 @@ describe('roles slice', () => {
         expect(next.isDeleting).toBe(false);
     });
 
+    test('bulkDelete / success removes only deleted roles / failure sets error', () => {
+        const items = [{ uuid: 'r-1' } as any, { uuid: 'r-2' } as any, { uuid: 'r-3' } as any];
+        const role = { uuid: 'r-2', name: 'Admin 2' } as any;
+
+        let next = reducer(
+            { ...initialState, roles: items, role, rolesListCheckedRows: ['r-1', 'r-2'], deleteErrorMessage: 'old error' },
+            actions.bulkDelete({ uuids: ['r-1', 'r-2'] }),
+        );
+        expect(next.isDeleting).toBe(true);
+        expect(next.deleteErrorMessage).toBe('');
+
+        next = reducer(next, actions.bulkDeleteSuccess({ uuids: ['r-1'] }));
+        expect(next.isDeleting).toBe(false);
+        expect(next.roles).toEqual([{ uuid: 'r-2' }, { uuid: 'r-3' }]);
+        expect(next.role).toEqual(role);
+        expect(next.rolesListCheckedRows).toEqual([]);
+
+        next = reducer({ ...next, isDeleting: true }, actions.bulkDeleteFailure({ error: 'bulk delete failed' }));
+        expect(next.isDeleting).toBe(false);
+        expect(next.deleteErrorMessage).toBe('bulk delete failed');
+    });
+
     test('getUsers / success updates role users / failure', () => {
         const role = { uuid: 'r-1', name: 'Admin', users: [] } as any;
 

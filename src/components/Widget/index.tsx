@@ -38,6 +38,7 @@ interface Props {
     innerContainerProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
     dataTestId?: string;
     noBorder?: boolean;
+    enableBusyOverlay?: boolean;
 }
 
 function Widget({
@@ -60,6 +61,7 @@ function Widget({
     innerContainerProps,
     dataTestId,
     noBorder = false,
+    enableBusyOverlay = false,
 }: Props) {
     const widgetLocks = useSelector(selectors.selectWidgetLocks) || [];
     const widgetLock = widgetLocks.find(
@@ -96,7 +98,13 @@ function Widget({
 
     const renderRefreshButton = () =>
         refreshAction ? (
-            <Button onClick={refreshAction} data-testid="refresh-icon" variant="transparent" title="Refresh">
+            <Button
+                onClick={refreshAction}
+                data-testid="refresh-icon"
+                variant="transparent"
+                title="Refresh"
+                disabled={busy || !!widgetLock}
+            >
                 <RefreshCw size={16} />
             </Button>
         ) : null;
@@ -191,7 +199,12 @@ function Widget({
                     lockType={widgetLock.lockType}
                 />
             ) : (
-                <div {...innerContainerProps}>{children}</div>
+                <div className="relative" {...innerContainerProps}>
+                    {children}
+                    {busy && enableBusyOverlay && (
+                        <div className="absolute inset-0 z-10 bg-white/35 dark:bg-neutral-900/35" data-testid="widget-busy-overlay" />
+                    )}
+                </div>
             )}
 
             <Spinner active={busy} />

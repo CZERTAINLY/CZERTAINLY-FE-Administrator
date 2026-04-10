@@ -1,6 +1,6 @@
 import { AppEpic } from 'ducks';
 import { concat, from, iif, of } from 'rxjs';
-import { catchError, concatMap, filter, map, mergeMap, switchMap, toArray } from 'rxjs/operators';
+import { catchError, concatMap, exhaustMap, filter, map, mergeMap, switchMap, toArray } from 'rxjs/operators';
 import { extractError } from 'utils/net';
 import { actions as alertActions } from './alerts';
 import { actions as appRedirectActions } from './app-redirect';
@@ -123,6 +123,48 @@ const deleteSchedulerJob: AppEpic = (action$, state$, deps) => {
                 ),
             ),
         ),
+    );
+};
+
+const bulkDeleteSchedulerJobs: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkDeleteSchedulerJobs.match),
+        exhaustMap((action) => {
+            return from(action.payload.uuids).pipe(
+                concatMap((uuid) =>
+                    deps.apiClients.scheduler.deleteScheduledJob({ uuid }).pipe(
+                        map(() => ({ uuid, ok: true })),
+                        catchError(() => of({ uuid, ok: false })),
+                    ),
+                ),
+                toArray(),
+                mergeMap((results) => {
+                    const deletedUuids = results.filter((result) => result.ok).map((result) => result.uuid);
+                    const failedDeletes = results.length - deletedUuids.length;
+
+                    if (failedDeletes === 0) {
+                        return of(slice.actions.bulkDeleteSchedulerJobsSuccess({ uuids: deletedUuids }));
+                    }
+
+                    return of(
+                        slice.actions.bulkDeleteSchedulerJobsSuccess({ uuids: deletedUuids }),
+                        slice.actions.bulkDeleteSchedulerJobsFailure({
+                            error: `Failed to delete ${failedDeletes} scheduled job${failedDeletes === 1 ? '' : 's'}`,
+                        }),
+                        appRedirectActions.fetchError({
+                            error: undefined,
+                            message: `Failed to delete ${failedDeletes} scheduled job${failedDeletes === 1 ? '' : 's'}`,
+                        }),
+                    );
+                }),
+                catchError((err) =>
+                    of(
+                        slice.actions.bulkDeleteSchedulerJobsFailure({ error: extractError(err, 'Failed to delete Scheduled Jobs') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to delete Scheduled Jobs' }),
+                    ),
+                ),
+            );
+        }),
     );
 };
 
@@ -267,6 +309,7 @@ const epics = [
     listSchedulerJobHistory,
     getSchedulerJob,
     deleteSchedulerJob,
+    bulkDeleteSchedulerJobs,
     enableSchedulerJob,
     disableSchedulerJob,
     bulkEnableSchedulerJobs,
