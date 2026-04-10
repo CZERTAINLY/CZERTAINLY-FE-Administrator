@@ -87,7 +87,7 @@ export default function RolesList() {
     const onDeleteConfirmed = useCallback(() => {
         setConfirmDelete(false);
 
-        checkedRows.forEach((uuid) => dispatch(actions.delete({ uuid })));
+        dispatch(actions.bulkDelete({ uuids: checkedRows }));
     }, [checkedRows, dispatch]);
 
     const setCheckedRows = useCallback(
@@ -108,13 +108,13 @@ export default function RolesList() {
         () => [
             {
                 icon: 'plus',
-                disabled: false,
+                disabled: isBusy,
                 tooltip: 'Create',
                 onClick: handleOpenAddModal,
             },
             {
                 icon: 'trash',
-                disabled: checkedRows.length === 0 || isSystemRoleSelected,
+                disabled: isBusy || checkedRows.length === 0 || isSystemRoleSelected,
                 tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
@@ -122,7 +122,7 @@ export default function RolesList() {
             },
             {
                 icon: 'user',
-                disabled: checkedRows.length !== 1 || isSystemRoleSelected,
+                disabled: isBusy || checkedRows.length !== 1 || isSystemRoleSelected,
                 tooltip: 'Edit role users',
                 onClick: () => {
                     onEditRoleUsersClick();
@@ -130,14 +130,14 @@ export default function RolesList() {
             },
             {
                 icon: 'lock',
-                disabled: checkedRows.length !== 1 || isSystemRoleSelected,
+                disabled: isBusy || checkedRows.length !== 1 || isSystemRoleSelected,
                 tooltip: 'Edit role permissions',
                 onClick: () => {
                     onEditRolePermissionsClick();
                 },
             },
         ],
-        [checkedRows.length, isSystemRoleSelected, handleOpenAddModal, onEditRolePermissionsClick, onEditRoleUsersClick],
+        [isBusy, checkedRows.length, isSystemRoleSelected, handleOpenAddModal, onEditRolePermissionsClick, onEditRoleUsersClick],
     );
 
     const rolesTableHeader: TableHeader[] = useMemo(
@@ -200,6 +200,7 @@ export default function RolesList() {
             <Widget
                 title="List of Roles"
                 busy={isBusy}
+                enableBusyOverlay
                 widgetLockName={LockWidgetNameEnum.ListOfRoles}
                 widgetButtons={buttons}
                 titleSize="large"
@@ -212,6 +213,9 @@ export default function RolesList() {
                     canSearch={true}
                     hasCheckboxes={true}
                     hasPagination={true}
+                    disableSearchControls={isBusy}
+                    disableSelectionControls={isBusy}
+                    disablePaginationControls={isBusy}
                 />
             </Widget>
 

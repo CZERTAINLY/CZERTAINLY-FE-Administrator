@@ -160,7 +160,7 @@ test.describe('AttributeFieldSelect', () => {
         await expect(page.getByTestId('select-testSelectSelect')).toBeVisible();
         await page.getByTestId('select-testSelectSelect').click();
         await expect(page.locator('.hs-select-option-row', { hasText: 'Option A' })).toBeVisible();
-        await expect(page.locator('.hs-select-option-row', { hasText: '+' })).toBeVisible();
+        await expect(page.locator('.hs-select-option-row', { hasText: 'Add new' })).toBeVisible();
     });
 
     test('extensible list adds extra option for current value not in options', async ({ mount, page }) => {

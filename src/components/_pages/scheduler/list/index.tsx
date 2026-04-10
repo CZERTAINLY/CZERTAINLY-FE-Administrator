@@ -40,7 +40,7 @@ function SchedulerJobsList() {
         () => [
             {
                 icon: 'check',
-                disabled: checkedRows.length === 0,
+                disabled: isBusy || checkedRows.length === 0,
                 tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
@@ -48,14 +48,14 @@ function SchedulerJobsList() {
             },
             {
                 icon: 'times',
-                disabled: checkedRows.length === 0,
+                disabled: isBusy || checkedRows.length === 0,
                 tooltip: 'Disable',
                 onClick: () => {
                     onDisableClick();
                 },
             },
         ],
-        [checkedRows.length, onDisableClick, onEnableClick],
+        [isBusy, checkedRows.length, onDisableClick, onEnableClick],
     );
 
     const schedulerJobsRowHeaders: TableHeader[] = useMemo(
@@ -144,7 +144,7 @@ function SchedulerJobsList() {
         <PagedList
             entity={EntityType.SCHEDULER}
             onListCallback={onListCallback}
-            onDeleteCallback={(uuids) => uuids.forEach((uuid) => dispatch(actions.deleteSchedulerJob({ uuid, redirect: false })))}
+            onDeleteCallback={(uuids) => dispatch(actions.bulkDeleteSchedulerJobs({ uuids }))}
             headers={schedulerJobsRowHeaders}
             data={schedulerJobList}
             isBusy={isBusy}

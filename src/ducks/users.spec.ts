@@ -128,6 +128,28 @@ describe('users slice', () => {
         expect(next.deleteErrorMessage).toBe('delete failed');
     });
 
+    test('bulkDeleteUsers / success removes only deleted users / failure sets error', () => {
+        const items = [{ uuid: 'u-1' } as any, { uuid: 'u-2' } as any, { uuid: 'u-3' } as any];
+        const user = { uuid: 'u-2' } as any;
+
+        let next = reducer(
+            { ...initialState, users: items, user, usersListCheckedRows: ['u-1', 'u-2'], deleteErrorMessage: 'old error' },
+            actions.bulkDeleteUsers({ uuids: ['u-1', 'u-2'] }),
+        );
+        expect(next.isDeleting).toBe(true);
+        expect(next.deleteErrorMessage).toBe('');
+
+        next = reducer(next, actions.bulkDeleteUsersSuccess({ uuids: ['u-1'] }));
+        expect(next.isDeleting).toBe(false);
+        expect(next.users).toEqual([{ uuid: 'u-2' }, { uuid: 'u-3' }]);
+        expect(next.user).toEqual(user);
+        expect(next.usersListCheckedRows).toEqual([]);
+
+        next = reducer({ ...next, isDeleting: true }, actions.bulkDeleteUsersFailure({ error: 'bulk delete failed' }));
+        expect(next.isDeleting).toBe(false);
+        expect(next.deleteErrorMessage).toBe('bulk delete failed');
+    });
+
     test('enable / success sets enabled on user and list item / failure', () => {
         const user = { uuid: 'u-1', enabled: false } as any;
 

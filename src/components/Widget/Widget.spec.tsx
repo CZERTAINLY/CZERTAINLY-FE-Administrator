@@ -35,6 +35,45 @@ test.describe('Widget', () => {
         await expect(page.getByTestId('refresh-icon')).toBeVisible();
     });
 
+    test('should disable refresh button when busy', async ({ mount, page }) => {
+        const store = createMockStore();
+        await mount(
+            withProviders(<Widget title="Refreshable" dataTestId="refresh-widget" refreshAction={() => {}} busy={true} />, { store }),
+        );
+        await expect(page.getByTestId('refresh-icon')).toBeDisabled();
+    });
+
+    test('should not render blocking overlay when busy and enableBusyOverlay is not provided', async ({ mount, page }) => {
+        const store = createMockStore();
+        await mount(
+            withProviders(
+                <Widget title="Busy Widget" dataTestId="busy-widget" busy={true}>
+                    <p>Content</p>
+                </Widget>,
+                { store },
+            ),
+        );
+        await expect(page.getByTestId('widget-busy-overlay')).toHaveCount(0);
+    });
+
+    test('should render blocking overlay when busy and enableBusyOverlay is true', async ({ mount, page }) => {
+        const store = createMockStore();
+        await mount(
+            withProviders(
+                <div style={{ width: '400px', minHeight: '120px' }}>
+                    <Widget title="Busy Widget" dataTestId="busy-widget" busy={true} enableBusyOverlay={true}>
+                        <p>Content</p>
+                    </Widget>
+                </div>,
+                { store },
+            ),
+        );
+        const overlay = page.getByTestId('widget-busy-overlay');
+        await expect(overlay).toHaveCount(1);
+        await expect(overlay).toHaveClass(/absolute/);
+        await expect(overlay).toHaveClass(/inset-0/);
+    });
+
     test('should show WidgetLock when widgetLocks match widgetLockName', async ({ mount, page }) => {
         const lock = {
             widgetName: LockWidgetNameEnum.ListOfCertificates,
