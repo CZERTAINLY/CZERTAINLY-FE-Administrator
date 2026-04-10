@@ -162,6 +162,27 @@ export const slice = createSlice({
             state.isDeleting = false;
         },
 
+        bulkDelete: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isDeleting = true;
+            state.deleteErrorMessage = '';
+        },
+
+        bulkDeleteSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.roles = state.roles.filter((role) => !action.payload.uuids.includes(role.uuid));
+
+            if (state.role && action.payload.uuids.includes(state.role.uuid)) {
+                state.role = undefined;
+            }
+
+            state.rolesListCheckedRows = [];
+            state.isDeleting = false;
+        },
+
+        bulkDeleteFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.deleteErrorMessage = action.payload.error || 'Unknown error';
+            state.isDeleting = false;
+        },
+
         getUsers: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isFetchingUsers = true;
         },

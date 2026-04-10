@@ -193,6 +193,7 @@ function PagedList({
             <Widget
                 title={title}
                 busy={isBusy || isFetchingList}
+                enableBusyOverlay
                 widgetLockName={pageWidgetLockName}
                 refreshAction={getFreshData}
                 widgetButtons={buttons}
@@ -211,6 +212,9 @@ function PagedList({
                     onPageChanged={onPageNumberChanged}
                     onCheckedRowsChanged={onCheckedRowsChanged}
                     onPageSizeChanged={onPageSizeChanged}
+                    disablePaginationControls={isBusy || isFetchingList}
+                    disableSelectionControls={isBusy || isFetchingList}
+                    disableSearchControls={isBusy || isFetchingList}
                 />
             </Widget>
             {onDeleteCallback && (

@@ -1,5 +1,5 @@
-import { iif, of } from 'rxjs';
-import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { from, iif, of } from 'rxjs';
+import { catchError, concatMap, exhaustMap, filter, map, mergeMap, switchMap, toArray } from 'rxjs/operators';
 
 import { AppEpic } from 'ducks';
 import { extractError } from 'utils/net';
@@ -167,6 +167,48 @@ const deleteUser: AppEpic = (action$, state, deps) => {
     );
 };
 
+const bulkDeleteUsers: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkDeleteUsers.match),
+        exhaustMap((action) =>
+            from(action.payload.uuids).pipe(
+                concatMap((uuid) =>
+                    deps.apiClients.users.deleteUser({ userUuid: uuid }).pipe(
+                        map(() => ({ uuid, ok: true })),
+                        catchError(() => of({ uuid, ok: false })),
+                    ),
+                ),
+                toArray(),
+                mergeMap((results) => {
+                    const deletedUuids = results.filter((result) => result.ok).map((result) => result.uuid);
+                    const failedDeletes = results.length - deletedUuids.length;
+
+                    if (failedDeletes === 0) {
+                        return of(slice.actions.bulkDeleteUsersSuccess({ uuids: deletedUuids }));
+                    }
+
+                    return of(
+                        slice.actions.bulkDeleteUsersSuccess({ uuids: deletedUuids }),
+                        slice.actions.bulkDeleteUsersFailure({
+                            error: `Failed to delete ${failedDeletes} user${failedDeletes === 1 ? '' : 's'}`,
+                        }),
+                        appRedirectActions.fetchError({
+                            error: undefined,
+                            message: `Failed to delete ${failedDeletes} user${failedDeletes === 1 ? '' : 's'}`,
+                        }),
+                    );
+                }),
+                catchError((err) =>
+                    of(
+                        slice.actions.bulkDeleteUsersFailure({ error: extractError(err, 'Failed to delete users') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to delete users' }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 const enable: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.enable.match),
@@ -277,6 +319,6 @@ const removeRole: AppEpic = (action$, state, deps) => {
     );
 };
 
-const epics = [list, getDetail, create, update, deleteUser, enable, disable, getRoles, updateRoles, addRole, removeRole];
+const epics = [list, getDetail, create, update, deleteUser, bulkDeleteUsers, enable, disable, getRoles, updateRoles, addRole, removeRole];
 
 export default epics;

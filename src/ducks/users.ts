@@ -191,6 +191,27 @@ export const slice = createSlice({
             state.isDeleting = false;
         },
 
+        bulkDeleteUsers: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isDeleting = true;
+            state.deleteErrorMessage = '';
+        },
+
+        bulkDeleteUsersSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.usersListCheckedRows = [];
+            state.users = state.users.filter((user) => !action.payload.uuids.includes(user.uuid));
+
+            if (state.user && action.payload.uuids.includes(state.user.uuid)) {
+                state.user = undefined;
+            }
+
+            state.isDeleting = false;
+        },
+
+        bulkDeleteUsersFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.deleteErrorMessage = action.payload.error || 'Unknown error';
+            state.isDeleting = false;
+        },
+
         enable: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isEnabling = true;
         },

@@ -44,6 +44,9 @@ interface Props {
     columnForDetail?: string;
     detailHeaders?: TableHeader[];
     paginationStateKey?: string;
+    disablePaginationControls?: boolean;
+    disableSelectionControls?: boolean;
+    disableSearchControls?: boolean;
 }
 
 const emptyCheckedRows: (string | number)[] = [];
@@ -68,6 +71,9 @@ function CustomTable({
     detailHeaders,
     columnForDetail,
     paginationStateKey,
+    disablePaginationControls = false,
+    disableSelectionControls = false,
+    disableSearchControls = false,
 }: Props) {
     const location = useLocation();
     const [tblHeaders, setTblHeaders] = useState<TableHeader[]>();
@@ -235,10 +241,11 @@ function CustomTable({
 
     const onPageChange = useCallback(
         (page: number) => {
+            if (disablePaginationControls) return;
             if (onPageChanged) onPageChanged(page);
             else setPage(page);
         },
-        [onPageChanged, setPage],
+        [disablePaginationControls, onPageChanged, setPage],
     );
 
     useEffect(() => {
@@ -328,6 +335,7 @@ function CustomTable({
 
     const onCheckAllCheckboxClick = useCallback(
         (value: boolean) => {
+            if (disableSelectionControls) return;
             if (!value) {
                 setTblCheckedRows([]);
                 if (onCheckedRowsChanged) onCheckedRowsChanged([]);
@@ -339,7 +347,7 @@ function CustomTable({
             setTblCheckedRows(checkedRows);
             if (onCheckedRowsChanged) onCheckedRowsChanged(checkedRows);
         },
-        [tblData, onCheckedRowsChanged],
+        [disableSelectionControls, tblData, onCheckedRowsChanged],
     );
 
     const onRowToggleSelection = useCallback(
@@ -365,6 +373,8 @@ function CustomTable({
             }
 
             if (e.target instanceof HTMLInputElement && e.target.type === 'checkbox') return;
+
+            if (disableSelectionControls) return;
 
             const id = e.currentTarget.getAttribute('data-id');
             if (!id) return;
@@ -392,11 +402,12 @@ function CustomTable({
             e.stopPropagation();
             e.preventDefault();
         },
-        [hasDetails, multiSelect, tblCheckedRows, onCheckedRowsChanged, expandedRow],
+        [hasDetails, disableSelectionControls, multiSelect, tblCheckedRows, onCheckedRowsChanged, expandedRow],
     );
 
     const onRowCheckboxClick = useCallback(
         (value: boolean, id: string) => {
+            if (disableSelectionControls) return;
             if (!id) return;
 
             if (!multiSelect) {
@@ -417,7 +428,7 @@ function CustomTable({
             setTblCheckedRows(checked);
             if (onCheckedRowsChanged) onCheckedRowsChanged(checked);
         },
-        [multiSelect, tblCheckedRows, onCheckedRowsChanged],
+        [disableSelectionControls, multiSelect, tblCheckedRows, onCheckedRowsChanged],
     );
 
     const onColumnSortClick = useCallback(
@@ -446,6 +457,7 @@ function CustomTable({
 
     const onPageSizeChange = useCallback(
         (value: string | number) => {
+            if (disablePaginationControls) return;
             const num = typeof value === 'string' ? Number.parseInt(value, 10) : value;
             if (onPageSizeChanged) {
                 onPageSizeChanged(num);
@@ -454,7 +466,7 @@ function CustomTable({
             setPageSize(num);
             setPage(1);
         },
-        [onPageSizeChanged],
+        [disablePaginationControls, onPageSizeChanged],
     );
 
     const checkAllChecked = useMemo(() => {
@@ -513,6 +525,7 @@ function CustomTable({
                                 checked={checkAllChecked}
                                 onChange={(value) => onCheckAllCheckboxClick(value)}
                                 id={`${header.id}__checkbox__`}
+                                disabled={disableSelectionControls}
                             />
                         ) : (
                             <div>&nbsp;</div>
@@ -529,7 +542,17 @@ function CustomTable({
                 </th>
             </Fragment>
         ));
-    }, [tblHeaders, hasCheckboxes, onColumnSortClick, hasAllCheckBox, multiSelect, checkAllChecked, onCheckAllCheckboxClick, getSortIcon]);
+    }, [
+        tblHeaders,
+        hasCheckboxes,
+        onColumnSortClick,
+        hasAllCheckBox,
+        multiSelect,
+        checkAllChecked,
+        onCheckAllCheckboxClick,
+        getSortIcon,
+        disableSelectionControls,
+    ]);
 
     const getRowStyle = useCallback((row: TableDataRow) => {
         if (!row.options) return undefined;
@@ -570,6 +593,7 @@ function CustomTable({
                                         onRowCheckboxClick(value, row.id.toString());
                                     }}
                                     id={`${row.id}__checkbox__`}
+                                    disabled={disableSelectionControls}
                                 />
                             </td>
                         )}
@@ -602,6 +626,7 @@ function CustomTable({
         tblHeaders,
         getRowStyle,
         handleRowDetailClick,
+        disableSelectionControls,
     ]);
 
     return (
@@ -614,6 +639,7 @@ function CustomTable({
                             placeholder="Search"
                             onChange={(event) => setSearchKey(event.target.value)}
                             type="text"
+                            disabled={disableSearchControls}
                             className="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
                         />
                     </div>
@@ -653,6 +679,7 @@ function CustomTable({
                                 )}
                                 value={(paginationData ? paginationData.pageSize : pageSize).toString()}
                                 onChange={(v) => onPageSizeChange(v as string | number)}
+                                isDisabled={disablePaginationControls}
                                 minWidth={90}
                             />
                         )}
@@ -663,6 +690,7 @@ function CustomTable({
                             page={paginationData?.page || page}
                             totalPages={paginationData?.totalPages || totalPages}
                             onPageChange={onPageChange}
+                            disabled={disablePaginationControls}
                         />
                     )}
 

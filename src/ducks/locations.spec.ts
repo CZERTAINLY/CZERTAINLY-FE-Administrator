@@ -94,6 +94,30 @@ describe('locations slice', () => {
         expect(next.isDeleting).toBe(false);
     });
 
+    test('bulkDeleteLocations / success removes only deleted locations / failure', () => {
+        const items = [{ uuid: 'l-1' } as any, { uuid: 'l-2' } as any, { uuid: 'l-3' } as any];
+        const selected = { uuid: 'l-2' } as any;
+
+        let next = reducer(
+            { ...initialState, locations: items, location: selected },
+            actions.bulkDeleteLocations({
+                locations: [
+                    { entityUuid: 'e-1', uuid: 'l-1' },
+                    { entityUuid: 'e-1', uuid: 'l-2' },
+                ],
+            }),
+        );
+        expect(next.isDeleting).toBe(true);
+
+        next = reducer(next, actions.bulkDeleteLocationsSuccess({ uuids: ['l-1'] }));
+        expect(next.isDeleting).toBe(false);
+        expect(next.locations).toEqual([{ uuid: 'l-2' }, { uuid: 'l-3' }]);
+        expect(next.location).toEqual(selected);
+
+        next = reducer({ ...next, isDeleting: true }, actions.bulkDeleteLocationsFailure({ error: 'err' }));
+        expect(next.isDeleting).toBe(false);
+    });
+
     test('enableLocation / success updates list and detail / failure', () => {
         const loc = { uuid: 'l-1', enabled: false } as any;
 
