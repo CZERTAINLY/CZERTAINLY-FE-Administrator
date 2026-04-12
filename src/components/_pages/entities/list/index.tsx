@@ -100,12 +100,12 @@ function EntityList() {
         () => [
             {
                 icon: 'plus',
-                disabled: false,
+                disabled: isBusy,
                 tooltip: 'Create',
                 onClick: handleOpenAddModal,
             },
         ],
-        [handleOpenAddModal],
+        [isBusy, handleOpenAddModal],
     );
 
     return (
@@ -113,7 +113,7 @@ function EntityList() {
             <PagedList
                 entity={EntityType.ENTITY}
                 onListCallback={onListCallback}
-                onDeleteCallback={(uuids) => uuids.map((uuid) => dispatch(actions.deleteEntity({ uuid })))}
+                onDeleteCallback={(uuids) => dispatch(actions.bulkDeleteEntities({ uuids }))}
                 getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.entities.getEntitySearchableFields(), [])}
                 headers={entitiesRowHeaders}
                 data={entityList}

@@ -2,10 +2,10 @@ import Select from 'components/Select';
 import Label from 'components/Label';
 import { actions as keyActions } from 'ducks/cryptographic-keys';
 import { selectors as tokenProfileSelectors } from 'ducks/token-profiles';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
+import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from '../../../../ducks/user-interface';
 import TokenProfileForm from 'components/_pages/token-profiles/form';
 
 type Props = {
@@ -15,8 +15,10 @@ type Props = {
 
 const RenderTokenProfile = ({ type, name }: Props) => {
     const dispatch = useDispatch();
-    const { control } = useFormContext();
+    const { control, setValue } = useFormContext();
     const tokenProfiles = useSelector(tokenProfileSelectors.tokenProfiles);
+    const initiateFormCallback = useSelector(userInterfaceSelectors.selectInitiateFormCallback);
+    const formCallbackValue = useSelector(userInterfaceSelectors.selectCallbackValue);
 
     const tokenProfileOptions = useMemo(
         () => [
@@ -25,7 +27,7 @@ const RenderTokenProfile = ({ type, name }: Props) => {
                 value: tokenProfile.uuid,
             })),
             {
-                label: '+',
+                label: '+ Add new',
                 value: '__add_new__',
                 disabled: false,
             },
@@ -46,11 +48,22 @@ const RenderTokenProfile = ({ type, name }: Props) => {
             userInterfaceActions.showGlobalModal({
                 content: <TokenProfileForm usesGlobalModal />,
                 isOpen: true,
-                size: 'lg',
+                size: 'xl',
                 title: 'Add New Token Profile',
             }),
         );
     }, [dispatch]);
+
+    useEffect(() => {
+        if (!initiateFormCallback || !formCallbackValue) return;
+        const newOption = tokenProfileOptions.find((option) => option.label === formCallbackValue);
+        if (newOption) {
+            setValue(name, newOption.value, { shouldDirty: true, shouldTouch: true });
+            handleTokenProfileChange(newOption.value);
+            dispatch(userInterfaceActions.clearFormCallbackValue());
+            dispatch(userInterfaceActions.setInitiateFormCallback(false));
+        }
+    }, [dispatch, formCallbackValue, handleTokenProfileChange, initiateFormCallback, tokenProfileOptions, name, setValue]);
 
     return (
         <Controller

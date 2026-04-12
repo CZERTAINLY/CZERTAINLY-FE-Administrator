@@ -111,6 +111,25 @@ describe('entities slice', () => {
         expect(next.isDeleting).toBe(false);
     });
 
+    test('bulkDeleteEntities / success removes only deleted entities / failure', () => {
+        const items = [{ uuid: 'e-1' } as any, { uuid: 'e-2' } as any, { uuid: 'e-3' } as any];
+        const selectedEntity = { uuid: 'e-2' } as any;
+
+        let next = reducer(
+            { ...initialState, entities: items, entity: selectedEntity },
+            actions.bulkDeleteEntities({ uuids: ['e-1', 'e-2'] }),
+        );
+        expect(next.isDeleting).toBe(true);
+
+        next = reducer(next, actions.bulkDeleteEntitiesSuccess({ uuids: ['e-1'] }));
+        expect(next.isDeleting).toBe(false);
+        expect(next.entities).toEqual([{ uuid: 'e-2' }, { uuid: 'e-3' }]);
+        expect(next.entity).toEqual(selectedEntity);
+
+        next = reducer({ ...next, isDeleting: true }, actions.bulkDeleteEntitiesFailure({ error: 'err' }));
+        expect(next.isDeleting).toBe(false);
+    });
+
     test('updateEntity / success / failure', () => {
         let next = reducer(initialState, actions.updateEntity({ uuid: 'e-1', attributes: [] }));
         expect(next.isUpdating).toBe(true);

@@ -19,6 +19,7 @@ import { TokenProfileDetailResponseModel } from 'types/token-profiles';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
+import Switch from 'components/Switch';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
@@ -41,6 +42,7 @@ interface FormValues {
     description: string;
     token: string;
     usages: { value: KeyUsage; label: string }[];
+    enabled: boolean;
 }
 
 export default function TokenProfileForm({
@@ -129,6 +131,7 @@ export default function TokenProfileForm({
             description: editMode ? tokenProfile?.description || '' : '',
             token: editMode ? token?.value || '' : '',
             usages: editMode ? tokenProfile?.usages?.map((usage) => ({ value: usage, label: usage })) || [] : [],
+            enabled: true,
         };
     }, [editMode, optionsForTokens, tokenProfile]);
 
@@ -163,6 +166,7 @@ export default function TokenProfileForm({
                         value: usage,
                         label: getEnumLabel(keyUsageEnum, usage),
                     })) || [],
+                enabled: tokenProfile.enabled ?? true,
             };
             reset(newDefaultValues, { keepDefaultValues: false });
         } else if (!editMode) {
@@ -172,6 +176,7 @@ export default function TokenProfileForm({
                 description: '',
                 token: tokenId || '',
                 usages: [],
+                enabled: true,
             });
         }
     }, [editMode, tokenProfile, id, reset, isFetchingDetail, tokenId, keyUsageEnum]);
@@ -221,6 +226,7 @@ export default function TokenProfileForm({
                         tokenProfileAddRequest: {
                             name: values.name,
                             description: values.description,
+                            enabled: values.enabled,
                             attributes: collectFormAttributes(
                                 'token-profile',
                                 [...(tokenProfileAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
@@ -308,6 +314,23 @@ export default function TokenProfileForm({
                                 />
                             )}
                         />
+
+                        {!editMode && (
+                            <Controller
+                                name="enabled"
+                                control={control}
+                                render={({ field }) => (
+                                    <div className="flex items-center gap-x-2">
+                                        <Switch
+                                            id="enabledSwitch"
+                                            secondaryLabel="Enable Token Profile"
+                                            checked={field.value}
+                                            onChange={field.onChange}
+                                        />
+                                    </div>
+                                )}
+                            />
+                        )}
 
                         <div>
                             <Controller

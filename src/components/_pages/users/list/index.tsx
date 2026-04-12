@@ -80,7 +80,7 @@ export default function UsersList() {
     const onDeleteConfirmed = useCallback(() => {
         setConfirmDelete(false);
 
-        checkedRows.forEach((uuid) => dispatch(actions.deleteUser({ uuid })));
+        dispatch(actions.bulkDeleteUsers({ uuids: checkedRows }));
     }, [checkedRows, dispatch]);
 
     const setCheckedRows = useCallback(
@@ -117,48 +117,45 @@ export default function UsersList() {
         return (user && user.enabled) || false;
     }, [checkedRows, users, isCurrentUserSelected]);
 
+    const isRestricted = isSystemUserSelected || isCurrentUserSelected;
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
                 icon: 'plus',
-                disabled: false,
+                disabled: isBusy,
                 tooltip: 'Create',
                 onClick: handleOpenAddModal,
             },
             {
                 icon: 'trash',
-                disabled: checkedRows.length === 0 || isSystemUserSelected || isCurrentUserSelected,
+                disabled: checkedRows.length === 0 || isRestricted || isBusy,
                 tooltip: isCurrentUserSelected ? 'You cannot delete your own account' : 'Delete',
-                onClick: () => {
-                    setConfirmDelete(true);
-                },
+                onClick: () => setConfirmDelete(true),
             },
             {
                 icon: 'check',
-                disabled: isSystemUserSelected || isCurrentUserSelected || !canEnable,
+                disabled: isRestricted || !canEnable || isBusy,
                 tooltip: isCurrentUserSelected ? 'You cannot enable your own account' : 'Enable',
-                onClick: () => {
-                    onEnableClick();
-                },
+                onClick: onEnableClick,
             },
             {
                 icon: 'times',
-                disabled: isSystemUserSelected || isCurrentUserSelected || !canDisable,
+                disabled: isRestricted || !canDisable || isBusy,
                 tooltip: isCurrentUserSelected ? 'You cannot disable your own account' : 'Disable',
-                onClick: () => {
-                    onDisableClick();
-                },
+                onClick: onDisableClick,
             },
         ],
         [
+            isBusy,
             checkedRows.length,
-            isSystemUserSelected,
+            isRestricted,
             isCurrentUserSelected,
             canEnable,
             canDisable,
             handleOpenAddModal,
             onEnableClick,
             onDisableClick,
+            setConfirmDelete,
         ],
     );
 
@@ -259,6 +256,7 @@ export default function UsersList() {
             <Widget
                 title="List of Users"
                 busy={isBusy}
+                enableBusyOverlay
                 widgetLockName={LockWidgetNameEnum.ListOfUsers}
                 widgetButtons={buttons}
                 titleSize="large"
@@ -271,6 +269,9 @@ export default function UsersList() {
                     canSearch={true}
                     hasCheckboxes={true}
                     hasPagination={true}
+                    disableSearchControls={isBusy}
+                    disableSelectionControls={isBusy}
+                    disablePaginationControls={isBusy}
                 />
             </Widget>
 

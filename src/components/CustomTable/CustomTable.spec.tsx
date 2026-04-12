@@ -316,6 +316,60 @@ test.describe('CustomTable', () => {
         await expect(component.getByText(/of loaded entries filtered/)).toBeVisible();
     });
 
+    test('should disable search input when disableSearchControls is true', async ({ mount }) => {
+        const component = await mount(
+            withProviders(<CustomTable headers={mockHeaders} data={mockData} canSearch={true} disableSearchControls={true} />),
+        );
+        await expect(component.getByPlaceholder('Search')).toBeDisabled();
+    });
+
+    test('should not change selection when disableSelectionControls is true', async ({ mount }) => {
+        let checkedRows: (string | number)[] = [];
+        const component = await mount(
+            withProviders(
+                <CustomTable
+                    headers={mockHeaders}
+                    data={mockData}
+                    hasCheckboxes={true}
+                    onCheckedRowsChanged={(rows) => {
+                        checkedRows = rows;
+                    }}
+                    disableSelectionControls={true}
+                />,
+            ),
+        );
+
+        await expect(component.locator('input[type="checkbox"]').first()).toBeDisabled();
+        await component.getByText('John Doe').click();
+        expect(checkedRows).toEqual([]);
+    });
+
+    test('should disable pagination buttons when disablePaginationControls is true', async ({ mount }) => {
+        const paginationData = {
+            page: 1,
+            totalItems: 20,
+            pageSize: 10,
+            loadedPageSize: 10,
+            totalPages: 2,
+            itemsPerPageOptions: [10, 20],
+        };
+
+        const component = await mount(
+            withProviders(
+                <CustomTable
+                    headers={mockHeaders}
+                    data={mockData}
+                    hasPagination={true}
+                    paginationData={paginationData}
+                    disablePaginationControls={true}
+                />,
+            ),
+        );
+
+        await expect(component.getByTestId('pagination-prev')).toBeDisabled();
+        await expect(component.getByTestId('pagination-next')).toBeDisabled();
+    });
+
     test('should render NewRowWidget when newRowWidgetProps provided', async ({ mount, page }) => {
         await mount(
             withProviders(
