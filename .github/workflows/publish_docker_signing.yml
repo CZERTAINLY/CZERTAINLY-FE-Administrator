@@ -1,0 +1,155 @@
+name: Publish signing Docker image
+
+# Builds and pushes a Docker image for the feat/signing branch.
+# Produces two tags:
+#   signing-latest          – mutable, always the most recent commit
+#   signing-<short-sha>     – immutable, use this in K8s manifests/Helm values
+#
+# Uses native runners for each platform to avoid slow QEMU emulation:
+#   - ubuntu-latest      → linux/amd64 (native)
+#   - ubuntu-24.04-arm   → linux/arm64 (native)
+# Both images are pushed by digest, then merged into a multiarch manifest.
+
+on:
+  push:
+    branches:
+      - feat/signing
+  workflow_dispatch:
+
+concurrency:
+  group: publish-signing-docker-czertainly-fe-administrator
+  cancel-in-progress: true
+
+env:
+  IMAGE: czertainly/czertainly-frontend-administrator
+
+jobs:
+  build_amd64:
+    name: Build amd64
+    runs-on: ubuntu-latest
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_CZERTAINLY_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_CZERTAINLY_PASSWORD }}
+
+      - name: Build and push (amd64) by digest
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          outputs: type=image,name=${{ env.IMAGE }},push-by-digest=true,name-canonical=true,push=true
+          provenance: mode=max
+          sbom: true
+
+  build_arm64:
+    name: Build arm64
+    runs-on: ubuntu-24.04-arm
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_CZERTAINLY_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_CZERTAINLY_PASSWORD }}
+
+      - name: Build and push (arm64) by digest
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/arm64
+          outputs: type=image,name=${{ env.IMAGE }},push-by-digest=true,name-canonical=true,push=true
+          provenance: mode=max
+          sbom: true
+
+  publish_manifest:
+    name: Publish multiarch manifest
+    runs-on: ubuntu-latest
+    needs: [build_amd64, build_arm64]
+    outputs:
+      digest: ${{ steps.merge.outputs.digest }}
+
+    steps:
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.8.1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_CZERTAINLY_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_CZERTAINLY_PASSWORD }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=raw,value=signing-latest
+            type=sha,prefix=signing-,format=short
+
+      - name: Create and push multiarch manifest
+        id: merge
+        run: |
+          AMD_DIGEST="${{ needs.build_amd64.outputs.digest }}"
+          ARM_DIGEST="${{ needs.build_arm64.outputs.digest }}"
+
+          echo "amd64 digest: ${AMD_DIGEST}"
+          echo "arm64 digest: ${ARM_DIGEST}"
+
+          TAGS=$(echo "${{ steps.meta.outputs.tags }}" | tr '\n' ' ' | xargs -n1 printf -- '--tag %s ')
+
+          docker buildx imagetools create \
+            $TAGS \
+            "${{ env.IMAGE }}@${AMD_DIGEST}" \
+            "${{ env.IMAGE }}@${ARM_DIGEST}"
+
+          MANIFEST_DIGEST=$(docker buildx imagetools inspect "${{ env.IMAGE }}:signing-latest" --format '{{json .Manifest}}' | jq -r '.digest')
+          echo "digest=${MANIFEST_DIGEST}" >> "$GITHUB_OUTPUT"
+
+      - name: Sign images with Cosign
+        run: |
+          cosign sign --yes --key env://COSIGN_PRIVATE_KEY \
+            ${{ env.IMAGE }}@${{ steps.merge.outputs.digest }}
+        env:
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
+        with:
+          image-ref: ${{ env.IMAGE }}@${{ steps.merge.outputs.digest }}
+          format: json
+          output: trivy-report.json
+          exit-code: 0   # non-blocking on feature branches
+
+      - name: Upload vulnerability report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: trivy-report.json
