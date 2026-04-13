@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify';
 import cn from 'classnames';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -34,7 +35,7 @@ function Alerts() {
                     <div
                         id="hs-soft-color-warning-label"
                         className="text-lg font-semibold overflow-hidden"
-                        dangerouslySetInnerHTML={{ __html: alert.message }}
+                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(alert.message) }}
                     />
                     <button
                         className="absolute top-2 right-2 translate-y-[3px] text-[var(--status-success-color)]"
