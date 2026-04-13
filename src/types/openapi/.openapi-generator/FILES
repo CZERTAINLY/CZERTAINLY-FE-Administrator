@@ -287,7 +287,6 @@ models/DecryptDataResponseDto.ts
 models/DelegatedSigningDto.ts
 models/DelegatedSigningRequestDto.ts
 models/DigestAlgorithm.ts
-models/DigitalSignatureListDto.ts
 models/DiscoveryCertificateDto.ts
 models/DiscoveryCertificateResponseDto.ts
 models/DiscoveryDto.ts
@@ -403,9 +402,9 @@ models/OperationResult.ts
 models/PaginationRequestDto.ts
 models/PaginationResponseDtoCbomDto.ts
 models/PaginationResponseDtoConnectorDtoV2.ts
-models/PaginationResponseDtoDigitalSignatureListDto.ts
 models/PaginationResponseDtoSecretDto.ts
 models/PaginationResponseDtoSigningProfileListDto.ts
+models/PaginationResponseDtoSigningRecordListDto.ts
 models/PaginationResponseDtoTimeQualityConfigurationListDto.ts
 models/PaginationResponseDtoTspProfileListDto.ts
 models/PaginationResponseDtoVaultInstanceDto.ts
@@ -512,6 +511,7 @@ models/SigningProfileDto.ts
 models/SigningProfileListDto.ts
 models/SigningProfileRequestDto.ts
 models/SigningProtocol.ts
+models/SigningRecordListDto.ts
 models/SigningScheme.ts
 models/SigningSchemeInterface.ts
 models/SigningSchemeRequestInterface.ts

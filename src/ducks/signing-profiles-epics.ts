@@ -446,19 +446,19 @@ const listSignatureAttributesForCertificate: AppEpic = (action$, state$, deps) =
     );
 };
 
-const listDigitalSignaturesForSigningProfile: AppEpic = (action$, state$, deps) => {
+const listSigningRecordsForSigningProfile: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(slice.actions.listDigitalSignaturesForSigningProfile.match),
+        filter(slice.actions.listSigningRecordsForSigningProfile.match),
         switchMap((action) => {
             const searchRequest = { filters: [] };
             return deps.apiClients.signingProfiles
-                .listDigitalSignaturesForSigningProfile({ uuid: action.payload.uuid, searchRequestDto: searchRequest })
+                .listSigningRecordsForSigningProfile({ uuid: action.payload.uuid, searchRequestDto: searchRequest })
                 .pipe(
-                    map((response) => slice.actions.listDigitalSignaturesForSigningProfileSuccess({ digitalSignatures: response })),
+                    map((response) => slice.actions.listSigningRecordsForSigningProfileSuccess({ signingRecords: response })),
                     catchError((error) =>
                         of(
-                            slice.actions.listDigitalSignaturesForSigningProfileFailure({
-                                error: extractError(error, 'Failed to get digital signatures for Signing Profile'),
+                            slice.actions.listSigningRecordsForSigningProfileFailure({
+                                error: extractError(error, 'Failed to get signing records for Signing Profile'),
                             }),
                         ),
                     ),
@@ -488,7 +488,7 @@ const epics = [
     listSupportedProtocols,
     listSigningCertificates,
     listSignatureAttributesForCertificate,
-    listDigitalSignaturesForSigningProfile,
+    listSigningRecordsForSigningProfile,
 ];
 
 export default epics;

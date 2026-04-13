@@ -300,14 +300,14 @@ describe('signingProfiles slice', () => {
         expect(next.isFetchingSigningCertificates).toBe(false);
     });
 
-    test('listDigitalSignaturesForSigningProfileSuccess sets digitalSignatures', () => {
+    test('listSigningRecordsForSigningProfileSuccess sets signingRecords', () => {
         const sigs = { items: [{ uuid: 'ds-1' }], totalItems: 1 } as any;
         const next = reducer(
-            { ...initialState, isFetchingDigitalSignatures: true },
-            actions.listDigitalSignaturesForSigningProfileSuccess({ digitalSignatures: sigs }),
+            { ...initialState, isFetchingSigningRecords: true },
+            actions.listSigningRecordsForSigningProfileSuccess({ signingRecords: sigs }),
         );
-        expect(next.isFetchingDigitalSignatures).toBe(false);
-        expect(next.digitalSignatures).toEqual(sigs);
+        expect(next.isFetchingSigningRecords).toBe(false);
+        expect(next.signingRecords).toEqual(sigs);
     });
 });
 
@@ -318,7 +318,7 @@ describe('signingProfiles selectors', () => {
         const approvalProfiles = [{ uuid: 'ap-1' }] as any[];
         const tspDetails = { uuid: 'tsp-1' } as any;
         const protocols = ['TSP'] as any[];
-        const digitalSigs = { items: [], totalItems: 0 } as any;
+        const signingRecordData = { items: [], totalItems: 0 } as any;
         const fields = [{ searchGroupEnum: 'g-1' }] as any[];
         const bulkErrors = [{ message: 'err' }] as any[];
 
@@ -330,7 +330,7 @@ describe('signingProfiles selectors', () => {
             tspActivationDetails: tspDetails,
             supportedProtocols: protocols,
             signingCertificates: [{ uuid: 'c-1' }] as any[],
-            digitalSignatures: digitalSigs,
+            signingRecords: signingRecordData,
             searchableFields: fields,
             deleteErrorMessage: 'del err',
             bulkDeleteErrorMessages: bulkErrors,
@@ -340,7 +340,7 @@ describe('signingProfiles selectors', () => {
             isFetchingTspActivationDetails: true,
             isFetchingSupportedProtocols: true,
             isFetchingSigningCertificates: true,
-            isFetchingDigitalSignatures: true,
+            isFetchingSigningRecords: true,
             isCreating: true,
             isDeleting: true,
             isUpdating: true,
@@ -363,7 +363,7 @@ describe('signingProfiles selectors', () => {
         expect(selectors.tspActivationDetails(state)).toEqual(tspDetails);
         expect(selectors.supportedProtocols(state)).toEqual(protocols);
         expect(selectors.signingCertificates(state)).toEqual([{ uuid: 'c-1' }]);
-        expect(selectors.digitalSignatures(state)).toEqual(digitalSigs);
+        expect(selectors.signingRecords(state)).toEqual(signingRecordData);
         expect(selectors.searchableFields(state)).toEqual(fields);
         expect(selectors.deleteErrorMessage(state)).toBe('del err');
         expect(selectors.bulkDeleteErrorMessages(state)).toEqual(bulkErrors);
@@ -373,7 +373,7 @@ describe('signingProfiles selectors', () => {
         expect(selectors.isFetchingTspActivationDetails(state)).toBe(true);
         expect(selectors.isFetchingSupportedProtocols(state)).toBe(true);
         expect(selectors.isFetchingSigningCertificates(state)).toBe(true);
-        expect(selectors.isFetchingDigitalSignatures(state)).toBe(true);
+        expect(selectors.isFetchingSigningRecords(state)).toBe(true);
         expect(selectors.isCreating(state)).toBe(true);
         expect(selectors.isDeleting(state)).toBe(true);
         expect(selectors.isUpdating(state)).toBe(true);

@@ -22,8 +22,8 @@ import type {
     BulkActionMessageDto,
     CertificateDto,
     ErrorMessageDto,
-    PaginationResponseDtoDigitalSignatureListDto,
     PaginationResponseDtoSigningProfileListDto,
+    PaginationResponseDtoSigningRecordListDto,
     SearchFieldDataByGroupDto,
     SearchRequestDto,
     SigningProfileDto,
@@ -93,11 +93,6 @@ export interface GetTspActivationDetailsRequest {
     uuid: string;
 }
 
-export interface ListDigitalSignaturesForSigningProfileRequest {
-    uuid: string;
-    searchRequestDto: SearchRequestDto;
-}
-
 export interface ListSignatureAttributesForCertificateRequest {
     certificateUuid: string;
 }
@@ -108,6 +103,11 @@ export interface ListSigningCertificatesRequest {
 }
 
 export interface ListSigningProfilesRequest {
+    searchRequestDto: SearchRequestDto;
+}
+
+export interface ListSigningRecordsForSigningProfileRequest {
+    uuid: string;
     searchRequestDto: SearchRequestDto;
 }
 
@@ -354,28 +354,6 @@ export class SigningProfileManagementApi extends BaseAPI {
     };
 
     /**
-     * Returns a paginated, filterable list of all Digital Signatures that were produced using this Signing Profile. Supports the same search and pagination parameters as the top-level Digital Signatures listing.
-     * List Digital Signatures produced under a Signing Profile
-     */
-    listDigitalSignaturesForSigningProfile({ uuid, searchRequestDto }: ListDigitalSignaturesForSigningProfileRequest): Observable<PaginationResponseDtoDigitalSignatureListDto>
-    listDigitalSignaturesForSigningProfile({ uuid, searchRequestDto }: ListDigitalSignaturesForSigningProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<PaginationResponseDtoDigitalSignatureListDto>>
-    listDigitalSignaturesForSigningProfile({ uuid, searchRequestDto }: ListDigitalSignaturesForSigningProfileRequest, opts?: OperationOpts): Observable<PaginationResponseDtoDigitalSignatureListDto | AjaxResponse<PaginationResponseDtoDigitalSignatureListDto>> {
-        throwIfNullOrUndefined(uuid, 'uuid', 'listDigitalSignaturesForSigningProfile');
-        throwIfNullOrUndefined(searchRequestDto, 'searchRequestDto', 'listDigitalSignaturesForSigningProfile');
-
-        const headers: HttpHeaders = {
-            'Content-Type': 'application/json',
-        };
-
-        return this.request<PaginationResponseDtoDigitalSignatureListDto>({
-            url: '/v1/signingProfiles/{uuid}/digitalSignatures'.replace('{uuid}', encodeURI(uuid)),
-            method: 'POST',
-            headers,
-            body: searchRequestDto,
-        }, opts?.responseOpts);
-    };
-
-    /**
      * Returns the signing operation attribute descriptors (e.g. signature scheme, digest algorithm) derived from the key algorithm of the given certificate. Intended for use during Signing Profile creation to populate the signingOperationAttributes field.
      * Get signing operation attribute descriptors for a certificate
      */
@@ -437,6 +415,28 @@ export class SigningProfileManagementApi extends BaseAPI {
 
         return this.request<PaginationResponseDtoSigningProfileListDto>({
             url: '/v1/signingProfiles/list',
+            method: 'POST',
+            headers,
+            body: searchRequestDto,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Returns a paginated, filterable list of all Signing Records that were produced using this Signing Profile. Supports the same search and pagination parameters as the top-level Signing Records listing.
+     * List Signing Records produced under a Signing Profile
+     */
+    listSigningRecordsForSigningProfile({ uuid, searchRequestDto }: ListSigningRecordsForSigningProfileRequest): Observable<PaginationResponseDtoSigningRecordListDto>
+    listSigningRecordsForSigningProfile({ uuid, searchRequestDto }: ListSigningRecordsForSigningProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<PaginationResponseDtoSigningRecordListDto>>
+    listSigningRecordsForSigningProfile({ uuid, searchRequestDto }: ListSigningRecordsForSigningProfileRequest, opts?: OperationOpts): Observable<PaginationResponseDtoSigningRecordListDto | AjaxResponse<PaginationResponseDtoSigningRecordListDto>> {
+        throwIfNullOrUndefined(uuid, 'uuid', 'listSigningRecordsForSigningProfile');
+        throwIfNullOrUndefined(searchRequestDto, 'searchRequestDto', 'listSigningRecordsForSigningProfile');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<PaginationResponseDtoSigningRecordListDto>({
+            url: '/v1/signingProfiles/{uuid}/signingRecords'.replace('{uuid}', encodeURI(uuid)),
             method: 'POST',
             headers,
             body: searchRequestDto,

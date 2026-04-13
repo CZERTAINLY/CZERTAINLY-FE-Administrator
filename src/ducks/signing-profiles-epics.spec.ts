@@ -33,7 +33,7 @@ type EpicDeps = {
             disassociateFromApprovalProfile: (args: any) => any;
             listSupportedProtocols: (args: any) => any;
             listSigningCertificates: (args: any) => any;
-            listDigitalSignaturesForSigningProfile: (args: any) => any;
+            listSigningRecordsForSigningProfile: (args: any) => any;
         };
     };
 };
@@ -59,7 +59,7 @@ enum SigningProfilesEpicIndex {
     ListSupportedProtocols = 17,
     ListSigningCertificates = 18,
     ListSignatureAttributes = 19,
-    ListDigitalSignatures = 20,
+    ListSigningRecords = 20,
 }
 
 vi.mock('../App', () => ({
@@ -101,7 +101,7 @@ async function runEpic(
         disassociateFromApprovalProfile: () => of(undefined),
         listSupportedProtocols: () => of(['TSP']),
         listSigningCertificates: () => of([{ uuid: 'c-1' }]),
-        listDigitalSignaturesForSigningProfile: () => of({ items: [], totalItems: 0 }),
+        listSigningRecordsForSigningProfile: () => of({ items: [], totalItems: 0 }),
     };
 
     const deps: EpicDeps = {
@@ -648,37 +648,35 @@ describe('signingProfiles epics', () => {
         expect(capturedArgs.qualifiedTimestamp).toBeUndefined();
     });
 
-    test('listDigitalSignaturesForSigningProfile success emits listDigitalSignaturesSuccess', async () => {
+    test('listSigningRecordsForSigningProfile success emits listSigningRecordsSuccess', async () => {
         const response = { items: [{ uuid: 'ds-1' }], totalItems: 1 };
         const emitted = await runEpic(
-            SigningProfilesEpicIndex.ListDigitalSignatures,
-            signingProfileActions.listDigitalSignaturesForSigningProfile({ uuid: 'p-1' }),
+            SigningProfilesEpicIndex.ListSigningRecords,
+            signingProfileActions.listSigningRecordsForSigningProfile({ uuid: 'p-1' }),
             {
                 signingProfiles: {
-                    listDigitalSignaturesForSigningProfile: () => of(response),
+                    listSigningRecordsForSigningProfile: () => of(response),
                 } as any,
             },
             1,
         );
 
-        expect(emitted[0]).toEqual(
-            signingProfileActions.listDigitalSignaturesForSigningProfileSuccess({ digitalSignatures: response as any }),
-        );
+        expect(emitted[0]).toEqual(signingProfileActions.listSigningRecordsForSigningProfileSuccess({ signingRecords: response as any }));
     });
 
-    test('listDigitalSignaturesForSigningProfile failure emits listDigitalSignaturesFailure', async () => {
-        const err = new Error('digital signatures failed');
+    test('listSigningRecordsForSigningProfile failure emits listSigningRecordsFailure', async () => {
+        const err = new Error('signing records failed');
         const emitted = await runEpic(
-            SigningProfilesEpicIndex.ListDigitalSignatures,
-            signingProfileActions.listDigitalSignaturesForSigningProfile({ uuid: 'p-1' }),
+            SigningProfilesEpicIndex.ListSigningRecords,
+            signingProfileActions.listSigningRecordsForSigningProfile({ uuid: 'p-1' }),
             {
                 signingProfiles: {
-                    listDigitalSignaturesForSigningProfile: () => throwError(() => err),
+                    listSigningRecordsForSigningProfile: () => throwError(() => err),
                 } as any,
             },
             1,
         );
 
-        expect(emitted[0].type).toBe(signingProfileActions.listDigitalSignaturesForSigningProfileFailure.type);
+        expect(emitted[0].type).toBe(signingProfileActions.listSigningRecordsForSigningProfileFailure.type);
     });
 });
