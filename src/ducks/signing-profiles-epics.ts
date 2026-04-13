@@ -409,16 +409,21 @@ const listSigningCertificates: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listSigningCertificates.match),
         switchMap((action) =>
-            deps.apiClients.signingProfiles.listSigningCertificates({ signingWorkflowType: action.payload.workflowType }).pipe(
-                map((certificates) => slice.actions.listSigningCertificatesSuccess({ signingCertificates: certificates })),
-                catchError((error) =>
-                    of(
-                        slice.actions.listSigningCertificatesFailure({
-                            error: extractError(error, 'Failed to get signing certificates'),
-                        }),
+            deps.apiClients.signingProfiles
+                .listSigningCertificates({
+                    signingWorkflowType: action.payload.workflowType,
+                    qualifiedTimestamp: action.payload.qualifiedTimestamp,
+                })
+                .pipe(
+                    map((certificates) => slice.actions.listSigningCertificatesSuccess({ signingCertificates: certificates })),
+                    catchError((error) =>
+                        of(
+                            slice.actions.listSigningCertificatesFailure({
+                                error: extractError(error, 'Failed to get signing certificates'),
+                            }),
+                        ),
                     ),
                 ),
-            ),
         ),
     );
 };

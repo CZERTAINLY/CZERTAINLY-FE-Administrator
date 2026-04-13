@@ -237,6 +237,22 @@ export default function SigningProfileForm() {
     const managedSigningTypeValue = useWatch({ control, name: 'managedSigningType' });
     const qualifiedTimestampValue = useWatch({ control, name: 'qualifiedTimestamp' });
     const certificateUuidValue = useWatch({ control, name: 'certificateUuid' });
+
+    const isFirstQualifiedTimestampRender = useRef(true);
+    useEffect(() => {
+        if (isFirstQualifiedTimestampRender.current) {
+            isFirstQualifiedTimestampRender.current = false;
+            return;
+        }
+        if (workflowTypeValue === SigningWorkflowType.Timestamping) {
+            dispatch(
+                signingProfileActions.listSigningCertificates({
+                    workflowType: workflowTypeValue,
+                    qualifiedTimestamp: qualifiedTimestampValue || undefined,
+                }),
+            );
+        }
+    }, [dispatch, workflowTypeValue, qualifiedTimestampValue]);
     const signingOperationAttributes = useMemo(
         () =>
             editMode

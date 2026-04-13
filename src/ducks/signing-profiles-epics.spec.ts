@@ -607,6 +607,47 @@ describe('signingProfiles epics', () => {
         expect(emitted[0].type).toBe(signingProfileActions.listSigningCertificatesFailure.type);
     });
 
+    test('listSigningCertificates forwards qualifiedTimestamp to API', async () => {
+        const certs = [{ uuid: 'c-2' }];
+        let capturedArgs: any;
+        const emitted = await runEpic(
+            SigningProfilesEpicIndex.ListSigningCertificates,
+            signingProfileActions.listSigningCertificates({ workflowType: 'SIGNING' as any, qualifiedTimestamp: true }),
+            {
+                signingProfiles: {
+                    listSigningCertificates: (args: any) => {
+                        capturedArgs = args;
+                        return of(certs);
+                    },
+                } as any,
+            },
+            1,
+        );
+
+        expect(capturedArgs).toEqual({ signingWorkflowType: 'SIGNING', qualifiedTimestamp: true });
+        expect(emitted[0]).toEqual(signingProfileActions.listSigningCertificatesSuccess({ signingCertificates: certs as any }));
+    });
+
+    test('listSigningCertificates omits qualifiedTimestamp when not provided', async () => {
+        const certs = [{ uuid: 'c-3' }];
+        let capturedArgs: any;
+        await runEpic(
+            SigningProfilesEpicIndex.ListSigningCertificates,
+            signingProfileActions.listSigningCertificates({ workflowType: 'SIGNING' as any }),
+            {
+                signingProfiles: {
+                    listSigningCertificates: (args: any) => {
+                        capturedArgs = args;
+                        return of(certs);
+                    },
+                } as any,
+            },
+            1,
+        );
+
+        expect(capturedArgs.qualifiedTimestamp).toBeUndefined();
+    });
+
     test('listDigitalSignaturesForSigningProfile success emits listDigitalSignaturesSuccess', async () => {
         const response = { items: [{ uuid: 'ds-1' }], totalItems: 1 };
         const emitted = await runEpic(

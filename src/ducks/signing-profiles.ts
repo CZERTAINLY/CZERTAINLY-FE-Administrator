@@ -416,7 +416,7 @@ export const slice = createSlice({
         },
 
         // Signing certificates
-        listSigningCertificates: (state, action: PayloadAction<{ workflowType: SigningWorkflowType }>) => {
+        listSigningCertificates: (state, action: PayloadAction<{ workflowType: SigningWorkflowType; qualifiedTimestamp?: boolean }>) => {
             state.isFetchingSigningCertificates = true;
         },
 

@@ -104,6 +104,7 @@ export interface ListSignatureAttributesForCertificateRequest {
 
 export interface ListSigningCertificatesRequest {
     signingWorkflowType: SigningWorkflowType;
+    qualifiedTimestamp?: boolean;
 }
 
 export interface ListSigningProfilesRequest {
@@ -392,14 +393,16 @@ export class SigningProfileManagementApi extends BaseAPI {
     /**
      * Get list of certificates eligible to be used for digital signing
      */
-    listSigningCertificates({ signingWorkflowType }: ListSigningCertificatesRequest): Observable<Array<CertificateDto>>
-    listSigningCertificates({ signingWorkflowType }: ListSigningCertificatesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<CertificateDto>>>
-    listSigningCertificates({ signingWorkflowType }: ListSigningCertificatesRequest, opts?: OperationOpts): Observable<Array<CertificateDto> | AjaxResponse<Array<CertificateDto>>> {
+    listSigningCertificates({ signingWorkflowType, qualifiedTimestamp }: ListSigningCertificatesRequest): Observable<Array<CertificateDto>>
+    listSigningCertificates({ signingWorkflowType, qualifiedTimestamp }: ListSigningCertificatesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<CertificateDto>>>
+    listSigningCertificates({ signingWorkflowType, qualifiedTimestamp }: ListSigningCertificatesRequest, opts?: OperationOpts): Observable<Array<CertificateDto> | AjaxResponse<Array<CertificateDto>>> {
         throwIfNullOrUndefined(signingWorkflowType, 'signingWorkflowType', 'listSigningCertificates');
 
         const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
             'signingWorkflowType': signingWorkflowType,
         };
+
+        if (qualifiedTimestamp != null) { query['qualifiedTimestamp'] = qualifiedTimestamp; }
 
         return this.request<Array<CertificateDto>>({
             url: '/v1/signingProfiles/signingCertificates',
