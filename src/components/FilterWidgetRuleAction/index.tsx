@@ -82,17 +82,20 @@ export default function FilterWidgetRuleAction({
     const availableFilters = useSelector(selectors.availableFilters(entity));
     const isFetchingAvailableFilters = useSelector(selectors.isFetchingFilters(entity));
 
-    const [selectedFilter, setSelectedFilter] = useState<{ filterNumber: number; isEditEnabled: boolean }>({
-        filterNumber: -1,
-        isEditEnabled: false,
-    });
+    const [selectedFilter, setSelectedFilter] = useState<number>(-1);
 
     const [fieldSource, setFieldSource] = useState<FilterFieldSource | undefined>(undefined);
 
     const [filterField, setFilterField] = useState<string | undefined>(undefined);
 
     const [filterValue, setFilterValue] = useState<
-        string | object | { value: string | number; label: string }[] | { value: string | number; label: string } | undefined
+        | string
+        | number
+        | boolean
+        | object
+        | { value: string | number; label: string }[]
+        | { value: string | number; label: string }
+        | undefined
     >(undefined);
 
     const booleanOptions = useMemo(
@@ -111,13 +114,13 @@ export default function FilterWidgetRuleAction({
         setFilterValue(undefined);
         setFilterField(undefined);
         setFieldSource(undefined);
-        setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
-    }, [getAvailableFiltersApi]);
+        setSelectedFilter(-1);
+    }, [entity]);
 
     const onUnselectFiltersClick = useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
             if ((e.target as HTMLDivElement).id === 'unselectFilters') {
-                setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
+                setSelectedFilter(-1);
             }
         },
         [setSelectedFilter],
@@ -130,36 +133,157 @@ export default function FilterWidgetRuleAction({
 
     const currentField = useMemo(() => currentFields?.find((f) => f.fieldIdentifier === filterField), [filterField, currentFields]);
 
+    const normalizeSelectValue = useCallback((value: any): string | number | boolean | object => {
+        if (value === null || value === undefined) return '';
+        if (typeof value !== 'object') return value;
+
+        if (value.uuid !== undefined && value.uuid !== null) return value.uuid;
+        if (value.value !== undefined && value.value !== null) return value.value;
+        if (value.reference !== undefined && value.reference !== null) return value.reference;
+
+        if (value.data !== undefined && value.data !== null) {
+            if (typeof value.data !== 'object') return value.data;
+            if (value.data?.uuid !== undefined && value.data?.uuid !== null) return value.data.uuid;
+            if (value.data?.value !== undefined && value.data?.value !== null) return value.data.value;
+            if (value.data?.reference !== undefined && value.data?.reference !== null) return value.data.reference;
+            if (value.data?.name !== undefined && value.data?.name !== null) return value.data.name;
+            if (value.data?.label !== undefined && value.data?.label !== null) return value.data.label;
+            return value.data;
+        }
+
+        if (value.name !== undefined && value.name !== null) return value.name;
+        if (value.label !== undefined && value.label !== null) return value.label;
+
+        return value;
+    }, []);
+
+    const mapActionDataToSelectValue = useCallback(
+        (field: any, actionData: any) => {
+            const getComparableValues = (value: any): Array<string | number | boolean> => {
+                if (value === null || value === undefined) return [];
+                if (typeof value !== 'object') return [value];
+
+                const directDataValue =
+                    value.data !== undefined && value.data !== null && typeof value.data !== 'object' ? value.data : undefined;
+                const nestedDataValue =
+                    value.data !== undefined && value.data !== null && typeof value.data === 'object'
+                        ? (value.data.value ?? value.data.reference ?? value.data.uuid ?? value.data.name ?? value.data.label)
+                        : undefined;
+
+                return [
+                    normalizeSelectValue(value),
+                    value.uuid,
+                    value.value,
+                    value.name,
+                    value.label,
+                    value.reference,
+                    directDataValue,
+                    nestedDataValue,
+                ].filter((candidate): candidate is string | number | boolean => candidate !== undefined && candidate !== null);
+            };
+
+            const isFieldOptionMatched = (optionValue: any, rawValue: any) => {
+                const optionCandidates = getComparableValues(optionValue);
+                const rawCandidates = getComparableValues(rawValue);
+
+                return optionCandidates.some((optionCandidate) =>
+                    rawCandidates.some((rawCandidate) => String(optionCandidate) === String(rawCandidate)),
+                );
+            };
+
+            const mapSingleValue = (singleValue: any): { label: string; value: any } => {
+                const fieldValues = Array.isArray(field?.value) ? (field.value as Array<any>) : [];
+                const matchedFieldValue = fieldValues.find((fieldValue) => isFieldOptionMatched(fieldValue, singleValue));
+
+                if (matchedFieldValue !== undefined) {
+                    if (typeof matchedFieldValue === 'string') {
+                        return { label: matchedFieldValue, value: matchedFieldValue };
+                    }
+
+                    if (checkIfFieldAttributeTypeIsDate(field)) {
+                        return {
+                            label: matchedFieldValue.label || getFormattedDateTime(matchedFieldValue.value || singleValue),
+                            value: normalizeSelectValue(matchedFieldValue.value || singleValue),
+                        };
+                    }
+
+                    return {
+                        label: matchedFieldValue.name || matchedFieldValue.label || String(singleValue),
+                        value: normalizeSelectValue(matchedFieldValue),
+                    };
+                }
+
+                if (typeof singleValue === 'object' && singleValue !== null) {
+                    if (Object.prototype.hasOwnProperty.call(singleValue, 'value')) {
+                        return {
+                            label: singleValue.label || singleValue.name || JSON.stringify(singleValue.value),
+                            value: normalizeSelectValue(singleValue.value),
+                        };
+                    }
+
+                    return {
+                        label:
+                            singleValue.name ||
+                            singleValue.label ||
+                            (typeof singleValue.data !== 'object' ? singleValue.data : undefined) ||
+                            JSON.stringify(singleValue),
+                        value: normalizeSelectValue(singleValue),
+                    };
+                }
+
+                return { label: String(singleValue), value: normalizeSelectValue(singleValue) };
+            };
+
+            return Array.isArray(actionData) ? actionData.map((singleValue) => mapSingleValue(singleValue)) : mapSingleValue(actionData);
+        },
+        [normalizeSelectValue],
+    );
+
+    const mapActionDataToSingleSelectPrimitive = useCallback(
+        (field: any, actionData: any): string | number | object => {
+            const normalizedActionData = Array.isArray(actionData) ? actionData[0] : actionData;
+            const mapped = mapActionDataToSelectValue(field, normalizedActionData) as { label: string; value: any };
+            if (mapped && typeof mapped === 'object' && Object.prototype.hasOwnProperty.call(mapped, 'value')) {
+                return mapped.value;
+            }
+
+            return normalizeSelectValue(normalizedActionData) as string | number | object;
+        },
+        [mapActionDataToSelectValue, normalizeSelectValue],
+    );
+
     const onUpdateClick = useCallback(() => {
         if (!fieldSource) return;
         if (!filterField) return;
-        if (!filterValue) return;
+        if (filterValue === undefined || filterValue === null || filterValue === '') return;
+        if (Array.isArray(filterValue) && !filterValue.length) return;
 
         const newExecution: ExecutionItemRequestModel = {
             fieldSource: fieldSource!,
             fieldIdentifier: filterField!,
-            data: filterValue
-                ? typeof filterValue === 'string'
+            data:
+                typeof filterValue === 'string' || typeof filterValue === 'number' || typeof filterValue === 'boolean'
                     ? filterValue
                     : Array.isArray(filterValue)
                       ? filterValue.map((v) => (v as any).value)
-                      : (filterValue as any).value
-                : undefined,
+                      : Object.prototype.hasOwnProperty.call(filterValue as object, 'value')
+                        ? (filterValue as any).value
+                        : filterValue,
         };
         setFieldSource(undefined);
         setFilterField(undefined);
         setFilterValue(undefined);
 
-        if (selectedFilter.filterNumber === -1) {
+        if (selectedFilter === -1) {
             const updatedActions = [...actions, newExecution];
             setActions(updatedActions);
             onActionsUpdate?.(updatedActions.map((a) => mapActionToExecutionItem(a, availableFilters)));
-            setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
+            setSelectedFilter(-1);
         } else {
-            const updatedActions = actions.map((a, i) => (i === selectedFilter.filterNumber ? newExecution : a));
+            const updatedActions = actions.map((a, i) => (i === selectedFilter ? newExecution : a));
             setActions(updatedActions);
             onActionsUpdate?.(updatedActions.map((a) => mapActionToExecutionItem(a, availableFilters)));
-            setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
+            setSelectedFilter(-1);
         }
     }, [
         fieldSource,
@@ -176,7 +300,7 @@ export default function FilterWidgetRuleAction({
     ]);
 
     useEffect(() => {
-        if (selectedFilter.filterNumber === -1) {
+        if (selectedFilter === -1) {
             setFieldSource(undefined);
             setFilterField(undefined);
             setFilterValue(undefined);
@@ -189,7 +313,7 @@ export default function FilterWidgetRuleAction({
             setActions(newActions);
             if (onActionsUpdate) {
                 onActionsUpdate(newActions.map((a) => mapActionToExecutionItem(a, availableFilters)));
-                setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
+                setSelectedFilter(-1);
             }
         },
         [actions, onActionsUpdate, availableFilters],
@@ -197,10 +321,7 @@ export default function FilterWidgetRuleAction({
 
     const toggleFilter = useCallback(
         (index: number) => {
-            setSelectedFilter({
-                filterNumber: selectedFilter.filterNumber === index ? -1 : index,
-                isEditEnabled: false,
-            });
+            setSelectedFilter(selectedFilter === index ? -1 : index);
         },
         [selectedFilter],
     );
@@ -211,7 +332,7 @@ export default function FilterWidgetRuleAction({
         if (Array.isArray(currentField?.value)) {
             const objectOptions = currentField?.value?.map((v, i) => {
                 let label = '';
-                let value = '';
+                let value: string | number | boolean | object = '';
                 if (typeof v === 'string') {
                     if (checkIfFieldAttributeTypeIsDate(currentField)) {
                         label = getFormattedDateTime(v);
@@ -224,52 +345,19 @@ export default function FilterWidgetRuleAction({
                         label = v.label;
                         value = v.value;
                     } else {
-                        label = v?.name || JSON.stringify(v);
-                        value = v;
+                        label = v?.name || v?.label || (typeof v?.data !== 'object' ? v?.data : undefined) || JSON.stringify(v);
+                        value = normalizeSelectValue(v);
                     }
                 }
 
                 return { label, value };
             });
-            if (selectedFilter.filterNumber === -1) return objectOptions;
-            const currentActionData = actions[selectedFilter.filterNumber]?.data;
-
-            if (currentActionData === undefined) return objectOptions;
-            const filteredOptions = objectOptions.filter((o) => {
-                if (Array.isArray(currentActionData)) {
-                    return !currentActionData.some((a) => a?.name === o?.label);
-                } else {
-                    return (currentActionData as unknown as string) !== o?.value;
-                }
-            });
-
-            if (checkIfFieldAttributeTypeIsDate(currentField)) {
-                const currentActionLabel = getFormattedDateTime(currentActionData as unknown as string);
-
-                if (Array.isArray(currentActionData)) {
-                    // return filteredOptions;
-                    const dateFilteredOptions = objectOptions.filter((o) => {
-                        return !currentActionData.some((a) => currentActionLabel === o?.label);
-                    });
-
-                    return dateFilteredOptions;
-                } else {
-                    const dateFilteredOptions = objectOptions.filter((o) => {
-                        return currentActionLabel !== o?.label;
-                    });
-
-                    return dateFilteredOptions;
-                }
-            } else {
-                return filteredOptions;
-            }
+            return objectOptions;
         }
 
         return [];
-    }, [currentField, actions, selectedFilter]);
-    const updateFilterValueDateTime = useCallback(() => {
-        const currentActionData = actions[selectedFilter.filterNumber]?.data;
-        const currentFieldThis = currentFields?.find((f) => f.fieldIdentifier === actions[selectedFilter.filterNumber]?.fieldIdentifier);
+    }, [currentField, normalizeSelectValue]);
+    const updateFilterValueDateTime = useCallback((currentFieldThis: any, currentActionData: any) => {
         if (currentFieldThis && currentFieldThis.attributeContentType && checkIfFieldAttributeTypeIsDate(currentFieldThis)) {
             if (currentFieldThis.type === 'list') {
                 if (Array.isArray(currentActionData)) {
@@ -296,14 +384,12 @@ export default function FilterWidgetRuleAction({
                         return { label, value };
                     });
                     setFilterValue(newFilterValue);
-                    setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
                     return;
                 } else {
                     const value = currentActionData;
                     const label = getFormattedDateTime(value as unknown as string);
 
                     setFilterValue({ label, value });
-                    setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
                     return;
                 }
             } else {
@@ -312,125 +398,107 @@ export default function FilterWidgetRuleAction({
                 const formattedDate = getFormattedDateByType(value as unknown as string, currentFieldThis.attributeContentType);
                 setFilterValue(formattedDate);
 
-                setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
                 return;
             }
         }
-    }, [actions, selectedFilter, currentFields]);
+    }, []);
     useEffect(() => {
         // this effect is for updating dropdowns when a filter is selected
 
-        if (selectedFilter.filterNumber >= actions.length) {
-            setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
+        if (selectedFilter >= actions.length) {
+            setSelectedFilter(-1);
             return;
         }
 
-        if (selectedFilter.filterNumber === -1) {
+        if (selectedFilter === -1) {
             return;
         }
 
-        // if edit is enabled that means the values are already set
-        if (selectedFilter.isEditEnabled) {
+        const selectedAction = actions[selectedFilter];
+        if (!selectedAction) {
+            setSelectedFilter(-1);
             return;
         }
 
-        const field = actions[selectedFilter.filterNumber].fieldSource;
+        const field = selectedAction.fieldSource;
         if (!field) {
-            setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
             return;
         }
 
-        setFieldSource({ label: getEnumLabel(searchGroupEnum, field), value: field });
+        const currentFieldsBySelectedSource = availableFilters.find((f) => f.filterFieldSource === field)?.searchFieldData;
 
-        const fieldIdentifier = actions[selectedFilter.filterNumber].fieldIdentifier;
-        const fieldIdentifierSelected = currentFields?.find((cf) => cf.fieldIdentifier === fieldIdentifier);
+        const fieldIdentifier = selectedAction.fieldIdentifier;
+        const fieldIdentifierSelected = currentFieldsBySelectedSource?.find((cf) => cf.fieldIdentifier === fieldIdentifier);
         if (!fieldIdentifier) {
-            setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
             return;
         }
+
+        setFieldSource(field);
 
         if (fieldIdentifierSelected) {
-            setFilterField({
-                label: fieldIdentifierSelected.fieldLabel,
-                value: fieldIdentifier,
-            });
+            setFilterField(fieldIdentifierSelected.fieldIdentifier);
         } else {
-            setFilterField({
-                label: fieldIdentifier,
-                value: fieldIdentifier,
-            });
+            setFilterField(fieldIdentifier);
         }
 
-        const currentActionData = actions[selectedFilter.filterNumber].data;
-        if (currentActionData === undefined) return;
+        const currentActionDataRaw = selectedAction.data;
+        if (currentActionDataRaw === undefined) {
+            return;
+        }
 
-        const thisCurrentField = currentFields?.find((f) => f.fieldIdentifier === fieldIdentifier);
+        const thisCurrentField = currentFieldsBySelectedSource?.find((f) => f.fieldIdentifier === fieldIdentifier);
+
+        const currentActionData =
+            thisCurrentField && !thisCurrentField.multiValue && Array.isArray(currentActionDataRaw)
+                ? currentActionDataRaw[0]
+                : currentActionDataRaw;
+
+        // Wait until field metadata is available; otherwise select-based values are hydrated
+        // from incomplete data and stay visually empty.
+        if (!thisCurrentField) {
+            return;
+        }
 
         if (thisCurrentField?.type === FilterFieldType.String || thisCurrentField?.type === FilterFieldType.Number) {
             setFilterValue(currentActionData);
-            setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
             return;
         }
 
         if (thisCurrentField?.type === FilterFieldType.Boolean) {
-            setFilterValue(booleanOptions.find((f) => !!currentActionData === f.value));
-            setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
+            setFilterValue(currentActionData === true || currentActionData === 'true');
 
             return;
         }
 
         if (thisCurrentField && thisCurrentField.attributeContentType && checkIfFieldAttributeTypeIsDate(thisCurrentField)) {
-            updateFilterValueDateTime();
-        }
-
-        if (thisCurrentField && !thisCurrentField?.multiValue && !checkIfFieldAttributeTypeIsDate(thisCurrentField)) {
-            const value = currentActionData;
-            const label = thisCurrentField.platformEnum
-                ? platformEnums[thisCurrentField.platformEnum][value as unknown as string].label
-                : value;
-            setFilterValue({ label, value });
-            setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
-
+            updateFilterValueDateTime(thisCurrentField, currentActionData);
             return;
         }
 
-        if (thisCurrentField && thisCurrentField?.multiValue && !checkIfFieldAttributeTypeIsDate(thisCurrentField)) {
-            const value = currentActionData;
-            const label = thisCurrentField.platformEnum
-                ? platformEnums[thisCurrentField.platformEnum][value as unknown as string].label
-                : value;
-            setFilterValue({ label, value });
-            setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
-        }
-
         if (thisCurrentField && Array.isArray(currentActionData) && !checkIfFieldAttributeTypeIsDate(thisCurrentField)) {
-            const newFilterValue = currentActionData.map((v: any) => {
-                let label = '';
-                let value = '';
-                if (typeof v === 'string') {
-                    label = v;
-                    value = v;
-                } else {
-                    label = v?.name || v?.label || JSON.stringify(v);
-                    value = v?.value || v;
-                }
-
-                return { label, value };
-            });
-
+            const newFilterValue = mapActionDataToSelectValue(thisCurrentField, currentActionData);
             setFilterValue(newFilterValue);
-            setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
+            return;
         }
+
+        if (thisCurrentField && !checkIfFieldAttributeTypeIsDate(thisCurrentField)) {
+            if (thisCurrentField.multiValue) {
+                const mappedValues = mapActionDataToSelectValue(thisCurrentField, currentActionData);
+                setFilterValue(Array.isArray(mappedValues) ? mappedValues : mappedValues ? [mappedValues] : []);
+            } else {
+                setFilterValue(mapActionDataToSingleSelectPrimitive(thisCurrentField, currentActionData));
+            }
+            return;
+        }
+
+        setFilterValue(currentActionData as any);
     }, [
         selectedFilter,
         actions,
-        currentFields,
-        // executionTypeEnum,
+        availableFilters,
         updateFilterValueDateTime,
-        booleanOptions,
-        // currentField,
-        platformEnums,
-        searchGroupEnum,
+        mapActionDataToSelectValue,
+        mapActionDataToSingleSelectPrimitive,
     ]);
 
     useEffect(() => {
@@ -446,45 +514,77 @@ export default function FilterWidgetRuleAction({
         const updatedActions = ExecutionsList.map((action) => {
             if (!(typeof action.data === 'object')) return action;
 
+            const thisCurrentFields = availableFilters.find((f) => f.filterFieldSource === action.fieldSource)?.searchFieldData;
+            if (!thisCurrentFields) return action;
+            const thisCurrentField = thisCurrentFields.find((f) => f.fieldIdentifier === action.fieldIdentifier);
+            if (!thisCurrentField) return action;
+
             if (Array.isArray(action.data) && action.data.every((v) => typeof v === 'string')) {
-                const thisCurrentFields = availableFilters.find((f) => f.filterFieldSource === action.fieldSource)?.searchFieldData;
-                if (!thisCurrentFields) return action;
-                const thisCurrentField = thisCurrentFields.find((f) => f.fieldIdentifier === action.fieldIdentifier);
+                const mappedData = action.data.map((v) => {
+                    if (!Array.isArray(thisCurrentField.value)) return { label: v, value: v };
 
-                if (!thisCurrentField || !Array.isArray(thisCurrentField.value)) return action;
+                    const value = (thisCurrentField.value as Array<any>)?.find(
+                        (f) => f.uuid === v || f.value === v || f.reference === v || f.data === v,
+                    );
 
-                const updatedActionData = action.data.map((v) => {
-                    const value = (thisCurrentField.value as Array<any>)?.find((f) => f.uuid === v);
-
-                    return value ? { uuid: value.uuid, name: value.name } : { label: v, value: v };
+                    return value ? { uuid: value.uuid, name: value.name, value: value.value ?? value.uuid ?? v } : { label: v, value: v };
                 });
 
                 return {
                     ...action,
-                    data: updatedActionData,
+                    data: thisCurrentField.multiValue ? mappedData : mappedData[0],
                 };
-            } else return action;
+            }
+
+            if (!thisCurrentField.multiValue && Array.isArray(action.data)) {
+                return {
+                    ...action,
+                    data: action.data[0],
+                };
+            }
+
+            return action;
         });
 
         setActions(updatedActions);
     }, [ExecutionsList, availableFilters]);
 
     const renderObjectValueSelector = useMemo(
-        () => (
-            <Select
-                id="value"
-                options={objectValueOptions}
-                value={
-                    Array.isArray(filterValue) ? filterValue : filterValue ? [filterValue as { value: string | number; label: string }] : []
-                }
-                onChange={(values) => {
-                    setFilterValue(currentField?.multiValue ? values || [] : values?.[0] || undefined);
-                }}
-                isMulti={currentField?.multiValue}
-                placeholder="Select filter value from options"
-            />
-        ),
-        [objectValueOptions, filterValue, currentField],
+        () =>
+            currentField?.multiValue ? (
+                <Select
+                    id="value"
+                    options={objectValueOptions}
+                    value={Array.isArray(filterValue) ? filterValue : []}
+                    onChange={(values) => {
+                        setFilterValue((values as { value: string | number; label: string }[] | undefined) || []);
+                    }}
+                    isMulti
+                    placeholder="Select filter value from options"
+                />
+            ) : (
+                <Select
+                    id="value"
+                    options={objectValueOptions}
+                    value={Array.isArray(filterValue) || typeof filterValue === 'boolean' ? '' : (filterValue ?? '')}
+                    onChange={(values) => {
+                        const singleValue = values as { value: string | number; label: string } | string | number | object | undefined;
+                        if (!singleValue) {
+                            setFilterValue(undefined);
+                            return;
+                        }
+
+                        if (typeof singleValue === 'object' && Object.prototype.hasOwnProperty.call(singleValue, 'value')) {
+                            setFilterValue(normalizeSelectValue((singleValue as { value: string | number; label: string }).value));
+                            return;
+                        }
+
+                        setFilterValue(normalizeSelectValue(singleValue));
+                    }}
+                    placeholder="Select filter value from options"
+                />
+            ),
+        [objectValueOptions, filterValue, currentField, normalizeSelectValue],
     );
 
     const renderBadgeContent = useCallback(
@@ -517,7 +617,12 @@ export default function FilterWidgetRuleAction({
         [isFetchingAvailableFilters, onRemoveFilterClick, searchGroupEnum, disableBadgeRemove, busyBadges],
     );
 
-    const isUpdateButtonDisabled = useMemo(() => !filterField || !fieldSource || !filterValue, [filterField, fieldSource, filterValue]);
+    const isUpdateButtonDisabled = useMemo(() => {
+        const isFilterValueEmpty =
+            filterValue === undefined || filterValue === null || filterValue === '' || (Array.isArray(filterValue) && !filterValue.length);
+
+        return !filterField || !fieldSource || isFilterValueEmpty;
+    }, [filterField, fieldSource, filterValue]);
 
     return (
         <>
@@ -572,13 +677,26 @@ export default function FilterWidgetRuleAction({
                                 currentField?.type === FilterFieldType.Number ? (
                                     <TextInput
                                         id="valueSelect"
-                                        type={
-                                            currentField?.attributeContentType && checkIfFieldAttributeTypeIsDate(currentField)
-                                                ? getFormTypeFromAttributeContentType(currentField?.attributeContentType)
-                                                : currentField?.type
-                                                  ? getFormTypeFromFilterFieldType(currentField?.type)
-                                                  : 'text'
-                                        }
+                                        type={(() => {
+                                            const rawType =
+                                                currentField?.attributeContentType && checkIfFieldAttributeTypeIsDate(currentField)
+                                                    ? getFormTypeFromAttributeContentType(currentField?.attributeContentType)
+                                                    : currentField?.type
+                                                      ? getFormTypeFromFilterFieldType(currentField?.type)
+                                                      : 'text';
+
+                                            const supportedInputTypes = new Set([
+                                                'number',
+                                                'email',
+                                                'time',
+                                                'textarea',
+                                                'text',
+                                                'password',
+                                                'date',
+                                            ]);
+
+                                            return supportedInputTypes.has(rawType) ? (rawType as any) : 'text';
+                                        })()}
                                         value={filterValue?.toString() || ''}
                                         onChange={(value) => {
                                             setFilterValue(JSON.parse(JSON.stringify(value)));
@@ -592,7 +710,7 @@ export default function FilterWidgetRuleAction({
                                         options={
                                             filterField ? booleanOptions.map((opt) => ({ label: opt.label, value: String(opt.value) })) : []
                                         }
-                                        value={filterValue ? String(filterValue) : ''}
+                                        value={filterValue === undefined ? '' : String(filterValue)}
                                         onChange={(value) => {
                                             setFilterValue(value === 'true' ? true : value === 'false' ? false : undefined);
                                         }}
@@ -610,7 +728,7 @@ export default function FilterWidgetRuleAction({
                                     onClick={onUpdateClick}
                                     disabled={isUpdateButtonDisabled}
                                 >
-                                    {selectedFilter.filterNumber === -1 ? 'Add' : 'Update'}
+                                    {selectedFilter === -1 ? 'Add' : 'Update'}
                                 </Button>
                             </div>
                         </div>
@@ -656,11 +774,7 @@ export default function FilterWidgetRuleAction({
                                           }'`
                                         : '';
                             return (
-                                <Badge
-                                    key={i}
-                                    onClick={() => toggleFilter(i)}
-                                    color={selectedFilter.filterNumber === i ? 'primary' : 'secondary'}
-                                >
+                                <Badge key={i} onClick={() => toggleFilter(i)} color={selectedFilter === i ? 'primary' : 'secondary'}>
                                     {!isFetchingAvailableFilters && !busyBadges && (
                                         <>{renderBadgeContent(i, value, label, f.fieldSource)}</>
                                     )}
