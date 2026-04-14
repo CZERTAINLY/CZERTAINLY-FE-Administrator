@@ -237,7 +237,7 @@ export function AttributeFieldInput({ name, descriptor, busy, deleteButton }: At
                                             <div className="mt-1 text-xs text-gray-600 dark:text-neutral-400">
                                                 {regexpConstraint.description && <div>{regexpConstraint.description}</div>}
                                                 {regexpConstraint?.data && (
-                                                    <div className="font-mono break-all">Pattern: ${regexpConstraint.data}</div>
+                                                    <div className="font-mono break-all">Pattern: {regexpConstraint.data}</div>
                                                 )}
                                             </div>
                                         )}
