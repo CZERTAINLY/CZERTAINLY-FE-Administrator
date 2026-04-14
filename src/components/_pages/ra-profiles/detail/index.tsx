@@ -17,7 +17,7 @@ import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import RaProfileForm from '../form';
-import { PlatformEnum, Resource } from '../../../../types/openapi';
+import { Resource } from 'types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -29,7 +29,6 @@ import CertificateValidationDialogBody from 'components/_pages/ra-profiles/Certi
 import { renderExpiringThresholdLabel, renderValidationFrequencyLabel } from 'utils/certificate-validation';
 import EventsTable from 'components/_pages/notifications/events-settings/EventsTable';
 import { createWidgetDetailHeaders } from 'utils/widget';
-import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import Breadcrumb from 'components/Breadcrumb';
 import Container from 'components/Container';
 import Switch from 'components/Switch';
@@ -51,7 +50,6 @@ export default function RaProfileDetail() {
     const cmpDetails = useSelector(raProfilesSelectors.cmpDetails);
     const associatedComplianceProfiles = useSelector(complianceProfileSelectors.associatedComplianceProfiles);
     const associatedApprovalProfiles = useSelector(raProfilesSelectors.associatedApprovalProfiles);
-    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const isDissociatingApprovalProfile = useSelector(raProfilesSelectors.isDissociatingApprovalProfile);
     const isFetchingApprovalProfiles = useSelector(raProfilesSelectors.isFetchingApprovalProfiles);
     const isFetchingProfile = useSelector(raProfilesSelectors.isFetchingDetail);
@@ -324,6 +322,7 @@ export default function RaProfileDetail() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
+                id: 'edit',
                 icon: 'pencil',
                 disabled: authorityId === 'unknown',
                 tooltip: 'Edit',
@@ -332,6 +331,7 @@ export default function RaProfileDetail() {
                 },
             },
             {
+                id: 'delete',
                 icon: 'trash',
                 disabled: false,
                 tooltip: 'Delete',
@@ -340,6 +340,7 @@ export default function RaProfileDetail() {
                 },
             },
             {
+                id: 'enable',
                 icon: 'check',
                 disabled: !!raProfile?.enabled,
                 tooltip: 'Enable',
@@ -348,6 +349,7 @@ export default function RaProfileDetail() {
                 },
             },
             {
+                id: 'disable',
                 icon: 'times',
                 disabled: !raProfile?.enabled,
                 tooltip: 'Disable',
@@ -356,6 +358,7 @@ export default function RaProfileDetail() {
                 },
             },
             {
+                id: 'check-compliance',
                 icon: 'gavel',
                 disabled: !raProfile?.authorityInstanceUuid || false,
                 tooltip: 'Check Compliance',
@@ -385,6 +388,7 @@ export default function RaProfileDetail() {
     const approvalProfilesButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
+                id: 'add',
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Associate Approval Profile',
@@ -400,6 +404,7 @@ export default function RaProfileDetail() {
     const certificateValidationButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
+                id: 'edit',
                 icon: 'pencil',
                 disabled: false,
                 tooltip: 'Edit Validation Settings',
@@ -449,6 +454,7 @@ export default function RaProfileDetail() {
                           <WidgetButtons
                               buttons={[
                                   {
+                                      id: 'remove',
                                       icon: 'minus-square',
                                       disabled: false,
                                       tooltip: 'Remove',
@@ -499,13 +505,13 @@ export default function RaProfileDetail() {
                           <WidgetButtons
                               buttons={[
                                   {
+                                      id: 'ra' + profile.uuid,
                                       icon: 'minus-square',
                                       disabled: false,
                                       tooltip: 'Remove',
                                       onClick: () => {
                                           onDissociateComplianceProfile(profile.uuid);
                                       },
-                                      id: 'ra' + profile.uuid,
                                   },
                               ]}
                           />,
@@ -518,7 +524,8 @@ export default function RaProfileDetail() {
 
     const detailData: TableDataRow[] = useMemo(() => {
         if (!raProfile) return [];
-        const data = [
+
+        return [
             {
                 id: 'uuid',
                 columns: ['UUID', raProfile.uuid],
@@ -551,8 +558,6 @@ export default function RaProfileDetail() {
                 ],
             },
         ];
-
-        return data;
     }, [raProfile]);
 
     const protocolProfileHeaders: TableHeader[] = useMemo(
@@ -664,7 +669,7 @@ export default function RaProfileDetail() {
                 id: 'acme',
                 columns: [
                     'ACME',
-                    <StatusBadge enabled={acmeDetails ? (acmeDetails.acmeAvailable ? true : false) : false} />,
+                    <StatusBadge enabled={acmeDetails ? acmeDetails.acmeAvailable : false} />,
                     <ProgressButton
                         type="button"
                         title={acmeDetails?.acmeAvailable ? 'Deactivate' : 'Activate'}
@@ -718,7 +723,7 @@ export default function RaProfileDetail() {
                 id: 'scep',
                 columns: [
                     'SCEP',
-                    <StatusBadge enabled={scepDetails ? (scepDetails.scepAvailable ? true : false) : false} />,
+                    <StatusBadge enabled={scepDetails ? scepDetails.scepAvailable : false} />,
                     <ProgressButton
                         type="button"
                         title={scepDetails?.scepAvailable ? 'Deactivate' : 'Activate'}
@@ -760,7 +765,7 @@ export default function RaProfileDetail() {
                 id: 'cmp',
                 columns: [
                     'CMP',
-                    <StatusBadge enabled={cmpDetails ? (cmpDetails.cmpAvailable ? true : false) : false} />,
+                    <StatusBadge enabled={cmpDetails ? cmpDetails.cmpAvailable : false} />,
                     <ProgressButton
                         type="button"
                         title={cmpDetails?.cmpAvailable ? 'Deactivate' : 'Activate'}

@@ -169,30 +169,35 @@ function VaultProfileDetail() {
     const widgetButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
+                id: 'enable',
                 icon: 'check',
                 disabled: !profile || profile.enabled,
                 tooltip: 'Enable',
                 onClick: onApprove,
             },
             {
+                id: 'disable',
                 icon: 'times',
                 disabled: !profile || !profile.enabled,
                 tooltip: 'Disable',
                 onClick: onDisapprove,
             },
             {
+                id: 'check-compliance',
                 icon: 'gavel',
                 disabled: !profile,
                 tooltip: 'Check Compliance',
                 onClick: () => setComplianceCheck(true),
             },
             {
+                id: 'edit',
                 icon: 'pencil',
                 disabled: !profile,
                 tooltip: 'Edit',
                 onClick: () => setIsEditOpen(true),
             },
             {
+                id: 'delete',
                 icon: 'trash',
                 disabled: !profile,
                 tooltip: 'Delete',
@@ -262,6 +267,7 @@ function VaultProfileDetail() {
                           <WidgetButtons
                               buttons={[
                                   {
+                                      id: 'remove',
                                       icon: 'minus-square',
                                       disabled: false,
                                       tooltip: 'Remove',
@@ -311,6 +317,7 @@ function VaultProfileDetail() {
                           <WidgetButtons
                               buttons={[
                                   {
+                                      id: 'remove',
                                       icon: 'minus-square',
                                       disabled: false,
                                       tooltip: 'Remove',

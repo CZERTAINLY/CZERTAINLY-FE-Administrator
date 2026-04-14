@@ -176,6 +176,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
+                id: 'delete',
                 icon: 'trash',
                 disabled: false,
                 tooltip: 'Delete',
@@ -184,6 +185,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 },
             },
             {
+                id: 'enable',
                 icon: 'check',
                 disabled: keyItem.enabled,
                 tooltip: 'Enable',
@@ -192,6 +194,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 },
             },
             {
+                id: 'disable',
                 icon: 'times',
                 disabled: !keyItem.enabled,
                 tooltip: 'Disable',
@@ -200,6 +203,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 },
             },
             {
+                id: 'key',
                 icon: 'key',
                 disabled: false,
                 tooltip: 'Update Key Usage',
@@ -208,6 +212,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 },
             },
             {
+                id: 'compromise',
                 icon: 'compromise',
                 disabled: ![KeyState.PreActive, KeyState.Active, KeyState.Deactivated].includes(keyItem.state),
                 tooltip: 'Compromise',
@@ -216,6 +221,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 },
             },
             {
+                id: 'destroy',
                 icon: 'destroy',
                 disabled: ![KeyState.PreActive, KeyState.Compromised, KeyState.Deactivated].includes(keyItem.state),
                 tooltip: 'Destroy',
@@ -224,6 +230,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 },
             },
             {
+                id: 'sign',
                 icon: 'sign',
                 disabled:
                     keyItem.state !== KeyState.Active || !keyItem.enabled || !keyItem.usage?.includes(KeyUsage.Sign) || !tokenInstanceUuid,
@@ -233,6 +240,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 },
             },
             {
+                id: 'verify',
                 icon: 'verify',
                 disabled:
                     keyItem.state !== KeyState.Active ||

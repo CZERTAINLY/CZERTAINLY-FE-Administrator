@@ -1,7 +1,9 @@
-import { test, expect } from '../../../playwright/ct-test';
+import { test, expect } from 'playwright/ct-test';
 import WidgetButtons, { WidgetButtonProps } from './index';
+import React from 'react';
 
 const createButton = (overrides: Partial<WidgetButtonProps> = {}): WidgetButtonProps => ({
+    id: 'add',
     icon: 'plus',
     disabled: false,
     onClick: () => {},
