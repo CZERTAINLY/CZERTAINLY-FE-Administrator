@@ -5,6 +5,8 @@ import { take, toArray } from 'rxjs/operators';
 
 import { actions as rulesActions } from './rules';
 import { actions as appRedirectActions } from './app-redirect';
+import { bulkDeleteRules, bulkDeleteActions, bulkDeleteConditions, bulkDeleteTriggers, bulkDeleteExecutions } from './rules-epics';
+import type { AppEpic } from 'ducks';
 
 type EpicDeps = {
     apiClients: {
@@ -21,14 +23,6 @@ type EpicDeps = {
         };
     };
 };
-
-enum RulesEpicIndex {
-    BulkDeleteRules = 29,
-    BulkDeleteActions = 30,
-    BulkDeleteConditions = 31,
-    BulkDeleteTriggers = 32,
-    BulkDeleteExecutions = 33,
-}
 
 vi.mock('../App', () => ({
     store: {
@@ -64,13 +58,11 @@ function mergeDeps(overrides: Partial<EpicDeps['apiClients']>): EpicDeps {
 }
 
 async function runEpic(
-    epicIndex: number,
+    epic: AppEpic,
     action: any,
     depsOverrides: Partial<EpicDeps['apiClients']> = {},
     takeCount = 1,
 ): Promise<UnknownAction[]> {
-    const { default: epics } = await import('./rules-epics');
-    const epic = (epics as any)[epicIndex];
     const deps = mergeDeps(depsOverrides);
     const output$ = epic(of(action), of({}) as any, deps as any);
     return firstValueFrom(output$.pipe(take(takeCount), toArray()));
@@ -80,7 +72,7 @@ describe('bulkDeleteRules epic', () => {
     test('success emits bulkDeleteRulesSuccess with all uuids', async () => {
         const calls: string[] = [];
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteRules,
+            bulkDeleteRules,
             rulesActions.bulkDeleteRules({ ruleUuids: ['r-1', 'r-2'] }),
             {
                 rules: {
@@ -99,7 +91,7 @@ describe('bulkDeleteRules epic', () => {
 
     test('partial failure emits success, failure and fetchError', async () => {
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteRules,
+            bulkDeleteRules,
             rulesActions.bulkDeleteRules({ ruleUuids: ['r-1', 'r-2'] }),
             {
                 rules: {
@@ -120,7 +112,7 @@ describe('bulkDeleteRules epic', () => {
 
     test('multiple failures uses plural message', async () => {
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteRules,
+            bulkDeleteRules,
             rulesActions.bulkDeleteRules({ ruleUuids: ['r-1', 'r-2'] }),
             { rules: { deleteRule: () => throwError(() => new Error('delete failed')) } as any },
             3,
@@ -136,7 +128,7 @@ describe('bulkDeleteRules epic', () => {
     test('sync throw emits bulkDeleteRulesFailure and fetchError', async () => {
         const err = new Error('sync fail');
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteRules,
+            bulkDeleteRules,
             rulesActions.bulkDeleteRules({ ruleUuids: ['r-1'] }),
             {
                 rules: {
@@ -159,7 +151,7 @@ describe('bulkDeleteActions epic', () => {
     test('success emits bulkDeleteActionsSuccess with all uuids', async () => {
         const calls: string[] = [];
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteActions,
+            bulkDeleteActions,
             rulesActions.bulkDeleteActions({ actionUuids: ['a-1', 'a-2'] }),
             {
                 actions: {
@@ -178,7 +170,7 @@ describe('bulkDeleteActions epic', () => {
 
     test('partial failure emits success, failure and fetchError', async () => {
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteActions,
+            bulkDeleteActions,
             rulesActions.bulkDeleteActions({ actionUuids: ['a-1', 'a-2'] }),
             {
                 actions: {
@@ -199,7 +191,7 @@ describe('bulkDeleteActions epic', () => {
 
     test('multiple failures uses plural message', async () => {
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteActions,
+            bulkDeleteActions,
             rulesActions.bulkDeleteActions({ actionUuids: ['a-1', 'a-2'] }),
             { actions: { deleteAction: () => throwError(() => new Error('delete failed')) } as any },
             3,
@@ -215,7 +207,7 @@ describe('bulkDeleteActions epic', () => {
     test('sync throw emits bulkDeleteActionsFailure and fetchError', async () => {
         const err = new Error('sync fail');
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteActions,
+            bulkDeleteActions,
             rulesActions.bulkDeleteActions({ actionUuids: ['a-1'] }),
             {
                 actions: {
@@ -238,7 +230,7 @@ describe('bulkDeleteConditions epic', () => {
     test('success emits bulkDeleteConditionsSuccess with all uuids', async () => {
         const calls: string[] = [];
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteConditions,
+            bulkDeleteConditions,
             rulesActions.bulkDeleteConditions({ conditionUuids: ['c-1', 'c-2'] }),
             {
                 rules: {
@@ -257,7 +249,7 @@ describe('bulkDeleteConditions epic', () => {
 
     test('partial failure emits success, failure and fetchError', async () => {
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteConditions,
+            bulkDeleteConditions,
             rulesActions.bulkDeleteConditions({ conditionUuids: ['c-1', 'c-2'] }),
             {
                 rules: {
@@ -278,7 +270,7 @@ describe('bulkDeleteConditions epic', () => {
 
     test('multiple failures uses plural message', async () => {
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteConditions,
+            bulkDeleteConditions,
             rulesActions.bulkDeleteConditions({ conditionUuids: ['c-1', 'c-2'] }),
             { rules: { deleteCondition: () => throwError(() => new Error('delete failed')) } as any },
             3,
@@ -294,7 +286,7 @@ describe('bulkDeleteConditions epic', () => {
     test('sync throw emits bulkDeleteConditionsFailure and fetchError', async () => {
         const err = new Error('sync fail');
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteConditions,
+            bulkDeleteConditions,
             rulesActions.bulkDeleteConditions({ conditionUuids: ['c-1'] }),
             {
                 rules: {
@@ -317,7 +309,7 @@ describe('bulkDeleteTriggers epic', () => {
     test('success emits bulkDeleteTriggersSuccess with all uuids', async () => {
         const calls: string[] = [];
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteTriggers,
+            bulkDeleteTriggers,
             rulesActions.bulkDeleteTriggers({ triggerUuids: ['t-1', 't-2'] }),
             {
                 triggers: {
@@ -336,7 +328,7 @@ describe('bulkDeleteTriggers epic', () => {
 
     test('partial failure emits success, failure and fetchError', async () => {
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteTriggers,
+            bulkDeleteTriggers,
             rulesActions.bulkDeleteTriggers({ triggerUuids: ['t-1', 't-2'] }),
             {
                 triggers: {
@@ -357,7 +349,7 @@ describe('bulkDeleteTriggers epic', () => {
 
     test('multiple failures uses plural message', async () => {
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteTriggers,
+            bulkDeleteTriggers,
             rulesActions.bulkDeleteTriggers({ triggerUuids: ['t-1', 't-2'] }),
             { triggers: { deleteTrigger: () => throwError(() => new Error('delete failed')) } as any },
             3,
@@ -373,7 +365,7 @@ describe('bulkDeleteTriggers epic', () => {
     test('sync throw emits bulkDeleteTriggersFailure and fetchError', async () => {
         const err = new Error('sync fail');
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteTriggers,
+            bulkDeleteTriggers,
             rulesActions.bulkDeleteTriggers({ triggerUuids: ['t-1'] }),
             {
                 triggers: {
@@ -396,7 +388,7 @@ describe('bulkDeleteExecutions epic', () => {
     test('success emits bulkDeleteExecutionsSuccess with all uuids', async () => {
         const calls: string[] = [];
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteExecutions,
+            bulkDeleteExecutions,
             rulesActions.bulkDeleteExecutions({ executionUuids: ['e-1', 'e-2'] }),
             {
                 actions: {
@@ -415,7 +407,7 @@ describe('bulkDeleteExecutions epic', () => {
 
     test('partial failure emits success, failure and fetchError', async () => {
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteExecutions,
+            bulkDeleteExecutions,
             rulesActions.bulkDeleteExecutions({ executionUuids: ['e-1', 'e-2'] }),
             {
                 actions: {
@@ -436,7 +428,7 @@ describe('bulkDeleteExecutions epic', () => {
 
     test('multiple failures uses plural message', async () => {
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteExecutions,
+            bulkDeleteExecutions,
             rulesActions.bulkDeleteExecutions({ executionUuids: ['e-1', 'e-2'] }),
             { actions: { deleteExecution: () => throwError(() => new Error('delete failed')) } as any },
             3,
@@ -452,7 +444,7 @@ describe('bulkDeleteExecutions epic', () => {
     test('sync throw emits bulkDeleteExecutionsFailure and fetchError', async () => {
         const err = new Error('sync fail');
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteExecutions,
+            bulkDeleteExecutions,
             rulesActions.bulkDeleteExecutions({ executionUuids: ['e-1'] }),
             {
                 actions: {

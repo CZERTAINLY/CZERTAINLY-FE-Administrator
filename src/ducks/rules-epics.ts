@@ -704,7 +704,7 @@ const associateEventTriggers: AppEpic = (action$, state, deps) => {
     );
 };
 
-const bulkDeleteRules: AppEpic = (action$, state, deps) => {
+export const bulkDeleteRules: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.bulkDeleteRules.match),
         exhaustMap((action) =>
@@ -746,7 +746,7 @@ const bulkDeleteRules: AppEpic = (action$, state, deps) => {
     );
 };
 
-const bulkDeleteActions: AppEpic = (action$, state, deps) => {
+export const bulkDeleteActions: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.bulkDeleteActions.match),
         exhaustMap((action) =>
@@ -788,7 +788,7 @@ const bulkDeleteActions: AppEpic = (action$, state, deps) => {
     );
 };
 
-const bulkDeleteConditions: AppEpic = (action$, state, deps) => {
+export const bulkDeleteConditions: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.bulkDeleteConditions.match),
         exhaustMap((action) =>
@@ -830,7 +830,7 @@ const bulkDeleteConditions: AppEpic = (action$, state, deps) => {
     );
 };
 
-const bulkDeleteTriggers: AppEpic = (action$, state, deps) => {
+export const bulkDeleteTriggers: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.bulkDeleteTriggers.match),
         exhaustMap((action) =>
@@ -872,7 +872,7 @@ const bulkDeleteTriggers: AppEpic = (action$, state, deps) => {
     );
 };
 
-const bulkDeleteExecutions: AppEpic = (action$, state, deps) => {
+export const bulkDeleteExecutions: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.bulkDeleteExecutions.match),
         exhaustMap((action) =>
