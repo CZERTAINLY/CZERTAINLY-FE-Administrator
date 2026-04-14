@@ -12,7 +12,7 @@ import PagedList from 'components/PagedList/PagedList';
 import { TableDataRow, TableHeader } from 'components/CustomTable';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { SearchRequestModel } from 'types/certificate';
-import { ApiClients, backendClient } from 'src/api';
+import { ApiClients, backendClient } from 'api';
 import { EntityType } from 'ducks/filters';
 import { CbomDetailDto } from 'types/openapi';
 

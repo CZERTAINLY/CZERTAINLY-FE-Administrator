@@ -8,7 +8,7 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Spinner from 'components/Spinner';
 import Widget from 'components/Widget';
 import WidgetButtons from 'components/WidgetButtons';
-import { backendClient } from 'src/api';
+import { backendClient } from 'api';
 import { actions as alertActions } from 'ducks/alerts';
 import { actions, selectors } from 'ducks/cbom';
 import { CbomDetailDto, CbomDto } from 'types/openapi';

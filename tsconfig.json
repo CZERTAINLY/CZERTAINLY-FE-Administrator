@@ -21,7 +21,8 @@
             "utils/*": ["./src/utils/*"],
             "components/*": ["./src/components/*"],
             "ducks": ["./src/ducks"],
-            "ducks/*": ["./src/ducks/*"]
+            "ducks/*": ["./src/ducks/*"],
+            "api": ["./src/api"]
         }
     },
     "include": ["src", "."],

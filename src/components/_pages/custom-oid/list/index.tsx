@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { actions, selectors } from 'ducks/oids';
 import { EntityType } from 'ducks/filters';
 import PagedList from 'components/PagedList/PagedList';
-import { ApiClients } from 'src/api';
+import { ApiClients } from 'api';
 import { Link } from 'react-router';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { SearchRequestModel } from 'types/certificate';

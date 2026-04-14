@@ -35,6 +35,7 @@ export default defineConfig(async () => {
                 { find: 'components/', replacement: path.resolve(__dirname, './src/components/') + '/' },
                 { find: 'ducks/', replacement: path.resolve(__dirname, './src/ducks/') + '/' },
                 { find: 'ducks', replacement: path.resolve(__dirname, './src/ducks') },
+                { find: 'api', replacement: path.resolve(__dirname, './src/api') },
             ],
         },
         css: {
