@@ -43,7 +43,7 @@ export const slice = createSlice({
             state.redirectUrl = action.payload.url;
         },
 
-        fetchError: (state, action: PayloadAction<{ error: Error; message: string }>) => {
+        fetchError: (state, action: PayloadAction<{ error: Error | undefined; message: string }>) => {
             if (action.payload.error instanceof AjaxError && action.payload.error.status === 401) {
                 state.unauthorized = true;
             }
