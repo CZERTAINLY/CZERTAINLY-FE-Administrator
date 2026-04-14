@@ -12,7 +12,7 @@ export default [
             'github/',
             'build/',
             'config-overrides.js',
-            'src/setupProxy.cjs',
+            'src/setupProxy.js',
         ],
     },
     {

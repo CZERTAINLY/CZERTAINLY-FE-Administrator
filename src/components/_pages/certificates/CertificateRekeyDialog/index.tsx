@@ -360,12 +360,7 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                                     }}
                                 />
 
-                                {certificateRequest && (
-                                    <>
-                                        <br />
-                                        <CertificateAttributes csr={true} certificate={certificateRequest} />
-                                    </>
-                                )}
+                                {certificateRequest && <CertificateAttributes csr={true} certificate={certificateRequest} />}
                             </>
                         ) : (
                             <></>
