@@ -155,8 +155,8 @@ const RulesList = () => {
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
 
