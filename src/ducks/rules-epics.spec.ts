@@ -4,7 +4,7 @@ import { firstValueFrom, of, throwError } from 'rxjs';
 import { take, toArray } from 'rxjs/operators';
 
 import { actions as rulesActions } from './rules';
-import { actions as alertActions } from './alerts';
+import { actions as appRedirectActions } from './app-redirect';
 
 type EpicDeps = {
     apiClients: {
@@ -77,241 +77,396 @@ async function runEpic(
 }
 
 describe('bulkDeleteRules epic', () => {
-    test('success emits bulkDeleteRulesSuccess and success alert', async () => {
-        const emitted = await runEpic(RulesEpicIndex.BulkDeleteRules, rulesActions.bulkDeleteRules({ ruleUuids: ['r-1', 'r-2'] }), {}, 2);
-
-        expect(emitted[0]).toEqual(rulesActions.bulkDeleteRulesSuccess({ ruleUuids: ['r-1', 'r-2'] }));
-        expect(emitted[1]).toEqual(alertActions.success('Selected rules successfully deleted.'));
-    });
-
-    test('calls deleteRule for each uuid', async () => {
-        const capturedUuids: string[] = [];
-
-        await runEpic(
+    test('success emits bulkDeleteRulesSuccess with all uuids', async () => {
+        const calls: string[] = [];
+        const emitted = await runEpic(
             RulesEpicIndex.BulkDeleteRules,
             rulesActions.bulkDeleteRules({ ruleUuids: ['r-1', 'r-2'] }),
             {
                 rules: {
                     deleteRule: ({ ruleUuid }: { ruleUuid: string }) => {
-                        capturedUuids.push(ruleUuid);
+                        calls.push(ruleUuid);
                         return of(undefined);
+                    },
+                } as any,
+            },
+            1,
+        );
+
+        expect(calls).toEqual(['r-1', 'r-2']);
+        expect(emitted).toEqual([rulesActions.bulkDeleteRulesSuccess({ ruleUuids: ['r-1', 'r-2'] })]);
+    });
+
+    test('partial failure emits success, failure and fetchError', async () => {
+        const emitted = await runEpic(
+            RulesEpicIndex.BulkDeleteRules,
+            rulesActions.bulkDeleteRules({ ruleUuids: ['r-1', 'r-2'] }),
+            {
+                rules: {
+                    deleteRule: ({ ruleUuid }: { ruleUuid: string }) =>
+                        ruleUuid === 'r-2' ? throwError(() => new Error('delete failed')) : of(undefined),
+                } as any,
+            },
+            3,
+        );
+
+        expect(emitted.slice(0, 2)).toEqual([
+            rulesActions.bulkDeleteRulesSuccess({ ruleUuids: ['r-1'] }),
+            rulesActions.bulkDeleteRulesFailure({ error: 'Failed to delete 1 rule' }),
+        ]);
+        expect(emitted[2].type).toBe(appRedirectActions.fetchError.type);
+        expect((emitted[2] as any).payload).toEqual({ error: undefined, message: 'Failed to delete 1 rule' });
+    });
+
+    test('multiple failures uses plural message', async () => {
+        const emitted = await runEpic(
+            RulesEpicIndex.BulkDeleteRules,
+            rulesActions.bulkDeleteRules({ ruleUuids: ['r-1', 'r-2'] }),
+            { rules: { deleteRule: () => throwError(() => new Error('delete failed')) } as any },
+            3,
+        );
+
+        expect(emitted.slice(0, 2)).toEqual([
+            rulesActions.bulkDeleteRulesSuccess({ ruleUuids: [] }),
+            rulesActions.bulkDeleteRulesFailure({ error: 'Failed to delete 2 rules' }),
+        ]);
+        expect((emitted[2] as any).payload).toEqual({ error: undefined, message: 'Failed to delete 2 rules' });
+    });
+
+    test('sync throw emits bulkDeleteRulesFailure and fetchError', async () => {
+        const err = new Error('sync fail');
+        const emitted = await runEpic(
+            RulesEpicIndex.BulkDeleteRules,
+            rulesActions.bulkDeleteRules({ ruleUuids: ['r-1'] }),
+            {
+                rules: {
+                    deleteRule: () => {
+                        throw err;
                     },
                 } as any,
             },
             2,
         );
 
-        expect(capturedUuids).toContain('r-1');
-        expect(capturedUuids).toContain('r-2');
-    });
-
-    test('failure emits bulkDeleteRulesFailure and error alert', async () => {
-        const err = new Error('delete failed');
-        const expectedMessage = 'Failed to delete rules. delete failed';
-        const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteRules,
-            rulesActions.bulkDeleteRules({ ruleUuids: ['r-1'] }),
-            { rules: { deleteRule: () => throwError(() => err) } as any },
-            2,
-        );
-
-        expect(emitted[0]).toEqual(rulesActions.bulkDeleteRulesFailure({ error: expectedMessage }));
-        expect(emitted[1]).toEqual(alertActions.error(expectedMessage));
+        expect(emitted).toEqual([
+            rulesActions.bulkDeleteRulesFailure({ error: 'Failed to delete Rules. sync fail' }),
+            appRedirectActions.fetchError({ error: err, message: 'Failed to delete Rules' }),
+        ]);
     });
 });
 
 describe('bulkDeleteActions epic', () => {
-    test('success emits bulkDeleteActionsSuccess and success alert', async () => {
+    test('success emits bulkDeleteActionsSuccess with all uuids', async () => {
+        const calls: string[] = [];
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteActions,
-            rulesActions.bulkDeleteActions({ actionUuids: ['a-1', 'a-2'] }),
-            {},
-            2,
-        );
-
-        expect(emitted[0]).toEqual(rulesActions.bulkDeleteActionsSuccess({ actionUuids: ['a-1', 'a-2'] }));
-        expect(emitted[1]).toEqual(alertActions.success('Selected actions successfully deleted.'));
-    });
-
-    test('calls deleteAction for each uuid', async () => {
-        const capturedUuids: string[] = [];
-
-        await runEpic(
             RulesEpicIndex.BulkDeleteActions,
             rulesActions.bulkDeleteActions({ actionUuids: ['a-1', 'a-2'] }),
             {
                 actions: {
                     deleteAction: ({ actionUuid }: { actionUuid: string }) => {
-                        capturedUuids.push(actionUuid);
+                        calls.push(actionUuid);
                         return of(undefined);
+                    },
+                } as any,
+            },
+            1,
+        );
+
+        expect(calls).toEqual(['a-1', 'a-2']);
+        expect(emitted).toEqual([rulesActions.bulkDeleteActionsSuccess({ actionUuids: ['a-1', 'a-2'] })]);
+    });
+
+    test('partial failure emits success, failure and fetchError', async () => {
+        const emitted = await runEpic(
+            RulesEpicIndex.BulkDeleteActions,
+            rulesActions.bulkDeleteActions({ actionUuids: ['a-1', 'a-2'] }),
+            {
+                actions: {
+                    deleteAction: ({ actionUuid }: { actionUuid: string }) =>
+                        actionUuid === 'a-2' ? throwError(() => new Error('delete failed')) : of(undefined),
+                } as any,
+            },
+            3,
+        );
+
+        expect(emitted.slice(0, 2)).toEqual([
+            rulesActions.bulkDeleteActionsSuccess({ actionUuids: ['a-1'] }),
+            rulesActions.bulkDeleteActionsFailure({ error: 'Failed to delete 1 action' }),
+        ]);
+        expect(emitted[2].type).toBe(appRedirectActions.fetchError.type);
+        expect((emitted[2] as any).payload).toEqual({ error: undefined, message: 'Failed to delete 1 action' });
+    });
+
+    test('multiple failures uses plural message', async () => {
+        const emitted = await runEpic(
+            RulesEpicIndex.BulkDeleteActions,
+            rulesActions.bulkDeleteActions({ actionUuids: ['a-1', 'a-2'] }),
+            { actions: { deleteAction: () => throwError(() => new Error('delete failed')) } as any },
+            3,
+        );
+
+        expect(emitted.slice(0, 2)).toEqual([
+            rulesActions.bulkDeleteActionsSuccess({ actionUuids: [] }),
+            rulesActions.bulkDeleteActionsFailure({ error: 'Failed to delete 2 actions' }),
+        ]);
+        expect((emitted[2] as any).payload).toEqual({ error: undefined, message: 'Failed to delete 2 actions' });
+    });
+
+    test('sync throw emits bulkDeleteActionsFailure and fetchError', async () => {
+        const err = new Error('sync fail');
+        const emitted = await runEpic(
+            RulesEpicIndex.BulkDeleteActions,
+            rulesActions.bulkDeleteActions({ actionUuids: ['a-1'] }),
+            {
+                actions: {
+                    deleteAction: () => {
+                        throw err;
                     },
                 } as any,
             },
             2,
         );
 
-        expect(capturedUuids).toContain('a-1');
-        expect(capturedUuids).toContain('a-2');
-    });
-
-    test('failure emits bulkDeleteActionsFailure and error alert', async () => {
-        const err = new Error('delete failed');
-        const expectedMessage = 'Failed to delete actions. delete failed';
-        const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteActions,
-            rulesActions.bulkDeleteActions({ actionUuids: ['a-1'] }),
-            { actions: { deleteAction: () => throwError(() => err) } as any },
-            2,
-        );
-
-        expect(emitted[0]).toEqual(rulesActions.bulkDeleteActionsFailure({ error: expectedMessage }));
-        expect(emitted[1]).toEqual(alertActions.error(expectedMessage));
+        expect(emitted).toEqual([
+            rulesActions.bulkDeleteActionsFailure({ error: 'Failed to delete Actions. sync fail' }),
+            appRedirectActions.fetchError({ error: err, message: 'Failed to delete Actions' }),
+        ]);
     });
 });
 
 describe('bulkDeleteConditions epic', () => {
-    test('success emits bulkDeleteConditionsSuccess and success alert', async () => {
+    test('success emits bulkDeleteConditionsSuccess with all uuids', async () => {
+        const calls: string[] = [];
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteConditions,
-            rulesActions.bulkDeleteConditions({ conditionUuids: ['c-1', 'c-2'] }),
-            {},
-            2,
-        );
-
-        expect(emitted[0]).toEqual(rulesActions.bulkDeleteConditionsSuccess({ conditionUuids: ['c-1', 'c-2'] }));
-        expect(emitted[1]).toEqual(alertActions.success('Selected conditions successfully deleted.'));
-    });
-
-    test('calls deleteCondition for each uuid', async () => {
-        const capturedUuids: string[] = [];
-
-        await runEpic(
             RulesEpicIndex.BulkDeleteConditions,
             rulesActions.bulkDeleteConditions({ conditionUuids: ['c-1', 'c-2'] }),
             {
                 rules: {
                     deleteCondition: ({ conditionUuid }: { conditionUuid: string }) => {
-                        capturedUuids.push(conditionUuid);
+                        calls.push(conditionUuid);
                         return of(undefined);
+                    },
+                } as any,
+            },
+            1,
+        );
+
+        expect(calls).toEqual(['c-1', 'c-2']);
+        expect(emitted).toEqual([rulesActions.bulkDeleteConditionsSuccess({ conditionUuids: ['c-1', 'c-2'] })]);
+    });
+
+    test('partial failure emits success, failure and fetchError', async () => {
+        const emitted = await runEpic(
+            RulesEpicIndex.BulkDeleteConditions,
+            rulesActions.bulkDeleteConditions({ conditionUuids: ['c-1', 'c-2'] }),
+            {
+                rules: {
+                    deleteCondition: ({ conditionUuid }: { conditionUuid: string }) =>
+                        conditionUuid === 'c-2' ? throwError(() => new Error('delete failed')) : of(undefined),
+                } as any,
+            },
+            3,
+        );
+
+        expect(emitted.slice(0, 2)).toEqual([
+            rulesActions.bulkDeleteConditionsSuccess({ conditionUuids: ['c-1'] }),
+            rulesActions.bulkDeleteConditionsFailure({ error: 'Failed to delete 1 condition' }),
+        ]);
+        expect(emitted[2].type).toBe(appRedirectActions.fetchError.type);
+        expect((emitted[2] as any).payload).toEqual({ error: undefined, message: 'Failed to delete 1 condition' });
+    });
+
+    test('multiple failures uses plural message', async () => {
+        const emitted = await runEpic(
+            RulesEpicIndex.BulkDeleteConditions,
+            rulesActions.bulkDeleteConditions({ conditionUuids: ['c-1', 'c-2'] }),
+            { rules: { deleteCondition: () => throwError(() => new Error('delete failed')) } as any },
+            3,
+        );
+
+        expect(emitted.slice(0, 2)).toEqual([
+            rulesActions.bulkDeleteConditionsSuccess({ conditionUuids: [] }),
+            rulesActions.bulkDeleteConditionsFailure({ error: 'Failed to delete 2 conditions' }),
+        ]);
+        expect((emitted[2] as any).payload).toEqual({ error: undefined, message: 'Failed to delete 2 conditions' });
+    });
+
+    test('sync throw emits bulkDeleteConditionsFailure and fetchError', async () => {
+        const err = new Error('sync fail');
+        const emitted = await runEpic(
+            RulesEpicIndex.BulkDeleteConditions,
+            rulesActions.bulkDeleteConditions({ conditionUuids: ['c-1'] }),
+            {
+                rules: {
+                    deleteCondition: () => {
+                        throw err;
                     },
                 } as any,
             },
             2,
         );
 
-        expect(capturedUuids).toContain('c-1');
-        expect(capturedUuids).toContain('c-2');
-    });
-
-    test('failure emits bulkDeleteConditionsFailure and error alert', async () => {
-        const err = new Error('delete failed');
-        const expectedMessage = 'Failed to delete conditions. delete failed';
-        const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteConditions,
-            rulesActions.bulkDeleteConditions({ conditionUuids: ['c-1'] }),
-            { rules: { deleteCondition: () => throwError(() => err) } as any },
-            2,
-        );
-
-        expect(emitted[0]).toEqual(rulesActions.bulkDeleteConditionsFailure({ error: expectedMessage }));
-        expect(emitted[1]).toEqual(alertActions.error(expectedMessage));
+        expect(emitted).toEqual([
+            rulesActions.bulkDeleteConditionsFailure({ error: 'Failed to delete Conditions. sync fail' }),
+            appRedirectActions.fetchError({ error: err, message: 'Failed to delete Conditions' }),
+        ]);
     });
 });
 
 describe('bulkDeleteTriggers epic', () => {
-    test('success emits bulkDeleteTriggersSuccess and success alert', async () => {
+    test('success emits bulkDeleteTriggersSuccess with all uuids', async () => {
+        const calls: string[] = [];
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteTriggers,
-            rulesActions.bulkDeleteTriggers({ triggerUuids: ['t-1', 't-2'] }),
-            {},
-            2,
-        );
-
-        expect(emitted[0]).toEqual(rulesActions.bulkDeleteTriggersSuccess({ triggerUuids: ['t-1', 't-2'] }));
-        expect(emitted[1]).toEqual(alertActions.success('Selected triggers successfully deleted.'));
-    });
-
-    test('calls deleteTrigger for each uuid', async () => {
-        const capturedUuids: string[] = [];
-
-        await runEpic(
             RulesEpicIndex.BulkDeleteTriggers,
             rulesActions.bulkDeleteTriggers({ triggerUuids: ['t-1', 't-2'] }),
             {
                 triggers: {
                     deleteTrigger: ({ triggerUuid }: { triggerUuid: string }) => {
-                        capturedUuids.push(triggerUuid);
+                        calls.push(triggerUuid);
                         return of(undefined);
+                    },
+                } as any,
+            },
+            1,
+        );
+
+        expect(calls).toEqual(['t-1', 't-2']);
+        expect(emitted).toEqual([rulesActions.bulkDeleteTriggersSuccess({ triggerUuids: ['t-1', 't-2'] })]);
+    });
+
+    test('partial failure emits success, failure and fetchError', async () => {
+        const emitted = await runEpic(
+            RulesEpicIndex.BulkDeleteTriggers,
+            rulesActions.bulkDeleteTriggers({ triggerUuids: ['t-1', 't-2'] }),
+            {
+                triggers: {
+                    deleteTrigger: ({ triggerUuid }: { triggerUuid: string }) =>
+                        triggerUuid === 't-2' ? throwError(() => new Error('delete failed')) : of(undefined),
+                } as any,
+            },
+            3,
+        );
+
+        expect(emitted.slice(0, 2)).toEqual([
+            rulesActions.bulkDeleteTriggersSuccess({ triggerUuids: ['t-1'] }),
+            rulesActions.bulkDeleteTriggersFailure({ error: 'Failed to delete 1 trigger' }),
+        ]);
+        expect(emitted[2].type).toBe(appRedirectActions.fetchError.type);
+        expect((emitted[2] as any).payload).toEqual({ error: undefined, message: 'Failed to delete 1 trigger' });
+    });
+
+    test('multiple failures uses plural message', async () => {
+        const emitted = await runEpic(
+            RulesEpicIndex.BulkDeleteTriggers,
+            rulesActions.bulkDeleteTriggers({ triggerUuids: ['t-1', 't-2'] }),
+            { triggers: { deleteTrigger: () => throwError(() => new Error('delete failed')) } as any },
+            3,
+        );
+
+        expect(emitted.slice(0, 2)).toEqual([
+            rulesActions.bulkDeleteTriggersSuccess({ triggerUuids: [] }),
+            rulesActions.bulkDeleteTriggersFailure({ error: 'Failed to delete 2 triggers' }),
+        ]);
+        expect((emitted[2] as any).payload).toEqual({ error: undefined, message: 'Failed to delete 2 triggers' });
+    });
+
+    test('sync throw emits bulkDeleteTriggersFailure and fetchError', async () => {
+        const err = new Error('sync fail');
+        const emitted = await runEpic(
+            RulesEpicIndex.BulkDeleteTriggers,
+            rulesActions.bulkDeleteTriggers({ triggerUuids: ['t-1'] }),
+            {
+                triggers: {
+                    deleteTrigger: () => {
+                        throw err;
                     },
                 } as any,
             },
             2,
         );
 
-        expect(capturedUuids).toContain('t-1');
-        expect(capturedUuids).toContain('t-2');
-    });
-
-    test('failure emits bulkDeleteTriggersFailure and error alert', async () => {
-        const err = new Error('delete failed');
-        const expectedMessage = 'Failed to delete triggers. delete failed';
-        const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteTriggers,
-            rulesActions.bulkDeleteTriggers({ triggerUuids: ['t-1'] }),
-            { triggers: { deleteTrigger: () => throwError(() => err) } as any },
-            2,
-        );
-
-        expect(emitted[0]).toEqual(rulesActions.bulkDeleteTriggersFailure({ error: expectedMessage }));
-        expect(emitted[1]).toEqual(alertActions.error(expectedMessage));
+        expect(emitted).toEqual([
+            rulesActions.bulkDeleteTriggersFailure({ error: 'Failed to delete Triggers. sync fail' }),
+            appRedirectActions.fetchError({ error: err, message: 'Failed to delete Triggers' }),
+        ]);
     });
 });
 
 describe('bulkDeleteExecutions epic', () => {
-    test('success emits bulkDeleteExecutionsSuccess and success alert', async () => {
+    test('success emits bulkDeleteExecutionsSuccess with all uuids', async () => {
+        const calls: string[] = [];
         const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteExecutions,
-            rulesActions.bulkDeleteExecutions({ executionUuids: ['e-1', 'e-2'] }),
-            {},
-            2,
-        );
-
-        expect(emitted[0]).toEqual(rulesActions.bulkDeleteExecutionsSuccess({ executionUuids: ['e-1', 'e-2'] }));
-        expect(emitted[1]).toEqual(alertActions.success('Selected executions successfully deleted.'));
-    });
-
-    test('calls deleteExecution for each uuid', async () => {
-        const capturedUuids: string[] = [];
-
-        await runEpic(
             RulesEpicIndex.BulkDeleteExecutions,
             rulesActions.bulkDeleteExecutions({ executionUuids: ['e-1', 'e-2'] }),
             {
                 actions: {
                     deleteExecution: ({ executionUuid }: { executionUuid: string }) => {
-                        capturedUuids.push(executionUuid);
+                        calls.push(executionUuid);
                         return of(undefined);
+                    },
+                } as any,
+            },
+            1,
+        );
+
+        expect(calls).toEqual(['e-1', 'e-2']);
+        expect(emitted).toEqual([rulesActions.bulkDeleteExecutionsSuccess({ executionUuids: ['e-1', 'e-2'] })]);
+    });
+
+    test('partial failure emits success, failure and fetchError', async () => {
+        const emitted = await runEpic(
+            RulesEpicIndex.BulkDeleteExecutions,
+            rulesActions.bulkDeleteExecutions({ executionUuids: ['e-1', 'e-2'] }),
+            {
+                actions: {
+                    deleteExecution: ({ executionUuid }: { executionUuid: string }) =>
+                        executionUuid === 'e-2' ? throwError(() => new Error('delete failed')) : of(undefined),
+                } as any,
+            },
+            3,
+        );
+
+        expect(emitted.slice(0, 2)).toEqual([
+            rulesActions.bulkDeleteExecutionsSuccess({ executionUuids: ['e-1'] }),
+            rulesActions.bulkDeleteExecutionsFailure({ error: 'Failed to delete 1 execution' }),
+        ]);
+        expect(emitted[2].type).toBe(appRedirectActions.fetchError.type);
+        expect((emitted[2] as any).payload).toEqual({ error: undefined, message: 'Failed to delete 1 execution' });
+    });
+
+    test('multiple failures uses plural message', async () => {
+        const emitted = await runEpic(
+            RulesEpicIndex.BulkDeleteExecutions,
+            rulesActions.bulkDeleteExecutions({ executionUuids: ['e-1', 'e-2'] }),
+            { actions: { deleteExecution: () => throwError(() => new Error('delete failed')) } as any },
+            3,
+        );
+
+        expect(emitted.slice(0, 2)).toEqual([
+            rulesActions.bulkDeleteExecutionsSuccess({ executionUuids: [] }),
+            rulesActions.bulkDeleteExecutionsFailure({ error: 'Failed to delete 2 executions' }),
+        ]);
+        expect((emitted[2] as any).payload).toEqual({ error: undefined, message: 'Failed to delete 2 executions' });
+    });
+
+    test('sync throw emits bulkDeleteExecutionsFailure and fetchError', async () => {
+        const err = new Error('sync fail');
+        const emitted = await runEpic(
+            RulesEpicIndex.BulkDeleteExecutions,
+            rulesActions.bulkDeleteExecutions({ executionUuids: ['e-1'] }),
+            {
+                actions: {
+                    deleteExecution: () => {
+                        throw err;
                     },
                 } as any,
             },
             2,
         );
 
-        expect(capturedUuids).toContain('e-1');
-        expect(capturedUuids).toContain('e-2');
-    });
-
-    test('failure emits bulkDeleteExecutionsFailure and error alert', async () => {
-        const err = new Error('delete failed');
-        const expectedMessage = 'Failed to delete executions. delete failed';
-        const emitted = await runEpic(
-            RulesEpicIndex.BulkDeleteExecutions,
-            rulesActions.bulkDeleteExecutions({ executionUuids: ['e-1'] }),
-            { actions: { deleteExecution: () => throwError(() => err) } as any },
-            2,
-        );
-
-        expect(emitted[0]).toEqual(rulesActions.bulkDeleteExecutionsFailure({ error: expectedMessage }));
-        expect(emitted[1]).toEqual(alertActions.error(expectedMessage));
+        expect(emitted).toEqual([
+            rulesActions.bulkDeleteExecutionsFailure({ error: 'Failed to delete Executions. sync fail' }),
+            appRedirectActions.fetchError({ error: err, message: 'Failed to delete Executions' }),
+        ]);
     });
 });

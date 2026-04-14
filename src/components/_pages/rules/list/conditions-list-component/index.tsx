@@ -145,6 +145,9 @@ const ConditionsList = () => {
                         setCheckedRows(checkedRows as string[]);
                     }}
                     hasPagination={true}
+                    disablePaginationControls={isBusy}
+                    disableSelectionControls={isBusy}
+                    disableSearchControls={isBusy}
                 />
             </Widget>
 

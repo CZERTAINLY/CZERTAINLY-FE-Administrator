@@ -138,6 +138,9 @@ const RulesList = () => {
                         setCheckedRows(checkedRows as string[]);
                     }}
                     hasPagination={true}
+                    disablePaginationControls={isBusy}
+                    disableSelectionControls={isBusy}
+                    disableSearchControls={isBusy}
                 />
             </Widget>
 

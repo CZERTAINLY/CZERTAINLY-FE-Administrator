@@ -200,6 +200,9 @@ const TriggerList = () => {
                         setCheckedRows(checkedRows as string[]);
                     }}
                     hasPagination
+                    disablePaginationControls={isBusy}
+                    disableSelectionControls={isBusy}
+                    disableSearchControls={isBusy}
                 />
             </Widget>
 
