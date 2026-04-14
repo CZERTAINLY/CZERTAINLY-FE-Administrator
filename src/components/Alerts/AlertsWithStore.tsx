@@ -4,6 +4,10 @@ import Alerts from './index';
 import { alertsSlice } from 'ducks/alert-slice';
 import type { MessageModel } from 'types/alerts';
 
+export function createAlertMessage(overrides: Partial<MessageModel> = {}): MessageModel {
+    return { id: 0, message: 'Test message', time: Date.now(), color: 'success', ...overrides };
+}
+
 export type AlertsWithStoreProps = {
     preloadedState?: Parameters<typeof createMockStore>[0];
 };
@@ -24,13 +28,3 @@ function AlertsWithStore({ preloadedState }: AlertsWithStoreProps) {
     );
 }
 export default AlertsWithStore;
-
-export function createAlertMessage(overrides: Partial<MessageModel> = {}): MessageModel {
-    return {
-        id: 0,
-        message: 'Test message',
-        time: Date.now(),
-        color: 'success',
-        ...overrides,
-    };
-}
