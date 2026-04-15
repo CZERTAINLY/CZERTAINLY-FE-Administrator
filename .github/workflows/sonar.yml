@@ -42,7 +42,7 @@ jobs:
 
       - name: Create GitHub Check (in_progress)
         id: create_check
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           github-token: ${{ steps.app_token.outputs.token }}
           script: |
@@ -56,7 +56,7 @@ jobs:
             core.setOutput("check_id", check.data.id);
 
       # Checkout fork PR branch + fetch base to compute diff
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           repository: ${{ env.HEAD_REPO }}
           ref: ${{ env.PR_BRANCH }}
@@ -70,7 +70,7 @@ jobs:
           git checkout "$PR_BRANCH"
           git clean -ffdx && git reset --hard HEAD
 
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: 22.x
           cache: npm
@@ -108,7 +108,7 @@ jobs:
 
       - name: Finalize GitHub Check
         if: always()
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           github-token: ${{ steps.app_token.outputs.token }}
           script: |

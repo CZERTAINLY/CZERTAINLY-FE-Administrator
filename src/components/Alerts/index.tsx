@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify';
 import cn from 'classnames';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -26,15 +27,15 @@ function Alerts() {
                     })}
                     role="alert"
                     tabIndex={-1}
-                    aria-labelledby="hs-soft-color-warning-label"
+                    aria-labelledby={`hs-soft-color-warning-label-${alert.id}`}
                 >
                     <div className="absolute top-5 left-4 translate-y-[2px]">
                         {alert.color === 'success' ? <CircleCheck size={14} /> : <CircleX size={14} />}
                     </div>
                     <div
-                        id="hs-soft-color-warning-label"
+                        id={`hs-soft-color-warning-label-${alert.id}`}
                         className="text-lg font-semibold overflow-hidden"
-                        dangerouslySetInnerHTML={{ __html: alert.message }}
+                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(alert.message) }}
                     />
                     <button
                         className="absolute top-2 right-2 translate-y-[3px] text-[var(--status-success-color)]"
