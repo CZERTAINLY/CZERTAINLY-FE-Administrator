@@ -52,7 +52,7 @@ jobs:
 
       - name: Create GitHub Check (in_progress)
         id: create_check
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           github-token: ${{ steps.app_token.outputs.token }}
           script: |
@@ -207,7 +207,7 @@ jobs:
 
       - name: Mark GitHub Check as success
         if: success()
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           github-token: ${{ steps.app_token.outputs.token }}
           script: |
@@ -233,7 +233,7 @@ jobs:
           private_key: ${{ secrets.SONAR_GH_APP_PRIVATE_KEY }}
 
       - name: Mark GitHub Check as failure
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           github-token: ${{ steps.app_token.outputs.token }}
           script: |
