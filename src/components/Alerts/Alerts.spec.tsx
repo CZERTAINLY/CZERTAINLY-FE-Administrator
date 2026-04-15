@@ -1,6 +1,11 @@
 import { test, expect } from 'playwright/ct-test';
-import AlertsWithStore, { createAlertMessage } from 'components/Alerts/AlertsWithStore';
+import AlertsWithStore from 'components/Alerts/AlertsWithStore';
 import { alertsSlice } from 'ducks/alert-slice';
+import type { MessageModel } from 'types/alerts';
+
+function createAlertMessage(overrides: Partial<MessageModel> = {}): MessageModel {
+    return { id: 0, message: 'Test message', time: Date.now(), color: 'success', ...overrides };
+}
 
 test.describe('Alerts', () => {
     test('should render alerts container when no messages', async ({ mount, page }) => {
