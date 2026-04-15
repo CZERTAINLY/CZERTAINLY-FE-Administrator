@@ -1,6 +1,5 @@
 import { test, expect } from 'playwright/ct-test';
-import AlertsWithStore from 'components/Alerts/AlertsWithStore';
-import { createAlertMessage } from 'components/Alerts/AlertsWithStore';
+import AlertsWithStore, { createAlertMessage } from 'components/Alerts/AlertsWithStore';
 import { alertsSlice } from 'ducks/alert-slice';
 
 test.describe('Alerts', () => {
