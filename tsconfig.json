@@ -22,7 +22,8 @@
             "components/*": ["./src/components/*"],
             "ducks": ["./src/ducks"],
             "ducks/*": ["./src/ducks/*"],
-            "api": ["./src/api"]
+            "src/*": ["./src/*"],
+            "playwright/*": ["./playwright/*"]
         }
     },
     "include": ["src", "."],

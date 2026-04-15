@@ -445,13 +445,16 @@ export default function RaProfileDetail() {
                 : (associatedApprovalProfiles || []).map((profile) => ({
                       id: profile.uuid,
                       columns: [
-                          <Link to={`../../../approvalprofiles/detail/${profile!.uuid}`}>{profile!.name}</Link>,
+                          <Link key="name" to={`../../../approvalprofiles/detail/${profile!.uuid}`}>
+                              {profile!.name}
+                          </Link>,
 
                           profile.description || '',
 
                           profile?.expiry?.toString() || '',
 
                           <WidgetButtons
+                              key="actions"
                               buttons={[
                                   {
                                       id: 'remove',
@@ -498,11 +501,14 @@ export default function RaProfileDetail() {
                 : (associatedComplianceProfiles || []).map((profile) => ({
                       id: profile.uuid,
                       columns: [
-                          <Link to={`../../../complianceprofiles/detail/${profile!.uuid}`}>{profile!.name}</Link>,
+                          <Link key="name" to={`../../../complianceprofiles/detail/${profile!.uuid}`}>
+                              {profile!.name}
+                          </Link>,
 
                           profile.description || '',
 
                           <WidgetButtons
+                              key="actions"
                               buttons={[
                                   {
                                       id: 'ra' + profile.uuid,
@@ -669,8 +675,9 @@ export default function RaProfileDetail() {
                 id: 'acme',
                 columns: [
                     'ACME',
-                    <StatusBadge enabled={acmeDetails ? acmeDetails.acmeAvailable : false} />,
+                    <StatusBadge key="status" enabled={acmeDetails ? acmeDetails.acmeAvailable : false} />,
                     <ProgressButton
+                        key="action"
                         type="button"
                         title={acmeDetails?.acmeAvailable ? 'Deactivate' : 'Activate'}
                         inProgressTitle={acmeDetails?.acmeAvailable ? 'Deactivating...' : 'Activating...'}
@@ -723,8 +730,9 @@ export default function RaProfileDetail() {
                 id: 'scep',
                 columns: [
                     'SCEP',
-                    <StatusBadge enabled={scepDetails ? scepDetails.scepAvailable : false} />,
+                    <StatusBadge key="status" enabled={scepDetails ? scepDetails.scepAvailable : false} />,
                     <ProgressButton
+                        key="action"
                         type="button"
                         title={scepDetails?.scepAvailable ? 'Deactivate' : 'Activate'}
                         inProgressTitle={scepDetails?.scepAvailable ? 'Deactivating...' : 'Activating...'}
@@ -765,8 +773,9 @@ export default function RaProfileDetail() {
                 id: 'cmp',
                 columns: [
                     'CMP',
-                    <StatusBadge enabled={cmpDetails ? cmpDetails.cmpAvailable : false} />,
+                    <StatusBadge key="status" enabled={cmpDetails ? cmpDetails.cmpAvailable : false} />,
                     <ProgressButton
+                        key="action"
                         type="button"
                         title={cmpDetails?.cmpAvailable ? 'Deactivate' : 'Activate'}
                         inProgressTitle={cmpDetails?.cmpAvailable ? 'Deactivating...' : 'Activating...'}

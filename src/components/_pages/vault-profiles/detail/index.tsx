@@ -260,11 +260,12 @@ function VaultProfileDetail() {
                 : associatedComplianceProfiles.map((complianceProfile) => ({
                       id: complianceProfile.uuid,
                       columns: [
-                          <Link to={`/${Resource.ComplianceProfiles.toLowerCase()}/detail/${complianceProfile.uuid}`}>
+                          <Link key="name" to={`/${Resource.ComplianceProfiles.toLowerCase()}/detail/${complianceProfile.uuid}`}>
                               {complianceProfile.name}
                           </Link>,
                           complianceProfile.description || '',
                           <WidgetButtons
+                              key="actions"
                               buttons={[
                                   {
                                       id: 'remove',
@@ -309,12 +310,13 @@ function VaultProfileDetail() {
                 : associatedApprovalProfiles.map((approvalProfile) => ({
                       id: approvalProfile.uuid,
                       columns: [
-                          <Link to={`/${Resource.ApprovalProfiles.toLowerCase()}/detail/${approvalProfile.uuid}`}>
+                          <Link key="name" to={`/${Resource.ApprovalProfiles.toLowerCase()}/detail/${approvalProfile.uuid}`}>
                               {approvalProfile.name}
                           </Link>,
                           approvalProfile.description || '',
                           approvalProfile.expiry ? approvalProfile.expiry.toString() : '',
                           <WidgetButtons
+                              key="actions"
                               buttons={[
                                   {
                                       id: 'remove',
