@@ -181,7 +181,7 @@ function Select({
     }, [options]);
 
     useEffect(() => {
-        if (!selectRef.current || !(window as any).HSSelect) return;
+        if (!selectRef.current || !(globalThis as any).HSSelect) return;
 
         const optionsChanged = previousOptionsRef.current !== optionsKey;
         const valueChanged = (() => {
@@ -200,15 +200,15 @@ function Select({
         })();
 
         if (optionsChanged) {
-            const instance = (window as any).HSSelect.getInstance(selectRef.current);
+            const instance = (globalThis as any).HSSelect.getInstance(selectRef.current);
             if (instance) {
                 instance.destroy();
                 isInitializedRef.current = false;
             }
 
             const frameId = requestAnimationFrame(() => {
-                if (selectRef.current && (window as any).HSSelect) {
-                    (window as any).HSSelect.autoInit();
+                if (selectRef.current && (globalThis as any).HSSelect) {
+                    (globalThis as any).HSSelect.autoInit();
                     isInitializedRef.current = true;
                 }
             });
@@ -218,7 +218,7 @@ function Select({
 
             return () => cancelAnimationFrame(frameId);
         } else if (valueChanged) {
-            const instance = (window as any).HSSelect.getInstance(selectRef.current);
+            const instance = (globalThis as any).HSSelect.getInstance(selectRef.current);
             if (instance) {
                 const isOpen = instance.isOpened && typeof instance.isOpened === 'function' && instance.isOpened();
                 if (isOpen) {
@@ -246,8 +246,8 @@ function Select({
             }
 
             const frameId = requestAnimationFrame(() => {
-                if (selectRef.current && (window as any).HSSelect) {
-                    (window as any).HSSelect.autoInit();
+                if (selectRef.current && (globalThis as any).HSSelect) {
+                    (globalThis as any).HSSelect.autoInit();
                     isInitializedRef.current = true;
                 }
             });
@@ -257,8 +257,8 @@ function Select({
             return () => cancelAnimationFrame(frameId);
         } else if (!isInitializedRef.current) {
             const frameId = requestAnimationFrame(() => {
-                if (selectRef.current && (window as any).HSSelect) {
-                    (window as any).HSSelect.autoInit();
+                if (selectRef.current && (globalThis as any).HSSelect) {
+                    (globalThis as any).HSSelect.autoInit();
                     isInitializedRef.current = true;
                 }
             });
@@ -340,8 +340,8 @@ function Select({
 
             applyVersionLabelColor(root);
 
-            // Try to get dropdown from (window as any).HSSelect instance (works also when dropdownScope === 'window')
-            const hsInstance = (window as any).HSSelect?.getInstance?.(select);
+            // Try to get dropdown from (globalThis as any).HSSelect instance (works also when dropdownScope === 'window')
+            const hsInstance = (globalThis as any).HSSelect?.getInstance?.(select);
             const dropdown: Element | null = (hsInstance && hsInstance.dropdown) || root.querySelector?.('.hs-select-dropdown');
             applyAddNewStyling(dropdown);
             applyDropdownOptionDescriptions(dropdown);
@@ -369,7 +369,7 @@ function Select({
                     }
                 }
             });
-            (window as any).HSTooltip?.autoInit?.();
+            (globalThis as any).HSTooltip?.autoInit?.();
         };
 
         const observer = new MutationObserver(() => {
