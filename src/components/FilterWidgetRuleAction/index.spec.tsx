@@ -1,4 +1,4 @@
-import { test, expect } from '../../../playwright/ct-test';
+import { test, expect } from 'playwright/ct-test';
 import { FilterWidgetRuleActionTestWrapper } from './FilterWidgetRuleActionTestWrapper';
 import { AttributeContentType, FilterFieldSource } from 'types/openapi';
 
@@ -17,7 +17,7 @@ async function syncNativeSelect(page: import('@playwright/test').Page, selectId:
     );
 }
 
-/** Open group select and choose option by label (e.g. 'Meta'). Scope to dropdown that contains this option (avoids 2 listboxes). */
+/** Open group select and choose option by label (e.g. 'Meta'). Scope to drop down that contains this option (avoids 2 listboxes). */
 async function selectFieldSource(page: import('@playwright/test').Page, optionLabel: string) {
     await page.getByTestId('select-group').click();
     const dropdown = page
@@ -48,6 +48,33 @@ async function fillFilterValue(page: import('@playwright/test').Page, text: stri
     const input = page.getByPlaceholder('Enter filter value');
     await input.focus();
     await input.fill(text);
+}
+
+/** Sync native #value select value and dispatch input+change so React state updates. */
+async function syncNativeValueSelect(page: import('@playwright/test').Page, value: string) {
+    await page.evaluate((v) => {
+        const sel = document.querySelector('#value') as HTMLSelectElement | null;
+        if (!sel) return;
+        sel.value = v;
+        sel.dispatchEvent(new Event('input', { bubbles: true }));
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+    }, value);
+}
+
+/** Open value select dropdown, pick an option by label, and sync the native select. */
+async function selectValueOption(page: import('@playwright/test').Page, optionLabel: string, nativeValue?: string) {
+    await page.getByTestId('select-value').click();
+    const valueListbox = page.getByRole('listbox').filter({ has: page.getByText(optionLabel, { exact: true }) });
+    await valueListbox.waitFor({ state: 'visible', timeout: 5000 });
+    await valueListbox.locator('.hs-select-option-row').filter({ hasText: optionLabel }).click();
+    if (nativeValue !== undefined) {
+        await syncNativeValueSelect(page, nativeValue);
+    }
+}
+
+/** Build a single-source availableFilters array for the test wrapper. */
+function makeSearchFieldList(source: FilterFieldSource, fields: Record<string, any>[]): any[] {
+    return [{ filterFieldSource: source, searchFieldData: fields.map((f) => ({ conditions: [], ...f })) }];
 }
 
 test.describe('FilterWidgetRuleAction', () => {
@@ -121,14 +148,7 @@ test.describe('FilterWidgetRuleAction', () => {
     });
 
     test('clicking badge selects filter and shows Update button', async ({ mount, page }) => {
-        let lastActions: unknown[] = [];
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                onActionsUpdate={(actions) => {
-                    lastActions = actions;
-                }}
-            />,
-        );
+        await mount(<FilterWidgetRuleActionTestWrapper onActionsUpdate={() => {}} />);
         await selectFieldSourceMeta(page);
         await selectFieldOption(page, 'Status');
         await fillFilterValue(page, 'active');
@@ -306,26 +326,18 @@ test.describe('FilterWidgetRuleAction', () => {
     test('multi value field hydrates on first click even when execution data has a single string', async ({ mount, page }) => {
         await mount(
             <FilterWidgetRuleActionTestWrapper
-                availableFilters={
-                    [
-                        {
-                            filterFieldSource: FilterFieldSource.Property,
-                            searchFieldData: [
-                                {
-                                    fieldIdentifier: 'groups',
-                                    fieldLabel: 'Groups',
-                                    type: 'list' as const,
-                                    conditions: [],
-                                    value: [
-                                        { uuid: 'g1', name: 'Group One' },
-                                        { uuid: 'g2', name: 'Group Two' },
-                                    ],
-                                    multiValue: true,
-                                },
-                            ],
-                        },
-                    ] as any
-                }
+                availableFilters={makeSearchFieldList(FilterFieldSource.Property, [
+                    {
+                        fieldIdentifier: 'groups',
+                        fieldLabel: 'Groups',
+                        type: 'list' as const,
+                        value: [
+                            { uuid: 'g1', name: 'Group One' },
+                            { uuid: 'g2', name: 'Group Two' },
+                        ],
+                        multiValue: true,
+                    },
+                ])}
                 ExecutionsList={[
                     {
                         fieldSource: FilterFieldSource.Property,
@@ -350,26 +362,18 @@ test.describe('FilterWidgetRuleAction', () => {
     test('custom attribute option with reference/data hydrates selected value', async ({ mount, page }) => {
         await mount(
             <FilterWidgetRuleActionTestWrapper
-                availableFilters={
-                    [
-                        {
-                            filterFieldSource: FilterFieldSource.Custom,
-                            searchFieldData: [
-                                {
-                                    fieldIdentifier: 'customAttr',
-                                    fieldLabel: 'Custom Attr',
-                                    type: 'list' as const,
-                                    conditions: [],
-                                    value: [
-                                        { reference: 'r1', data: 'Option One' },
-                                        { reference: 'r2', data: 'Option Two' },
-                                    ],
-                                    multiValue: false,
-                                },
-                            ],
-                        },
-                    ] as any
-                }
+                availableFilters={makeSearchFieldList(FilterFieldSource.Custom, [
+                    {
+                        fieldIdentifier: 'customAttr',
+                        fieldLabel: 'Custom Attr',
+                        type: 'list' as const,
+                        value: [
+                            { reference: 'r1', data: 'Option One' },
+                            { reference: 'r2', data: 'Option Two' },
+                        ],
+                        multiValue: false,
+                    },
+                ])}
                 ExecutionsList={[
                     {
                         fieldSource: FilterFieldSource.Custom,
@@ -413,17 +417,7 @@ test.describe('FilterWidgetRuleAction', () => {
 
         await selectFieldSourceMeta(page);
         await selectFieldOption(page, 'Enabled');
-        await page.getByTestId('select-value').click();
-        const valueListbox = page.getByRole('listbox').filter({ has: page.getByText('False', { exact: true }) });
-        await valueListbox.waitFor({ state: 'visible', timeout: 5000 });
-        await valueListbox.locator('.hs-select-option-row').filter({ hasText: 'False' }).click();
-        await page.evaluate(() => {
-            const sel = document.querySelector('#value') as HTMLSelectElement | null;
-            if (!sel) return;
-            sel.value = 'false';
-            sel.dispatchEvent(new Event('input', { bubbles: true }));
-            sel.dispatchEvent(new Event('change', { bubbles: true }));
-        });
+        await selectValueOption(page, 'False', 'false');
 
         await expect(page.getByRole('button', { name: 'Add', exact: true })).toBeEnabled();
         await page.getByRole('button', { name: 'Add', exact: true }).click();
@@ -436,24 +430,16 @@ test.describe('FilterWidgetRuleAction', () => {
         let lastActions: unknown[] = [];
         await mount(
             <FilterWidgetRuleActionTestWrapper
-                availableFilters={
-                    [
-                        {
-                            filterFieldSource: FilterFieldSource.Meta,
-                            searchFieldData: [
-                                {
-                                    fieldIdentifier: 'expiresAt',
-                                    fieldLabel: 'Expires At',
-                                    type: 'list' as const,
-                                    conditions: [],
-                                    multiValue: true,
-                                    attributeContentType: AttributeContentType.Datetime,
-                                    value: ['2026-03-01T10:00:00Z', '2026-03-02T10:00:00Z'],
-                                },
-                            ],
-                        },
-                    ] as any
-                }
+                availableFilters={makeSearchFieldList(FilterFieldSource.Meta, [
+                    {
+                        fieldIdentifier: 'expiresAt',
+                        fieldLabel: 'Expires At',
+                        type: 'list' as const,
+                        multiValue: true,
+                        attributeContentType: AttributeContentType.Datetime,
+                        value: ['2026-03-01T10:00:00Z', '2026-03-02T10:00:00Z'],
+                    },
+                ])}
                 ExecutionsList={[
                     {
                         fieldSource: FilterFieldSource.Meta,
@@ -485,22 +471,14 @@ test.describe('FilterWidgetRuleAction', () => {
         let lastActions: unknown[] = [];
         await mount(
             <FilterWidgetRuleActionTestWrapper
-                availableFilters={
-                    [
-                        {
-                            filterFieldSource: FilterFieldSource.Meta,
-                            searchFieldData: [
-                                {
-                                    fieldIdentifier: 'issuedOn',
-                                    fieldLabel: 'Issued On',
-                                    type: 'date' as const,
-                                    conditions: [],
-                                    attributeContentType: AttributeContentType.Date,
-                                },
-                            ],
-                        },
-                    ] as any
-                }
+                availableFilters={makeSearchFieldList(FilterFieldSource.Meta, [
+                    {
+                        fieldIdentifier: 'issuedOn',
+                        fieldLabel: 'Issued On',
+                        type: 'date' as const,
+                        attributeContentType: AttributeContentType.Date,
+                    },
+                ])}
                 ExecutionsList={[
                     {
                         fieldSource: FilterFieldSource.Meta,
@@ -526,23 +504,15 @@ test.describe('FilterWidgetRuleAction', () => {
     test('string options list keeps selected primitive value in edit mode', async ({ mount, page }) => {
         await mount(
             <FilterWidgetRuleActionTestWrapper
-                availableFilters={
-                    [
-                        {
-                            filterFieldSource: FilterFieldSource.Meta,
-                            searchFieldData: [
-                                {
-                                    fieldIdentifier: 'mode',
-                                    fieldLabel: 'Mode',
-                                    type: 'list' as const,
-                                    conditions: [],
-                                    value: ['alpha', 'beta'],
-                                    multiValue: false,
-                                },
-                            ],
-                        },
-                    ] as any
-                }
+                availableFilters={makeSearchFieldList(FilterFieldSource.Meta, [
+                    {
+                        fieldIdentifier: 'mode',
+                        fieldLabel: 'Mode',
+                        type: 'list' as const,
+                        value: ['alpha', 'beta'],
+                        multiValue: false,
+                    },
+                ])}
                 ExecutionsList={[
                     {
                         fieldSource: FilterFieldSource.Meta,
@@ -560,23 +530,15 @@ test.describe('FilterWidgetRuleAction', () => {
     test('object execution data with nested value.data.uuid hydrates single select value', async ({ mount, page }) => {
         await mount(
             <FilterWidgetRuleActionTestWrapper
-                availableFilters={
-                    [
-                        {
-                            filterFieldSource: FilterFieldSource.Custom,
-                            searchFieldData: [
-                                {
-                                    fieldIdentifier: 'complexAttr',
-                                    fieldLabel: 'Complex Attr',
-                                    type: 'list' as const,
-                                    conditions: [],
-                                    value: [{ data: { uuid: 'cx1', name: 'Complex One' } }, { data: { uuid: 'cx2', name: 'Complex Two' } }],
-                                    multiValue: false,
-                                },
-                            ],
-                        },
-                    ] as any
-                }
+                availableFilters={makeSearchFieldList(FilterFieldSource.Custom, [
+                    {
+                        fieldIdentifier: 'complexAttr',
+                        fieldLabel: 'Complex Attr',
+                        type: 'list' as const,
+                        value: [{ data: { uuid: 'cx1', name: 'Complex One' } }, { data: { uuid: 'cx2', name: 'Complex Two' } }],
+                        multiValue: false,
+                    },
+                ])}
                 ExecutionsList={[
                     {
                         fieldSource: FilterFieldSource.Custom,
@@ -600,6 +562,343 @@ test.describe('FilterWidgetRuleAction', () => {
         await selectFieldOption(page, 'Status');
         await fillFilterValue(page, 'clear');
         await page.getByTestId('select-group-clear').click();
+        await expect(page.getByRole('button', { name: 'Add', exact: true })).toBeDisabled();
+    });
+
+    test('single non-array datetime in list-type field hydrates label/value pair', async ({ mount, page }) => {
+        await mount(
+            <FilterWidgetRuleActionTestWrapper
+                availableFilters={makeSearchFieldList(FilterFieldSource.Meta, [
+                    {
+                        fieldIdentifier: 'createdAt',
+                        fieldLabel: 'Created At',
+                        type: 'list' as const,
+                        multiValue: false,
+                        attributeContentType: AttributeContentType.Datetime,
+                        value: ['2026-04-01T08:00:00Z', '2026-04-02T08:00:00Z'],
+                    },
+                ])}
+                ExecutionsList={[
+                    {
+                        fieldSource: FilterFieldSource.Meta,
+                        fieldIdentifier: 'createdAt',
+                        data: '2026-04-01T08:00:00Z',
+                    },
+                ]}
+            />,
+        );
+
+        await page.getByText("'Created At'").click();
+        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
+    });
+
+    test('selecting a value from single-select list and adding it calls onActionsUpdate', async ({ mount, page }) => {
+        let lastActions: unknown[] = [];
+        await mount(
+            <FilterWidgetRuleActionTestWrapper
+                onActionsUpdate={(actions) => {
+                    lastActions = actions;
+                }}
+            />,
+        );
+
+        await selectFieldSourceMeta(page);
+        await selectFieldOption(page, 'Kind');
+
+        await selectValueOption(page, 'Kind One', 'k1');
+
+        await expect(page.getByRole('button', { name: 'Add', exact: true })).toBeEnabled();
+        await page.getByRole('button', { name: 'Add', exact: true }).click();
+
+        expect(lastActions).toHaveLength(1);
+        expect((lastActions as any[])[0]).toMatchObject({ fieldSource: 'meta', fieldIdentifier: 'kind' });
+    });
+
+    test('selecting values in multi-select list and adding calls onActionsUpdate', async ({ mount, page }) => {
+        let lastActions: unknown[] = [];
+        await mount(
+            <FilterWidgetRuleActionTestWrapper
+                availableFilters={makeSearchFieldList(FilterFieldSource.Property, [
+                    {
+                        fieldIdentifier: 'groups',
+                        fieldLabel: 'Groups',
+                        type: 'list' as const,
+                        value: [
+                            { uuid: 'g1', name: 'Group One' },
+                            { uuid: 'g2', name: 'Group Two' },
+                        ],
+                        multiValue: true,
+                    },
+                ])}
+                onActionsUpdate={(actions) => {
+                    lastActions = actions;
+                }}
+            />,
+        );
+
+        await selectFieldSource(page, 'Property');
+        await selectFieldOption(page, 'Groups');
+
+        await selectValueOption(page, 'Group One', 'g1');
+
+        await expect(page.getByRole('button', { name: 'Add', exact: true })).toBeEnabled();
+        await page.getByRole('button', { name: 'Add', exact: true }).click();
+
+        expect(lastActions).toHaveLength(1);
+        expect((lastActions as any[])[0].fieldIdentifier).toBe('groups');
+    });
+
+    test('toggling selected badge deselects it and resets to Add', async ({ mount, page }) => {
+        await mount(
+            <FilterWidgetRuleActionTestWrapper
+                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'status', data: 'val' }]}
+            />,
+        );
+
+        await page.getByText("'Status'").click();
+        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
+
+        await page.getByText("'Status'").click();
+        await expect(page.getByRole('button', { name: 'Add', exact: true })).toBeVisible();
+    });
+
+    test('ExecutionsList with non-multiValue array data unwraps to single value', async ({ mount, page }) => {
+        await mount(
+            <FilterWidgetRuleActionTestWrapper
+                availableFilters={makeSearchFieldList(FilterFieldSource.Meta, [
+                    {
+                        fieldIdentifier: 'kind',
+                        fieldLabel: 'Kind',
+                        type: 'list' as const,
+                        value: [
+                            { uuid: 'k1', name: 'Kind One' },
+                            { uuid: 'k2', name: 'Kind Two' },
+                        ],
+                        multiValue: false,
+                    },
+                ])}
+                ExecutionsList={[
+                    {
+                        fieldSource: FilterFieldSource.Meta,
+                        fieldIdentifier: 'kind',
+                        data: [{ uuid: 'k1', name: 'Kind One' }] as any,
+                    },
+                ]}
+            />,
+        );
+
+        await page.getByText("'Kind'").click();
+        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
+        await expect(page.locator('#value')).toHaveValue('k1');
+    });
+
+    test('badge displays platformEnum label when field has platformEnum', async ({ mount, page }) => {
+        await mount(
+            <FilterWidgetRuleActionTestWrapper
+                availableFilters={makeSearchFieldList(FilterFieldSource.Meta, [
+                    {
+                        fieldIdentifier: 'priority',
+                        fieldLabel: 'Priority',
+                        type: 'list' as const,
+                        platformEnum: 'PriorityLevel',
+                        value: [
+                            { uuid: 'high', name: 'High' },
+                            { uuid: 'low', name: 'Low' },
+                        ],
+                        multiValue: false,
+                    },
+                ])}
+                platformEnumsOverride={{
+                    PriorityLevel: {
+                        high: { label: 'High Priority' },
+                        low: { label: 'Low Priority' },
+                    },
+                }}
+                ExecutionsList={[
+                    {
+                        fieldSource: FilterFieldSource.Meta,
+                        fieldIdentifier: 'priority',
+                        data: 'high',
+                    },
+                ]}
+            />,
+        );
+
+        await expect(page.getByText('High Priority')).toBeVisible();
+    });
+
+    test('number field execution item hydrates value and renders number input', async ({ mount, page }) => {
+        await mount(
+            <FilterWidgetRuleActionTestWrapper
+                availableFilters={makeSearchFieldList(FilterFieldSource.Meta, [
+                    {
+                        fieldIdentifier: 'count',
+                        fieldLabel: 'Count',
+                        type: 'number' as const,
+                    },
+                ])}
+                ExecutionsList={[
+                    {
+                        fieldSource: FilterFieldSource.Meta,
+                        fieldIdentifier: 'count',
+                        data: 42,
+                    },
+                ]}
+            />,
+        );
+
+        await page.getByText("'Count'").click();
+        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
+        await expect(page.locator('#valueSelect')).toHaveValue('42');
+    });
+
+    test('updating an existing list field execution item via Update button', async ({ mount, page }) => {
+        let lastActions: unknown[] = [];
+        await mount(
+            <FilterWidgetRuleActionTestWrapper
+                onActionsUpdate={(actions) => {
+                    lastActions = actions;
+                }}
+                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'kind', data: 'k1' }]}
+            />,
+        );
+
+        await page.getByText("'Kind'").click();
+        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
+        await expect(page.locator('#value')).toHaveValue('k1');
+
+        await selectValueOption(page, 'Kind Two', 'k2');
+
+        await page.getByRole('button', { name: 'Update', exact: true }).click();
+        expect(lastActions).toHaveLength(1);
+    });
+
+    test('multi-value list execution item with array of objects hydrates as array', async ({ mount, page }) => {
+        await mount(
+            <FilterWidgetRuleActionTestWrapper
+                availableFilters={makeSearchFieldList(FilterFieldSource.Property, [
+                    {
+                        fieldIdentifier: 'tags',
+                        fieldLabel: 'Tags',
+                        type: 'list' as const,
+                        value: [
+                            { uuid: 't1', name: 'Tag One' },
+                            { uuid: 't2', name: 'Tag Two' },
+                            { uuid: 't3', name: 'Tag Three' },
+                        ],
+                        multiValue: true,
+                    },
+                ])}
+                ExecutionsList={[
+                    {
+                        fieldSource: FilterFieldSource.Property,
+                        fieldIdentifier: 'tags',
+                        data: [
+                            { uuid: 't1', name: 'Tag One' },
+                            { uuid: 't2', name: 'Tag Two' },
+                        ] as any,
+                    },
+                ]}
+            />,
+        );
+
+        await page.getByText("'Tags'").click();
+        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
+
+        const selectedValues = await page
+            .locator('#value')
+            .evaluate((el: HTMLSelectElement) => Array.from(el.selectedOptions).map((opt) => opt.value));
+        expect(selectedValues.length).toBeGreaterThanOrEqual(1);
+    });
+
+    test('badge with platformEnum falls back to string when enum entry missing', async ({ mount, page }) => {
+        await mount(
+            <FilterWidgetRuleActionTestWrapper
+                availableFilters={makeSearchFieldList(FilterFieldSource.Meta, [
+                    {
+                        fieldIdentifier: 'priority',
+                        fieldLabel: 'Priority',
+                        type: 'string' as const,
+                        platformEnum: 'PriorityLevel',
+                    },
+                ])}
+                platformEnumsOverride={{
+                    PriorityLevel: {
+                        high: { label: 'High Priority' },
+                    },
+                }}
+                ExecutionsList={[
+                    {
+                        fieldSource: FilterFieldSource.Meta,
+                        fieldIdentifier: 'priority',
+                        data: 'unknown_value',
+                    },
+                ]}
+            />,
+        );
+
+        await expect(page.getByText('unknown_value')).toBeVisible();
+    });
+
+    test('badge with datetime scalar data formats the date', async ({ mount, page }) => {
+        await mount(
+            <FilterWidgetRuleActionTestWrapper
+                availableFilters={makeSearchFieldList(FilterFieldSource.Meta, [
+                    {
+                        fieldIdentifier: 'updatedAt',
+                        fieldLabel: 'Updated At',
+                        type: 'string' as const,
+                        attributeContentType: AttributeContentType.Datetime,
+                    },
+                ])}
+                ExecutionsList={[
+                    {
+                        fieldSource: FilterFieldSource.Meta,
+                        fieldIdentifier: 'updatedAt',
+                        data: '2026-05-15T14:30:00Z',
+                    },
+                ]}
+            />,
+        );
+
+        await expect(page.getByText("'Updated At'")).toBeVisible();
+        await expect(page.getByText(/2026/)).toBeVisible();
+    });
+
+    test('badge with date scalar data formats as date', async ({ mount, page }) => {
+        await mount(
+            <FilterWidgetRuleActionTestWrapper
+                availableFilters={makeSearchFieldList(FilterFieldSource.Meta, [
+                    {
+                        fieldIdentifier: 'issuedOn',
+                        fieldLabel: 'Issued On',
+                        type: 'string' as const,
+                        attributeContentType: AttributeContentType.Date,
+                    },
+                ])}
+                ExecutionsList={[
+                    {
+                        fieldSource: FilterFieldSource.Meta,
+                        fieldIdentifier: 'issuedOn',
+                        data: '2026-06-01',
+                    },
+                ]}
+            />,
+        );
+
+        await expect(page.getByText("'Issued On'")).toBeVisible();
+        await expect(page.getByText(/2026/)).toBeVisible();
+    });
+
+    test('changing field clears value and disables Add', async ({ mount, page }) => {
+        await mount(<FilterWidgetRuleActionTestWrapper />);
+
+        await selectFieldSourceMeta(page);
+        await selectFieldOption(page, 'Status');
+        await fillFilterValue(page, 'test');
+        await expect(page.getByRole('button', { name: 'Add', exact: true })).toBeEnabled();
+
+        await selectFieldOption(page, 'Enabled');
         await expect(page.getByRole('button', { name: 'Add', exact: true })).toBeDisabled();
     });
 

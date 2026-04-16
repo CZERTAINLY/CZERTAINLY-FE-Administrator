@@ -64,6 +64,7 @@ export interface FilterWidgetRuleActionTestWrapperProps {
     ExecutionsList?: ExecutionItemModel[];
     disableBadgeRemove?: boolean;
     busyBadges?: boolean;
+    platformEnumsOverride?: Record<string, Record<string, { label: string }>>;
 }
 
 export function FilterWidgetRuleActionTestWrapper({
@@ -74,12 +75,18 @@ export function FilterWidgetRuleActionTestWrapper({
     ExecutionsList,
     disableBadgeRemove,
     busyBadges,
+    platformEnumsOverride,
 }: FilterWidgetRuleActionTestWrapperProps) {
     const getAvailableFiltersApi = useMemo(() => () => of(availableFilters), [availableFilters]);
 
     const preloadedState = useMemo(
         () => ({
-            ...defaultEnumsPreload,
+            enums: {
+                platformEnums: {
+                    ...defaultEnumsPreload.enums.platformEnums,
+                    ...platformEnumsOverride,
+                },
+            },
             filters: {
                 filters: [
                     {
@@ -94,7 +101,7 @@ export function FilterWidgetRuleActionTestWrapper({
                 ],
             },
         }),
-        [entity, availableFilters],
+        [entity, availableFilters, platformEnumsOverride],
     );
 
     const store = useMemo(() => createMockStore(preloadedState), [preloadedState]);
