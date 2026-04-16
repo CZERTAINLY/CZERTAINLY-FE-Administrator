@@ -80,154 +80,83 @@ export function SelectTooltipSyncHarness() {
     return <Select id="hs-tooltip-sync" value="" onChange={() => {}} options={options} />;
 }
 
-// ---------------------------------------------------------------------------
-// Single-select where options arrive AFTER the value is already set.
-// ---------------------------------------------------------------------------
-export function SelectLateOptionsSingleHarness() {
-    const [options, setOptions] = useState<{ value: string; label: string }[]>([]);
+// --------------------------------------------------------------------------------------------------------------
+// Parameterized harness for scenarios where the <Select> options arrive AFTER the component has mounted.
+// Covers both single and multi modes and captures the native <select>'s state at each HSSelect.autoInit() call
+// so tests can verify syncNativeSelection runs before HSSelect re-initializes.
+// --------------------------------------------------------------------------------------------------------------
+type LateOptionsCapture = string | string[];
 
-    useLayoutEffect(() => {
-        const state: { destroy: number; autoInit: number; valueAtAutoInit: string[] } = {
-            destroy: 0,
-            autoInit: 0,
-            valueAtAutoInit: [],
-        };
-        (globalThis as any).__hsLateSingleState = state;
-        (globalThis as any).HSSelect = {
-            getInstance: (el: HTMLSelectElement) => ({
-                isOpened: () => false,
-                close: () => {},
-                destroy: () => {
-                    state.destroy += 1;
-                    el.value = ''; // simulate real HSSelect clearing value on destroy
-                },
-            }),
-            autoInit: () => {
-                state.autoInit += 1;
-                const sel = document.getElementById('hs-late-single') as HTMLSelectElement | null;
-                state.valueAtAutoInit.push(sel?.value ?? '');
-            },
-        };
-        return () => {
-            delete (globalThis as any).__hsLateSingleState;
-            delete (globalThis as any).HSSelect;
-        };
-    }, []);
-
-    return (
-        <div>
-            <button data-testid="load-single-options" onClick={() => setOptions([{ value: 'uuid-123', label: 'TQC Name' }])}>
-                Load Options
-            </button>
-            <Select id="hs-late-single" value="uuid-123" onChange={() => {}} options={options} />
-        </div>
-    );
+interface LateOptionsHarnessProps {
+    mode: 'single' | 'multi';
+    id: string;
+    stateKey: string;
+    loadTestId: string;
+    loadOptions: { value: string; label: string }[];
+    initialSingleValue?: string;
+    initialMultiValue?: { value: string; label: string }[];
 }
 
-// ---------------------------------------------------------------------------
-// Multi-select where options arrive AFTER the value is already set.
-// ---------------------------------------------------------------------------
-export function SelectLateOptionsMultiHarness() {
+export function SelectLateOptionsHarness({
+    mode,
+    id,
+    stateKey,
+    loadTestId,
+    loadOptions,
+    initialSingleValue,
+    initialMultiValue,
+}: LateOptionsHarnessProps) {
     const [options, setOptions] = useState<{ value: string; label: string }[]>([]);
 
     useLayoutEffect(() => {
-        const state: { destroy: number; autoInit: number; selectedAtAutoInit: string[][] } = {
+        const state: { destroy: number; autoInit: number; captures: LateOptionsCapture[] } = {
             destroy: 0,
             autoInit: 0,
-            selectedAtAutoInit: [],
+            captures: [],
         };
-        (globalThis as any).__hsLateMultiState = state;
+        (globalThis as any)[stateKey] = state;
         (globalThis as any).HSSelect = {
             getInstance: (el: HTMLSelectElement) => ({
                 isOpened: () => false,
                 close: () => {},
                 destroy: () => {
                     state.destroy += 1;
-                    Array.from(el.options).forEach((o) => {
-                        o.selected = false; // simulate real HSSelect deselecting all on destroy
-                    });
+                    // Simulate real HSSelect clearing selection on destroy.
+                    if (mode === 'multi') {
+                        Array.from(el.options).forEach((o) => {
+                            o.selected = false;
+                        });
+                    } else {
+                        el.value = '';
+                    }
                 },
             }),
             autoInit: () => {
                 state.autoInit += 1;
-                const sel = document.getElementById('hs-late-multi') as HTMLSelectElement | null;
-                state.selectedAtAutoInit.push(sel ? Array.from(sel.selectedOptions).map((o) => o.value) : []);
-            },
-        };
-        return () => {
-            delete (globalThis as any).__hsLateMultiState;
-            delete (globalThis as any).HSSelect;
-        };
-    }, []);
-
-    return (
-        <div>
-            <button
-                data-testid="load-multi-options"
-                onClick={() =>
-                    setOptions([
-                        { value: 'uuid-a', label: 'Option A' },
-                        { value: 'uuid-b', label: 'Option B' },
-                    ])
+                const sel = document.getElementById(id) as HTMLSelectElement | null;
+                if (mode === 'multi') {
+                    state.captures.push(sel ? Array.from(sel.selectedOptions).map((o) => o.value) : []);
+                } else {
+                    state.captures.push(sel?.value ?? '');
                 }
-            >
-                Load Options
-            </button>
-            <Select
-                id="hs-late-multi"
-                value={[
-                    { value: 'uuid-a', label: 'Option A' },
-                    { value: 'uuid-b', label: 'Option B' },
-                ]}
-                onChange={() => {}}
-                options={options}
-                isMulti={true}
-            />
-        </div>
-    );
-}
-
-// ---------------------------------------------------------------------------
-// Single-select where options arrive AFTER mount but NO value is set.
-// Covers syncNativeSelection with an empty-string value (getValueFromProp === '').
-// ---------------------------------------------------------------------------
-export function SelectLateOptionsSingleNoValueHarness() {
-    const [options, setOptions] = useState<{ value: string; label: string }[]>([]);
-
-    useLayoutEffect(() => {
-        const state: { destroy: number; autoInit: number; valueAtAutoInit: string[] } = {
-            destroy: 0,
-            autoInit: 0,
-            valueAtAutoInit: [],
-        };
-        (globalThis as any).__hsLateNoValueState = state;
-        (globalThis as any).HSSelect = {
-            getInstance: (el: HTMLSelectElement) => ({
-                isOpened: () => false,
-                close: () => {},
-                destroy: () => {
-                    state.destroy += 1;
-                    el.value = '';
-                },
-            }),
-            autoInit: () => {
-                state.autoInit += 1;
-                const sel = document.getElementById('hs-late-no-value') as HTMLSelectElement | null;
-                state.valueAtAutoInit.push(sel?.value ?? '(no-element)');
             },
         };
         return () => {
-            delete (globalThis as any).__hsLateNoValueState;
+            delete (globalThis as any)[stateKey];
             delete (globalThis as any).HSSelect;
         };
-    }, []);
+    }, [id, stateKey, mode]);
 
     return (
         <div>
-            <button data-testid="load-no-value-options" onClick={() => setOptions([{ value: 'uuid-123', label: 'TQC Name' }])}>
+            <button data-testid={loadTestId} onClick={() => setOptions(loadOptions)}>
                 Load Options
             </button>
-            <Select id="hs-late-no-value" value="" onChange={() => {}} options={options} />
+            {mode === 'multi' ? (
+                <Select id={id} value={initialMultiValue ?? []} onChange={() => {}} options={options} isMulti={true} />
+            ) : (
+                <Select id={id} value={initialSingleValue ?? ''} onChange={() => {}} options={options} />
+            )}
         </div>
     );
 }

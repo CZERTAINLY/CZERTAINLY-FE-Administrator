@@ -1,12 +1,7 @@
 import { test, expect } from '../../../playwright/ct-test';
 import Select from './index';
 import SelectHSSelectTestWrapper from './SelectHSSelectTestWrapper';
-import {
-    SelectHSSelectValueChangeHarness,
-    SelectLateOptionsSingleHarness,
-    SelectLateOptionsMultiHarness,
-    SelectLateOptionsSingleNoValueHarness,
-} from './SelectHSCoverageHarness';
+import { SelectHSSelectValueChangeHarness, SelectLateOptionsHarness } from './SelectHSCoverageHarness';
 
 test.describe('Select', () => {
     test('should render select with options', async ({ mount }) => {
@@ -692,84 +687,93 @@ test.describe('Select', () => {
             .toMatchObject({ close: 1, destroy: 2, autoInit: 2 });
     });
 
-    test('should restore single-select value in native element before HSSelect reinit when options load late', async ({ mount, page }) => {
-        await mount(<SelectLateOptionsSingleHarness />);
-
-        // Click the button that simulates the async option list arriving
-        await page.getByTestId('load-single-options').click();
-
+    const runLateOptionsTest = async (
+        page: any,
+        loadTestId: string,
+        stateKey: string,
+        assertSecondCapture: (capture: string | string[]) => void,
+    ) => {
+        await page.getByTestId(loadTestId).click();
         // Wait for the second autoInit (initial mount + options-changed re-init)
-        await expect.poll(async () => page.evaluate(() => (globalThis as any).__hsLateSingleState?.autoInit)).toBe(2);
+        await expect.poll(async () => page.evaluate((key: string) => (globalThis as any)[key]?.autoInit, stateKey)).toBe(2);
 
         const state = await page.evaluate(
-            () =>
-                (globalThis as any).__hsLateSingleState as {
+            (key: string) =>
+                (globalThis as any)[key] as {
                     destroy: number;
                     autoInit: number;
-                    valueAtAutoInit: string[];
+                    captures: (string | string[])[];
                 },
+            stateKey,
         );
 
         // destroy() and autoInit() must each have fired twice
         expect(state.destroy).toBe(2);
         expect(state.autoInit).toBe(2);
 
-        // On the second autoInit (after options loaded) the native <select>.value must already be 'uuid-123' so HSSelect renders the correct label.
-        expect(state.valueAtAutoInit[1]).toBe('uuid-123');
+        // The second autoInit happens after options arrived; native <select> must be in sync by then.
+        assertSecondCapture(state.captures[1]);
+    };
+
+    test('should restore single-select value in native element before HSSelect reinit when options load late', async ({ mount, page }) => {
+        await mount(
+            <SelectLateOptionsHarness
+                mode="single"
+                id="hs-late-single"
+                stateKey="__hsLateSingleState"
+                loadTestId="load-single-options"
+                loadOptions={[{ value: 'uuid-123', label: 'TQC Name' }]}
+                initialSingleValue="uuid-123"
+            />,
+        );
+        await runLateOptionsTest(page, 'load-single-options', '__hsLateSingleState', (capture) => {
+            expect(capture).toBe('uuid-123');
+        });
     });
 
     test('should restore multi-select selected state in native element before HSSelect reinit when options load late', async ({
         mount,
         page,
     }) => {
-        await mount(<SelectLateOptionsMultiHarness />);
-
-        await page.getByTestId('load-multi-options').click();
-
-        await expect.poll(async () => page.evaluate(() => (globalThis as any).__hsLateMultiState?.autoInit)).toBe(2);
-
-        const state = await page.evaluate(
-            () =>
-                (globalThis as any).__hsLateMultiState as {
-                    destroy: number;
-                    autoInit: number;
-                    selectedAtAutoInit: string[][];
-                },
+        await mount(
+            <SelectLateOptionsHarness
+                mode="multi"
+                id="hs-late-multi"
+                stateKey="__hsLateMultiState"
+                loadTestId="load-multi-options"
+                loadOptions={[
+                    { value: 'uuid-a', label: 'Option A' },
+                    { value: 'uuid-b', label: 'Option B' },
+                ]}
+                initialMultiValue={[
+                    { value: 'uuid-a', label: 'Option A' },
+                    { value: 'uuid-b', label: 'Option B' },
+                ]}
+            />,
         );
-
-        expect(state.destroy).toBe(2);
-        expect(state.autoInit).toBe(2);
-
-        // Both values must be selected at the moment of the second autoInit.
-        expect(state.selectedAtAutoInit[1]).toContain('uuid-a');
-        expect(state.selectedAtAutoInit[1]).toContain('uuid-b');
+        await runLateOptionsTest(page, 'load-multi-options', '__hsLateMultiState', (capture) => {
+            expect(capture).toContain('uuid-a');
+            expect(capture).toContain('uuid-b');
+        });
     });
 
     test('should set empty native select value before HSSelect reinit when options load late and no value is set', async ({
         mount,
         page,
     }) => {
-        await mount(<SelectLateOptionsSingleNoValueHarness />);
-
-        await page.getByTestId('load-no-value-options').click();
-
-        // Wait for the second autoInit (initial mount + options-changed re-init)
-        await expect.poll(async () => page.evaluate(() => (globalThis as any).__hsLateNoValueState?.autoInit)).toBe(2);
-
-        const state = await page.evaluate(
-            () =>
-                (globalThis as any).__hsLateNoValueState as {
-                    destroy: number;
-                    autoInit: number;
-                    valueAtAutoInit: string[];
-                },
+        await mount(
+            <SelectLateOptionsHarness
+                mode="single"
+                id="hs-late-no-value"
+                stateKey="__hsLateNoValueState"
+                loadTestId="load-no-value-options"
+                loadOptions={[{ value: 'uuid-123', label: 'TQC Name' }]}
+                initialSingleValue=""
+            />,
         );
-
-        expect(state.destroy).toBe(2);
-        expect(state.autoInit).toBe(2);
-
-        // With no value prop, the native <select>.value must be '' at the second autoInit.
-        expect(state.valueAtAutoInit[1]).toBe('');
+        await runLateOptionsTest(page, 'load-no-value-options', '__hsLateNoValueState', (capture) => {
+            expect(capture).toBe('');
+        });
     });
 
     test('should accept option descriptions for dropdown rendering', async ({ mount }) => {

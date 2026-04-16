@@ -212,62 +212,45 @@ function Select({
             }
         })();
 
-        if (optionsChanged) {
-            const instance = (window as any).HSSelect.getInstance(selectRef.current);
-            if (instance) {
-                instance.destroy();
-                isInitializedRef.current = false;
-            }
-
-            if (selectRef.current) {
-                syncNativeSelection(selectRef.current, isMulti, value, getValueFromProp);
-            }
-
+        const scheduleAutoInit = () => {
             const frameId = requestAnimationFrame(() => {
                 if (selectRef.current && (window as any).HSSelect) {
                     (window as any).HSSelect.autoInit();
                     isInitializedRef.current = true;
                 }
             });
-
-            previousOptionsRef.current = optionsKey;
-            previousValueRef.current = value;
-
             return () => cancelAnimationFrame(frameId);
-        } else if (valueChanged) {
+        };
+
+        const destroyAndResync = (closeIfOpen: boolean) => {
             const instance = (window as any).HSSelect.getInstance(selectRef.current);
             if (instance) {
-                const isOpen = instance.isOpened && typeof instance.isOpened === 'function' && instance.isOpened();
-                if (isOpen) {
+                if (closeIfOpen && typeof instance.isOpened === 'function' && instance.isOpened()) {
                     instance.close();
                 }
                 instance.destroy();
                 isInitializedRef.current = false;
             }
-
             if (selectRef.current) {
                 syncNativeSelection(selectRef.current, isMulti, value, getValueFromProp);
             }
+        };
 
-            const frameId = requestAnimationFrame(() => {
-                if (selectRef.current && (window as any).HSSelect) {
-                    (window as any).HSSelect.autoInit();
-                    isInitializedRef.current = true;
-                }
-            });
-
+        if (optionsChanged) {
+            destroyAndResync(false);
+            const cleanup = scheduleAutoInit();
+            previousOptionsRef.current = optionsKey;
             previousValueRef.current = value;
-
-            return () => cancelAnimationFrame(frameId);
+            return cleanup;
+        } else if (valueChanged) {
+            destroyAndResync(true);
+            const cleanup = scheduleAutoInit();
+            previousValueRef.current = value;
+            return cleanup;
         } else if (!isInitializedRef.current) {
-            const frameId = requestAnimationFrame(() => {
-                if (selectRef.current && (window as any).HSSelect) {
-                    (window as any).HSSelect.autoInit();
-                    isInitializedRef.current = true;
-                }
-            });
+            const cleanup = scheduleAutoInit();
             previousValueRef.current = value;
-            return () => cancelAnimationFrame(frameId);
+            return cleanup;
         } else {
             previousValueRef.current = value;
         }
