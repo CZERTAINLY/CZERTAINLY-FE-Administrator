@@ -1,5 +1,4 @@
 import { useEffect, useRef, useMemo } from 'react';
-import HSSelect from 'preline/dist/select.mjs';
 import Label from 'components/Label';
 import Button from 'components/Button';
 import cn from 'classnames';
@@ -182,7 +181,7 @@ function Select({
     }, [options]);
 
     useEffect(() => {
-        if (!selectRef.current || !HSSelect) return;
+        if (!selectRef.current || !(window as any).HSSelect) return;
 
         const optionsChanged = previousOptionsRef.current !== optionsKey;
         const valueChanged = (() => {
@@ -201,15 +200,15 @@ function Select({
         })();
 
         if (optionsChanged) {
-            const instance = HSSelect.getInstance(selectRef.current);
+            const instance = (window as any).HSSelect.getInstance(selectRef.current);
             if (instance) {
                 instance.destroy();
                 isInitializedRef.current = false;
             }
 
             const frameId = requestAnimationFrame(() => {
-                if (selectRef.current && HSSelect) {
-                    HSSelect.autoInit();
+                if (selectRef.current && (window as any).HSSelect) {
+                    (window as any).HSSelect.autoInit();
                     isInitializedRef.current = true;
                 }
             });
@@ -219,7 +218,7 @@ function Select({
 
             return () => cancelAnimationFrame(frameId);
         } else if (valueChanged) {
-            const instance = HSSelect.getInstance(selectRef.current);
+            const instance = (window as any).HSSelect.getInstance(selectRef.current);
             if (instance) {
                 const isOpen = instance.isOpened && typeof instance.isOpened === 'function' && instance.isOpened();
                 if (isOpen) {
@@ -247,8 +246,8 @@ function Select({
             }
 
             const frameId = requestAnimationFrame(() => {
-                if (selectRef.current && HSSelect) {
-                    HSSelect.autoInit();
+                if (selectRef.current && (window as any).HSSelect) {
+                    (window as any).HSSelect.autoInit();
                     isInitializedRef.current = true;
                 }
             });
@@ -258,8 +257,8 @@ function Select({
             return () => cancelAnimationFrame(frameId);
         } else if (!isInitializedRef.current) {
             const frameId = requestAnimationFrame(() => {
-                if (selectRef.current && HSSelect) {
-                    HSSelect.autoInit();
+                if (selectRef.current && (window as any).HSSelect) {
+                    (window as any).HSSelect.autoInit();
                     isInitializedRef.current = true;
                 }
             });
@@ -341,8 +340,8 @@ function Select({
 
             applyVersionLabelColor(root);
 
-            // Try to get dropdown from HSSelect instance (works also when dropdownScope === 'window')
-            const hsInstance = HSSelect?.getInstance?.(select);
+            // Try to get dropdown from (window as any).HSSelect instance (works also when dropdownScope === 'window')
+            const hsInstance = (window as any).HSSelect?.getInstance?.(select);
             const dropdown: Element | null = (hsInstance && hsInstance.dropdown) || root.querySelector?.('.hs-select-dropdown');
             applyAddNewStyling(dropdown);
             applyDropdownOptionDescriptions(dropdown);
@@ -354,21 +353,33 @@ function Select({
                     const titleText = titleEl.querySelector('span')?.textContent?.trim() || titleEl.textContent.trim();
                     const option = options.find((opt) => opt.label.trim() === titleText);
                     const description = option?.description?.trim();
-                    tooltipContentEl.textContent = description ? `${titleText} ${description}` : titleText;
+                    const newContent = description ? `${titleText} ${description}` : titleText;
+                    if (tooltipContentEl.textContent !== newContent) {
+                        tooltipContentEl.textContent = newContent;
+                    }
                 }
             });
             root.querySelectorAll?.('[data-tag-value]').forEach((tagEl) => {
                 const titleEl = tagEl.querySelector?.('[data-title]');
                 const tooltipContentEl = tagEl.querySelector?.('[data-tooltip-content]');
                 if (titleEl instanceof HTMLElement && tooltipContentEl instanceof HTMLElement && titleEl.textContent) {
-                    tooltipContentEl.textContent = titleEl.textContent.trim();
+                    const newContent = titleEl.textContent.trim();
+                    if (tooltipContentEl.textContent !== newContent) {
+                        tooltipContentEl.textContent = newContent;
+                    }
                 }
             });
             (window as any).HSTooltip?.autoInit?.();
         };
 
         const observer = new MutationObserver(() => {
-            requestAnimationFrame(() => setTitlesAndTooltips());
+            observer.disconnect();
+            requestAnimationFrame(() => {
+                setTitlesAndTooltips();
+                if (select?.parentNode) {
+                    observer.observe(select.parentNode, { childList: true, subtree: true });
+                }
+            });
         });
         observer.observe(select.parentNode, { childList: true, subtree: true });
         requestAnimationFrame(() => setTitlesAndTooltips());

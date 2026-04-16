@@ -1,6 +1,9 @@
 import * as FloatingUIDOM from '@floating-ui/dom';
 (window as any).FloatingUIDOM = FloatingUIDOM;
 
+import HSSelect from 'preline/dist/select.mjs';
+(window as any).HSSelect = HSSelect;
+
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import 'reactflow/dist/style.css';
