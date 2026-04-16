@@ -79,3 +79,110 @@ export function SelectTooltipSyncHarness() {
 
     return <Select id="hs-tooltip-sync" value="" onChange={() => {}} options={options} />;
 }
+
+// ---------------------------------------------------------------------------
+// Single-select where options arrive AFTER the value is already set.
+// ---------------------------------------------------------------------------
+export function SelectLateOptionsSingleHarness() {
+    const [options, setOptions] = useState<{ value: string; label: string }[]>([]);
+
+    useLayoutEffect(() => {
+        const state: { destroy: number; autoInit: number; valueAtAutoInit: string[] } = {
+            destroy: 0,
+            autoInit: 0,
+            valueAtAutoInit: [],
+        };
+        (window as any).__hsLateSingleState = state;
+        (window as any).HSSelect = {
+            getInstance: (el: HTMLSelectElement) => ({
+                isOpened: () => false,
+                close: () => {},
+                destroy: () => {
+                    state.destroy += 1;
+                    el.value = ''; // simulate real HSSelect clearing value on destroy
+                },
+            }),
+            autoInit: () => {
+                state.autoInit += 1;
+                const sel = document.getElementById('hs-late-single') as HTMLSelectElement | null;
+                state.valueAtAutoInit.push(sel?.value ?? '');
+            },
+        };
+        return () => {
+            delete (window as any).__hsLateSingleState;
+            delete (window as any).HSSelect;
+        };
+    }, []);
+
+    return (
+        <div>
+            <button data-testid="load-single-options" onClick={() => setOptions([{ value: 'uuid-123', label: 'TQC Name' }])}>
+                Load Options
+            </button>
+            <Select id="hs-late-single" value="uuid-123" onChange={() => {}} options={options} />
+        </div>
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Multi-select where options arrive AFTER the value is already set.
+// ---------------------------------------------------------------------------
+export function SelectLateOptionsMultiHarness() {
+    const [options, setOptions] = useState<{ value: string; label: string }[]>([]);
+
+    useLayoutEffect(() => {
+        const state: { destroy: number; autoInit: number; selectedAtAutoInit: string[][] } = {
+            destroy: 0,
+            autoInit: 0,
+            selectedAtAutoInit: [],
+        };
+        (window as any).__hsLateMultiState = state;
+        (window as any).HSSelect = {
+            getInstance: (el: HTMLSelectElement) => ({
+                isOpened: () => false,
+                close: () => {},
+                destroy: () => {
+                    state.destroy += 1;
+                    Array.from(el.options).forEach((o) => {
+                        o.selected = false; // simulate real HSSelect deselecting all on destroy
+                    });
+                },
+            }),
+            autoInit: () => {
+                state.autoInit += 1;
+                const sel = document.getElementById('hs-late-multi') as HTMLSelectElement | null;
+                state.selectedAtAutoInit.push(sel ? Array.from(sel.selectedOptions).map((o) => o.value) : []);
+            },
+        };
+        return () => {
+            delete (window as any).__hsLateMultiState;
+            delete (window as any).HSSelect;
+        };
+    }, []);
+
+    return (
+        <div>
+            <button
+                data-testid="load-multi-options"
+                onClick={() =>
+                    setOptions([
+                        { value: 'uuid-a', label: 'Option A' },
+                        { value: 'uuid-b', label: 'Option B' },
+                    ])
+                }
+            >
+                Load Options
+            </button>
+            <Select
+                id="hs-late-multi"
+                value={[
+                    { value: 'uuid-a', label: 'Option A' },
+                    { value: 'uuid-b', label: 'Option B' },
+                ]}
+                onChange={() => {}}
+                options={options}
+                isMulti={true}
+            />
+        </div>
+    );
+}

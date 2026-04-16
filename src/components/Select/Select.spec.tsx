@@ -1,7 +1,7 @@
 import { test, expect } from '../../../playwright/ct-test';
 import Select from './index';
 import SelectHSSelectTestWrapper from './SelectHSSelectTestWrapper';
-import { SelectHSSelectValueChangeHarness } from './SelectHSCoverageHarness';
+import { SelectHSSelectValueChangeHarness, SelectLateOptionsSingleHarness, SelectLateOptionsMultiHarness } from './SelectHSCoverageHarness';
 
 test.describe('Select', () => {
     test('should render select with options', async ({ mount }) => {
@@ -683,6 +683,59 @@ test.describe('Select', () => {
         await mount(<SelectHSSelectValueChangeHarness />);
         await page.getByTestId('set-second').click();
         await expect.poll(async () => page.evaluate(() => (window as any).__hsState)).toMatchObject({ close: 1, destroy: 2, autoInit: 2 });
+    });
+
+    test('should restore single-select value in native element before HSSelect reinit when options load late', async ({ mount, page }) => {
+        await mount(<SelectLateOptionsSingleHarness />);
+
+        // Click the button that simulates the async option list arriving
+        await page.getByTestId('load-single-options').click();
+
+        // Wait for the second autoInit (initial mount + options-changed re-init)
+        await expect.poll(async () => page.evaluate(() => (window as any).__hsLateSingleState?.autoInit)).toBe(2);
+
+        const state = await page.evaluate(
+            () =>
+                (window as any).__hsLateSingleState as {
+                    destroy: number;
+                    autoInit: number;
+                    valueAtAutoInit: string[];
+                },
+        );
+
+        // destroy() and autoInit() must each have fired twice
+        expect(state.destroy).toBe(2);
+        expect(state.autoInit).toBe(2);
+
+        // On the second autoInit (after options loaded) the native <select>.value must already be 'uuid-123' so HSSelect renders the correct label.
+        expect(state.valueAtAutoInit[1]).toBe('uuid-123');
+    });
+
+    test('should restore multi-select selected state in native element before HSSelect reinit when options load late', async ({
+        mount,
+        page,
+    }) => {
+        await mount(<SelectLateOptionsMultiHarness />);
+
+        await page.getByTestId('load-multi-options').click();
+
+        await expect.poll(async () => page.evaluate(() => (window as any).__hsLateMultiState?.autoInit)).toBe(2);
+
+        const state = await page.evaluate(
+            () =>
+                (window as any).__hsLateMultiState as {
+                    destroy: number;
+                    autoInit: number;
+                    selectedAtAutoInit: string[][];
+                },
+        );
+
+        expect(state.destroy).toBe(2);
+        expect(state.autoInit).toBe(2);
+
+        // Both values must be selected at the moment of the second autoInit.
+        expect(state.selectedAtAutoInit[1]).toContain('uuid-a');
+        expect(state.selectedAtAutoInit[1]).toContain('uuid-b');
     });
 
     test('should accept option descriptions for dropdown rendering', async ({ mount }) => {

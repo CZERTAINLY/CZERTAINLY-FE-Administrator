@@ -193,6 +193,23 @@ function Select({
                 isInitializedRef.current = false;
             }
 
+            if (selectRef.current) {
+                if (isMulti) {
+                    const curr = value as { value: string | number; label: string }[];
+                    Array.from(selectRef.current.options).forEach((option) => {
+                        if (option.value === '') {
+                            option.selected = false;
+                            return;
+                        }
+                        const isSelected = curr?.some((v) => getOptionValueString(v.value) === option.value);
+                        option.selected = isSelected || false;
+                    });
+                } else {
+                    const valueString = getValueFromProp != null ? getOptionValueString(getValueFromProp as OptionValue) : '';
+                    selectRef.current.value = valueString;
+                }
+            }
+
             const frameId = requestAnimationFrame(() => {
                 if (selectRef.current && (window as any).HSSelect) {
                     (window as any).HSSelect.autoInit();
