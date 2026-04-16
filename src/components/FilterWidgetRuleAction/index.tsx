@@ -312,17 +312,11 @@ export default function FilterWidgetRuleAction({
         setFilterField(undefined);
         setFilterValue(undefined);
 
-        if (selectedFilter === -1) {
-            const updatedActions = [...actions, newExecution];
-            setActions(updatedActions);
-            onActionsUpdate?.(updatedActions.map((a) => mapActionToExecutionItem(a, availableFilters)));
-            setSelectedFilter(-1);
-        } else {
-            const updatedActions = actions.map((a, i) => (i === selectedFilter ? newExecution : a));
-            setActions(updatedActions);
-            onActionsUpdate?.(updatedActions.map((a) => mapActionToExecutionItem(a, availableFilters)));
-            setSelectedFilter(-1);
-        }
+        const updatedActions =
+            selectedFilter === -1 ? [...actions, newExecution] : actions.map((a, i) => (i === selectedFilter ? newExecution : a));
+        setActions(updatedActions);
+        onActionsUpdate?.(updatedActions.map((a) => mapActionToExecutionItem(a, availableFilters)));
+        setSelectedFilter(-1);
     }, [
         fieldSource,
         filterField,
@@ -587,33 +581,29 @@ export default function FilterWidgetRuleAction({
     );
 
     const renderBadgeContent = useCallback(
-        (itemNumber: number, value: string, label?: string, fieldSource?: string) => {
-            if (isFetchingAvailableFilters || busyBadges) return <></>;
-            return (
-                <React.Fragment key={itemNumber}>
-                    {/* {getEnumLabel(executionTypeEnum, actionType)}&nbsp; */}
-                    <b>{fieldSource && getEnumLabel(searchGroupEnum, fieldSource)}&nbsp;</b>'{label}
-                    '&nbsp;to&nbsp;
-                    {value}
-                    {!disableBadgeRemove && (
-                        <span
-                            onClick={() => onRemoveFilterClick(itemNumber)}
-                            role="button"
-                            tabIndex={0}
-                            onKeyDown={(event) => {
-                                if (event.key === 'Enter' || event.key === ' ') {
-                                    event.preventDefault();
-                                    onRemoveFilterClick(itemNumber);
-                                }
-                            }}
-                        >
-                            &times;
-                        </span>
-                    )}
-                </React.Fragment>
-            );
-        },
-        [isFetchingAvailableFilters, onRemoveFilterClick, searchGroupEnum, disableBadgeRemove, busyBadges],
+        (itemNumber: number, value: string, label?: string, fieldSource?: string) => (
+            <React.Fragment key={itemNumber}>
+                <b>{fieldSource && getEnumLabel(searchGroupEnum, fieldSource)}&nbsp;</b>'{label}
+                '&nbsp;to&nbsp;
+                {value}
+                {!disableBadgeRemove && (
+                    <span
+                        onClick={() => onRemoveFilterClick(itemNumber)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                                event.preventDefault();
+                                onRemoveFilterClick(itemNumber);
+                            }
+                        }}
+                    >
+                        &times;
+                    </span>
+                )}
+            </React.Fragment>
+        ),
+        [onRemoveFilterClick, searchGroupEnum, disableBadgeRemove],
     );
 
     const isUpdateButtonDisabled = useMemo(() => {

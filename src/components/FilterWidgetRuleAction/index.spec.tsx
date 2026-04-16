@@ -1,5 +1,5 @@
 import { test, expect } from 'playwright/ct-test';
-import { FilterWidgetRuleActionTestWrapper } from './FilterWidgetRuleActionTestWrapper';
+import { FilterWidgetRuleActionTestWrapper, defaultMockAvailableFilters } from './FilterWidgetRuleActionTestWrapper';
 import { AttributeContentType, FilterFieldSource } from 'types/openapi';
 
 /** Sync native select value and dispatch input+change so React state updates (Preline may not fire it on option click). */
@@ -75,6 +75,19 @@ async function selectValueOption(page: import('@playwright/test').Page, optionLa
 /** Build a single-source availableFilters array for the test wrapper. */
 function makeSearchFieldList(source: FilterFieldSource, fields: Record<string, any>[]): any[] {
     return [{ filterFieldSource: source, searchFieldData: fields.map((f) => ({ conditions: [], ...f })) }];
+}
+
+/** Click a badge by its label text, then assert that Update mode is active and that group/field selects have the expected values. */
+async function clickBadgeAndVerifyEditMode(
+    page: import('@playwright/test').Page,
+    badgeLabel: string,
+    expectedGroup: string,
+    expectedField: string,
+) {
+    await page.getByText(`'${badgeLabel}'`).click();
+    await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
+    await expect(page.locator('#group')).toHaveValue(expectedGroup);
+    await expect(page.locator('#field')).toHaveValue(expectedField);
 }
 
 test.describe('FilterWidgetRuleAction', () => {
@@ -263,11 +276,7 @@ test.describe('FilterWidgetRuleAction', () => {
             />,
         );
 
-        await page.getByText("'Status'").click();
-
-        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
-        await expect(page.locator('#group')).toHaveValue('meta');
-        await expect(page.locator('#field')).toHaveValue('status');
+        await clickBadgeAndVerifyEditMode(page, 'Status', 'meta', 'status');
         await expect(page.getByPlaceholder('Enter filter value')).toHaveValue('synced');
     });
 
@@ -278,11 +287,7 @@ test.describe('FilterWidgetRuleAction', () => {
             />,
         );
 
-        await page.getByText("'Kind'").click();
-
-        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
-        await expect(page.locator('#group')).toHaveValue('meta');
-        await expect(page.locator('#field')).toHaveValue('kind');
+        await clickBadgeAndVerifyEditMode(page, 'Kind', 'meta', 'kind');
         await expect(page.locator('#value')).toHaveValue('k2');
     });
 
@@ -315,11 +320,7 @@ test.describe('FilterWidgetRuleAction', () => {
             />,
         );
 
-        await page.getByText("'Kind'").click();
-
-        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
-        await expect(page.locator('#group')).toHaveValue('meta');
-        await expect(page.locator('#field')).toHaveValue('kind');
+        await clickBadgeAndVerifyEditMode(page, 'Kind', 'meta', 'kind');
         await expect(page.locator('#value')).toHaveValue('k1');
     });
 
@@ -384,10 +385,7 @@ test.describe('FilterWidgetRuleAction', () => {
             />,
         );
 
-        await page.getByText("'Custom Attr'").click();
-        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
-        await expect(page.locator('#group')).toHaveValue('custom');
-        await expect(page.locator('#field')).toHaveValue('customAttr');
+        await clickBadgeAndVerifyEditMode(page, 'Custom Attr', 'custom', 'customAttr');
         await expect(page.locator('#value')).toHaveValue('r1');
     });
 
@@ -398,10 +396,7 @@ test.describe('FilterWidgetRuleAction', () => {
             />,
         );
 
-        await page.getByText("'Enabled'").click();
-        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
-        await expect(page.locator('#group')).toHaveValue('meta');
-        await expect(page.locator('#field')).toHaveValue('enabled');
+        await clickBadgeAndVerifyEditMode(page, 'Enabled', 'meta', 'enabled');
         await expect(page.locator('#value')).toHaveValue('false');
     });
 
@@ -549,10 +544,7 @@ test.describe('FilterWidgetRuleAction', () => {
             />,
         );
 
-        await page.getByText("'Complex Attr'").click();
-        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
-        await expect(page.locator('#group')).toHaveValue('custom');
-        await expect(page.locator('#field')).toHaveValue('complexAttr');
+        await clickBadgeAndVerifyEditMode(page, 'Complex Attr', 'custom', 'complexAttr');
         await expect(page.locator('#value')).toHaveValue('cx2');
     });
 
@@ -913,5 +905,67 @@ test.describe('FilterWidgetRuleAction', () => {
         await page.locator('#unselectFilters').focus();
         await page.keyboard.press('Enter');
         await expect(page.getByRole('button', { name: 'Add', exact: true })).toBeVisible();
+    });
+
+    test('boolean execution item hydrates true when backend sends string true', async ({ mount, page }) => {
+        await mount(
+            <FilterWidgetRuleActionTestWrapper
+                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'enabled', data: 'true' as any }]}
+            />,
+        );
+
+        await clickBadgeAndVerifyEditMode(page, 'Enabled', 'meta', 'enabled');
+        await expect(page.locator('#value')).toHaveValue('true');
+    });
+
+    test('boolean execution item hydrates true when backend sends boolean true', async ({ mount, page }) => {
+        await mount(
+            <FilterWidgetRuleActionTestWrapper
+                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'enabled', data: true as any }]}
+            />,
+        );
+
+        await clickBadgeAndVerifyEditMode(page, 'Enabled', 'meta', 'enabled');
+        await expect(page.locator('#value')).toHaveValue('true');
+    });
+
+    test('remove badge triggers uuid extraction for multi-value object array data', async ({ mount, page }) => {
+        let lastActions: unknown[] = [];
+        await mount(
+            <FilterWidgetRuleActionTestWrapper
+                availableFilters={[
+                    ...defaultMockAvailableFilters,
+                    ...makeSearchFieldList(FilterFieldSource.Property, [
+                        {
+                            fieldIdentifier: 'tags',
+                            fieldLabel: 'Tags',
+                            type: 'list' as const,
+                            value: [
+                                { uuid: 't1', name: 'Tag One' },
+                                { uuid: 't2', name: 'Tag Two' },
+                            ],
+                            multiValue: true,
+                        },
+                    ]),
+                ]}
+                onActionsUpdate={(actions) => {
+                    lastActions = actions;
+                }}
+                ExecutionsList={[
+                    { fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'status', data: 'val' },
+                    {
+                        fieldSource: FilterFieldSource.Property,
+                        fieldIdentifier: 'tags',
+                        data: [{ uuid: 't1', name: 'Tag One' }] as any,
+                    },
+                ]}
+            />,
+        );
+
+        const statusBadge = page.getByTestId('badge').filter({ hasText: 'Status' });
+        await statusBadge.getByRole('button').click();
+        expect(lastActions).toHaveLength(1);
+        expect((lastActions as any[])[0].fieldIdentifier).toBe('tags');
+        expect((lastActions as any[])[0].data[0]).toBe('t1');
     });
 });
