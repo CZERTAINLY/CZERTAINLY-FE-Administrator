@@ -2,7 +2,7 @@ import Widget from 'components/Widget';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { ApiClients } from '../../api';
+import { ApiClients } from 'src/api';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { EntityType, actions as filterActions, selectors } from 'ducks/filters';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,7 +15,7 @@ import { Observable } from 'rxjs';
 import { SearchFieldListModel } from 'types/certificate';
 import { AttributeContentType, FilterFieldSource, FilterFieldType, PlatformEnum } from 'types/openapi';
 import { ExecutionItemModel, ExecutionItemRequestModel } from 'types/rules';
-import { getFormTypeFromAttributeContentType, getFormTypeFromFilterFieldType, getStepValue } from 'utils/common-utils';
+import { getFormTypeFromAttributeContentType, getFormTypeFromFilterFieldType } from 'utils/common-utils';
 import {
     checkIfFieldAttributeTypeIsDate,
     getFormattedDate,
@@ -23,6 +23,48 @@ import {
     getFormattedDateTime,
     getFormattedUtc,
 } from 'utils/dateUtil';
+
+const supportedInputTypes = new Set(['number', 'email', 'time', 'textarea', 'text', 'password', 'date']);
+
+function formatBadgeDataValue(v: any, field: any, platformEnums: Record<string, any>): string {
+    if (field?.platformEnum) {
+        return platformEnums[field.platformEnum][v]?.label ?? String(v);
+    }
+    if (typeof v === 'object' && v !== null) {
+        if (v.name) return v.name;
+        if (field && checkIfFieldAttributeTypeIsDate(field)) {
+            return v.label ? getFormattedDateTime(v.label) : getFormattedDateTime(v);
+        }
+        return v.label ?? String(v);
+    }
+    if (field && field.attributeContentType === AttributeContentType.Date) {
+        return getFormattedDate(v as string);
+    }
+    if (field && field.attributeContentType === AttributeContentType.Datetime) {
+        return getFormattedDateTime(v as string);
+    }
+    return String(v);
+}
+
+function mapFieldValueToOption(
+    v: any,
+    fieldRef: any,
+    normalizeValue: (v: any) => string | number | boolean | object = (x) => x,
+): { label: string; value: string | number | boolean | object } {
+    if (typeof v === 'string') {
+        return {
+            label: checkIfFieldAttributeTypeIsDate(fieldRef) ? getFormattedDateTime(v) : v,
+            value: v,
+        };
+    }
+    if (checkIfFieldAttributeTypeIsDate(fieldRef)) {
+        return { label: v.label, value: v.value };
+    }
+    return {
+        label: v?.name || v?.label || (typeof v?.data !== 'object' ? v?.data : undefined) || JSON.stringify(v),
+        value: normalizeValue(v),
+    };
+}
 
 interface CurrentActionOptions {
     label: string;
@@ -67,14 +109,12 @@ export default function FilterWidgetRuleAction({
     title,
     entity,
     getAvailableFiltersApi,
-    includeIgnoreAction,
     disableBadgeRemove,
     busyBadges,
 }: Props) {
     const dispatch = useDispatch();
 
     const searchGroupEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterFieldSource));
-    const executionTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ExecutionType));
     const [actions, setActions] = useState<ExecutionItemRequestModel[]>([]);
 
     const platformEnums = useSelector(enumSelectors.platformEnums);
@@ -330,29 +370,7 @@ export default function FilterWidgetRuleAction({
         if (!currentField) return [];
 
         if (Array.isArray(currentField?.value)) {
-            const objectOptions = currentField?.value?.map((v, i) => {
-                let label = '';
-                let value: string | number | boolean | object = '';
-                if (typeof v === 'string') {
-                    if (checkIfFieldAttributeTypeIsDate(currentField)) {
-                        label = getFormattedDateTime(v);
-                    } else {
-                        label = v;
-                    }
-                    value = v;
-                } else {
-                    if (checkIfFieldAttributeTypeIsDate(currentField)) {
-                        label = v.label;
-                        value = v.value;
-                    } else {
-                        label = v?.name || v?.label || (typeof v?.data !== 'object' ? v?.data : undefined) || JSON.stringify(v);
-                        value = normalizeSelectValue(v);
-                    }
-                }
-
-                return { label, value };
-            });
-            return objectOptions;
+            return currentField?.value?.map((v) => mapFieldValueToOption(v, currentField, normalizeSelectValue));
         }
 
         return [];
@@ -361,28 +379,7 @@ export default function FilterWidgetRuleAction({
         if (currentFieldThis && currentFieldThis.attributeContentType && checkIfFieldAttributeTypeIsDate(currentFieldThis)) {
             if (currentFieldThis.type === 'list') {
                 if (Array.isArray(currentActionData)) {
-                    const newFilterValue = currentActionData.map((v: any) => {
-                        let label = '';
-                        let value = '';
-                        if (typeof v === 'string') {
-                            if (checkIfFieldAttributeTypeIsDate(currentFieldThis)) {
-                                label = getFormattedDateTime(v);
-                            } else {
-                                label = v;
-                            }
-                            value = v;
-                        } else {
-                            if (checkIfFieldAttributeTypeIsDate(currentFieldThis)) {
-                                label = v.label;
-                                value = v.value;
-                            } else {
-                                label = v?.name || JSON.stringify(v);
-                                value = v;
-                            }
-                        }
-
-                        return { label, value };
-                    });
+                    const newFilterValue = currentActionData.map((v: any) => mapFieldValueToOption(v, currentFieldThis));
                     setFilterValue(newFilterValue);
                     return;
                 } else {
@@ -393,9 +390,7 @@ export default function FilterWidgetRuleAction({
                     return;
                 }
             } else {
-                const value = currentActionData;
-                const label = getFormattedDateTime(value as unknown as string);
-                const formattedDate = getFormattedDateByType(value as unknown as string, currentFieldThis.attributeContentType);
+                const formattedDate = getFormattedDateByType(currentActionData as unknown as string, currentFieldThis.attributeContentType);
                 setFilterValue(formattedDate);
 
                 return;
@@ -685,16 +680,6 @@ export default function FilterWidgetRuleAction({
                                                       ? getFormTypeFromFilterFieldType(currentField?.type)
                                                       : 'text';
 
-                                            const supportedInputTypes = new Set([
-                                                'number',
-                                                'email',
-                                                'time',
-                                                'textarea',
-                                                'text',
-                                                'password',
-                                                'date',
-                                            ]);
-
                                             return supportedInputTypes.has(rawType) ? (rawType as any) : 'text';
                                         })()}
                                         value={filterValue?.toString() || ''}
@@ -744,34 +729,9 @@ export default function FilterWidgetRuleAction({
                                 field && field.type === FilterFieldType.Boolean
                                     ? `'${booleanOptions.find((b) => !!f.data === b.value)?.label}'`
                                     : Array.isArray(f.data)
-                                      ? `${f.data
-                                            .map(
-                                                (v) =>
-                                                    `'${
-                                                        field?.platformEnum
-                                                            ? platformEnums[field.platformEnum][v]?.label
-                                                            : v?.name
-                                                              ? v.name
-                                                              : field && checkIfFieldAttributeTypeIsDate(field)
-                                                                ? v?.label
-                                                                    ? getFormattedDateTime(v?.label)
-                                                                    : getFormattedDateTime(v)
-                                                                : v?.label
-                                                                  ? v.label
-                                                                  : v
-                                                    }'`,
-                                            )
-                                            .join(', ')}`
+                                      ? f.data.map((v) => `'${formatBadgeDataValue(v, field, platformEnums)}'`).join(', ')
                                       : f.data
-                                        ? `'${
-                                              field?.platformEnum
-                                                  ? platformEnums[field.platformEnum][f.data as unknown as string]?.label
-                                                  : field && field.attributeContentType === AttributeContentType.Date
-                                                    ? getFormattedDate(f.data as unknown as string)
-                                                    : field && field.attributeContentType === AttributeContentType.Datetime
-                                                      ? getFormattedDateTime(f.data as unknown as string)
-                                                      : f.data
-                                          }'`
+                                        ? `'${formatBadgeDataValue(f.data, field, platformEnums)}'`
                                         : '';
                             return (
                                 <Badge key={i} onClick={() => toggleFilter(i)} color={selectedFilter === i ? 'primary' : 'secondary'}>
