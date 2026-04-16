@@ -16,7 +16,7 @@ COPY . ./
 RUN npm run build
 
 # production environment
-FROM nginxinc/nginx-unprivileged:1.29.5-alpine
+FROM nginxinc/nginx-unprivileged:1.29.8-alpine
 
 USER root
 RUN apk update && apk upgrade --no-cache
