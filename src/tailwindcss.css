@@ -79,7 +79,6 @@
 /* Preline UI */
 /* stylelint-disable-next-line at-rule-no-unknown */
 @source "../node_modules/preline/dist/*.js";
-@source "../node_modules/@preline/select/index.js";
 @import '../node_modules/preline/variants.css';
 
 /* Plugins */

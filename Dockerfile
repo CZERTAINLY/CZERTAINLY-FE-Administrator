@@ -8,7 +8,9 @@ ENV PATH=/app/node_modules/.bin:$PATH
 COPY package.json ./
 COPY package-lock.json ./
 
-RUN npm ci --cache /tmp/empty-npm-cache --silent
+RUN npm ci --silent
+# RUN npm install react-scripts@3.4.1 -g --silent
+RUN npm install -g --silent
 # RUN npm install -g
 COPY . ./
 RUN npm run build
