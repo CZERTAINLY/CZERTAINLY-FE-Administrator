@@ -445,8 +445,8 @@ export default function RaProfileDetail() {
                 : (associatedApprovalProfiles || []).map((profile) => ({
                       id: profile.uuid,
                       columns: [
-                          <Link key="name" to={`../../../approvalprofiles/detail/${profile!.uuid}`}>
-                              {profile!.name}
+                          <Link key="name" to={`../../../approvalprofiles/detail/${profile.uuid}`}>
+                              {profile.name}
                           </Link>,
 
                           profile.description || '',
@@ -501,8 +501,8 @@ export default function RaProfileDetail() {
                 : (associatedComplianceProfiles || []).map((profile) => ({
                       id: profile.uuid,
                       columns: [
-                          <Link key="name" to={`../../../complianceprofiles/detail/${profile!.uuid}`}>
-                              {profile!.name}
+                          <Link key="name" to={`../../../complianceprofiles/detail/${profile.uuid}`}>
+                              {profile.name}
                           </Link>,
 
                           profile.description || '',
