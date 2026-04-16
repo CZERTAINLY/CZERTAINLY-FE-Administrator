@@ -30,7 +30,7 @@ type SelectableValue = string | number | boolean | object;
 
 function formatBadgeDataValue(v: any, field: any, platformEnums: Record<string, any>): string {
     if (field?.platformEnum) {
-        return platformEnums[field.platformEnum][v]?.label ?? String(v);
+        return platformEnums[field.platformEnum]?.[v]?.label ?? String(v);
     }
     if (typeof v === 'object' && v !== null) {
         if (v.name) return v.name;
@@ -77,20 +77,16 @@ function mapActionToExecutionItem(a: ExecutionItemRequestModel, availableFilters
     const fieldOfAction = availableFilters
         .find((f) => f.filterFieldSource === a.fieldSource)
         ?.searchFieldData?.find((s) => s.fieldIdentifier === a.fieldIdentifier);
+    const isDateField = fieldOfAction && checkIfFieldAttributeTypeIsDate(fieldOfAction);
     const formatData = (v: any) => {
         if (typeof v === 'object' && Object.prototype.hasOwnProperty.call(v, 'uuid')) return v.uuid;
-        if (fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldAttributeTypeIsDate(fieldOfAction)) {
-            return Object.prototype.hasOwnProperty.call(v, 'value')
-                ? getFormattedUtc(fieldOfAction.attributeContentType, v.value)
-                : getFormattedUtc(fieldOfAction.attributeContentType, v);
+        if (isDateField) {
+            const raw = Object.prototype.hasOwnProperty.call(v, 'value') ? v.value : v;
+            return getFormattedUtc(fieldOfAction.attributeContentType!, raw);
         }
         return v;
     };
-    const data = Array.isArray(a.data)
-        ? a.data.map(formatData)
-        : fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldAttributeTypeIsDate(fieldOfAction)
-          ? [getFormattedUtc(fieldOfAction.attributeContentType, a.data as unknown as string) as Object]
-          : a.data;
+    const data = Array.isArray(a.data) ? a.data.map(formatData) : isDateField ? [formatData(a.data)] : a.data;
     return { fieldSource: a.fieldSource, fieldIdentifier: a.fieldIdentifier, data };
 }
 
@@ -368,25 +364,14 @@ export default function FilterWidgetRuleAction({
         return [];
     }, [currentField, normalizeSelectValue]);
     const updateFilterValueDateTime = useCallback((currentFieldThis: any, currentActionData: any) => {
-        if (currentFieldThis && currentFieldThis.attributeContentType && checkIfFieldAttributeTypeIsDate(currentFieldThis)) {
-            if (currentFieldThis.type === 'list') {
-                if (Array.isArray(currentActionData)) {
-                    const newFilterValue = currentActionData.map((v: any) => mapFieldValueToOption(v, currentFieldThis));
-                    setFilterValue(newFilterValue);
-                    return;
-                } else {
-                    const value = currentActionData;
-                    const label = getFormattedDateTime(value as unknown as string);
-
-                    setFilterValue({ label, value });
-                    return;
-                }
+        if (currentFieldThis.type === 'list') {
+            if (Array.isArray(currentActionData)) {
+                setFilterValue(currentActionData.map((v: any) => mapFieldValueToOption(v, currentFieldThis)));
             } else {
-                const formattedDate = getFormattedDateByType(currentActionData as unknown as string, currentFieldThis.attributeContentType);
-                setFilterValue(formattedDate);
-
-                return;
+                setFilterValue({ label: getFormattedDateTime(currentActionData as unknown as string), value: currentActionData });
             }
+        } else {
+            setFilterValue(getFormattedDateByType(currentActionData as unknown as string, currentFieldThis.attributeContentType));
         }
     }, []);
     useEffect(() => {
@@ -446,45 +431,34 @@ export default function FilterWidgetRuleAction({
             return;
         }
 
-        if (thisCurrentField?.type === FilterFieldType.String || thisCurrentField?.type === FilterFieldType.Number) {
+        if (thisCurrentField.type === FilterFieldType.String || thisCurrentField.type === FilterFieldType.Number) {
             setFilterValue(currentActionData);
             return;
         }
 
-        if (thisCurrentField?.type === FilterFieldType.Boolean) {
-            setFilterValue(currentActionData === true || currentActionData === 'true');
-
+        if (thisCurrentField.type === FilterFieldType.Boolean) {
+            setFilterValue(
+                currentActionData === true || (typeof currentActionData === 'string' && currentActionData.toLowerCase() === 'true'),
+            );
             return;
         }
 
-        if (thisCurrentField && thisCurrentField.attributeContentType && checkIfFieldAttributeTypeIsDate(thisCurrentField)) {
+        if (checkIfFieldAttributeTypeIsDate(thisCurrentField)) {
             updateFilterValueDateTime(thisCurrentField, currentActionData);
             return;
         }
 
-        if (thisCurrentField && Array.isArray(currentActionData) && !checkIfFieldAttributeTypeIsDate(thisCurrentField)) {
-            const newFilterValue = mapActionDataToSelectValue(thisCurrentField, currentActionData);
-            setFilterValue(newFilterValue);
+        if (Array.isArray(currentActionData)) {
+            setFilterValue(mapActionDataToSelectValue(thisCurrentField, currentActionData));
             return;
         }
 
-        if (thisCurrentField && !checkIfFieldAttributeTypeIsDate(thisCurrentField)) {
-            if (thisCurrentField.multiValue) {
-                const mappedValues = mapActionDataToSelectValue(thisCurrentField, currentActionData);
-                if (Array.isArray(mappedValues)) {
-                    setFilterValue(mappedValues);
-                } else if (mappedValues) {
-                    setFilterValue([mappedValues]);
-                } else {
-                    setFilterValue([]);
-                }
-            } else {
-                setFilterValue(mapActionDataToSingleSelectPrimitive(thisCurrentField, currentActionData));
-            }
-            return;
+        if (thisCurrentField.multiValue) {
+            const mappedValues = mapActionDataToSelectValue(thisCurrentField, currentActionData);
+            setFilterValue(Array.isArray(mappedValues) ? mappedValues : mappedValues ? [mappedValues] : []);
+        } else {
+            setFilterValue(mapActionDataToSingleSelectPrimitive(thisCurrentField, currentActionData));
         }
-
-        setFilterValue(currentActionData);
     }, [
         selectedFilter,
         actions,
@@ -542,42 +516,46 @@ export default function FilterWidgetRuleAction({
         setActions(updatedActions);
     }, [ExecutionsList, availableFilters]);
 
+    const onMultiValueChange = useCallback((values: unknown) => {
+        setFilterValue((values as { value: string | number; label: string }[] | undefined) || []);
+    }, []);
+
+    const onSingleValueChange = useCallback(
+        (values: unknown) => {
+            const singleValue = values as { value: string | number; label: string } | string | number | object | undefined;
+            if (!singleValue) {
+                setFilterValue(undefined);
+                return;
+            }
+            if (typeof singleValue === 'object' && Object.hasOwn(singleValue as object, 'value')) {
+                setFilterValue(normalizeSelectValue((singleValue as { value: string | number; label: string }).value));
+                return;
+            }
+            setFilterValue(normalizeSelectValue(singleValue));
+        },
+        [normalizeSelectValue],
+    );
+
     const renderObjectValueSelector = useMemo(
-        () =>
-            currentField?.multiValue ? (
-                <Select
-                    id="value"
-                    options={objectValueOptions}
-                    value={Array.isArray(filterValue) ? filterValue : []}
-                    onChange={(values) => {
-                        setFilterValue((values as { value: string | number; label: string }[] | undefined) || []);
-                    }}
-                    isMulti
-                    placeholder="Select filter value from options"
-                />
-            ) : (
-                <Select
-                    id="value"
-                    options={objectValueOptions}
-                    value={Array.isArray(filterValue) || typeof filterValue === 'boolean' ? '' : (filterValue ?? '')}
-                    onChange={(values) => {
-                        const singleValue = values as { value: string | number; label: string } | string | number | object | undefined;
-                        if (!singleValue) {
-                            setFilterValue(undefined);
-                            return;
-                        }
-
-                        if (typeof singleValue === 'object' && Object.hasOwn(singleValue as object, 'value')) {
-                            setFilterValue(normalizeSelectValue((singleValue as { value: string | number; label: string }).value));
-                            return;
-                        }
-
-                        setFilterValue(normalizeSelectValue(singleValue));
-                    }}
-                    placeholder="Select filter value from options"
-                />
-            ),
-        [objectValueOptions, filterValue, currentField, normalizeSelectValue],
+        () => (
+            <Select
+                id="value"
+                options={objectValueOptions}
+                value={
+                    currentField?.multiValue
+                        ? Array.isArray(filterValue)
+                            ? filterValue
+                            : []
+                        : Array.isArray(filterValue) || typeof filterValue === 'boolean'
+                          ? ''
+                          : (filterValue ?? '')
+                }
+                onChange={currentField?.multiValue ? onMultiValueChange : onSingleValueChange}
+                isMulti={!!currentField?.multiValue}
+                placeholder="Select filter value from options"
+            />
+        ),
+        [objectValueOptions, filterValue, currentField, onMultiValueChange, onSingleValueChange],
     );
 
     const renderBadgeContent = useCallback(
