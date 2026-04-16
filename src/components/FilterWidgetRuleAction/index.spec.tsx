@@ -1,5 +1,6 @@
 import { test, expect } from 'playwright/ct-test';
-import { FilterWidgetRuleActionTestWrapper, defaultMockAvailableFilters } from './FilterWidgetRuleActionTestWrapper';
+import { FilterWidgetRuleActionTestWrapper } from './FilterWidgetRuleActionTestWrapper';
+import { defaultMockAvailableFilters } from './FilterWidgetRuleActionTestData';
 import { AttributeContentType, FilterFieldSource } from 'types/openapi';
 
 /** Sync native select value and dispatch input+change so React state updates (Preline may not fire it on option click). */
