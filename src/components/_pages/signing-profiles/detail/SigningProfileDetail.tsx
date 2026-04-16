@@ -276,8 +276,12 @@ export default function SigningProfileDetail() {
                 id: 'timeQualityConfig',
                 columns: [
                     'Time Quality Configuration',
-                    timestampingWorkflow.timeQualityConfiguration ? (
-                        <span>{timestampingWorkflow.timeQualityConfiguration.uuid ?? 'Configured'}</span>
+                    timestampingWorkflow.timeQualityConfiguration?.uuid ? (
+                        <Link
+                            to={`/${Resource.TimeQualityConfigurations.toLowerCase()}/detail/${timestampingWorkflow.timeQualityConfiguration.uuid}`}
+                        >
+                            {timestampingWorkflow.timeQualityConfiguration.name ?? timestampingWorkflow.timeQualityConfiguration.uuid}
+                        </Link>
                     ) : (
                         <span className="text-gray-400 text-sm">Not configured</span>
                     ),

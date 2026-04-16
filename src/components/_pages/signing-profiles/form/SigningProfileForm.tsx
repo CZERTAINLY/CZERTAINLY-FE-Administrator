@@ -17,6 +17,7 @@ import { actions as customAttributesActions, selectors as customAttributesSelect
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as connectorActions, selectors as connectorSelectors } from 'ducks/connectors';
 import { actions as signingProfileActions, selectors as signingProfileSelectors } from 'ducks/signing-profiles';
+import { actions as tqcActions, selectors as tqcSelectors } from 'ducks/time-quality-configurations';
 
 import {
     DigestAlgorithm,
@@ -107,6 +108,9 @@ export default function SigningProfileForm() {
     const connectors = useSelector(connectorSelectors.connectors);
     const isFetchingConnectors = useSelector(connectorSelectors.isFetchingList);
 
+    const timeQualityConfigurations = useSelector(tqcSelectors.timeQualityConfigurations);
+    const isFetchingTqcList = useSelector(tqcSelectors.isFetchingList);
+
     const signingCertificates = useSelector(signingProfileSelectors.signingCertificates);
     const isFetchingSigningCertificates = useSelector(signingProfileSelectors.isFetchingSigningCertificates);
 
@@ -152,6 +156,7 @@ export default function SigningProfileForm() {
         dispatch(connectorActions.listConnectorsMerge({}));
         dispatch(signingProfileActions.listSigningCertificates({ workflowType: WORKFLOW_TYPE }));
         dispatch(signingProfileActions.listSupportedProtocols({ workflowType: WORKFLOW_TYPE }));
+        dispatch(tqcActions.listTimeQualityConfigurations({}));
         dispatch(
             customAttributesActions.loadMultipleResourceCustomAttributes([{ resource: Resource.SigningProfiles, customAttributes: [] }]),
         );
@@ -290,9 +295,9 @@ export default function SigningProfileForm() {
             name: signingProfile.name || '',
             description: signingProfile.description || '',
             workflowType: wf?.type || WORKFLOW_TYPE,
-            signatureFormatterConnectorUuid: isTimestampingWorkflow(wf) ? wf.signatureFormatterConnectorUuid || '' : '',
+            signatureFormatterConnectorUuid: isTimestampingWorkflow(wf) ? wf.signatureFormatterConnector?.uuid || '' : '',
             qualifiedTimestamp: isTimestampingWorkflow(wf) ? (wf.qualifiedTimestamp ?? false) : false,
-            timeQualityConfigurationUuid: isTimestampingWorkflow(wf) ? wf.timeQualityConfigurationUuid || '' : '',
+            timeQualityConfigurationUuid: isTimestampingWorkflow(wf) ? wf.timeQualityConfiguration?.uuid || '' : '',
             defaultPolicyId: isTimestampingWorkflow(wf) ? wf.defaultPolicyId || '' : '',
             allowedDigestAlgorithms:
                 isTimestampingWorkflow(wf) && wf.allowedDigestAlgorithms
@@ -512,22 +517,29 @@ export default function SigningProfileForm() {
                 <Controller
                     name="timeQualityConfigurationUuid"
                     control={control}
+                    rules={buildValidationRules([validateRequired()])}
                     render={({ field, fieldState }) => (
-                        <TextInput
+                        <Select
                             {...field}
-                            id="timeQualityConfigurationUuid"
-                            type="text"
-                            label="Time Quality Configuration UUID"
-                            placeholder="e.g. 123e4567-e89b-12d3-a456-426614174000"
+                            inputId="timeQualityConfigurationUuid"
+                            label="Time Quality Configuration"
+                            placeholder="Select a Time Quality Configuration…"
+                            options={timeQualityConfigurations.map((tqc) => ({ value: tqc.uuid, label: tqc.name }))}
+                            value={
+                                field.value
+                                    ? (timeQualityConfigurations
+                                          .filter((tqc) => tqc.uuid === field.value)
+                                          .map((tqc) => ({ value: tqc.uuid, label: tqc.name }))[0] ?? null)
+                                    : null
+                            }
+                            onChange={field.onChange}
+                            isLoading={isFetchingTqcList}
+                            isClearable
                             invalid={fieldState.error && fieldState.isTouched}
                             error={getFieldErrorMessage(fieldState)}
                         />
                     )}
                 />
-            )}
-
-            {qualifiedTimestampValue && (
-                <p className="text-xs text-gray-500">Time Quality Configuration management will be available in an upcoming release.</p>
             )}
 
             <Controller

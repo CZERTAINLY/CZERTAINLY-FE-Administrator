@@ -1,6 +1,7 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
     SearchFieldDataByGroupDto,
+    SimplifiedSigningProfileDto,
     TimeQualityConfigurationCreateRequestDto,
     TimeQualityConfigurationDto,
     TimeQualityConfigurationListDto,
@@ -27,6 +28,9 @@ export type State = {
     isDeleting: boolean;
     isUpdating: boolean;
     isBulkDeleting: boolean;
+
+    associatedSigningProfiles: SimplifiedSigningProfileDto[];
+    isFetchingAssociatedSigningProfiles: boolean;
 };
 
 export const initialState: State = {
@@ -44,6 +48,9 @@ export const initialState: State = {
     isDeleting: false,
     isUpdating: false,
     isBulkDeleting: false,
+
+    associatedSigningProfiles: [],
+    isFetchingAssociatedSigningProfiles: false,
 };
 
 export const slice = createSlice({
@@ -100,6 +107,20 @@ export const slice = createSlice({
 
         getTimeQualityConfigurationFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingDetail = false;
+        },
+
+        listAssociatedSigningProfiles: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isFetchingAssociatedSigningProfiles = true;
+            state.associatedSigningProfiles = [];
+        },
+
+        listAssociatedSigningProfilesSuccess: (state, action: PayloadAction<{ signingProfiles: SimplifiedSigningProfileDto[] }>) => {
+            state.isFetchingAssociatedSigningProfiles = false;
+            state.associatedSigningProfiles = action.payload.signingProfiles;
+        },
+
+        listAssociatedSigningProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingAssociatedSigningProfiles = false;
         },
 
         listTimeQualityConfigurationSearchableFields: (state, action: PayloadAction<void>) => {
@@ -229,6 +250,8 @@ const isCreating = createSelector(state, (state) => state.isCreating);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isUpdating = createSelector(state, (state) => state.isUpdating);
 const isBulkDeleting = createSelector(state, (state) => state.isBulkDeleting);
+const associatedSigningProfiles = createSelector(state, (state) => state.associatedSigningProfiles);
+const isFetchingAssociatedSigningProfiles = createSelector(state, (state) => state.isFetchingAssociatedSigningProfiles);
 
 export const selectors = {
     state,
@@ -245,6 +268,8 @@ export const selectors = {
     isDeleting,
     isUpdating,
     isBulkDeleting,
+    associatedSigningProfiles,
+    isFetchingAssociatedSigningProfiles,
 };
 
 export const actions = slice.actions;
