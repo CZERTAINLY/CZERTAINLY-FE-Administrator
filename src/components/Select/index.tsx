@@ -116,25 +116,19 @@ const valuesMatch = (val1: any, val2: any): boolean => {
  * Must be called after HSSelect.destroy() and before HSSelect.autoInit() so that
  * the re-initialized widget reads the correct selection from the DOM.
  */
-const syncNativeSelection = (
-    selectEl: HTMLSelectElement,
-    isMulti: boolean,
-    value: unknown,
-    getValueFromProp: OptionValue | undefined,
-): void => {
-    if (isMulti) {
-        const curr = value as { value: string | number; label: string }[];
-        const selectedValueStrings = new Set((curr ?? []).map((v) => getOptionValueString(v.value)));
-        Array.from(selectEl.options).forEach((option) => {
-            if (option.value === '') {
-                option.selected = false;
-                return;
-            }
-            option.selected = selectedValueStrings.has(option.value);
-        });
-    } else {
-        selectEl.value = getValueFromProp == null ? '' : getOptionValueString(getValueFromProp as OptionValue);
-    }
+const syncNativeSelectionSingle = (selectEl: HTMLSelectElement, valueFromProp: OptionValue | undefined): void => {
+    selectEl.value = valueFromProp == null ? '' : getOptionValueString(valueFromProp);
+};
+
+const syncNativeSelectionMulti = (selectEl: HTMLSelectElement, values: { value: string | number; label: string }[] | undefined): void => {
+    const selectedValueStrings = new Set((values ?? []).map((v) => getOptionValueString(v.value)));
+    Array.from(selectEl.options).forEach((option) => {
+        if (option.value === '') {
+            option.selected = false;
+            return;
+        }
+        option.selected = selectedValueStrings.has(option.value);
+    });
 };
 
 type Props = SingleSelectProps | MultiSelectProps;
@@ -232,7 +226,11 @@ function Select({
                 isInitializedRef.current = false;
             }
             if (selectRef.current) {
-                syncNativeSelection(selectRef.current, isMulti, value, getValueFromProp);
+                if (isMulti) {
+                    syncNativeSelectionMulti(selectRef.current, value as { value: string | number; label: string }[] | undefined);
+                } else {
+                    syncNativeSelectionSingle(selectRef.current, getValueFromProp);
+                }
             }
         };
 

@@ -109,30 +109,35 @@ export function SelectLateOptionsHarness({
     const [options, setOptions] = useState<{ value: string; label: string }[]>([]);
 
     useLayoutEffect(() => {
-        const state: { destroy: number; autoInit: number; captures: LateOptionsCapture[] } = {
+        const state: { destroy: number; autoInit: number; initialized: boolean; captures: LateOptionsCapture[] } = {
             destroy: 0,
             autoInit: 0,
+            initialized: false,
             captures: [],
         };
         (globalThis as any)[stateKey] = state;
+        const instanceFor = (el: HTMLSelectElement) => ({
+            isOpened: () => false,
+            close: () => {},
+            destroy: () => {
+                state.destroy += 1;
+                // Simulate real HSSelect clearing selection on destroy.
+                if (mode === 'multi') {
+                    Array.from(el.options).forEach((o) => {
+                        o.selected = false;
+                    });
+                } else {
+                    el.value = '';
+                }
+            },
+        });
         (globalThis as any).HSSelect = {
-            getInstance: (el: HTMLSelectElement) => ({
-                isOpened: () => false,
-                close: () => {},
-                destroy: () => {
-                    state.destroy += 1;
-                    // Simulate real HSSelect clearing selection on destroy.
-                    if (mode === 'multi') {
-                        Array.from(el.options).forEach((o) => {
-                            o.selected = false;
-                        });
-                    } else {
-                        el.value = '';
-                    }
-                },
-            }),
+            // Real HSSelect has no instance until autoInit() has run; mirror that so the initial
+            // optionsChanged pass takes the no-instance branch rather than destroying a phantom widget.
+            getInstance: (el: HTMLSelectElement) => (state.initialized ? instanceFor(el) : undefined),
             autoInit: () => {
                 state.autoInit += 1;
+                state.initialized = true;
                 const sel = document.getElementById(id) as HTMLSelectElement | null;
                 if (mode === 'multi') {
                     state.captures.push(sel ? Array.from(sel.selectedOptions).map((o) => o.value) : []);

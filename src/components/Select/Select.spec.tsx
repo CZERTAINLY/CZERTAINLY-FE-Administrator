@@ -707,9 +707,11 @@ test.describe('Select', () => {
             stateKey,
         );
 
-        // destroy() and autoInit() must each have fired twice
-        expect(state.destroy).toBe(2);
+        // autoInit() fires twice (initial mount + options-changed re-init).
+        // destroy() fires once: the initial mount has no HSSelect instance yet (getInstance returns undefined),
+        // so only the options-changed re-init destroys an existing widget.
         expect(state.autoInit).toBe(2);
+        expect(state.destroy).toBe(1);
 
         // The second autoInit happens after options arrived; native <select> must be in sync by then.
         assertSecondCapture(state.captures[1]);
