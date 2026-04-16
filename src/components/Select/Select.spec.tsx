@@ -1,7 +1,12 @@
 import { test, expect } from '../../../playwright/ct-test';
 import Select from './index';
 import SelectHSSelectTestWrapper from './SelectHSSelectTestWrapper';
-import { SelectHSSelectValueChangeHarness, SelectLateOptionsSingleHarness, SelectLateOptionsMultiHarness } from './SelectHSCoverageHarness';
+import {
+    SelectHSSelectValueChangeHarness,
+    SelectLateOptionsSingleHarness,
+    SelectLateOptionsMultiHarness,
+    SelectLateOptionsSingleNoValueHarness,
+} from './SelectHSCoverageHarness';
 
 test.describe('Select', () => {
     test('should render select with options', async ({ mount }) => {
@@ -682,7 +687,9 @@ test.describe('Select', () => {
     test('should execute HSSelect valueChanged branch and close opened instance', async ({ mount, page }) => {
         await mount(<SelectHSSelectValueChangeHarness />);
         await page.getByTestId('set-second').click();
-        await expect.poll(async () => page.evaluate(() => (window as any).__hsState)).toMatchObject({ close: 1, destroy: 2, autoInit: 2 });
+        await expect
+            .poll(async () => page.evaluate(() => (globalThis as any).__hsState))
+            .toMatchObject({ close: 1, destroy: 2, autoInit: 2 });
     });
 
     test('should restore single-select value in native element before HSSelect reinit when options load late', async ({ mount, page }) => {
@@ -692,11 +699,11 @@ test.describe('Select', () => {
         await page.getByTestId('load-single-options').click();
 
         // Wait for the second autoInit (initial mount + options-changed re-init)
-        await expect.poll(async () => page.evaluate(() => (window as any).__hsLateSingleState?.autoInit)).toBe(2);
+        await expect.poll(async () => page.evaluate(() => (globalThis as any).__hsLateSingleState?.autoInit)).toBe(2);
 
         const state = await page.evaluate(
             () =>
-                (window as any).__hsLateSingleState as {
+                (globalThis as any).__hsLateSingleState as {
                     destroy: number;
                     autoInit: number;
                     valueAtAutoInit: string[];
@@ -719,11 +726,11 @@ test.describe('Select', () => {
 
         await page.getByTestId('load-multi-options').click();
 
-        await expect.poll(async () => page.evaluate(() => (window as any).__hsLateMultiState?.autoInit)).toBe(2);
+        await expect.poll(async () => page.evaluate(() => (globalThis as any).__hsLateMultiState?.autoInit)).toBe(2);
 
         const state = await page.evaluate(
             () =>
-                (window as any).__hsLateMultiState as {
+                (globalThis as any).__hsLateMultiState as {
                     destroy: number;
                     autoInit: number;
                     selectedAtAutoInit: string[][];
@@ -736,6 +743,33 @@ test.describe('Select', () => {
         // Both values must be selected at the moment of the second autoInit.
         expect(state.selectedAtAutoInit[1]).toContain('uuid-a');
         expect(state.selectedAtAutoInit[1]).toContain('uuid-b');
+    });
+
+    test('should set empty native select value before HSSelect reinit when options load late and no value is set', async ({
+        mount,
+        page,
+    }) => {
+        await mount(<SelectLateOptionsSingleNoValueHarness />);
+
+        await page.getByTestId('load-no-value-options').click();
+
+        // Wait for the second autoInit (initial mount + options-changed re-init)
+        await expect.poll(async () => page.evaluate(() => (globalThis as any).__hsLateNoValueState?.autoInit)).toBe(2);
+
+        const state = await page.evaluate(
+            () =>
+                (globalThis as any).__hsLateNoValueState as {
+                    destroy: number;
+                    autoInit: number;
+                    valueAtAutoInit: string[];
+                },
+        );
+
+        expect(state.destroy).toBe(2);
+        expect(state.autoInit).toBe(2);
+
+        // With no value prop, the native <select>.value must be '' at the second autoInit.
+        expect(state.valueAtAutoInit[1]).toBe('');
     });
 
     test('should accept option descriptions for dropdown rendering', async ({ mount }) => {

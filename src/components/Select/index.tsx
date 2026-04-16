@@ -111,6 +111,32 @@ const valuesMatch = (val1: any, val2: any): boolean => {
     return JSON.stringify(val1) === JSON.stringify(val2);
 };
 
+/**
+ * Syncs the native <select> element's value/selected state to match the React prop.
+ * Must be called after HSSelect.destroy() and before HSSelect.autoInit() so that
+ * the re-initialized widget reads the correct selection from the DOM.
+ */
+const syncNativeSelection = (
+    selectEl: HTMLSelectElement,
+    isMulti: boolean,
+    value: unknown,
+    getValueFromProp: OptionValue | undefined,
+): void => {
+    if (isMulti) {
+        const curr = value as { value: string | number; label: string }[];
+        const selectedValueStrings = new Set((curr ?? []).map((v) => getOptionValueString(v.value)));
+        Array.from(selectEl.options).forEach((option) => {
+            if (option.value === '') {
+                option.selected = false;
+                return;
+            }
+            option.selected = selectedValueStrings.has(option.value);
+        });
+    } else {
+        selectEl.value = getValueFromProp == null ? '' : getOptionValueString(getValueFromProp as OptionValue);
+    }
+};
+
 type Props = SingleSelectProps | MultiSelectProps;
 
 function Select({
@@ -194,20 +220,7 @@ function Select({
             }
 
             if (selectRef.current) {
-                if (isMulti) {
-                    const curr = value as { value: string | number; label: string }[];
-                    Array.from(selectRef.current.options).forEach((option) => {
-                        if (option.value === '') {
-                            option.selected = false;
-                            return;
-                        }
-                        const isSelected = curr?.some((v) => getOptionValueString(v.value) === option.value);
-                        option.selected = isSelected || false;
-                    });
-                } else {
-                    const valueString = getValueFromProp != null ? getOptionValueString(getValueFromProp as OptionValue) : '';
-                    selectRef.current.value = valueString;
-                }
+                syncNativeSelection(selectRef.current, isMulti, value, getValueFromProp);
             }
 
             const frameId = requestAnimationFrame(() => {
@@ -233,20 +246,7 @@ function Select({
             }
 
             if (selectRef.current) {
-                if (isMulti) {
-                    const curr = value as { value: string | number; label: string }[];
-                    Array.from(selectRef.current.options).forEach((option) => {
-                        if (option.value === '') {
-                            option.selected = false;
-                            return;
-                        }
-                        const isSelected = curr?.some((v) => getOptionValueString(v.value) === option.value);
-                        option.selected = isSelected || false;
-                    });
-                } else {
-                    const valueString = getValueFromProp != null ? getOptionValueString(getValueFromProp as OptionValue) : '';
-                    selectRef.current.value = valueString;
-                }
+                syncNativeSelection(selectRef.current, isMulti, value, getValueFromProp);
             }
 
             const frameId = requestAnimationFrame(() => {

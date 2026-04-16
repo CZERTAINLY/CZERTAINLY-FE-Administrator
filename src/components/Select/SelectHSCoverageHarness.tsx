@@ -13,7 +13,7 @@ export function SelectHSSelectValueChangeHarness() {
 
     useLayoutEffect(() => {
         const state = { close: 0, destroy: 0, autoInit: 0 };
-        (window as any).__hsState = state;
+        (globalThis as any).__hsState = state;
         const instance = {
             isOpened: () => true,
             close: () => {
@@ -23,15 +23,15 @@ export function SelectHSSelectValueChangeHarness() {
                 state.destroy += 1;
             },
         };
-        (window as any).HSSelect = {
+        (globalThis as any).HSSelect = {
             getInstance: () => instance,
             autoInit: () => {
                 state.autoInit += 1;
             },
         };
         return () => {
-            delete (window as any).__hsState;
-            delete (window as any).HSSelect;
+            delete (globalThis as any).__hsState;
+            delete (globalThis as any).HSSelect;
         };
     }, []);
 
@@ -59,21 +59,21 @@ export function SelectTooltipSyncHarness() {
           </div>
         `;
         document.body.appendChild(dropdown);
-        (window as any).__tooltipCalls = 0;
-        (window as any).HSSelect = {
+        (globalThis as any).__tooltipCalls = 0;
+        (globalThis as any).HSSelect = {
             getInstance: () => ({ dropdown }),
             autoInit: () => {},
         };
-        (window as any).HSTooltip = {
+        (globalThis as any).HSTooltip = {
             autoInit: () => {
-                (window as any).__tooltipCalls += 1;
+                (globalThis as any).__tooltipCalls += 1;
             },
         };
         return () => {
             dropdown.remove();
-            delete (window as any).__tooltipCalls;
-            delete (window as any).HSSelect;
-            delete (window as any).HSTooltip;
+            delete (globalThis as any).__tooltipCalls;
+            delete (globalThis as any).HSSelect;
+            delete (globalThis as any).HSTooltip;
         };
     }, []);
 
@@ -92,8 +92,8 @@ export function SelectLateOptionsSingleHarness() {
             autoInit: 0,
             valueAtAutoInit: [],
         };
-        (window as any).__hsLateSingleState = state;
-        (window as any).HSSelect = {
+        (globalThis as any).__hsLateSingleState = state;
+        (globalThis as any).HSSelect = {
             getInstance: (el: HTMLSelectElement) => ({
                 isOpened: () => false,
                 close: () => {},
@@ -109,8 +109,8 @@ export function SelectLateOptionsSingleHarness() {
             },
         };
         return () => {
-            delete (window as any).__hsLateSingleState;
-            delete (window as any).HSSelect;
+            delete (globalThis as any).__hsLateSingleState;
+            delete (globalThis as any).HSSelect;
         };
     }, []);
 
@@ -136,8 +136,8 @@ export function SelectLateOptionsMultiHarness() {
             autoInit: 0,
             selectedAtAutoInit: [],
         };
-        (window as any).__hsLateMultiState = state;
-        (window as any).HSSelect = {
+        (globalThis as any).__hsLateMultiState = state;
+        (globalThis as any).HSSelect = {
             getInstance: (el: HTMLSelectElement) => ({
                 isOpened: () => false,
                 close: () => {},
@@ -155,8 +155,8 @@ export function SelectLateOptionsMultiHarness() {
             },
         };
         return () => {
-            delete (window as any).__hsLateMultiState;
-            delete (window as any).HSSelect;
+            delete (globalThis as any).__hsLateMultiState;
+            delete (globalThis as any).HSSelect;
         };
     }, []);
 
@@ -183,6 +183,51 @@ export function SelectLateOptionsMultiHarness() {
                 options={options}
                 isMulti={true}
             />
+        </div>
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Single-select where options arrive AFTER mount but NO value is set.
+// Covers the getValueFromProp == null path in syncNativeSelection.
+// ---------------------------------------------------------------------------
+export function SelectLateOptionsSingleNoValueHarness() {
+    const [options, setOptions] = useState<{ value: string; label: string }[]>([]);
+
+    useLayoutEffect(() => {
+        const state: { destroy: number; autoInit: number; valueAtAutoInit: string[] } = {
+            destroy: 0,
+            autoInit: 0,
+            valueAtAutoInit: [],
+        };
+        (globalThis as any).__hsLateNoValueState = state;
+        (globalThis as any).HSSelect = {
+            getInstance: (el: HTMLSelectElement) => ({
+                isOpened: () => false,
+                close: () => {},
+                destroy: () => {
+                    state.destroy += 1;
+                    el.value = '';
+                },
+            }),
+            autoInit: () => {
+                state.autoInit += 1;
+                const sel = document.getElementById('hs-late-no-value') as HTMLSelectElement | null;
+                state.valueAtAutoInit.push(sel?.value ?? '(no-element)');
+            },
+        };
+        return () => {
+            delete (globalThis as any).__hsLateNoValueState;
+            delete (globalThis as any).HSSelect;
+        };
+    }, []);
+
+    return (
+        <div>
+            <button data-testid="load-no-value-options" onClick={() => setOptions([{ value: 'uuid-123', label: 'TQC Name' }])}>
+                Load Options
+            </button>
+            <Select id="hs-late-no-value" value="" onChange={() => {}} options={options} />
         </div>
     );
 }
