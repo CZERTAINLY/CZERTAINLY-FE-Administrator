@@ -58,12 +58,14 @@ export const TimeQualityConfigurationDetail = () => {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
+                id: 'edit',
                 icon: 'pencil',
                 disabled: false,
                 tooltip: 'Edit',
                 onClick: onEditClick,
             },
             {
+                id: 'delete',
                 icon: 'trash',
                 disabled: false,
                 tooltip: 'Delete',

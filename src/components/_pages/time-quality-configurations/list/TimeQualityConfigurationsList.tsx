@@ -68,12 +68,14 @@ export const TimeQualityConfigurationsList = () => {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
+                id: 'create',
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
                 onClick: onAddClick,
             },
             {
+                id: 'delete',
                 icon: 'trash',
                 disabled: checkedRows.length === 0,
                 tooltip: 'Delete',

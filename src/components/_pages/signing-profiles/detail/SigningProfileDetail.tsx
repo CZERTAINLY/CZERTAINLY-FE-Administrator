@@ -158,24 +158,28 @@ export default function SigningProfileDetail() {
     const headerButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
+                id: 'edit',
                 icon: 'pencil',
                 disabled: false,
                 tooltip: 'Edit',
                 onClick: onEditClick,
             },
             {
+                id: 'delete',
                 icon: 'trash',
                 disabled: false,
                 tooltip: 'Delete',
                 onClick: () => setConfirmDelete(true),
             },
             {
+                id: 'enable',
                 icon: 'check',
                 disabled: signingProfile?.enabled ?? true,
                 tooltip: 'Enable',
                 onClick: onEnableClick,
             },
             {
+                id: 'disable',
                 icon: 'times',
                 disabled: !(signingProfile?.enabled ?? false),
                 tooltip: 'Disable',
@@ -194,6 +198,7 @@ export default function SigningProfileDetail() {
     const approvalProfilesButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
+                id: 'associate-approval-profile',
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Associate Approval Profile',
