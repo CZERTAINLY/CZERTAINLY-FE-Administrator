@@ -79,9 +79,6 @@
 /* Preline UI */
 /* stylelint-disable-next-line at-rule-no-unknown */
 @source "../node_modules/preline/dist/*.js";
-/* Safelist: dynamic classes that can't be statically detected */
-/* stylelint-disable-next-line at-rule-no-unknown */
-@source inline("w-[400px]");
 @import '../node_modules/preline/variants.css';
 
 /* Plugins */

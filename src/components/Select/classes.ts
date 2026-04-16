@@ -18,6 +18,8 @@ export const SELECT_TOGGLE_CLASSES_BASE =
 export const SELECT_DROPDOWN_CLASSES_BASE =
     'hs-select-dropdown mt-2 z-[100] max-h-72 space-y-0.5 bg-white border border-gray-200 rounded-lg overflow-hidden overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 dark:bg-neutral-900 dark:border-neutral-700';
 
+export const SELECT_DROPDOWN_FIXED_WIDTH_CLASSES = 'w-[var(--select-dropdown-width)] !right-0 !left-auto';
+
 export const SELECT_OPTION_CLASSES =
     'hs-select-option-row py-2 px-3 w-full text-sm cursor-pointer hover:bg-gray-100 rounded-lg focus:outline-hidden focus:bg-gray-100 hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:text-neutral-200 dark:focus:bg-neutral-800 overflow-hidden';
 

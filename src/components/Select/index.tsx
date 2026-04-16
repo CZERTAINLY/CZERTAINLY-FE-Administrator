@@ -10,6 +10,7 @@ import {
     SELECT_SEARCH_WRAPPER_CLASSES,
     SELECT_TOGGLE_CLASSES_BASE,
     SELECT_DROPDOWN_CLASSES_BASE,
+    SELECT_DROPDOWN_FIXED_WIDTH_CLASSES,
     SELECT_OPTION_CLASSES,
     SELECT_OPTION_TEMPLATE,
     SELECT_EXTRA_MARKUP,
@@ -385,7 +386,13 @@ function Select({
     return (
         <div data-testid={dataTestId ?? `select-${id}`}>
             {label && <Label htmlFor={id} title={label} required={required} />}
-            <div className={cn('relative', className)} style={minWidth ? { minWidth: `${minWidth}px` } : undefined}>
+            <div
+                className={cn('relative', className)}
+                style={{
+                    ...(minWidth ? { minWidth: `${minWidth}px` } : {}),
+                    ...(dropdownWidth ? ({ '--select-dropdown-width': `${dropdownWidth}px` } as React.CSSProperties) : {}),
+                }}
+            >
                 <select
                     ref={selectRef}
                     multiple={isMulti}
@@ -413,7 +420,7 @@ function Select({
                         toggleTag: '<button type="button" aria-expanded="false"></button>',
                         toggleClasses: `${isClearable && hasValue ? 'pe-14' : 'pe-9'} ${SELECT_TOGGLE_CLASSES_BASE}`,
                         dropdownClasses: `${SELECT_DROPDOWN_CLASSES_BASE} ${
-                            dropdownWidth ? `w-[${dropdownWidth}px] !right-0 !left-auto` : 'w-full'
+                            dropdownWidth ? SELECT_DROPDOWN_FIXED_WIDTH_CLASSES : 'w-full'
                         } ${hasSearch ? 'px-1 pb-1' : 'p-1'}`,
                         ...(dropdownScope && { dropdownScope }),
                         optionClasses: SELECT_OPTION_CLASSES,
