@@ -419,7 +419,7 @@ export default function FilterWidget({
         if (!currentField) return [];
 
         if (Array.isArray(currentField?.value)) {
-            const objectOptions = currentField?.value?.map((v, i) => {
+            return currentField?.value?.map((v) => {
                 let label = '';
                 let value = '';
                 if (typeof v === 'string') {
@@ -436,24 +436,10 @@ export default function FilterWidget({
 
                 return { label, value };
             });
-
-            if (selectedFilter === -1) return objectOptions;
-
-            const currentValue = currentFilters[selectedFilter]?.value;
-
-            const filteredOptions = objectOptions.filter((o) => {
-                if (Array.isArray(currentValue)) {
-                    return !currentValue.some((a) => a?.name === o?.label);
-                } else {
-                    return JSON.stringify(currentValue) !== o?.value;
-                }
-            });
-
-            return filteredOptions;
         }
 
         return [];
-    }, [currentField, currentFilters, selectedFilter, platformEnums]);
+    }, [currentField, platformEnums]);
 
     const getBadgeContent = useCallback(
         (itemNumber: number, fieldSource: string, fieldCondition: string, label: string, value: string) => {

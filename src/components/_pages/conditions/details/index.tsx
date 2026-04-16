@@ -194,7 +194,7 @@ const ConditionDetails = () => {
         <Container>
             <Breadcrumb
                 items={[
-                    { label: `${getEnumLabel(resourceTypeEnum, Resource.Conditions)} Inventory`, href: '/rules' },
+                    { label: `${getEnumLabel(resourceTypeEnum, Resource.Conditions)} Inventory`, href: '/rules/1' },
                     { label: conditionDetails?.name || 'Condition Details', href: '' },
                 ]}
             />

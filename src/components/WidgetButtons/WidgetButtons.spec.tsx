@@ -1,12 +1,12 @@
-import { test, expect } from '../../../playwright/ct-test';
+import { test, expect } from 'playwright/ct-test';
 import WidgetButtons, { WidgetButtonProps } from './index';
+import React from 'react';
 
-const createButton = (overrides: Partial<WidgetButtonProps> = {}): WidgetButtonProps => ({
+const defaultButtonProps: Omit<WidgetButtonProps, 'id'> = {
     icon: 'plus',
     disabled: false,
     onClick: () => {},
-    ...overrides,
-});
+};
 
 async function renderWidgetButtons(
     mount: (component: React.JSX.Element) => Promise<import('@playwright/experimental-ct-react').MountResult>,
@@ -21,7 +21,10 @@ async function renderWidgetButtons(
 
 test.describe('WidgetButtons', () => {
     test('should render buttons', async ({ mount }) => {
-        const buttons: WidgetButtonProps[] = [createButton(), createButton({ icon: 'trash' })];
+        const buttons: WidgetButtonProps[] = [
+            { ...defaultButtonProps, id: 'add' },
+            { ...defaultButtonProps, id: 'delete', icon: 'trash' },
+        ];
         const component = await renderWidgetButtons(mount, { buttons });
 
         const buttonElements = component.locator('button');
@@ -30,7 +33,7 @@ test.describe('WidgetButtons', () => {
 
     test('should call onClick when button is clicked', async ({ mount }) => {
         let clicked = false;
-        const buttons: WidgetButtonProps[] = [createButton({ onClick: () => (clicked = true) })];
+        const buttons: WidgetButtonProps[] = [{ ...defaultButtonProps, id: 'click-test', onClick: () => (clicked = true) }];
         const component = await renderWidgetButtons(mount, { buttons });
 
         const button = component.locator('button').first();
@@ -39,7 +42,7 @@ test.describe('WidgetButtons', () => {
     });
 
     test('should disable button when disabled is true', async ({ mount }) => {
-        const buttons: WidgetButtonProps[] = [createButton({ disabled: true })];
+        const buttons: WidgetButtonProps[] = [{ ...defaultButtonProps, id: 'disabled-test', disabled: true }];
         const component = await renderWidgetButtons(mount, { buttons });
 
         const button = component.locator('button').first();
@@ -47,7 +50,7 @@ test.describe('WidgetButtons', () => {
     });
 
     test('should use custom data-testid when id is provided', async ({ mount }) => {
-        const buttons: WidgetButtonProps[] = [createButton({ id: 'custom-button' })];
+        const buttons: WidgetButtonProps[] = [{ ...defaultButtonProps, id: 'custom-button' }];
         const component = await renderWidgetButtons(mount, { buttons });
 
         const button = component.locator('[data-testid="custom-button-button"]');
@@ -55,14 +58,14 @@ test.describe('WidgetButtons', () => {
     });
 
     test('should render custom button when custom prop is provided', async ({ mount }) => {
-        const buttons: WidgetButtonProps[] = [createButton({ custom: <div>Custom Button</div> })];
+        const buttons: WidgetButtonProps[] = [{ ...defaultButtonProps, id: 'custom-render', custom: <div>Custom Button</div> }];
         const component = await renderWidgetButtons(mount, { buttons });
 
         await expect(component.getByText('Custom Button')).toBeVisible();
     });
 
     test('should support justify prop', async ({ mount }) => {
-        const buttons: WidgetButtonProps[] = [createButton()];
+        const buttons: WidgetButtonProps[] = [{ ...defaultButtonProps, id: 'justify-test' }];
         const component = await renderWidgetButtons(mount, { buttons, justify: 'end' });
 
         const container = component.locator('div.flex');
@@ -70,7 +73,7 @@ test.describe('WidgetButtons', () => {
     });
 
     test('should support custom className', async ({ mount }) => {
-        const buttons: WidgetButtonProps[] = [createButton()];
+        const buttons: WidgetButtonProps[] = [{ ...defaultButtonProps, id: 'class-test' }];
         const component = await renderWidgetButtons(mount, { buttons, className: 'custom-class' });
 
         const container = component.locator('div.flex');
@@ -78,7 +81,11 @@ test.describe('WidgetButtons', () => {
     });
 
     test('should render different icon types', async ({ mount }) => {
-        const buttons: WidgetButtonProps[] = [createButton(), createButton({ icon: 'trash' }), createButton({ icon: 'copy' })];
+        const buttons: WidgetButtonProps[] = [
+            { ...defaultButtonProps, id: 'add' },
+            { ...defaultButtonProps, id: 'delete', icon: 'trash' },
+            { ...defaultButtonProps, id: 'copy', icon: 'copy' },
+        ];
         const component = await renderWidgetButtons(mount, { buttons });
 
         const buttonElements = component.locator('button');
