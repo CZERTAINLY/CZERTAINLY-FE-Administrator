@@ -26,6 +26,8 @@ import {
 
 const supportedInputTypes = new Set(['number', 'email', 'time', 'textarea', 'text', 'password', 'date']);
 
+type SelectableValue = string | number | boolean | object;
+
 function formatBadgeDataValue(v: any, field: any, platformEnums: Record<string, any>): string {
     if (field?.platformEnum) {
         return platformEnums[field.platformEnum][v]?.label ?? String(v);
@@ -37,10 +39,10 @@ function formatBadgeDataValue(v: any, field: any, platformEnums: Record<string, 
         }
         return v.label ?? String(v);
     }
-    if (field && field.attributeContentType === AttributeContentType.Date) {
+    if (field?.attributeContentType === AttributeContentType.Date) {
         return getFormattedDate(v as string);
     }
-    if (field && field.attributeContentType === AttributeContentType.Datetime) {
+    if (field?.attributeContentType === AttributeContentType.Datetime) {
         return getFormattedDateTime(v as string);
     }
     return String(v);
@@ -49,8 +51,8 @@ function formatBadgeDataValue(v: any, field: any, platformEnums: Record<string, 
 function mapFieldValueToOption(
     v: any,
     fieldRef: any,
-    normalizeValue: (v: any) => string | number | boolean | object = (x) => x,
-): { label: string; value: string | number | boolean | object } {
+    normalizeValue: (v: any) => SelectableValue = (x) => x,
+): { label: string; value: SelectableValue } {
     if (typeof v === 'string') {
         return {
             label: checkIfFieldAttributeTypeIsDate(fieldRef) ? getFormattedDateTime(v) : v,
@@ -61,7 +63,7 @@ function mapFieldValueToOption(
         return { label: v.label, value: v.value };
     }
     return {
-        label: v?.name || v?.label || (typeof v?.data !== 'object' ? v?.data : undefined) || JSON.stringify(v),
+        label: v?.name || v?.label || (typeof v?.data === 'object' ? undefined : v?.data) || JSON.stringify(v),
         value: normalizeValue(v),
     };
 }
@@ -173,28 +175,21 @@ export default function FilterWidgetRuleAction({
 
     const currentField = useMemo(() => currentFields?.find((f) => f.fieldIdentifier === filterField), [filterField, currentFields]);
 
-    const normalizeSelectValue = useCallback((value: any): string | number | boolean | object => {
-        if (value === null || value === undefined) return '';
+    const normalizeSelectValue = useCallback((value: any): SelectableValue => {
+        if (value == null) return '';
         if (typeof value !== 'object') return value;
 
-        if (value.uuid !== undefined && value.uuid !== null) return value.uuid;
-        if (value.value !== undefined && value.value !== null) return value.value;
-        if (value.reference !== undefined && value.reference !== null) return value.reference;
+        const direct = value.uuid ?? value.value ?? value.reference;
+        if (direct != null) return direct;
 
-        if (value.data !== undefined && value.data !== null) {
+        if (value.data != null) {
             if (typeof value.data !== 'object') return value.data;
-            if (value.data?.uuid !== undefined && value.data?.uuid !== null) return value.data.uuid;
-            if (value.data?.value !== undefined && value.data?.value !== null) return value.data.value;
-            if (value.data?.reference !== undefined && value.data?.reference !== null) return value.data.reference;
-            if (value.data?.name !== undefined && value.data?.name !== null) return value.data.name;
-            if (value.data?.label !== undefined && value.data?.label !== null) return value.data.label;
-            return value.data;
+            const nested = value.data.uuid ?? value.data.value ?? value.data.reference ?? value.data.name ?? value.data.label;
+
+            return nested ?? value.data;
         }
 
-        if (value.name !== undefined && value.name !== null) return value.name;
-        if (value.label !== undefined && value.label !== null) return value.label;
-
-        return value;
+        return value.name ?? value.label ?? value;
     }, []);
 
     const mapActionDataToSelectValue = useCallback(
@@ -254,7 +249,7 @@ export default function FilterWidgetRuleAction({
                 }
 
                 if (typeof singleValue === 'object' && singleValue !== null) {
-                    if (Object.prototype.hasOwnProperty.call(singleValue, 'value')) {
+                    if (Object.hasOwn(singleValue, 'value')) {
                         return {
                             label: singleValue.label || singleValue.name || JSON.stringify(singleValue.value),
                             value: normalizeSelectValue(singleValue.value),
@@ -265,7 +260,7 @@ export default function FilterWidgetRuleAction({
                         label:
                             singleValue.name ||
                             singleValue.label ||
-                            (typeof singleValue.data !== 'object' ? singleValue.data : undefined) ||
+                            (typeof singleValue.data === 'object' ? undefined : singleValue.data) ||
                             JSON.stringify(singleValue),
                         value: normalizeSelectValue(singleValue),
                     };
@@ -283,7 +278,7 @@ export default function FilterWidgetRuleAction({
         (field: any, actionData: any): string | number | object => {
             const normalizedActionData = Array.isArray(actionData) ? actionData[0] : actionData;
             const mapped = mapActionDataToSelectValue(field, normalizedActionData) as { label: string; value: any };
-            if (mapped && typeof mapped === 'object' && Object.prototype.hasOwnProperty.call(mapped, 'value')) {
+            if (mapped && typeof mapped === 'object' && Object.hasOwn(mapped, 'value')) {
                 return mapped.value;
             }
 
@@ -298,17 +293,20 @@ export default function FilterWidgetRuleAction({
         if (filterValue === undefined || filterValue === null || filterValue === '') return;
         if (Array.isArray(filterValue) && !filterValue.length) return;
 
+        let executionData: any;
+        if (typeof filterValue === 'string' || typeof filterValue === 'number' || typeof filterValue === 'boolean') {
+            executionData = filterValue;
+        } else if (Array.isArray(filterValue)) {
+            executionData = filterValue.map((v) => (v as { value: unknown }).value);
+        } else if (Object.hasOwn(filterValue as object, 'value')) {
+            executionData = (filterValue as { value: unknown }).value;
+        } else {
+            executionData = filterValue;
+        }
         const newExecution: ExecutionItemRequestModel = {
             fieldSource: fieldSource!,
             fieldIdentifier: filterField!,
-            data:
-                typeof filterValue === 'string' || typeof filterValue === 'number' || typeof filterValue === 'boolean'
-                    ? filterValue
-                    : Array.isArray(filterValue)
-                      ? filterValue.map((v) => (v as any).value)
-                      : Object.prototype.hasOwnProperty.call(filterValue as object, 'value')
-                        ? (filterValue as any).value
-                        : filterValue,
+            data: executionData,
         };
         setFieldSource(undefined);
         setFilterField(undefined);
@@ -479,14 +477,20 @@ export default function FilterWidgetRuleAction({
         if (thisCurrentField && !checkIfFieldAttributeTypeIsDate(thisCurrentField)) {
             if (thisCurrentField.multiValue) {
                 const mappedValues = mapActionDataToSelectValue(thisCurrentField, currentActionData);
-                setFilterValue(Array.isArray(mappedValues) ? mappedValues : mappedValues ? [mappedValues] : []);
+                if (Array.isArray(mappedValues)) {
+                    setFilterValue(mappedValues);
+                } else if (mappedValues) {
+                    setFilterValue([mappedValues]);
+                } else {
+                    setFilterValue([]);
+                }
             } else {
                 setFilterValue(mapActionDataToSingleSelectPrimitive(thisCurrentField, currentActionData));
             }
             return;
         }
 
-        setFilterValue(currentActionData as any);
+        setFilterValue(currentActionData);
     }, [
         selectedFilter,
         actions,
@@ -518,8 +522,8 @@ export default function FilterWidgetRuleAction({
                 const mappedData = action.data.map((v) => {
                     if (!Array.isArray(thisCurrentField.value)) return { label: v, value: v };
 
-                    const value = (thisCurrentField.value as Array<any>)?.find(
-                        (f) => f.uuid === v || f.value === v || f.reference === v || f.data === v,
+                    const value = thisCurrentField.value.find(
+                        (f: any) => f.uuid === v || f.value === v || f.reference === v || f.data === v,
                     );
 
                     return value ? { uuid: value.uuid, name: value.name, value: value.value ?? value.uuid ?? v } : { label: v, value: v };
@@ -569,7 +573,7 @@ export default function FilterWidgetRuleAction({
                             return;
                         }
 
-                        if (typeof singleValue === 'object' && Object.prototype.hasOwnProperty.call(singleValue, 'value')) {
+                        if (typeof singleValue === 'object' && Object.hasOwn(singleValue as object, 'value')) {
                             setFilterValue(normalizeSelectValue((singleValue as { value: string | number; label: string }).value));
                             return;
                         }
@@ -682,7 +686,7 @@ export default function FilterWidgetRuleAction({
 
                                             return supportedInputTypes.has(rawType) ? (rawType as any) : 'text';
                                         })()}
-                                        value={filterValue?.toString() || ''}
+                                        value={filterValue !== undefined && typeof filterValue !== 'object' ? String(filterValue) : ''}
                                         onChange={(value) => {
                                             setFilterValue(JSON.parse(JSON.stringify(value)));
                                         }}
@@ -734,7 +738,11 @@ export default function FilterWidgetRuleAction({
                                         ? `'${formatBadgeDataValue(f.data, field, platformEnums)}'`
                                         : '';
                             return (
-                                <Badge key={i} onClick={() => toggleFilter(i)} color={selectedFilter === i ? 'primary' : 'secondary'}>
+                                <Badge
+                                    key={`${f.fieldSource}-${f.fieldIdentifier}`}
+                                    onClick={() => toggleFilter(i)}
+                                    color={selectedFilter === i ? 'primary' : 'secondary'}
+                                >
                                     {!isFetchingAvailableFilters && !busyBadges && (
                                         <>{renderBadgeContent(i, value, label, f.fieldSource)}</>
                                     )}
