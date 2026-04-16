@@ -189,7 +189,7 @@ export function SelectLateOptionsMultiHarness() {
 
 // ---------------------------------------------------------------------------
 // Single-select where options arrive AFTER mount but NO value is set.
-// Covers the getValueFromProp == null path in syncNativeSelection.
+// Covers syncNativeSelection with an empty-string value (getValueFromProp === '').
 // ---------------------------------------------------------------------------
 export function SelectLateOptionsSingleNoValueHarness() {
     const [options, setOptions] = useState<{ value: string; label: string }[]>([]);
