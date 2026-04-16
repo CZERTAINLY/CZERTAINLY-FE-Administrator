@@ -8,7 +8,7 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Spinner from 'components/Spinner';
 import Widget from 'components/Widget';
 import WidgetButtons from 'components/WidgetButtons';
-import { backendClient } from '../../../../api';
+import { backendClient } from 'src/api';
 import { actions as alertActions } from 'ducks/alerts';
 import { actions, selectors } from 'ducks/cbom';
 import { CbomDetailDto, CbomDto } from 'types/openapi';
@@ -106,6 +106,7 @@ export default function CbomVersionsHistory() {
                         key={`actions-${version.uuid}`}
                         buttons={[
                             {
+                                id: 'copy',
                                 icon: 'copy',
                                 disabled: false,
                                 tooltip: 'Copy JSON',
@@ -115,6 +116,7 @@ export default function CbomVersionsHistory() {
                                 },
                             },
                             {
+                                id: 'download',
                                 icon: 'download',
                                 disabled: false,
                                 tooltip: 'Download JSON',

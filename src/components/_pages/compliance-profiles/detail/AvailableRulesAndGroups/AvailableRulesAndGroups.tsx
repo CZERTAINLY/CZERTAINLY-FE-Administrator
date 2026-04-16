@@ -278,6 +278,7 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                             justify="start"
                             buttons={[
                                 {
+                                    id: 'add',
                                     icon: 'plus',
                                     disabled: false,
                                     tooltip: 'Add',
@@ -293,6 +294,7 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                                 ...(availableSelectedRulesSource === 'Internal'
                                     ? ([
                                           {
+                                              id: 'delete',
                                               icon: 'trash',
                                               disabled: false,
                                               tooltip: 'Delete',
@@ -301,6 +303,7 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                                               },
                                           },
                                           {
+                                              id: 'edit',
                                               icon: 'pencil',
                                               disabled: false,
                                               tooltip: 'Edit',
