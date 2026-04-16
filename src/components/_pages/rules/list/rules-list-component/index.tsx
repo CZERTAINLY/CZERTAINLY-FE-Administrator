@@ -23,6 +23,7 @@ const RulesList = () => {
     const [selectedResource, setSelectedResource] = useState<Resource>();
     const isFetchingList = useSelector(rulesSelectors.isFetchingRulesList);
     const isDeleting = useSelector(rulesSelectors.isDeletingRule);
+    const isBulkDeleting = useSelector(rulesSelectors.isBulkDeletingRules);
     const isCreatingRule = useSelector(rulesSelectors.isCreatingRule);
     const createRuleSucceeded = useSelector(rulesSelectors.createRuleSucceeded);
 
@@ -32,8 +33,8 @@ const RulesList = () => {
     const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
     const isBusy = useMemo(
-        () => isFetchingList || isDeleting || isFetchingResourcesList,
-        [isFetchingList, isDeleting, isFetchingResourcesList],
+        () => isFetchingList || isDeleting || isBulkDeleting || isFetchingResourcesList,
+        [isFetchingList, isDeleting, isBulkDeleting, isFetchingResourcesList],
     );
 
     const getFreshList = useCallback(() => {
@@ -54,7 +55,7 @@ const RulesList = () => {
     }, []);
 
     const onDeleteConfirmed = useCallback(() => {
-        dispatch(rulesActions.deleteRule({ ruleUuid: checkedRows[0] }));
+        dispatch(rulesActions.bulkDeleteRules({ ruleUuids: checkedRows }));
         setConfirmDelete(false);
         setCheckedRows([]);
     }, [dispatch, checkedRows]);
@@ -130,26 +131,32 @@ const RulesList = () => {
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes
-                    hasAllCheckBox={false}
-                    multiSelect={false}
+                    multiSelect
                     data={rulesData}
                     headers={rulesHeader}
                     onCheckedRowsChanged={(checkedRows) => {
                         setCheckedRows(checkedRows as string[]);
                     }}
                     hasPagination={true}
+                    disablePaginationControls={isBusy}
+                    disableSelectionControls={isBusy}
+                    disableSearchControls={isBusy}
                 />
             </Widget>
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete a Rule`}
-                body={`You are about to delete a Rule. Is this what you want to do?`}
+                caption={checkedRows.length > 1 ? `Delete Rules` : `Delete a Rule`}
+                body={
+                    checkedRows.length > 1
+                        ? `You are about to delete ${checkedRows.length} Rules. Is this what you want to do?`
+                        : `You are about to delete a Rule. Is this what you want to do?`
+                }
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
 

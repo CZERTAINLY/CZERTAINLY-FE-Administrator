@@ -75,6 +75,11 @@ export type State = {
     isUpdatingEventTriggersAssociation: boolean;
     isFetchingActions: boolean;
     isDeletingAction: boolean;
+    isBulkDeletingRules: boolean;
+    isBulkDeletingActions: boolean;
+    isBulkDeletingConditions: boolean;
+    isBulkDeletingTriggers: boolean;
+    isBulkDeletingExecutions: boolean;
 };
 
 export const initialState: State = {
@@ -120,6 +125,11 @@ export const initialState: State = {
     isFetchingActions: false,
     isFetchingActionDetails: false,
     isDeletingAction: false,
+    isBulkDeletingRules: false,
+    isBulkDeletingActions: false,
+    isBulkDeletingConditions: false,
+    isBulkDeletingTriggers: false,
+    isBulkDeletingExecutions: false,
 };
 
 export const slice = createSlice({
@@ -329,6 +339,61 @@ export const slice = createSlice({
 
         deleteTriggerFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isDeletingTrigger = false;
+        },
+
+        bulkDeleteRules: (state, action: PayloadAction<{ ruleUuids: string[] }>) => {
+            state.isBulkDeletingRules = true;
+        },
+        bulkDeleteRulesSuccess: (state, action: PayloadAction<{ ruleUuids: string[] }>) => {
+            state.rules = state.rules.filter((rule) => !action.payload.ruleUuids.includes(rule.uuid));
+            state.isBulkDeletingRules = false;
+        },
+        bulkDeleteRulesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isBulkDeletingRules = false;
+        },
+
+        bulkDeleteActions: (state, action: PayloadAction<{ actionUuids: string[] }>) => {
+            state.isBulkDeletingActions = true;
+        },
+        bulkDeleteActionsSuccess: (state, action: PayloadAction<{ actionUuids: string[] }>) => {
+            state.actionsList = state.actionsList.filter((item) => !action.payload.actionUuids.includes(item.uuid));
+            state.isBulkDeletingActions = false;
+        },
+        bulkDeleteActionsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isBulkDeletingActions = false;
+        },
+
+        bulkDeleteConditions: (state, action: PayloadAction<{ conditionUuids: string[] }>) => {
+            state.isBulkDeletingConditions = true;
+        },
+        bulkDeleteConditionsSuccess: (state, action: PayloadAction<{ conditionUuids: string[] }>) => {
+            state.conditions = state.conditions.filter((condition) => !action.payload.conditionUuids.includes(condition.uuid));
+            state.isBulkDeletingConditions = false;
+        },
+        bulkDeleteConditionsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isBulkDeletingConditions = false;
+        },
+
+        bulkDeleteTriggers: (state, action: PayloadAction<{ triggerUuids: string[] }>) => {
+            state.isBulkDeletingTriggers = true;
+        },
+        bulkDeleteTriggersSuccess: (state, action: PayloadAction<{ triggerUuids: string[] }>) => {
+            state.triggers = state.triggers.filter((trigger) => !action.payload.triggerUuids.includes(trigger.uuid));
+            state.isBulkDeletingTriggers = false;
+        },
+        bulkDeleteTriggersFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isBulkDeletingTriggers = false;
+        },
+
+        bulkDeleteExecutions: (state, action: PayloadAction<{ executionUuids: string[] }>) => {
+            state.isBulkDeletingExecutions = true;
+        },
+        bulkDeleteExecutionsSuccess: (state, action: PayloadAction<{ executionUuids: string[] }>) => {
+            state.executions = state.executions.filter((execution) => !action.payload.executionUuids.includes(execution.uuid));
+            state.isBulkDeletingExecutions = false;
+        },
+        bulkDeleteExecutionsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isBulkDeletingExecutions = false;
         },
 
         getExecution: (state, action: PayloadAction<{ executionUuid: string }>) => {
@@ -597,6 +662,11 @@ const isCreatingTrigger = createSelector(state, (state) => state.isCreatingTrigg
 const createTriggerSucceeded = createSelector(state, (state) => state.createTriggerSucceeded);
 const isFetchingActions = createSelector(state, (state) => state.isFetchingActions);
 const isDeletingAction = createSelector(state, (state) => state.isDeletingAction);
+const isBulkDeletingRules = createSelector(state, (state) => state.isBulkDeletingRules);
+const isBulkDeletingActions = createSelector(state, (state) => state.isBulkDeletingActions);
+const isBulkDeletingConditions = createSelector(state, (state) => state.isBulkDeletingConditions);
+const isBulkDeletingTriggers = createSelector(state, (state) => state.isBulkDeletingTriggers);
+const isBulkDeletingExecutions = createSelector(state, (state) => state.isBulkDeletingExecutions);
 
 export const selectors = {
     rules,
@@ -646,6 +716,11 @@ export const selectors = {
     isUpdatingEventTriggersAssociation,
     isFetchingActions,
     isDeletingAction,
+    isBulkDeletingRules,
+    isBulkDeletingActions,
+    isBulkDeletingConditions,
+    isBulkDeletingTriggers,
+    isBulkDeletingExecutions,
 };
 
 export const actions = slice.actions;

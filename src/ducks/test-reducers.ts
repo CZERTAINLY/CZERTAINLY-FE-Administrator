@@ -445,6 +445,29 @@ function tablePaginationTestReducer(
     return state;
 }
 
+export type AlertsTestState = {
+    messages: Array<{ id: number; message: string; time: number; color: 'success' | 'danger' | 'info'; isHiding?: boolean }>;
+    msgId: number;
+};
+
+const alertsTestInitialState: AlertsTestState = {
+    messages: [],
+    msgId: 0,
+};
+
+function alertsTestReducer(state: AlertsTestState = alertsTestInitialState, action: UnknownAction): AlertsTestState {
+    if (action.type === 'alerts/dismiss' && typeof action.payload === 'number') {
+        return { ...state, messages: state.messages.filter((m) => m.id !== action.payload) };
+    }
+    if (action.type === 'alerts/hide' && typeof action.payload === 'number') {
+        return {
+            ...state,
+            messages: state.messages.map((m) => (m.id === action.payload ? { ...m, isHiding: true } : m)),
+        };
+    }
+    return state;
+}
+
 export const testReducers = combineReducers({
     userInterface: userInterfaceTestReducer,
     enums: enumsTestReducer,
@@ -457,6 +480,7 @@ export const testReducers = combineReducers({
     secrets: secretsTestReducer,
     vaultProfiles: vaultProfilesTestReducer,
     tablePagination: tablePaginationTestReducer,
+    alerts: alertsTestReducer,
 });
 
 export const testInitialState = {
@@ -471,4 +495,5 @@ export const testInitialState = {
     secrets: secretsTestInitialState,
     vaultProfiles: vaultProfilesTestInitialState,
     tablePagination: tablePaginationTestInitialState,
+    alerts: alertsTestInitialState,
 };

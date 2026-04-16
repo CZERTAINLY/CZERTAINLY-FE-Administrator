@@ -681,15 +681,15 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
                                             <Controller
                                                 name="sharedSecret"
                                                 control={control}
-                                                rules={buildValidationRules([validateRequired()])}
+                                                rules={buildValidationRules(editMode ? [] : [validateRequired()])}
                                                 render={({ field, fieldState }) => (
                                                     <TextInput
                                                         {...field}
                                                         id="sharedSecret"
                                                         type="password"
                                                         label="Shared Secret"
-                                                        required
-                                                        placeholder="Shared Secret"
+                                                        required={!editMode}
+                                                        placeholder={editMode ? 'Leave blank to keep current' : 'Shared Secret'}
                                                         invalid={fieldState.error && fieldState.isTouched}
                                                         error={getFieldErrorMessage(fieldState)}
                                                     />
