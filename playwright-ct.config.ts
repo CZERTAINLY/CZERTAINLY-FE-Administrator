@@ -36,6 +36,8 @@ export default defineConfig({
                     { find: 'components/', replacement: path.resolve(__dirname, './src/components/') + '/' },
                     { find: 'ducks/', replacement: path.resolve(__dirname, './src/ducks/') + '/' },
                     { find: 'ducks', replacement: path.resolve(__dirname, './src/ducks') },
+                    { find: 'src/', replacement: path.resolve(__dirname, './src/') + '/' },
+                    { find: 'playwright/', replacement: path.resolve(__dirname, './playwright/') + '/' },
                 ],
                 dedupe: ['react', 'react-dom', 'react-hook-form'],
             },
