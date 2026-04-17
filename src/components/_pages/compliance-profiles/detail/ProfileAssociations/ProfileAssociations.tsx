@@ -74,6 +74,7 @@ export default function ProfileAssociations({ profile }: Props) {
                               justify="start"
                               buttons={[
                                   {
+                                      id: 'remove',
                                       icon: 'minus-square',
                                       disabled: false,
                                       tooltip: 'Remove',

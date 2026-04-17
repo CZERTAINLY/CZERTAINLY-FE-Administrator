@@ -12,7 +12,7 @@ import PagedList from 'components/PagedList/PagedList';
 import { TableDataRow, TableHeader } from 'components/CustomTable';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { SearchRequestModel } from 'types/certificate';
-import { ApiClients, backendClient } from '../../../../api';
+import { ApiClients, backendClient } from 'src/api';
 import { EntityType } from 'ducks/filters';
 import { CbomDetailDto } from 'types/openapi';
 
@@ -53,12 +53,14 @@ function CbomsList() {
     const additionalButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
+                id: 'upload',
                 icon: 'upload',
                 disabled: false,
                 tooltip: 'Upload CBOM',
                 onClick: () => setIsUploadOpen(true),
             },
             {
+                id: 'sync',
                 icon: 'sync',
                 disabled: isSyncing,
                 tooltip: 'Sync CBOMs',
@@ -128,6 +130,7 @@ function CbomsList() {
                         buttons={
                             [
                                 {
+                                    id: 'copy',
                                     icon: 'copy',
                                     disabled: false,
                                     tooltip: 'Copy JSON',
@@ -137,6 +140,7 @@ function CbomsList() {
                                     },
                                 },
                                 {
+                                    id: 'download',
                                     icon: 'download',
                                     disabled: false,
                                     tooltip: 'Download JSON',

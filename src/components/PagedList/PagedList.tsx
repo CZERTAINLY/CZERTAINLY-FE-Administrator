@@ -3,12 +3,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
-import { ApiClients } from '../../api';
+import { ApiClients } from 'src/api';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import FilterWidget from 'components/FilterWidget';
 import Widget from 'components/Widget';
-import { IconName, WidgetButtonProps } from 'components/WidgetButtons';
+import type { IconName } from 'types/icons';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/paging';
 import { Observable } from 'rxjs';
 import { SearchFieldListModel, SearchFilterModel, SearchRequestModel } from 'types/certificate';
@@ -147,6 +148,7 @@ function PagedList({
         const result = [];
         if (!addHidden) {
             result.push({
+                id: 'create',
                 icon: 'plus' as IconName,
                 disabled: false,
                 tooltip: 'Create',
@@ -155,6 +157,7 @@ function PagedList({
         }
         if (onDeleteCallback) {
             result.push({
+                id: 'delete',
                 icon: 'trash' as IconName,
                 disabled: checkedRows.length === 0,
                 tooltip: 'Delete',
