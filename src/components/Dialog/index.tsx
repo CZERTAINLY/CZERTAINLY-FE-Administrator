@@ -23,15 +23,19 @@ import { useLayoutEffect } from 'react';
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
 export type ModalIcon =
     | 'delete'
+    | 'destroy'
     | 'info'
     | 'warning'
-    | 'success'
-    | 'error'
+    | 'check'
+    | 'upload'
     | 'users'
     | 'user'
     | 'user-check'
     | 'shield-check'
     | 'download'
+    | 'refresh'
+    | 'shuffle'
+    | 'minus'
     | 'plug'
     | React.ReactNode;
 
