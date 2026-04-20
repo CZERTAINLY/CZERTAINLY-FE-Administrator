@@ -79,6 +79,28 @@ async function openBadgeForEdit(page: import('@playwright/test').Page, badgeLabe
     await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
 }
 
+async function mountAndOpenSingleExecution(
+    mount: (component: any) => Promise<unknown>,
+    page: import('@playwright/test').Page,
+    execution: any,
+    badgeLabel: string,
+    props: Omit<FilterWidgetRuleActionTestWrapperProps, 'ExecutionsList'> = {},
+) {
+    await mount(<FilterWidgetRuleActionTestWrapper {...props} ExecutionsList={[execution]} />);
+    await page.getByText(`'${badgeLabel}'`).click();
+}
+
+async function expectHydratedGroupAndField(page: import('@playwright/test').Page, group: string, field: string) {
+    await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
+    await expect(page.locator('#group')).toHaveValue(group);
+    await expect(page.locator('#field')).toHaveValue(field);
+}
+
+async function expectStatusRemovedAndCapturedCleared(page: import('@playwright/test').Page, captured: { lastActions: unknown[] }) {
+    await expect(page.getByText("'Status'")).not.toBeVisible();
+    expect(captured.lastActions).toHaveLength(0);
+}
+
 test.describe('FilterWidgetRuleAction', () => {
     test('renders Widget with title and Field Source / Field / Value controls', async ({ mount, page }) => {
         await mount(<FilterWidgetRuleActionTestWrapper title="Rule actions" />);
@@ -177,8 +199,7 @@ test.describe('FilterWidgetRuleAction', () => {
 
         await expect(page.getByText("'Status'")).toBeVisible();
         await page.getByText('×').click();
-        await expect(page.getByText("'Status'")).not.toBeVisible();
-        expect(captured.lastActions).toHaveLength(0);
+        await expectStatusRemovedAndCapturedCleared(page, captured);
     });
 
     test('remove badge via keyboard Enter triggers remove', async ({ mount, page }) => {
@@ -187,8 +208,7 @@ test.describe('FilterWidgetRuleAction', () => {
 
         await page.getByText('×').focus();
         await page.keyboard.press('Enter');
-        await expect(page.getByText("'Status'")).not.toBeVisible();
-        expect(captured.lastActions).toHaveLength(0);
+        await expectStatusRemovedAndCapturedCleared(page, captured);
     });
 
     test('remove badge via keyboard Space triggers remove', async ({ mount, page }) => {
@@ -197,8 +217,7 @@ test.describe('FilterWidgetRuleAction', () => {
 
         await page.getByText('×').focus();
         await page.keyboard.press('Space');
-        await expect(page.getByText("'Status'")).not.toBeVisible();
-        expect(captured.lastActions).toHaveLength(0);
+        await expectStatusRemovedAndCapturedCleared(page, captured);
     });
 
     test('remove selected badge without callback exits edit mode', async ({ mount, page }) => {
@@ -249,13 +268,13 @@ test.describe('FilterWidgetRuleAction', () => {
     });
 
     test('execution item with missing fieldSource is ignored during hydration', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                ExecutionsList={[{ fieldSource: undefined as any, fieldIdentifier: 'status', data: 'raw' } as any]}
-            />,
+        await mountAndOpenSingleExecution(
+            mount,
+            page,
+            { fieldSource: undefined as any, fieldIdentifier: 'status', data: 'raw' } as any,
+            'status',
         );
 
-        await page.getByText("'status'").click();
         await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
         await expect(page.locator('#group')).toHaveValue('');
         await expect(page.locator('#field')).toHaveValue('');
@@ -267,7 +286,6 @@ test.describe('FilterWidgetRuleAction', () => {
                 ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: undefined as any, data: 'raw' } as any]}
             />,
         );
-
         await page.getByTestId('badge').first().click();
         await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
         await expect(page.locator('#group')).toHaveValue('');
@@ -275,16 +293,14 @@ test.describe('FilterWidgetRuleAction', () => {
     });
 
     test('execution item with undefined data keeps selection without hydrating value', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'status', data: undefined as any }]}
-            />,
+        await mountAndOpenSingleExecution(
+            mount,
+            page,
+            { fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'status', data: undefined as any },
+            'Status',
         );
 
-        await page.getByText("'Status'").click();
-        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
-        await expect(page.locator('#group')).toHaveValue('meta');
-        await expect(page.locator('#field')).toHaveValue('status');
+        await expectHydratedGroupAndField(page, 'meta', 'status');
         await expect(page.getByPlaceholder('Enter filter value')).toHaveValue('');
     });
 
@@ -341,33 +357,76 @@ test.describe('FilterWidgetRuleAction', () => {
     });
 
     test('clicking existing execution item badge hydrates Field and Value inputs', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'status', data: 'synced' }]}
-            />,
+        await mountAndOpenSingleExecution(
+            mount,
+            page,
+            { fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'status', data: 'synced' },
+            'Status',
         );
 
-        await page.getByText("'Status'").click();
-
-        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
-        await expect(page.locator('#group')).toHaveValue('meta');
-        await expect(page.locator('#field')).toHaveValue('status');
+        await expectHydratedGroupAndField(page, 'meta', 'status');
         await expect(page.getByPlaceholder('Enter filter value')).toHaveValue('synced');
     });
 
     test('clicking existing select execution item hydrates selected option without delayed mismatch', async ({ mount, page }) => {
+        await mountAndOpenSingleExecution(
+            mount,
+            page,
+            { fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'kind', data: 'k2' },
+            'Kind',
+        );
+
+        await expectHydratedGroupAndField(page, 'meta', 'kind');
+        await expect(page.locator('#value')).toHaveValue('k2');
+    });
+
+    test('object execution item with unknown field source keeps fallback badge without crashing', async ({ mount, page }) => {
         await mount(
             <FilterWidgetRuleActionTestWrapper
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'kind', data: 'k2' }]}
+                ExecutionsList={[{ fieldSource: FilterFieldSource.Custom, fieldIdentifier: 'ghost', data: { value: 'x' } as any } as any]}
             />,
         );
 
-        await page.getByText("'Kind'").click();
+        await expect(page.getByText("'ghost'")).toBeVisible();
+    });
 
-        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
-        await expect(page.locator('#group')).toHaveValue('meta');
-        await expect(page.locator('#field')).toHaveValue('kind');
-        await expect(page.locator('#value')).toHaveValue('k2');
+    test('object execution item with unknown field identifier keeps fallback badge without crashing', async ({ mount, page }) => {
+        await mount(
+            <FilterWidgetRuleActionTestWrapper
+                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'ghost', data: { value: 'x' } as any } as any]}
+            />,
+        );
+
+        await expect(page.getByText("'ghost'")).toBeVisible();
+    });
+
+    test('list option mapping with no match keeps select empty without crashing', async ({ mount, page }) => {
+        await mountAndOpenSingleExecution(
+            mount,
+            page,
+            { fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'kind', data: ['k999'] as any },
+            'Kind',
+            {
+                availableFilters: [
+                    {
+                        filterFieldSource: FilterFieldSource.Meta,
+                        searchFieldData: [
+                            {
+                                fieldIdentifier: 'kind',
+                                fieldLabel: 'Kind',
+                                type: 'list' as const,
+                                conditions: [],
+                                value: [{ uuid: 'k1', name: 'Kind One' }],
+                                multiValue: false,
+                            },
+                        ],
+                    },
+                ] as any,
+            },
+        );
+
+        await expectHydratedGroupAndField(page, 'meta', 'kind');
+        await expect(page.locator('#value')).toHaveValue('');
     });
 
     test('edit mode keeps current selected option in value dropdown', async ({ mount, page }) => {
