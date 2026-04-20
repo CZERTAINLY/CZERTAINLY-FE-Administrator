@@ -186,7 +186,7 @@ export default function CertificateList({
                           },
                       },
                       {
-                          icon: 'user',
+                          icon: 'user-check',
                           disabled: checkedRows.length === 0,
                           tooltip: 'Override Owner',
                           onClick: () => {
@@ -417,7 +417,7 @@ export default function CertificateList({
                 }
                 toggle={() => setUpdateOwner(false)}
                 buttons={[]}
-                icon="user"
+                icon="user-check"
                 size="md"
             />
 

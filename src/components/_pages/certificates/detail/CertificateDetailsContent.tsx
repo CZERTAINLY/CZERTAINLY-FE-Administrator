@@ -762,7 +762,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                         onChange={(value) => setOwnerUuid(value as string)}
                     />
                 }
-                icon="user"
+                icon="user-check"
                 size="md"
                 toggle={onCancelOwnerUpdate}
                 buttons={[
@@ -792,7 +792,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                         label="RA Profile"
                     />
                 }
-                icon="plug"
+                icon="shield-check"
                 size="md"
                 toggle={onCancelRaProfileUpdate}
                 buttons={[

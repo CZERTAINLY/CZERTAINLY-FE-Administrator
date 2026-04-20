@@ -193,7 +193,7 @@ export default function ConnectorDetail() {
                 },
             },
             {
-                icon: 'plug',
+                icon: 'unplug',
                 disabled: false,
                 tooltip: 'Reconnect',
                 onClick: () => {

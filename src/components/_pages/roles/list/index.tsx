@@ -121,7 +121,7 @@ export default function RolesList() {
                 },
             },
             {
-                icon: 'user',
+                icon: 'user-cog',
                 disabled: isBusy || checkedRows.length !== 1 || isSystemRoleSelected,
                 tooltip: 'Edit role users',
                 onClick: () => {

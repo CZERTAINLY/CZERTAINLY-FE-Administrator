@@ -113,7 +113,7 @@ export default function ConnectorList() {
                 },
             },
             {
-                icon: 'plug',
+                icon: 'unplug',
                 disabled: checkedRows.length === 0,
                 tooltip: 'Reconnect',
                 onClick: () => {

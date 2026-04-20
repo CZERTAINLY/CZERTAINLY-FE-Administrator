@@ -118,7 +118,7 @@ export default function UserDetail() {
                 },
             },
             {
-                icon: 'user',
+                icon: 'user-cog',
                 disabled: role?.systemRole || false,
                 tooltip: 'Edit role users',
                 onClick: () => {

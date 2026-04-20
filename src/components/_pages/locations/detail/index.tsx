@@ -508,7 +508,7 @@ export default function LocationDetail() {
                 },
             },
             {
-                icon: 'sync',
+                icon: 'repeat',
                 disabled: false,
                 tooltip: 'Sync',
                 onClick: () => {

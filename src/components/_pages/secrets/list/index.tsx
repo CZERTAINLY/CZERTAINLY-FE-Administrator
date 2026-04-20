@@ -207,7 +207,7 @@ export default function SecretsList() {
                 onClick: () => setIsDisableSecretsOpen(true),
             },
             {
-                icon: 'user',
+                icon: 'user-check',
                 disabled: checkedRows.length === 0,
                 tooltip: 'Override Owner',
                 onClick: () => setIsUpdateOwnerOpen(true),

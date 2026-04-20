@@ -61,7 +61,7 @@ function CbomsList() {
             },
             {
                 id: 'sync',
-                icon: 'sync',
+                icon: 'repeat',
                 disabled: isSyncing,
                 tooltip: 'Sync CBOMs',
                 onClick: () => dispatch(actions.syncCboms()),
