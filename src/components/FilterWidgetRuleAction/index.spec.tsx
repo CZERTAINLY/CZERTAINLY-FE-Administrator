@@ -101,6 +101,29 @@ async function expectStatusRemovedAndCapturedCleared(page: import('@playwright/t
     expect(captured.lastActions).toHaveLength(0);
 }
 
+const executionStatusSynced = {
+    fieldSource: FilterFieldSource.Meta,
+    fieldIdentifier: 'status',
+    data: 'synced',
+};
+
+const executionKindK2 = {
+    fieldSource: FilterFieldSource.Meta,
+    fieldIdentifier: 'kind',
+    data: 'k2',
+};
+
+const executionKindObjectK1 = {
+    fieldSource: FilterFieldSource.Meta,
+    fieldIdentifier: 'kind',
+    data: { uuid: 'k1', name: 'Kind One' } as any,
+};
+
+async function expectKindHydratedValue(page: import('@playwright/test').Page, expectedValue: string) {
+    await expectHydratedGroupAndField(page, 'meta', 'kind');
+    await expect(page.locator('#value')).toHaveValue(expectedValue);
+}
+
 test.describe('FilterWidgetRuleAction', () => {
     test('renders Widget with title and Field Source / Field / Value controls', async ({ mount, page }) => {
         await mount(<FilterWidgetRuleActionTestWrapper title="Rule actions" />);
@@ -347,37 +370,21 @@ test.describe('FilterWidgetRuleAction', () => {
     });
 
     test('ExecutionsList syncs actions into badges', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'status', data: 'synced' }]}
-            />,
-        );
+        await mount(<FilterWidgetRuleActionTestWrapper ExecutionsList={[executionStatusSynced]} />);
         await expect(page.getByText("'Status'")).toBeVisible();
         await expect(page.getByText('synced')).toBeVisible();
     });
 
     test('clicking existing execution item badge hydrates Field and Value inputs', async ({ mount, page }) => {
-        await mountAndOpenSingleExecution(
-            mount,
-            page,
-            { fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'status', data: 'synced' },
-            'Status',
-        );
+        await mountAndOpenSingleExecution(mount, page, executionStatusSynced, 'Status');
 
         await expectHydratedGroupAndField(page, 'meta', 'status');
         await expect(page.getByPlaceholder('Enter filter value')).toHaveValue('synced');
     });
 
     test('clicking existing select execution item hydrates selected option without delayed mismatch', async ({ mount, page }) => {
-        await mountAndOpenSingleExecution(
-            mount,
-            page,
-            { fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'kind', data: 'k2' },
-            'Kind',
-        );
-
-        await expectHydratedGroupAndField(page, 'meta', 'kind');
-        await expect(page.locator('#value')).toHaveValue('k2');
+        await mountAndOpenSingleExecution(mount, page, executionKindK2, 'Kind');
+        await expectKindHydratedValue(page, 'k2');
     });
 
     test('object execution item with unknown field source keeps fallback badge without crashing', async ({ mount, page }) => {
@@ -425,19 +432,117 @@ test.describe('FilterWidgetRuleAction', () => {
             },
         );
 
-        await expectHydratedGroupAndField(page, 'meta', 'kind');
-        await expect(page.locator('#value')).toHaveValue('');
+        await expectKindHydratedValue(page, '');
+    });
+
+    test('remove one badge maps remaining object array to uuid values in callback', async ({ mount, page }) => {
+        const captured = await mountWithActionCapture(mount, {
+            availableFilters: [
+                {
+                    filterFieldSource: FilterFieldSource.Meta,
+                    searchFieldData: [
+                        {
+                            fieldIdentifier: 'kind',
+                            fieldLabel: 'Kind',
+                            type: 'list' as const,
+                            conditions: [],
+                            multiValue: true,
+                            value: [
+                                { uuid: 'k1', name: 'Kind One' },
+                                { uuid: 'k2', name: 'Kind Two' },
+                            ],
+                        },
+                        {
+                            fieldIdentifier: 'status',
+                            fieldLabel: 'Status',
+                            type: 'string' as const,
+                            conditions: [],
+                        },
+                    ],
+                },
+            ] as any,
+            ExecutionsList: [
+                {
+                    fieldSource: FilterFieldSource.Meta,
+                    fieldIdentifier: 'kind',
+                    data: [{ uuid: 'k1', name: 'Kind One' }] as any,
+                },
+                {
+                    fieldSource: FilterFieldSource.Meta,
+                    fieldIdentifier: 'status',
+                    data: 'tmp',
+                },
+            ] as any,
+        });
+
+        await expect(page.getByText("'Kind'")).toBeVisible();
+        await expect(page.getByText("'Status'")).toBeVisible();
+
+        await page.getByText('×').nth(1).click();
+
+        expect(captured.lastActions).toHaveLength(1);
+        expect((captured.lastActions as any[])[0]).toMatchObject({
+            fieldSource: FilterFieldSource.Meta,
+            fieldIdentifier: 'kind',
+        });
+        expect((captured.lastActions as any[])[0].data).toEqual(['k1']);
+    });
+
+    test('remove one badge maps remaining date object value to UTC string in callback', async ({ mount, page }) => {
+        const captured = await mountWithActionCapture(mount, {
+            availableFilters: [
+                {
+                    filterFieldSource: FilterFieldSource.Meta,
+                    searchFieldData: [
+                        {
+                            fieldIdentifier: 'expiresAt',
+                            fieldLabel: 'Expires At',
+                            type: 'list' as const,
+                            conditions: [],
+                            multiValue: true,
+                            attributeContentType: AttributeContentType.Datetime,
+                            value: ['2026-03-04T10:00:00Z'],
+                        },
+                        {
+                            fieldIdentifier: 'status',
+                            fieldLabel: 'Status',
+                            type: 'string' as const,
+                            conditions: [],
+                        },
+                    ],
+                },
+            ] as any,
+            ExecutionsList: [
+                {
+                    fieldSource: FilterFieldSource.Meta,
+                    fieldIdentifier: 'expiresAt',
+                    data: [{ value: '2026-03-04T10:00:00Z', label: 'Date Value' }] as any,
+                },
+                {
+                    fieldSource: FilterFieldSource.Meta,
+                    fieldIdentifier: 'status',
+                    data: 'tmp',
+                },
+            ] as any,
+        });
+
+        await expect(page.getByText("'Expires At'")).toBeVisible();
+        await expect(page.getByText("'Status'")).toBeVisible();
+
+        await page.getByText('×').nth(1).click();
+
+        expect(captured.lastActions).toHaveLength(1);
+        expect((captured.lastActions as any[])[0]).toMatchObject({
+            fieldSource: FilterFieldSource.Meta,
+            fieldIdentifier: 'expiresAt',
+        });
+        expect(Array.isArray((captured.lastActions as any[])[0].data)).toBe(true);
+        expect(String((captured.lastActions as any[])[0].data[0])).toContain('2026-03-04T10:00:00');
     });
 
     test('edit mode keeps current selected option in value dropdown', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'kind', data: 'k2' }]}
-            />,
-        );
-
-        await page.getByText("'Kind'").click();
-        await expect(page.locator('#value')).toHaveValue('k2');
+        await mountAndOpenSingleExecution(mount, page, executionKindK2, 'Kind');
+        await expectKindHydratedValue(page, 'k2');
 
         await page.getByTestId('select-value').click();
         const valueListbox = page.getByRole('listbox').filter({ has: page.getByText('Kind Two', { exact: true }) });
@@ -446,24 +551,8 @@ test.describe('FilterWidgetRuleAction', () => {
     });
 
     test('clicking existing select execution item hydrates selected option from object data', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                ExecutionsList={[
-                    {
-                        fieldSource: FilterFieldSource.Meta,
-                        fieldIdentifier: 'kind',
-                        data: { uuid: 'k1', name: 'Kind One' } as any,
-                    },
-                ]}
-            />,
-        );
-
-        await page.getByText("'Kind'").click();
-
-        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
-        await expect(page.locator('#group')).toHaveValue('meta');
-        await expect(page.locator('#field')).toHaveValue('kind');
-        await expect(page.locator('#value')).toHaveValue('k1');
+        await mountAndOpenSingleExecution(mount, page, executionKindObjectK1, 'Kind');
+        await expectKindHydratedValue(page, 'k1');
     });
 
     test('multi value field hydrates on first click even when execution data has a single string', async ({ mount, page }) => {
