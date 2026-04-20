@@ -1,5 +1,5 @@
 import { test, expect } from 'playwright/ct-test';
-import { FilterWidgetRuleActionTestWrapper } from './FilterWidgetRuleActionTestWrapper';
+import { FilterWidgetRuleActionTestWrapper, type FilterWidgetRuleActionTestWrapperProps } from './FilterWidgetRuleActionTestWrapper';
 import {
     complexAttrFieldDef,
     countFieldDef,
@@ -21,6 +21,7 @@ import {
     updatedAtFieldDef,
 } from './FilterWidgetRuleActionTestData';
 import { FilterFieldSource } from 'types/openapi';
+import type { ExecutionItemModel } from 'types/rules';
 
 /** Sync native select value and dispatch input+change so React state updates (Preline may not fire it on option click). */
 async function syncNativeSelect(page: import('@playwright/test').Page, selectId: 'group' | 'field', value: string) {
@@ -110,12 +111,65 @@ async function getSelectedNativeValues(page: import('@playwright/test').Page): P
     return page.locator('#value').evaluate((el: HTMLSelectElement) => Array.from(el.selectedOptions).map((opt) => opt.value));
 }
 
-/** Add a string action via UI: select Meta source, pick field, fill value, click Add. */
+/** Add a string action via UI: select a Meta source, pick a field, fill value, click Add. */
 async function addStringAction(page: import('@playwright/test').Page, fieldLabel: string, value: string) {
     await selectFieldSourceMeta(page);
     await selectFieldOption(page, fieldLabel);
     await fillFilterValue(page, value);
     await page.getByRole('button', { name: 'Add', exact: true }).click();
+}
+
+type MountFn = (jsx: any) => Promise<any>;
+
+interface ActionsCapture {
+    current: unknown[];
+}
+
+async function mountWithActions(
+    mount: MountFn,
+    extraProps: Omit<FilterWidgetRuleActionTestWrapperProps, 'onActionsUpdate'> = {},
+): Promise<ActionsCapture> {
+    const capture: ActionsCapture = { current: [] };
+    await mount(
+        <FilterWidgetRuleActionTestWrapper
+            {...extraProps}
+            onActionsUpdate={(actions) => {
+                capture.current = actions;
+            }}
+        />,
+    );
+    return capture;
+}
+
+async function mountWithExecution(
+    mount: MountFn,
+    opts: {
+        source: FilterFieldSource;
+        fieldIdentifier: string;
+        data: unknown;
+        fieldDef?: Record<string, unknown>;
+        extraProps?: Omit<FilterWidgetRuleActionTestWrapperProps, 'availableFilters' | 'ExecutionsList'>;
+    },
+): Promise<void> {
+    const { source, fieldIdentifier, data, fieldDef, extraProps } = opts;
+    const availableFilters = fieldDef ? makeSearchFieldList(source, [fieldDef]) : undefined;
+    const execution = { fieldSource: source, fieldIdentifier, data } as ExecutionItemModel;
+    await mount(
+        <FilterWidgetRuleActionTestWrapper
+            {...(availableFilters ? { availableFilters } : {})}
+            {...extraProps}
+            ExecutionsList={[execution]}
+        />,
+    );
+}
+
+async function clickBadgeAndExpectUpdate(page: import('@playwright/test').Page, badgeLabel: string) {
+    await page.getByText(`'${badgeLabel}'`).click();
+    await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
+}
+
+function firstAction(actions: unknown[]): Record<string, any> {
+    return (actions as Record<string, any>[])[0];
 }
 
 test.describe('FilterWidgetRuleAction', () => {
@@ -150,20 +204,13 @@ test.describe('FilterWidgetRuleAction', () => {
     });
 
     test('Add creates a badge and calls onActionsUpdate', async ({ mount, page }) => {
-        let lastActions: unknown[] = [];
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                onActionsUpdate={(actions) => {
-                    lastActions = actions;
-                }}
-            />,
-        );
+        const actions = await mountWithActions(mount);
         await addStringAction(page, 'Status', 'active');
 
         await expect(page.getByText("'Status'")).toBeVisible();
         await expect(page.getByText('active')).toBeVisible();
-        expect(lastActions).toHaveLength(1);
-        expect((lastActions as any[])[0]).toMatchObject({ fieldSource: 'meta', fieldIdentifier: 'status', data: 'active' });
+        expect(actions.current).toHaveLength(1);
+        expect(firstAction(actions.current)).toMatchObject({ fieldSource: 'meta', fieldIdentifier: 'status', data: 'active' });
     });
 
     test('Boolean field shows True/False select', async ({ mount, page }) => {
@@ -195,75 +242,47 @@ test.describe('FilterWidgetRuleAction', () => {
     });
 
     test('editing selected badge and Update calls onActionsUpdate', async ({ mount, page }) => {
-        let lastActions: unknown[] = [];
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                onActionsUpdate={(actions) => {
-                    lastActions = actions;
-                }}
-            />,
-        );
+        const actions = await mountWithActions(mount);
         await addStringAction(page, 'Status', 'draft');
 
         await page.getByText("'Status'").click();
         await fillFilterValue(page, 'published');
         await page.getByRole('button', { name: 'Update', exact: true }).click();
 
-        expect(lastActions).toHaveLength(1);
-        const action = (lastActions as any[])[0];
+        expect(actions.current).toHaveLength(1);
+        const action = firstAction(actions.current);
         expect(action.data).toBe('published');
         expect(action.fieldIdentifier === 'status' || action.fieldIdentifier?.value === 'status').toBe(true);
     });
 
     test('remove badge via × removes action and calls onActionsUpdate', async ({ mount, page }) => {
-        let lastActions: unknown[] = [];
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                onActionsUpdate={(actions) => {
-                    lastActions = actions;
-                }}
-            />,
-        );
+        const actions = await mountWithActions(mount);
         await addStringAction(page, 'Status', 'x');
 
         await expect(page.getByText("'Status'")).toBeVisible();
         await page.getByText('×').click();
         await expect(page.getByText("'Status'")).not.toBeVisible();
-        expect(lastActions).toHaveLength(0);
+        expect(actions.current).toHaveLength(0);
     });
 
     test('remove badge via keyboard Enter triggers remove', async ({ mount, page }) => {
-        let lastActions: unknown[] = [];
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                onActionsUpdate={(actions) => {
-                    lastActions = actions;
-                }}
-            />,
-        );
+        const actions = await mountWithActions(mount);
         await addStringAction(page, 'Status', 'y');
 
         await page.getByText('×').focus();
         await page.keyboard.press('Enter');
         await expect(page.getByText("'Status'")).not.toBeVisible();
-        expect(lastActions).toHaveLength(0);
+        expect(actions.current).toHaveLength(0);
     });
 
     test('remove badge via keyboard Space triggers remove', async ({ mount, page }) => {
-        let lastActions: unknown[] = [];
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                onActionsUpdate={(actions) => {
-                    lastActions = actions;
-                }}
-            />,
-        );
+        const actions = await mountWithActions(mount);
         await addStringAction(page, 'Status', 'sp');
 
         await page.getByText('×').focus();
         await page.keyboard.press('Space');
         await expect(page.getByText("'Status'")).not.toBeVisible();
-        expect(lastActions).toHaveLength(0);
+        expect(actions.current).toHaveLength(0);
     });
 
     test('disableBadgeRemove hides remove control in badge', async ({ mount, page }) => {
@@ -284,41 +303,25 @@ test.describe('FilterWidgetRuleAction', () => {
     });
 
     test('ExecutionsList syncs actions into badges', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'status', data: 'synced' }]}
-            />,
-        );
+        await mountWithExecution(mount, { source: FilterFieldSource.Meta, fieldIdentifier: 'status', data: 'synced' });
         await expect(page.getByText("'Status'")).toBeVisible();
         await expect(page.getByText('synced')).toBeVisible();
     });
 
     test('clicking existing execution item badge hydrates Field and Value inputs', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'status', data: 'synced' }]}
-            />,
-        );
+        await mountWithExecution(mount, { source: FilterFieldSource.Meta, fieldIdentifier: 'status', data: 'synced' });
         await clickBadgeAndVerifyEditMode(page, 'Status', 'meta', 'status');
         await expect(page.getByPlaceholder('Enter filter value')).toHaveValue('synced');
     });
 
     test('clicking existing select execution item hydrates selected option', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'kind', data: 'k2' }]}
-            />,
-        );
+        await mountWithExecution(mount, { source: FilterFieldSource.Meta, fieldIdentifier: 'kind', data: 'k2' });
         await clickBadgeAndVerifyEditMode(page, 'Kind', 'meta', 'kind');
         await expect(page.locator('#value')).toHaveValue('k2');
     });
 
     test('edit mode keeps current selected option in value dropdown', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'kind', data: 'k2' }]}
-            />,
-        );
+        await mountWithExecution(mount, { source: FilterFieldSource.Meta, fieldIdentifier: 'kind', data: 'k2' });
         await page.getByText("'Kind'").click();
         await expect(page.locator('#value')).toHaveValue('k2');
 
@@ -329,27 +332,24 @@ test.describe('FilterWidgetRuleAction', () => {
     });
 
     test('clicking existing select execution item hydrates from object data', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                ExecutionsList={[
-                    { fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'kind', data: { uuid: 'k1', name: 'Kind One' } as any },
-                ]}
-            />,
-        );
+        await mountWithExecution(mount, {
+            source: FilterFieldSource.Meta,
+            fieldIdentifier: 'kind',
+            data: { uuid: 'k1', name: 'Kind One' },
+        });
         await clickBadgeAndVerifyEditMode(page, 'Kind', 'meta', 'kind');
         await expect(page.locator('#value')).toHaveValue('k1');
     });
 
     test('multi value field hydrates on first click even when execution data has a single string', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                availableFilters={makeSearchFieldList(FilterFieldSource.Property, [groupsFieldDef])}
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Property, fieldIdentifier: 'groups', data: 'g1' as any }]}
-            />,
-        );
+        await mountWithExecution(mount, {
+            source: FilterFieldSource.Property,
+            fieldDef: groupsFieldDef,
+            fieldIdentifier: 'groups',
+            data: 'g1',
+        });
 
-        await page.getByText("'Groups'").click();
-        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
+        await clickBadgeAndExpectUpdate(page, 'Groups');
         await expect(page.locator('#group')).toHaveValue('property');
         await expect(page.locator('#field')).toHaveValue('groups');
 
@@ -358,37 +358,24 @@ test.describe('FilterWidgetRuleAction', () => {
     });
 
     test('custom attribute option with reference/data hydrates selected value', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                availableFilters={makeSearchFieldList(FilterFieldSource.Custom, [customAttrFieldDef])}
-                ExecutionsList={[
-                    { fieldSource: FilterFieldSource.Custom, fieldIdentifier: 'customAttr', data: { name: 'Option One' } as any },
-                ]}
-            />,
-        );
+        await mountWithExecution(mount, {
+            source: FilterFieldSource.Custom,
+            fieldDef: customAttrFieldDef,
+            fieldIdentifier: 'customAttr',
+            data: { name: 'Option One' },
+        });
         await clickBadgeAndVerifyEditMode(page, 'Custom Attr', 'custom', 'customAttr');
         await expect(page.locator('#value')).toHaveValue('r1');
     });
 
     test('boolean execution item hydrates value when backend sends string', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'enabled', data: 'FALSE' as any }]}
-            />,
-        );
+        await mountWithExecution(mount, { source: FilterFieldSource.Meta, fieldIdentifier: 'enabled', data: 'FALSE' });
         await clickBadgeAndVerifyEditMode(page, 'Enabled', 'meta', 'enabled');
         await expect(page.locator('#value')).toHaveValue('false');
     });
 
     test('boolean selector allows selecting false and persists boolean false on Add', async ({ mount, page }) => {
-        let lastActions: unknown[] = [];
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                onActionsUpdate={(actions) => {
-                    lastActions = actions;
-                }}
-            />,
-        );
+        const actions = await mountWithActions(mount);
 
         await selectFieldSourceMeta(page);
         await selectFieldOption(page, 'Enabled');
@@ -397,79 +384,59 @@ test.describe('FilterWidgetRuleAction', () => {
         await expect(page.getByRole('button', { name: 'Add', exact: true })).toBeEnabled();
         await page.getByRole('button', { name: 'Add', exact: true }).click();
 
-        expect(lastActions).toHaveLength(1);
-        expect((lastActions as any[])[0]).toMatchObject({ fieldSource: 'meta', fieldIdentifier: 'enabled', data: false });
+        expect(actions.current).toHaveLength(1);
+        expect(firstAction(actions.current)).toMatchObject({ fieldSource: 'meta', fieldIdentifier: 'enabled', data: false });
     });
 
     test('date list execution item hydrates multi values and update maps them to UTC strings', async ({ mount, page }) => {
-        let lastActions: unknown[] = [];
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                availableFilters={makeSearchFieldList(FilterFieldSource.Meta, [expiresAtFieldDef])}
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'expiresAt', data: ['2026-03-01T10:00:00Z'] }]}
-                onActionsUpdate={(actions) => {
-                    lastActions = actions;
-                }}
-            />,
-        );
+        const actions = await mountWithActions(mount, {
+            availableFilters: makeSearchFieldList(FilterFieldSource.Meta, [expiresAtFieldDef]),
+            ExecutionsList: [{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'expiresAt', data: ['2026-03-01T10:00:00Z'] }],
+        });
 
-        await page.getByText("'Expires At'").click();
-        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
+        await clickBadgeAndExpectUpdate(page, 'Expires At');
 
         const selectedValues = await getSelectedNativeValues(page);
         expect(selectedValues).toContain('2026-03-01T10:00:00Z');
 
         await page.getByRole('button', { name: 'Update', exact: true }).click();
-        expect(lastActions).toHaveLength(1);
-        expect(Array.isArray((lastActions as any[])[0].data)).toBe(true);
-        expect((lastActions as any[])[0].data[0]).toContain('2026-03-01T10:00:00');
+        expect(actions.current).toHaveLength(1);
+        expect(Array.isArray(firstAction(actions.current).data)).toBe(true);
+        expect(firstAction(actions.current).data[0]).toContain('2026-03-01T10:00:00');
     });
 
     test('date scalar execution item hydrates formatted date input and keeps update enabled', async ({ mount, page }) => {
-        let lastActions: unknown[] = [];
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                availableFilters={makeSearchFieldList(FilterFieldSource.Meta, [issuedOnDateFieldDef])}
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'issuedOn', data: '2026-03-03T00:00:00Z' }]}
-                onActionsUpdate={(actions) => {
-                    lastActions = actions;
-                }}
-            />,
-        );
+        const actions = await mountWithActions(mount, {
+            availableFilters: makeSearchFieldList(FilterFieldSource.Meta, [issuedOnDateFieldDef]),
+            ExecutionsList: [{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'issuedOn', data: '2026-03-03T00:00:00Z' }],
+        });
 
-        await page.getByText("'Issued On'").click();
-        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
+        await clickBadgeAndExpectUpdate(page, 'Issued On');
         await expect(page.locator('#valueSelect')).toHaveValue(/2026/);
 
         await page.getByRole('button', { name: 'Update', exact: true }).click();
-        expect(lastActions).toHaveLength(1);
-        expect(Array.isArray((lastActions as any[])[0].data)).toBe(true);
+        expect(actions.current).toHaveLength(1);
+        expect(Array.isArray(firstAction(actions.current).data)).toBe(true);
     });
 
     test('string options list keeps selected primitive value in edit mode', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                availableFilters={makeSearchFieldList(FilterFieldSource.Meta, [modeFieldDef])}
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'mode', data: 'beta' }]}
-            />,
-        );
+        await mountWithExecution(mount, {
+            source: FilterFieldSource.Meta,
+            fieldDef: modeFieldDef,
+            fieldIdentifier: 'mode',
+            data: 'beta',
+        });
         await page.getByText("'Mode'").click();
         await expect(page.locator('#value')).toHaveValue('beta');
     });
 
     test('object execution data with nested value.data.uuid hydrates single select value', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                availableFilters={makeSearchFieldList(FilterFieldSource.Custom, [complexAttrFieldDef])}
-                ExecutionsList={[
-                    {
-                        fieldSource: FilterFieldSource.Custom,
-                        fieldIdentifier: 'complexAttr',
-                        data: { value: { data: { uuid: 'cx2', name: 'Complex Two' } } } as any,
-                    },
-                ]}
-            />,
-        );
+        await mountWithExecution(mount, {
+            source: FilterFieldSource.Custom,
+            fieldDef: complexAttrFieldDef,
+            fieldIdentifier: 'complexAttr',
+            data: { value: { data: { uuid: 'cx2', name: 'Complex Two' } } },
+        });
         await clickBadgeAndVerifyEditMode(page, 'Complex Attr', 'custom', 'complexAttr');
         await expect(page.locator('#value')).toHaveValue('cx2');
     });
@@ -484,25 +451,17 @@ test.describe('FilterWidgetRuleAction', () => {
     });
 
     test('single non-array datetime in list-type field hydrates label/value pair', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                availableFilters={makeSearchFieldList(FilterFieldSource.Meta, [createdAtDatetimeFieldDef])}
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'createdAt', data: '2026-04-01T08:00:00Z' }]}
-            />,
-        );
-        await page.getByText("'Created At'").click();
-        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
+        await mountWithExecution(mount, {
+            source: FilterFieldSource.Meta,
+            fieldDef: createdAtDatetimeFieldDef,
+            fieldIdentifier: 'createdAt',
+            data: '2026-04-01T08:00:00Z',
+        });
+        await clickBadgeAndExpectUpdate(page, 'Created At');
     });
 
     test('selecting a value from single-select list and adding it calls onActionsUpdate', async ({ mount, page }) => {
-        let lastActions: unknown[] = [];
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                onActionsUpdate={(actions) => {
-                    lastActions = actions;
-                }}
-            />,
-        );
+        const actions = await mountWithActions(mount);
 
         await selectFieldSourceMeta(page);
         await selectFieldOption(page, 'Kind');
@@ -511,20 +470,14 @@ test.describe('FilterWidgetRuleAction', () => {
         await expect(page.getByRole('button', { name: 'Add', exact: true })).toBeEnabled();
         await page.getByRole('button', { name: 'Add', exact: true }).click();
 
-        expect(lastActions).toHaveLength(1);
-        expect((lastActions as any[])[0]).toMatchObject({ fieldSource: 'meta', fieldIdentifier: 'kind' });
+        expect(actions.current).toHaveLength(1);
+        expect(firstAction(actions.current)).toMatchObject({ fieldSource: 'meta', fieldIdentifier: 'kind' });
     });
 
     test('selecting values in multi-select list and adding calls onActionsUpdate', async ({ mount, page }) => {
-        let lastActions: unknown[] = [];
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                availableFilters={makeSearchFieldList(FilterFieldSource.Property, [groupsFieldDef])}
-                onActionsUpdate={(actions) => {
-                    lastActions = actions;
-                }}
-            />,
-        );
+        const actions = await mountWithActions(mount, {
+            availableFilters: makeSearchFieldList(FilterFieldSource.Property, [groupsFieldDef]),
+        });
 
         await selectFieldSource(page, 'Property');
         await selectFieldOption(page, 'Groups');
@@ -533,133 +486,108 @@ test.describe('FilterWidgetRuleAction', () => {
         await expect(page.getByRole('button', { name: 'Add', exact: true })).toBeEnabled();
         await page.getByRole('button', { name: 'Add', exact: true }).click();
 
-        expect(lastActions).toHaveLength(1);
-        expect((lastActions as any[])[0].fieldIdentifier).toBe('groups');
+        expect(actions.current).toHaveLength(1);
+        expect(firstAction(actions.current).fieldIdentifier).toBe('groups');
     });
 
     test('toggling selected badge deselects it and resets to Add', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'status', data: 'val' }]}
-            />,
-        );
-        await page.getByText("'Status'").click();
-        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
+        await mountWithExecution(mount, { source: FilterFieldSource.Meta, fieldIdentifier: 'status', data: 'val' });
+        await clickBadgeAndExpectUpdate(page, 'Status');
 
         await page.getByText("'Status'").click();
         await expect(page.getByRole('button', { name: 'Add', exact: true })).toBeVisible();
     });
 
     test('ExecutionsList with non-multiValue array data unwraps to single value', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                availableFilters={makeSearchFieldList(FilterFieldSource.Meta, [
-                    { ...defaultMockAvailableFilters[0].searchFieldData![2], multiValue: false },
-                ])}
-                ExecutionsList={[
-                    { fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'kind', data: [{ uuid: 'k1', name: 'Kind One' }] as any },
-                ]}
-            />,
-        );
-        await page.getByText("'Kind'").click();
-        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
+        await mountWithExecution(mount, {
+            source: FilterFieldSource.Meta,
+            fieldDef: { ...defaultMockAvailableFilters[0].searchFieldData![2], multiValue: false },
+            fieldIdentifier: 'kind',
+            data: [{ uuid: 'k1', name: 'Kind One' }],
+        });
+        await clickBadgeAndExpectUpdate(page, 'Kind');
         await expect(page.locator('#value')).toHaveValue('k1');
     });
 
     test('badge displays platformEnum label when field has platformEnum', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                availableFilters={makeSearchFieldList(FilterFieldSource.Meta, [priorityListFieldDef])}
-                platformEnumsOverride={priorityEnumsOverride}
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'priority', data: 'high' }]}
-            />,
-        );
+        await mountWithExecution(mount, {
+            source: FilterFieldSource.Meta,
+            fieldDef: priorityListFieldDef,
+            fieldIdentifier: 'priority',
+            data: 'high',
+            extraProps: { platformEnumsOverride: priorityEnumsOverride },
+        });
         await expect(page.getByText('High Priority')).toBeVisible();
     });
 
     test('number field execution item hydrates value and renders number input', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                availableFilters={makeSearchFieldList(FilterFieldSource.Meta, [countFieldDef])}
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'count', data: 42 }]}
-            />,
-        );
-        await page.getByText("'Count'").click();
-        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
+        await mountWithExecution(mount, {
+            source: FilterFieldSource.Meta,
+            fieldDef: countFieldDef,
+            fieldIdentifier: 'count',
+            data: 42,
+        });
+        await clickBadgeAndExpectUpdate(page, 'Count');
         await expect(page.locator('#valueSelect')).toHaveValue('42');
     });
 
     test('updating an existing list field execution item via Update button', async ({ mount, page }) => {
-        let lastActions: unknown[] = [];
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                onActionsUpdate={(actions) => {
-                    lastActions = actions;
-                }}
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'kind', data: 'k1' }]}
-            />,
-        );
-        await page.getByText("'Kind'").click();
-        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
+        const actions = await mountWithActions(mount, {
+            ExecutionsList: [{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'kind', data: 'k1' }],
+        });
+        await clickBadgeAndExpectUpdate(page, 'Kind');
         await expect(page.locator('#value')).toHaveValue('k1');
 
         await selectValueOption(page, 'Kind Two', 'k2');
         await page.getByRole('button', { name: 'Update', exact: true }).click();
-        expect(lastActions).toHaveLength(1);
+        expect(actions.current).toHaveLength(1);
     });
 
     test('multi-value list execution item with array of objects hydrates as array', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                availableFilters={makeSearchFieldList(FilterFieldSource.Property, [tagsFieldDef])}
-                ExecutionsList={[
-                    {
-                        fieldSource: FilterFieldSource.Property,
-                        fieldIdentifier: 'tags',
-                        data: [
-                            { uuid: 't1', name: 'Tag One' },
-                            { uuid: 't2', name: 'Tag Two' },
-                        ] as any,
-                    },
-                ]}
-            />,
-        );
-        await page.getByText("'Tags'").click();
-        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
+        await mountWithExecution(mount, {
+            source: FilterFieldSource.Property,
+            fieldDef: tagsFieldDef,
+            fieldIdentifier: 'tags',
+            data: [
+                { uuid: 't1', name: 'Tag One' },
+                { uuid: 't2', name: 'Tag Two' },
+            ],
+        });
+        await clickBadgeAndExpectUpdate(page, 'Tags');
 
         const selectedValues = await getSelectedNativeValues(page);
         expect(selectedValues.length).toBeGreaterThanOrEqual(1);
     });
 
     test('badge with platformEnum falls back to string when enum entry missing', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                availableFilters={makeSearchFieldList(FilterFieldSource.Meta, [priorityStringFieldDef])}
-                platformEnumsOverride={priorityEnumsHighOnly}
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'priority', data: 'unknown_value' }]}
-            />,
-        );
+        await mountWithExecution(mount, {
+            source: FilterFieldSource.Meta,
+            fieldDef: priorityStringFieldDef,
+            fieldIdentifier: 'priority',
+            data: 'unknown_value',
+            extraProps: { platformEnumsOverride: priorityEnumsHighOnly },
+        });
         await expect(page.getByText('unknown_value')).toBeVisible();
     });
 
     test('badge with datetime scalar data formats the date', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                availableFilters={makeSearchFieldList(FilterFieldSource.Meta, [updatedAtFieldDef])}
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'updatedAt', data: '2026-05-15T14:30:00Z' }]}
-            />,
-        );
+        await mountWithExecution(mount, {
+            source: FilterFieldSource.Meta,
+            fieldDef: updatedAtFieldDef,
+            fieldIdentifier: 'updatedAt',
+            data: '2026-05-15T14:30:00Z',
+        });
         await expect(page.getByText("'Updated At'")).toBeVisible();
         await expect(page.getByText(/2026/)).toBeVisible();
     });
 
     test('badge with date scalar data formats as date', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                availableFilters={makeSearchFieldList(FilterFieldSource.Meta, [issuedOnStringFieldDef])}
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'issuedOn', data: '2026-06-01' }]}
-            />,
-        );
+        await mountWithExecution(mount, {
+            source: FilterFieldSource.Meta,
+            fieldDef: issuedOnStringFieldDef,
+            fieldIdentifier: 'issuedOn',
+            data: '2026-06-01',
+        });
         await expect(page.getByText("'Issued On'")).toBeVisible();
         await expect(page.getByText(/2026/)).toBeVisible();
     });
@@ -696,56 +624,35 @@ test.describe('FilterWidgetRuleAction', () => {
     });
 
     test('boolean execution item hydrates true when backend sends string true', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'enabled', data: 'true' as any }]}
-            />,
-        );
+        await mountWithExecution(mount, { source: FilterFieldSource.Meta, fieldIdentifier: 'enabled', data: 'true' });
         await clickBadgeAndVerifyEditMode(page, 'Enabled', 'meta', 'enabled');
         await expect(page.locator('#value')).toHaveValue('true');
     });
 
     test('boolean execution item hydrates true when backend sends boolean true', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'enabled', data: true as any }]}
-            />,
-        );
+        await mountWithExecution(mount, { source: FilterFieldSource.Meta, fieldIdentifier: 'enabled', data: true });
         await clickBadgeAndVerifyEditMode(page, 'Enabled', 'meta', 'enabled');
         await expect(page.locator('#value')).toHaveValue('true');
     });
 
     test('remove badge triggers uuid extraction for multi-value object array data', async ({ mount, page }) => {
-        let lastActions: unknown[] = [];
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                availableFilters={[
-                    ...defaultMockAvailableFilters,
-                    ...makeSearchFieldList(FilterFieldSource.Property, [tagsFieldTwoValuesDef]),
-                ]}
-                onActionsUpdate={(actions) => {
-                    lastActions = actions;
-                }}
-                ExecutionsList={[
-                    { fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'status', data: 'val' },
-                    { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'tags', data: [{ uuid: 't1', name: 'Tag One' }] as any },
-                ]}
-            />,
-        );
+        const actions = await mountWithActions(mount, {
+            availableFilters: [...defaultMockAvailableFilters, ...makeSearchFieldList(FilterFieldSource.Property, [tagsFieldTwoValuesDef])],
+            ExecutionsList: [
+                { fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'status', data: 'val' },
+                { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'tags', data: [{ uuid: 't1', name: 'Tag One' }] as any },
+            ],
+        });
 
         const statusBadge = page.getByTestId('badge').filter({ hasText: 'Status' });
         await statusBadge.getByRole('button').click();
-        expect(lastActions).toHaveLength(1);
-        expect((lastActions as any[])[0].fieldIdentifier).toBe('tags');
-        expect((lastActions as any[])[0].data[0]).toBe('t1');
+        expect(actions.current).toHaveLength(1);
+        expect(firstAction(actions.current).fieldIdentifier).toBe('tags');
+        expect(firstAction(actions.current).data[0]).toBe('t1');
     });
 
     test('badge with object data shows name property', async ({ mount, page }) => {
-        await mount(
-            <FilterWidgetRuleActionTestWrapper
-                ExecutionsList={[{ fieldSource: FilterFieldSource.Meta, fieldIdentifier: 'kind', data: { name: 'Kind One' } as any }]}
-            />,
-        );
+        await mountWithExecution(mount, { source: FilterFieldSource.Meta, fieldIdentifier: 'kind', data: { name: 'Kind One' } });
         await expect(page.getByText('Kind One')).toBeVisible();
     });
 });

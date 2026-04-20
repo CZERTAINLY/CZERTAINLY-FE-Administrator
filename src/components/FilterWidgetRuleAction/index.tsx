@@ -73,10 +73,25 @@ interface CurrentActionOptions {
     value: string | any;
 }
 
+function findSearchFieldData(availableFilters: SearchFieldListModel[], source: FilterFieldSource | undefined) {
+    return availableFilters.find((f) => f.filterFieldSource === source)?.searchFieldData;
+}
+
+function findFieldDef(availableFilters: SearchFieldListModel[], source: FilterFieldSource | undefined, identifier: string | undefined) {
+    if (!source || !identifier) return undefined;
+    return findSearchFieldData(availableFilters, source)?.find((s) => s.fieldIdentifier === identifier);
+}
+
+function isFilterValueEmpty(value: unknown): boolean {
+    return value === undefined || value === null || value === '' || (Array.isArray(value) && !value.length);
+}
+
+function isEnterOrSpaceKey(key: string): boolean {
+    return key === 'Enter' || key === ' ';
+}
+
 function mapActionToExecutionItem(a: ExecutionItemRequestModel, availableFilters: SearchFieldListModel[]): ExecutionItemModel {
-    const fieldOfAction = availableFilters
-        .find((f) => f.filterFieldSource === a.fieldSource)
-        ?.searchFieldData?.find((s) => s.fieldIdentifier === a.fieldIdentifier);
+    const fieldOfAction = findFieldDef(availableFilters, a.fieldSource, a.fieldIdentifier);
     const isDateField = fieldOfAction && checkIfFieldAttributeTypeIsDate(fieldOfAction);
     const formatData = (v: any) => {
         if (typeof v === 'object' && Object.prototype.hasOwnProperty.call(v, 'uuid')) return v.uuid;
@@ -164,9 +179,19 @@ export default function FilterWidgetRuleAction({
         [setSelectedFilter],
     );
 
-    const currentFields = useMemo(
-        () => availableFilters.find((f) => f.filterFieldSource === fieldSource)?.searchFieldData,
-        [availableFilters, fieldSource],
+    const currentFields = useMemo(() => findSearchFieldData(availableFilters, fieldSource), [availableFilters, fieldSource]);
+
+    const clearFilterInputs = useCallback(() => {
+        setFieldSource(undefined);
+        setFilterField(undefined);
+        setFilterValue(undefined);
+    }, []);
+
+    const notifyActionsUpdate = useCallback(
+        (next: ExecutionItemRequestModel[]) => {
+            onActionsUpdate?.(next.map((a) => mapActionToExecutionItem(a, availableFilters)));
+        },
+        [onActionsUpdate, availableFilters],
     );
 
     const currentField = useMemo(() => currentFields?.find((f) => f.fieldIdentifier === filterField), [filterField, currentFields]);
@@ -284,10 +309,7 @@ export default function FilterWidgetRuleAction({
     );
 
     const onUpdateClick = useCallback(() => {
-        if (!fieldSource) return;
-        if (!filterField) return;
-        if (filterValue === undefined || filterValue === null || filterValue === '') return;
-        if (Array.isArray(filterValue) && !filterValue.length) return;
+        if (!fieldSource || !filterField || isFilterValueEmpty(filterValue)) return;
 
         let executionData: any;
         if (typeof filterValue === 'string' || typeof filterValue === 'number' || typeof filterValue === 'boolean') {
@@ -304,47 +326,31 @@ export default function FilterWidgetRuleAction({
             fieldIdentifier: filterField!,
             data: executionData,
         };
-        setFieldSource(undefined);
-        setFilterField(undefined);
-        setFilterValue(undefined);
+        clearFilterInputs();
 
         const updatedActions =
             selectedFilter === -1 ? [...actions, newExecution] : actions.map((a, i) => (i === selectedFilter ? newExecution : a));
         setActions(updatedActions);
-        onActionsUpdate?.(updatedActions.map((a) => mapActionToExecutionItem(a, availableFilters)));
+        notifyActionsUpdate(updatedActions);
         setSelectedFilter(-1);
-    }, [
-        fieldSource,
-        filterField,
-        filterValue,
-        setFieldSource,
-        setFilterField,
-        setFilterValue,
-        actions,
-        setActions,
-        onActionsUpdate,
-        selectedFilter,
-        availableFilters,
-    ]);
+    }, [fieldSource, filterField, filterValue, actions, selectedFilter, clearFilterInputs, notifyActionsUpdate]);
 
     useEffect(() => {
         if (selectedFilter === -1) {
-            setFieldSource(undefined);
-            setFilterField(undefined);
-            setFilterValue(undefined);
+            clearFilterInputs();
         }
-    }, [selectedFilter]);
+    }, [selectedFilter, clearFilterInputs]);
 
     const onRemoveFilterClick = useCallback(
         (index: number) => {
             const newActions = actions.filter((_, i) => i !== index);
             setActions(newActions);
             if (onActionsUpdate) {
-                onActionsUpdate(newActions.map((a) => mapActionToExecutionItem(a, availableFilters)));
+                notifyActionsUpdate(newActions);
                 setSelectedFilter(-1);
             }
         },
-        [actions, onActionsUpdate, availableFilters],
+        [actions, onActionsUpdate, notifyActionsUpdate],
     );
 
     const toggleFilter = useCallback(
@@ -393,32 +399,20 @@ export default function FilterWidgetRuleAction({
         }
 
         const field = selectedAction.fieldSource;
-        if (!field) {
-            return;
-        }
-
-        const currentFieldsBySelectedSource = availableFilters.find((f) => f.filterFieldSource === field)?.searchFieldData;
-
         const fieldIdentifier = selectedAction.fieldIdentifier;
-        const fieldIdentifierSelected = currentFieldsBySelectedSource?.find((cf) => cf.fieldIdentifier === fieldIdentifier);
-        if (!fieldIdentifier) {
+        if (!field || !fieldIdentifier) {
             return;
         }
 
         setFieldSource(field);
-
-        if (fieldIdentifierSelected) {
-            setFilterField(fieldIdentifierSelected.fieldIdentifier);
-        } else {
-            setFilterField(fieldIdentifier);
-        }
+        setFilterField(fieldIdentifier);
 
         const currentActionDataRaw = selectedAction.data;
         if (currentActionDataRaw === undefined) {
             return;
         }
 
-        const thisCurrentField = currentFieldsBySelectedSource?.find((f) => f.fieldIdentifier === fieldIdentifier);
+        const thisCurrentField = findFieldDef(availableFilters, field, fieldIdentifier);
 
         const currentActionData =
             thisCurrentField && !thisCurrentField.multiValue && Array.isArray(currentActionDataRaw)
@@ -481,9 +475,7 @@ export default function FilterWidgetRuleAction({
         const updatedActions = ExecutionsList.map((action) => {
             if (!(typeof action.data === 'object')) return action;
 
-            const thisCurrentFields = availableFilters.find((f) => f.filterFieldSource === action.fieldSource)?.searchFieldData;
-            if (!thisCurrentFields) return action;
-            const thisCurrentField = thisCurrentFields.find((f) => f.fieldIdentifier === action.fieldIdentifier);
+            const thisCurrentField = findFieldDef(availableFilters, action.fieldSource, action.fieldIdentifier);
             if (!thisCurrentField) return action;
 
             if (Array.isArray(action.data) && action.data.every((v) => typeof v === 'string')) {
@@ -537,24 +529,25 @@ export default function FilterWidgetRuleAction({
     );
 
     const renderObjectValueSelector = useMemo(
-        () => (
-            <Select
-                id="value"
-                options={objectValueOptions}
-                value={
-                    currentField?.multiValue
-                        ? Array.isArray(filterValue)
-                            ? filterValue
-                            : []
-                        : Array.isArray(filterValue) || typeof filterValue === 'boolean'
-                          ? ''
-                          : (filterValue ?? '')
-                }
-                onChange={currentField?.multiValue ? onMultiValueChange : onSingleValueChange}
-                isMulti={!!currentField?.multiValue}
-                placeholder="Select filter value from options"
-            />
-        ),
+        () =>
+            currentField?.multiValue ? (
+                <Select
+                    id="value"
+                    options={objectValueOptions}
+                    isMulti
+                    value={Array.isArray(filterValue) ? filterValue : []}
+                    onChange={onMultiValueChange}
+                    placeholder="Select filter value from options"
+                />
+            ) : (
+                <Select
+                    id="value"
+                    options={objectValueOptions}
+                    value={Array.isArray(filterValue) || typeof filterValue === 'boolean' ? '' : (filterValue ?? '')}
+                    onChange={onSingleValueChange}
+                    placeholder="Select filter value from options"
+                />
+            ),
         [objectValueOptions, filterValue, currentField, onMultiValueChange, onSingleValueChange],
     );
 
@@ -570,7 +563,7 @@ export default function FilterWidgetRuleAction({
                         role="button"
                         tabIndex={0}
                         onKeyDown={(event) => {
-                            if (event.key === 'Enter' || event.key === ' ') {
+                            if (isEnterOrSpaceKey(event.key)) {
                                 event.preventDefault();
                                 onRemoveFilterClick(itemNumber);
                             }
@@ -584,12 +577,10 @@ export default function FilterWidgetRuleAction({
         [onRemoveFilterClick, searchGroupEnum, disableBadgeRemove],
     );
 
-    const isUpdateButtonDisabled = useMemo(() => {
-        const isFilterValueEmpty =
-            filterValue === undefined || filterValue === null || filterValue === '' || (Array.isArray(filterValue) && !filterValue.length);
-
-        return !filterField || !fieldSource || isFilterValueEmpty;
-    }, [filterField, fieldSource, filterValue]);
+    const isUpdateButtonDisabled = useMemo(
+        () => !filterField || !fieldSource || isFilterValueEmpty(filterValue),
+        [filterField, fieldSource, filterValue],
+    );
 
     return (
         <>
@@ -600,7 +591,7 @@ export default function FilterWidgetRuleAction({
                     tabIndex={0}
                     onClick={onUnselectFiltersClick}
                     onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
+                        if (isEnterOrSpaceKey(e.key)) {
                             onUnselectFiltersClick({ target: { id: 'unselectFilters' } } as unknown as React.MouseEvent<HTMLDivElement>);
                         }
                     }}
@@ -693,9 +684,7 @@ export default function FilterWidgetRuleAction({
 
                     <div className="flex gap-2 flex-wrap">
                         {actions.map((f, i) => {
-                            const field = availableFilters
-                                .find((a) => a.filterFieldSource === f.fieldSource)
-                                ?.searchFieldData?.find((s) => s.fieldIdentifier === f.fieldIdentifier);
+                            const field = findFieldDef(availableFilters, f.fieldSource, f.fieldIdentifier);
                             const label = field ? field.fieldLabel : f.fieldIdentifier;
                             const value =
                                 field && field.type === FilterFieldType.Boolean
