@@ -265,25 +265,17 @@ test.describe('FilterWidgetRuleAction', () => {
         expect(actions.current).toHaveLength(0);
     });
 
-    test('remove badge via keyboard Enter triggers remove', async ({ mount, page }) => {
-        const actions = await mountWithActions(mount);
-        await addStringAction(page, 'Status', 'y');
+    for (const key of ['Enter', 'Space'] as const) {
+        test(`remove badge via keyboard ${key} triggers remove`, async ({ mount, page }) => {
+            const actions = await mountWithActions(mount);
+            await addStringAction(page, 'Status', key);
 
-        await page.getByText('×').focus();
-        await page.keyboard.press('Enter');
-        await expect(page.getByText("'Status'")).not.toBeVisible();
-        expect(actions.current).toHaveLength(0);
-    });
-
-    test('remove badge via keyboard Space triggers remove', async ({ mount, page }) => {
-        const actions = await mountWithActions(mount);
-        await addStringAction(page, 'Status', 'sp');
-
-        await page.getByText('×').focus();
-        await page.keyboard.press('Space');
-        await expect(page.getByText("'Status'")).not.toBeVisible();
-        expect(actions.current).toHaveLength(0);
-    });
+            await page.getByText('×').focus();
+            await page.keyboard.press(key);
+            await expect(page.getByText("'Status'")).not.toBeVisible();
+            expect(actions.current).toHaveLength(0);
+        });
+    }
 
     test('disableBadgeRemove hides remove control in badge', async ({ mount, page }) => {
         await mount(<FilterWidgetRuleActionTestWrapper disableBadgeRemove onActionsUpdate={() => {}} />);
@@ -570,27 +562,33 @@ test.describe('FilterWidgetRuleAction', () => {
         await expect(page.getByText('unknown_value')).toBeVisible();
     });
 
-    test('badge with datetime scalar data formats the date', async ({ mount, page }) => {
-        await mountWithExecution(mount, {
-            source: FilterFieldSource.Meta,
+    for (const scenario of [
+        {
+            title: 'datetime scalar data formats the date',
             fieldDef: updatedAtFieldDef,
             fieldIdentifier: 'updatedAt',
             data: '2026-05-15T14:30:00Z',
-        });
-        await expect(page.getByText("'Updated At'")).toBeVisible();
-        await expect(page.getByText(/2026/)).toBeVisible();
-    });
-
-    test('badge with date scalar data formats as date', async ({ mount, page }) => {
-        await mountWithExecution(mount, {
-            source: FilterFieldSource.Meta,
+            label: 'Updated At',
+        },
+        {
+            title: 'date scalar data formats as date',
             fieldDef: issuedOnStringFieldDef,
             fieldIdentifier: 'issuedOn',
             data: '2026-06-01',
+            label: 'Issued On',
+        },
+    ]) {
+        test(`badge with ${scenario.title}`, async ({ mount, page }) => {
+            await mountWithExecution(mount, {
+                source: FilterFieldSource.Meta,
+                fieldDef: scenario.fieldDef,
+                fieldIdentifier: scenario.fieldIdentifier,
+                data: scenario.data,
+            });
+            await expect(page.getByText(`'${scenario.label}'`)).toBeVisible();
+            await expect(page.getByText(/2026/)).toBeVisible();
         });
-        await expect(page.getByText("'Issued On'")).toBeVisible();
-        await expect(page.getByText(/2026/)).toBeVisible();
-    });
+    }
 
     test('changing field clears value and disables Add', async ({ mount, page }) => {
         await mount(<FilterWidgetRuleActionTestWrapper />);
@@ -603,37 +601,25 @@ test.describe('FilterWidgetRuleAction', () => {
         await expect(page.getByRole('button', { name: 'Add', exact: true })).toBeDisabled();
     });
 
-    test('unselectFilters click clears selection', async ({ mount, page }) => {
-        await mount(<FilterWidgetRuleActionTestWrapper onActionsUpdate={() => {}} />);
-        await addStringAction(page, 'Status', 'a');
-        await page.getByText("'Status'").click();
-        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
-        await page.locator('#unselectFilters').focus();
-        await page.keyboard.press('Enter');
-        await expect(page.getByRole('button', { name: 'Add', exact: true })).toBeVisible();
-    });
+    for (const key of ['Enter', 'Space'] as const) {
+        test(`unselectFilters via keyboard ${key} clears selection`, async ({ mount, page }) => {
+            await mount(<FilterWidgetRuleActionTestWrapper onActionsUpdate={() => {}} />);
+            await addStringAction(page, 'Status', key);
+            await page.getByText("'Status'").click();
+            await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
+            await page.locator('#unselectFilters').focus();
+            await page.keyboard.press(key);
+            await expect(page.getByRole('button', { name: 'Add', exact: true })).toBeVisible();
+        });
+    }
 
-    test('unselectFilters via keyboard Space clears selection', async ({ mount, page }) => {
-        await mount(<FilterWidgetRuleActionTestWrapper onActionsUpdate={() => {}} />);
-        await addStringAction(page, 'Status', 'b');
-        await page.getByText("'Status'").click();
-        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeVisible();
-        await page.locator('#unselectFilters').focus();
-        await page.keyboard.press('Space');
-        await expect(page.getByRole('button', { name: 'Add', exact: true })).toBeVisible();
-    });
-
-    test('boolean execution item hydrates true when backend sends string true', async ({ mount, page }) => {
-        await mountWithExecution(mount, { source: FilterFieldSource.Meta, fieldIdentifier: 'enabled', data: 'true' });
-        await clickBadgeAndVerifyEditMode(page, 'Enabled', 'meta', 'enabled');
-        await expect(page.locator('#value')).toHaveValue('true');
-    });
-
-    test('boolean execution item hydrates true when backend sends boolean true', async ({ mount, page }) => {
-        await mountWithExecution(mount, { source: FilterFieldSource.Meta, fieldIdentifier: 'enabled', data: true });
-        await clickBadgeAndVerifyEditMode(page, 'Enabled', 'meta', 'enabled');
-        await expect(page.locator('#value')).toHaveValue('true');
-    });
+    for (const data of ['true', true] as const) {
+        test(`boolean execution item hydrates true when backend sends ${typeof data} true`, async ({ mount, page }) => {
+            await mountWithExecution(mount, { source: FilterFieldSource.Meta, fieldIdentifier: 'enabled', data });
+            await clickBadgeAndVerifyEditMode(page, 'Enabled', 'meta', 'enabled');
+            await expect(page.locator('#value')).toHaveValue('true');
+        });
+    }
 
     test('remove badge triggers uuid extraction for multi-value object array data', async ({ mount, page }) => {
         const actions = await mountWithActions(mount, {

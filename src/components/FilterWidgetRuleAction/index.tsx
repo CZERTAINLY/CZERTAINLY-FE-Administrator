@@ -86,22 +86,25 @@ function isFilterValueEmpty(value: unknown): boolean {
     return value === undefined || value === null || value === '' || (Array.isArray(value) && !value.length);
 }
 
-function isEnterOrSpaceKey(key: string): boolean {
-    return key === 'Enter' || key === ' ';
-}
-
 function mapActionToExecutionItem(a: ExecutionItemRequestModel, availableFilters: SearchFieldListModel[]): ExecutionItemModel {
     const fieldOfAction = findFieldDef(availableFilters, a.fieldSource, a.fieldIdentifier);
     const isDateField = fieldOfAction && checkIfFieldAttributeTypeIsDate(fieldOfAction);
     const formatData = (v: any) => {
-        if (typeof v === 'object' && Object.prototype.hasOwnProperty.call(v, 'uuid')) return v.uuid;
+        if (typeof v === 'object' && v !== null && Object.hasOwn(v, 'uuid')) return v.uuid;
         if (isDateField) {
-            const raw = Object.prototype.hasOwnProperty.call(v, 'value') ? v.value : v;
+            const raw = typeof v === 'object' && v !== null && Object.hasOwn(v, 'value') ? v.value : v;
             return getFormattedUtc(fieldOfAction.attributeContentType!, raw);
         }
         return v;
     };
-    const data = Array.isArray(a.data) ? a.data.map(formatData) : isDateField ? [formatData(a.data)] : a.data;
+    let data: unknown;
+    if (Array.isArray(a.data)) {
+        data = a.data.map(formatData);
+    } else if (isDateField) {
+        data = [formatData(a.data)];
+    } else {
+        data = a.data;
+    }
     return { fieldSource: a.fieldSource, fieldIdentifier: a.fieldIdentifier, data };
 }
 
@@ -111,7 +114,6 @@ interface Props {
     getAvailableFiltersApi: (apiClients: ApiClients) => Observable<Array<SearchFieldListModel>>;
     onActionsUpdate?: (actionRuleRequests: ExecutionItemModel[]) => void;
     ExecutionsList?: ExecutionItemModel[];
-    includeIgnoreAction?: boolean;
     disableBadgeRemove?: boolean;
     busyBadges?: boolean;
 }
@@ -322,8 +324,8 @@ export default function FilterWidgetRuleAction({
             executionData = filterValue;
         }
         const newExecution: ExecutionItemRequestModel = {
-            fieldSource: fieldSource!,
-            fieldIdentifier: filterField!,
+            fieldSource,
+            fieldIdentifier: filterField,
             data: executionData,
         };
         clearFilterInputs();
@@ -449,7 +451,14 @@ export default function FilterWidgetRuleAction({
 
         if (thisCurrentField.multiValue) {
             const mappedValues = mapActionDataToSelectValue(thisCurrentField, currentActionData);
-            setFilterValue(Array.isArray(mappedValues) ? mappedValues : mappedValues ? [mappedValues] : []);
+            let nextValue: typeof mappedValues | [] = [];
+
+            if (Array.isArray(mappedValues)) {
+                nextValue = mappedValues;
+            } else if (mappedValues) {
+                nextValue = [mappedValues];
+            }
+            setFilterValue(nextValue);
         } else {
             setFilterValue(mapActionDataToSingleSelectPrimitive(thisCurrentField, currentActionData));
         }
@@ -559,12 +568,16 @@ export default function FilterWidgetRuleAction({
                 {value}
                 {!disableBadgeRemove && (
                     <span
-                        onClick={() => onRemoveFilterClick(itemNumber)}
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            onRemoveFilterClick(itemNumber);
+                        }}
                         role="button"
                         tabIndex={0}
                         onKeyDown={(event) => {
-                            if (isEnterOrSpaceKey(event.key)) {
+                            if (event.key === 'Enter' || event.key === ' ') {
                                 event.preventDefault();
+                                event.stopPropagation();
                                 onRemoveFilterClick(itemNumber);
                             }
                         }}
@@ -585,17 +598,8 @@ export default function FilterWidgetRuleAction({
     return (
         <>
             <Widget title={title} busy={isFetchingAvailableFilters} titleSize="large">
-                <div
-                    id="unselectFilters"
-                    role="button"
-                    tabIndex={0}
-                    onClick={onUnselectFiltersClick}
-                    onKeyDown={(e) => {
-                        if (isEnterOrSpaceKey(e.key)) {
-                            onUnselectFiltersClick({ target: { id: 'unselectFilters' } } as unknown as React.MouseEvent<HTMLDivElement>);
-                        }
-                    }}
-                >
+                {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
+                <div id="unselectFilters" onClick={onUnselectFiltersClick}>
                     <div className="flex flex-row gap-2 mb-4 items-end">
                         <div className="grid grid-cols-4 gap-2 w-full">
                             <Select
@@ -647,7 +651,7 @@ export default function FilterWidgetRuleAction({
                                         })()}
                                         value={filterValue !== undefined && typeof filterValue !== 'object' ? String(filterValue) : ''}
                                         onChange={(value) => {
-                                            setFilterValue(JSON.parse(JSON.stringify(value)));
+                                            setFilterValue(structuredClone(value));
                                         }}
                                         placeholder="Enter filter value"
                                         disabled={!filterField}
@@ -658,9 +662,15 @@ export default function FilterWidgetRuleAction({
                                         options={
                                             filterField ? booleanOptions.map((opt) => ({ label: opt.label, value: String(opt.value) })) : []
                                         }
-                                        value={filterValue === undefined ? '' : String(filterValue)}
+                                        value={typeof filterValue === 'boolean' ? String(filterValue) : ''}
                                         onChange={(value) => {
-                                            setFilterValue(value === 'true' ? true : value === 'false' ? false : undefined);
+                                            if (value === 'true') {
+                                                setFilterValue(true);
+                                            } else if (value === 'false') {
+                                                setFilterValue(false);
+                                            } else {
+                                                setFilterValue(undefined);
+                                            }
                                         }}
                                         isDisabled={!filterField}
                                     />
@@ -687,7 +697,7 @@ export default function FilterWidgetRuleAction({
                             const field = findFieldDef(availableFilters, f.fieldSource, f.fieldIdentifier);
                             const label = field ? field.fieldLabel : f.fieldIdentifier;
                             const value =
-                                field && field.type === FilterFieldType.Boolean
+                                field?.type === FilterFieldType.Boolean
                                     ? `'${booleanOptions.find((b) => !!f.data === b.value)?.label}'`
                                     : Array.isArray(f.data)
                                       ? f.data.map((v) => `'${formatBadgeDataValue(v, field, platformEnums)}'`).join(', ')
