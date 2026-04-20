@@ -195,7 +195,7 @@ export default function CertificateList({
                           },
                       },
                       {
-                          icon: 'plug',
+                          icon: 'shield-check',
                           disabled: checkedRows.length === 0,
                           tooltip: 'Override RA Profile',
                           onClick: () => {
@@ -434,7 +434,7 @@ export default function CertificateList({
                 toggle={() => setUpdateRaProfile(false)}
                 buttons={[]}
                 size="md"
-                icon="plug"
+                icon="shield-check"
             />
         </>
     );

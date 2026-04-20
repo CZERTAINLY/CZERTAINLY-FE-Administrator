@@ -219,7 +219,7 @@ export default function SecretsList() {
                 onClick: () => setIsUpdateGroupsOpen(true),
             },
             {
-                icon: 'plug',
+                icon: 'shield-check',
                 disabled: checkedRows.length === 0,
                 tooltip: 'Override Source Vault Profile',
                 onClick: () => setIsUpdateVaultProfileOpen(true),
