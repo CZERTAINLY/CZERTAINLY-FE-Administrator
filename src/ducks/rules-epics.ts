@@ -1,5 +1,5 @@
-import { of } from 'rxjs';
-import { catchError, filter, switchMap } from 'rxjs/operators';
+import { from, of } from 'rxjs';
+import { catchError, concatMap, exhaustMap, filter, map, mergeMap, switchMap, toArray } from 'rxjs/operators';
 
 import { AppEpic } from 'ducks';
 import { extractError } from 'utils/net';
@@ -704,6 +704,216 @@ const associateEventTriggers: AppEpic = (action$, state, deps) => {
     );
 };
 
+export const bulkDeleteRules: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkDeleteRules.match),
+        exhaustMap((action) =>
+            from(action.payload.ruleUuids).pipe(
+                concatMap((ruleUuid) =>
+                    deps.apiClients.rules.deleteRule({ ruleUuid }).pipe(
+                        map(() => ({ uuid: ruleUuid, ok: true })),
+                        catchError(() => of({ uuid: ruleUuid, ok: false })),
+                    ),
+                ),
+                toArray(),
+                mergeMap((results) => {
+                    const deletedUuids = results.filter((r) => r.ok).map((r) => r.uuid);
+                    const failedDeletes = results.length - deletedUuids.length;
+
+                    if (failedDeletes === 0) {
+                        return of(slice.actions.bulkDeleteRulesSuccess({ ruleUuids: deletedUuids }));
+                    }
+
+                    return of(
+                        slice.actions.bulkDeleteRulesSuccess({ ruleUuids: deletedUuids }),
+                        slice.actions.bulkDeleteRulesFailure({
+                            error: `Failed to delete ${failedDeletes} rule${failedDeletes === 1 ? '' : 's'}`,
+                        }),
+                        appRedirectActions.fetchError({
+                            error: undefined,
+                            message: `Failed to delete ${failedDeletes} rule${failedDeletes === 1 ? '' : 's'}`,
+                        }),
+                    );
+                }),
+                catchError((error) =>
+                    of(
+                        slice.actions.bulkDeleteRulesFailure({ error: extractError(error, 'Failed to delete Rules') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to delete Rules' }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+export const bulkDeleteActions: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkDeleteActions.match),
+        exhaustMap((action) =>
+            from(action.payload.actionUuids).pipe(
+                concatMap((actionUuid) =>
+                    deps.apiClients.actions.deleteAction({ actionUuid }).pipe(
+                        map(() => ({ uuid: actionUuid, ok: true })),
+                        catchError(() => of({ uuid: actionUuid, ok: false })),
+                    ),
+                ),
+                toArray(),
+                mergeMap((results) => {
+                    const deletedUuids = results.filter((r) => r.ok).map((r) => r.uuid);
+                    const failedDeletes = results.length - deletedUuids.length;
+
+                    if (failedDeletes === 0) {
+                        return of(slice.actions.bulkDeleteActionsSuccess({ actionUuids: deletedUuids }));
+                    }
+
+                    return of(
+                        slice.actions.bulkDeleteActionsSuccess({ actionUuids: deletedUuids }),
+                        slice.actions.bulkDeleteActionsFailure({
+                            error: `Failed to delete ${failedDeletes} action${failedDeletes === 1 ? '' : 's'}`,
+                        }),
+                        appRedirectActions.fetchError({
+                            error: undefined,
+                            message: `Failed to delete ${failedDeletes} action${failedDeletes === 1 ? '' : 's'}`,
+                        }),
+                    );
+                }),
+                catchError((error) =>
+                    of(
+                        slice.actions.bulkDeleteActionsFailure({ error: extractError(error, 'Failed to delete Actions') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to delete Actions' }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+export const bulkDeleteConditions: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkDeleteConditions.match),
+        exhaustMap((action) =>
+            from(action.payload.conditionUuids).pipe(
+                concatMap((conditionUuid) =>
+                    deps.apiClients.rules.deleteCondition({ conditionUuid }).pipe(
+                        map(() => ({ uuid: conditionUuid, ok: true })),
+                        catchError(() => of({ uuid: conditionUuid, ok: false })),
+                    ),
+                ),
+                toArray(),
+                mergeMap((results) => {
+                    const deletedUuids = results.filter((r) => r.ok).map((r) => r.uuid);
+                    const failedDeletes = results.length - deletedUuids.length;
+
+                    if (failedDeletes === 0) {
+                        return of(slice.actions.bulkDeleteConditionsSuccess({ conditionUuids: deletedUuids }));
+                    }
+
+                    return of(
+                        slice.actions.bulkDeleteConditionsSuccess({ conditionUuids: deletedUuids }),
+                        slice.actions.bulkDeleteConditionsFailure({
+                            error: `Failed to delete ${failedDeletes} condition${failedDeletes === 1 ? '' : 's'}`,
+                        }),
+                        appRedirectActions.fetchError({
+                            error: undefined,
+                            message: `Failed to delete ${failedDeletes} condition${failedDeletes === 1 ? '' : 's'}`,
+                        }),
+                    );
+                }),
+                catchError((error) =>
+                    of(
+                        slice.actions.bulkDeleteConditionsFailure({ error: extractError(error, 'Failed to delete Conditions') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to delete Conditions' }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+export const bulkDeleteTriggers: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkDeleteTriggers.match),
+        exhaustMap((action) =>
+            from(action.payload.triggerUuids).pipe(
+                concatMap((triggerUuid) =>
+                    deps.apiClients.triggers.deleteTrigger({ triggerUuid }).pipe(
+                        map(() => ({ uuid: triggerUuid, ok: true })),
+                        catchError(() => of({ uuid: triggerUuid, ok: false })),
+                    ),
+                ),
+                toArray(),
+                mergeMap((results) => {
+                    const deletedUuids = results.filter((r) => r.ok).map((r) => r.uuid);
+                    const failedDeletes = results.length - deletedUuids.length;
+
+                    if (failedDeletes === 0) {
+                        return of(slice.actions.bulkDeleteTriggersSuccess({ triggerUuids: deletedUuids }));
+                    }
+
+                    return of(
+                        slice.actions.bulkDeleteTriggersSuccess({ triggerUuids: deletedUuids }),
+                        slice.actions.bulkDeleteTriggersFailure({
+                            error: `Failed to delete ${failedDeletes} trigger${failedDeletes === 1 ? '' : 's'}`,
+                        }),
+                        appRedirectActions.fetchError({
+                            error: undefined,
+                            message: `Failed to delete ${failedDeletes} trigger${failedDeletes === 1 ? '' : 's'}`,
+                        }),
+                    );
+                }),
+                catchError((error) =>
+                    of(
+                        slice.actions.bulkDeleteTriggersFailure({ error: extractError(error, 'Failed to delete Triggers') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to delete Triggers' }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+export const bulkDeleteExecutions: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkDeleteExecutions.match),
+        exhaustMap((action) =>
+            from(action.payload.executionUuids).pipe(
+                concatMap((executionUuid) =>
+                    deps.apiClients.actions.deleteExecution({ executionUuid }).pipe(
+                        map(() => ({ uuid: executionUuid, ok: true })),
+                        catchError(() => of({ uuid: executionUuid, ok: false })),
+                    ),
+                ),
+                toArray(),
+                mergeMap((results) => {
+                    const deletedUuids = results.filter((r) => r.ok).map((r) => r.uuid);
+                    const failedDeletes = results.length - deletedUuids.length;
+
+                    if (failedDeletes === 0) {
+                        return of(slice.actions.bulkDeleteExecutionsSuccess({ executionUuids: deletedUuids }));
+                    }
+
+                    return of(
+                        slice.actions.bulkDeleteExecutionsSuccess({ executionUuids: deletedUuids }),
+                        slice.actions.bulkDeleteExecutionsFailure({
+                            error: `Failed to delete ${failedDeletes} execution${failedDeletes === 1 ? '' : 's'}`,
+                        }),
+                        appRedirectActions.fetchError({
+                            error: undefined,
+                            message: `Failed to delete ${failedDeletes} execution${failedDeletes === 1 ? '' : 's'}`,
+                        }),
+                    );
+                }),
+                catchError((error) =>
+                    of(
+                        slice.actions.bulkDeleteExecutionsFailure({ error: extractError(error, 'Failed to delete Executions') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to delete Executions' }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 const epics = [
     listRules,
     listExecutions,
@@ -734,6 +944,11 @@ const epics = [
     getTriggerHistorySummary,
     getEventTriggersAssociations,
     associateEventTriggers,
+    bulkDeleteRules,
+    bulkDeleteActions,
+    bulkDeleteConditions,
+    bulkDeleteTriggers,
+    bulkDeleteExecutions,
 ];
 
 export default epics;

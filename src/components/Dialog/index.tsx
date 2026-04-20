@@ -16,7 +16,7 @@ import {
     Check,
     Plug,
 } from 'lucide-react';
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
 export type ModalIcon = 'delete' | 'info' | 'warning' | 'success' | 'error' | 'users' | 'user' | 'download' | 'plug' | React.ReactNode;
@@ -52,7 +52,7 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
     };
 
     // Lock body scroll when modal is open
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
         } else {
