@@ -104,8 +104,7 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
     }, [isList, contentValues, setValue]);
 
     const fieldStepValue = useMemo(() => {
-        const stepValue = getStepValue(ContentFieldConfiguration[contentType].type);
-        return stepValue;
+        return getStepValue(ContentFieldConfiguration[contentType].type);
     }, [contentType]);
 
     useEffect(() => {
@@ -154,6 +153,7 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
                                         justify="start"
                                         buttons={[
                                             {
+                                                id: 'remove',
                                                 icon: 'cross',
                                                 disabled: readOnly && contentValues?.length === 1,
                                                 tooltip: 'Remove',

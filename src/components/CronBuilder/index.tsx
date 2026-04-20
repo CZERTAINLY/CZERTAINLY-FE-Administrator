@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Checkbox from 'components/Checkbox';
 import Label from 'components/Label';
 import TabLayout from 'components/Layout/TabLayout';
@@ -40,7 +40,7 @@ export default function CronBuilder({ value, onChange }: Props) {
     const [state, setState] = useState<CronState>(() => parseCron(value));
     const lastEmittedRef = useRef<string>(value);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (value === lastEmittedRef.current) return;
         setState(parseCron(value));
     }, [value]);
