@@ -696,7 +696,7 @@ export default function FilterWidgetRuleAction({
                                         : '';
                             return (
                                 <Badge
-                                    key={`${f.fieldSource}-${f.fieldIdentifier}`}
+                                    key={`${i}-${f.fieldSource}-${f.fieldIdentifier}`}
                                     onClick={() => toggleFilter(i)}
                                     color={selectedFilter === i ? 'primary' : 'secondary'}
                                 >
