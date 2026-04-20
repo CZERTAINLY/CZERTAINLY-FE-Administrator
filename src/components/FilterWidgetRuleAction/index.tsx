@@ -172,13 +172,27 @@ export default function FilterWidgetRuleAction({
         setSelectedFilter(-1);
     }, [entity]);
 
+    const unselectAllFilters = useCallback(() => {
+        setSelectedFilter(-1);
+    }, [setSelectedFilter]);
+
     const onUnselectFiltersClick = useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
             if ((e.target as HTMLDivElement).id === 'unselectFilters') {
-                setSelectedFilter(-1);
+                unselectAllFilters();
             }
         },
-        [setSelectedFilter],
+        [unselectAllFilters],
+    );
+
+    const onUnselectFiltersKeyDown = useCallback(
+        (e: React.KeyboardEvent<HTMLDivElement>) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                unselectAllFilters();
+            }
+        },
+        [unselectAllFilters],
     );
 
     const currentFields = useMemo(() => findSearchFieldData(availableFilters, fieldSource), [availableFilters, fieldSource]);
@@ -349,8 +363,8 @@ export default function FilterWidgetRuleAction({
             setActions(newActions);
             if (onActionsUpdate) {
                 notifyActionsUpdate(newActions);
-                setSelectedFilter(-1);
             }
+            setSelectedFilter(-1);
         },
         [actions, onActionsUpdate, notifyActionsUpdate],
     );
@@ -598,8 +612,7 @@ export default function FilterWidgetRuleAction({
     return (
         <>
             <Widget title={title} busy={isFetchingAvailableFilters} titleSize="large">
-                {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
-                <div id="unselectFilters" onClick={onUnselectFiltersClick}>
+                <div id="unselectFilters" role="button" tabIndex={0} onClick={onUnselectFiltersClick} onKeyDown={onUnselectFiltersKeyDown}>
                     <div className="flex flex-row gap-2 mb-4 items-end">
                         <div className="grid grid-cols-4 gap-2 w-full">
                             <Select
