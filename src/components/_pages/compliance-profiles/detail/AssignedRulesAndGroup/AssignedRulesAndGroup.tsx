@@ -103,6 +103,7 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                             justify="start"
                             buttons={[
                                 {
+                                    id: 'remove',
                                     icon: 'minus-square',
                                     disabled: false,
                                     tooltip: 'Remove',
@@ -177,8 +178,9 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
     );
 
     const filterRulesAndGroupsList = useCallback(() => {
-        let filteredRulesAndGroupsList: TRuleGroupType[] = [];
-        let resourcesList: (Resource | 'All')[] = [];
+        let filteredRulesAndGroupsList: TRuleGroupType[];
+        let resourcesList: (Resource | 'All')[];
+
         if (assignedRulesSource === 'Internal') {
             filteredRulesAndGroupsList = getInternalListOfGroupsAndRules(
                 assignedResourceType === 'All' || assignedResourceType === null ? undefined : (assignedResourceType as Resource),

@@ -169,30 +169,35 @@ function VaultProfileDetail() {
     const widgetButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
+                id: 'enable',
                 icon: 'check',
                 disabled: !profile || profile.enabled,
                 tooltip: 'Enable',
                 onClick: onApprove,
             },
             {
+                id: 'disable',
                 icon: 'times',
                 disabled: !profile || !profile.enabled,
                 tooltip: 'Disable',
                 onClick: onDisapprove,
             },
             {
+                id: 'check-compliance',
                 icon: 'gavel',
                 disabled: !profile,
                 tooltip: 'Check Compliance',
                 onClick: () => setComplianceCheck(true),
             },
             {
+                id: 'edit',
                 icon: 'pencil',
                 disabled: !profile,
                 tooltip: 'Edit',
                 onClick: () => setIsEditOpen(true),
             },
             {
+                id: 'delete',
                 icon: 'trash',
                 disabled: !profile,
                 tooltip: 'Delete',
@@ -255,13 +260,15 @@ function VaultProfileDetail() {
                 : associatedComplianceProfiles.map((complianceProfile) => ({
                       id: complianceProfile.uuid,
                       columns: [
-                          <Link to={`/${Resource.ComplianceProfiles.toLowerCase()}/detail/${complianceProfile.uuid}`}>
+                          <Link key="name" to={`/${Resource.ComplianceProfiles.toLowerCase()}/detail/${complianceProfile.uuid}`}>
                               {complianceProfile.name}
                           </Link>,
                           complianceProfile.description || '',
                           <WidgetButtons
+                              key="actions"
                               buttons={[
                                   {
+                                      id: 'remove',
                                       icon: 'minus-square',
                                       disabled: false,
                                       tooltip: 'Remove',
@@ -303,14 +310,16 @@ function VaultProfileDetail() {
                 : associatedApprovalProfiles.map((approvalProfile) => ({
                       id: approvalProfile.uuid,
                       columns: [
-                          <Link to={`/${Resource.ApprovalProfiles.toLowerCase()}/detail/${approvalProfile.uuid}`}>
+                          <Link key="name" to={`/${Resource.ApprovalProfiles.toLowerCase()}/detail/${approvalProfile.uuid}`}>
                               {approvalProfile.name}
                           </Link>,
                           approvalProfile.description || '',
                           approvalProfile.expiry ? approvalProfile.expiry.toString() : '',
                           <WidgetButtons
+                              key="actions"
                               buttons={[
                                   {
+                                      id: 'remove',
                                       icon: 'minus-square',
                                       disabled: false,
                                       tooltip: 'Remove',
