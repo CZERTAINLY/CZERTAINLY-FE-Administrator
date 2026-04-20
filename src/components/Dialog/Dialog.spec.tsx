@@ -251,6 +251,22 @@ test.describe('Dialog', () => {
         await expect(component.locator('.w-12.h-12')).toBeVisible();
     });
 
+    test('should render user-check icon', async ({ mount }) => {
+        const component = await mount(
+            <Dialog isOpen={true} caption="Update Owner" body="Assign new owner" icon="user-check" dataTestId="test-dialog" />,
+        );
+        await expect(component.getByRole('heading', { name: 'Update Owner' })).toBeVisible();
+        await expect(component.locator('.w-12.h-12')).toBeVisible();
+    });
+
+    test('should render shield-check icon', async ({ mount }) => {
+        const component = await mount(
+            <Dialog isOpen={true} caption="Update RA Profile" body="Select RA Profile" icon="shield-check" dataTestId="test-dialog" />,
+        );
+        await expect(component.getByRole('heading', { name: 'Update RA Profile' })).toBeVisible();
+        await expect(component.locator('.w-12.h-12')).toBeVisible();
+    });
+
     test('should render custom icon as React node', async ({ mount }) => {
         const component = await mount(
             <Dialog
