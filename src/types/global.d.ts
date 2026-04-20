@@ -1,3 +1,8 @@
+declare module 'preline/dist/select.mjs' {
+    import HSSelect from 'preline/dist/select';
+    export default HSSelect;
+}
+
 type Env = {
     BASE_URL: string;
     API_URL: string;

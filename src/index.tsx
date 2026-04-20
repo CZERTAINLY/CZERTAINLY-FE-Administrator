@@ -1,11 +1,14 @@
 import * as FloatingUIDOM from '@floating-ui/dom';
-(window as any).FloatingUIDOM = FloatingUIDOM;
+(globalThis as any).FloatingUIDOM = FloatingUIDOM;
+
+import HSSelect from 'preline/dist/select.mjs';
+(globalThis as any).HSSelect = HSSelect;
 
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import 'reactflow/dist/style.css';
 import reportWebVitals from './reportWebVitals';
-import 'preline/dist/preline.js';
+import 'preline';
 import './tailwindcss.css';
 import App from './App';
 import '@preline/tooltip';
