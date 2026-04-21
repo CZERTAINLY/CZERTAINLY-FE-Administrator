@@ -1,27 +1,24 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "extends": ["config:base", ":dependencyDashboard"],
-    "schedule": ["before 6am on Monday"],
+    "extends": ["config:recommended"],
+    "schedule": ["before 6am"],
     "timezone": "Europe/Prague",
     "labels": ["dependencies"],
     "prConcurrentLimit": 10,
+    "prHourlyLimit": 0,
     "packageRules": [
         {
-            "matchUpdateTypes": ["minor", "patch"],
+            "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
             "groupName": "all non-major dependencies",
             "groupSlug": "all-minor-patch"
         },
-        { "matchManagers": ["github-actions"], "groupName": "github actions", "groupSlug": "github-actions" },
-        { "matchPackagePatterns": ["^@preline/", "^preline$"], "groupName": "preline", "groupSlug": "preline" },
-        { "matchPackagePatterns": ["^@tailwindcss/", "^tailwindcss$"], "groupName": "tailwind", "groupSlug": "tailwind" },
-        { "matchPackagePatterns": ["^@playwright/"], "groupName": "playwright", "groupSlug": "playwright" },
-        { "matchPackagePatterns": ["^vitest$", "^@vitest/"], "groupName": "vitest", "groupSlug": "vitest" },
-        { "matchPackagePatterns": ["^eslint", "^@typescript-eslint/"], "groupName": "eslint", "groupSlug": "eslint" },
-        { "matchPackagePatterns": ["^vite$", "^@vitejs/", "^vite-plugin-"], "groupName": "vite", "groupSlug": "vite" },
-        { "matchPackageNames": ["react", "react-dom", "@types/react", "@types/react-dom"], "groupName": "react", "groupSlug": "react" },
-        { "matchPackageNames": ["@reduxjs/toolkit", "react-redux", "redux-observable"], "groupName": "redux", "groupSlug": "redux" },
-        { "matchPackagePatterns": ["^@types/"], "groupName": "types", "groupSlug": "types" },
-        { "matchUpdateTypes": ["major"], "dependencyDashboardApproval": true }
+        {
+            "matchUpdateTypes": ["major"],
+            "dependencyDashboardApproval": true
+        }
     ],
-    "lockFileMaintenance": { "enabled": true, "schedule": ["before 6am on Monday"] }
+    "lockFileMaintenance": {
+        "enabled": true,
+        "schedule": ["before 6am on Monday"]
+    }
 }
