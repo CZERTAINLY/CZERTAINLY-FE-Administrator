@@ -6,16 +6,16 @@ import { CircleCheck, CircleAlert, CircleHelp } from 'lucide-react';
 import Badge from 'components/Badge';
 import Breadcrumb from 'components/Breadcrumb';
 import Container from 'components/Container';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/connectors';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as userInterfaceActions } from 'ducks/user-interface';
 
-import { AttributeDescriptorModel } from 'types/attributes';
-import { FunctionGroupModel } from 'types/connectors';
+import type { AttributeDescriptorModel } from 'types/attributes';
+import type { FunctionGroupModel } from 'types/connectors';
 import { ConnectorStatus, ConnectorVersion, HealthStatus, PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
@@ -117,7 +117,7 @@ export default function ConnectorDetail() {
     }, [connector]);
 
     useEffect(() => {
-        let attrs: AttributeDescriptorModel[] | undefined = undefined;
+        let attrs: AttributeDescriptorModel[] | undefined;
 
         if (attributes && connector && currentFunctionGroup && currentFunctionGroupKind) {
             const fgAttrs = attributes[currentFunctionGroup.functionGroupCode];

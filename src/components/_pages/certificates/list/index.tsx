@@ -1,7 +1,7 @@
-import { TableDataRow, TableHeader } from 'components/CustomTable';
+import type { TableDataRow, TableHeader } from 'components/CustomTable';
 
 import Dialog from 'components/Dialog';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/certificates';
 import { EntityType, actions as filterActions, selectors as filterSelectors } from 'ducks/filters';
@@ -14,13 +14,13 @@ import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 
 import Dropdown from 'components/Dropdown';
 
-import { ApiClients } from '../../../../api';
+import type { ApiClients } from '../../../../api';
 import PagedList from 'components/PagedList/PagedList';
 import { actions as userAction, selectors as userSelectors } from 'ducks/users';
-import { SearchRequestModel } from 'types/certificate';
+import type { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
-import { AttributeRequestModel } from '../../../../types/attributes';
+import type { AttributeRequestModel } from '../../../../types/attributes';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CertificateGroupDialog from '../CertificateGroupDialog';
 import CertificateOwnerDialog from '../CertificateOwnerDialog';

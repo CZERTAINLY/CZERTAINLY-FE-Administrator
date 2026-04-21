@@ -1,7 +1,7 @@
 import { Buffer } from 'buffer';
 import AttributeEditor from 'components/Attributes/AttributeEditor';
 import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from 'components/Attributes/AttributeViewer';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import ProgressButton from 'components/ProgressButton';
 import Spinner from 'components/Spinner';
@@ -9,7 +9,7 @@ import StatusBadge from 'components/StatusBadge';
 import { actions as utilsActuatorActions } from 'ducks/utilsActuator';
 
 import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import { selectors as userSelectors } from 'ducks/users';
 
 import { actions, selectors } from 'ducks/certificates';
@@ -21,11 +21,11 @@ import { EntityType, actions as filterActions, selectors as filterSelectors } fr
 import {
     CertificateState as CertStatus,
     CertificateFormatEncoding,
-    CertificateSimpleDto,
+    type CertificateSimpleDto,
     CertificateSubjectType,
     FilterConditionOperator,
     FilterFieldSource,
-    SearchFilterRequestDto,
+    type SearchFilterRequestDto,
 } from '../../../../types/openapi';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -35,7 +35,7 @@ import { Link, useParams } from 'react-router';
 
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
 import Button from 'components/Button';
-import { AttributeDescriptorModel, AttributeResponseModel } from 'types/attributes';
+import type { AttributeDescriptorModel, AttributeResponseModel } from 'types/attributes';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { collectFormAttributes } from 'utils/attributes/attributes';
@@ -45,10 +45,10 @@ import { dateFormatter } from 'utils/dateUtil';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import TabLayout from '../../../Layout/TabLayout';
 
-import FlowChart, { CustomNode } from 'components/FlowChart';
+import FlowChart, { type CustomNode } from 'components/FlowChart';
 import { transformCertificateObjectToNodesAndEdges } from 'ducks/transform/certificates';
 import { Info } from 'lucide-react';
-import { Edge } from 'reactflow';
+import type { Edge } from 'reactflow';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { DeviceType, useCopyToClipboard, useDeviceType } from 'utils/common-hooks';
 import CertificateStatus from '../CertificateStatus';
@@ -395,7 +395,7 @@ export default function CertificateDetail() {
     useEffect(() => {
         if (!certificate || !locations || locations.length === 0) return;
 
-        let locationToEntityMapLocal: { [key: string]: string } = {};
+        const locationToEntityMapLocal: { [key: string]: string } = {};
 
         for (const location of locations) {
             locationToEntityMapLocal[location.uuid] = location.entityInstanceUuid;
@@ -522,45 +522,43 @@ export default function CertificateDetail() {
         () =>
             !eventHistory
                 ? []
-                : eventHistory.map(function (history) {
-                      return {
-                          id: history.uuid,
-                          columns: [
-                              <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(history.created)}</span>,
+                : eventHistory.map((history) => ({
+                      id: history.uuid,
+                      columns: [
+                          <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(history.created)}</span>,
 
-                              history.createdBy,
+                          history.createdBy,
 
-                              history.event,
+                          history.event,
 
-                              <CertificateStatus status={history.status} />,
+                          <CertificateStatus status={history.status} />,
 
-                              <div style={{ wordBreak: 'break-all' }}>{history.message}</div>,
+                          <div style={{ wordBreak: 'break-all' }}>{history.message}</div>,
 
-                              history.additionalInformation ? (
-                                  <Button
-                                      variant="transparent"
-                                      onClick={() => setCurrentInfoId(history.uuid)}
-                                      title="Show Additional Information"
-                                  >
-                                      <Info size={16} aria-hidden="true" />
-                                  </Button>
-                              ) : (
-                                  ''
-                              ),
-                          ],
-                      };
-                  }),
+                          history.additionalInformation ? (
+                              <Button
+                                  variant="transparent"
+                                  onClick={() => setCurrentInfoId(history.uuid)}
+                                  title="Show Additional Information"
+                              >
+                                  <Info size={16} aria-hidden="true" />
+                              </Button>
+                          ) : (
+                              ''
+                          ),
+                      ],
+                  })),
         [eventHistory],
     );
 
     const additionalInfoEntry = (): any => {
-        let returnList = [];
+        const returnList = [];
 
         if (!currentInfoId) return;
 
         const currentHistory = eventHistory?.filter((history) => history.uuid === currentInfoId);
 
-        for (let [key, value] of Object.entries(currentHistory![0]?.additionalInformation ?? {})) {
+        for (const [key, value] of Object.entries(currentHistory![0]?.additionalInformation ?? {})) {
             returnList.push(
                 <tr>
                     <td style={{ padding: '0.25em' }}>{key}</td>
@@ -620,27 +618,25 @@ export default function CertificateDetail() {
     );
 
     const validationData: TableDataRow[] = useMemo(() => {
-        let validationDataRows =
+        const validationDataRows =
             !certificate && validationResult?.validationChecks
                 ? []
                 : [
-                      ...Object.entries(validationResult?.validationChecks ?? {}).map(function ([key, value]) {
-                          return {
-                              id: key,
-                              columns: [
-                                  getEnumLabel(certificateValidationCheck, key),
-                                  value?.status ? <CertificateStatus status={value.status} /> : '',
-                                  <div style={{ wordBreak: 'break-all' }}>
-                                      {value.message?.split('\n').map((str: string, i) => (
-                                          <div key={i}>
-                                              {str}
-                                              <br />
-                                          </div>
-                                      ))}
-                                  </div>,
-                              ],
-                          };
-                      }),
+                      ...Object.entries(validationResult?.validationChecks ?? {}).map(([key, value]) => ({
+                          id: key,
+                          columns: [
+                              getEnumLabel(certificateValidationCheck, key),
+                              value?.status ? <CertificateStatus status={value.status} /> : '',
+                              <div style={{ wordBreak: 'break-all' }}>
+                                  {value.message?.split('\n').map((str: string, i) => (
+                                      <div key={i}>
+                                          {str}
+                                          <br />
+                                      </div>
+                                  ))}
+                              </div>,
+                          ],
+                      })),
                   ];
 
         validationDataRows.push({

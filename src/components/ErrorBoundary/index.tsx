@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { Component, type ErrorInfo, type ReactNode } from 'react';
 import { useLocation } from 'react-router';
 import Button from 'components/Button';
 import Container from 'components/Container';

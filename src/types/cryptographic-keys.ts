@@ -1,7 +1,7 @@
-import { AttributeRequestModel, AttributeResponseModel } from './attributes';
-import { CertificateGroupResponseModel } from './certificateGroups';
-import { MetadataModel } from './locations';
-import {
+import type { AttributeRequestModel, AttributeResponseModel } from './attributes';
+import type { CertificateGroupResponseModel } from './certificateGroups';
+import type { MetadataModel } from './locations';
+import type {
     BulkCompromiseKeyItemRequestDto,
     BulkCompromiseKeyRequestDto,
     BulkKeyUsageRequestDto,

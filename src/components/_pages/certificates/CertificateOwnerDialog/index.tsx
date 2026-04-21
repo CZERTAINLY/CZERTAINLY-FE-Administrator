@@ -5,7 +5,7 @@ import { actions } from 'ducks/certificates';
 
 import Select from 'components/Select';
 import Button from 'components/Button';
-import { UserResponseModel } from 'types/users';
+import type { UserResponseModel } from 'types/users';
 import Container from 'components/Container';
 
 interface Props {

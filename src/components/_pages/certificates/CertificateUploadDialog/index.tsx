@@ -3,11 +3,11 @@ import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } 
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { CertificateDetailResponseModel } from 'types/certificate';
+import type { CertificateDetailResponseModel } from 'types/certificate';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { transformParseCertificateResponseDtoToCertificateResponseDetailModel } from '../../../../ducks/transform/utilsCertificate';
 import { actions as utilsCertificateActions, selectors as utilsCertificateSelectors } from '../../../../ducks/utilsCertificate';
-import { AttributeRequestModel } from '../../../../types/attributes';
+import type { AttributeRequestModel } from '../../../../types/attributes';
 import { Resource } from '../../../../types/openapi';
 import { ParseCertificateRequestDtoParseTypeEnum } from '../../../../types/openapi/utils';
 import { collectFormAttributes } from '../../../../utils/attributes/attributes';
@@ -18,7 +18,7 @@ import ProgressButton from '../../../ProgressButton';
 import Button from 'components/Button';
 import Container from 'components/Container';
 
-interface FormValues {}
+type FormValues = {};
 
 interface Props {
     onCancel: () => void;

@@ -1,10 +1,10 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ApiClients } from '../api';
-import { WritableDraft } from 'immer/dist/internal';
-import { Observable } from 'rxjs';
-import { SearchFieldListModel, SearchFilterModel } from 'types/certificate';
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { ApiClients } from '../api';
+import type { WritableDraft } from 'immer/dist/internal';
+import type { Observable } from 'rxjs';
+import type { SearchFieldListModel, SearchFilterModel } from 'types/certificate';
 
-export const enum EntityType {
+export enum EntityType {
     AUDIT_LOG,
     ENTITY,
     CBOM,

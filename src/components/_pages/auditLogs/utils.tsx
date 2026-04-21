@@ -1,10 +1,10 @@
-import { TableHeader } from 'components/CustomTable';
+import type { TableHeader } from 'components/CustomTable';
 import { auditLogsTypeMapping } from './mapping';
 import { getEnumLabel } from 'ducks/enums';
 import { Link } from 'react-router';
 import Button from 'components/Button';
-import { EnumItemDto } from 'types/enums';
-import { AuditLogDto } from 'types/openapi';
+import type { EnumItemDto } from 'types/enums';
+import type { AuditLogDto } from 'types/openapi';
 import { dateFormatter } from 'utils/dateUtil';
 import { ArrowRightCircle, Info } from 'lucide-react';
 

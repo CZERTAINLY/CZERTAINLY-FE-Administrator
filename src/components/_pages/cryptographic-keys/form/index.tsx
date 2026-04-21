@@ -18,8 +18,8 @@ import Select from 'components/Select';
 import TextInput from 'components/TextInput';
 import TextArea from 'components/TextArea';
 
-import { AttributeDescriptorModel } from 'types/attributes';
-import { TokenProfileResponseModel } from 'types/token-profiles';
+import type { AttributeDescriptorModel } from 'types/attributes';
+import type { TokenProfileResponseModel } from 'types/token-profiles';
 import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
@@ -286,8 +286,8 @@ export default function CryptographicKeyForm({ keyId, onSuccess, onCancel, usesG
     useRunOnSuccessfulFinish(isUpdating, updateCryptographicKeySucceeded, handleUpdateSuccess);
 
     const optionsForType = () => {
-        let options: { value: string; label: string }[] = [];
-        for (let key in KeyRequestType) {
+        const options: { value: string; label: string }[] = [];
+        for (const key in KeyRequestType) {
             options.push({
                 value: KeyRequestType[key as keyof typeof KeyRequestType],
                 label: getEnumLabel(keyRequestTypeEnum, KeyRequestType[key as keyof typeof KeyRequestType]),

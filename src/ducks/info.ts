@@ -1,5 +1,5 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { CoreInfoResponseModel } from 'types/info';
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { CoreInfoResponseModel } from 'types/info';
 
 export type State = {
     platformInfo?: CoreInfoResponseModel;

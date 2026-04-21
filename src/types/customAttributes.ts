@@ -1,5 +1,5 @@
-import { BaseAttributeContentModel } from './attributes';
-import {
+import type { BaseAttributeContentModel } from './attributes';
+import type {
     CustomAttributeCreateRequestDto as CustomAttributeCreateRequestDtoOpenApi,
     CustomAttributeDefinitionDetailDto,
     CustomAttributeDefinitionDto,

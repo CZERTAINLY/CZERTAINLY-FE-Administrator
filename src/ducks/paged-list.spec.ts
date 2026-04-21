@@ -3,7 +3,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { act } from 'react';
-import { createRoot, Root } from 'react-dom/client';
+import { createRoot, type Root } from 'react-dom/client';
 import PagedList from 'components/PagedList/PagedList';
 import pagingReducer, { actions as pagingActions } from './paging';
 import filtersReducer, { actions as filterActions, EntityType } from './filters';

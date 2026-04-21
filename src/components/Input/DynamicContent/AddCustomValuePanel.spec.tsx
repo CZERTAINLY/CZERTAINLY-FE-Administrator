@@ -75,7 +75,7 @@ test.describe('AddCustomValuePanel', () => {
     });
 
     test('filling value and clicking Add calls onFieldChange and onClose', async ({ mount, page }) => {
-        let receivedValue: any = undefined;
+        let receivedValue: any;
         let closed = false;
         await mount(
             <AddCustomValuePanel
@@ -103,7 +103,7 @@ test.describe('AddCustomValuePanel', () => {
     });
 
     async function mountMultiSelectAndAdd(mount: any, page: any, fieldValue: any, typedValue: string): Promise<any> {
-        let receivedValue: any = undefined;
+        let receivedValue: any;
         await mount(
             <AddCustomValuePanel
                 open={true}

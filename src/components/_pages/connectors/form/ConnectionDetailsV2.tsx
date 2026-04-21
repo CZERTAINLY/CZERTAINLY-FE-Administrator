@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Badge from 'components/Badge';
 
 interface Props {

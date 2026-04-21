@@ -7,11 +7,11 @@ import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
 import Badge from 'components/Badge';
 import Breadcrumb from 'components/Breadcrumb';
 import Container from 'components/Container';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import WidgetButtons from 'components/WidgetButtons';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions as approvalProfileActions, selectors as approvalProfileSelectors } from 'ducks/approval-profiles';
 import { actions as complianceProfileActions, selectors as complianceProfileSelectors } from 'ducks/compliance-profiles';

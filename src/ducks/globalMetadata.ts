@@ -1,12 +1,12 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type {
     ConnectorMetadataResponseModel,
     GlobalMetadataCreateRequestModel,
     GlobalMetadataDetailResponseModel,
     GlobalMetadataResponseModel,
     GlobalMetadataUpdateRequestModel,
 } from '../types/globalMetadata';
-import { NameAndUuidModel } from '../types/locations';
+import type { NameAndUuidModel } from '../types/locations';
 
 export type State = {
     checkedRows: string[];

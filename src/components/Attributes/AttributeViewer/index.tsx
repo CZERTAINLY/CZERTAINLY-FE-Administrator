@@ -1,23 +1,23 @@
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useMemo, useState } from 'react';
 import * as ReactHookForm from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import {
-    AttributeDescriptorModel,
-    AttributeResponseModel,
-    BaseAttributeContentModel,
-    CustomAttributeModel,
+    type AttributeDescriptorModel,
+    type AttributeResponseModel,
+    type BaseAttributeContentModel,
+    type CustomAttributeModel,
     isCustomAttributeModelArray,
 } from 'types/attributes';
-import { MetadataItemModel, MetadataModel } from 'types/locations';
-import { AttributeContentType, NameAndUuidDto, PlatformEnum, Resource } from 'types/openapi';
+import type { MetadataItemModel, MetadataModel } from 'types/locations';
+import { AttributeContentType, type NameAndUuidDto, PlatformEnum, type Resource } from 'types/openapi';
 import { getAttributeContent, getAttributeCopyValue } from 'utils/attributes/attributes';
 import { useCopyToClipboard } from 'utils/common-hooks';
 import { actions as userInterfaceActions } from '../../../ducks/user-interface';
 import ContentValueField from '../../Input/DynamicContent/ContentValueField';
-import WidgetButtons, { WidgetButtonProps } from '../../WidgetButtons';
+import WidgetButtons, { type WidgetButtonProps } from '../../WidgetButtons';
 import { InfoIcon } from 'lucide-react';
 import Button from 'components/Button';
 
@@ -377,19 +377,17 @@ export default function AttributeViewer({
             case ATTRIBUTE_VIEWER_TYPE.METADATA:
                 return metadata?.map(getMetadataTableData);
             case ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT:
-                return metadata
-                    ?.map((m) =>
-                        m.items.map((i) => ({
-                            ...getAttributesTableData(i),
-                            columns: [
-                                m.connectorName ?? 'No connector',
-                                m.sourceObjectType ? getEnumLabel(resourceEnum, m.sourceObjectType) : 'No Source Object',
+                return metadata?.flatMap((m) =>
+                    m.items.map((i) => ({
+                        ...getAttributesTableData(i),
+                        columns: [
+                            m.connectorName ?? 'No connector',
+                            m.sourceObjectType ? getEnumLabel(resourceEnum, m.sourceObjectType) : 'No Source Object',
 
-                                ...getAttributesTableData(i).columns,
-                            ],
-                        })),
-                    )
-                    .flat();
+                            ...getAttributesTableData(i).columns,
+                        ],
+                    })),
+                );
 
             default:
                 return [];

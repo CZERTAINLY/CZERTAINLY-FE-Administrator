@@ -1,7 +1,7 @@
 import { from, iif, of } from 'rxjs';
 import { catchError, concatMap, exhaustMap, filter, map, mergeMap, switchMap, toArray } from 'rxjs/operators';
 
-import { AppEpic } from 'ducks';
+import type { AppEpic } from 'ducks';
 import { extractError } from 'utils/net';
 
 import { store } from '../App';

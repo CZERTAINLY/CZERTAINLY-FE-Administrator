@@ -1,6 +1,6 @@
 import Dialog from 'components/Dialog';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ComplianceProfileDtoV2, PlatformEnum, Resource, ResourceObjectDto } from 'types/openapi';
+import { type ComplianceProfileDtoV2, PlatformEnum, type Resource, type ResourceObjectDto } from 'types/openapi';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import Select from 'components/Select';
 import { useDispatch, useSelector } from 'react-redux';

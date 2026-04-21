@@ -1,14 +1,14 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AttributeDescriptorModel } from 'types/attributes';
-import { SearchRequestModel } from 'types/certificate';
-import { ConnectorResponseModel } from 'types/connectors';
-import {
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { AttributeDescriptorModel } from 'types/attributes';
+import type { SearchRequestModel } from 'types/certificate';
+import type { ConnectorResponseModel } from 'types/connectors';
+import type {
     DiscoveryCertificateListModel,
     DiscoveryRequestModel,
     DiscoveryResponseDetailModel,
     DiscoveryResponseModel,
 } from 'types/discoveries';
-import { GetDiscoveryCertificatesRequest } from '../types/openapi';
+import type { GetDiscoveryCertificatesRequest } from '../types/openapi';
 
 export type State = {
     discovery?: DiscoveryResponseDetailModel;
@@ -52,7 +52,7 @@ export const slice = createSlice({
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
             Object.keys(state).forEach((key) => {
-                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+                if (!Object.hasOwn(initialState, key)) (state as any)[key] = undefined;
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));

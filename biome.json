@@ -1,0 +1,108 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.4.12/schema.json",
+    "vcs": {
+        "enabled": true,
+        "clientKind": "git",
+        "useIgnoreFile": true
+    },
+    "files": {
+        "includes": [
+            "**",
+            "!**/build",
+            "!**/dist",
+            "!**/coverage-vitest",
+            "!**/coverage-playwright",
+            "!**/monocart-report",
+            "!**/node_modules",
+            "!.claude",
+            "!src/types/openapi",
+            "!src/resources/fonts/fontawesome/css",
+            "!src/setupProxy.js",
+            "!.github",
+            "!package-lock.json",
+            "!src/tailwindcss.css"
+        ]
+    },
+    "formatter": {
+        "enabled": true,
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineWidth": 140,
+        "lineEnding": "lf"
+    },
+    "javascript": {
+        "formatter": {
+            "quoteStyle": "single",
+            "jsxQuoteStyle": "double",
+            "trailingCommas": "all",
+            "semicolons": "always",
+            "arrowParentheses": "always",
+            "bracketSpacing": true,
+            "bracketSameLine": false
+        }
+    },
+    "json": {
+        "formatter": {
+            "enabled": true,
+            "indentWidth": 4,
+            "trailingCommas": "none"
+        }
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "recommended": true,
+            "a11y": {
+                "recommended": true,
+                "useButtonType": "warn",
+                "noSvgWithoutTitle": "warn",
+                "useSemanticElements": "warn",
+                "noLabelWithoutControl": "warn"
+            },
+            "correctness": {
+                "useExhaustiveDependencies": "warn",
+                "useHookAtTopLevel": "error",
+                "noUnusedFunctionParameters": "off",
+                "useJsxKeyInIterable": "warn",
+                "noInnerDeclarations": "warn"
+            },
+            "style": {
+                "noParameterAssign": "off",
+                "useTemplate": "off",
+                "noNonNullAssertion": "off",
+                "useImportType": "warn"
+            },
+            "complexity": {
+                "noUselessFragments": "off"
+            },
+            "suspicious": {
+                "noExplicitAny": "off",
+                "noArrayIndexKey": "off",
+                "useIterableCallbackReturn": "warn",
+                "noImplicitAnyLet": "warn",
+                "noDoubleEquals": "warn",
+                "noNonNullAssertedOptionalChain": "warn",
+                "noAssignInExpressions": "warn"
+            },
+            "security": {
+                "noDangerouslySetInnerHtml": "warn"
+            }
+        }
+    },
+    "assist": {
+        "enabled": true,
+        "actions": {
+            "source": {
+                "organizeImports": "off"
+            }
+        }
+    },
+    "overrides": [
+        {
+            "includes": ["*.md", "*.yml", "*.yaml"],
+            "formatter": {
+                "enabled": false
+            }
+        }
+    ]
+}

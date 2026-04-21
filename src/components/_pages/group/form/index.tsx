@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import Button from 'components/Button';
 import Container from 'components/Container';
-import { CertificateGroupResponseModel } from 'types/certificateGroups';
+import type { CertificateGroupResponseModel } from 'types/certificateGroups';
 import { Resource } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { validateAlphaNumericWithSpecialChars, validateEmail, validateLength, validateRequired } from 'utils/validators';

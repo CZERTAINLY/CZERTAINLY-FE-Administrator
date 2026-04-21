@@ -15,7 +15,7 @@ import Button from 'components/Button';
 import Container from 'components/Container';
 import TextInput from 'components/TextInput';
 import { ConditionType, PlatformEnum, Resource } from 'types/openapi';
-import { ConditionItemModel } from 'types/rules';
+import type { ConditionItemModel } from 'types/rules';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';

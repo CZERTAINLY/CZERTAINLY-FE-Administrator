@@ -1,5 +1,5 @@
-import { AttributeRequestModel } from './attributes';
-import { AddUserRequestDto, UserDto } from './openapi';
+import type { AttributeRequestModel } from './attributes';
+import type { AddUserRequestDto, UserDto } from './openapi';
 
 export type UserResponseDto = UserDto;
 export type UserResponseModel = UserResponseDto;

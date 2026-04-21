@@ -1,6 +1,6 @@
-import { AppEpic, AppState } from 'ducks';
-import { AnyAction } from '@reduxjs/toolkit';
-import { of, forkJoin, Observable } from 'rxjs';
+import type { AppEpic, AppState } from 'ducks';
+import type { AnyAction } from '@reduxjs/toolkit';
+import { of, forkJoin, type Observable } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 
 import { extractError } from 'utils/net';
@@ -21,7 +21,7 @@ import {
 import { actions as vaultProfileActions } from './vault-profiles';
 import { actions as secretActions } from './secrets';
 import { actions as vaultActions } from './vaults';
-import { AttributeRequestModel, AttributeResponseDto, AttributeResponseModel } from 'types/attributes';
+import type { AttributeRequestModel, AttributeResponseDto, AttributeResponseModel } from 'types/attributes';
 
 const normalizeAttributeVersion = (version: unknown): AttributeVersion => {
     if (version === AttributeVersion.V3 || version === 'v3' || version === '3' || version === 3) {

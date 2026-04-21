@@ -19,8 +19,8 @@ import Label from 'components/Label';
 import CronBuilder from 'components/CronBuilder';
 import { Clock } from 'lucide-react';
 
-import { AttributeDescriptorModel } from 'types/attributes';
-import { ConnectorResponseModel } from 'types/connectors';
+import type { AttributeDescriptorModel } from 'types/attributes';
+import type { ConnectorResponseModel } from 'types/connectors';
 import { FunctionGroupCode, Resource } from 'types/openapi';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';

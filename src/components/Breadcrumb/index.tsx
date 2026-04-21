@@ -1,6 +1,6 @@
 import cn from 'classnames';
 import { Link } from 'react-router';
-import React from 'react';
+import type React from 'react';
 
 interface Props {
     items: {

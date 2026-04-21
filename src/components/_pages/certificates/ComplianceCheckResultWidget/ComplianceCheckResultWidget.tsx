@@ -1,16 +1,16 @@
 import CertificateStatus from 'components/_pages/certificates/CertificateStatus';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Widget from 'components/Widget';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppState } from 'ducks';
+import type { AppState } from 'ducks';
 import { dateFormatter } from 'utils/dateUtil';
 import { selectors as complianceProfilesSelectors, actions as complianceProfilesActions } from 'ducks/compliance-profiles';
-import { LockWidgetNameEnum } from 'types/user-interface';
-import { ComplianceRuleStatus, ComplianceStatus, Resource } from 'types/openapi';
+import type { LockWidgetNameEnum } from 'types/user-interface';
+import type { ComplianceRuleStatus, ComplianceStatus, Resource } from 'types/openapi';
 import { useCallback, useEffect, useMemo } from 'react';
 import Button from 'components/Button';
 import { Info } from 'lucide-react';
-import { AttributeResponseModel } from 'types/attributes';
+import type { AttributeResponseModel } from 'types/attributes';
 
 type Props = {
     objectUuid: string;

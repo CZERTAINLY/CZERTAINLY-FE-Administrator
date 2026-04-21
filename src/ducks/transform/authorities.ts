@@ -1,4 +1,4 @@
-import {
+import type {
     AuthorityRequestDto,
     AuthorityRequestModel,
     AuthorityResponseDto,

@@ -1,11 +1,11 @@
 import AttributeViewer from 'components/Attributes/AttributeViewer';
 import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
 
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import CertificateStatus from 'components/_pages/certificates/CertificateStatus';
 
 import { actions, selectors } from 'ducks/scep-profiles';

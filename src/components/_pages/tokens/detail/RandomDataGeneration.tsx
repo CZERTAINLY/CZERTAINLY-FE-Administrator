@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from 'components/Button';
-import { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
+import type { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { getFieldErrorMessage } from 'utils/validators-helper';

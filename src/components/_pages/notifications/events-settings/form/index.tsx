@@ -13,7 +13,7 @@ import Button from 'components/Button';
 import Container from 'components/Container';
 import Breadcrumb from 'components/Breadcrumb';
 import { useAreDefaultValuesSame } from 'utils/common-hooks';
-import { EventSettingsDto, PlatformEnum, Resource, ResourceEvent } from 'types/openapi';
+import { type EventSettingsDto, PlatformEnum, Resource, type ResourceEvent } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import TriggerEditorWidget from 'components/TriggerEditorWidget';
 import Label from 'components/Label';

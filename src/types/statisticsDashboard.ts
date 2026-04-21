@@ -1,4 +1,4 @@
-import { StatisticsDto } from './openapi';
+import type { StatisticsDto } from './openapi';
 
 export type DashboardDict = {
     [key: string]: number;

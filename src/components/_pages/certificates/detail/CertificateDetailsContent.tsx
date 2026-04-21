@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import Select from 'components/Select';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Widget from 'components/Widget';
 import Container from 'components/Container';
 import Dialog from 'components/Dialog';
@@ -11,7 +11,7 @@ import Badge from 'components/Badge';
 import Asn1Dialog from '../Asn1Dialog/Asn1Dialog';
 import CertificateRenewDialog from '../CertificateRenewDialog';
 import CertificateRekeyDialog from '../CertificateRekeyDialog';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import { formatPEM } from 'utils/certificate';
@@ -23,13 +23,13 @@ import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as certificateGroupActions, selectors as groupSelectors } from 'ducks/certificateGroups';
 import { actions as userActions, selectors as userSelectors } from 'ducks/users';
 import { actions as raProfileActions, selectors as raProfileSelectors } from 'ducks/ra-profiles';
-import { CertificateDetailResponseModel } from 'types/certificate';
+import type { CertificateDetailResponseModel } from 'types/certificate';
 import {
     CertificateRequestFormat,
     CertificateRevocationReason,
     CertificateState as CertStatus,
     CertificateSubjectType,
-    CertificateValidationResultDto,
+    type CertificateValidationResultDto,
     CertificateProtocol,
     PlatformEnum,
 } from 'types/openapi';
@@ -389,8 +389,8 @@ export default function CertificateDetailsContent({ certificate, validationResul
     }, [certificate, validationResult, isCertificateArchived, certificateKeyUsageEnum, isUpdatingTrustedStatus, switchCallback]);
 
     const sanData: TableDataRow[] = useMemo(() => {
-        let sanList: TableDataRow[] = [];
-        for (let [key, value] of Object.entries(certificate?.subjectAlternativeNames || {})) {
+        const sanList: TableDataRow[] = [];
+        for (const [key, value] of Object.entries(certificate?.subjectAlternativeNames || {})) {
             if (value && Array.isArray(value) && value.length > 0) {
                 sanList.push({
                     id: key,

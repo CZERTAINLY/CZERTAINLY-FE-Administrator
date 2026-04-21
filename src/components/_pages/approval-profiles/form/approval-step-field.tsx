@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import Select from 'components/Select';
 import TextInput from 'components/TextInput';
-import { ApprovalStepRequestModel, ApproverType, ProfileApprovalRequestModel } from 'types/approval-profiles';
+import { type ApprovalStepRequestModel, ApproverType, type ProfileApprovalRequestModel } from 'types/approval-profiles';
 import { validateLength, validateNonZeroInteger, validatePositiveInteger, validateRequired } from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { Plus, X } from 'lucide-react';

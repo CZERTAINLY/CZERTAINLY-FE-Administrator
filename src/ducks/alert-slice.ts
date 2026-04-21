@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { MessageModel } from 'types/alerts';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { MessageModel } from 'types/alerts';
 
 export type State = {
     messages: MessageModel[];

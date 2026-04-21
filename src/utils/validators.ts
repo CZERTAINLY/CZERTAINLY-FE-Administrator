@@ -15,7 +15,7 @@ export const validateRequired = () => (value: any) => {
 };
 
 const getValueFromObject = (value: any) => {
-    if (typeof value === 'object' && value && value.hasOwnProperty('label') && value.hasOwnProperty('value')) {
+    if (typeof value === 'object' && value && Object.hasOwn(value, 'label') && Object.hasOwn(value, 'value')) {
         return value['value']['data'];
     }
     // Attribute content objects from list (select) fields are stored as {data, reference}.
@@ -95,7 +95,7 @@ export const validateQuartzCronExpression = (cronExpression: string | undefined)
     const validationInput = getValueFromObject(value);
 
     try {
-        let validObj: { isValid: boolean; errorMessage: Array<string> } = cronValidator.isValidCronExpression(validationInput, {
+        const validObj: { isValid: boolean; errorMessage: Array<string> } = cronValidator.isValidCronExpression(validationInput, {
             error: true,
         });
         let uniqueErrors: string[] = [];

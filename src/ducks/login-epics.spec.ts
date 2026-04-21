@@ -1,8 +1,8 @@
 import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
-import { firstValueFrom, of, throwError, Observable } from 'rxjs';
+import { firstValueFrom, of, throwError, type Observable } from 'rxjs';
 import { AjaxError } from 'rxjs/ajax';
 import { take, toArray } from 'rxjs/operators';
-import { AppState, EpicDependencies } from './index';
+import type { AppState, EpicDependencies } from './index';
 import * as slice from './login';
 import loginEpics from './login-epics';
 

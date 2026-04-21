@@ -1,17 +1,17 @@
 import {
-    AttributeDescriptorModel,
-    AttributeRequestModel,
-    AttributeRequestModelV2,
-    AttributeRequestModelV3,
-    AttributeResponseModel,
-    BaseAttributeContentDtoV2,
-    BaseAttributeContentDtoV3,
-    BaseAttributeContentModel,
-    CodeBlockAttributeContentDataModel,
-    CodeBlockAttributeContentDtoV2,
-    CodeBlockAttributeContentModel,
-    CustomAttributeModel,
-    DataAttributeModel,
+    type AttributeDescriptorModel,
+    type AttributeRequestModel,
+    type AttributeRequestModelV2,
+    type AttributeRequestModelV3,
+    type AttributeResponseModel,
+    type BaseAttributeContentDtoV2,
+    type BaseAttributeContentDtoV3,
+    type BaseAttributeContentModel,
+    type CodeBlockAttributeContentDataModel,
+    type CodeBlockAttributeContentDtoV2,
+    type CodeBlockAttributeContentModel,
+    type CustomAttributeModel,
+    type DataAttributeModel,
     isCustomAttributeModel,
     isDataAttributeModel,
 } from 'types/attributes';
@@ -19,9 +19,9 @@ import {
     AttributeContentType,
     AttributeVersion,
     CodeBlockAttributeContentV2,
-    FileAttributeContentData,
+    type FileAttributeContentData,
     ProgrammingLanguageEnum,
-    SecretAttributeContentV2,
+    type SecretAttributeContentV2,
 } from 'types/openapi';
 import { base64ToUtf8, utf8ToBase64 } from 'utils/common-utils';
 import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
@@ -228,7 +228,7 @@ export function collectFormAttributes(
     };
 
     for (const attribute in attributes) {
-        if (!attributes.hasOwnProperty(attribute)) continue;
+        if (!Object.hasOwn(attributes, attribute)) continue;
 
         const info = attribute.split(':');
 
@@ -351,7 +351,7 @@ export const testAttributeSetFunction = (
     setDefaultOnRequiredValuesOnly: boolean,
     forceDefaultDescriptorValue: boolean,
 ) => {
-    let formAttributeValue = undefined;
+    let formAttributeValue;
 
     const appliedContent = forceDefaultDescriptorValue ? descriptor?.content : attribute?.content;
 

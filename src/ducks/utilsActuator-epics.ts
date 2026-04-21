@@ -1,4 +1,4 @@
-import { AppEpic } from 'ducks';
+import type { AppEpic } from 'ducks';
 import { EMPTY, of } from 'rxjs';
 import { catchError, filter, map, switchMap } from 'rxjs/operators';
 
@@ -13,7 +13,7 @@ const health: AppEpic = (action$, state$, deps) => {
             () =>
                 deps.apiClients.utilsActuator?.health().pipe(
                     map((result) => {
-                        if (result.hasOwnProperty('status') && (result as { status: string }).status === 'UP') {
+                        if (Object.hasOwn(result, 'status') && (result as { status: string }).status === 'UP') {
                             return slice.actions.healthSuccess(result);
                         } else {
                             return slice.actions.healthFailure({ error: 'Failed to get utils service health status.' });

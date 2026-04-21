@@ -1,19 +1,19 @@
-import { TableDataRow, TableHeader } from 'components/CustomTable';
+import type { TableDataRow, TableHeader } from 'components/CustomTable';
 import { useCallback, useMemo, useState } from 'react';
 import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions, selectors } from 'ducks/oids';
 import { EntityType } from 'ducks/filters';
 import PagedList from 'components/PagedList/PagedList';
-import { ApiClients } from 'src/api';
+import type { ApiClients } from 'src/api';
 import { Link } from 'react-router';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { SearchRequestModel } from 'types/certificate';
+import type { SearchRequestModel } from 'types/certificate';
 import { selectors as enumSelectors } from 'ducks/enums';
-import { OidCategory, PlatformEnum } from 'types/openapi';
+import { type OidCategory, PlatformEnum } from 'types/openapi';
 import Dialog from 'components/Dialog';
 import CustomOIDForm from 'components/_pages/custom-oid/form';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 
 export default function CustomOIDList() {
     const dispatch = useDispatch();

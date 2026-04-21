@@ -19,8 +19,8 @@ import AttributeEditor from 'components/Attributes/AttributeEditor';
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 
-import { AttributeDescriptorModel } from 'types/attributes';
-import { ConnectorResponseModel } from 'types/connectors';
+import type { AttributeDescriptorModel } from 'types/attributes';
+import type { ConnectorResponseModel } from 'types/connectors';
 import { ConnectorInterface, FilterConditionOperator, FilterFieldSource, FunctionGroupCode, Resource } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { useRunOnSuccessfulFinish } from 'utils/common-hooks';

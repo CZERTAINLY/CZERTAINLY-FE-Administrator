@@ -13,8 +13,8 @@ import { actions as customAttributesActions, selectors as customAttributesSelect
 import { actions as vaultActions, selectors as vaultSelectors } from 'ducks/vaults';
 import { actions as connectorsActions } from 'ducks/connectors';
 
-import { AttributeDescriptorModel } from 'types/attributes';
-import { FunctionGroupCode, Resource, VaultInstanceDetailDto } from 'types/openapi';
+import type { AttributeDescriptorModel } from 'types/attributes';
+import { FunctionGroupCode, Resource, type VaultInstanceDetailDto } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
