@@ -9,14 +9,15 @@ import { useDispatch } from 'react-redux';
 import { Resource } from 'types/openapi';
 import { filterToConditionItems } from 'utils/rules';
 import { ConditionFormValues } from '../_pages/conditions/form';
+
 type FormType = 'conditionItem' | 'executionItem';
+
 interface ConditionGroupFormFilterProps {
     resource: Resource;
     formType: FormType;
-    includeIgnoreAction?: boolean;
 }
 
-const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: ConditionGroupFormFilterProps) => {
+const ConditionFormFilter = ({ resource, formType }: ConditionGroupFormFilterProps) => {
     const form = useFormContext<ConditionFormValues>();
     const actionGroupForm = useFormContext<ExecutionFormValues>();
 
@@ -44,7 +45,6 @@ const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: Condit
                     entity={EntityType.ACTIONS}
                     title="Execution Items"
                     getAvailableFiltersApi={getAvailableFiltersApi}
-                    includeIgnoreAction={includeIgnoreAction}
                     onActionsUpdate={(currentActions) => {
                         actionGroupForm.setValue('items', currentActions);
                     }}
@@ -64,7 +64,7 @@ const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: Condit
                 />
             </div>
         );
-    }, [form, formType, actionGroupForm, includeIgnoreAction, getAvailableFiltersApi]);
+    }, [form, formType, actionGroupForm, getAvailableFiltersApi]);
 
     return <div data-testid="condition-form-filter">{renderFilterWidget}</div>;
 };

@@ -503,16 +503,18 @@ test.describe('Select', () => {
         expect(dataAttr).toContain('window');
     });
 
-    test('should pass dropdownWidth to data-hs-select', async ({ mount }) => {
+    test('should pass dropdownWidth via CSS variable and fixed-width class', async ({ mount }) => {
         const options = [{ value: '1', label: 'Option 1' }];
         const component = await mount(
             <div>
                 <Select id="test-select" value="" onChange={() => {}} options={options} dropdownWidth={400} />
             </div>,
         );
-        const select = component.locator('select');
-        const dataAttr = await select.getAttribute('data-hs-select');
-        expect(dataAttr).toContain('400');
+        const wrapper = component.locator('div.relative').first();
+        const style = await wrapper.getAttribute('style');
+        expect(style).toContain('--select-dropdown-width: 400px');
+        const dataAttr = await component.locator('select').getAttribute('data-hs-select');
+        expect(dataAttr).toContain('select-dropdown-width');
     });
 
     test('should render multi-select with multiple values selected', async ({ mount }) => {
