@@ -246,7 +246,9 @@ export default function UserDetail() {
                       id: resource.name,
                       columns: [
                           resource.name,
-                          <Badge color={resource.allowAllActions ? 'success' : 'danger'}>{resource.allowAllActions ? 'Yes' : 'No'}</Badge>,
+                          <Badge key="allowAllActions" color={resource.allowAllActions ? 'success' : 'danger'}>
+                              {resource.allowAllActions ? 'Yes' : 'No'}
+                          </Badge>,
                           <span style={{ whiteSpace: 'nowrap' }}>{resource.actions.join(', ')}</span>,
                           <></>,
                           resource.objects?.length.toString() || '0',

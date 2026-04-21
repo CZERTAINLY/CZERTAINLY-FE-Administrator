@@ -185,7 +185,9 @@ export default function RolesList() {
 
                     role.email || '',
 
-                    <Badge color={role.systemRole ? 'danger' : 'success'}>{role.systemRole ? 'Yes' : 'No'}</Badge>,
+                    <Badge key="systemRole" color={role.systemRole ? 'danger' : 'success'}>
+                        {role.systemRole ? 'Yes' : 'No'}
+                    </Badge>,
                 ],
             })),
         [roles],

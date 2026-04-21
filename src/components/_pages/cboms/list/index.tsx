@@ -71,7 +71,7 @@ function CbomsList() {
     );
 
     const getCbomJson = useCallback(async (uuid: string): Promise<string> => {
-        const cbomDetail = (await firstValueFrom(backendClient.cbomManagement.getCbomDetail({ uuid }))) as CbomDetailDto;
+        const cbomDetail = await firstValueFrom(backendClient.cbomManagement.getCbomDetail({ uuid }));
         return JSON.stringify(cbomDetail.content ?? {}, null, 2);
     }, []);
 
