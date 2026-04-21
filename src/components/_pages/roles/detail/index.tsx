@@ -14,11 +14,10 @@ import { useParams, useNavigate } from 'react-router';
 
 import Badge from 'components/Badge';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { PlatformEnum, Resource } from '../../../../types/openapi';
+import { Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
 import { createWidgetDetailHeaders } from 'utils/widget';
-import { selectors as enumSelectors } from 'ducks/enums';
 import Breadcrumb from 'components/Breadcrumb';
 import Container from 'components/Container';
 import Checkbox from 'components/Checkbox';
@@ -36,7 +35,6 @@ export default function UserDetail() {
     const isFetchingPermissions = useSelector(selectors.isFetchingPermissions);
     const isUpdating = useSelector(selectors.isUpdating);
     const updateRoleSucceeded = useSelector(selectors.updateRoleSucceeded);
-    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
     const [isEditUsersModalOpen, setIsEditUsersModalOpen] = useState<boolean>(false);
@@ -141,9 +139,8 @@ export default function UserDetail() {
 
     const detailData: TableDataRow[] = useMemo(
         () =>
-            !role
-                ? []
-                : [
+            role
+                ? [
                       {
                           id: 'roleName',
                           columns: ['Name', role.name],
@@ -160,7 +157,8 @@ export default function UserDetail() {
                           id: 'systemRole',
                           columns: ['System role ', <BooleanBadge key="systemRole" value={role.systemRole} invertColor />],
                       },
-                  ],
+                  ]
+                : [],
         [role],
     );
 
@@ -192,9 +190,8 @@ export default function UserDetail() {
 
     const usersData: TableDataRow[] = useMemo(
         () =>
-            !role
-                ? []
-                : role.users.map((user) => ({
+            role
+                ? role.users.map((user) => ({
                       id: user.uuid,
                       columns: [
                           <span style={{ whiteSpace: 'nowrap' }}>{user.username || ''}</span>,
@@ -203,7 +200,8 @@ export default function UserDetail() {
                           <span style={{ whiteSpace: 'nowrap' }}>{user.lastName || ''}</span>,
                           <span style={{ whiteSpace: 'nowrap' }}>{user.email || ''}</span>,
                       ],
-                  })),
+                  }))
+                : [],
         [role],
     );
 
@@ -243,32 +241,31 @@ export default function UserDetail() {
 
     const permsData: TableDataRow[] = useMemo(
         () =>
-            !permissions
-                ? []
-                : permissions.permissions.resources.map((resource) => ({
+            permissions
+                ? permissions.permissions.resources.map((resource) => ({
                       id: resource.name,
                       columns: [
                           resource.name,
-                          <Badge color={!resource.allowAllActions ? 'danger' : 'success'}>{resource.allowAllActions ? 'Yes' : 'No'}</Badge>,
+                          <Badge color={resource.allowAllActions ? 'success' : 'danger'}>{resource.allowAllActions ? 'Yes' : 'No'}</Badge>,
                           <span style={{ whiteSpace: 'nowrap' }}>{resource.actions.join(', ')}</span>,
                           <></>,
                           resource.objects?.length.toString() || '0',
                       ],
-                      detailColumns:
-                          !resource.objects || resource.objects.length === 0
-                              ? undefined
-                              : [
-                                    resource.objects.map((object) => <div key={object.name}>{object.name}</div>),
-                                    <></>,
-                                    resource.objects.map((object) => (
-                                        <div key={object.uuid}>{object.allow.join(',') || <span>&nbsp;</span>}</div>
-                                    )),
-                                    resource.objects.map((object) => (
-                                        <div key={object.uuid}>{object.deny.join(',') || <span>&nbsp;</span>}</div>
-                                    )),
-                                    <></>,
-                                ],
-                  })),
+                      detailColumns: resource.objects?.length
+                          ? [
+                                resource.objects.map((object) => <div key={object.name}>{object.name}</div>),
+                                <></>,
+                                resource.objects.map((object) => (
+                                    <div key={object.uuid}>{object.allow.join(',') || <span>&nbsp;</span>}</div>
+                                )),
+                                resource.objects.map((object) => (
+                                    <div key={object.uuid}>{object.deny.join(',') || <span>&nbsp;</span>}</div>
+                                )),
+                                <></>,
+                            ]
+                          : undefined,
+                  }))
+                : [],
         [permissions],
     );
 
@@ -304,9 +301,7 @@ export default function UserDetail() {
                         titleSize="large"
                         refreshAction={role && getFreshPermissions}
                     >
-                        {!permissions ? (
-                            <></>
-                        ) : (
+                        {permissions ? (
                             <>
                                 <Checkbox
                                     checked={permissions.permissions.allowAllResources}
@@ -323,7 +318,7 @@ export default function UserDetail() {
                                     </>
                                 )}
                             </>
-                        )}
+                        ) : null}
                     </Widget>
                 </Container>
             </Widget>

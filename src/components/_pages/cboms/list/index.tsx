@@ -98,7 +98,7 @@ function CbomsList() {
                 anchor.download = `cbom-${serialNumber}-v${version}.json`;
                 document.body.appendChild(anchor);
                 anchor.click();
-                document.body.removeChild(anchor);
+                anchor.remove();
                 URL.revokeObjectURL(url);
             } catch {
                 dispatch(alertActions.error('Failed to download CBOM JSON'));
@@ -174,8 +174,8 @@ function CbomsList() {
             return;
         }
 
-        const timeoutId = window.setTimeout(() => setHighlightedCbomUuid(undefined), 5000);
-        return () => window.clearTimeout(timeoutId);
+        const timeoutId = globalThis.setTimeout(() => setHighlightedCbomUuid(undefined), 5000);
+        return () => globalThis.clearTimeout(timeoutId);
     }, [highlightedCbomUuid]);
 
     useRunOnSuccessfulFinish(isSyncing, syncSucceeded, () => {

@@ -272,7 +272,7 @@ export default function ConnectorDetail() {
     }, [connector, authTypeEnum]);
 
     const connectorInfoData: TableDataRow[] = useMemo(() => {
-        if (!connector || connector.version !== ConnectorVersion.V2 || !connectorInfoV2) return [];
+        if (connector?.version !== ConnectorVersion.V2 || !connectorInfoV2) return [];
 
         const description = connectorInfoV2.description ?? '';
         const metadata = connectorInfoV2.metadata as Record<string, unknown> | undefined;

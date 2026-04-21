@@ -183,12 +183,11 @@ const IssueCertificateForm = ({
                     control={control}
                     rules={buildValidationRules([validateRequired()])}
                     render={({ field, fieldState }) => {
-                        const errorMessage =
-                            fieldState.error && fieldState.isTouched
-                                ? typeof fieldState.error === 'string'
-                                    ? fieldState.error
-                                    : fieldState.error?.message || 'Required Field'
-                                : undefined;
+                        let errorMessage: string | undefined;
+                        if (fieldState.error && fieldState.isTouched) {
+                            errorMessage =
+                                typeof fieldState.error === 'string' ? fieldState.error : fieldState.error?.message || 'Required Field';
+                        }
                         return (
                             <Select
                                 {...field}
@@ -339,7 +338,7 @@ export default function LocationDetail() {
     }, [id, getFreshLocationDetails]);
 
     useEffect(() => {
-        if (!id || !entityId || !location || !location.uuid) return;
+        if (!id || !entityId || !location?.uuid) return;
 
         if (location.enabled) {
             dispatch(actions.getPushAttributes({ entityUuid: entityId, uuid: id }));
@@ -523,9 +522,8 @@ export default function LocationDetail() {
 
     const detailData: TableDataRow[] = useMemo(
         () =>
-            !location
-                ? []
-                : [
+            location
+                ? [
                       {
                           id: 'uuid',
                           columns: ['UUID', location.uuid],
@@ -557,7 +555,8 @@ export default function LocationDetail() {
                               ),
                           ],
                       },
-                  ],
+                  ]
+                : [],
         [location],
     );
 
@@ -604,9 +603,8 @@ export default function LocationDetail() {
 
     const certData: TableDataRow[] = useMemo(
         () =>
-            !location
-                ? []
-                : location.certificates.map((cert) => ({
+            location
+                ? location.certificates.map((cert) => ({
                       id: cert.certificateUuid,
                       columns: [
                           <>
@@ -656,7 +654,8 @@ export default function LocationDetail() {
                               <></>
                           ),
                       ],
-                  })),
+                  }))
+                : [],
         [location],
     );
 

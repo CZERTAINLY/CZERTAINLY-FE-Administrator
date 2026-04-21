@@ -30,9 +30,7 @@ import {
     CertificateState as CertStatus,
     CertificateSubjectType,
     CertificateValidationResultDto,
-    CertificateValidationStatus,
     CertificateProtocol,
-    ComplianceStatus,
     PlatformEnum,
 } from 'types/openapi';
 import CertificateDownloadForm from './CertificateDownloadForm';

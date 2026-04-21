@@ -8,8 +8,6 @@ import PagedList from 'components/PagedList/PagedList';
 import Dialog from 'components/Dialog';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import Select from 'components/Select';
-import Container from 'components/Container';
-import Button from 'components/Button';
 
 import { ApiClients } from '../../../../api';
 import { actions, selectors } from 'ducks/secrets';
