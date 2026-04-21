@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import react from '@vitejs/plugin-react-swc';
 import eslint from 'vite-plugin-eslint';
 import istanbul from 'vite-plugin-istanbul';
 import tailwindcss from '@tailwindcss/vite';
