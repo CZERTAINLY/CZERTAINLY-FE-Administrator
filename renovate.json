@@ -1,4 +1,24 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "extends": ["config:base"]
+    "extends": ["config:recommended"],
+    "schedule": ["before 6am"],
+    "timezone": "Europe/Prague",
+    "labels": ["dependencies"],
+    "prConcurrentLimit": 10,
+    "prHourlyLimit": 0,
+    "packageRules": [
+        {
+            "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+            "groupName": "all non-major dependencies",
+            "groupSlug": "all-minor-patch"
+        },
+        {
+            "matchUpdateTypes": ["major"],
+            "dependencyDashboardApproval": true
+        }
+    ],
+    "lockFileMaintenance": {
+        "enabled": true,
+        "schedule": ["before 6am on Monday"]
+    }
 }
