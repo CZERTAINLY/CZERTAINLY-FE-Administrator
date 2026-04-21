@@ -565,7 +565,7 @@ test.describe('Select', () => {
         const select = component.locator('select');
         await select.evaluate((el: HTMLSelectElement) => {
             Array.from(el.options).forEach((o) => {
-                (o as HTMLOptionElement).selected = false;
+                o.selected = false;
             });
             el.dispatchEvent(new Event('change', { bubbles: true }));
         });

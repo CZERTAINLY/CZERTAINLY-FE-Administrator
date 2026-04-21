@@ -19,11 +19,12 @@ import { X } from 'lucide-react';
 
 export type SingleValue<T> = T | undefined;
 export type MultiValue<T> = T[] | undefined;
+export type OptionValue = string | number | object;
 
 interface BaseProps {
     id: string;
     options?: {
-        value: string | number | object;
+        value: OptionValue;
         label: string;
         description?: string;
         disabled?: boolean;
@@ -57,8 +58,6 @@ interface MultiSelectProps extends BaseProps {
     value: { value: string | number; label: string }[];
     onChange: (value: { value: string | number; label: string }[] | undefined) => void;
 }
-
-type OptionValue = string | number | object;
 
 const getOptionValueString = (val: OptionValue): string => {
     if (typeof val === 'object' && val !== null) {
@@ -258,12 +257,12 @@ function Select({
             const cleanup = scheduleAutoInit();
             previousValueRef.current = value;
             return cleanup;
-        } else if (!isInitializedRef.current) {
+        } else if (isInitializedRef.current) {
+            previousValueRef.current = value;
+        } else {
             const cleanup = scheduleAutoInit();
             previousValueRef.current = value;
             return cleanup;
-        } else {
-            previousValueRef.current = value;
         }
     }, [optionsKey, value, id, isMulti, getValueFromProp]);
 
@@ -272,7 +271,12 @@ function Select({
         if (!select?.parentNode) return;
 
         const escapeHtml = (text: string) =>
-            text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+            text
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
 
         const applyVersionLabelColor = (root: Element) => {
             if (!colorizeVersionLabel) return;
@@ -281,7 +285,7 @@ function Select({
                 const text = element.textContent?.trim();
                 if (!text) return;
 
-                const match = text.match(/^(Version\s+\d+)(\s+\((Latest|Original)\))$/);
+                const match = /^(Version\s+\d+)(\s+\((Latest|Original)\))$/.exec(text);
                 if (!match) return;
 
                 const versionPart = escapeHtml(match[1]);
@@ -340,7 +344,7 @@ function Select({
 
             // Try to get dropdown from (globalThis as any).HSSelect instance (works also when dropdownScope === 'window')
             const hsInstance = (globalThis as any).HSSelect?.getInstance?.(select);
-            const dropdown: Element | null = (hsInstance && hsInstance.dropdown) || root.querySelector?.('.hs-select-dropdown');
+            const dropdown: Element | null = hsInstance?.dropdown ?? root.querySelector?.('.hs-select-dropdown');
             applyAddNewStyling(dropdown);
             applyDropdownOptionDescriptions(dropdown);
 
