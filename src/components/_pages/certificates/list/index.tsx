@@ -4,11 +4,11 @@ import Dialog from 'components/Dialog';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/certificates';
-import { EntityType } from 'ducks/filters';
+import { EntityType, actions as filterActions, selectors as filterSelectors } from 'ducks/filters';
 import { selectors as pagingSelectors } from 'ducks/paging';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 
@@ -17,7 +17,6 @@ import Dropdown from 'components/Dropdown';
 import { ApiClients } from '../../../../api';
 import PagedList from 'components/PagedList/PagedList';
 import { actions as userAction, selectors as userSelectors } from 'ducks/users';
-import { actions as filterActions, selectors as filterSelectors } from 'ducks/filters';
 import { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
@@ -27,7 +26,7 @@ import CertificateGroupDialog from '../CertificateGroupDialog';
 import CertificateOwnerDialog from '../CertificateOwnerDialog';
 import CertificateRAProfileDialog from '../CertificateRAProfileDialog';
 import CertificateUploadDialog from '../CertificateUploadDialog';
-import { ArrowDownToLine, KeyRound } from 'lucide-react';
+import { ArrowDownToLine } from 'lucide-react';
 import Switch from 'components/Switch';
 import { buildCertificateRowColumns } from '../certificateTableHelpers';
 
@@ -186,7 +185,7 @@ export default function CertificateList({
                           },
                       },
                       {
-                          icon: 'user',
+                          icon: 'user-check',
                           disabled: checkedRows.length === 0,
                           tooltip: 'Override Owner',
                           onClick: () => {
@@ -195,7 +194,7 @@ export default function CertificateList({
                           },
                       },
                       {
-                          icon: 'plug',
+                          icon: 'shield-check',
                           disabled: checkedRows.length === 0,
                           tooltip: 'Override RA Profile',
                           onClick: () => {
@@ -417,7 +416,7 @@ export default function CertificateList({
                 }
                 toggle={() => setUpdateOwner(false)}
                 buttons={[]}
-                icon="user"
+                icon="user-check"
                 size="md"
             />
 
@@ -434,7 +433,7 @@ export default function CertificateList({
                 toggle={() => setUpdateRaProfile(false)}
                 buttons={[]}
                 size="md"
-                icon="plug"
+                icon="shield-check"
             />
         </>
     );

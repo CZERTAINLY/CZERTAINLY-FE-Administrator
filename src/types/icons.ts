@@ -37,4 +37,9 @@ export type IconName =
     | 'recycle'
     | 'rekey'
     | 'archive'
-    | 'unarchive';
+    | 'unarchive'
+    | 'user-check'
+    | 'user-cog'
+    | 'shield-check'
+    | 'unplug'
+    | 'repeat';

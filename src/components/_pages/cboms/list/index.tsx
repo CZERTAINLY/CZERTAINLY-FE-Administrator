@@ -61,7 +61,7 @@ function CbomsList() {
             },
             {
                 id: 'sync',
-                icon: 'sync',
+                icon: 'repeat',
                 disabled: isSyncing,
                 tooltip: 'Sync CBOMs',
                 onClick: () => dispatch(actions.syncCboms()),
@@ -71,7 +71,7 @@ function CbomsList() {
     );
 
     const getCbomJson = useCallback(async (uuid: string): Promise<string> => {
-        const cbomDetail = (await firstValueFrom(backendClient.cbomManagement.getCbomDetail({ uuid }))) as CbomDetailDto;
+        const cbomDetail = await firstValueFrom(backendClient.cbomManagement.getCbomDetail({ uuid }));
         return JSON.stringify(cbomDetail.content ?? {}, null, 2);
     }, []);
 
@@ -98,7 +98,7 @@ function CbomsList() {
                 anchor.download = `cbom-${serialNumber}-v${version}.json`;
                 document.body.appendChild(anchor);
                 anchor.click();
-                document.body.removeChild(anchor);
+                anchor.remove();
                 URL.revokeObjectURL(url);
             } catch {
                 dispatch(alertActions.error('Failed to download CBOM JSON'));
@@ -174,8 +174,8 @@ function CbomsList() {
             return;
         }
 
-        const timeoutId = window.setTimeout(() => setHighlightedCbomUuid(undefined), 5000);
-        return () => window.clearTimeout(timeoutId);
+        const timeoutId = globalThis.setTimeout(() => setHighlightedCbomUuid(undefined), 5000);
+        return () => globalThis.clearTimeout(timeoutId);
     }, [highlightedCbomUuid]);
 
     useRunOnSuccessfulFinish(isSyncing, syncSucceeded, () => {
