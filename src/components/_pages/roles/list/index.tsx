@@ -63,10 +63,6 @@ export default function RolesList() {
         setEditingRoleId(undefined);
     }, []);
 
-    const onAddClick = useCallback(() => {
-        handleOpenAddModal();
-    }, [handleOpenAddModal]);
-
     const onEditRoleUsersClick = useCallback(() => {
         if (checkedRows.length !== 1) return;
         setSelectedRoleId(checkedRows[0]);
@@ -121,7 +117,7 @@ export default function RolesList() {
                 },
             },
             {
-                icon: 'user',
+                icon: 'user-cog',
                 disabled: isBusy || checkedRows.length !== 1 || isSystemRoleSelected,
                 tooltip: 'Edit role users',
                 onClick: () => {
@@ -189,7 +185,9 @@ export default function RolesList() {
 
                     role.email || '',
 
-                    <Badge color={!role.systemRole ? 'success' : 'danger'}>{role.systemRole ? 'Yes' : 'No'}</Badge>,
+                    <Badge key="systemRole" color={role.systemRole ? 'danger' : 'success'}>
+                        {role.systemRole ? 'Yes' : 'No'}
+                    </Badge>,
                 ],
             })),
         [roles],

@@ -8,8 +8,6 @@ import PagedList from 'components/PagedList/PagedList';
 import Dialog from 'components/Dialog';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import Select from 'components/Select';
-import Container from 'components/Container';
-import Button from 'components/Button';
 
 import { ApiClients } from '../../../../api';
 import { actions, selectors } from 'ducks/secrets';
@@ -207,7 +205,7 @@ export default function SecretsList() {
                 onClick: () => setIsDisableSecretsOpen(true),
             },
             {
-                icon: 'user',
+                icon: 'user-check',
                 disabled: checkedRows.length === 0,
                 tooltip: 'Override Owner',
                 onClick: () => setIsUpdateOwnerOpen(true),
@@ -219,7 +217,7 @@ export default function SecretsList() {
                 onClick: () => setIsUpdateGroupsOpen(true),
             },
             {
-                icon: 'plug',
+                icon: 'shield-check',
                 disabled: checkedRows.length === 0,
                 tooltip: 'Override Source Vault Profile',
                 onClick: () => setIsUpdateVaultProfileOpen(true),
