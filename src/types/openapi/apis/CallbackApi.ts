@@ -15,12 +15,7 @@ import type { Observable } from 'rxjs';
 import type { AjaxResponse } from 'rxjs/ajax';
 import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
 import type { OperationOpts, HttpHeaders } from '../runtime';
-import type {
-    AuthenticationServiceExceptionDto,
-    ErrorMessageDto,
-    RequestAttributeCallback,
-    Resource,
-} from '../models';
+import type { AuthenticationServiceExceptionDto, ErrorMessageDto, RequestAttributeCallback, Resource } from '../models';
 
 export interface CallbackRequest {
     uuid: string;
@@ -44,14 +39,19 @@ export interface ResourceCallbackRequest {
  * no description
  */
 export class CallbackApi extends BaseAPI {
-
     /**
      * API to trigger the Callback for Connector.
      * Connector Callback API
      */
-    callback({ uuid, functionGroup, kind, requestAttributeCallback }: CallbackRequest): Observable<object>
-    callback({ uuid, functionGroup, kind, requestAttributeCallback }: CallbackRequest, opts?: OperationOpts): Observable<AjaxResponse<object>>
-    callback({ uuid, functionGroup, kind, requestAttributeCallback }: CallbackRequest, opts?: OperationOpts): Observable<object | AjaxResponse<object>> {
+    callback({ uuid, functionGroup, kind, requestAttributeCallback }: CallbackRequest): Observable<object>;
+    callback(
+        { uuid, functionGroup, kind, requestAttributeCallback }: CallbackRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<object>>;
+    callback(
+        { uuid, functionGroup, kind, requestAttributeCallback }: CallbackRequest,
+        opts?: OperationOpts,
+    ): Observable<object | AjaxResponse<object>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'callback');
         throwIfNullOrUndefined(functionGroup, 'functionGroup', 'callback');
         throwIfNullOrUndefined(kind, 'kind', 'callback');
@@ -61,20 +61,26 @@ export class CallbackApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<object>({
-            url: '/v1/connectors/{uuid}/{functionGroup}/{kind}/callback'.replace('{uuid}', encodeURI(uuid)).replace('{functionGroup}', encodeURI(functionGroup)).replace('{kind}', encodeURI(kind)),
-            method: 'POST',
-            headers,
-            body: requestAttributeCallback,
-        }, opts?.responseOpts);
-    };
+        return this.request<object>(
+            {
+                url: '/v1/connectors/{uuid}/{functionGroup}/{kind}/callback'
+                    .replace('{uuid}', encodeURI(uuid))
+                    .replace('{functionGroup}', encodeURI(functionGroup))
+                    .replace('{kind}', encodeURI(kind)),
+                method: 'POST',
+                headers,
+                body: requestAttributeCallback,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * API to trigger the Callback for Connector.
      * Connector Callback API v2
      */
-    callbackV2({ uuid, requestAttributeCallback }: CallbackV2Request): Observable<object>
-    callbackV2({ uuid, requestAttributeCallback }: CallbackV2Request, opts?: OperationOpts): Observable<AjaxResponse<object>>
+    callbackV2({ uuid, requestAttributeCallback }: CallbackV2Request): Observable<object>;
+    callbackV2({ uuid, requestAttributeCallback }: CallbackV2Request, opts?: OperationOpts): Observable<AjaxResponse<object>>;
     callbackV2({ uuid, requestAttributeCallback }: CallbackV2Request, opts?: OperationOpts): Observable<object | AjaxResponse<object>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'callbackV2');
         throwIfNullOrUndefined(requestAttributeCallback, 'requestAttributeCallback', 'callbackV2');
@@ -83,21 +89,30 @@ export class CallbackApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<object>({
-            url: '/v2/connectors/{uuid}/callback'.replace('{uuid}', encodeURI(uuid)),
-            method: 'POST',
-            headers,
-            body: requestAttributeCallback,
-        }, opts?.responseOpts);
-    };
+        return this.request<object>(
+            {
+                url: '/v2/connectors/{uuid}/callback'.replace('{uuid}', encodeURI(uuid)),
+                method: 'POST',
+                headers,
+                body: requestAttributeCallback,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * API to trigger the Callback for resource.
      * Resource Callback API
      */
-    resourceCallback({ resource, parentObjectUuid, requestAttributeCallback }: ResourceCallbackRequest): Observable<object>
-    resourceCallback({ resource, parentObjectUuid, requestAttributeCallback }: ResourceCallbackRequest, opts?: OperationOpts): Observable<AjaxResponse<object>>
-    resourceCallback({ resource, parentObjectUuid, requestAttributeCallback }: ResourceCallbackRequest, opts?: OperationOpts): Observable<object | AjaxResponse<object>> {
+    resourceCallback({ resource, parentObjectUuid, requestAttributeCallback }: ResourceCallbackRequest): Observable<object>;
+    resourceCallback(
+        { resource, parentObjectUuid, requestAttributeCallback }: ResourceCallbackRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<object>>;
+    resourceCallback(
+        { resource, parentObjectUuid, requestAttributeCallback }: ResourceCallbackRequest,
+        opts?: OperationOpts,
+    ): Observable<object | AjaxResponse<object>> {
         throwIfNullOrUndefined(resource, 'resource', 'resourceCallback');
         throwIfNullOrUndefined(parentObjectUuid, 'parentObjectUuid', 'resourceCallback');
         throwIfNullOrUndefined(requestAttributeCallback, 'requestAttributeCallback', 'resourceCallback');
@@ -106,12 +121,16 @@ export class CallbackApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<object>({
-            url: '/v1/{resource}/{parentObjectUuid}/callback'.replace('{resource}', encodeURI(resource)).replace('{parentObjectUuid}', encodeURI(parentObjectUuid)),
-            method: 'POST',
-            headers,
-            body: requestAttributeCallback,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<object>(
+            {
+                url: '/v1/{resource}/{parentObjectUuid}/callback'
+                    .replace('{resource}', encodeURI(resource))
+                    .replace('{parentObjectUuid}', encodeURI(parentObjectUuid)),
+                method: 'POST',
+                headers,
+                body: requestAttributeCallback,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

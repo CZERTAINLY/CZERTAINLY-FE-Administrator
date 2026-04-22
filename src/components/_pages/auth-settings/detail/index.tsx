@@ -1,9 +1,9 @@
 import JwkSetKeysTable from 'components/_pages/auth-settings/JwkSetKeysTable';
 import OAuth2ProviderForm from 'components/_pages/auth-settings/form';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/auth-settings';
 import { useCallback, useEffect, useMemo, useState } from 'react';

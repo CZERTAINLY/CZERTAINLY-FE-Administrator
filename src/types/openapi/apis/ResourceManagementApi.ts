@@ -37,63 +37,86 @@ export interface ListResourceRuleFilterFieldsRequest {
  * no description
  */
 export class ResourceManagementApi extends BaseAPI {
-
     /**
      * This endpoint returns a map of resource events, where the key is the event type and the value is a list of event details.
      * Retrieve a list of all events that can be triggered by all resources
      */
-    listAllResourceEvents(): Observable<{ [key: string]: Array<ResourceEventDto>; }>
-    listAllResourceEvents(opts?: OperationOpts): Observable<AjaxResponse<{ [key: string]: Array<ResourceEventDto>; }>>
-    listAllResourceEvents(opts?: OperationOpts): Observable<{ [key: string]: Array<ResourceEventDto>; } | AjaxResponse<{ [key: string]: Array<ResourceEventDto>; }>> {
-        return this.request<{ [key: string]: Array<ResourceEventDto>; }>({
-            url: '/v1/resources/events',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+    listAllResourceEvents(): Observable<{ [key: string]: Array<ResourceEventDto> }>;
+    listAllResourceEvents(opts?: OperationOpts): Observable<AjaxResponse<{ [key: string]: Array<ResourceEventDto> }>>;
+    listAllResourceEvents(
+        opts?: OperationOpts,
+    ): Observable<{ [key: string]: Array<ResourceEventDto> } | AjaxResponse<{ [key: string]: Array<ResourceEventDto> }>> {
+        return this.request<{ [key: string]: Array<ResourceEventDto> }>(
+            {
+                url: '/v1/resources/events',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Retrieve a list of all events that can be triggered by a resource
      */
-    listResourceEvents({ resource }: ListResourceEventsRequest): Observable<Array<ResourceEventDto>>
-    listResourceEvents({ resource }: ListResourceEventsRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<ResourceEventDto>>>
-    listResourceEvents({ resource }: ListResourceEventsRequest, opts?: OperationOpts): Observable<Array<ResourceEventDto> | AjaxResponse<Array<ResourceEventDto>>> {
+    listResourceEvents({ resource }: ListResourceEventsRequest): Observable<Array<ResourceEventDto>>;
+    listResourceEvents({ resource }: ListResourceEventsRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<ResourceEventDto>>>;
+    listResourceEvents(
+        { resource }: ListResourceEventsRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<ResourceEventDto> | AjaxResponse<Array<ResourceEventDto>>> {
         throwIfNullOrUndefined(resource, 'resource', 'listResourceEvents');
 
-        return this.request<Array<ResourceEventDto>>({
-            url: '/v1/resources/{resource}/events'.replace('{resource}', encodeURI(resource)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<ResourceEventDto>>(
+            {
+                url: '/v1/resources/{resource}/events'.replace('{resource}', encodeURI(resource)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Retrieve filter fields that can be used for creating rule conditions and actions
      */
-    listResourceRuleFilterFields({ resource, settable }: ListResourceRuleFilterFieldsRequest): Observable<Array<SearchFieldDataByGroupDto>>
-    listResourceRuleFilterFields({ resource, settable }: ListResourceRuleFilterFieldsRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
-    listResourceRuleFilterFields({ resource, settable }: ListResourceRuleFilterFieldsRequest, opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
+    listResourceRuleFilterFields({ resource, settable }: ListResourceRuleFilterFieldsRequest): Observable<Array<SearchFieldDataByGroupDto>>;
+    listResourceRuleFilterFields(
+        { resource, settable }: ListResourceRuleFilterFieldsRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>;
+    listResourceRuleFilterFields(
+        { resource, settable }: ListResourceRuleFilterFieldsRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
         throwIfNullOrUndefined(resource, 'resource', 'listResourceRuleFilterFields');
 
         const query: HttpQuery = {};
 
-        if (settable != null) { query['settable'] = settable; }
+        if (settable != null) {
+            query['settable'] = settable;
+        }
 
-        return this.request<Array<SearchFieldDataByGroupDto>>({
-            url: '/v1/resources/{resource}/filters/rules'.replace('{resource}', encodeURI(resource)),
-            method: 'GET',
-            query,
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<SearchFieldDataByGroupDto>>(
+            {
+                url: '/v1/resources/{resource}/filters/rules'.replace('{resource}', encodeURI(resource)),
+                method: 'GET',
+                query,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Retrieve list of resources with information and settings
      */
-    listResources(): Observable<Array<ResourceDto>>
-    listResources(opts?: OperationOpts): Observable<AjaxResponse<Array<ResourceDto>>>
+    listResources(): Observable<Array<ResourceDto>>;
+    listResources(opts?: OperationOpts): Observable<AjaxResponse<Array<ResourceDto>>>;
     listResources(opts?: OperationOpts): Observable<Array<ResourceDto> | AjaxResponse<Array<ResourceDto>>> {
-        return this.request<Array<ResourceDto>>({
-            url: '/v1/resources',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
-
+        return this.request<Array<ResourceDto>>(
+            {
+                url: '/v1/resources',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 }

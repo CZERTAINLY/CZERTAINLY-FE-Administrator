@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ComplianceProfileRulesRequestDto,
-    RequestAttribute,
-} from './';
+import type { ComplianceProfileRulesRequestDto, RequestAttribute } from './';
 
 /**
  * @export

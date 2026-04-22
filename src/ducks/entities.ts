@@ -1,8 +1,8 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
-import { SearchRequestModel } from 'types/certificate';
-import { ConnectorResponseModel } from 'types/connectors';
-import { EntityRequestModel, EntityResponseModel } from 'types/entities';
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
+import type { SearchRequestModel } from 'types/certificate';
+import type { ConnectorResponseModel } from 'types/connectors';
+import type { EntityRequestModel, EntityResponseModel } from 'types/entities';
 
 export type State = {
     entity?: EntityResponseModel;
@@ -48,7 +48,7 @@ export const slice = createSlice({
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
             Object.keys(state).forEach((key) => {
-                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+                if (!Object.hasOwn(initialState, key)) (state as any)[key] = undefined;
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));

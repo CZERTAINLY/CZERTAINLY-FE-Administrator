@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -22,6 +22,5 @@ export enum RecipientType {
     User = 'user',
     Group = 'group',
     Role = 'role',
-    Owner = 'owner'
+    Owner = 'owner',
 }
-

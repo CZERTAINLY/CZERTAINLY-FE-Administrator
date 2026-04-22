@@ -3,9 +3,9 @@ import { actions, selectors } from 'ducks/oids';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-    CustomOidEntryRequestDto,
-    CustomOidEntryUpdateRequestDto,
-    CustomOidEntryUpdateRequestDtoAdditionalProperties,
+    type CustomOidEntryRequestDto,
+    type CustomOidEntryUpdateRequestDto,
+    type CustomOidEntryUpdateRequestDtoAdditionalProperties,
     OidCategory,
     PlatformEnum,
 } from 'types/openapi';

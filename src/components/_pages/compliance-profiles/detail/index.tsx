@@ -1,8 +1,8 @@
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
-import { ApiClients } from '../../../../api';
+import type { ApiClients } from '../../../../api';
 import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/compliance-profiles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -17,7 +17,7 @@ import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { capitalize } from 'utils/common-utils';
 import TabLayout from 'components/Layout/TabLayout';
 import AttributeViewer from 'components/Attributes/AttributeViewer';
-import { AttributeResponseModel } from 'types/attributes';
+import type { AttributeResponseModel } from 'types/attributes';
 import { Info } from 'lucide-react';
 import AssignedRulesAndGroup from 'components/_pages/compliance-profiles/detail/AssignedRulesAndGroup/AssignedRulesAndGroup';
 import AvailableRulesAndGroups from 'components/_pages/compliance-profiles/detail/AvailableRulesAndGroups/AvailableRulesAndGroups';

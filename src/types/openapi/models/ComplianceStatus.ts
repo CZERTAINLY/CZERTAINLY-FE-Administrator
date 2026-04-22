@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -21,6 +21,5 @@ export enum ComplianceStatus {
     Ok = 'ok',
     Nok = 'nok',
     Na = 'na',
-    Failed = 'failed'
+    Failed = 'failed',
 }
-

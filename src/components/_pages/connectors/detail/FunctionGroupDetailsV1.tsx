@@ -2,11 +2,11 @@ import { useMemo } from 'react';
 
 import Select from 'components/Select';
 import Container from 'components/Container';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Widget from 'components/Widget';
 import AttributeDescriptorViewer from 'components/Attributes/AttributeDescriptorViewer';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { FunctionGroupModel } from 'types/connectors';
+import type { FunctionGroupModel } from 'types/connectors';
 import { useSelector } from 'react-redux';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { PlatformEnum } from 'types/openapi';

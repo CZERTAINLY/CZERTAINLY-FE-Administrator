@@ -1,11 +1,11 @@
 import AttributeViewer from 'components/Attributes/AttributeViewer';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
 import TokenStatusBadge from 'components/_pages/tokens/TokenStatusBadge';
 
 import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } from 'ducks/token-profiles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -17,7 +17,7 @@ import KeyUsageSelect from '../../cryptographic-keys/KeyUsageSelect';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import Label from 'components/Label';
 import Badge from 'components/Badge';
-import { KeyUsage, PlatformEnum, Resource } from 'types/openapi';
+import { type KeyUsage, PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import { createWidgetDetailHeaders } from 'utils/widget';

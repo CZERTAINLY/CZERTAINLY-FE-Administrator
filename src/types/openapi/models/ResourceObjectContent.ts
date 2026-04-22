@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-    ResourceObjectContentData,
-} from './';
+import type { AttributeContentType, ResourceObjectContentData } from './';
 
 /**
  * Resource object attribute content carrying resource object data
@@ -41,5 +38,3 @@ export interface ResourceObjectContent {
      */
     contentType: AttributeContentType;
 }
-
-

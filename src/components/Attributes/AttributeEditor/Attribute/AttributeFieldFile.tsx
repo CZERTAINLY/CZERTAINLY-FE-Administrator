@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import Label from 'components/Label';
 import TextInput from 'components/TextInput';

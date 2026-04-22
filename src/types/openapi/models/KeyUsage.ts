@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -22,6 +22,5 @@ export enum KeyUsage {
     Encrypt = 'encrypt',
     Decrypt = 'decrypt',
     Wrap = 'wrap',
-    Unwrap = 'unwrap'
+    Unwrap = 'unwrap',
 }
-

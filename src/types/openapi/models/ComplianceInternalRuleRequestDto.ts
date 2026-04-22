@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ConditionItemRequestDto,
-    Resource,
-} from './';
+import type { ConditionItemRequestDto, Resource } from './';
 
 /**
  * @export
@@ -46,5 +43,3 @@ export interface ComplianceInternalRuleRequestDto {
      */
     conditionItems: Array<ConditionItemRequestDto>;
 }
-
-

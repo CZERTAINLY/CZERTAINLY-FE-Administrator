@@ -76,32 +76,40 @@ export interface UpdateRaProfile1Request {
  * no description
  */
 export class CMPProfileManagementApi extends BaseAPI {
-
     /**
      * Delete multiple CMP Profiles
      */
-    bulkDeleteCmpProfile({ requestBody }: BulkDeleteCmpProfileRequest): Observable<Array<BulkActionMessageDto>>
-    bulkDeleteCmpProfile({ requestBody }: BulkDeleteCmpProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BulkActionMessageDto>>>
-    bulkDeleteCmpProfile({ requestBody }: BulkDeleteCmpProfileRequest, opts?: OperationOpts): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
+    bulkDeleteCmpProfile({ requestBody }: BulkDeleteCmpProfileRequest): Observable<Array<BulkActionMessageDto>>;
+    bulkDeleteCmpProfile(
+        { requestBody }: BulkDeleteCmpProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<BulkActionMessageDto>>>;
+    bulkDeleteCmpProfile(
+        { requestBody }: BulkDeleteCmpProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
         throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDeleteCmpProfile');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<Array<BulkActionMessageDto>>({
-            url: '/v1/cmpProfiles/delete',
-            method: 'DELETE',
-            headers,
-            body: requestBody,
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<BulkActionMessageDto>>(
+            {
+                url: '/v1/cmpProfiles/delete',
+                method: 'DELETE',
+                headers,
+                body: requestBody,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Disable multiple CMP Profile
      */
-    bulkDisableCmpProfile({ requestBody }: BulkDisableCmpProfileRequest): Observable<void>
-    bulkDisableCmpProfile({ requestBody }: BulkDisableCmpProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    bulkDisableCmpProfile({ requestBody }: BulkDisableCmpProfileRequest): Observable<void>;
+    bulkDisableCmpProfile({ requestBody }: BulkDisableCmpProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     bulkDisableCmpProfile({ requestBody }: BulkDisableCmpProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDisableCmpProfile');
 
@@ -109,19 +117,22 @@ export class CMPProfileManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>({
-            url: '/v1/cmpProfiles/disable',
-            method: 'PATCH',
-            headers,
-            body: requestBody,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/cmpProfiles/disable',
+                method: 'PATCH',
+                headers,
+                body: requestBody,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Enable multiple CMP Profiles
      */
-    bulkEnableCmpProfile({ requestBody }: BulkEnableCmpProfileRequest): Observable<void>
-    bulkEnableCmpProfile({ requestBody }: BulkEnableCmpProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    bulkEnableCmpProfile({ requestBody }: BulkEnableCmpProfileRequest): Observable<void>;
+    bulkEnableCmpProfile({ requestBody }: BulkEnableCmpProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     bulkEnableCmpProfile({ requestBody }: BulkEnableCmpProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkEnableCmpProfile');
 
@@ -129,68 +140,92 @@ export class CMPProfileManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>({
-            url: '/v1/cmpProfiles/enable',
-            method: 'PATCH',
-            headers,
-            body: requestBody,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/cmpProfiles/enable',
+                method: 'PATCH',
+                headers,
+                body: requestBody,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Create CMP Profile
      */
-    createCmpProfile({ cmpProfileRequestDto }: CreateCmpProfileRequest): Observable<CmpProfileDetailDto>
-    createCmpProfile({ cmpProfileRequestDto }: CreateCmpProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<CmpProfileDetailDto>>
-    createCmpProfile({ cmpProfileRequestDto }: CreateCmpProfileRequest, opts?: OperationOpts): Observable<CmpProfileDetailDto | AjaxResponse<CmpProfileDetailDto>> {
+    createCmpProfile({ cmpProfileRequestDto }: CreateCmpProfileRequest): Observable<CmpProfileDetailDto>;
+    createCmpProfile(
+        { cmpProfileRequestDto }: CreateCmpProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<CmpProfileDetailDto>>;
+    createCmpProfile(
+        { cmpProfileRequestDto }: CreateCmpProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<CmpProfileDetailDto | AjaxResponse<CmpProfileDetailDto>> {
         throwIfNullOrUndefined(cmpProfileRequestDto, 'cmpProfileRequestDto', 'createCmpProfile');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<CmpProfileDetailDto>({
-            url: '/v1/cmpProfiles',
-            method: 'POST',
-            headers,
-            body: cmpProfileRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<CmpProfileDetailDto>(
+            {
+                url: '/v1/cmpProfiles',
+                method: 'POST',
+                headers,
+                body: cmpProfileRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Delete CMP Profile
      */
-    deleteCmpProfile({ cmpProfileUuid }: DeleteCmpProfileRequest): Observable<void>
-    deleteCmpProfile({ cmpProfileUuid }: DeleteCmpProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    deleteCmpProfile({ cmpProfileUuid }: DeleteCmpProfileRequest): Observable<void>;
+    deleteCmpProfile({ cmpProfileUuid }: DeleteCmpProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteCmpProfile({ cmpProfileUuid }: DeleteCmpProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(cmpProfileUuid, 'cmpProfileUuid', 'deleteCmpProfile');
 
-        return this.request<void>({
-            url: '/v1/cmpProfiles/{cmpProfileUuid}'.replace('{cmpProfileUuid}', encodeURI(cmpProfileUuid)),
-            method: 'DELETE',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/cmpProfiles/{cmpProfileUuid}'.replace('{cmpProfileUuid}', encodeURI(cmpProfileUuid)),
+                method: 'DELETE',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Disable CMP Profile
      */
-    disableCmpProfile({ cmpProfileUuid }: DisableCmpProfileRequest): Observable<void>
-    disableCmpProfile({ cmpProfileUuid }: DisableCmpProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    disableCmpProfile({ cmpProfileUuid }: DisableCmpProfileRequest): Observable<void>;
+    disableCmpProfile({ cmpProfileUuid }: DisableCmpProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     disableCmpProfile({ cmpProfileUuid }: DisableCmpProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(cmpProfileUuid, 'cmpProfileUuid', 'disableCmpProfile');
 
-        return this.request<void>({
-            url: '/v1/cmpProfiles/{cmpProfileUuid}/disable'.replace('{cmpProfileUuid}', encodeURI(cmpProfileUuid)),
-            method: 'PATCH',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/cmpProfiles/{cmpProfileUuid}/disable'.replace('{cmpProfileUuid}', encodeURI(cmpProfileUuid)),
+                method: 'PATCH',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Edit CMP Profile
      */
-    editCmpProfile({ cmpProfileUuid, cmpProfileEditRequestDto }: EditCmpProfileRequest): Observable<CmpProfileDetailDto>
-    editCmpProfile({ cmpProfileUuid, cmpProfileEditRequestDto }: EditCmpProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<CmpProfileDetailDto>>
-    editCmpProfile({ cmpProfileUuid, cmpProfileEditRequestDto }: EditCmpProfileRequest, opts?: OperationOpts): Observable<CmpProfileDetailDto | AjaxResponse<CmpProfileDetailDto>> {
+    editCmpProfile({ cmpProfileUuid, cmpProfileEditRequestDto }: EditCmpProfileRequest): Observable<CmpProfileDetailDto>;
+    editCmpProfile(
+        { cmpProfileUuid, cmpProfileEditRequestDto }: EditCmpProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<CmpProfileDetailDto>>;
+    editCmpProfile(
+        { cmpProfileUuid, cmpProfileEditRequestDto }: EditCmpProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<CmpProfileDetailDto | AjaxResponse<CmpProfileDetailDto>> {
         throwIfNullOrUndefined(cmpProfileUuid, 'cmpProfileUuid', 'editCmpProfile');
         throwIfNullOrUndefined(cmpProfileEditRequestDto, 'cmpProfileEditRequestDto', 'editCmpProfile');
 
@@ -198,99 +233,136 @@ export class CMPProfileManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<CmpProfileDetailDto>({
-            url: '/v1/cmpProfiles/{cmpProfileUuid}'.replace('{cmpProfileUuid}', encodeURI(cmpProfileUuid)),
-            method: 'PUT',
-            headers,
-            body: cmpProfileEditRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<CmpProfileDetailDto>(
+            {
+                url: '/v1/cmpProfiles/{cmpProfileUuid}'.replace('{cmpProfileUuid}', encodeURI(cmpProfileUuid)),
+                method: 'PUT',
+                headers,
+                body: cmpProfileEditRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Enable CMP Profile
      */
-    enableCmpProfile({ cmpProfileUuid }: EnableCmpProfileRequest): Observable<void>
-    enableCmpProfile({ cmpProfileUuid }: EnableCmpProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    enableCmpProfile({ cmpProfileUuid }: EnableCmpProfileRequest): Observable<void>;
+    enableCmpProfile({ cmpProfileUuid }: EnableCmpProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     enableCmpProfile({ cmpProfileUuid }: EnableCmpProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(cmpProfileUuid, 'cmpProfileUuid', 'enableCmpProfile');
 
-        return this.request<void>({
-            url: '/v1/cmpProfiles/{cmpProfileUuid}/enable'.replace('{cmpProfileUuid}', encodeURI(cmpProfileUuid)),
-            method: 'PATCH',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/cmpProfiles/{cmpProfileUuid}/enable'.replace('{cmpProfileUuid}', encodeURI(cmpProfileUuid)),
+                method: 'PATCH',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Force delete multiple CMP Profiles
      */
-    forceDeleteCmpProfiles({ requestBody }: ForceDeleteCmpProfilesRequest): Observable<Array<BulkActionMessageDto>>
-    forceDeleteCmpProfiles({ requestBody }: ForceDeleteCmpProfilesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BulkActionMessageDto>>>
-    forceDeleteCmpProfiles({ requestBody }: ForceDeleteCmpProfilesRequest, opts?: OperationOpts): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
+    forceDeleteCmpProfiles({ requestBody }: ForceDeleteCmpProfilesRequest): Observable<Array<BulkActionMessageDto>>;
+    forceDeleteCmpProfiles(
+        { requestBody }: ForceDeleteCmpProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<BulkActionMessageDto>>>;
+    forceDeleteCmpProfiles(
+        { requestBody }: ForceDeleteCmpProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
         throwIfNullOrUndefined(requestBody, 'requestBody', 'forceDeleteCmpProfiles');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<Array<BulkActionMessageDto>>({
-            url: '/v1/cmpProfiles/delete/force',
-            method: 'DELETE',
-            headers,
-            body: requestBody,
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<BulkActionMessageDto>>(
+            {
+                url: '/v1/cmpProfiles/delete/force',
+                method: 'DELETE',
+                headers,
+                body: requestBody,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get details of CMP Profile
      */
-    getCmpProfile({ cmpProfileUuid }: GetCmpProfileRequest): Observable<CmpProfileDetailDto>
-    getCmpProfile({ cmpProfileUuid }: GetCmpProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<CmpProfileDetailDto>>
-    getCmpProfile({ cmpProfileUuid }: GetCmpProfileRequest, opts?: OperationOpts): Observable<CmpProfileDetailDto | AjaxResponse<CmpProfileDetailDto>> {
+    getCmpProfile({ cmpProfileUuid }: GetCmpProfileRequest): Observable<CmpProfileDetailDto>;
+    getCmpProfile({ cmpProfileUuid }: GetCmpProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<CmpProfileDetailDto>>;
+    getCmpProfile(
+        { cmpProfileUuid }: GetCmpProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<CmpProfileDetailDto | AjaxResponse<CmpProfileDetailDto>> {
         throwIfNullOrUndefined(cmpProfileUuid, 'cmpProfileUuid', 'getCmpProfile');
 
-        return this.request<CmpProfileDetailDto>({
-            url: '/v1/cmpProfiles/{cmpProfileUuid}'.replace('{cmpProfileUuid}', encodeURI(cmpProfileUuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<CmpProfileDetailDto>(
+            {
+                url: '/v1/cmpProfiles/{cmpProfileUuid}'.replace('{cmpProfileUuid}', encodeURI(cmpProfileUuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get list of CMP Profiles
      */
-    listCmpProfiles(): Observable<Array<CmpProfileDto>>
-    listCmpProfiles(opts?: OperationOpts): Observable<AjaxResponse<Array<CmpProfileDto>>>
+    listCmpProfiles(): Observable<Array<CmpProfileDto>>;
+    listCmpProfiles(opts?: OperationOpts): Observable<AjaxResponse<Array<CmpProfileDto>>>;
     listCmpProfiles(opts?: OperationOpts): Observable<Array<CmpProfileDto> | AjaxResponse<Array<CmpProfileDto>>> {
-        return this.request<Array<CmpProfileDto>>({
-            url: '/v1/cmpProfiles',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<CmpProfileDto>>(
+            {
+                url: '/v1/cmpProfiles',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get list of certificates eligible for signing of CMP responses
      */
-    listCmpSigningCertificates(): Observable<Array<CertificateDto>>
-    listCmpSigningCertificates(opts?: OperationOpts): Observable<AjaxResponse<Array<CertificateDto>>>
+    listCmpSigningCertificates(): Observable<Array<CertificateDto>>;
+    listCmpSigningCertificates(opts?: OperationOpts): Observable<AjaxResponse<Array<CertificateDto>>>;
     listCmpSigningCertificates(opts?: OperationOpts): Observable<Array<CertificateDto> | AjaxResponse<Array<CertificateDto>>> {
-        return this.request<Array<CertificateDto>>({
-            url: '/v1/cmpProfiles/signingCertificates',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<CertificateDto>>(
+            {
+                url: '/v1/cmpProfiles/signingCertificates',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Update RA Profile for CMP Profile
      */
-    updateRaProfile1({ cmpProfileUuid, raProfileUuid }: UpdateRaProfile1Request): Observable<void>
-    updateRaProfile1({ cmpProfileUuid, raProfileUuid }: UpdateRaProfile1Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    updateRaProfile1({ cmpProfileUuid, raProfileUuid }: UpdateRaProfile1Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    updateRaProfile1({ cmpProfileUuid, raProfileUuid }: UpdateRaProfile1Request): Observable<void>;
+    updateRaProfile1(
+        { cmpProfileUuid, raProfileUuid }: UpdateRaProfile1Request,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    updateRaProfile1(
+        { cmpProfileUuid, raProfileUuid }: UpdateRaProfile1Request,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(cmpProfileUuid, 'cmpProfileUuid', 'updateRaProfile1');
         throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'updateRaProfile1');
 
-        return this.request<void>({
-            url: '/v1/cmpProfiles/{cmpProfileUuid}/raProfiles/{raProfileUuid}'.replace('{cmpProfileUuid}', encodeURI(cmpProfileUuid)).replace('{raProfileUuid}', encodeURI(raProfileUuid)),
-            method: 'PATCH',
-        }, opts?.responseOpts);
-    };
-
+        return this.request<void>(
+            {
+                url: '/v1/cmpProfiles/{cmpProfileUuid}/raProfiles/{raProfileUuid}'
+                    .replace('{cmpProfileUuid}', encodeURI(cmpProfileUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'PATCH',
+            },
+            opts?.responseOpts,
+        );
+    }
 }

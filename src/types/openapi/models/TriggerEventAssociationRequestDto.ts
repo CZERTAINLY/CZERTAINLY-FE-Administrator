@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    Resource,
-    ResourceEvent,
-} from './';
+import type { Resource, ResourceEvent } from './';
 
 /**
  * @export
@@ -46,5 +43,3 @@ export interface TriggerEventAssociationRequestDto {
      */
     triggerUuids: Array<string>;
 }
-
-

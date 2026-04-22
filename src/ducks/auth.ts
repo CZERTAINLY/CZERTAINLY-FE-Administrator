@@ -1,7 +1,7 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AuthResourceModel, UserDetailModel, UserProfileDetailModel, UserUpdateRequestModel } from 'types/auth';
-import { NameAndUuidModel } from 'types/locations';
-import { Resource } from 'types/openapi';
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { AuthResourceModel, UserDetailModel, UserProfileDetailModel, UserUpdateRequestModel } from 'types/auth';
+import type { NameAndUuidModel } from 'types/locations';
+import type { Resource } from 'types/openapi';
 
 export type State = {
     profile?: UserProfileDetailModel;

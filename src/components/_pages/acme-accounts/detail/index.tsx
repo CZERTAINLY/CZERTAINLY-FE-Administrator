@@ -4,12 +4,12 @@ import { Link, useParams } from 'react-router';
 
 import { actions, selectors } from 'ducks/acme-accounts';
 
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
 import StatusCircle from 'components/StatusCircle';
 import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { AccountStatus, PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';

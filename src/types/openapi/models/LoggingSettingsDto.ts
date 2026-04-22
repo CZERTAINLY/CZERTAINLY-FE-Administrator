@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AuditLoggingSettingsDto,
-    ResourceLoggingSettingsDto,
-} from './';
+import type { AuditLoggingSettingsDto, ResourceLoggingSettingsDto } from './';
 
 /**
  * @export

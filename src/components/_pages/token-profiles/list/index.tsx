@@ -7,16 +7,16 @@ import Badge from 'components/Badge';
 
 import { actions, selectors } from 'ducks/token-profiles';
 
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import TokenStatusBadge from 'components/_pages/tokens/TokenStatusBadge';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import KeyUsageSelect from '../../cryptographic-keys/KeyUsageSelect';
-import { KeyUsage, PlatformEnum } from 'types/openapi';
-import { TokenProfileResponseModel } from 'types/token-profiles';
+import { type KeyUsage, PlatformEnum } from 'types/openapi';
+import type { TokenProfileResponseModel } from 'types/token-profiles';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
 function TokenProfileList() {

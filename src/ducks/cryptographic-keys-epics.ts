@@ -1,4 +1,4 @@
-import { AppEpic } from 'ducks';
+import type { AppEpic } from 'ducks';
 import { iif, of } from 'rxjs';
 import { catchError, concatMap, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 import { LockWidgetNameEnum } from 'types/user-interface';

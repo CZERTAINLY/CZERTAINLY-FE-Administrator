@@ -11,7 +11,7 @@ import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'components/Select';
 import Button from 'components/Button';
-import { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
+import type { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
 

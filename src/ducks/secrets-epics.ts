@@ -1,9 +1,9 @@
-import { AppEpic } from 'ducks';
-import { Observable, of } from 'rxjs';
+import type { AppEpic } from 'ducks';
+import { type Observable, of } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 
-import { AttributeDescriptorDto, AttributeDescriptorModel } from 'types/attributes';
-import { SecretType, VaultProfileManagementApi } from 'types/openapi';
+import type { AttributeDescriptorDto, AttributeDescriptorModel } from 'types/attributes';
+import type { SecretType, VaultProfileManagementApi } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { extractError } from 'utils/net';
 

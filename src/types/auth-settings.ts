@@ -1,4 +1,4 @@
-import {
+import type {
     AuthenticationSettingsDto as AuthenticationSettingsDtoApi,
     AuthenticationSettingsUpdateDto as AuthenticationSettingsUpdateDtoApi,
     OAuth2ProviderSettingsDto as OAuth2ProviderSettingsDtoApi,

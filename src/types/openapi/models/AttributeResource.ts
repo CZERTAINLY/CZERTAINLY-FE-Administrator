@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -22,6 +22,5 @@ export enum AttributeResource {
     Authorities = 'authorities',
     Entities = 'entities',
     Locations = 'locations',
-    Secrets = 'secrets'
+    Secrets = 'secrets',
 }
-

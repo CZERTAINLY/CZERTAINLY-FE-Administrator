@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    SecretType,
-} from './';
+import type { SecretType } from './';
 
 /**
  * Secret representing Basic Authentication credentials
@@ -40,5 +38,3 @@ export interface BasicAuthSecretContent {
      */
     password: string;
 }
-
-

@@ -12,12 +12,11 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
 export enum CertificateFormat {
     Raw = 'raw',
-    Pkcs7 = 'pkcs7'
+    Pkcs7 = 'pkcs7',
 }
-

@@ -1,9 +1,9 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ProfileApprovalModel } from 'types/approval-profiles';
-import { AttributeDescriptorModel } from 'types/attributes';
-import { BulkActionModel } from 'types/connectors';
-import { Resource } from 'types/openapi';
-import {
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { ProfileApprovalModel } from 'types/approval-profiles';
+import type { AttributeDescriptorModel } from 'types/attributes';
+import type { BulkActionModel } from 'types/connectors';
+import type { Resource } from 'types/openapi';
+import type {
     ComplianceProfileSimplifiedModel,
     RaProfileAcmeDetailResponseModel,
     RaProfileActivateAcmeRequestModel,
@@ -122,7 +122,7 @@ export const slice = createSlice({
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
             Object.keys(state).forEach((key) => {
-                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+                if (!Object.hasOwn(initialState, key)) (state as any)[key] = undefined;
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));

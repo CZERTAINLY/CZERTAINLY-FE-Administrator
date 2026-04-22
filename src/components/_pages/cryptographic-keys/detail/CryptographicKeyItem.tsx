@@ -1,10 +1,10 @@
 import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from 'components/Attributes/AttributeViewer';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
 
-import WidgetButtons, { WidgetButtonProps } from 'components/WidgetButtons';
+import WidgetButtons, { type WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/cryptographic-keys';
 
@@ -14,7 +14,7 @@ import Select from 'components/Select';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import Badge from 'components/Badge';
-import { CryptographicKeyHistoryModel, CryptographicKeyItemDetailResponseModel } from 'types/cryptographic-keys';
+import type { CryptographicKeyHistoryModel, CryptographicKeyItemDetailResponseModel } from 'types/cryptographic-keys';
 import { KeyCompromiseReason, KeyState, KeyUsage, PlatformEnum } from 'types/openapi';
 import { dateFormatter } from 'utils/dateUtil';
 import KeyStateBadge from '../KeyStateBadge';
@@ -389,34 +389,32 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
         () =>
             !keyHistory
                 ? []
-                : keyHistory.map(function (history) {
-                      return {
-                          id: history.uuid,
-                          columns: [
-                              <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(history.created)}</span>,
+                : keyHistory.map((history) => ({
+                      id: history.uuid,
+                      columns: [
+                          <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(history.created)}</span>,
 
-                              history.createdBy,
+                          history.createdBy,
 
-                              history.event,
+                          history.event,
 
-                              <KeyStatus status={history.status} />,
+                          <KeyStatus status={history.status} />,
 
-                              <div style={{ wordBreak: 'break-all' }}>{history.message}</div>,
+                          <div style={{ wordBreak: 'break-all' }}>{history.message}</div>,
 
-                              history.additionalInformation ? (
-                                  <Button
-                                      variant="transparent"
-                                      onClick={() => setCurrentInfoId(history.uuid)}
-                                      title="Show Additional Information"
-                                  >
-                                      <Info size={16} />
-                                  </Button>
-                              ) : (
-                                  ''
-                              ),
-                          ],
-                      };
-                  }),
+                          history.additionalInformation ? (
+                              <Button
+                                  variant="transparent"
+                                  onClick={() => setCurrentInfoId(history.uuid)}
+                                  title="Show Additional Information"
+                              >
+                                  <Info size={16} />
+                              </Button>
+                          ) : (
+                              ''
+                          ),
+                      ],
+                  })),
         [keyHistory],
     );
 
@@ -428,13 +426,13 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
     };
 
     const additionalInfoEntry = (): any => {
-        let returnList = [];
+        const returnList = [];
 
         if (!currentInfoId) return;
 
         const currentHistory = keyHistory?.filter((history) => history.uuid === currentInfoId);
 
-        for (let [key, value] of Object.entries(currentHistory![0]?.additionalInformation ?? {})) {
+        for (const [key, value] of Object.entries(currentHistory![0]?.additionalInformation ?? {})) {
             returnList.push(
                 <tr>
                     <td style={{ padding: '0.25em' }}>{key}</td>

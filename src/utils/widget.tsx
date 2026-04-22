@@ -1,10 +1,10 @@
 import AttributeEditor from 'components/Attributes/AttributeEditor';
-import { TableDataRow, TableHeader } from 'components/CustomTable';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { TableDataRow, TableHeader } from 'components/CustomTable';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import { useMemo } from 'react';
-import { CustomAttributeModel } from 'types/attributes';
-import { CertificateGroupResponseModel } from 'types/certificateGroups';
-import { Resource, ResponseAttributeDto, UserDto } from 'types/openapi';
+import type { CustomAttributeModel } from 'types/attributes';
+import type { CertificateGroupResponseModel } from 'types/certificateGroups';
+import type { Resource, ResponseAttributeDto, UserDto } from 'types/openapi';
 
 export function getEditAndDeleteWidgetButtons(
     onEditClick: (event: React.MouseEvent) => void,

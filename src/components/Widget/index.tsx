@@ -1,13 +1,14 @@
 import cn from 'classnames';
-import React, { useCallback, useMemo, useState } from 'react';
+import type React from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import Spinner from 'components/Spinner';
-import WidgetButtons, { WidgetButtonProps } from 'components/WidgetButtons';
+import WidgetButtons, { type WidgetButtonProps } from 'components/WidgetButtons';
 import WidgetLock from 'components/WidgetLock';
 import { selectors } from 'ducks/user-interface';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { LockWidgetNameEnum } from 'types/user-interface';
+import type { LockWidgetNameEnum } from 'types/user-interface';
 import { RefreshCw } from 'lucide-react';
 import Button from 'components/Button';
 

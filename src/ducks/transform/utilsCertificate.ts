@@ -1,5 +1,5 @@
-import { CertificateDetailResponseModel } from '../../types/certificate';
-import { ParseCertificateResponseDto } from '../../types/openapi/utils';
+import type { CertificateDetailResponseModel } from '../../types/certificate';
+import type { ParseCertificateResponseDto } from '../../types/openapi/utils';
 import { isX509CertificateAsn1Data, isX509CertificateBasicData } from '../../types/utilsCertificate';
 import { emptyCertificate } from '../../utils/certificate';
 

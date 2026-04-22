@@ -51,47 +51,69 @@ export interface ListNotificationProfilesRequest {
  * no description
  */
 export class NotificationProfileInventoryApi extends BaseAPI {
-
     /**
      * Create Notification profile
      */
-    createNotificationProfile({ notificationProfileRequestDto }: CreateNotificationProfileRequest): Observable<NotificationProfileDetailDto>
-    createNotificationProfile({ notificationProfileRequestDto }: CreateNotificationProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<NotificationProfileDetailDto>>
-    createNotificationProfile({ notificationProfileRequestDto }: CreateNotificationProfileRequest, opts?: OperationOpts): Observable<NotificationProfileDetailDto | AjaxResponse<NotificationProfileDetailDto>> {
+    createNotificationProfile({
+        notificationProfileRequestDto,
+    }: CreateNotificationProfileRequest): Observable<NotificationProfileDetailDto>;
+    createNotificationProfile(
+        { notificationProfileRequestDto }: CreateNotificationProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<NotificationProfileDetailDto>>;
+    createNotificationProfile(
+        { notificationProfileRequestDto }: CreateNotificationProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<NotificationProfileDetailDto | AjaxResponse<NotificationProfileDetailDto>> {
         throwIfNullOrUndefined(notificationProfileRequestDto, 'notificationProfileRequestDto', 'createNotificationProfile');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<NotificationProfileDetailDto>({
-            url: '/v1/notificationProfiles',
-            method: 'POST',
-            headers,
-            body: notificationProfileRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<NotificationProfileDetailDto>(
+            {
+                url: '/v1/notificationProfiles',
+                method: 'POST',
+                headers,
+                body: notificationProfileRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Delete notification profile
      */
-    deleteNotificationProfile({ uuid }: DeleteNotificationProfileRequest): Observable<void>
-    deleteNotificationProfile({ uuid }: DeleteNotificationProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    deleteNotificationProfile({ uuid }: DeleteNotificationProfileRequest): Observable<void>;
+    deleteNotificationProfile({ uuid }: DeleteNotificationProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteNotificationProfile({ uuid }: DeleteNotificationProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'deleteNotificationProfile');
 
-        return this.request<void>({
-            url: '/v1/notificationProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'DELETE',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/notificationProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Edit Notification profile
      */
-    editNotificationProfile({ uuid, notificationProfileUpdateRequestDto }: EditNotificationProfileRequest): Observable<NotificationProfileDetailDto>
-    editNotificationProfile({ uuid, notificationProfileUpdateRequestDto }: EditNotificationProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<NotificationProfileDetailDto>>
-    editNotificationProfile({ uuid, notificationProfileUpdateRequestDto }: EditNotificationProfileRequest, opts?: OperationOpts): Observable<NotificationProfileDetailDto | AjaxResponse<NotificationProfileDetailDto>> {
+    editNotificationProfile({
+        uuid,
+        notificationProfileUpdateRequestDto,
+    }: EditNotificationProfileRequest): Observable<NotificationProfileDetailDto>;
+    editNotificationProfile(
+        { uuid, notificationProfileUpdateRequestDto }: EditNotificationProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<NotificationProfileDetailDto>>;
+    editNotificationProfile(
+        { uuid, notificationProfileUpdateRequestDto }: EditNotificationProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<NotificationProfileDetailDto | AjaxResponse<NotificationProfileDetailDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'editNotificationProfile');
         throwIfNullOrUndefined(notificationProfileUpdateRequestDto, 'notificationProfileUpdateRequestDto', 'editNotificationProfile');
 
@@ -99,51 +121,75 @@ export class NotificationProfileInventoryApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<NotificationProfileDetailDto>({
-            url: '/v1/notificationProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'PUT',
-            headers,
-            body: notificationProfileUpdateRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<NotificationProfileDetailDto>(
+            {
+                url: '/v1/notificationProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PUT',
+                headers,
+                body: notificationProfileUpdateRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get Notification profile details
      */
-    getNotificationProfile({ uuid, version }: GetNotificationProfileRequest): Observable<NotificationProfileDetailDto>
-    getNotificationProfile({ uuid, version }: GetNotificationProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<NotificationProfileDetailDto>>
-    getNotificationProfile({ uuid, version }: GetNotificationProfileRequest, opts?: OperationOpts): Observable<NotificationProfileDetailDto | AjaxResponse<NotificationProfileDetailDto>> {
+    getNotificationProfile({ uuid, version }: GetNotificationProfileRequest): Observable<NotificationProfileDetailDto>;
+    getNotificationProfile(
+        { uuid, version }: GetNotificationProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<NotificationProfileDetailDto>>;
+    getNotificationProfile(
+        { uuid, version }: GetNotificationProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<NotificationProfileDetailDto | AjaxResponse<NotificationProfileDetailDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getNotificationProfile');
         throwIfNullOrUndefined(version, 'version', 'getNotificationProfile');
 
-        const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
-            'version': version,
+        const query: HttpQuery = {
+            // required parameters are used directly since they are already checked by throwIfNullOrUndefined
+            version: version,
         };
 
-        return this.request<NotificationProfileDetailDto>({
-            url: '/v1/notificationProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'GET',
-            query,
-        }, opts?.responseOpts);
-    };
+        return this.request<NotificationProfileDetailDto>(
+            {
+                url: '/v1/notificationProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
+                query,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List Notification profiles
      */
-    listNotificationProfiles({ itemsPerPage, pageNumber }: ListNotificationProfilesRequest): Observable<NotificationProfileResponseDto>
-    listNotificationProfiles({ itemsPerPage, pageNumber }: ListNotificationProfilesRequest, opts?: OperationOpts): Observable<AjaxResponse<NotificationProfileResponseDto>>
-    listNotificationProfiles({ itemsPerPage, pageNumber }: ListNotificationProfilesRequest, opts?: OperationOpts): Observable<NotificationProfileResponseDto | AjaxResponse<NotificationProfileResponseDto>> {
-
+    listNotificationProfiles({ itemsPerPage, pageNumber }: ListNotificationProfilesRequest): Observable<NotificationProfileResponseDto>;
+    listNotificationProfiles(
+        { itemsPerPage, pageNumber }: ListNotificationProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<NotificationProfileResponseDto>>;
+    listNotificationProfiles(
+        { itemsPerPage, pageNumber }: ListNotificationProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<NotificationProfileResponseDto | AjaxResponse<NotificationProfileResponseDto>> {
         const query: HttpQuery = {};
 
-        if (itemsPerPage != null) { query['itemsPerPage'] = itemsPerPage; }
-        if (pageNumber != null) { query['pageNumber'] = pageNumber; }
+        if (itemsPerPage != null) {
+            query['itemsPerPage'] = itemsPerPage;
+        }
+        if (pageNumber != null) {
+            query['pageNumber'] = pageNumber;
+        }
 
-        return this.request<NotificationProfileResponseDto>({
-            url: '/v1/notificationProfiles',
-            method: 'GET',
-            query,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<NotificationProfileResponseDto>(
+            {
+                url: '/v1/notificationProfiles',
+                method: 'GET',
+                query,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

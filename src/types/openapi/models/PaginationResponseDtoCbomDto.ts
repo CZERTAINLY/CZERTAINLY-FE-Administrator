@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CbomDto,
-} from './';
+import type { CbomDto } from './';
 
 /**
  * @export

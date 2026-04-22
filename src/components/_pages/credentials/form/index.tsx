@@ -15,9 +15,9 @@ import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
 import TextInput from 'components/TextInput';
-import { AttributeDescriptorModel } from 'types/attributes';
-import { ConnectorResponseModel } from 'types/connectors';
-import { CredentialResponseModel } from 'types/credentials';
+import type { AttributeDescriptorModel } from 'types/attributes';
+import type { ConnectorResponseModel } from 'types/connectors';
+import type { CredentialResponseModel } from 'types/credentials';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
 

@@ -1,5 +1,5 @@
-import { NotificationInstanceModel, NotificationInstanceRequestModel, NotificationModel } from 'types/notifications';
-import { NotificationDto, NotificationInstanceDto, NotificationInstanceRequestDto } from 'types/openapi';
+import type { NotificationInstanceModel, NotificationInstanceRequestModel, NotificationModel } from 'types/notifications';
+import type { NotificationDto, NotificationInstanceDto, NotificationInstanceRequestDto } from 'types/openapi';
 import {
     transformAttributeMappingDtoToModel,
     transformAttributeMappingModelToDto,

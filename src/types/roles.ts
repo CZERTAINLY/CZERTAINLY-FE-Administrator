@@ -1,5 +1,5 @@
-import { AttributeRequestModel, AttributeResponseModel } from './attributes';
-import {
+import type { AttributeRequestModel, AttributeResponseModel } from './attributes';
+import type {
     ObjectPermissionsDto,
     ObjectPermissionsRequestDto as ObjectPermissionsRequestDtoOpenApi,
     ResourcePermissionsDto,
@@ -9,7 +9,7 @@ import {
     RoleRequestDto as RoleRequestDtoOpenApi,
     SubjectPermissionsDto as SubjectPermissionsDtoOpenApi,
 } from './openapi';
-import { UserResponseModel } from './users';
+import type { UserResponseModel } from './users';
 
 export type RoleDetailDto = RoleDetailDtoOpenApi;
 export type RoleDetailModel = Omit<RoleDetailDto, 'users | customAttributes'> & {

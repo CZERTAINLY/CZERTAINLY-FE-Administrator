@@ -1,7 +1,7 @@
 import DOMPurify from 'dompurify';
 import parse from 'html-react-parser';
 import { marked } from 'marked';
-import React from 'react';
+import type React from 'react';
 
 interface AttributeInfoProps {
     name: string;

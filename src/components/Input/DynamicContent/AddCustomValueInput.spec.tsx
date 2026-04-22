@@ -81,7 +81,7 @@ test.describe('AddCustomValueInput', () => {
     });
 
     test('number input parses integer values via onChange', async ({ mount, page }) => {
-        let lastValue: unknown = undefined;
+        let lastValue: unknown;
         await mount(
             <AddCustomValueInput
                 {...defaultProps}
@@ -105,7 +105,7 @@ test.describe('AddCustomValueInput', () => {
     });
 
     test('number input parses float values via onChange', async ({ mount, page }) => {
-        let lastValue: unknown = undefined;
+        let lastValue: unknown;
         await mount(
             <AddCustomValueInput
                 {...defaultProps}

@@ -1,4 +1,4 @@
-import { EntityRequestDto, EntityRequestModel, EntityResponseDto, EntityResponseModel } from 'types/entities';
+import type { EntityRequestDto, EntityRequestModel, EntityResponseDto, EntityResponseModel } from 'types/entities';
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from './attributes';
 
 export function transformEntityResponseDtoToModel(entity: EntityResponseDto): EntityResponseModel {

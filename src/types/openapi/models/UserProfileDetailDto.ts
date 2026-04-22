@@ -11,13 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    NameAndUuidDto,
-    ResponseAttribute,
-    RoleDto,
-    UserCertificateDto,
-    UserProfilePermissionsDto,
-} from './';
+import type { NameAndUuidDto, ResponseAttribute, RoleDto, UserCertificateDto, UserProfilePermissionsDto } from './';
 
 /**
  * @export

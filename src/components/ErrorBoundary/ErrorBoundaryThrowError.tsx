@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 const ErrorBoundaryThrowError: React.FC = () => {
     throw new Error('Test error');

@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    RequestAttribute,
-    SignatureRequestData,
-} from './';
+import type { RequestAttribute, SignatureRequestData } from './';
 
 /**
  * @export

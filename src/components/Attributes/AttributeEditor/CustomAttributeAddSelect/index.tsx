@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import Select from 'components/Select';
-import { AttributeDescriptorModel, CustomAttributeModel, isCustomAttributeModel } from '../../../../types/attributes';
+import { type AttributeDescriptorModel, type CustomAttributeModel, isCustomAttributeModel } from '../../../../types/attributes';
 import Label from 'components/Label';
 
 export type Props = {

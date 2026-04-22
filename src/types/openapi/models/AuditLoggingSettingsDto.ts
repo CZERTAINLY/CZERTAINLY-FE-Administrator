@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    Module,
-    Resource,
-} from './';
+import type { Module, Resource } from './';
 
 /**
  * @export
@@ -79,6 +76,5 @@ export enum AuditLoggingSettingsDtoOutputEnum {
     None = 'NONE',
     All = 'ALL',
     Console = 'CONSOLE',
-    Database = 'DATABASE'
+    Database = 'DATABASE',
 }
-

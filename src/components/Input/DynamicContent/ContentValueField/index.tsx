@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { getStepValue } from 'utils/common-utils';
 import { getFormattedDateTime } from 'utils/dateUtil';
-import { BaseAttributeContentModel, CustomAttributeModel } from '../../../../types/attributes';
+import type { BaseAttributeContentModel, CustomAttributeModel } from '../../../../types/attributes';
 import { AttributeContentType } from '../../../../types/openapi';
 import { composeValidators, validateRequired } from '../../../../utils/validators';
 import WidgetButtons from '../../../WidgetButtons';

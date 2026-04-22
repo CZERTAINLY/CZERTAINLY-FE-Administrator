@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ConnectorDto,
-    ProxyStatus,
-} from './';
+import type { ConnectorDto, ProxyStatus } from './';
 
 /**
  * @export
@@ -64,5 +61,3 @@ export interface ProxyDto {
      */
     connectors?: Array<ConnectorDto>;
 }
-
-

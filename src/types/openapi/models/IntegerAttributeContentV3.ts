@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-} from './';
+import type { AttributeContentType } from './';
 
 /**
  * Integer attribute content for integer numbers
@@ -40,5 +38,3 @@ export interface IntegerAttributeContentV3 {
      */
     contentType: AttributeContentType;
 }
-
-

@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    RequestAttribute,
-    SecretContent,
-} from './';
+import type { RequestAttribute, SecretContent } from './';
 
 /**
  * @export

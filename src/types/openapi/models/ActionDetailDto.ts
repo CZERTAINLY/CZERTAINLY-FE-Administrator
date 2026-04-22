@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ExecutionDto,
-    Resource,
-} from './';
+import type { ExecutionDto, Resource } from './';
 
 /**
  * @export
@@ -52,5 +49,3 @@ export interface ActionDetailDto {
      */
     executions: Array<ExecutionDto>;
 }
-
-

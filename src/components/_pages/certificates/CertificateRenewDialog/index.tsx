@@ -7,7 +7,7 @@ import {
     actions as utilsCertificateRequestActions,
     selectors as utilsCertificateRequestSelectors,
 } from '../../../../ducks/utilsCertificateRequest';
-import { CertificateDetailResponseModel } from '../../../../types/certificate';
+import type { CertificateDetailResponseModel } from '../../../../types/certificate';
 import CertificateAttributes from '../../../CertificateAttributes';
 import FileUpload from '../../../Input/FileUpload/FileUpload';
 import Button from 'components/Button';

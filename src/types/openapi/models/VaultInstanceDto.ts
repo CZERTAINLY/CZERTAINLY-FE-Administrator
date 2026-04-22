@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ConnectorInterfaceDto,
-    NameAndUuidDto,
-} from './';
+import type { ConnectorInterfaceDto, NameAndUuidDto } from './';
 
 /**
  * @export

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
-import { ComplianceRuleListDto, ConditionItemRequestDto, Resource } from 'types/openapi';
+import { type ComplianceRuleListDto, type ConditionItemRequestDto, Resource } from 'types/openapi';
 import Select from 'components/Select';
 import Button from 'components/Button';
 import { useComplianceProfileResourceOptions } from 'utils/rules';

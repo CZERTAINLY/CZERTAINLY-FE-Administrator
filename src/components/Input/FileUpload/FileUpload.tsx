@@ -1,4 +1,5 @@
-import React, { useCallback, useRef, useState } from 'react';
+import type React from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import Label from 'components/Label';
 import TextInput from 'components/TextInput';

@@ -1,4 +1,4 @@
-import {
+import type {
     AttributeDefinitionDto,
     ConnectorMetadataResponseDto as ConnectorMetadataResponseDtoOpenApi,
     GlobalMetadataCreateRequestDto as GlobalMetadataCreateRequestDtoOpenApi,

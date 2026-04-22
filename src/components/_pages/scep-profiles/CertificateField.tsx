@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import Select from 'components/Select';
-import { CertificateListResponseModel } from 'types/certificate';
+import type { CertificateListResponseModel } from 'types/certificate';
 
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { validateRequired } from 'utils/validators';

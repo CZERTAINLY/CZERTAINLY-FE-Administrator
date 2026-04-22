@@ -76,79 +76,120 @@ export interface ListApprovalProfilesRequest {
  * no description
  */
 export class ApprovalProfileInventoryApi extends BaseAPI {
-
     /**
      * Associate Approval Profile to specified resource object
      */
-    associateApprovalProfile({ uuid, resource, associationObjectUuid }: AssociateApprovalProfileRequest): Observable<void>
-    associateApprovalProfile({ uuid, resource, associationObjectUuid }: AssociateApprovalProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    associateApprovalProfile({ uuid, resource, associationObjectUuid }: AssociateApprovalProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    associateApprovalProfile({ uuid, resource, associationObjectUuid }: AssociateApprovalProfileRequest): Observable<void>;
+    associateApprovalProfile(
+        { uuid, resource, associationObjectUuid }: AssociateApprovalProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    associateApprovalProfile(
+        { uuid, resource, associationObjectUuid }: AssociateApprovalProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'associateApprovalProfile');
         throwIfNullOrUndefined(resource, 'resource', 'associateApprovalProfile');
         throwIfNullOrUndefined(associationObjectUuid, 'associationObjectUuid', 'associateApprovalProfile');
 
-        return this.request<void>({
-            url: '/v1/approvalProfiles/{uuid}/associations/{resource}/{associationObjectUuid}'.replace('{uuid}', encodeURI(uuid)).replace('{resource}', encodeURI(resource)).replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
-            method: 'PATCH',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/approvalProfiles/{uuid}/associations/{resource}/{associationObjectUuid}'
+                    .replace('{uuid}', encodeURI(uuid))
+                    .replace('{resource}', encodeURI(resource))
+                    .replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
+                method: 'PATCH',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Create a Approval profile
      */
-    createApprovalProfile({ approvalProfileRequestDto }: CreateApprovalProfileRequest): Observable<UuidDto>
-    createApprovalProfile({ approvalProfileRequestDto }: CreateApprovalProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<UuidDto>>
-    createApprovalProfile({ approvalProfileRequestDto }: CreateApprovalProfileRequest, opts?: OperationOpts): Observable<UuidDto | AjaxResponse<UuidDto>> {
+    createApprovalProfile({ approvalProfileRequestDto }: CreateApprovalProfileRequest): Observable<UuidDto>;
+    createApprovalProfile(
+        { approvalProfileRequestDto }: CreateApprovalProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<UuidDto>>;
+    createApprovalProfile(
+        { approvalProfileRequestDto }: CreateApprovalProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<UuidDto | AjaxResponse<UuidDto>> {
         throwIfNullOrUndefined(approvalProfileRequestDto, 'approvalProfileRequestDto', 'createApprovalProfile');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<UuidDto>({
-            url: '/v1/approvalProfiles',
-            method: 'POST',
-            headers,
-            body: approvalProfileRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<UuidDto>(
+            {
+                url: '/v1/approvalProfiles',
+                method: 'POST',
+                headers,
+                body: approvalProfileRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Delete an approval profile
      */
-    deleteApprovalProfile({ uuid }: DeleteApprovalProfileRequest): Observable<void>
-    deleteApprovalProfile({ uuid }: DeleteApprovalProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    deleteApprovalProfile({ uuid }: DeleteApprovalProfileRequest): Observable<void>;
+    deleteApprovalProfile({ uuid }: DeleteApprovalProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteApprovalProfile({ uuid }: DeleteApprovalProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'deleteApprovalProfile');
 
-        return this.request<void>({
-            url: '/v1/approvalProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'DELETE',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/approvalProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Disassociate Approval Profile from specified resource object
      */
-    disassociateApprovalProfile({ uuid, resource, associationObjectUuid }: DisassociateApprovalProfileRequest): Observable<void>
-    disassociateApprovalProfile({ uuid, resource, associationObjectUuid }: DisassociateApprovalProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    disassociateApprovalProfile({ uuid, resource, associationObjectUuid }: DisassociateApprovalProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    disassociateApprovalProfile({ uuid, resource, associationObjectUuid }: DisassociateApprovalProfileRequest): Observable<void>;
+    disassociateApprovalProfile(
+        { uuid, resource, associationObjectUuid }: DisassociateApprovalProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    disassociateApprovalProfile(
+        { uuid, resource, associationObjectUuid }: DisassociateApprovalProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'disassociateApprovalProfile');
         throwIfNullOrUndefined(resource, 'resource', 'disassociateApprovalProfile');
         throwIfNullOrUndefined(associationObjectUuid, 'associationObjectUuid', 'disassociateApprovalProfile');
 
-        return this.request<void>({
-            url: '/v1/approvalProfiles/{uuid}/associations/{resource}/{associationObjectUuid}'.replace('{uuid}', encodeURI(uuid)).replace('{resource}', encodeURI(resource)).replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
-            method: 'DELETE',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/approvalProfiles/{uuid}/associations/{resource}/{associationObjectUuid}'
+                    .replace('{uuid}', encodeURI(uuid))
+                    .replace('{resource}', encodeURI(resource))
+                    .replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
+                method: 'DELETE',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Edit an Approval profile
      */
-    editApprovalProfile({ uuid, approvalProfileUpdateRequestDto }: EditApprovalProfileRequest): Observable<UuidDto>
-    editApprovalProfile({ uuid, approvalProfileUpdateRequestDto }: EditApprovalProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<UuidDto>>
-    editApprovalProfile({ uuid, approvalProfileUpdateRequestDto }: EditApprovalProfileRequest, opts?: OperationOpts): Observable<UuidDto | AjaxResponse<UuidDto>> {
+    editApprovalProfile({ uuid, approvalProfileUpdateRequestDto }: EditApprovalProfileRequest): Observable<UuidDto>;
+    editApprovalProfile(
+        { uuid, approvalProfileUpdateRequestDto }: EditApprovalProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<UuidDto>>;
+    editApprovalProfile(
+        { uuid, approvalProfileUpdateRequestDto }: EditApprovalProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<UuidDto | AjaxResponse<UuidDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'editApprovalProfile');
         throwIfNullOrUndefined(approvalProfileUpdateRequestDto, 'approvalProfileUpdateRequestDto', 'editApprovalProfile');
 
@@ -156,79 +197,124 @@ export class ApprovalProfileInventoryApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<UuidDto>({
-            url: '/v1/approvalProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'PUT',
-            headers,
-            body: approvalProfileUpdateRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<UuidDto>(
+            {
+                url: '/v1/approvalProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PUT',
+                headers,
+                body: approvalProfileUpdateRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get Approval Profile Details
      */
-    getApprovalProfile({ uuid, version }: GetApprovalProfileRequest): Observable<ApprovalProfileDetailDto>
-    getApprovalProfile({ uuid, version }: GetApprovalProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<ApprovalProfileDetailDto>>
-    getApprovalProfile({ uuid, version }: GetApprovalProfileRequest, opts?: OperationOpts): Observable<ApprovalProfileDetailDto | AjaxResponse<ApprovalProfileDetailDto>> {
+    getApprovalProfile({ uuid, version }: GetApprovalProfileRequest): Observable<ApprovalProfileDetailDto>;
+    getApprovalProfile(
+        { uuid, version }: GetApprovalProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<ApprovalProfileDetailDto>>;
+    getApprovalProfile(
+        { uuid, version }: GetApprovalProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<ApprovalProfileDetailDto | AjaxResponse<ApprovalProfileDetailDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getApprovalProfile');
 
         const query: HttpQuery = {};
 
-        if (version != null) { query['version'] = version; }
+        if (version != null) {
+            query['version'] = version;
+        }
 
-        return this.request<ApprovalProfileDetailDto>({
-            url: '/v1/approvalProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'GET',
-            query,
-        }, opts?.responseOpts);
-    };
+        return this.request<ApprovalProfileDetailDto>(
+            {
+                url: '/v1/approvalProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
+                query,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get associated Approval Profiles for resource object
      */
-    getAssociatedApprovalProfiles1({ resource, associationObjectUuid }: GetAssociatedApprovalProfiles1Request): Observable<Array<ApprovalProfileDto>>
-    getAssociatedApprovalProfiles1({ resource, associationObjectUuid }: GetAssociatedApprovalProfiles1Request, opts?: OperationOpts): Observable<AjaxResponse<Array<ApprovalProfileDto>>>
-    getAssociatedApprovalProfiles1({ resource, associationObjectUuid }: GetAssociatedApprovalProfiles1Request, opts?: OperationOpts): Observable<Array<ApprovalProfileDto> | AjaxResponse<Array<ApprovalProfileDto>>> {
+    getAssociatedApprovalProfiles1({
+        resource,
+        associationObjectUuid,
+    }: GetAssociatedApprovalProfiles1Request): Observable<Array<ApprovalProfileDto>>;
+    getAssociatedApprovalProfiles1(
+        { resource, associationObjectUuid }: GetAssociatedApprovalProfiles1Request,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<ApprovalProfileDto>>>;
+    getAssociatedApprovalProfiles1(
+        { resource, associationObjectUuid }: GetAssociatedApprovalProfiles1Request,
+        opts?: OperationOpts,
+    ): Observable<Array<ApprovalProfileDto> | AjaxResponse<Array<ApprovalProfileDto>>> {
         throwIfNullOrUndefined(resource, 'resource', 'getAssociatedApprovalProfiles1');
         throwIfNullOrUndefined(associationObjectUuid, 'associationObjectUuid', 'getAssociatedApprovalProfiles1');
 
-        return this.request<Array<ApprovalProfileDto>>({
-            url: '/v1/approvalProfiles/associations/{resource}/{associationObjectUuid}'.replace('{resource}', encodeURI(resource)).replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<ApprovalProfileDto>>(
+            {
+                url: '/v1/approvalProfiles/associations/{resource}/{associationObjectUuid}'
+                    .replace('{resource}', encodeURI(resource))
+                    .replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get associations of Approval Profile
      */
-    getAssociations({ uuid }: GetAssociationsRequest): Observable<Array<ResourceObjectDto>>
-    getAssociations({ uuid }: GetAssociationsRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<ResourceObjectDto>>>
-    getAssociations({ uuid }: GetAssociationsRequest, opts?: OperationOpts): Observable<Array<ResourceObjectDto> | AjaxResponse<Array<ResourceObjectDto>>> {
+    getAssociations({ uuid }: GetAssociationsRequest): Observable<Array<ResourceObjectDto>>;
+    getAssociations({ uuid }: GetAssociationsRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<ResourceObjectDto>>>;
+    getAssociations(
+        { uuid }: GetAssociationsRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<ResourceObjectDto> | AjaxResponse<Array<ResourceObjectDto>>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getAssociations');
 
-        return this.request<Array<ResourceObjectDto>>({
-            url: '/v1/approvalProfiles/{uuid}/associations'.replace('{uuid}', encodeURI(uuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<ResourceObjectDto>>(
+            {
+                url: '/v1/approvalProfiles/{uuid}/associations'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List Approval Profiles
      */
-    listApprovalProfiles({ itemsPerPage, pageNumber }: ListApprovalProfilesRequest): Observable<ApprovalProfileResponseDto>
-    listApprovalProfiles({ itemsPerPage, pageNumber }: ListApprovalProfilesRequest, opts?: OperationOpts): Observable<AjaxResponse<ApprovalProfileResponseDto>>
-    listApprovalProfiles({ itemsPerPage, pageNumber }: ListApprovalProfilesRequest, opts?: OperationOpts): Observable<ApprovalProfileResponseDto | AjaxResponse<ApprovalProfileResponseDto>> {
-
+    listApprovalProfiles({ itemsPerPage, pageNumber }: ListApprovalProfilesRequest): Observable<ApprovalProfileResponseDto>;
+    listApprovalProfiles(
+        { itemsPerPage, pageNumber }: ListApprovalProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<ApprovalProfileResponseDto>>;
+    listApprovalProfiles(
+        { itemsPerPage, pageNumber }: ListApprovalProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<ApprovalProfileResponseDto | AjaxResponse<ApprovalProfileResponseDto>> {
         const query: HttpQuery = {};
 
-        if (itemsPerPage != null) { query['itemsPerPage'] = itemsPerPage; }
-        if (pageNumber != null) { query['pageNumber'] = pageNumber; }
+        if (itemsPerPage != null) {
+            query['itemsPerPage'] = itemsPerPage;
+        }
+        if (pageNumber != null) {
+            query['pageNumber'] = pageNumber;
+        }
 
-        return this.request<ApprovalProfileResponseDto>({
-            url: '/v1/approvalProfiles',
-            method: 'GET',
-            query,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<ApprovalProfileResponseDto>(
+            {
+                url: '/v1/approvalProfiles',
+                method: 'GET',
+                query,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

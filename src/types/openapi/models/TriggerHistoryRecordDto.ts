@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ConditionDto,
-    ExecutionDto,
-} from './';
+import type { ConditionDto, ExecutionDto } from './';
 
 /**
  * @export

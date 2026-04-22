@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import type React from 'react';
+import { useMemo } from 'react';
 import * as ReactHookForm from 'react-hook-form';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router';

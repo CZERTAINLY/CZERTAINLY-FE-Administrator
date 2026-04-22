@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeResource,
-    ProtectionLevel,
-} from './';
+import type { AttributeResource, ProtectionLevel } from './';
 
 /**
  * @export
@@ -82,5 +79,3 @@ export interface DataAttributeProperties {
      */
     extensibleList: boolean;
 }
-
-

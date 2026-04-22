@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CertificateRequestFormat,
-    RequestAttribute,
-} from './';
+import type { CertificateRequestFormat, RequestAttribute } from './';
 
 /**
  * @export
@@ -76,5 +73,3 @@ export interface ClientCertificateRekeyRequestDto {
      */
     altSignatureAttributes?: Array<RequestAttribute>;
 }
-
-

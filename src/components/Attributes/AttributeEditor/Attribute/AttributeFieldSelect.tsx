@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import Select from 'components/Select';
 import Label from 'components/Label';

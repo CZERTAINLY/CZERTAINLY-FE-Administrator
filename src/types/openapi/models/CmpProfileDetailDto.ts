@@ -11,13 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CertificateDto,
-    ProtectionMethod,
-    ProtocolCertificateAssociationsDto,
-    ResponseAttribute,
-    SimplifiedRaProfileDto,
-} from './';
+import type { CertificateDto, ProtectionMethod, ProtocolCertificateAssociationsDto, ResponseAttribute, SimplifiedRaProfileDto } from './';
 
 /**
  * @export
@@ -117,6 +111,5 @@ export interface CmpProfileDetailDto {
 export enum CmpProfileDetailDtoVariantEnum {
     V2 = 'v2',
     V23gpp = 'v2_3gpp',
-    V3 = 'v3'
+    V3 = 'v3',
 }
-

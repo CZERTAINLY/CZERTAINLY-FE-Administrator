@@ -1,6 +1,6 @@
 import Badge from 'components/Badge';
 import { Circle } from 'lucide-react';
-import { CertificateEventHistoryDtoStatusEnum, KeyEventHistoryDtoStatusEnum } from 'types/openapi';
+import { CertificateEventHistoryDtoStatusEnum, type KeyEventHistoryDtoStatusEnum } from 'types/openapi';
 
 interface Props {
     status: KeyEventHistoryDtoStatusEnum | undefined;

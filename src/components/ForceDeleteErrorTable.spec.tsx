@@ -1,6 +1,6 @@
 import { test, expect } from '../../playwright/ct-test';
 import { withProviders } from 'utils/test-helpers';
-import ForceDeleteErrorTable, { ForceDeleteErrorItem } from './ForceDeleteErrorTable';
+import ForceDeleteErrorTable, { type ForceDeleteErrorItem } from './ForceDeleteErrorTable';
 
 test.describe('ForceDeleteErrorTable', () => {
     const items: ForceDeleteErrorItem[] = [

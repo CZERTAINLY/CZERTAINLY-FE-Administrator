@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    SecretType,
-} from './';
+import type { SecretType } from './';
 
 /**
  * Secret representing key-value pairs
@@ -32,7 +30,5 @@ export interface KeyValueSecretContent {
      * @type {{ [key: string]: any; }}
      * @memberof KeyValueSecretContent
      */
-    content: { [key: string]: any; };
+    content: { [key: string]: any };
 }
-
-

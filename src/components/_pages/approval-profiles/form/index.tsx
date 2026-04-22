@@ -12,7 +12,7 @@ import { useParams } from 'react-router';
 import Button from 'components/Button';
 import Container from 'components/Container';
 import TextInput from 'components/TextInput';
-import { ApprovalStepRequestModel, ProfileApprovalRequestModel } from 'types/approval-profiles';
+import type { ApprovalStepRequestModel, ProfileApprovalRequestModel } from 'types/approval-profiles';
 import {
     validateAlphaNumericWithSpecialChars,
     validateLength,

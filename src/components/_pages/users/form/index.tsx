@@ -1,7 +1,7 @@
 import CertificateUploadDialog from 'components/_pages/certificates/CertificateUploadDialog';
 
 import CertificateAttributes from 'components/CertificateAttributes';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import ProgressButton from 'components/ProgressButton';
 import Label from 'components/Label';
@@ -23,8 +23,8 @@ import Container from 'components/Container';
 import Switch from 'components/Switch';
 
 import Badge from 'components/Badge';
-import { UserDetailModel } from 'types/auth';
-import { CertificateDetailResponseModel, CertificateListResponseModel } from 'types/certificate';
+import type { UserDetailModel } from 'types/auth';
+import type { CertificateDetailResponseModel, CertificateListResponseModel } from 'types/certificate';
 
 import { EntityType } from 'ducks/filters';
 import { validateAlphaNumericWithSpecialChars, validateEmail, validateLength, validateRequired } from 'utils/validators';

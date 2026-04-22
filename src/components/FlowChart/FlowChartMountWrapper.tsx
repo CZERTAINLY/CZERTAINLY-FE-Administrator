@@ -1,7 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router';
-import FlowChart, { FlowChartProps } from './index';
+import FlowChart, { type FlowChartProps } from './index';
 import { createMockStore } from 'utils/test-helpers';
 import { testInitialState } from 'ducks/test-reducers';
 

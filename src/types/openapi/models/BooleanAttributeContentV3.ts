@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-} from './';
+import type { AttributeContentType } from './';
 
 /**
  * Boolean attribute content to store true/false values
@@ -40,5 +38,3 @@ export interface BooleanAttributeContentV3 {
      */
     contentType: AttributeContentType;
 }
-
-

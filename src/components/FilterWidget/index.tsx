@@ -2,22 +2,22 @@ import Widget from 'components/Widget';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { ApiClients } from '../../api';
+import type { ApiClients } from '../../api';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as alertActions } from 'ducks/alerts';
-import { EntityType, actions, selectors } from 'ducks/filters';
+import { type EntityType, actions, selectors } from 'ducks/filters';
 import { useDispatch, useSelector } from 'react-redux';
-import Select, { SingleValue, MultiValue } from 'components/Select';
+import Select, { type SingleValue, type MultiValue } from 'components/Select';
 import TextInput from 'components/TextInput';
-import { Observable } from 'rxjs';
-import { SearchFieldListModel, SearchFilterModel } from 'types/certificate';
+import type { Observable } from 'rxjs';
+import type { SearchFieldListModel, SearchFilterModel } from 'types/certificate';
 import {
     AttributeContentType,
     FilterConditionOperator,
-    FilterFieldSource,
+    type FilterFieldSource,
     FilterFieldType,
     PlatformEnum,
-    SearchFilterRequestDto,
+    type SearchFilterRequestDto,
 } from 'types/openapi';
 import { getFormTypeFromAttributeContentType, getFormTypeFromFilterFieldType, getStepValue } from 'utils/common-utils';
 import {
@@ -295,7 +295,7 @@ export default function FilterWidget({
             .find((f) => f?.filterFieldSource === filterGroup.value)
             ?.searchFieldData?.find((f) => f?.fieldIdentifier === filterField.value);
 
-        let value = undefined;
+        let value;
         if (filterValue) {
             if (typeof filterValue === 'number') {
                 value = filterValue;
@@ -333,7 +333,7 @@ export default function FilterWidget({
                     condition: f.condition,
                     value: Array.isArray(f.value)
                         ? f.value.map((v) => {
-                              if (typeof v === 'object' && v.hasOwnProperty('name')) {
+                              if (typeof v === 'object' && Object.hasOwn(v, 'name')) {
                                   return v.name;
                               }
                               return v;
@@ -375,7 +375,7 @@ export default function FilterWidget({
                         condition: f.condition,
                         value: Array.isArray(f.value)
                             ? f.value.map((v) => {
-                                  if (typeof v === 'object' && v.hasOwnProperty('name')) {
+                                  if (typeof v === 'object' && Object.hasOwn(v, 'name')) {
                                       return v.name;
                                   }
                                   return v;

@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    RdnAttributeTypeOidPropertiesDto,
-} from './';
+import type { RdnAttributeTypeOidPropertiesDto } from './';
 
 /**
  * @type CustomOidEntryDetailResponseDtoAdditionalProperties

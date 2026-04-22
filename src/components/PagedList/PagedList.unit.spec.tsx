@@ -1,6 +1,6 @@
 import { act } from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { createRoot, Root } from 'react-dom/client';
+import { createRoot, type Root } from 'react-dom/client';
 
 import PagedList from './PagedList';
 import { EntityType } from 'ducks/filters';

@@ -1,16 +1,16 @@
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useDispatch, useSelector } from 'react-redux';
 
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { Link } from 'react-router';
 import Select from 'components/Select';
-import { PlatformEnum, Resource } from 'types/openapi';
+import { PlatformEnum, type Resource } from 'types/openapi';
 
 import { actions as resourceActions, selectors as resourceSelectors } from 'ducks/resource';
 import TriggerForm from '../form';

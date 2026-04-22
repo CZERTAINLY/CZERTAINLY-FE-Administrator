@@ -234,7 +234,7 @@ describe('validators', () => {
     describe('validateAlphaNumericWithSpecialChars', () => {
         test('should accept valid strings with spaces and separators', () => {
             expect(validateAlphaNumericWithSpecialChars()('John Doe')).toBeUndefined();
-            expect(validateAlphaNumericWithSpecialChars()(`O\'Brien`)).toBeUndefined();
+            expect(validateAlphaNumericWithSpecialChars()(`O'Brien`)).toBeUndefined();
         });
 
         test('should reject invalid format', () => {

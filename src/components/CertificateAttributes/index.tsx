@@ -1,6 +1,6 @@
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import { useMemo } from 'react';
-import { CertificateDetailResponseModel } from 'types/certificate';
+import type { CertificateDetailResponseModel } from 'types/certificate';
 import { dateFormatter } from 'utils/dateUtil';
 
 interface Props {

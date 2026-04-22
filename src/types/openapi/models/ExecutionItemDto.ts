@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    FilterFieldSource,
-} from './';
+import type { FilterFieldSource } from './';
 
 /**
  * @export
@@ -50,5 +48,3 @@ export interface ExecutionItemDto {
      */
     data?: any | null;
 }
-
-

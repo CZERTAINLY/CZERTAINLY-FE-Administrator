@@ -55,118 +55,146 @@ export interface UploadCbomRequest {
  * no description
  */
 export class CBOMManagementApi extends BaseAPI {
-
     /**
      * Delete multiple CBOM entries
      */
-    bulkDeleteCbom({ requestBody }: BulkDeleteCbomRequest): Observable<Array<BulkActionMessageDto>>
-    bulkDeleteCbom({ requestBody }: BulkDeleteCbomRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BulkActionMessageDto>>>
-    bulkDeleteCbom({ requestBody }: BulkDeleteCbomRequest, opts?: OperationOpts): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
+    bulkDeleteCbom({ requestBody }: BulkDeleteCbomRequest): Observable<Array<BulkActionMessageDto>>;
+    bulkDeleteCbom({ requestBody }: BulkDeleteCbomRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BulkActionMessageDto>>>;
+    bulkDeleteCbom(
+        { requestBody }: BulkDeleteCbomRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
         throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDeleteCbom');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<Array<BulkActionMessageDto>>({
-            url: '/v1/cboms',
-            method: 'DELETE',
-            headers,
-            body: requestBody,
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<BulkActionMessageDto>>(
+            {
+                url: '/v1/cboms',
+                method: 'DELETE',
+                headers,
+                body: requestBody,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Delete CBOM entry
      */
-    deleteCbom({ uuid }: DeleteCbomRequest): Observable<void>
-    deleteCbom({ uuid }: DeleteCbomRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    deleteCbom({ uuid }: DeleteCbomRequest): Observable<void>;
+    deleteCbom({ uuid }: DeleteCbomRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteCbom({ uuid }: DeleteCbomRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'deleteCbom');
 
-        return this.request<void>({
-            url: '/v1/cboms/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'DELETE',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/cboms/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * CBOM detail
      */
-    getCbomDetail({ uuid }: GetCbomDetailRequest): Observable<CbomDetailDto>
-    getCbomDetail({ uuid }: GetCbomDetailRequest, opts?: OperationOpts): Observable<AjaxResponse<CbomDetailDto>>
+    getCbomDetail({ uuid }: GetCbomDetailRequest): Observable<CbomDetailDto>;
+    getCbomDetail({ uuid }: GetCbomDetailRequest, opts?: OperationOpts): Observable<AjaxResponse<CbomDetailDto>>;
     getCbomDetail({ uuid }: GetCbomDetailRequest, opts?: OperationOpts): Observable<CbomDetailDto | AjaxResponse<CbomDetailDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getCbomDetail');
 
-        return this.request<CbomDetailDto>({
-            url: '/v1/cboms/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<CbomDetailDto>(
+            {
+                url: '/v1/cboms/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get Cbom searchable fields information
      */
-    getCbomSearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>
-    getCbomSearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
-    getCbomSearchableFields(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
-        return this.request<Array<SearchFieldDataByGroupDto>>({
-            url: '/v1/cboms/search',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+    getCbomSearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>;
+    getCbomSearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>;
+    getCbomSearchableFields(
+        opts?: OperationOpts,
+    ): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
+        return this.request<Array<SearchFieldDataByGroupDto>>(
+            {
+                url: '/v1/cboms/search',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List CBOM versions
      */
-    listCbomVersions({ uuid }: ListCbomVersionsRequest): Observable<Array<CbomDto>>
-    listCbomVersions({ uuid }: ListCbomVersionsRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<CbomDto>>>
+    listCbomVersions({ uuid }: ListCbomVersionsRequest): Observable<Array<CbomDto>>;
+    listCbomVersions({ uuid }: ListCbomVersionsRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<CbomDto>>>;
     listCbomVersions({ uuid }: ListCbomVersionsRequest, opts?: OperationOpts): Observable<Array<CbomDto> | AjaxResponse<Array<CbomDto>>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'listCbomVersions');
 
-        return this.request<Array<CbomDto>>({
-            url: '/v1/cboms/{uuid}/versions'.replace('{uuid}', encodeURI(uuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<CbomDto>>(
+            {
+                url: '/v1/cboms/{uuid}/versions'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List CBOMs
      */
-    listCboms({ searchRequestDto }: ListCbomsRequest): Observable<PaginationResponseDtoCbomDto>
-    listCboms({ searchRequestDto }: ListCbomsRequest, opts?: OperationOpts): Observable<AjaxResponse<PaginationResponseDtoCbomDto>>
-    listCboms({ searchRequestDto }: ListCbomsRequest, opts?: OperationOpts): Observable<PaginationResponseDtoCbomDto | AjaxResponse<PaginationResponseDtoCbomDto>> {
+    listCboms({ searchRequestDto }: ListCbomsRequest): Observable<PaginationResponseDtoCbomDto>;
+    listCboms({ searchRequestDto }: ListCbomsRequest, opts?: OperationOpts): Observable<AjaxResponse<PaginationResponseDtoCbomDto>>;
+    listCboms(
+        { searchRequestDto }: ListCbomsRequest,
+        opts?: OperationOpts,
+    ): Observable<PaginationResponseDtoCbomDto | AjaxResponse<PaginationResponseDtoCbomDto>> {
         throwIfNullOrUndefined(searchRequestDto, 'searchRequestDto', 'listCboms');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<PaginationResponseDtoCbomDto>({
-            url: '/v1/cboms',
-            method: 'POST',
-            headers,
-            body: searchRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<PaginationResponseDtoCbomDto>(
+            {
+                url: '/v1/cboms',
+                method: 'POST',
+                headers,
+                body: searchRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Sync CBOMs
      */
-    sync(): Observable<void>
-    sync(opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    sync(): Observable<void>;
+    sync(opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     sync(opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        return this.request<void>({
-            url: '/v1/cboms/sync',
-            method: 'POST',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/cboms/sync',
+                method: 'POST',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Upload CBOM
      */
-    uploadCbom({ cbomUploadRequestDto }: UploadCbomRequest): Observable<CbomDto>
-    uploadCbom({ cbomUploadRequestDto }: UploadCbomRequest, opts?: OperationOpts): Observable<AjaxResponse<CbomDto>>
+    uploadCbom({ cbomUploadRequestDto }: UploadCbomRequest): Observable<CbomDto>;
+    uploadCbom({ cbomUploadRequestDto }: UploadCbomRequest, opts?: OperationOpts): Observable<AjaxResponse<CbomDto>>;
     uploadCbom({ cbomUploadRequestDto }: UploadCbomRequest, opts?: OperationOpts): Observable<CbomDto | AjaxResponse<CbomDto>> {
         throwIfNullOrUndefined(cbomUploadRequestDto, 'cbomUploadRequestDto', 'uploadCbom');
 
@@ -174,12 +202,14 @@ export class CBOMManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<CbomDto>({
-            url: '/v1/cboms/upload',
-            method: 'POST',
-            headers,
-            body: cbomUploadRequestDto,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<CbomDto>(
+            {
+                url: '/v1/cboms/upload',
+                method: 'POST',
+                headers,
+                body: cbomUploadRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

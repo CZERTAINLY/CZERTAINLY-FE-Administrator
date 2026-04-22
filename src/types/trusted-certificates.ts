@@ -1,4 +1,4 @@
-import {
+import type {
     TrustedCertificateDto as TrustedCertificateDtoOpenApi,
     TrustedCertificateRequestDto as TrustedCertificateRequestDtoOpenApi,
 } from './openapi';

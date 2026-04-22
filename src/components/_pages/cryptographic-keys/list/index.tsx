@@ -1,9 +1,9 @@
-import { TableDataRow, TableHeader } from 'components/CustomTable';
+import type { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { ApiClients } from '../../../../api';
+import type { ApiClients } from '../../../../api';
 import PagedList from 'components/PagedList/PagedList';
 import { actions, selectors } from 'ducks/cryptographic-keys';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -13,8 +13,8 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import Select from 'components/Select';
-import { SearchRequestModel } from 'types/certificate';
-import { KeyCompromiseReason, KeyUsage, PlatformEnum } from 'types/openapi';
+import type { SearchRequestModel } from 'types/certificate';
+import { KeyCompromiseReason, type KeyUsage, PlatformEnum } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
 import KeyStateCircle from '../KeyStateCircle';

@@ -4,11 +4,11 @@ import { Link } from 'react-router';
 
 import Breadcrumb from 'components/Breadcrumb';
 import Container from 'components/Container';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import CertificateUploadDialog from 'components/_pages/certificates/CertificateUploadDialog';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/trusted-certificates';
 import { Resource } from 'types/openapi';
 import { formatTrustedCertificateDate, formatTrustedCertificateValue } from 'utils/trusted-certificate';

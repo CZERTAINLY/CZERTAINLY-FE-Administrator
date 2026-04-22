@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    TriggerHistoryRecordDto,
-} from './';
+import type { TriggerHistoryRecordDto } from './';
 
 /**
  * @export
@@ -63,7 +61,7 @@ export interface TriggerHistoryDto {
      */
     triggeredAt: string;
     /**
-     * Additional message. 
+     * Additional message.
      * @type {string}
      * @memberof TriggerHistoryDto
      */
