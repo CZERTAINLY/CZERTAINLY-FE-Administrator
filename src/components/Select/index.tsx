@@ -19,11 +19,12 @@ import { X } from 'lucide-react';
 
 export type SingleValue<T> = T | undefined;
 export type MultiValue<T> = T[] | undefined;
+export type OptionValue = string | number | object;
 
 interface BaseProps {
     id: string;
     options?: {
-        value: string | number | object;
+        value: OptionValue;
         label: string;
         description?: string;
         disabled?: boolean;
@@ -57,8 +58,6 @@ interface MultiSelectProps extends BaseProps {
     value: { value: string | number; label: string }[];
     onChange: (value: { value: string | number; label: string }[] | undefined) => void;
 }
-
-type OptionValue = string | number | object;
 
 const getOptionValueString = (val: OptionValue): string => {
     if (typeof val === 'object' && val !== null) {
@@ -122,6 +121,26 @@ const valuesMatch = (val1: any, val2: any): boolean => {
     }
 
     return JSON.stringify(val1) === JSON.stringify(val2);
+};
+
+/**
+ * Syncs the native <select> element's value/selected state to match the React prop.
+ * Must be called after HSSelect.destroy() and before HSSelect.autoInit() so that
+ * the re-initialized widget reads the correct selection from the DOM.
+ */
+const syncNativeSelectionSingle = (selectEl: HTMLSelectElement, valueFromProp: OptionValue | undefined): void => {
+    selectEl.value = valueFromProp == null ? '' : getOptionValueString(valueFromProp);
+};
+
+const syncNativeSelectionMulti = (selectEl: HTMLSelectElement, values: { value: string | number; label: string }[] | undefined): void => {
+    const selectedValueStrings = new Set((values ?? []).map((v) => getOptionValueString(v.value)));
+    Array.from(selectEl.options).forEach((option) => {
+        if (option.value === '') {
+            option.selected = false;
+            return;
+        }
+        option.selected = selectedValueStrings.has(option.value);
+    });
 };
 
 type Props = SingleSelectProps | MultiSelectProps;
@@ -199,73 +218,51 @@ function Select({
             }
         })();
 
-        if (optionsChanged) {
-            const instance = (globalThis as any).HSSelect.getInstance(selectRef.current);
-            if (instance) {
-                instance.destroy();
-                isInitializedRef.current = false;
-            }
-
+        const scheduleAutoInit = () => {
             const frameId = requestAnimationFrame(() => {
                 if (selectRef.current && (globalThis as any).HSSelect) {
                     (globalThis as any).HSSelect.autoInit();
                     isInitializedRef.current = true;
                 }
             });
-
-            previousOptionsRef.current = optionsKey;
-            previousValueRef.current = value;
-
             return () => cancelAnimationFrame(frameId);
-        } else if (valueChanged) {
+        };
+
+        const destroyAndResync = (closeIfOpen: boolean) => {
             const instance = (globalThis as any).HSSelect.getInstance(selectRef.current);
             if (instance) {
-                const isOpen = instance.isOpened && typeof instance.isOpened === 'function' && instance.isOpened();
-                if (isOpen) {
+                if (closeIfOpen && typeof instance.isOpened === 'function' && instance.isOpened()) {
                     instance.close();
                 }
                 instance.destroy();
                 isInitializedRef.current = false;
             }
-
             if (selectRef.current) {
                 if (isMulti) {
-                    const curr = value as { value: string | number; label: string }[];
-                    Array.from(selectRef.current.options).forEach((option) => {
-                        if (option.value === '') {
-                            option.selected = false;
-                            return;
-                        }
-                        const isSelected = curr?.some((v) => getOptionValueString(v.value) === option.value);
-                        option.selected = isSelected || false;
-                    });
+                    syncNativeSelectionMulti(selectRef.current, value as { value: string | number; label: string }[] | undefined);
                 } else {
-                    const valueString = getValueFromProp != null ? getOptionValueString(getValueFromProp as OptionValue) : '';
-                    selectRef.current.value = valueString;
+                    syncNativeSelectionSingle(selectRef.current, getValueFromProp);
                 }
             }
+        };
 
-            const frameId = requestAnimationFrame(() => {
-                if (selectRef.current && (globalThis as any).HSSelect) {
-                    (globalThis as any).HSSelect.autoInit();
-                    isInitializedRef.current = true;
-                }
-            });
-
+        if (optionsChanged) {
+            destroyAndResync(false);
+            const cleanup = scheduleAutoInit();
+            previousOptionsRef.current = optionsKey;
             previousValueRef.current = value;
-
-            return () => cancelAnimationFrame(frameId);
-        } else if (!isInitializedRef.current) {
-            const frameId = requestAnimationFrame(() => {
-                if (selectRef.current && (globalThis as any).HSSelect) {
-                    (globalThis as any).HSSelect.autoInit();
-                    isInitializedRef.current = true;
-                }
-            });
+            return cleanup;
+        } else if (valueChanged) {
+            destroyAndResync(true);
+            const cleanup = scheduleAutoInit();
             previousValueRef.current = value;
-            return () => cancelAnimationFrame(frameId);
+            return cleanup;
+        } else if (isInitializedRef.current) {
+            previousValueRef.current = value;
         } else {
+            const cleanup = scheduleAutoInit();
             previousValueRef.current = value;
+            return cleanup;
         }
     }, [optionsKey, value, id, isMulti, getValueFromProp]);
 
@@ -274,7 +271,12 @@ function Select({
         if (!select?.parentNode) return;
 
         const escapeHtml = (text: string) =>
-            text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+            text
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
 
         const applyVersionLabelColor = (root: Element) => {
             if (!colorizeVersionLabel) return;
@@ -283,7 +285,7 @@ function Select({
                 const text = element.textContent?.trim();
                 if (!text) return;
 
-                const match = text.match(/^(Version\s+\d+)(\s+\((Latest|Original)\))$/);
+                const match = /^(Version\s+\d+)(\s+\((Latest|Original)\))$/.exec(text);
                 if (!match) return;
 
                 const versionPart = escapeHtml(match[1]);
@@ -342,7 +344,7 @@ function Select({
 
             // Try to get dropdown from (globalThis as any).HSSelect instance (works also when dropdownScope === 'window')
             const hsInstance = (globalThis as any).HSSelect?.getInstance?.(select);
-            const dropdown: Element | null = (hsInstance && hsInstance.dropdown) || root.querySelector?.('.hs-select-dropdown');
+            const dropdown: Element | null = hsInstance?.dropdown ?? root.querySelector?.('.hs-select-dropdown');
             applyAddNewStyling(dropdown);
             applyDropdownOptionDescriptions(dropdown);
 
