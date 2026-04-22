@@ -45,5 +45,5 @@ export interface ConnectorInfo {
      * @type {{ [key: string]: any; }}
      * @memberof ConnectorInfo
      */
-    metadata?: { [key: string]: any; };
+    metadata?: { [key: string]: any };
 }

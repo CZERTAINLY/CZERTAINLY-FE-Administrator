@@ -12,7 +12,7 @@ import Breadcrumb from 'components/Breadcrumb';
 import { actions as authActions, selectors as authSelectors } from 'ducks/auth';
 import { actions as rolesActions, selectors as rolesSelectors } from 'ducks/roles';
 
-import { SubjectPermissionsModel } from 'types/roles';
+import type { SubjectPermissionsModel } from 'types/roles';
 import RolePermissionsEditor from '../RolePermissionsEditor';
 
 function RolePermissionsForm() {
@@ -85,7 +85,6 @@ function RolePermissionsForm() {
 
                 if (outRes.objects?.length === 0 && (!inRes || (inRes.objects && inRes.objects.length === 0))) {
                     delete perms.objects;
-                    continue;
                 }
             }
 

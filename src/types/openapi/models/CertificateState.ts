@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -24,6 +24,5 @@ export enum CertificateState {
     PendingRevoke = 'pending_revoke',
     Failed = 'failed',
     Issued = 'issued',
-    Revoked = 'revoked'
+    Revoked = 'revoked',
 }
-

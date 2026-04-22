@@ -12,13 +12,12 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
 export enum ComplianceRuleAvailabilityStatus {
     Available = 'available',
     NotAvailable = 'not_available',
-    Updated = 'updated'
+    Updated = 'updated',
 }
-

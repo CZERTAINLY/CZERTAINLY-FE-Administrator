@@ -1,5 +1,5 @@
-import { AttributeRequestModel, AttributeResponseModel } from './attributes';
-import {
+import type { AttributeRequestModel, AttributeResponseModel } from './attributes';
+import type {
     AddTokenProfileRequestDto,
     BulkTokenProfileKeyUsageRequestDto,
     EditTokenProfileRequestDto,

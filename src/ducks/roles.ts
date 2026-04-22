@@ -1,7 +1,7 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RoleResponseModel } from 'types/auth';
-import { RoleDetailModel, RolePermissionsModel, RoleRequestModel, SubjectPermissionsModel } from 'types/roles';
-import { UserResponseModel } from 'types/users';
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { RoleResponseModel } from 'types/auth';
+import type { RoleDetailModel, RolePermissionsModel, RoleRequestModel, SubjectPermissionsModel } from 'types/roles';
+import type { UserResponseModel } from 'types/users';
 
 export type State = {
     rolesListCheckedRows: string[];
@@ -60,7 +60,7 @@ export const slice = createSlice({
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
             Object.keys(state).forEach((key) => {
-                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+                if (!Object.hasOwn(initialState, key)) (state as any)[key] = undefined;
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));

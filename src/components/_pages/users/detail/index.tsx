@@ -1,10 +1,10 @@
 import CertificateAttributes from 'components/CertificateAttributes';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
 
 import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import UserForm from '../form';
 import { actions as certActions, selectors as certSelectors } from 'ducks/certificates';
 

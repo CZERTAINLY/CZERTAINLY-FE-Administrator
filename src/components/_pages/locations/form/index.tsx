@@ -16,8 +16,8 @@ import { useNavigate, useParams } from 'react-router';
 import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
-import { AttributeDescriptorModel } from 'types/attributes';
-import { LocationResponseModel } from 'types/locations';
+import type { AttributeDescriptorModel } from 'types/attributes';
+import type { LocationResponseModel } from 'types/locations';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
 

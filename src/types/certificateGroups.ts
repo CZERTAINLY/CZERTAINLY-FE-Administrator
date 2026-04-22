@@ -1,5 +1,5 @@
-import { AttributeRequestModel, AttributeResponseModel } from './attributes';
-import { GroupDto, GroupRequestDto } from './openapi';
+import type { AttributeRequestModel, AttributeResponseModel } from './attributes';
+import type { GroupDto, GroupRequestDto } from './openapi';
 
 export type CertificateGroupResponseDto = GroupDto;
 export type CertificateGroupResponseModel = Omit<CertificateGroupResponseDto, 'customAttributes'> & {

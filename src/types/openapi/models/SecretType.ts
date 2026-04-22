@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -24,6 +24,5 @@ export enum SecretType {
     SecretKey = 'secretKey',
     KeyStore = 'keyStore',
     KeyValue = 'keyValue',
-    Generic = 'generic'
+    Generic = 'generic',
 }
-

@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    NameAndUuidDto,
-    RecipientType,
-} from './';
+import type { NameAndUuidDto, RecipientType } from './';
 
 /**
  * @export
@@ -82,5 +79,3 @@ export interface NotificationProfileDetailDto {
      */
     repetitions?: number;
 }
-
-

@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { getFieldErrorMessage } from 'utils/validators-helper';
 import { useDispatch, useSelector } from 'react-redux';
-import { SettingsPlatformModel } from 'types/settings';
+import type { SettingsPlatformModel } from 'types/settings';
 import {
     buildCbomHealthPath,
     CBOM_REPOSITORY_HEALTH_WARNING_MESSAGE,

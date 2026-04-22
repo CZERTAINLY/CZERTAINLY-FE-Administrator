@@ -14,7 +14,7 @@ interface Props {
     okButtonTitle?: string;
 }
 
-interface FormValues {}
+type FormValues = {};
 
 export default function CbomUploadDialog({ onCancel, onUpload, okButtonTitle = 'Upload' }: Props) {
     const dispatch = useDispatch();

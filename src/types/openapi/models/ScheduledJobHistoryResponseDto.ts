@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ScheduledJobHistoryDto,
-} from './';
+import type { ScheduledJobHistoryDto } from './';
 
 /**
  * @export

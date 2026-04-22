@@ -75,55 +75,55 @@ export interface StatisticsDto {
      * @type {{ [key: string]: number; }}
      * @memberof StatisticsDto
      */
-    groupStatByCertificateCount?: { [key: string]: number; };
+    groupStatByCertificateCount?: { [key: string]: number };
     /**
      * Map of Certificate count by RA Profile
      * @type {{ [key: string]: number; }}
      * @memberof StatisticsDto
      */
-    raProfileStatByCertificateCount?: { [key: string]: number; };
+    raProfileStatByCertificateCount?: { [key: string]: number };
     /**
      * Map of Certificate count by Type
      * @type {{ [key: string]: number; }}
      * @memberof StatisticsDto
      */
-    certificateStatByType?: { [key: string]: number; };
+    certificateStatByType?: { [key: string]: number };
     /**
      * Map of Certificate count by expiry date
      * @type {{ [key: string]: number; }}
      * @memberof StatisticsDto
      */
-    certificateStatByExpiry?: { [key: string]: number; };
+    certificateStatByExpiry?: { [key: string]: number };
     /**
      * Map of Certificate count by key size
      * @type {{ [key: string]: number; }}
      * @memberof StatisticsDto
      */
-    certificateStatByKeySize?: { [key: string]: number; };
+    certificateStatByKeySize?: { [key: string]: number };
     /**
      * Map of Certificate count by subject type
      * @type {{ [key: string]: number; }}
      * @memberof StatisticsDto
      */
-    certificateStatBySubjectType?: { [key: string]: number; };
+    certificateStatBySubjectType?: { [key: string]: number };
     /**
      * Map of Certificate count by state
      * @type {{ [key: string]: number; }}
      * @memberof StatisticsDto
      */
-    certificateStatByState?: { [key: string]: number; };
+    certificateStatByState?: { [key: string]: number };
     /**
      * Map of Certificate count by validationStatus
      * @type {{ [key: string]: number; }}
      * @memberof StatisticsDto
      */
-    certificateStatByValidationStatus?: { [key: string]: number; };
+    certificateStatByValidationStatus?: { [key: string]: number };
     /**
      * Map of Certificate count by compliance status
      * @type {{ [key: string]: number; }}
      * @memberof StatisticsDto
      */
-    certificateStatByComplianceStatus?: { [key: string]: number; };
+    certificateStatByComplianceStatus?: { [key: string]: number };
     /**
      * Number of Secrets
      * @type {number}
@@ -147,53 +147,53 @@ export interface StatisticsDto {
      * @type {{ [key: string]: number; }}
      * @memberof StatisticsDto
      */
-    secretStatByType?: { [key: string]: number; };
+    secretStatByType?: { [key: string]: number };
     /**
      * Map of Secret count by state
      * @type {{ [key: string]: number; }}
      * @memberof StatisticsDto
      */
-    secretStatByState?: { [key: string]: number; };
+    secretStatByState?: { [key: string]: number };
     /**
      * Map of Secret count by compliance status
      * @type {{ [key: string]: number; }}
      * @memberof StatisticsDto
      */
-    secretStatByComplianceStatus?: { [key: string]: number; };
+    secretStatByComplianceStatus?: { [key: string]: number };
     /**
      * Map of Secret count by vault profile
      * @type {{ [key: string]: number; }}
      * @memberof StatisticsDto
      */
-    secretStatByVaultProfile?: { [key: string]: number; };
+    secretStatByVaultProfile?: { [key: string]: number };
     /**
      * Map of Secret count by group
      * @type {{ [key: string]: number; }}
      * @memberof StatisticsDto
      */
-    secretStatByGroup?: { [key: string]: number; };
+    secretStatByGroup?: { [key: string]: number };
     /**
      * Map of Connector count by status
      * @type {{ [key: string]: number; }}
      * @memberof StatisticsDto
      */
-    connectorStatByStatus?: { [key: string]: number; };
+    connectorStatByStatus?: { [key: string]: number };
     /**
      * Map of RA Profile count by status
      * @type {{ [key: string]: number; }}
      * @memberof StatisticsDto
      */
-    raProfileStatByStatus?: { [key: string]: number; };
+    raProfileStatByStatus?: { [key: string]: number };
     /**
      * Map of Administrator count by status
      * @type {{ [key: string]: number; }}
      * @memberof StatisticsDto
      */
-    administratorStatByStatus?: { [key: string]: number; };
+    administratorStatByStatus?: { [key: string]: number };
     /**
      * Map of Client count by status
      * @type {{ [key: string]: number; }}
      * @memberof StatisticsDto
      */
-    clientStatByStatus?: { [key: string]: number; };
+    clientStatByStatus?: { [key: string]: number };
 }

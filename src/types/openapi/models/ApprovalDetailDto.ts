@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ApprovalDetailStepDto,
-    Resource,
-} from './';
+import type { ApprovalDetailStepDto, Resource } from './';
 
 /**
  * @export
@@ -127,6 +124,5 @@ export enum ApprovalDetailDtoStatusEnum {
     Pending = 'PENDING',
     Approved = 'APPROVED',
     Rejected = 'REJECTED',
-    Expired = 'EXPIRED'
+    Expired = 'EXPIRED',
 }
-

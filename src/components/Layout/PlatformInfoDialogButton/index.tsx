@@ -1,4 +1,4 @@
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Spinner from 'components/Spinner';
 import { actions, selectors } from 'ducks/info';

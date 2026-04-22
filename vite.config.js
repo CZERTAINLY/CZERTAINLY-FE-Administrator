@@ -1,7 +1,6 @@
 import path from 'node:path';
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import eslint from 'vite-plugin-eslint';
+import react from '@vitejs/plugin-react-swc';
 import istanbul from 'vite-plugin-istanbul';
 import tailwindcss from '@tailwindcss/vite';
 
@@ -50,9 +49,6 @@ export default defineConfig(async () => {
         },
         plugins: [
             react(),
-            eslint({
-                failOnWarning: true,
-            }),
             istanbul({
                 requireEnv: false, // or set via env var
                 include: ['src/**/*'],

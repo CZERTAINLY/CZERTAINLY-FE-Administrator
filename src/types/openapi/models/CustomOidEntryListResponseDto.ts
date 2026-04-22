@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CustomOidEntryResponseDto,
-} from './';
+import type { CustomOidEntryResponseDto } from './';
 
 /**
  * @export

@@ -1,13 +1,13 @@
-import { ApiClients } from '../../api';
+import type { ApiClients } from '../../api';
 import Spinner from 'components/Spinner';
 import Widget from 'components/Widget';
 import { EntityType, actions as filterActions, selectors } from 'ducks/filters';
 import { selectors as rulesSelectors } from 'ducks/rules';
 import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Observable } from 'rxjs';
-import { SearchFieldListModel } from 'types/certificate';
-import { ConditionModel, ExecutionModel } from 'types/rules';
+import type { Observable } from 'rxjs';
+import type { SearchFieldListModel } from 'types/certificate';
+import type { ConditionModel, ExecutionModel } from 'types/rules';
 import ConditionsItemsList from './ConditionsItemsList';
 import ExecutionsItemsList from './ExecutionsItemsList';
 

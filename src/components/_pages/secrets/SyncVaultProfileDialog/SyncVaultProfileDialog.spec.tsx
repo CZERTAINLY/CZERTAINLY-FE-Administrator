@@ -1,4 +1,4 @@
-import { JSX } from 'react';
+import type { JSX } from 'react';
 import type { Locator, Page } from '@playwright/test';
 
 import type { AttributeDescriptorModel } from 'types/attributes';

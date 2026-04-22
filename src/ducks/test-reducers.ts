@@ -279,7 +279,7 @@ function customAttributesTestReducer(
             };
         case 'customAttributes/listResourceCustomAttributesFailure':
             return { ...state, isFetchingResourceCustomAttributes: false };
-        case 'customAttributes/loadCustomAttributeContent':
+        case 'customAttributes/loadCustomAttributeContent': {
             if (!a.payload) return state;
             const loadIdx = state.resourceCustomAttributesContents.findIndex(
                 (c) => c.resource === a.payload.resource && c.resourceUuid === a.payload.resourceUuid,
@@ -296,6 +296,7 @@ function customAttributesTestReducer(
                     i === loadIdx ? { ...c, customAttributes: a.payload.customAttributes } : c,
                 ),
             };
+        }
         case 'customAttributes/updateCustomAttributeContent':
             return { ...state, isUpdatingContent: true };
         case 'customAttributes/updateCustomAttributeContentSuccess':

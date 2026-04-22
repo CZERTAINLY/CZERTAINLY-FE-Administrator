@@ -11,12 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CertificateDto,
-    ProtocolCertificateAssociationsDto,
-    ResponseAttribute,
-    SimplifiedRaProfileDto,
-} from './';
+import type { CertificateDto, ProtocolCertificateAssociationsDto, ResponseAttribute, SimplifiedRaProfileDto } from './';
 
 /**
  * @export

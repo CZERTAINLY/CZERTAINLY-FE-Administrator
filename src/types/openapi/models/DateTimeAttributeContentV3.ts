@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-} from './';
+import type { AttributeContentType } from './';
 
 /**
  * DateTime attribute content in predefined format with timezone
@@ -40,5 +38,3 @@ export interface DateTimeAttributeContentV3 {
      */
     contentType: AttributeContentType;
 }
-
-

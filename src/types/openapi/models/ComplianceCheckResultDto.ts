@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ComplianceCheckRuleDto,
-    ComplianceStatus,
-} from './';
+import type { ComplianceCheckRuleDto, ComplianceStatus } from './';
 
 /**
  * @export
@@ -46,5 +43,3 @@ export interface ComplianceCheckResultDto {
      */
     failedRules: Array<ComplianceCheckRuleDto>;
 }
-
-

@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/experimental-ct-react';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import react from '@vitejs/plugin-react';
+import react from '@vitejs/plugin-react-swc';
 import tailwindcss from '@tailwindcss/vite';
 import istanbul from 'vite-plugin-istanbul';
 

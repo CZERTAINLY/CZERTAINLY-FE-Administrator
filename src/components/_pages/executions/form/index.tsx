@@ -14,7 +14,7 @@ import ProgressButton from 'components/ProgressButton';
 import TextInput from 'components/TextInput';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { ExecutionType, PlatformEnum, Resource } from 'types/openapi';
-import { ExecutionItemRequestModel } from 'types/rules';
+import type { ExecutionItemRequestModel } from 'types/rules';
 import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';

@@ -12,12 +12,11 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
 export enum ExecutionType {
     SetField = 'setField',
-    SendNotification = 'sendNotification'
+    SendNotification = 'sendNotification',
 }
-

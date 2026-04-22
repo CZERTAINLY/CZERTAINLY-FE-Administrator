@@ -1,4 +1,4 @@
-import { MutableState, Tools } from 'final-form';
+import type { MutableState, Tools } from 'final-form';
 
 export function mutators<T>() {
     return {

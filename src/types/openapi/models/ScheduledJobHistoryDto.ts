@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    Resource,
-    SchedulerJobExecutionStatus,
-} from './';
+import type { Resource, SchedulerJobExecutionStatus } from './';
 
 /**
  * @export
@@ -64,5 +61,3 @@ export interface ScheduledJobHistoryDto {
      */
     resultObjectIdentification?: Array<string>;
 }
-
-

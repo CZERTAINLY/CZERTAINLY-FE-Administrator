@@ -12,12 +12,11 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
 export enum KeyStoreType {
     Jks = 'JKS',
-    Pkcs12 = 'PKCS12'
+    Pkcs12 = 'PKCS12',
 }
-

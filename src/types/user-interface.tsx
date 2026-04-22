@@ -1,8 +1,8 @@
 import CredentialForm from 'components/_pages/credentials/form';
-import { CustomNode, LegendItem } from 'components/FlowChart';
-import { Edge } from 'reactflow';
+import type { CustomNode, LegendItem } from 'components/FlowChart';
+import type { Edge } from 'reactflow';
 import { AttributeContentType } from 'types/openapi';
-import { ModalIcon, ModalSize } from 'components/Dialog';
+import type { ModalIcon, ModalSize } from 'components/Dialog';
 
 export enum LockTypeEnum {
     GENERIC,

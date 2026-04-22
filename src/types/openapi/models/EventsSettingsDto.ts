@@ -22,5 +22,5 @@ export interface EventsSettingsDto {
      * @type {{ [key: string]: Array<string>; }}
      * @memberof EventsSettingsDto
      */
-    eventsMapping: { [key: string]: Array<string>; };
+    eventsMapping: { [key: string]: Array<string> };
 }

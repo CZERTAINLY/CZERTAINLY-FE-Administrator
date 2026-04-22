@@ -1,9 +1,9 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AttributeDescriptorModel, DataAttributeModel } from 'types/attributes';
-import { SearchRequestModel } from 'types/certificate';
-import { ConnectorResponseModel } from 'types/connectors';
-import { NotificationInstanceModel, NotificationInstanceRequestModel, NotificationModel } from 'types/notifications';
-import { ListMappingAttributesRequest } from 'types/openapi';
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { AttributeDescriptorModel, DataAttributeModel } from 'types/attributes';
+import type { SearchRequestModel } from 'types/certificate';
+import type { ConnectorResponseModel } from 'types/connectors';
+import type { NotificationInstanceModel, NotificationInstanceRequestModel, NotificationModel } from 'types/notifications';
+import type { ListMappingAttributesRequest } from 'types/openapi';
 
 const MAX_FAILED_RETRY_COUNT = 10;
 export type State = {

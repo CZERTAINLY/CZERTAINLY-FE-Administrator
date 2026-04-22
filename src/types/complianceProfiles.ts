@@ -1,6 +1,6 @@
-import { AttributeDescriptorModel, AttributeRequestModel, AttributeResponseModel } from './attributes';
-import { RaProfileSimplifiedModel } from './certificate';
-import {
+import type { AttributeDescriptorModel, AttributeRequestModel, AttributeResponseModel } from './attributes';
+import type { RaProfileSimplifiedModel } from './certificate';
+import type {
     ComplianceGroupDto,
     ComplianceGroupRequestDto,
     ComplianceGroupsListResponseDto,

@@ -1,4 +1,4 @@
-import { BadgeColor } from 'components/Badge';
+import type { BadgeColor } from 'components/Badge';
 
 export function acmeAccountStatus(status: string): [string, BadgeColor] {
     switch (status) {

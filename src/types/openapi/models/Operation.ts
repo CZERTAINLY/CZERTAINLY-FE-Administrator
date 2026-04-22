@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -112,6 +112,5 @@ export enum Operation {
     GetAssociations = 'getAssociations',
     ListVersions = 'listVersions',
     ListCertificateProfiles = 'listCertificateProfiles',
-    ListCas = 'listCas'
+    ListCas = 'listCas',
 }
-

@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    FilterConditionOperator,
-    FilterFieldSource,
-} from './';
+import type { FilterConditionOperator, FilterFieldSource } from './';
 
 /**
  * @export
@@ -45,5 +42,3 @@ export interface ConditionItemDto {
      */
     value?: any | null;
 }
-
-

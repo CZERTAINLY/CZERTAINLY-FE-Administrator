@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    RecipientType,
-} from './';
+import type { RecipientType } from './';
 
 /**
  * @export
@@ -39,5 +37,3 @@ export interface RecipientDto {
      */
     name?: string;
 }
-
-

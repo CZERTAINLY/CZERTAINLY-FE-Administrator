@@ -129,5 +129,3 @@ export interface SecretDetailDto {
      */
     metadata?: Array<MetadataResponseDto>;
 }
-
-

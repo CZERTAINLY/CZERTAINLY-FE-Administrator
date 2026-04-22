@@ -18,9 +18,9 @@ import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
 import Switch from 'components/Switch';
-import { AttributeDescriptorModel } from 'types/attributes';
-import { RaProfileSimplifiedModel } from 'types/ra-profiles';
-import { ScepProfileAddRequestModel, ScepProfileEditRequestModel, ScepProfileResponseModel } from 'types/scep-profiles';
+import type { AttributeDescriptorModel } from 'types/attributes';
+import type { RaProfileSimplifiedModel } from 'types/ra-profiles';
+import type { ScepProfileAddRequestModel, ScepProfileEditRequestModel, ScepProfileResponseModel } from 'types/scep-profiles';
 
 import { collectFormAttributes, mapProfileAttribute, transformAttributes } from 'utils/attributes/attributes';
 

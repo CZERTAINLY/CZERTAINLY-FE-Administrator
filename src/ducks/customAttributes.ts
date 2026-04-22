@@ -1,12 +1,12 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type {
     CustomAttributeCreateRequestModel,
     CustomAttributeDetailResponseModel,
     CustomAttributeResponseModel,
     CustomAttributeUpdateRequestModel,
 } from 'types/customAttributes';
-import { AttributeResponseModel, BaseAttributeContentModel, CustomAttributeModel } from '../types/attributes';
-import { AttributeContentType, AttributeVersion, Resource } from '../types/openapi';
+import type { AttributeResponseModel, BaseAttributeContentModel, CustomAttributeModel } from '../types/attributes';
+import { type AttributeContentType, AttributeVersion, type Resource } from '../types/openapi';
 
 type ResourceCustomAttributesContents = {
     resource: Resource;
@@ -73,7 +73,7 @@ export const slice = createSlice({
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
             Object.keys(state).forEach((key) => {
-                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+                if (!Object.hasOwn(initialState, key)) (state as any)[key] = undefined;
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));

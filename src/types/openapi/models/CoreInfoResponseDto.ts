@@ -11,11 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AppInfoDto,
-    BuildInfoDto,
-    DatabaseInfoDto,
-} from './';
+import type { AppInfoDto, BuildInfoDto, DatabaseInfoDto } from './';
 
 /**
  * @export

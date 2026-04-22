@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AuthType,
-    RequestAttribute,
-} from './';
+import type { AuthType, RequestAttribute } from './';
 
 /**
  * @export
@@ -52,5 +49,3 @@ export interface ConnectorRequestDto {
      */
     customAttributes?: Array<RequestAttribute>;
 }
-
-

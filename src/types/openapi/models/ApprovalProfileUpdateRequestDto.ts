@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ApprovalStepRequestDto,
-} from './';
+import type { ApprovalStepRequestDto } from './';
 
 /**
  * @export

@@ -1,9 +1,9 @@
-import { configureStore, Middleware } from '@reduxjs/toolkit';
-import { AnyAction } from 'redux';
+import { configureStore, type Middleware } from '@reduxjs/toolkit';
+import type { AnyAction } from 'redux';
 import { createEpicMiddleware } from 'redux-observable';
 
 import { backendClient } from './api';
-import { AppState, epics } from './ducks';
+import { type AppState, epics } from './ducks';
 import { initialState } from './ducks/initial-state';
 import { reducers } from './ducks/reducers';
 import { startAlertsTicker } from './ducks/alerts-ticker';

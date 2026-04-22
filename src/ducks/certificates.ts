@@ -1,6 +1,6 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AttributeDescriptorModel } from 'types/attributes';
-import {
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { AttributeDescriptorModel } from 'types/attributes';
+import type {
     CertificateBulkDeleteRequestModel,
     CertificateBulkDeleteResponseModel,
     CertificateBulkObjectModel,
@@ -21,16 +21,16 @@ import {
     SearchRequestModel,
     ValidationCertificateResultModel,
 } from 'types/certificate';
-import { LocationResponseModel } from 'types/locations';
-import {
+import type { LocationResponseModel } from 'types/locations';
+import type {
     ApprovalDto,
     CertificateRelationsDto,
     DownloadCertificateChainRequest,
     DownloadCertificateRequest,
     ListCertificateApprovalsRequest,
 } from 'types/openapi';
-import { RaProfileResponseModel } from 'types/ra-profiles';
-import { UserResponseModel } from 'types/users';
+import type { RaProfileResponseModel } from 'types/ra-profiles';
+import type { UserResponseModel } from 'types/users';
 import { downloadFileZip } from 'utils/download';
 
 export type State = {
@@ -165,7 +165,7 @@ export const slice = createSlice({
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
             Object.keys(state).forEach((key) => {
-                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+                if (!Object.hasOwn(initialState, key)) (state as any)[key] = undefined;
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));

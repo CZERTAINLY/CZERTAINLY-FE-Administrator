@@ -326,7 +326,7 @@ test.describe('Select', () => {
     });
 
     test('should call onChange with empty string when single select is cleared to Choose', async ({ mount }) => {
-        let received: string | undefined = undefined;
+        let received: string | undefined;
         const options = [
             { value: '1', label: 'Option 1' },
             { value: '2', label: 'Option 2' },
@@ -546,7 +546,7 @@ test.describe('Select', () => {
     });
 
     test('should call multi onChange with undefined when all options deselected', async ({ mount }) => {
-        let received: { value: string; label: string }[] | undefined = undefined;
+        let received: { value: string; label: string }[] | undefined;
         const options = [
             { value: '1', label: 'One' },
             { value: '2', label: 'Two' },

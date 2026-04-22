@@ -60,121 +60,179 @@ export interface UpdateVaultInstanceRequest {
  * no description
  */
 export class VaultInstanceManagementApi extends BaseAPI {
-
     /**
      * Create a Vault instance
      */
-    createVaultInstance({ vaultInstanceRequestDto }: CreateVaultInstanceRequest): Observable<VaultInstanceDetailDto>
-    createVaultInstance({ vaultInstanceRequestDto }: CreateVaultInstanceRequest, opts?: OperationOpts): Observable<AjaxResponse<VaultInstanceDetailDto>>
-    createVaultInstance({ vaultInstanceRequestDto }: CreateVaultInstanceRequest, opts?: OperationOpts): Observable<VaultInstanceDetailDto | AjaxResponse<VaultInstanceDetailDto>> {
+    createVaultInstance({ vaultInstanceRequestDto }: CreateVaultInstanceRequest): Observable<VaultInstanceDetailDto>;
+    createVaultInstance(
+        { vaultInstanceRequestDto }: CreateVaultInstanceRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<VaultInstanceDetailDto>>;
+    createVaultInstance(
+        { vaultInstanceRequestDto }: CreateVaultInstanceRequest,
+        opts?: OperationOpts,
+    ): Observable<VaultInstanceDetailDto | AjaxResponse<VaultInstanceDetailDto>> {
         throwIfNullOrUndefined(vaultInstanceRequestDto, 'vaultInstanceRequestDto', 'createVaultInstance');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<VaultInstanceDetailDto>({
-            url: '/v1/vaults',
-            method: 'POST',
-            headers,
-            body: vaultInstanceRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<VaultInstanceDetailDto>(
+            {
+                url: '/v1/vaults',
+                method: 'POST',
+                headers,
+                body: vaultInstanceRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Delete a Vault instance
      */
-    deleteVaultInstance({ uuid }: DeleteVaultInstanceRequest): Observable<void>
-    deleteVaultInstance({ uuid }: DeleteVaultInstanceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    deleteVaultInstance({ uuid }: DeleteVaultInstanceRequest): Observable<void>;
+    deleteVaultInstance({ uuid }: DeleteVaultInstanceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteVaultInstance({ uuid }: DeleteVaultInstanceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'deleteVaultInstance');
 
-        return this.request<void>({
-            url: '/v1/vaults/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'DELETE',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/vaults/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Details of a Vault instance
      */
-    getVaultInstanceDetails({ uuid }: GetVaultInstanceDetailsRequest): Observable<VaultInstanceDetailDto>
-    getVaultInstanceDetails({ uuid }: GetVaultInstanceDetailsRequest, opts?: OperationOpts): Observable<AjaxResponse<VaultInstanceDetailDto>>
-    getVaultInstanceDetails({ uuid }: GetVaultInstanceDetailsRequest, opts?: OperationOpts): Observable<VaultInstanceDetailDto | AjaxResponse<VaultInstanceDetailDto>> {
+    getVaultInstanceDetails({ uuid }: GetVaultInstanceDetailsRequest): Observable<VaultInstanceDetailDto>;
+    getVaultInstanceDetails(
+        { uuid }: GetVaultInstanceDetailsRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<VaultInstanceDetailDto>>;
+    getVaultInstanceDetails(
+        { uuid }: GetVaultInstanceDetailsRequest,
+        opts?: OperationOpts,
+    ): Observable<VaultInstanceDetailDto | AjaxResponse<VaultInstanceDetailDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getVaultInstanceDetails');
 
-        return this.request<VaultInstanceDetailDto>({
-            url: '/v1/vaults/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<VaultInstanceDetailDto>(
+            {
+                url: '/v1/vaults/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List search filters for Vault instances
      */
-    getVaultInstanceSearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>
-    getVaultInstanceSearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
-    getVaultInstanceSearchableFields(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
-        return this.request<Array<SearchFieldDataByGroupDto>>({
-            url: '/v1/vaults/search',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+    getVaultInstanceSearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>;
+    getVaultInstanceSearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>;
+    getVaultInstanceSearchableFields(
+        opts?: OperationOpts,
+    ): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
+        return this.request<Array<SearchFieldDataByGroupDto>>(
+            {
+                url: '/v1/vaults/search',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List Vault Instance Attributes
      */
-    listVaultInstanceAttributes({ connectorUuid }: ListVaultInstanceAttributesRequest): Observable<Array<BaseAttributeDto>>
-    listVaultInstanceAttributes({ connectorUuid }: ListVaultInstanceAttributesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BaseAttributeDto>>>
-    listVaultInstanceAttributes({ connectorUuid }: ListVaultInstanceAttributesRequest, opts?: OperationOpts): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
+    listVaultInstanceAttributes({ connectorUuid }: ListVaultInstanceAttributesRequest): Observable<Array<BaseAttributeDto>>;
+    listVaultInstanceAttributes(
+        { connectorUuid }: ListVaultInstanceAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<BaseAttributeDto>>>;
+    listVaultInstanceAttributes(
+        { connectorUuid }: ListVaultInstanceAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
         throwIfNullOrUndefined(connectorUuid, 'connectorUuid', 'listVaultInstanceAttributes');
 
-        return this.request<Array<BaseAttributeDto>>({
-            url: '/v1/vaults/{connectorUuid}/attributes'.replace('{connectorUuid}', encodeURI(connectorUuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<BaseAttributeDto>>(
+            {
+                url: '/v1/vaults/{connectorUuid}/attributes'.replace('{connectorUuid}', encodeURI(connectorUuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List Vault instances
      */
-    listVaultInstances({ searchRequestDto }: ListVaultInstancesRequest): Observable<PaginationResponseDtoVaultInstanceDto>
-    listVaultInstances({ searchRequestDto }: ListVaultInstancesRequest, opts?: OperationOpts): Observable<AjaxResponse<PaginationResponseDtoVaultInstanceDto>>
-    listVaultInstances({ searchRequestDto }: ListVaultInstancesRequest, opts?: OperationOpts): Observable<PaginationResponseDtoVaultInstanceDto | AjaxResponse<PaginationResponseDtoVaultInstanceDto>> {
+    listVaultInstances({ searchRequestDto }: ListVaultInstancesRequest): Observable<PaginationResponseDtoVaultInstanceDto>;
+    listVaultInstances(
+        { searchRequestDto }: ListVaultInstancesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<PaginationResponseDtoVaultInstanceDto>>;
+    listVaultInstances(
+        { searchRequestDto }: ListVaultInstancesRequest,
+        opts?: OperationOpts,
+    ): Observable<PaginationResponseDtoVaultInstanceDto | AjaxResponse<PaginationResponseDtoVaultInstanceDto>> {
         throwIfNullOrUndefined(searchRequestDto, 'searchRequestDto', 'listVaultInstances');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<PaginationResponseDtoVaultInstanceDto>({
-            url: '/v1/vaults/list',
-            method: 'POST',
-            headers,
-            body: searchRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<PaginationResponseDtoVaultInstanceDto>(
+            {
+                url: '/v1/vaults/list',
+                method: 'POST',
+                headers,
+                body: searchRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List Vault Profile Attributes
      */
-    listVaultProfileAttributes({ uuid }: ListVaultProfileAttributesRequest): Observable<Array<BaseAttributeDto>>
-    listVaultProfileAttributes({ uuid }: ListVaultProfileAttributesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BaseAttributeDto>>>
-    listVaultProfileAttributes({ uuid }: ListVaultProfileAttributesRequest, opts?: OperationOpts): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
+    listVaultProfileAttributes({ uuid }: ListVaultProfileAttributesRequest): Observable<Array<BaseAttributeDto>>;
+    listVaultProfileAttributes(
+        { uuid }: ListVaultProfileAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<BaseAttributeDto>>>;
+    listVaultProfileAttributes(
+        { uuid }: ListVaultProfileAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'listVaultProfileAttributes');
 
-        return this.request<Array<BaseAttributeDto>>({
-            url: '/v1/vaults/{uuid}/vaultProfiles/attributes'.replace('{uuid}', encodeURI(uuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<BaseAttributeDto>>(
+            {
+                url: '/v1/vaults/{uuid}/vaultProfiles/attributes'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Update a Vault instance
      */
-    updateVaultInstance({ uuid, vaultInstanceUpdateRequestDto }: UpdateVaultInstanceRequest): Observable<VaultInstanceDetailDto>
-    updateVaultInstance({ uuid, vaultInstanceUpdateRequestDto }: UpdateVaultInstanceRequest, opts?: OperationOpts): Observable<AjaxResponse<VaultInstanceDetailDto>>
-    updateVaultInstance({ uuid, vaultInstanceUpdateRequestDto }: UpdateVaultInstanceRequest, opts?: OperationOpts): Observable<VaultInstanceDetailDto | AjaxResponse<VaultInstanceDetailDto>> {
+    updateVaultInstance({ uuid, vaultInstanceUpdateRequestDto }: UpdateVaultInstanceRequest): Observable<VaultInstanceDetailDto>;
+    updateVaultInstance(
+        { uuid, vaultInstanceUpdateRequestDto }: UpdateVaultInstanceRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<VaultInstanceDetailDto>>;
+    updateVaultInstance(
+        { uuid, vaultInstanceUpdateRequestDto }: UpdateVaultInstanceRequest,
+        opts?: OperationOpts,
+    ): Observable<VaultInstanceDetailDto | AjaxResponse<VaultInstanceDetailDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'updateVaultInstance');
         throwIfNullOrUndefined(vaultInstanceUpdateRequestDto, 'vaultInstanceUpdateRequestDto', 'updateVaultInstance');
 
@@ -182,12 +240,14 @@ export class VaultInstanceManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<VaultInstanceDetailDto>({
-            url: '/v1/vaults/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'PUT',
-            headers,
-            body: vaultInstanceUpdateRequestDto,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<VaultInstanceDetailDto>(
+            {
+                url: '/v1/vaults/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PUT',
+                headers,
+                body: vaultInstanceUpdateRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

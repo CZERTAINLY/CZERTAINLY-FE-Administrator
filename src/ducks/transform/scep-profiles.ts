@@ -1,4 +1,4 @@
-import {
+import type {
     ScepProfileAddRequestDto,
     ScepProfileAddRequestModel,
     ScepProfileEditRequestDto,

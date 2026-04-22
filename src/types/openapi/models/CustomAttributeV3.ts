@@ -11,13 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-    AttributeType,
-    AttributeVersion,
-    BaseAttributeContentDtoV3,
-    CustomAttributeProperties,
-} from './';
+import type { AttributeContentType, AttributeType, AttributeVersion, BaseAttributeContentDtoV3, CustomAttributeProperties } from './';
 
 /**
  * Custom attribute allows to store and transfer dynamic data. Its content can be edited and send in requests to store.
@@ -80,5 +74,3 @@ export interface CustomAttributeV3 {
      */
     schemaVersion: AttributeVersion;
 }
-
-

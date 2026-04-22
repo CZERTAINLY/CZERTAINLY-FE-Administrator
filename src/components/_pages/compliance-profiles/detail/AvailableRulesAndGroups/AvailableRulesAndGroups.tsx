@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Select from 'components/Select';
 import Button from 'components/Button';
 import Label from 'components/Label';
-import { ComplianceProfileDtoV2, ComplianceRuleListDto, FunctionGroupCode, PlatformEnum, Resource } from 'types/openapi';
+import { type ComplianceProfileDtoV2, type ComplianceRuleListDto, FunctionGroupCode, PlatformEnum, type Resource } from 'types/openapi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import { actions, selectors, actions as complianceActions } from 'ducks/compliance-profiles';
@@ -29,10 +29,10 @@ import { FormProvider, useForm } from 'react-hook-form';
 import ProgressButton from 'components/ProgressButton';
 import { Plus } from 'lucide-react';
 import { collectFormAttributes } from 'utils/attributes/attributes';
-import { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
+import type { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
 import InternalRuleForm from 'components/_pages/compliance-profiles/detail/InternalRuleForm/InternalRuleForm';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { TRuleGroupType } from 'types/complianceProfiles';
+import type { TRuleGroupType } from 'types/complianceProfiles';
 
 const AttributeEditorDialogBody = ({
     isAssigningRule,

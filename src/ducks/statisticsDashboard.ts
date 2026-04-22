@@ -1,5 +1,5 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { StatisticsDashboardModel } from '../types/statisticsDashboard';
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { StatisticsDashboardModel } from '../types/statisticsDashboard';
 
 export type State = {
     isFetching: boolean;

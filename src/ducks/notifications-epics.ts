@@ -1,5 +1,5 @@
-import { AnyAction } from '@reduxjs/toolkit';
-import { AppEpic } from 'ducks';
+import type { AnyAction } from '@reduxjs/toolkit';
+import type { AppEpic } from 'ducks';
 import { store } from '../App';
 import { iif, of } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';

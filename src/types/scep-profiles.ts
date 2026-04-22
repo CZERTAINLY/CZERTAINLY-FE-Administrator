@@ -1,12 +1,12 @@
-import { AttributeRequestModel, AttributeResponseModel } from './attributes';
-import { CertificateListResponseModel } from './certificate';
-import {
+import type { AttributeRequestModel, AttributeResponseModel } from './attributes';
+import type { CertificateListResponseModel } from './certificate';
+import type {
     ScepProfileDetailDto,
     ScepProfileDto,
     ScepProfileEditRequestDto as ScepProfileEditRequestDtoOpenApi,
     ScepProfileRequestDto,
 } from './openapi';
-import { RaProfileSimplifiedModel } from './ra-profiles';
+import type { RaProfileSimplifiedModel } from './ra-profiles';
 
 export type ScepProfileAddRequestDto = ScepProfileRequestDto;
 export type ScepProfileAddRequestModel = Omit<ScepProfileAddRequestDto, 'issueCertificateAttributes | customAttributes'> & {

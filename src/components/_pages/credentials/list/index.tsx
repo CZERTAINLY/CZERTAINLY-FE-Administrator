@@ -8,9 +8,9 @@ import { actions, selectors } from 'ducks/credentials';
 
 import Widget from 'components/Widget';
 import CredentialForm from '../form';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import { LockWidgetNameEnum } from 'types/user-interface';
 

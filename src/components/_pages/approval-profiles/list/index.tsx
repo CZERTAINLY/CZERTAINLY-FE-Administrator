@@ -5,11 +5,11 @@ import { Link } from 'react-router';
 
 import { actions as profileApprovalActions, selectors as profileApprovalSelector } from 'ducks/approval-profiles';
 
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import ApprovalProfileForm from '../form';
 import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
 export default function ApprovalProfilesList() {

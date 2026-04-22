@@ -1,10 +1,10 @@
 import { useCallback, useMemo } from 'react';
 import { attributeFieldNameTransform, getAttributeContent } from 'utils/attributes/attributes';
 
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useSelector } from 'react-redux';
-import { AttributeDescriptorModel, isDataAttributeModel, isInfoAttributeModel } from 'types/attributes';
+import { type AttributeDescriptorModel, isDataAttributeModel, isInfoAttributeModel } from 'types/attributes';
 import { AttributeConstraintType, PlatformEnum } from 'types/openapi';
 
 export interface Props {

@@ -9,7 +9,7 @@ import Select from 'components/Select';
 
 import { actions as secretsActions, selectors as secretsSelectors } from 'ducks/secrets';
 import { selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
-import { SecretDetailDto } from 'types/openapi';
+import type { SecretDetailDto } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
 interface SyncVaultProfileDialogProps {

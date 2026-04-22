@@ -7,7 +7,7 @@ import { validateNonZeroInteger, validatePositiveInteger } from 'utils/validator
 import Spinner from 'components/Spinner';
 
 import { actions, selectors } from 'ducks/ra-profiles';
-import { RaProfileResponseModel } from 'types/ra-profiles';
+import type { RaProfileResponseModel } from 'types/ra-profiles';
 import TextInput from 'components/TextInput';
 import Switch from 'components/Switch';
 import Container from 'components/Container';
@@ -15,8 +15,8 @@ import Label from 'components/Label';
 import { buildValidationRules } from 'utils/validators-helper';
 import ProgressButton from 'components/ProgressButton';
 import { useAreDefaultValuesSame } from 'utils/common-hooks';
-import { SettingsPlatformModel } from 'types/settings';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import type { SettingsPlatformModel } from 'types/settings';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import { renderExpiringThresholdLabel, renderValidationFrequencyLabel } from 'utils/certificate-validation';
 
 type FormValues = {

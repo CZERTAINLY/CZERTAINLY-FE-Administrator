@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    EndpointDto,
-    FunctionGroupCode,
-} from './';
+import type { EndpointDto, FunctionGroupCode } from './';
 
 /**
  * @export
@@ -52,5 +49,3 @@ export interface FunctionGroupDto {
      */
     name: string;
 }
-
-
