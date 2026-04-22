@@ -129,6 +129,7 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
                             key={name}
                             name={name}
                             control={control}
+                            shouldUnregister
                             rules={
                                 ContentFieldConfiguration[contentType].validators
                                     ? buildValidationRules([
