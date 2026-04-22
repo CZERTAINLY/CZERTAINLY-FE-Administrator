@@ -26,12 +26,18 @@ jobs:
 
     steps:
       - name: Export context
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+          HEAD_SHA: ${{ inputs.head_sha }}
+          HEAD_REPO: ${{ inputs.head_repo }}
+          PR_BRANCH: ${{ inputs.head_branch }}
+          BASE_BRANCH: ${{ inputs.base_ref }}
         run: |
-          echo "PR_NUMBER=${{ inputs.pr_number }}"   >> $GITHUB_ENV
-          echo "HEAD_SHA=${{ inputs.head_sha }}"     >> $GITHUB_ENV
-          echo "HEAD_REPO=${{ inputs.head_repo }}"   >> $GITHUB_ENV
-          echo "PR_BRANCH=${{ inputs.head_branch }}" >> $GITHUB_ENV
-          echo "BASE_BRANCH=${{ inputs.base_ref }}"  >> $GITHUB_ENV
+          echo "PR_NUMBER=$PR_NUMBER"     >> "$GITHUB_ENV"
+          echo "HEAD_SHA=$HEAD_SHA"       >> "$GITHUB_ENV"
+          echo "HEAD_REPO=$HEAD_REPO"     >> "$GITHUB_ENV"
+          echo "PR_BRANCH=$PR_BRANCH"     >> "$GITHUB_ENV"
+          echo "BASE_BRANCH=$BASE_BRANCH" >> "$GITHUB_ENV"
 
       - name: Generate token
         id: app_token
@@ -79,7 +85,7 @@ jobs:
         env:
           CI: true
         run: |
-          npm ci
+          npm ci --ignore-scripts
           npm run lint
           npm run build
 

@@ -16,6 +16,6 @@ jobs:
           node-version: 22.x
       - name: Test build
         run: |
-          npm install
+          npm install --ignore-scripts
           npm run lint
           npm run build
