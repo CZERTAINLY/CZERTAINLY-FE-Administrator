@@ -5,7 +5,6 @@ import { getFormattedDateTime } from 'utils/dateUtil';
 import { BaseAttributeContentModel, CustomAttributeModel } from '../../../../types/attributes';
 import { AttributeContentType } from '../../../../types/openapi';
 import { composeValidators, validateRequired } from '../../../../utils/validators';
-import WidgetButtons from '../../../WidgetButtons';
 import { ContentFieldConfiguration } from '../index';
 import Select from 'components/Select';
 import TextInput from 'components/TextInput';
@@ -14,10 +13,9 @@ import Container from 'components/Container';
 import cn from 'classnames';
 import Switch from 'components/Switch';
 import { AddCustomValuePanel } from '../AddCustomValuePanel';
-
-const ADD_CUSTOM_OPTION_VALUE = '__add_custom__';
 import { parseListValueByContentType } from 'components/Attributes/AttributeEditor/Attribute/attributeHelpers';
 import Button from 'components/Button';
+import { Plus } from 'lucide-react';
 
 function getValueFieldError(fieldState: { error?: { message?: string }; isTouched: boolean; invalid: boolean }) {
     if (!fieldState.isTouched || !fieldState.invalid) return undefined;
@@ -47,25 +45,11 @@ function ListValueField({ descriptor, field, options, inputClassName }: ValueFie
     const handleListChange = (v: any) => {
         if (multiSelect) {
             const arr = Array.isArray(v) ? v : [];
-            const hasAddCustom = arr.some((item: any) => (item?.value ?? item) === ADD_CUSTOM_OPTION_VALUE);
-            if (hasAddCustom) {
-                setShowAddCustom(true);
-                const withoutAddCustom = arr
-                    .map((item) => parseListValueByContentType(descriptor.contentType, item?.value ?? item))
-                    .filter((x) => x !== undefined && x !== ADD_CUSTOM_OPTION_VALUE);
-                field.onChange(withoutAddCustom.length > 0 ? withoutAddCustom : undefined);
-                return;
-            }
             const parsed = arr
-                .map((item) => parseListValueByContentType(descriptor.contentType, item?.value ?? item))
+                .map((item: any) => parseListValueByContentType(descriptor.contentType, item?.value ?? item))
                 .filter((x) => x !== undefined);
             field.onChange(parsed.length > 0 ? parsed : undefined);
         } else {
-            const raw = typeof v === 'object' && v !== null && 'value' in v ? v.value : v;
-            if (raw === ADD_CUSTOM_OPTION_VALUE) {
-                setShowAddCustom(true);
-                return;
-            }
             const parsed = parseListValueByContentType(descriptor.contentType, v);
             field.onChange(parsed ?? '');
         }
@@ -90,11 +74,7 @@ function ListValueField({ descriptor, field, options, inputClassName }: ValueFie
     const extra = currentValues
         .filter((v: string | number | boolean) => !seen.has(String(v)))
         .map((v: string | number | boolean) => ({ label: formatListLabel(v), value: v }));
-    const addCustomOption =
-        isExtensible && !descriptor.properties.readOnly
-            ? [{ label: '+ Add custom', value: ADD_CUSTOM_OPTION_VALUE, className: 'text-blue-600 dark:text-blue-400' }]
-            : [];
-    const extendedOptions = [...options, ...extra, ...addCustomOption];
+    const extendedOptions = [...options, ...extra];
     const { value: _omitValue, ...selectFieldProps } = field;
 
     return (
@@ -117,17 +97,32 @@ function ListValueField({ descriptor, field, options, inputClassName }: ValueFie
                     />
                 </div>
             </Container>
-            <AddCustomValuePanel
-                open={showAddCustom}
-                onClose={() => setShowAddCustom(false)}
-                idPrefix={descriptor.name}
-                contentType={descriptor.contentType}
-                multiSelect={multiSelect}
-                readOnly={descriptor.properties.readOnly}
-                fieldValue={field.value}
-                onFieldChange={field.onChange}
-                inputClassName={inputClassName}
-            />
+            {isExtensible && !descriptor.properties.readOnly && (
+                <>
+                    {!showAddCustom && (
+                        <Button
+                            type="button"
+                            variant="transparent"
+                            className="text-blue-600 mt-1 self-start"
+                            onClick={() => setShowAddCustom(true)}
+                        >
+                            <Plus size={14} className="mr-1" />
+                            Add custom value
+                        </Button>
+                    )}
+                    <AddCustomValuePanel
+                        open={showAddCustom}
+                        onClose={() => setShowAddCustom(false)}
+                        idPrefix={descriptor.name}
+                        contentType={descriptor.contentType}
+                        multiSelect={multiSelect}
+                        readOnly={descriptor.properties.readOnly}
+                        fieldValue={field.value}
+                        onFieldChange={field.onChange}
+                        inputClassName={inputClassName}
+                    />
+                </>
+            )}
         </div>
     );
 }
