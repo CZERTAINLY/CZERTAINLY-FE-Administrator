@@ -11,11 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ComplianceRuleDto,
-    ProviderComplianceRulesDto,
-    ResponseAttribute,
-} from './';
+import type { ComplianceRuleDto, ProviderComplianceRulesDto, ResponseAttribute } from './';
 
 /**
  * @export

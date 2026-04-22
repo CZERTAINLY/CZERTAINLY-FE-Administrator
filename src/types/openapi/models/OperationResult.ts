@@ -12,12 +12,11 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
 export enum OperationResult {
     Success = 'success',
-    Failure = 'failure'
+    Failure = 'failure',
 }
-

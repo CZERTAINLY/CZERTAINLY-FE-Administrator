@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { ButtonColor, ButtonVariant } from 'components/Button';
+import type { ButtonColor, ButtonVariant } from 'components/Button';
 import { useEffect } from 'react';
 
 export interface DropdownItem {

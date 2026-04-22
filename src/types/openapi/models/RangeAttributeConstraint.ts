@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeConstraintType,
-    RangeAttributeConstraintData,
-} from './';
+import type { AttributeConstraintType, RangeAttributeConstraintData } from './';
 
 /**
  * Range attribute constraint to specify boundaries for integer value
@@ -47,5 +44,3 @@ export interface RangeAttributeConstraint {
      */
     data?: RangeAttributeConstraintData;
 }
-
-

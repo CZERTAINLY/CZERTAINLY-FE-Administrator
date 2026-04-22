@@ -94,5 +94,3 @@ export interface DataAttributeV3 {
      */
     schemaVersion: AttributeVersion;
 }
-
-

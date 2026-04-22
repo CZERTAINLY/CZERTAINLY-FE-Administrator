@@ -1,6 +1,6 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { WritableDraft } from 'immer/dist/internal';
-import { EntityType } from './filters';
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { WritableDraft } from 'immer/dist/internal';
+import type { EntityType } from './filters';
 
 export type Paging = {
     entity: EntityType;

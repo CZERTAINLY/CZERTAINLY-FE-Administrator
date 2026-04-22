@@ -1,4 +1,4 @@
-import { ResourceDto as ResourceDtoApi, ResourceEventDto as ResourceEventDtoApi } from './openapi';
+import type { ResourceDto as ResourceDtoApi, ResourceEventDto as ResourceEventDtoApi } from './openapi';
 
 export type ResourceEventDto = ResourceEventDtoApi;
 export type ResourceEventModel = ResourceEventDto;

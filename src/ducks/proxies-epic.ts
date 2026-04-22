@@ -1,4 +1,4 @@
-import { AppEpic } from 'ducks';
+import type { AppEpic } from 'ducks';
 import { of, forkJoin } from 'rxjs';
 import { catchError, filter, switchMap, mergeMap } from 'rxjs/operators';
 import { LockWidgetNameEnum } from 'types/user-interface';

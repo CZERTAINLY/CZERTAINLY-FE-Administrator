@@ -6,21 +6,21 @@ import { Link } from 'react-router';
 import Badge from 'components/Badge';
 import { actions, selectors } from 'ducks/connectors';
 
-import { TableDataRow, TableHeader } from 'components/CustomTable';
+import type { TableDataRow, TableHeader } from 'components/CustomTable';
 import ForceDeleteErrorTable from 'components/ForceDeleteErrorTable';
 import Dialog from 'components/Dialog';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import ConnectorForm from '../form';
 import PagedList from 'components/PagedList/PagedList';
 
 import { EntityType } from 'ducks/filters';
 import { selectors as pagingSelectors } from 'ducks/paging';
-import { SearchRequestModel } from 'types/certificate';
+import type { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { inventoryStatus } from 'utils/connector';
 import { featureFlags } from 'utils/feature-flags';
 
-import { ApiClients } from '../../../../api';
+import type { ApiClients } from '../../../../api';
 
 export default function ConnectorList() {
     const dispatch = useDispatch();

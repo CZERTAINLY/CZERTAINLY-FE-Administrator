@@ -15,9 +15,9 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import Select from 'components/Select';
 import Button from 'components/Button';
-import { AttributeDescriptorModel } from 'types/attributes';
-import { CertificateDetailResponseModel } from 'types/certificate';
-import { CryptographicKeyPairResponseModel } from 'types/cryptographic-keys';
+import type { AttributeDescriptorModel } from 'types/attributes';
+import type { CertificateDetailResponseModel } from 'types/certificate';
+import type { CryptographicKeyPairResponseModel } from 'types/cryptographic-keys';
 import { CertificateRequestFormat, KeyType } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { buildValidationRules } from 'utils/validators-helper';

@@ -73,13 +73,18 @@ export interface UpdateVaultProfileRequest {
  * no description
  */
 export class VaultProfileManagementApi extends BaseAPI {
-
     /**
      * Create a Vault Profile
      */
-    createVaultProfile({ vaultUuid, vaultProfileRequestDto }: CreateVaultProfileRequest): Observable<VaultProfileDetailDto>
-    createVaultProfile({ vaultUuid, vaultProfileRequestDto }: CreateVaultProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<VaultProfileDetailDto>>
-    createVaultProfile({ vaultUuid, vaultProfileRequestDto }: CreateVaultProfileRequest, opts?: OperationOpts): Observable<VaultProfileDetailDto | AjaxResponse<VaultProfileDetailDto>> {
+    createVaultProfile({ vaultUuid, vaultProfileRequestDto }: CreateVaultProfileRequest): Observable<VaultProfileDetailDto>;
+    createVaultProfile(
+        { vaultUuid, vaultProfileRequestDto }: CreateVaultProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<VaultProfileDetailDto>>;
+    createVaultProfile(
+        { vaultUuid, vaultProfileRequestDto }: CreateVaultProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<VaultProfileDetailDto | AjaxResponse<VaultProfileDetailDto>> {
         throwIfNullOrUndefined(vaultUuid, 'vaultUuid', 'createVaultProfile');
         throwIfNullOrUndefined(vaultProfileRequestDto, 'vaultProfileRequestDto', 'createVaultProfile');
 
@@ -87,128 +92,211 @@ export class VaultProfileManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<VaultProfileDetailDto>({
-            url: '/v1/vaults/{vaultUuid}/vaultProfiles'.replace('{vaultUuid}', encodeURI(vaultUuid)),
-            method: 'POST',
-            headers,
-            body: vaultProfileRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<VaultProfileDetailDto>(
+            {
+                url: '/v1/vaults/{vaultUuid}/vaultProfiles'.replace('{vaultUuid}', encodeURI(vaultUuid)),
+                method: 'POST',
+                headers,
+                body: vaultProfileRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Delete a Vault Profile
      */
-    deleteVaultProfile({ vaultUuid, vaultProfileUuid }: DeleteVaultProfileRequest): Observable<void>
-    deleteVaultProfile({ vaultUuid, vaultProfileUuid }: DeleteVaultProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    deleteVaultProfile({ vaultUuid, vaultProfileUuid }: DeleteVaultProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    deleteVaultProfile({ vaultUuid, vaultProfileUuid }: DeleteVaultProfileRequest): Observable<void>;
+    deleteVaultProfile(
+        { vaultUuid, vaultProfileUuid }: DeleteVaultProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    deleteVaultProfile(
+        { vaultUuid, vaultProfileUuid }: DeleteVaultProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(vaultUuid, 'vaultUuid', 'deleteVaultProfile');
         throwIfNullOrUndefined(vaultProfileUuid, 'vaultProfileUuid', 'deleteVaultProfile');
 
-        return this.request<void>({
-            url: '/v1/vaults/{vaultUuid}/vaultProfiles/{vaultProfileUuid}'.replace('{vaultUuid}', encodeURI(vaultUuid)).replace('{vaultProfileUuid}', encodeURI(vaultProfileUuid)),
-            method: 'DELETE',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/vaults/{vaultUuid}/vaultProfiles/{vaultProfileUuid}'
+                    .replace('{vaultUuid}', encodeURI(vaultUuid))
+                    .replace('{vaultProfileUuid}', encodeURI(vaultProfileUuid)),
+                method: 'DELETE',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Disable a Vault Profile
      */
-    disableVaultProfile({ vaultUuid, vaultProfileUuid }: DisableVaultProfileRequest): Observable<void>
-    disableVaultProfile({ vaultUuid, vaultProfileUuid }: DisableVaultProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    disableVaultProfile({ vaultUuid, vaultProfileUuid }: DisableVaultProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    disableVaultProfile({ vaultUuid, vaultProfileUuid }: DisableVaultProfileRequest): Observable<void>;
+    disableVaultProfile(
+        { vaultUuid, vaultProfileUuid }: DisableVaultProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    disableVaultProfile(
+        { vaultUuid, vaultProfileUuid }: DisableVaultProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(vaultUuid, 'vaultUuid', 'disableVaultProfile');
         throwIfNullOrUndefined(vaultProfileUuid, 'vaultProfileUuid', 'disableVaultProfile');
 
-        return this.request<void>({
-            url: '/v1/vaults/{vaultUuid}/vaultProfiles/{vaultProfileUuid}/disable'.replace('{vaultUuid}', encodeURI(vaultUuid)).replace('{vaultProfileUuid}', encodeURI(vaultProfileUuid)),
-            method: 'PATCH',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/vaults/{vaultUuid}/vaultProfiles/{vaultProfileUuid}/disable'
+                    .replace('{vaultUuid}', encodeURI(vaultUuid))
+                    .replace('{vaultProfileUuid}', encodeURI(vaultProfileUuid)),
+                method: 'PATCH',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Enable a Vault Profile
      */
-    enableVaultProfile({ vaultUuid, vaultProfileUuid }: EnableVaultProfileRequest): Observable<void>
-    enableVaultProfile({ vaultUuid, vaultProfileUuid }: EnableVaultProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    enableVaultProfile({ vaultUuid, vaultProfileUuid }: EnableVaultProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    enableVaultProfile({ vaultUuid, vaultProfileUuid }: EnableVaultProfileRequest): Observable<void>;
+    enableVaultProfile(
+        { vaultUuid, vaultProfileUuid }: EnableVaultProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    enableVaultProfile(
+        { vaultUuid, vaultProfileUuid }: EnableVaultProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(vaultUuid, 'vaultUuid', 'enableVaultProfile');
         throwIfNullOrUndefined(vaultProfileUuid, 'vaultProfileUuid', 'enableVaultProfile');
 
-        return this.request<void>({
-            url: '/v1/vaults/{vaultUuid}/vaultProfiles/{vaultProfileUuid}/enable'.replace('{vaultUuid}', encodeURI(vaultUuid)).replace('{vaultProfileUuid}', encodeURI(vaultProfileUuid)),
-            method: 'PATCH',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/vaults/{vaultUuid}/vaultProfiles/{vaultProfileUuid}/enable'
+                    .replace('{vaultUuid}', encodeURI(vaultUuid))
+                    .replace('{vaultProfileUuid}', encodeURI(vaultProfileUuid)),
+                method: 'PATCH',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get details of a Vault Profile
      */
-    getVaultProfileDetails({ vaultUuid, vaultProfileUuid }: GetVaultProfileDetailsRequest): Observable<VaultProfileDetailDto>
-    getVaultProfileDetails({ vaultUuid, vaultProfileUuid }: GetVaultProfileDetailsRequest, opts?: OperationOpts): Observable<AjaxResponse<VaultProfileDetailDto>>
-    getVaultProfileDetails({ vaultUuid, vaultProfileUuid }: GetVaultProfileDetailsRequest, opts?: OperationOpts): Observable<VaultProfileDetailDto | AjaxResponse<VaultProfileDetailDto>> {
+    getVaultProfileDetails({ vaultUuid, vaultProfileUuid }: GetVaultProfileDetailsRequest): Observable<VaultProfileDetailDto>;
+    getVaultProfileDetails(
+        { vaultUuid, vaultProfileUuid }: GetVaultProfileDetailsRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<VaultProfileDetailDto>>;
+    getVaultProfileDetails(
+        { vaultUuid, vaultProfileUuid }: GetVaultProfileDetailsRequest,
+        opts?: OperationOpts,
+    ): Observable<VaultProfileDetailDto | AjaxResponse<VaultProfileDetailDto>> {
         throwIfNullOrUndefined(vaultUuid, 'vaultUuid', 'getVaultProfileDetails');
         throwIfNullOrUndefined(vaultProfileUuid, 'vaultProfileUuid', 'getVaultProfileDetails');
 
-        return this.request<VaultProfileDetailDto>({
-            url: '/v1/vaults/{vaultUuid}/vaultProfiles/{vaultProfileUuid}'.replace('{vaultUuid}', encodeURI(vaultUuid)).replace('{vaultProfileUuid}', encodeURI(vaultProfileUuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<VaultProfileDetailDto>(
+            {
+                url: '/v1/vaults/{vaultUuid}/vaultProfiles/{vaultProfileUuid}'
+                    .replace('{vaultUuid}', encodeURI(vaultUuid))
+                    .replace('{vaultProfileUuid}', encodeURI(vaultProfileUuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List search filters for Vault Profiles
      */
-    getVaultProfileSearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>
-    getVaultProfileSearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
-    getVaultProfileSearchableFields(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
-        return this.request<Array<SearchFieldDataByGroupDto>>({
-            url: '/v1/vaultProfiles/search',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+    getVaultProfileSearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>;
+    getVaultProfileSearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>;
+    getVaultProfileSearchableFields(
+        opts?: OperationOpts,
+    ): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
+        return this.request<Array<SearchFieldDataByGroupDto>>(
+            {
+                url: '/v1/vaultProfiles/search',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List attributes for creating a secret in a Vault Profile
      */
-    listSecretAttributes({ vaultUuid, vaultProfileUuid, secretType }: ListSecretAttributesRequest): Observable<Array<BaseAttributeDto>>
-    listSecretAttributes({ vaultUuid, vaultProfileUuid, secretType }: ListSecretAttributesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BaseAttributeDto>>>
-    listSecretAttributes({ vaultUuid, vaultProfileUuid, secretType }: ListSecretAttributesRequest, opts?: OperationOpts): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
+    listSecretAttributes({ vaultUuid, vaultProfileUuid, secretType }: ListSecretAttributesRequest): Observable<Array<BaseAttributeDto>>;
+    listSecretAttributes(
+        { vaultUuid, vaultProfileUuid, secretType }: ListSecretAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<BaseAttributeDto>>>;
+    listSecretAttributes(
+        { vaultUuid, vaultProfileUuid, secretType }: ListSecretAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
         throwIfNullOrUndefined(vaultUuid, 'vaultUuid', 'listSecretAttributes');
         throwIfNullOrUndefined(vaultProfileUuid, 'vaultProfileUuid', 'listSecretAttributes');
         throwIfNullOrUndefined(secretType, 'secretType', 'listSecretAttributes');
 
-        return this.request<Array<BaseAttributeDto>>({
-            url: '/v1/vaults/{vaultUuid}/vaultProfiles/{vaultProfileUuid}/secrets/{secretType}/attributes'.replace('{vaultUuid}', encodeURI(vaultUuid)).replace('{vaultProfileUuid}', encodeURI(vaultProfileUuid)).replace('{secretType}', encodeURI(secretType)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<BaseAttributeDto>>(
+            {
+                url: '/v1/vaults/{vaultUuid}/vaultProfiles/{vaultProfileUuid}/secrets/{secretType}/attributes'
+                    .replace('{vaultUuid}', encodeURI(vaultUuid))
+                    .replace('{vaultProfileUuid}', encodeURI(vaultProfileUuid))
+                    .replace('{secretType}', encodeURI(secretType)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List Vault Profiles
      */
-    listVaultProfiles({ searchRequestDto }: ListVaultProfilesRequest): Observable<PaginationResponseDtoVaultProfileDto>
-    listVaultProfiles({ searchRequestDto }: ListVaultProfilesRequest, opts?: OperationOpts): Observable<AjaxResponse<PaginationResponseDtoVaultProfileDto>>
-    listVaultProfiles({ searchRequestDto }: ListVaultProfilesRequest, opts?: OperationOpts): Observable<PaginationResponseDtoVaultProfileDto | AjaxResponse<PaginationResponseDtoVaultProfileDto>> {
+    listVaultProfiles({ searchRequestDto }: ListVaultProfilesRequest): Observable<PaginationResponseDtoVaultProfileDto>;
+    listVaultProfiles(
+        { searchRequestDto }: ListVaultProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<PaginationResponseDtoVaultProfileDto>>;
+    listVaultProfiles(
+        { searchRequestDto }: ListVaultProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<PaginationResponseDtoVaultProfileDto | AjaxResponse<PaginationResponseDtoVaultProfileDto>> {
         throwIfNullOrUndefined(searchRequestDto, 'searchRequestDto', 'listVaultProfiles');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<PaginationResponseDtoVaultProfileDto>({
-            url: '/v1/vaultProfiles/list',
-            method: 'POST',
-            headers,
-            body: searchRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<PaginationResponseDtoVaultProfileDto>(
+            {
+                url: '/v1/vaultProfiles/list',
+                method: 'POST',
+                headers,
+                body: searchRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Update a Vault Profile
      */
-    updateVaultProfile({ vaultUuid, vaultProfileUuid, vaultProfileUpdateRequestDto }: UpdateVaultProfileRequest): Observable<VaultProfileDetailDto>
-    updateVaultProfile({ vaultUuid, vaultProfileUuid, vaultProfileUpdateRequestDto }: UpdateVaultProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<VaultProfileDetailDto>>
-    updateVaultProfile({ vaultUuid, vaultProfileUuid, vaultProfileUpdateRequestDto }: UpdateVaultProfileRequest, opts?: OperationOpts): Observable<VaultProfileDetailDto | AjaxResponse<VaultProfileDetailDto>> {
+    updateVaultProfile({
+        vaultUuid,
+        vaultProfileUuid,
+        vaultProfileUpdateRequestDto,
+    }: UpdateVaultProfileRequest): Observable<VaultProfileDetailDto>;
+    updateVaultProfile(
+        { vaultUuid, vaultProfileUuid, vaultProfileUpdateRequestDto }: UpdateVaultProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<VaultProfileDetailDto>>;
+    updateVaultProfile(
+        { vaultUuid, vaultProfileUuid, vaultProfileUpdateRequestDto }: UpdateVaultProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<VaultProfileDetailDto | AjaxResponse<VaultProfileDetailDto>> {
         throwIfNullOrUndefined(vaultUuid, 'vaultUuid', 'updateVaultProfile');
         throwIfNullOrUndefined(vaultProfileUuid, 'vaultProfileUuid', 'updateVaultProfile');
         throwIfNullOrUndefined(vaultProfileUpdateRequestDto, 'vaultProfileUpdateRequestDto', 'updateVaultProfile');
@@ -217,12 +305,16 @@ export class VaultProfileManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<VaultProfileDetailDto>({
-            url: '/v1/vaults/{vaultUuid}/vaultProfiles/{vaultProfileUuid}'.replace('{vaultUuid}', encodeURI(vaultUuid)).replace('{vaultProfileUuid}', encodeURI(vaultProfileUuid)),
-            method: 'PUT',
-            headers,
-            body: vaultProfileUpdateRequestDto,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<VaultProfileDetailDto>(
+            {
+                url: '/v1/vaults/{vaultUuid}/vaultProfiles/{vaultProfileUuid}'
+                    .replace('{vaultUuid}', encodeURI(vaultUuid))
+                    .replace('{vaultProfileUuid}', encodeURI(vaultProfileUuid)),
+                method: 'PUT',
+                headers,
+                body: vaultProfileUpdateRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

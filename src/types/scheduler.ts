@@ -1,4 +1,4 @@
-import { ScheduledJobDetailDto, ScheduledJobDto, ScheduledJobHistoryDto } from './openapi';
+import type { ScheduledJobDetailDto, ScheduledJobDto, ScheduledJobHistoryDto } from './openapi';
 
 export type SchedulerJobDto = ScheduledJobDto;
 export type SchedulerJobModel = SchedulerJobDto;

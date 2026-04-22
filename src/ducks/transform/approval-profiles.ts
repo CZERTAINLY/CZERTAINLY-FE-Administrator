@@ -1,4 +1,4 @@
-import {
+import type {
     ApprovalStepRequestModel,
     ProfileApprovalDetailDto,
     ProfileApprovalDetailModel,
@@ -13,7 +13,7 @@ import {
     ProfileApprovalUpdateRequestDto,
     ProfileApprovalUpdateRequestModel,
 } from 'types/approval-profiles';
-import { ApprovalStepRequestDto } from 'types/openapi';
+import type { ApprovalStepRequestDto } from 'types/openapi';
 
 export function transformProfileApprovalStepDtoToModel(profileApprovalStep: ProfileApprovalStepDto): ProfileApprovalStepModel {
     return { ...profileApprovalStep };

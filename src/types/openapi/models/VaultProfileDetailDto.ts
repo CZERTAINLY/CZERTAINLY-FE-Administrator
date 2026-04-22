@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    NameAndUuidDto,
-    ResponseAttribute,
-} from './';
+import type { NameAndUuidDto, ResponseAttribute } from './';
 
 /**
  * @export

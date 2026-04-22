@@ -11,12 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AuthType,
-    ConnectorStatus,
-    FunctionGroupDto,
-    ResponseAttribute,
-} from './';
+import type { AuthType, ConnectorStatus, FunctionGroupDto, ResponseAttribute } from './';
 
 /**
  * @export
@@ -72,5 +67,3 @@ export interface ConnectorDto {
      */
     customAttributes?: Array<ResponseAttribute>;
 }
-
-

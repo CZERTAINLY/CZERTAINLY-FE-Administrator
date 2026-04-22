@@ -4,7 +4,7 @@ import { selectors as rulesSelectors } from 'ducks/rules';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import Spinner from 'components/Spinner';
-import { ConditionItemDto, PlatformEnum } from 'types/openapi';
+import { type ConditionItemDto, PlatformEnum } from 'types/openapi';
 import { renderConditionItems } from 'utils/condition-badges';
 
 interface ConditionsTableViewerProps {

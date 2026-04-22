@@ -1,4 +1,4 @@
-import { expect, vi } from 'vitest';
+import { expect, type vi } from 'vitest';
 import { clickByTestId, clickByText, clickByTitle } from './domActions';
 
 interface UpdateActionSelectors {

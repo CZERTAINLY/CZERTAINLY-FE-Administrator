@@ -1,10 +1,11 @@
-import React, { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import type React from 'react';
+import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { jsxInnerText } from 'utils/jsxInnerText';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions as userInterfaceActions } from 'ducks/user-interface';
 import { actions as tablePaginationActions, selectors as tablePaginationSelectors } from 'ducks/table-pagination';
 
-import NewRowWidget, { NewRowWidgetProps } from './NewRowWidget';
+import NewRowWidget, { type NewRowWidgetProps } from './NewRowWidget';
 import { TableRowCell } from './TableRowCell';
 import type { TableDataRow, TableHeader } from './types';
 import Select from 'components/Select';
@@ -298,10 +299,11 @@ function CustomTable({
                             : jsxInnerText(b.columns[sortColumnIndex] as React.ReactNode).toLowerCase();
 
                     switch (sortCol.sortType) {
-                        case 'date':
+                        case 'date': {
                             const aDate = new Date(aVal.replace(/ at /g, ' '));
                             const bDate = new Date(bVal.replace(/ at /g, ' '));
                             return sortDirection === 'asc' ? aDate.getTime() - bDate.getTime() : bDate.getTime() - aDate.getTime();
+                        }
 
                         case 'numeric':
                             return sortDirection === 'asc' ? parseFloat(aVal) - parseFloat(bVal) : parseFloat(bVal) - parseFloat(aVal);

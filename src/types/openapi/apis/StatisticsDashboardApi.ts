@@ -15,11 +15,7 @@ import type { Observable } from 'rxjs';
 import type { AjaxResponse } from 'rxjs/ajax';
 import { BaseAPI } from '../runtime';
 import type { OperationOpts, HttpQuery } from '../runtime';
-import type {
-    AuthenticationServiceExceptionDto,
-    ErrorMessageDto,
-    StatisticsDto,
-} from '../models';
+import type { AuthenticationServiceExceptionDto, ErrorMessageDto, StatisticsDto } from '../models';
 
 export interface GetStatisticsRequest {
     includeArchived?: boolean;
@@ -29,23 +25,28 @@ export interface GetStatisticsRequest {
  * no description
  */
 export class StatisticsDashboardApi extends BaseAPI {
-
     /**
      * Get Dashboard/Statistics Details
      */
-    getStatistics({ includeArchived }: GetStatisticsRequest): Observable<StatisticsDto>
-    getStatistics({ includeArchived }: GetStatisticsRequest, opts?: OperationOpts): Observable<AjaxResponse<StatisticsDto>>
-    getStatistics({ includeArchived }: GetStatisticsRequest, opts?: OperationOpts): Observable<StatisticsDto | AjaxResponse<StatisticsDto>> {
-
+    getStatistics({ includeArchived }: GetStatisticsRequest): Observable<StatisticsDto>;
+    getStatistics({ includeArchived }: GetStatisticsRequest, opts?: OperationOpts): Observable<AjaxResponse<StatisticsDto>>;
+    getStatistics(
+        { includeArchived }: GetStatisticsRequest,
+        opts?: OperationOpts,
+    ): Observable<StatisticsDto | AjaxResponse<StatisticsDto>> {
         const query: HttpQuery = {};
 
-        if (includeArchived != null) { query['includeArchived'] = includeArchived; }
+        if (includeArchived != null) {
+            query['includeArchived'] = includeArchived;
+        }
 
-        return this.request<StatisticsDto>({
-            url: '/v1/statistics',
-            method: 'GET',
-            query,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<StatisticsDto>(
+            {
+                url: '/v1/statistics',
+                method: 'GET',
+                query,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

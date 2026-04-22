@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    VaultProfileDto,
-} from './';
+import type { VaultProfileDto } from './';
 
 /**
  * @export

@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import * as ReactHookForm from 'react-hook-form';
 import { AttributeFieldSelect } from './AttributeFieldSelect';
 import type { DataAttributeModel } from 'types/attributes';

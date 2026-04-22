@@ -11,12 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-    AttributeType,
-    AttributeVersion,
-    ProtectionLevel,
-} from './';
+import type { AttributeContentType, AttributeType, AttributeVersion, ProtectionLevel } from './';
 
 /**
  * @export
@@ -90,5 +85,3 @@ export interface GlobalMetadataDefinitionDetailDto {
      */
     group?: string;
 }
-
-

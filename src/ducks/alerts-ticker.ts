@@ -1,4 +1,4 @@
-import { MessageModel } from 'types/alerts';
+import type { MessageModel } from 'types/alerts';
 import { actions } from './alerts';
 
 const HIDE_AFTER_MS = 7000;

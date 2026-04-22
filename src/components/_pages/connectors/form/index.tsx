@@ -13,7 +13,7 @@ import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
 import TextInput from 'components/TextInput';
-import { ConnectorResponseModel } from 'types/connectors';
+import type { ConnectorResponseModel } from 'types/connectors';
 import { AuthType, ConnectorStatus, ConnectorVersion, PlatformEnum, Resource } from 'types/openapi';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';

@@ -1,6 +1,6 @@
 import { test, expect } from 'playwright/ct-test';
-import WidgetButtons, { WidgetButtonProps } from './index';
-import React from 'react';
+import WidgetButtons, { type WidgetButtonProps } from './index';
+import type React from 'react';
 
 const defaultButtonProps: Omit<WidgetButtonProps, 'id'> = {
     icon: 'plus',

@@ -1,6 +1,6 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Resource } from 'types/openapi';
-import {
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { Resource } from 'types/openapi';
+import type {
     ActionDetailModel,
     ActionModel,
     ActionRequestModel,
@@ -140,7 +140,7 @@ export const slice = createSlice({
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
             Object.keys(state).forEach((key) => {
-                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+                if (!Object.hasOwn(initialState, key)) (state as any)[key] = undefined;
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));

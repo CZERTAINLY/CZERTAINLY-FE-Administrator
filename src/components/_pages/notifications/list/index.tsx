@@ -5,12 +5,12 @@ import { EntityType } from 'ducks/filters';
 import { actions, selectors } from 'ducks/notifications';
 import { selectors as pagingSelectors } from 'ducks/paging';
 
-import { TableDataRow, TableHeader } from 'components/CustomTable';
+import type { TableDataRow, TableHeader } from 'components/CustomTable';
 import PagedList from 'components/PagedList/PagedList';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import { useNavigate } from 'react-router';
 import Button from 'components/Button';
-import { SearchRequestModel } from 'types/certificate';
+import type { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
 import { ArrowRight } from 'lucide-react';

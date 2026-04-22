@@ -33,4 +33,16 @@ import type {
  * Base Attribute Content
  * @export
  */
-export type BaseAttributeContentDtoV3 = BooleanAttributeContentV3 | CodeBlockAttributeContentV3 | DateAttributeContentV3 | DateTimeAttributeContentV3 | FileAttributeContentV3 | FloatAttributeContentV3 | IntegerAttributeContentV3 | ObjectAttributeContentV3 | ResourceObjectContent | StringAttributeContentV3 | TextAttributeContentV3 | TimeAttributeContentV3;
+export type BaseAttributeContentDtoV3 =
+    | BooleanAttributeContentV3
+    | CodeBlockAttributeContentV3
+    | DateAttributeContentV3
+    | DateTimeAttributeContentV3
+    | FileAttributeContentV3
+    | FloatAttributeContentV3
+    | IntegerAttributeContentV3
+    | ObjectAttributeContentV3
+    | ResourceObjectContent
+    | StringAttributeContentV3
+    | TextAttributeContentV3
+    | TimeAttributeContentV3;

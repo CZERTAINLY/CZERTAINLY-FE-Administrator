@@ -11,13 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ConnectorInterfaceDto,
-    ConnectorStatus,
-    ConnectorVersion,
-    FunctionGroupDto,
-    ProxyDto,
-} from './';
+import type { ConnectorInterfaceDto, ConnectorStatus, ConnectorVersion, FunctionGroupDto, ProxyDto } from './';
 
 /**
  * @export
@@ -76,5 +70,3 @@ export interface ConnectorDtoV2 {
      */
     proxy?: ProxyDto;
 }
-
-

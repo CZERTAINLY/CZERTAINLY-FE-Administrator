@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    KeyUsage,
-    RequestAttribute,
-} from './';
+import type { KeyUsage, RequestAttribute } from './';
 
 /**
  * @export

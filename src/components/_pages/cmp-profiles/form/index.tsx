@@ -16,10 +16,10 @@ import Button from 'components/Button';
 import Container from 'components/Container';
 import TextInput from 'components/TextInput';
 import TextArea from 'components/TextArea';
-import { AttributeDescriptorModel } from 'types/attributes';
-import { CmpProfileEditRequestModel, CmpProfileRequestModel } from 'types/cmp-profiles';
+import type { AttributeDescriptorModel } from 'types/attributes';
+import type { CmpProfileEditRequestModel, CmpProfileRequestModel } from 'types/cmp-profiles';
 import {
-    CmpProfileEditRequestDtoVariantEnum,
+    type CmpProfileEditRequestDtoVariantEnum,
     CmpProfileRequestDtoVariantEnum,
     PlatformEnum,
     ProtectionMethod,

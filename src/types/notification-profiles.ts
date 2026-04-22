@@ -1,4 +1,4 @@
-import {
+import type {
     NotificationProfileDetailDto as NotificationProfileDetailDtoApi,
     NotificationProfileDto as NotificationProfileDtoApi,
     NotificationProfileRequestDto as NotificationProfileRequestDtoApi,

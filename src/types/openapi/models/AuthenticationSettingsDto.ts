@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    OAuth2ProviderSettingsDto,
-} from './';
+import type { OAuth2ProviderSettingsDto } from './';
 
 /**
  * @export
@@ -30,5 +28,5 @@ export interface AuthenticationSettingsDto {
      * @type {{ [key: string]: OAuth2ProviderSettingsDto; }}
      * @memberof AuthenticationSettingsDto
      */
-    oauth2Providers?: { [key: string]: OAuth2ProviderSettingsDto; };
+    oauth2Providers?: { [key: string]: OAuth2ProviderSettingsDto };
 }

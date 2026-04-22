@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -30,6 +30,5 @@ export enum AttributeContentType {
     Credential = 'credential',
     Codeblock = 'codeblock',
     Object = 'object',
-    Resource = 'resource'
+    Resource = 'resource',
 }
-

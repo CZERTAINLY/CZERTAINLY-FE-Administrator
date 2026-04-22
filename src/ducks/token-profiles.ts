@@ -1,7 +1,7 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { BulkActionModel } from 'types/connectors';
-import { KeyUsage } from 'types/openapi';
-import {
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { BulkActionModel } from 'types/connectors';
+import type { KeyUsage } from 'types/openapi';
+import type {
     TokenProfileAddRequestModel,
     TokenProfileDetailResponseModel,
     TokenProfileEditRequestModel,
@@ -70,7 +70,7 @@ export const slice = createSlice({
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
             Object.keys(state).forEach((key) => {
-                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+                if (!Object.hasOwn(initialState, key)) (state as any)[key] = undefined;
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));

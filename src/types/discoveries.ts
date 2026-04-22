@@ -1,6 +1,6 @@
-import { AttributeRequestModel, AttributeResponseModel } from './attributes';
-import { MetadataModel } from './locations';
-import {
+import type { AttributeRequestModel, AttributeResponseModel } from './attributes';
+import type { MetadataModel } from './locations';
+import type {
     DiscoveryCertificateDto as DiscoveryCertificateDtoOpenApi,
     DiscoveryCertificateResponseDto,
     DiscoveryDto,

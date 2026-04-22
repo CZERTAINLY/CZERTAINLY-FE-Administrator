@@ -7,8 +7,8 @@ import Button from 'components/Button';
 import { actions } from 'ducks/user-interface';
 import { Info } from 'lucide-react';
 import { base64ToUtf8 } from 'utils/common-utils';
-import { CodeBlockAttributeContentModel } from '../../../types/attributes';
-import { ProgrammingLanguageEnum } from '../../../types/openapi';
+import type { CodeBlockAttributeContentModel } from '../../../types/attributes';
+import type { ProgrammingLanguageEnum } from '../../../types/openapi';
 
 type Props = {
     content: CodeBlockAttributeContentModel;

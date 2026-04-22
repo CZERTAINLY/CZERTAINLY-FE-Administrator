@@ -11,13 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-    AttributeVersion,
-    BaseAttributeContentDtoV2,
-    RequestAttributeV2,
-    RequestAttributeV3,
-} from './';
+import type { AttributeContentType, AttributeVersion, BaseAttributeContentDtoV2, RequestAttributeV2, RequestAttributeV3 } from './';
 
 /**
  * @type RequestAttribute

@@ -12,11 +12,10 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
 export enum ConditionType {
-    CheckField = 'checkField'
+    CheckField = 'checkField',
 }
-

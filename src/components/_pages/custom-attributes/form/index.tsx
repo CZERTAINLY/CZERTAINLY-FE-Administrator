@@ -14,7 +14,7 @@ import Button from 'components/Button';
 import Container from 'components/Container';
 import Checkbox from 'components/Checkbox';
 import TextInput from 'components/TextInput';
-import { CustomAttributeCreateRequestModel, CustomAttributeUpdateRequestModel } from 'types/customAttributes';
+import type { CustomAttributeCreateRequestModel, CustomAttributeUpdateRequestModel } from 'types/customAttributes';
 import { AttributeContentType, PlatformEnum, ProtectionLevel } from 'types/openapi';
 import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';

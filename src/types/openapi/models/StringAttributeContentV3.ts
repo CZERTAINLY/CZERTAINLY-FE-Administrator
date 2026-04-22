@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-} from './';
+import type { AttributeContentType } from './';
 
 /**
  * String attribute content
@@ -40,5 +38,3 @@ export interface StringAttributeContentV3 {
      */
     contentType: AttributeContentType;
 }
-
-

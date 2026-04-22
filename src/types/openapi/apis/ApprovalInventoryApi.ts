@@ -60,27 +60,35 @@ export interface RejectApprovalRecipientRequest {
  * no description
  */
 export class ApprovalInventoryApi extends BaseAPI {
-
     /**
      * Approving of the Approval
      */
-    approveApproval({ uuid }: ApproveApprovalRequest): Observable<void>
-    approveApproval({ uuid }: ApproveApprovalRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    approveApproval({ uuid }: ApproveApprovalRequest): Observable<void>;
+    approveApproval({ uuid }: ApproveApprovalRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     approveApproval({ uuid }: ApproveApprovalRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'approveApproval');
 
-        return this.request<void>({
-            url: '/v1/approvals/{uuid}/approve'.replace('{uuid}', encodeURI(uuid)),
-            method: 'PATCH',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/approvals/{uuid}/approve'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Approving of Recipient of the Approval
      */
-    approveApprovalRecipient({ uuid, userApprovalDto }: ApproveApprovalRecipientRequest): Observable<void>
-    approveApprovalRecipient({ uuid, userApprovalDto }: ApproveApprovalRecipientRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    approveApprovalRecipient({ uuid, userApprovalDto }: ApproveApprovalRecipientRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    approveApprovalRecipient({ uuid, userApprovalDto }: ApproveApprovalRecipientRequest): Observable<void>;
+    approveApprovalRecipient(
+        { uuid, userApprovalDto }: ApproveApprovalRecipientRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    approveApprovalRecipient(
+        { uuid, userApprovalDto }: ApproveApprovalRecipientRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'approveApprovalRecipient');
         throwIfNullOrUndefined(userApprovalDto, 'userApprovalDto', 'approveApprovalRecipient');
 
@@ -88,87 +96,125 @@ export class ApprovalInventoryApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>({
-            url: '/v1/approvals/{uuid}/approveRecipient'.replace('{uuid}', encodeURI(uuid)),
-            method: 'PATCH',
-            headers,
-            body: userApprovalDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/approvals/{uuid}/approveRecipient'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
+                headers,
+                body: userApprovalDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get Approval Detail
      */
-    getApproval({ uuid }: GetApprovalRequest): Observable<ApprovalDetailDto>
-    getApproval({ uuid }: GetApprovalRequest, opts?: OperationOpts): Observable<AjaxResponse<ApprovalDetailDto>>
+    getApproval({ uuid }: GetApprovalRequest): Observable<ApprovalDetailDto>;
+    getApproval({ uuid }: GetApprovalRequest, opts?: OperationOpts): Observable<AjaxResponse<ApprovalDetailDto>>;
     getApproval({ uuid }: GetApprovalRequest, opts?: OperationOpts): Observable<ApprovalDetailDto | AjaxResponse<ApprovalDetailDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getApproval');
 
-        return this.request<ApprovalDetailDto>({
-            url: '/v1/approvals/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<ApprovalDetailDto>(
+            {
+                url: '/v1/approvals/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List of Approvals
      */
-    listApprovals({ itemsPerPage, pageNumber }: ListApprovalsRequest): Observable<ApprovalResponseDto>
-    listApprovals({ itemsPerPage, pageNumber }: ListApprovalsRequest, opts?: OperationOpts): Observable<AjaxResponse<ApprovalResponseDto>>
-    listApprovals({ itemsPerPage, pageNumber }: ListApprovalsRequest, opts?: OperationOpts): Observable<ApprovalResponseDto | AjaxResponse<ApprovalResponseDto>> {
-
+    listApprovals({ itemsPerPage, pageNumber }: ListApprovalsRequest): Observable<ApprovalResponseDto>;
+    listApprovals({ itemsPerPage, pageNumber }: ListApprovalsRequest, opts?: OperationOpts): Observable<AjaxResponse<ApprovalResponseDto>>;
+    listApprovals(
+        { itemsPerPage, pageNumber }: ListApprovalsRequest,
+        opts?: OperationOpts,
+    ): Observable<ApprovalResponseDto | AjaxResponse<ApprovalResponseDto>> {
         const query: HttpQuery = {};
 
-        if (itemsPerPage != null) { query['itemsPerPage'] = itemsPerPage; }
-        if (pageNumber != null) { query['pageNumber'] = pageNumber; }
+        if (itemsPerPage != null) {
+            query['itemsPerPage'] = itemsPerPage;
+        }
+        if (pageNumber != null) {
+            query['pageNumber'] = pageNumber;
+        }
 
-        return this.request<ApprovalResponseDto>({
-            url: '/v1/approvals',
-            method: 'GET',
-            query,
-        }, opts?.responseOpts);
-    };
+        return this.request<ApprovalResponseDto>(
+            {
+                url: '/v1/approvals',
+                method: 'GET',
+                query,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List of User\'s Approvals
      */
-    listUserApprovals({ itemsPerPage, pageNumber, history }: ListUserApprovalsRequest): Observable<ApprovalResponseDto>
-    listUserApprovals({ itemsPerPage, pageNumber, history }: ListUserApprovalsRequest, opts?: OperationOpts): Observable<AjaxResponse<ApprovalResponseDto>>
-    listUserApprovals({ itemsPerPage, pageNumber, history }: ListUserApprovalsRequest, opts?: OperationOpts): Observable<ApprovalResponseDto | AjaxResponse<ApprovalResponseDto>> {
-
+    listUserApprovals({ itemsPerPage, pageNumber, history }: ListUserApprovalsRequest): Observable<ApprovalResponseDto>;
+    listUserApprovals(
+        { itemsPerPage, pageNumber, history }: ListUserApprovalsRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<ApprovalResponseDto>>;
+    listUserApprovals(
+        { itemsPerPage, pageNumber, history }: ListUserApprovalsRequest,
+        opts?: OperationOpts,
+    ): Observable<ApprovalResponseDto | AjaxResponse<ApprovalResponseDto>> {
         const query: HttpQuery = {};
 
-        if (itemsPerPage != null) { query['itemsPerPage'] = itemsPerPage; }
-        if (pageNumber != null) { query['pageNumber'] = pageNumber; }
-        if (history != null) { query['history'] = history; }
+        if (itemsPerPage != null) {
+            query['itemsPerPage'] = itemsPerPage;
+        }
+        if (pageNumber != null) {
+            query['pageNumber'] = pageNumber;
+        }
+        if (history != null) {
+            query['history'] = history;
+        }
 
-        return this.request<ApprovalResponseDto>({
-            url: '/v1/approvals/user',
-            method: 'GET',
-            query,
-        }, opts?.responseOpts);
-    };
+        return this.request<ApprovalResponseDto>(
+            {
+                url: '/v1/approvals/user',
+                method: 'GET',
+                query,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Rejecting of the Approval
      */
-    rejectApproval({ uuid }: RejectApprovalRequest): Observable<void>
-    rejectApproval({ uuid }: RejectApprovalRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    rejectApproval({ uuid }: RejectApprovalRequest): Observable<void>;
+    rejectApproval({ uuid }: RejectApprovalRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     rejectApproval({ uuid }: RejectApprovalRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'rejectApproval');
 
-        return this.request<void>({
-            url: '/v1/approvals/{uuid}/reject'.replace('{uuid}', encodeURI(uuid)),
-            method: 'PATCH',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/approvals/{uuid}/reject'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Rejecting of Recipient of the Approval
      */
-    rejectApprovalRecipient({ uuid, userApprovalDto }: RejectApprovalRecipientRequest): Observable<void>
-    rejectApprovalRecipient({ uuid, userApprovalDto }: RejectApprovalRecipientRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    rejectApprovalRecipient({ uuid, userApprovalDto }: RejectApprovalRecipientRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    rejectApprovalRecipient({ uuid, userApprovalDto }: RejectApprovalRecipientRequest): Observable<void>;
+    rejectApprovalRecipient(
+        { uuid, userApprovalDto }: RejectApprovalRecipientRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    rejectApprovalRecipient(
+        { uuid, userApprovalDto }: RejectApprovalRecipientRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'rejectApprovalRecipient');
         throwIfNullOrUndefined(userApprovalDto, 'userApprovalDto', 'rejectApprovalRecipient');
 
@@ -176,12 +222,14 @@ export class ApprovalInventoryApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>({
-            url: '/v1/approvals/{uuid}/rejectRecipient'.replace('{uuid}', encodeURI(uuid)),
-            method: 'PATCH',
-            headers,
-            body: userApprovalDto,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<void>(
+            {
+                url: '/v1/approvals/{uuid}/rejectRecipient'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
+                headers,
+                body: userApprovalDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

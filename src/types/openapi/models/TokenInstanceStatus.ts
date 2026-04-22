@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -22,6 +22,5 @@ export enum TokenInstanceStatus {
     Activated = 'Activated',
     Deactivated = 'Deactivated',
     Warning = 'Warning',
-    Unknown = 'Unknown'
+    Unknown = 'Unknown',
 }
-

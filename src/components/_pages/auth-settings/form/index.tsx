@@ -14,7 +14,7 @@ import Label from 'components/Label';
 import { useAreDefaultValuesSame } from 'utils/common-hooks';
 import { validateAlphaNumericWithSpecialChars, validateRequired, validateUrlWithRoute, validatePositiveInteger } from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
-import { OAuth2ProviderSettingsUpdateDto } from 'types/auth-settings';
+import type { OAuth2ProviderSettingsUpdateDto } from 'types/auth-settings';
 import { isValidJWTBearerProvider, isValidOAuth2FlowProvider } from 'utils/oauth2Providers';
 
 interface OAuth2ProviderFormProps {

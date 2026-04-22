@@ -1,8 +1,8 @@
-import { ApiClients } from '../../api';
+import type { ApiClients } from '../../api';
 import cn from 'classnames';
 import ConditionsItemsList from 'components/ExecutionConditionItemsList/ConditionsItemsList';
 import ExecutionsItemsList from 'components/ExecutionConditionItemsList/ExecutionsItemsList';
-import { CustomNode } from 'components/FlowChart';
+import type { CustomNode } from 'components/FlowChart';
 import ProgressButton from 'components/ProgressButton';
 import Switch from 'components/Switch';
 import { actions as alertActions } from 'ducks/alerts';
@@ -12,11 +12,11 @@ import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rule
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'components/Select';
-import { Edge, MarkerType } from 'reactflow';
+import { type Edge, MarkerType } from 'reactflow';
 import Label from 'components/Label';
-import { OtherProperties } from 'types/flowchart';
+import type { OtherProperties } from 'types/flowchart';
 import { PlatformEnum, Resource } from 'types/openapi';
-import {
+import type {
     ActionDetailDto,
     ActionDetailModel,
     ActionDto,

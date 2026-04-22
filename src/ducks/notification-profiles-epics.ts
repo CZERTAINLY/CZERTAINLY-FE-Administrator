@@ -1,4 +1,4 @@
-import { AppEpic } from 'ducks';
+import type { AppEpic } from 'ducks';
 import { store } from '../App';
 import { iif, of } from 'rxjs';
 import { catchError, filter, mergeMap, switchMap } from 'rxjs/operators';

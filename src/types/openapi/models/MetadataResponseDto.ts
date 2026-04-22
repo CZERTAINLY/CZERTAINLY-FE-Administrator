@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    Resource,
-    ResponseMetadataDto,
-} from './';
+import type { Resource, ResponseMetadataDto } from './';
 
 /**
  * Metadata response attributes with their source connector
@@ -47,5 +44,3 @@ export interface MetadataResponseDto {
      */
     items: Array<ResponseMetadataDto>;
 }
-
-

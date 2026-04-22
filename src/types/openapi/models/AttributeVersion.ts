@@ -12,12 +12,11 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
 export enum AttributeVersion {
     V2 = 'v2',
-    V3 = 'v3'
+    V3 = 'v3',
 }
-

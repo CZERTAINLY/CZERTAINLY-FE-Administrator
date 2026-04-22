@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ProtocolCertificateAssociationsRequestDto,
-    RequestAttribute,
-} from './';
+import type { ProtocolCertificateAssociationsRequestDto, RequestAttribute } from './';
 
 /**
  * @export

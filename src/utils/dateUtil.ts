@@ -1,6 +1,6 @@
 import { CronExpressionParser } from 'cron-parser';
 import cronstrue from 'cronstrue';
-import { AttributeContentType, FilterConditionOperator, FilterFieldType, SearchFieldDataDto } from 'types/openapi';
+import { AttributeContentType, FilterConditionOperator, FilterFieldType, type SearchFieldDataDto } from 'types/openapi';
 
 function leading0(s: string, count: number) {
     while (s.length < count) {
@@ -100,8 +100,8 @@ export function getFormattedDateTime(dateString: string): string {
         return dateString;
     }
 
-    let date = new Date(dateString);
-    let formattedDateTime = `${date.getFullYear()}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + date.getDate()).slice(-2)} ${(
+    const date = new Date(dateString);
+    const formattedDateTime = `${date.getFullYear()}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + date.getDate()).slice(-2)} ${(
         '0' + date.getHours()
     ).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}:${('0' + date.getSeconds()).slice(-2)}`;
 
@@ -113,8 +113,8 @@ export function getFormattedDate(dateString: string): string {
         return dateString;
     }
 
-    let date = new Date(dateString);
-    let formattedDate = `${date.getFullYear()}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + date.getDate()).slice(-2)}`;
+    const date = new Date(dateString);
+    const formattedDate = `${date.getFullYear()}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + date.getDate()).slice(-2)}`;
 
     return formattedDate;
 }

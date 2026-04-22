@@ -1,5 +1,5 @@
 import { AjaxError } from 'rxjs/ajax';
-import { ErrorCodeDetailMap, ErrorCodeTexteMap, LockTypeEnum, WidgetLockErrorModel } from 'types/user-interface';
+import { ErrorCodeDetailMap, ErrorCodeTexteMap, LockTypeEnum, type WidgetLockErrorModel } from 'types/user-interface';
 
 export function extractError(err: Error, headline: string): string {
     if (!err) return headline;

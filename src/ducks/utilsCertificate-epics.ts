@@ -1,4 +1,4 @@
-import { AppEpic } from 'ducks';
+import type { AppEpic } from 'ducks';
 import { EMPTY, of } from 'rxjs';
 import { catchError, filter, map, switchMap } from 'rxjs/operators';
 

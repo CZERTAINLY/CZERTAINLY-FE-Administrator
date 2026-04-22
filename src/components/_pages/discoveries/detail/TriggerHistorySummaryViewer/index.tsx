@@ -1,10 +1,10 @@
 import { useCallback, useMemo } from 'react';
-import { TriggerHistoryObjectSummaryModel, TriggerHistoryObjectTriggerSummaryModel } from 'types/rules';
+import type { TriggerHistoryObjectSummaryModel, TriggerHistoryObjectTriggerSummaryModel } from 'types/rules';
 interface TriggerHistorySummaryProps {
     triggerHistoryObjectSummary: TriggerHistoryObjectSummaryModel;
 }
 
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import TabLayout from 'components/Layout/TabLayout';
 import Widget from 'components/Widget';
 import { actions as userInterfaceActions } from 'ducks/user-interface';

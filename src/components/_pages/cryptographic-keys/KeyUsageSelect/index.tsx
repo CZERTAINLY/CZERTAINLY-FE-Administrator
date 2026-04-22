@@ -2,7 +2,7 @@ import Select from 'components/Select';
 import Label from 'components/Label';
 import { getEnumLabel } from 'ducks/enums';
 import { useMemo } from 'react';
-import { EnumItemModel } from 'types/enums';
+import type { EnumItemModel } from 'types/enums';
 import { KeyType, KeyUsage } from 'types/openapi';
 
 type KeyUsageEnum = { [key: string]: EnumItemModel } | undefined;

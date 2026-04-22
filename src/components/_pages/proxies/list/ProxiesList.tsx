@@ -2,14 +2,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Select from 'components/Select';
 import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/proxies';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { ProxyStatus } from 'types/openapi';
+import type { ProxyStatus } from 'types/openapi';
 import { dateFormatter } from 'utils/dateUtil';
 import { PROXY_STATUS_OPTIONS } from 'utils/proxy';
 import { useRunOnSuccessfulFinish } from 'utils/common-hooks';

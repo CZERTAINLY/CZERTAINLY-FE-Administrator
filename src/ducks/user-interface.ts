@@ -1,9 +1,9 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { CustomNode } from 'components/FlowChart';
-import { Edge } from 'reactflow';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { CustomNode } from 'components/FlowChart';
+import type { Edge } from 'reactflow';
 import { createSelector } from 'reselect';
 import { AjaxError } from 'rxjs/ajax';
-import { GlobalModalModel, LockWidgetNameEnum, ReactFlowUI, WidgetLockErrorModel, WidgetLockModel } from 'types/user-interface';
+import type { GlobalModalModel, LockWidgetNameEnum, ReactFlowUI, WidgetLockErrorModel, WidgetLockModel } from 'types/user-interface';
 import { getLockWidgetObject } from 'utils/net';
 
 export type State = {
@@ -40,7 +40,7 @@ export const slice = createSlice({
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
             Object.keys(state).forEach((key) => {
-                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+                if (!Object.hasOwn(initialState, key)) (state as any)[key] = undefined;
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));

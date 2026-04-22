@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    Resource,
-    TriggerHistoryObjectSummaryDto,
-} from './';
+import type { Resource, TriggerHistoryObjectSummaryDto } from './';
 
 /**
  * @export
@@ -64,5 +61,3 @@ export interface TriggerHistorySummaryDto {
      */
     objects: Array<TriggerHistoryObjectSummaryDto>;
 }
-
-

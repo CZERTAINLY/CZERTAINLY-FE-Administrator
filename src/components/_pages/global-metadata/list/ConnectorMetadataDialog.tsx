@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { PlatformEnum } from 'types/openapi';
 import { actions, selectors } from '../../../../ducks/globalMetadata';
-import CustomTable, { TableDataRow, TableHeader } from '../../../CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from '../../../CustomTable';
 import Dialog from '../../../Dialog';
 import Spinner from '../../../Spinner';
 import Button from 'components/Button';

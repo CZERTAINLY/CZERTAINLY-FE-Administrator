@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-} from './';
+import type { AttributeContentType } from './';
 
 /**
  * Float attribute content for decimal numbers
@@ -40,5 +38,3 @@ export interface FloatAttributeContentV3 {
      */
     contentType: AttributeContentType;
 }
-
-

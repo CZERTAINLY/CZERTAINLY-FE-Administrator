@@ -5,7 +5,11 @@
  *
  */
 export class ServerConfiguration<T extends { [key: string]: string }> {
-    public constructor(private url: string, private variableConfiguration: T, private description: string) {}
+    public constructor(
+        private url: string,
+        private variableConfiguration: T,
+        private description: string,
+    ) {}
 
     /**
      * Sets the value of the variables of this server.
@@ -32,14 +36,14 @@ export class ServerConfiguration<T extends { [key: string]: string }> {
         let replacedUrl = this.url;
         for (const key in this.variableConfiguration) {
             if (this.variableConfiguration.hasOwnProperty(key)) {
-                 const re = new RegExp("{" + key + "}","g");
-                 replacedUrl = replacedUrl.replace(re, this.variableConfiguration[key]);
+                const re = new RegExp('{' + key + '}', 'g');
+                replacedUrl = replacedUrl.replace(re, this.variableConfiguration[key]);
             }
         }
         return replacedUrl;
     }
 }
 
-const server1 = new ServerConfiguration<{  }>("https://demo.czertainly.online/api", {  }, "CZERTAINLY Demo server");
+const server1 = new ServerConfiguration<{}>('https://demo.czertainly.online/api', {}, 'CZERTAINLY Demo server');
 
 export const servers = [server1];

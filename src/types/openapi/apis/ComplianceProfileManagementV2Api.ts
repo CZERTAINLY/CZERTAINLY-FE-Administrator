@@ -125,319 +125,511 @@ export interface UpdateComplianceProfileV2Request {
  * no description
  */
 export class ComplianceProfileManagementV2Api extends BaseAPI {
-
     /**
      * Associate Compliance Profile to specified resource object
      */
-    associateComplianceProfileV2({ uuid, resource, associationObjectUuid }: AssociateComplianceProfileV2Request): Observable<void>
-    associateComplianceProfileV2({ uuid, resource, associationObjectUuid }: AssociateComplianceProfileV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    associateComplianceProfileV2({ uuid, resource, associationObjectUuid }: AssociateComplianceProfileV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    associateComplianceProfileV2({ uuid, resource, associationObjectUuid }: AssociateComplianceProfileV2Request): Observable<void>;
+    associateComplianceProfileV2(
+        { uuid, resource, associationObjectUuid }: AssociateComplianceProfileV2Request,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    associateComplianceProfileV2(
+        { uuid, resource, associationObjectUuid }: AssociateComplianceProfileV2Request,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'associateComplianceProfileV2');
         throwIfNullOrUndefined(resource, 'resource', 'associateComplianceProfileV2');
         throwIfNullOrUndefined(associationObjectUuid, 'associationObjectUuid', 'associateComplianceProfileV2');
 
-        return this.request<void>({
-            url: '/v2/complianceProfiles/{uuid}/associations/{resource}/{associationObjectUuid}'.replace('{uuid}', encodeURI(uuid)).replace('{resource}', encodeURI(resource)).replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
-            method: 'PATCH',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v2/complianceProfiles/{uuid}/associations/{resource}/{associationObjectUuid}'
+                    .replace('{uuid}', encodeURI(uuid))
+                    .replace('{resource}', encodeURI(resource))
+                    .replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
+                method: 'PATCH',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Delete multiple Compliance Profiles
      */
-    bulkDeleteComplianceProfilesV2({ requestBody }: BulkDeleteComplianceProfilesV2Request): Observable<Array<BulkActionMessageDto>>
-    bulkDeleteComplianceProfilesV2({ requestBody }: BulkDeleteComplianceProfilesV2Request, opts?: OperationOpts): Observable<AjaxResponse<Array<BulkActionMessageDto>>>
-    bulkDeleteComplianceProfilesV2({ requestBody }: BulkDeleteComplianceProfilesV2Request, opts?: OperationOpts): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
+    bulkDeleteComplianceProfilesV2({ requestBody }: BulkDeleteComplianceProfilesV2Request): Observable<Array<BulkActionMessageDto>>;
+    bulkDeleteComplianceProfilesV2(
+        { requestBody }: BulkDeleteComplianceProfilesV2Request,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<BulkActionMessageDto>>>;
+    bulkDeleteComplianceProfilesV2(
+        { requestBody }: BulkDeleteComplianceProfilesV2Request,
+        opts?: OperationOpts,
+    ): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
         throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDeleteComplianceProfilesV2');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<Array<BulkActionMessageDto>>({
-            url: '/v2/complianceProfiles',
-            method: 'DELETE',
-            headers,
-            body: requestBody,
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<BulkActionMessageDto>>(
+            {
+                url: '/v2/complianceProfiles',
+                method: 'DELETE',
+                headers,
+                body: requestBody,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Create Compliance internal rule
      */
-    createComplianceInternalRuleV2({ complianceInternalRuleRequestDto }: CreateComplianceInternalRuleV2Request): Observable<ComplianceRuleListDto>
-    createComplianceInternalRuleV2({ complianceInternalRuleRequestDto }: CreateComplianceInternalRuleV2Request, opts?: OperationOpts): Observable<AjaxResponse<ComplianceRuleListDto>>
-    createComplianceInternalRuleV2({ complianceInternalRuleRequestDto }: CreateComplianceInternalRuleV2Request, opts?: OperationOpts): Observable<ComplianceRuleListDto | AjaxResponse<ComplianceRuleListDto>> {
+    createComplianceInternalRuleV2({
+        complianceInternalRuleRequestDto,
+    }: CreateComplianceInternalRuleV2Request): Observable<ComplianceRuleListDto>;
+    createComplianceInternalRuleV2(
+        { complianceInternalRuleRequestDto }: CreateComplianceInternalRuleV2Request,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<ComplianceRuleListDto>>;
+    createComplianceInternalRuleV2(
+        { complianceInternalRuleRequestDto }: CreateComplianceInternalRuleV2Request,
+        opts?: OperationOpts,
+    ): Observable<ComplianceRuleListDto | AjaxResponse<ComplianceRuleListDto>> {
         throwIfNullOrUndefined(complianceInternalRuleRequestDto, 'complianceInternalRuleRequestDto', 'createComplianceInternalRuleV2');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<ComplianceRuleListDto>({
-            url: '/v2/complianceProfiles/rules',
-            method: 'POST',
-            headers,
-            body: complianceInternalRuleRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<ComplianceRuleListDto>(
+            {
+                url: '/v2/complianceProfiles/rules',
+                method: 'POST',
+                headers,
+                body: complianceInternalRuleRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Add Compliance Profile
      */
-    createComplianceProfileV2({ complianceProfileRequestDtoV2 }: CreateComplianceProfileV2Request): Observable<ComplianceProfileDtoV2>
-    createComplianceProfileV2({ complianceProfileRequestDtoV2 }: CreateComplianceProfileV2Request, opts?: OperationOpts): Observable<AjaxResponse<ComplianceProfileDtoV2>>
-    createComplianceProfileV2({ complianceProfileRequestDtoV2 }: CreateComplianceProfileV2Request, opts?: OperationOpts): Observable<ComplianceProfileDtoV2 | AjaxResponse<ComplianceProfileDtoV2>> {
+    createComplianceProfileV2({ complianceProfileRequestDtoV2 }: CreateComplianceProfileV2Request): Observable<ComplianceProfileDtoV2>;
+    createComplianceProfileV2(
+        { complianceProfileRequestDtoV2 }: CreateComplianceProfileV2Request,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<ComplianceProfileDtoV2>>;
+    createComplianceProfileV2(
+        { complianceProfileRequestDtoV2 }: CreateComplianceProfileV2Request,
+        opts?: OperationOpts,
+    ): Observable<ComplianceProfileDtoV2 | AjaxResponse<ComplianceProfileDtoV2>> {
         throwIfNullOrUndefined(complianceProfileRequestDtoV2, 'complianceProfileRequestDtoV2', 'createComplianceProfileV2');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<ComplianceProfileDtoV2>({
-            url: '/v2/complianceProfiles',
-            method: 'POST',
-            headers,
-            body: complianceProfileRequestDtoV2,
-        }, opts?.responseOpts);
-    };
+        return this.request<ComplianceProfileDtoV2>(
+            {
+                url: '/v2/complianceProfiles',
+                method: 'POST',
+                headers,
+                body: complianceProfileRequestDtoV2,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Delete Compliance internal rule
      */
-    deleteComplianceInternalRuleV2({ internalRuleUuid }: DeleteComplianceInternalRuleV2Request): Observable<void>
-    deleteComplianceInternalRuleV2({ internalRuleUuid }: DeleteComplianceInternalRuleV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    deleteComplianceInternalRuleV2({ internalRuleUuid }: DeleteComplianceInternalRuleV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    deleteComplianceInternalRuleV2({ internalRuleUuid }: DeleteComplianceInternalRuleV2Request): Observable<void>;
+    deleteComplianceInternalRuleV2(
+        { internalRuleUuid }: DeleteComplianceInternalRuleV2Request,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    deleteComplianceInternalRuleV2(
+        { internalRuleUuid }: DeleteComplianceInternalRuleV2Request,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(internalRuleUuid, 'internalRuleUuid', 'deleteComplianceInternalRuleV2');
 
-        return this.request<void>({
-            url: '/v2/complianceProfiles/rules/{internalRuleUuid}'.replace('{internalRuleUuid}', encodeURI(internalRuleUuid)),
-            method: 'DELETE',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v2/complianceProfiles/rules/{internalRuleUuid}'.replace('{internalRuleUuid}', encodeURI(internalRuleUuid)),
+                method: 'DELETE',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Delete Compliance Profile
      */
-    deleteComplianceProfileV2({ uuid }: DeleteComplianceProfileV2Request): Observable<void>
-    deleteComplianceProfileV2({ uuid }: DeleteComplianceProfileV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    deleteComplianceProfileV2({ uuid }: DeleteComplianceProfileV2Request): Observable<void>;
+    deleteComplianceProfileV2({ uuid }: DeleteComplianceProfileV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteComplianceProfileV2({ uuid }: DeleteComplianceProfileV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'deleteComplianceProfileV2');
 
-        return this.request<void>({
-            url: '/v2/complianceProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'DELETE',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v2/complianceProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Disassociate Compliance Profile from specified resource object
      */
-    disassociateComplianceProfileV2({ uuid, resource, associationObjectUuid }: DisassociateComplianceProfileV2Request): Observable<void>
-    disassociateComplianceProfileV2({ uuid, resource, associationObjectUuid }: DisassociateComplianceProfileV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    disassociateComplianceProfileV2({ uuid, resource, associationObjectUuid }: DisassociateComplianceProfileV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    disassociateComplianceProfileV2({ uuid, resource, associationObjectUuid }: DisassociateComplianceProfileV2Request): Observable<void>;
+    disassociateComplianceProfileV2(
+        { uuid, resource, associationObjectUuid }: DisassociateComplianceProfileV2Request,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    disassociateComplianceProfileV2(
+        { uuid, resource, associationObjectUuid }: DisassociateComplianceProfileV2Request,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'disassociateComplianceProfileV2');
         throwIfNullOrUndefined(resource, 'resource', 'disassociateComplianceProfileV2');
         throwIfNullOrUndefined(associationObjectUuid, 'associationObjectUuid', 'disassociateComplianceProfileV2');
 
-        return this.request<void>({
-            url: '/v2/complianceProfiles/{uuid}/associations/{resource}/{associationObjectUuid}'.replace('{uuid}', encodeURI(uuid)).replace('{resource}', encodeURI(resource)).replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
-            method: 'DELETE',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v2/complianceProfiles/{uuid}/associations/{resource}/{associationObjectUuid}'
+                    .replace('{uuid}', encodeURI(uuid))
+                    .replace('{resource}', encodeURI(resource))
+                    .replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
+                method: 'DELETE',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Force delete Compliance Profiles
      */
-    forceDeleteComplianceProfilesV2({ requestBody }: ForceDeleteComplianceProfilesV2Request): Observable<Array<BulkActionMessageDto>>
-    forceDeleteComplianceProfilesV2({ requestBody }: ForceDeleteComplianceProfilesV2Request, opts?: OperationOpts): Observable<AjaxResponse<Array<BulkActionMessageDto>>>
-    forceDeleteComplianceProfilesV2({ requestBody }: ForceDeleteComplianceProfilesV2Request, opts?: OperationOpts): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
+    forceDeleteComplianceProfilesV2({ requestBody }: ForceDeleteComplianceProfilesV2Request): Observable<Array<BulkActionMessageDto>>;
+    forceDeleteComplianceProfilesV2(
+        { requestBody }: ForceDeleteComplianceProfilesV2Request,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<BulkActionMessageDto>>>;
+    forceDeleteComplianceProfilesV2(
+        { requestBody }: ForceDeleteComplianceProfilesV2Request,
+        opts?: OperationOpts,
+    ): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
         throwIfNullOrUndefined(requestBody, 'requestBody', 'forceDeleteComplianceProfilesV2');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<Array<BulkActionMessageDto>>({
-            url: '/v2/complianceProfiles/force',
-            method: 'DELETE',
-            headers,
-            body: requestBody,
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<BulkActionMessageDto>>(
+            {
+                url: '/v2/complianceProfiles/force',
+                method: 'DELETE',
+                headers,
+                body: requestBody,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get associated Compliance Profiles for resource object
      */
-    getAssociatedComplianceProfilesV2({ resource, associationObjectUuid }: GetAssociatedComplianceProfilesV2Request): Observable<Array<ComplianceProfileListDto>>
-    getAssociatedComplianceProfilesV2({ resource, associationObjectUuid }: GetAssociatedComplianceProfilesV2Request, opts?: OperationOpts): Observable<AjaxResponse<Array<ComplianceProfileListDto>>>
-    getAssociatedComplianceProfilesV2({ resource, associationObjectUuid }: GetAssociatedComplianceProfilesV2Request, opts?: OperationOpts): Observable<Array<ComplianceProfileListDto> | AjaxResponse<Array<ComplianceProfileListDto>>> {
+    getAssociatedComplianceProfilesV2({
+        resource,
+        associationObjectUuid,
+    }: GetAssociatedComplianceProfilesV2Request): Observable<Array<ComplianceProfileListDto>>;
+    getAssociatedComplianceProfilesV2(
+        { resource, associationObjectUuid }: GetAssociatedComplianceProfilesV2Request,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<ComplianceProfileListDto>>>;
+    getAssociatedComplianceProfilesV2(
+        { resource, associationObjectUuid }: GetAssociatedComplianceProfilesV2Request,
+        opts?: OperationOpts,
+    ): Observable<Array<ComplianceProfileListDto> | AjaxResponse<Array<ComplianceProfileListDto>>> {
         throwIfNullOrUndefined(resource, 'resource', 'getAssociatedComplianceProfilesV2');
         throwIfNullOrUndefined(associationObjectUuid, 'associationObjectUuid', 'getAssociatedComplianceProfilesV2');
 
-        return this.request<Array<ComplianceProfileListDto>>({
-            url: '/v2/complianceProfiles/associations/{resource}/{associationObjectUuid}'.replace('{resource}', encodeURI(resource)).replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<ComplianceProfileListDto>>(
+            {
+                url: '/v2/complianceProfiles/associations/{resource}/{associationObjectUuid}'
+                    .replace('{resource}', encodeURI(resource))
+                    .replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get associations of Compliance Profile
      */
-    getAssociationsV2({ uuid }: GetAssociationsV2Request): Observable<Array<ResourceObjectDto>>
-    getAssociationsV2({ uuid }: GetAssociationsV2Request, opts?: OperationOpts): Observable<AjaxResponse<Array<ResourceObjectDto>>>
-    getAssociationsV2({ uuid }: GetAssociationsV2Request, opts?: OperationOpts): Observable<Array<ResourceObjectDto> | AjaxResponse<Array<ResourceObjectDto>>> {
+    getAssociationsV2({ uuid }: GetAssociationsV2Request): Observable<Array<ResourceObjectDto>>;
+    getAssociationsV2({ uuid }: GetAssociationsV2Request, opts?: OperationOpts): Observable<AjaxResponse<Array<ResourceObjectDto>>>;
+    getAssociationsV2(
+        { uuid }: GetAssociationsV2Request,
+        opts?: OperationOpts,
+    ): Observable<Array<ResourceObjectDto> | AjaxResponse<Array<ResourceObjectDto>>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getAssociationsV2');
 
-        return this.request<Array<ResourceObjectDto>>({
-            url: '/v2/complianceProfiles/{uuid}/associations'.replace('{uuid}', encodeURI(uuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<ResourceObjectDto>>(
+            {
+                url: '/v2/complianceProfiles/{uuid}/associations'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get Compliance group rules
      */
-    getComplianceGroupRulesV2({ groupUuid, connectorUuid, kind }: GetComplianceGroupRulesV2Request): Observable<Array<ComplianceRuleListDto>>
-    getComplianceGroupRulesV2({ groupUuid, connectorUuid, kind }: GetComplianceGroupRulesV2Request, opts?: OperationOpts): Observable<AjaxResponse<Array<ComplianceRuleListDto>>>
-    getComplianceGroupRulesV2({ groupUuid, connectorUuid, kind }: GetComplianceGroupRulesV2Request, opts?: OperationOpts): Observable<Array<ComplianceRuleListDto> | AjaxResponse<Array<ComplianceRuleListDto>>> {
+    getComplianceGroupRulesV2({
+        groupUuid,
+        connectorUuid,
+        kind,
+    }: GetComplianceGroupRulesV2Request): Observable<Array<ComplianceRuleListDto>>;
+    getComplianceGroupRulesV2(
+        { groupUuid, connectorUuid, kind }: GetComplianceGroupRulesV2Request,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<ComplianceRuleListDto>>>;
+    getComplianceGroupRulesV2(
+        { groupUuid, connectorUuid, kind }: GetComplianceGroupRulesV2Request,
+        opts?: OperationOpts,
+    ): Observable<Array<ComplianceRuleListDto> | AjaxResponse<Array<ComplianceRuleListDto>>> {
         throwIfNullOrUndefined(groupUuid, 'groupUuid', 'getComplianceGroupRulesV2');
         throwIfNullOrUndefined(connectorUuid, 'connectorUuid', 'getComplianceGroupRulesV2');
         throwIfNullOrUndefined(kind, 'kind', 'getComplianceGroupRulesV2');
 
-        const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
-            'connectorUuid': connectorUuid,
-            'kind': kind,
+        const query: HttpQuery = {
+            // required parameters are used directly since they are already checked by throwIfNullOrUndefined
+            connectorUuid: connectorUuid,
+            kind: kind,
         };
 
-        return this.request<Array<ComplianceRuleListDto>>({
-            url: '/v2/complianceProfiles/groups/{groupUuid}/rules'.replace('{groupUuid}', encodeURI(groupUuid)),
-            method: 'GET',
-            query,
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<ComplianceRuleListDto>>(
+            {
+                url: '/v2/complianceProfiles/groups/{groupUuid}/rules'.replace('{groupUuid}', encodeURI(groupUuid)),
+                method: 'GET',
+                query,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get Compliance groups
      */
-    getComplianceGroupsV2({ connectorUuid, kind, resource }: GetComplianceGroupsV2Request): Observable<Array<ComplianceGroupListDto>>
-    getComplianceGroupsV2({ connectorUuid, kind, resource }: GetComplianceGroupsV2Request, opts?: OperationOpts): Observable<AjaxResponse<Array<ComplianceGroupListDto>>>
-    getComplianceGroupsV2({ connectorUuid, kind, resource }: GetComplianceGroupsV2Request, opts?: OperationOpts): Observable<Array<ComplianceGroupListDto> | AjaxResponse<Array<ComplianceGroupListDto>>> {
+    getComplianceGroupsV2({ connectorUuid, kind, resource }: GetComplianceGroupsV2Request): Observable<Array<ComplianceGroupListDto>>;
+    getComplianceGroupsV2(
+        { connectorUuid, kind, resource }: GetComplianceGroupsV2Request,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<ComplianceGroupListDto>>>;
+    getComplianceGroupsV2(
+        { connectorUuid, kind, resource }: GetComplianceGroupsV2Request,
+        opts?: OperationOpts,
+    ): Observable<Array<ComplianceGroupListDto> | AjaxResponse<Array<ComplianceGroupListDto>>> {
         throwIfNullOrUndefined(connectorUuid, 'connectorUuid', 'getComplianceGroupsV2');
         throwIfNullOrUndefined(kind, 'kind', 'getComplianceGroupsV2');
 
-        const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
-            'connectorUuid': connectorUuid,
-            'kind': kind,
+        const query: HttpQuery = {
+            // required parameters are used directly since they are already checked by throwIfNullOrUndefined
+            connectorUuid: connectorUuid,
+            kind: kind,
         };
 
-        if (resource != null) { query['resource'] = resource; }
+        if (resource != null) {
+            query['resource'] = resource;
+        }
 
-        return this.request<Array<ComplianceGroupListDto>>({
-            url: '/v2/complianceProfiles/groups',
-            method: 'GET',
-            query,
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<ComplianceGroupListDto>>(
+            {
+                url: '/v2/complianceProfiles/groups',
+                method: 'GET',
+                query,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Details of a Compliance Profile
      */
-    getComplianceProfileV2({ uuid }: GetComplianceProfileV2Request): Observable<ComplianceProfileDtoV2>
-    getComplianceProfileV2({ uuid }: GetComplianceProfileV2Request, opts?: OperationOpts): Observable<AjaxResponse<ComplianceProfileDtoV2>>
-    getComplianceProfileV2({ uuid }: GetComplianceProfileV2Request, opts?: OperationOpts): Observable<ComplianceProfileDtoV2 | AjaxResponse<ComplianceProfileDtoV2>> {
+    getComplianceProfileV2({ uuid }: GetComplianceProfileV2Request): Observable<ComplianceProfileDtoV2>;
+    getComplianceProfileV2({ uuid }: GetComplianceProfileV2Request, opts?: OperationOpts): Observable<AjaxResponse<ComplianceProfileDtoV2>>;
+    getComplianceProfileV2(
+        { uuid }: GetComplianceProfileV2Request,
+        opts?: OperationOpts,
+    ): Observable<ComplianceProfileDtoV2 | AjaxResponse<ComplianceProfileDtoV2>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getComplianceProfileV2');
 
-        return this.request<ComplianceProfileDtoV2>({
-            url: '/v2/complianceProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<ComplianceProfileDtoV2>(
+            {
+                url: '/v2/complianceProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Lists compliance rules. If provider UUID is sent (also kind is required) then provider rules are listed, otherwise lists internal rules
      * Get Compliance rules
      */
-    getComplianceRulesV2({ connectorUuid, kind, resource, type, format }: GetComplianceRulesV2Request): Observable<Array<ComplianceRuleListDto>>
-    getComplianceRulesV2({ connectorUuid, kind, resource, type, format }: GetComplianceRulesV2Request, opts?: OperationOpts): Observable<AjaxResponse<Array<ComplianceRuleListDto>>>
-    getComplianceRulesV2({ connectorUuid, kind, resource, type, format }: GetComplianceRulesV2Request, opts?: OperationOpts): Observable<Array<ComplianceRuleListDto> | AjaxResponse<Array<ComplianceRuleListDto>>> {
-
+    getComplianceRulesV2({
+        connectorUuid,
+        kind,
+        resource,
+        type,
+        format,
+    }: GetComplianceRulesV2Request): Observable<Array<ComplianceRuleListDto>>;
+    getComplianceRulesV2(
+        { connectorUuid, kind, resource, type, format }: GetComplianceRulesV2Request,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<ComplianceRuleListDto>>>;
+    getComplianceRulesV2(
+        { connectorUuid, kind, resource, type, format }: GetComplianceRulesV2Request,
+        opts?: OperationOpts,
+    ): Observable<Array<ComplianceRuleListDto> | AjaxResponse<Array<ComplianceRuleListDto>>> {
         const query: HttpQuery = {};
 
-        if (connectorUuid != null) { query['connectorUuid'] = connectorUuid; }
-        if (kind != null) { query['kind'] = kind; }
-        if (resource != null) { query['resource'] = resource; }
-        if (type != null) { query['type'] = type; }
-        if (format != null) { query['format'] = format; }
+        if (connectorUuid != null) {
+            query['connectorUuid'] = connectorUuid;
+        }
+        if (kind != null) {
+            query['kind'] = kind;
+        }
+        if (resource != null) {
+            query['resource'] = resource;
+        }
+        if (type != null) {
+            query['type'] = type;
+        }
+        if (format != null) {
+            query['format'] = format;
+        }
 
-        return this.request<Array<ComplianceRuleListDto>>({
-            url: '/v2/complianceProfiles/rules',
-            method: 'GET',
-            query,
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<ComplianceRuleListDto>>(
+            {
+                url: '/v2/complianceProfiles/rules',
+                method: 'GET',
+                query,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List of available Compliance Profiles
      */
-    listComplianceProfilesV2(): Observable<Array<ComplianceProfileListDto>>
-    listComplianceProfilesV2(opts?: OperationOpts): Observable<AjaxResponse<Array<ComplianceProfileListDto>>>
-    listComplianceProfilesV2(opts?: OperationOpts): Observable<Array<ComplianceProfileListDto> | AjaxResponse<Array<ComplianceProfileListDto>>> {
-        return this.request<Array<ComplianceProfileListDto>>({
-            url: '/v2/complianceProfiles',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+    listComplianceProfilesV2(): Observable<Array<ComplianceProfileListDto>>;
+    listComplianceProfilesV2(opts?: OperationOpts): Observable<AjaxResponse<Array<ComplianceProfileListDto>>>;
+    listComplianceProfilesV2(
+        opts?: OperationOpts,
+    ): Observable<Array<ComplianceProfileListDto> | AjaxResponse<Array<ComplianceProfileListDto>>> {
+        return this.request<Array<ComplianceProfileListDto>>(
+            {
+                url: '/v2/complianceProfiles',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Add/remove group to/from Compliance Profile
      */
-    patchComplianceProfileGroupsV2({ uuid, complianceProfileGroupsPatchRequestDto }: PatchComplianceProfileGroupsV2Request): Observable<void>
-    patchComplianceProfileGroupsV2({ uuid, complianceProfileGroupsPatchRequestDto }: PatchComplianceProfileGroupsV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    patchComplianceProfileGroupsV2({ uuid, complianceProfileGroupsPatchRequestDto }: PatchComplianceProfileGroupsV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    patchComplianceProfileGroupsV2({
+        uuid,
+        complianceProfileGroupsPatchRequestDto,
+    }: PatchComplianceProfileGroupsV2Request): Observable<void>;
+    patchComplianceProfileGroupsV2(
+        { uuid, complianceProfileGroupsPatchRequestDto }: PatchComplianceProfileGroupsV2Request,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    patchComplianceProfileGroupsV2(
+        { uuid, complianceProfileGroupsPatchRequestDto }: PatchComplianceProfileGroupsV2Request,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'patchComplianceProfileGroupsV2');
-        throwIfNullOrUndefined(complianceProfileGroupsPatchRequestDto, 'complianceProfileGroupsPatchRequestDto', 'patchComplianceProfileGroupsV2');
+        throwIfNullOrUndefined(
+            complianceProfileGroupsPatchRequestDto,
+            'complianceProfileGroupsPatchRequestDto',
+            'patchComplianceProfileGroupsV2',
+        );
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>({
-            url: '/v2/complianceProfiles/{uuid}/groups'.replace('{uuid}', encodeURI(uuid)),
-            method: 'PATCH',
-            headers,
-            body: complianceProfileGroupsPatchRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v2/complianceProfiles/{uuid}/groups'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
+                headers,
+                body: complianceProfileGroupsPatchRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * If provider UUID is sent (also kind is required) then provider rules is handled, otherwise handling internal rule
      * Add/remove compliance rule to/from Compliance Profile
      */
-    patchComplianceProfileRulesV2({ uuid, complianceProfileRulesPatchRequestDto }: PatchComplianceProfileRulesV2Request): Observable<void>
-    patchComplianceProfileRulesV2({ uuid, complianceProfileRulesPatchRequestDto }: PatchComplianceProfileRulesV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    patchComplianceProfileRulesV2({ uuid, complianceProfileRulesPatchRequestDto }: PatchComplianceProfileRulesV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    patchComplianceProfileRulesV2({ uuid, complianceProfileRulesPatchRequestDto }: PatchComplianceProfileRulesV2Request): Observable<void>;
+    patchComplianceProfileRulesV2(
+        { uuid, complianceProfileRulesPatchRequestDto }: PatchComplianceProfileRulesV2Request,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    patchComplianceProfileRulesV2(
+        { uuid, complianceProfileRulesPatchRequestDto }: PatchComplianceProfileRulesV2Request,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'patchComplianceProfileRulesV2');
-        throwIfNullOrUndefined(complianceProfileRulesPatchRequestDto, 'complianceProfileRulesPatchRequestDto', 'patchComplianceProfileRulesV2');
+        throwIfNullOrUndefined(
+            complianceProfileRulesPatchRequestDto,
+            'complianceProfileRulesPatchRequestDto',
+            'patchComplianceProfileRulesV2',
+        );
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>({
-            url: '/v2/complianceProfiles/{uuid}/rules'.replace('{uuid}', encodeURI(uuid)),
-            method: 'PATCH',
-            headers,
-            body: complianceProfileRulesPatchRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v2/complianceProfiles/{uuid}/rules'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
+                headers,
+                body: complianceProfileRulesPatchRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Update Compliance internal rule
      */
-    updateComplianceInternalRuleV2({ internalRuleUuid, complianceInternalRuleRequestDto }: UpdateComplianceInternalRuleV2Request): Observable<ComplianceRuleListDto>
-    updateComplianceInternalRuleV2({ internalRuleUuid, complianceInternalRuleRequestDto }: UpdateComplianceInternalRuleV2Request, opts?: OperationOpts): Observable<AjaxResponse<ComplianceRuleListDto>>
-    updateComplianceInternalRuleV2({ internalRuleUuid, complianceInternalRuleRequestDto }: UpdateComplianceInternalRuleV2Request, opts?: OperationOpts): Observable<ComplianceRuleListDto | AjaxResponse<ComplianceRuleListDto>> {
+    updateComplianceInternalRuleV2({
+        internalRuleUuid,
+        complianceInternalRuleRequestDto,
+    }: UpdateComplianceInternalRuleV2Request): Observable<ComplianceRuleListDto>;
+    updateComplianceInternalRuleV2(
+        { internalRuleUuid, complianceInternalRuleRequestDto }: UpdateComplianceInternalRuleV2Request,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<ComplianceRuleListDto>>;
+    updateComplianceInternalRuleV2(
+        { internalRuleUuid, complianceInternalRuleRequestDto }: UpdateComplianceInternalRuleV2Request,
+        opts?: OperationOpts,
+    ): Observable<ComplianceRuleListDto | AjaxResponse<ComplianceRuleListDto>> {
         throwIfNullOrUndefined(internalRuleUuid, 'internalRuleUuid', 'updateComplianceInternalRuleV2');
         throwIfNullOrUndefined(complianceInternalRuleRequestDto, 'complianceInternalRuleRequestDto', 'updateComplianceInternalRuleV2');
 
@@ -445,20 +637,32 @@ export class ComplianceProfileManagementV2Api extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<ComplianceRuleListDto>({
-            url: '/v2/complianceProfiles/rules/{internalRuleUuid}'.replace('{internalRuleUuid}', encodeURI(internalRuleUuid)),
-            method: 'PUT',
-            headers,
-            body: complianceInternalRuleRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<ComplianceRuleListDto>(
+            {
+                url: '/v2/complianceProfiles/rules/{internalRuleUuid}'.replace('{internalRuleUuid}', encodeURI(internalRuleUuid)),
+                method: 'PUT',
+                headers,
+                body: complianceInternalRuleRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Update Compliance Profile
      */
-    updateComplianceProfileV2({ uuid, complianceProfileUpdateRequestDto }: UpdateComplianceProfileV2Request): Observable<ComplianceProfileDtoV2>
-    updateComplianceProfileV2({ uuid, complianceProfileUpdateRequestDto }: UpdateComplianceProfileV2Request, opts?: OperationOpts): Observable<AjaxResponse<ComplianceProfileDtoV2>>
-    updateComplianceProfileV2({ uuid, complianceProfileUpdateRequestDto }: UpdateComplianceProfileV2Request, opts?: OperationOpts): Observable<ComplianceProfileDtoV2 | AjaxResponse<ComplianceProfileDtoV2>> {
+    updateComplianceProfileV2({
+        uuid,
+        complianceProfileUpdateRequestDto,
+    }: UpdateComplianceProfileV2Request): Observable<ComplianceProfileDtoV2>;
+    updateComplianceProfileV2(
+        { uuid, complianceProfileUpdateRequestDto }: UpdateComplianceProfileV2Request,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<ComplianceProfileDtoV2>>;
+    updateComplianceProfileV2(
+        { uuid, complianceProfileUpdateRequestDto }: UpdateComplianceProfileV2Request,
+        opts?: OperationOpts,
+    ): Observable<ComplianceProfileDtoV2 | AjaxResponse<ComplianceProfileDtoV2>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'updateComplianceProfileV2');
         throwIfNullOrUndefined(complianceProfileUpdateRequestDto, 'complianceProfileUpdateRequestDto', 'updateComplianceProfileV2');
 
@@ -466,12 +670,14 @@ export class ComplianceProfileManagementV2Api extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<ComplianceProfileDtoV2>({
-            url: '/v2/complianceProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'PUT',
-            headers,
-            body: complianceProfileUpdateRequestDto,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<ComplianceProfileDtoV2>(
+            {
+                url: '/v2/complianceProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PUT',
+                headers,
+                body: complianceProfileUpdateRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

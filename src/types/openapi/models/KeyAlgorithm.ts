@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -25,6 +25,5 @@ export enum KeyAlgorithm {
     MlKem = 'ML-KEM',
     CrystalsDilithium = 'CRYSTALS-Dilithium',
     Sphincs = 'SPHINCS+',
-    Unknown = 'Unknown'
+    Unknown = 'Unknown',
 }
-

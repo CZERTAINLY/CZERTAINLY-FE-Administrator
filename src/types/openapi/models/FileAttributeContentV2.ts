@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    FileAttributeContentData,
-} from './';
+import type { FileAttributeContentData } from './';
 
 /**
  * File attribute content for storing encoded file content with additional info

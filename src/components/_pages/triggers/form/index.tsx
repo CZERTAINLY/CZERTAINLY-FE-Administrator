@@ -14,7 +14,7 @@ import Switch from 'components/Switch';
 import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
-import { PlatformEnum, Resource, ResourceEvent, TriggerType } from 'types/openapi';
+import { PlatformEnum, Resource, type ResourceEvent, TriggerType } from 'types/openapi';
 import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import TextInput from 'components/TextInput';

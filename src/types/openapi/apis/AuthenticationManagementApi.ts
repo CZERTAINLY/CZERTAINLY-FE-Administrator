@@ -38,63 +38,82 @@ export interface UpdateUserProfileRequest {
  * no description
  */
 export class AuthenticationManagementApi extends BaseAPI {
-
     /**
      * Get Auth Resources
      */
-    getAuthResources(): Observable<Array<AuthResourceDto>>
-    getAuthResources(opts?: OperationOpts): Observable<AjaxResponse<Array<AuthResourceDto>>>
+    getAuthResources(): Observable<Array<AuthResourceDto>>;
+    getAuthResources(opts?: OperationOpts): Observable<AjaxResponse<Array<AuthResourceDto>>>;
     getAuthResources(opts?: OperationOpts): Observable<Array<AuthResourceDto> | AjaxResponse<Array<AuthResourceDto>>> {
-        return this.request<Array<AuthResourceDto>>({
-            url: '/v1/auth/resources',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<AuthResourceDto>>(
+            {
+                url: '/v1/auth/resources',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get List of objects for Object Access
      */
-    getObjectsForResource({ resourceName }: GetObjectsForResourceRequest): Observable<Array<NameAndUuidDto>>
-    getObjectsForResource({ resourceName }: GetObjectsForResourceRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<NameAndUuidDto>>>
-    getObjectsForResource({ resourceName }: GetObjectsForResourceRequest, opts?: OperationOpts): Observable<Array<NameAndUuidDto> | AjaxResponse<Array<NameAndUuidDto>>> {
+    getObjectsForResource({ resourceName }: GetObjectsForResourceRequest): Observable<Array<NameAndUuidDto>>;
+    getObjectsForResource(
+        { resourceName }: GetObjectsForResourceRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<NameAndUuidDto>>>;
+    getObjectsForResource(
+        { resourceName }: GetObjectsForResourceRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<NameAndUuidDto> | AjaxResponse<Array<NameAndUuidDto>>> {
         throwIfNullOrUndefined(resourceName, 'resourceName', 'getObjectsForResource');
 
-        return this.request<Array<NameAndUuidDto>>({
-            url: '/v1/auth/resources/{resourceName}/objects'.replace('{resourceName}', encodeURI(resourceName)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<NameAndUuidDto>>(
+            {
+                url: '/v1/auth/resources/{resourceName}/objects'.replace('{resourceName}', encodeURI(resourceName)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Profile Authorization
      */
-    profile(): Observable<UserProfileDetailDto>
-    profile(opts?: OperationOpts): Observable<AjaxResponse<UserProfileDetailDto>>
+    profile(): Observable<UserProfileDetailDto>;
+    profile(opts?: OperationOpts): Observable<AjaxResponse<UserProfileDetailDto>>;
     profile(opts?: OperationOpts): Observable<UserProfileDetailDto | AjaxResponse<UserProfileDetailDto>> {
-        return this.request<UserProfileDetailDto>({
-            url: '/v1/auth/profile',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<UserProfileDetailDto>(
+            {
+                url: '/v1/auth/profile',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Update User Profile
      */
-    updateUserProfile({ updateUserRequestDto }: UpdateUserProfileRequest): Observable<UserDetailDto>
-    updateUserProfile({ updateUserRequestDto }: UpdateUserProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<UserDetailDto>>
-    updateUserProfile({ updateUserRequestDto }: UpdateUserProfileRequest, opts?: OperationOpts): Observable<UserDetailDto | AjaxResponse<UserDetailDto>> {
+    updateUserProfile({ updateUserRequestDto }: UpdateUserProfileRequest): Observable<UserDetailDto>;
+    updateUserProfile({ updateUserRequestDto }: UpdateUserProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<UserDetailDto>>;
+    updateUserProfile(
+        { updateUserRequestDto }: UpdateUserProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<UserDetailDto | AjaxResponse<UserDetailDto>> {
         throwIfNullOrUndefined(updateUserRequestDto, 'updateUserRequestDto', 'updateUserProfile');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<UserDetailDto>({
-            url: '/v1/auth/profile',
-            method: 'PUT',
-            headers,
-            body: updateUserRequestDto,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<UserDetailDto>(
+            {
+                url: '/v1/auth/profile',
+                method: 'PUT',
+                headers,
+                body: updateUserRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

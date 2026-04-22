@@ -4,7 +4,7 @@ import { Buffer } from 'buffer';
 import saveAs from 'file-saver';
 
 import JSZip from 'jszip';
-import { CertificateContentResponseModel, CertificateDetailResponseModel } from 'types/certificate';
+import type { CertificateContentResponseModel, CertificateDetailResponseModel } from 'types/certificate';
 
 export function downloadFile(content: any, fileName: string, type?: string) {
     const element = document.createElement('a');
@@ -33,7 +33,7 @@ export function downloadFileZip(
 ) {
     const zip = new JSZip();
 
-    for (let i of certificateUuids) {
+    for (const i of certificateUuids) {
         const certificate = (certificates as Array<CertificateDetailResponseModel | CertificateContentResponseModel>).find(
             (c) => c.uuid === i,
         );

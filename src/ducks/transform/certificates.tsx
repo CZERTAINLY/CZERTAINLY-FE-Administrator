@@ -1,7 +1,7 @@
-import { CustomNode } from 'components/FlowChart';
+import type { CustomNode } from 'components/FlowChart';
 import CertificateStatus from 'components/_pages/certificates/CertificateStatus';
-import { Edge, MarkerType } from 'reactflow';
-import {
+import { type Edge, MarkerType } from 'reactflow';
+import type {
     CertificateBulkDeleteRequestDto,
     CertificateBulkDeleteRequestModel,
     CertificateBulkDeleteResponseDto,
@@ -43,11 +43,11 @@ import {
     SearchRequestDto,
     SearchRequestModel,
 } from 'types/certificate';
-import { OtherProperties } from 'types/flowchart';
-import { LocationResponseModel } from 'types/locations';
-import { RaProfileResponseModel } from 'types/ra-profiles';
-import { UserResponseModel } from 'types/users';
-import { CertificateChainResponseDto, CertificateComplianceCheckDto } from '../../types/openapi';
+import type { OtherProperties } from 'types/flowchart';
+import type { LocationResponseModel } from 'types/locations';
+import type { RaProfileResponseModel } from 'types/ra-profiles';
+import type { UserResponseModel } from 'types/users';
+import type { CertificateChainResponseDto, CertificateComplianceCheckDto } from '../../types/openapi';
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from './attributes';
 import { transformCertificateGroupResponseDtoToModel } from './certificateGroups';
 import { transformLocationResponseDtoToModel, transformMetadataDtoToModel } from './locations';
@@ -275,8 +275,8 @@ function addOwnerNodeAndEdges(
         const user = users?.find((u) => u.username === certificate?.owner);
         const userOtherProperties: OtherProperties[] = [];
         let entityLabel = '';
-        let description = undefined;
-        let redirectUrl = undefined;
+        let description;
+        let redirectUrl;
         if (user) {
             entityLabel = user.username;
             description = user.description;

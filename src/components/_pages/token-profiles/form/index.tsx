@@ -14,8 +14,8 @@ import { useNavigate, useParams } from 'react-router';
 import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
-import { AttributeDescriptorModel } from 'types/attributes';
-import { TokenProfileDetailResponseModel } from 'types/token-profiles';
+import type { AttributeDescriptorModel } from 'types/attributes';
+import type { TokenProfileDetailResponseModel } from 'types/token-profiles';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
@@ -264,8 +264,8 @@ export default function TokenProfileForm({
     }, [isBusy, resourceCustomAttributes, tokenProfile]);
 
     const keyUsageOptions = useMemo(() => {
-        let options: { value: KeyUsage; label: string }[] = [];
-        for (let key in KeyUsage) {
+        const options: { value: KeyUsage; label: string }[] = [];
+        for (const key in KeyUsage) {
             options.push({
                 value: KeyUsage[key as keyof typeof KeyUsage],
                 label: getEnumLabel(keyUsageEnum, KeyUsage[key as keyof typeof KeyUsage]),

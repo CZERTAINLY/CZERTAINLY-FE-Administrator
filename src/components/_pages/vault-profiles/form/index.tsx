@@ -21,9 +21,9 @@ import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-hel
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
-import { AttributeDescriptorModel } from 'types/attributes';
-import { SearchRequestModel } from 'types/certificate';
-import { FunctionGroupCode, Resource, VaultInstanceDto, VaultProfileRequestDto } from 'types/openapi';
+import type { AttributeDescriptorModel } from 'types/attributes';
+import type { SearchRequestModel } from 'types/certificate';
+import { FunctionGroupCode, Resource, type VaultInstanceDto, type VaultProfileRequestDto } from 'types/openapi';
 
 interface VaultProfileFormProps {
     onCancel?: () => void;

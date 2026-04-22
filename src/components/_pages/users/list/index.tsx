@@ -6,11 +6,11 @@ import { Link } from 'react-router';
 import { actions, selectors } from 'ducks/users';
 import { selectors as authSelectors } from 'ducks/auth';
 
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import UserForm from '../form';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import Badge from 'components/Badge';

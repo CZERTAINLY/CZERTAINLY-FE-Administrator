@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -21,6 +21,5 @@ export enum ActorType {
     Core = 'core',
     User = 'user',
     Connector = 'connector',
-    Protocol = 'protocol'
+    Protocol = 'protocol',
 }
-

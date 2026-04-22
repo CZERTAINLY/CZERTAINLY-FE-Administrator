@@ -1,13 +1,13 @@
-import { ColorOptions } from 'components/_pages/dashboard/DashboardItem/DonutChart';
+import type { ColorOptions } from 'components/_pages/dashboard/DashboardItem/DonutChart';
 import { useMemo } from 'react';
-import {
+import type {
     CertificateEventHistoryDtoStatusEnum,
     CertificateState,
     CertificateValidationStatus,
     ComplianceRuleStatus,
     ComplianceStatus,
 } from 'types/openapi';
-import { DashboardDict } from 'types/statisticsDashboard';
+import type { DashboardDict } from 'types/statisticsDashboard';
 import { getCertificateStatusColor, useGetStatusText } from './certificate';
 import { getSecretStatusColor, useGetSecretStatusText } from './secret';
 
@@ -23,9 +23,9 @@ export function useGetLabels(data: DashboardDict) {
     const getSecretStatusText = useGetSecretStatusText();
 
     const labels = useMemo(() => {
-        let result: string[] = [];
+        const result: string[] = [];
 
-        for (let i of Object.entries(data)) {
+        for (const i of Object.entries(data)) {
             const certLabel = getStatusText(i[0] as Status);
             if (certLabel !== 'Unknown') {
                 result.push(certLabel);
@@ -50,9 +50,9 @@ export function getDefaultColors() {
 }
 
 export function getValues(data: DashboardDict) {
-    let values: number[] = [];
+    const values: number[] = [];
 
-    for (let i of Object.entries(data)) {
+    for (const i of Object.entries(data)) {
         values.push(i[1]);
     }
 

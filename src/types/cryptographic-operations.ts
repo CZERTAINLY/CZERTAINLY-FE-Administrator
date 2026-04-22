@@ -1,5 +1,5 @@
-import { AttributeRequestModel } from './attributes';
-import {
+import type { AttributeRequestModel } from './attributes';
+import type {
     RandomDataRequestDto,
     RandomDataResponseDto,
     SignatureRequestData,

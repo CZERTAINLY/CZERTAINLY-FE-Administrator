@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -36,6 +36,5 @@ export enum FilterConditionOperator {
     CountEqual = 'COUNT_EQUAL',
     CountNotEqual = 'COUNT_NOT_EQUAL',
     CountGreaterThan = 'COUNT_GREATER_THAN',
-    CountLessThan = 'COUNT_LESS_THAN'
+    CountLessThan = 'COUNT_LESS_THAN',
 }
-

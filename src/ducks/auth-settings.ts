@@ -1,5 +1,5 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type {
     AuthenticationSettingsModel,
     AuthenticationSettingsUpdateModel,
     OAuth2ProviderSettingsResponseModel,
@@ -39,7 +39,7 @@ export const slice = createSlice({
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
             Object.keys(state).forEach((key) => {
-                if (!initialState.hasOwnProperty(key)) (state as Partial<State>)[key as keyof State] = undefined;
+                if (!Object.hasOwn(initialState, key)) (state as Partial<State>)[key as keyof State] = undefined;
             });
 
             Object.keys(initialState).forEach((key) => ((state as Partial<State>)[key as keyof State] = (initialState as any)[key]));

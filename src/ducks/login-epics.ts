@@ -1,6 +1,6 @@
 import { EMPTY, of } from 'rxjs';
 import { catchError, filter, switchMap } from 'rxjs/operators';
-import { AppEpic } from 'ducks';
+import type { AppEpic } from 'ducks';
 import { extractError } from 'utils/net';
 import * as slice from './login';
 import { loginRedirect } from 'utils/login-redirect';

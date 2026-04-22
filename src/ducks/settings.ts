@@ -1,5 +1,5 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type {
     SettingsPlatformModel,
     SettingsLoggingModel,
     SettingsPlatformUpdateModel,

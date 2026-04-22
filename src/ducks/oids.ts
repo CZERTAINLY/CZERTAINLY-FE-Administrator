@@ -1,6 +1,6 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { SearchRequestModel } from 'types/certificate';
-import { OIDRequestModel, OIDResponseModel, OIDUpdateRequestModel } from 'types/oids';
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { SearchRequestModel } from 'types/certificate';
+import type { OIDRequestModel, OIDResponseModel, OIDUpdateRequestModel } from 'types/oids';
 
 export type State = {
     oid?: OIDResponseModel;
@@ -32,7 +32,7 @@ export const slice = createSlice({
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
             Object.keys(state).forEach((key) => {
-                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+                if (!Object.hasOwn(initialState, key)) (state as any)[key] = undefined;
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));

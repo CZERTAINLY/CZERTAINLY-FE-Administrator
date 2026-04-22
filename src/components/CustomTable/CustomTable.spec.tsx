@@ -1,5 +1,5 @@
 import { test, expect } from '../../../playwright/ct-test';
-import CustomTable, { TableHeader, TableDataRow } from './index';
+import CustomTable, { type TableHeader, type TableDataRow } from './index';
 import { createMockStore, withProviders } from 'utils/test-helpers';
 
 test.describe('CustomTable', () => {

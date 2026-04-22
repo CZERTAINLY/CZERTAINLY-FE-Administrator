@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    SecretDto,
-} from './';
+import type { SecretDto } from './';
 
 /**
  * @export
