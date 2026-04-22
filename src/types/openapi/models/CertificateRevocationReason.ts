@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -25,6 +25,5 @@ export enum CertificateRevocationReason {
     CessationOfOperation = 'cessationOfOperation',
     CertificateHold = 'certificateHold',
     PrivilegeWithdrawn = 'privilegeWithdrawn',
-    AACompromise = 'aACompromise'
+    AACompromise = 'aACompromise',
 }
-

@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    KeyStoreType,
-    SecretType,
-} from './';
+import type { KeyStoreType, SecretType } from './';
 
 /**
  * Secret representing Key Store
@@ -47,5 +44,3 @@ export interface KeyStoreSecretContent {
      */
     password: string;
 }
-
-

@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    SimplifiedRaProfileDto,
-} from './';
+import type { SimplifiedRaProfileDto } from './';
 
 /**
  * @export
@@ -71,6 +69,5 @@ export interface CmpProfileDto {
 export enum CmpProfileDtoVariantEnum {
     V2 = 'v2',
     V23gpp = 'v2_3gpp',
-    V3 = 'v3'
+    V3 = 'v3',
 }
-

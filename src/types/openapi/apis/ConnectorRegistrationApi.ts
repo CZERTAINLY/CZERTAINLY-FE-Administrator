@@ -15,13 +15,7 @@ import type { Observable } from 'rxjs';
 import type { AjaxResponse } from 'rxjs/ajax';
 import { BaseAPI, throwIfNullOrUndefined } from '../runtime';
 import type { OperationOpts, HttpHeaders } from '../runtime';
-import type {
-    ConnectorDetailDtoV2,
-    ConnectorRequestDto,
-    ConnectorRequestDtoV2,
-    ErrorMessageDto,
-    UuidDto,
-} from '../models';
+import type { ConnectorDetailDtoV2, ConnectorRequestDto, ConnectorRequestDtoV2, ErrorMessageDto, UuidDto } from '../models';
 
 export interface RegisterRequest {
     connectorRequestDto: ConnectorRequestDto;
@@ -35,12 +29,11 @@ export interface RegisterV2Request {
  * no description
  */
 export class ConnectorRegistrationApi extends BaseAPI {
-
     /**
      * Register a Connector
      */
-    register({ connectorRequestDto }: RegisterRequest): Observable<UuidDto>
-    register({ connectorRequestDto }: RegisterRequest, opts?: OperationOpts): Observable<AjaxResponse<UuidDto>>
+    register({ connectorRequestDto }: RegisterRequest): Observable<UuidDto>;
+    register({ connectorRequestDto }: RegisterRequest, opts?: OperationOpts): Observable<AjaxResponse<UuidDto>>;
     register({ connectorRequestDto }: RegisterRequest, opts?: OperationOpts): Observable<UuidDto | AjaxResponse<UuidDto>> {
         throwIfNullOrUndefined(connectorRequestDto, 'connectorRequestDto', 'register');
 
@@ -48,32 +41,40 @@ export class ConnectorRegistrationApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<UuidDto>({
-            url: '/v1/connector/register',
-            method: 'POST',
-            headers,
-            body: connectorRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<UuidDto>(
+            {
+                url: '/v1/connector/register',
+                method: 'POST',
+                headers,
+                body: connectorRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Register a Connector v2
      */
-    registerV2({ connectorRequestDtoV2 }: RegisterV2Request): Observable<ConnectorDetailDtoV2>
-    registerV2({ connectorRequestDtoV2 }: RegisterV2Request, opts?: OperationOpts): Observable<AjaxResponse<ConnectorDetailDtoV2>>
-    registerV2({ connectorRequestDtoV2 }: RegisterV2Request, opts?: OperationOpts): Observable<ConnectorDetailDtoV2 | AjaxResponse<ConnectorDetailDtoV2>> {
+    registerV2({ connectorRequestDtoV2 }: RegisterV2Request): Observable<ConnectorDetailDtoV2>;
+    registerV2({ connectorRequestDtoV2 }: RegisterV2Request, opts?: OperationOpts): Observable<AjaxResponse<ConnectorDetailDtoV2>>;
+    registerV2(
+        { connectorRequestDtoV2 }: RegisterV2Request,
+        opts?: OperationOpts,
+    ): Observable<ConnectorDetailDtoV2 | AjaxResponse<ConnectorDetailDtoV2>> {
         throwIfNullOrUndefined(connectorRequestDtoV2, 'connectorRequestDtoV2', 'registerV2');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<ConnectorDetailDtoV2>({
-            url: '/v2/connector/register',
-            method: 'POST',
-            headers,
-            body: connectorRequestDtoV2,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<ConnectorDetailDtoV2>(
+            {
+                url: '/v2/connector/register',
+                method: 'POST',
+                headers,
+                body: connectorRequestDtoV2,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

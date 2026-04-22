@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ConnectorInterface,
-    FeatureFlag,
-} from './';
+import type { ConnectorInterface, FeatureFlag } from './';
 
 /**
  * @export
@@ -40,5 +37,3 @@ export interface ConnectorInterfaceInfo {
      */
     features?: Array<FeatureFlag>;
 }
-
-

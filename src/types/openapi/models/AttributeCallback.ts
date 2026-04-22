@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeCallbackMapping,
-} from './';
+import type { AttributeCallbackMapping } from './';
 
 /**
  * @export

@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    RaProfileCertificateValidationSettingsDto,
-    ResponseAttribute,
-} from './';
+import type { RaProfileCertificateValidationSettingsDto, ResponseAttribute } from './';
 
 /**
  * @export

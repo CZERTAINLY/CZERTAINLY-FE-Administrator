@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    DiscoveryHistoryDto,
-} from './';
+import type { DiscoveryHistoryDto } from './';
 
 /**
  * @export

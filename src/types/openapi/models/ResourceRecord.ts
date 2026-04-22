@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    Resource,
-    ResourceObjectIdentity,
-} from './';
+import type { Resource, ResourceObjectIdentity } from './';
 
 /**
  * @export
@@ -32,5 +29,3 @@ export interface ResourceRecord {
      */
     objects?: Array<ResourceObjectIdentity>;
 }
-
-

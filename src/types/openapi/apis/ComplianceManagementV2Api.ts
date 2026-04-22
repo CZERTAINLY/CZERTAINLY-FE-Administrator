@@ -15,12 +15,7 @@ import type { Observable } from 'rxjs';
 import type { AjaxResponse } from 'rxjs/ajax';
 import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
 import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
-import type {
-    AuthenticationServiceExceptionDto,
-    ComplianceCheckResultDto,
-    ErrorMessageDto,
-    Resource,
-} from '../models';
+import type { AuthenticationServiceExceptionDto, ComplianceCheckResultDto, ErrorMessageDto, Resource } from '../models';
 
 export interface CheckComplianceV2Request {
     requestBody: Array<string>;
@@ -47,13 +42,18 @@ export interface GetComplianceCheckResultV2Request {
  * no description
  */
 export class ComplianceManagementV2Api extends BaseAPI {
-
     /**
      * Initiate compliance check for requested compliance profiles
      */
-    checkComplianceV2({ requestBody, resource, type }: CheckComplianceV2Request): Observable<void>
-    checkComplianceV2({ requestBody, resource, type }: CheckComplianceV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    checkComplianceV2({ requestBody, resource, type }: CheckComplianceV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    checkComplianceV2({ requestBody, resource, type }: CheckComplianceV2Request): Observable<void>;
+    checkComplianceV2(
+        { requestBody, resource, type }: CheckComplianceV2Request,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    checkComplianceV2(
+        { requestBody, resource, type }: CheckComplianceV2Request,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(requestBody, 'requestBody', 'checkComplianceV2');
 
         const headers: HttpHeaders = {
@@ -62,39 +62,63 @@ export class ComplianceManagementV2Api extends BaseAPI {
 
         const query: HttpQuery = {};
 
-        if (resource != null) { query['resource'] = resource; }
-        if (type != null) { query['type'] = type; }
+        if (resource != null) {
+            query['resource'] = resource;
+        }
+        if (type != null) {
+            query['type'] = type;
+        }
 
-        return this.request<void>({
-            url: '/v2/compliance',
-            method: 'POST',
-            headers,
-            query,
-            body: requestBody,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v2/compliance',
+                method: 'POST',
+                headers,
+                query,
+                body: requestBody,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Initiate compliance Check for requested resource object
      */
-    checkResourceObjectComplianceV2({ resource, objectUuid }: CheckResourceObjectComplianceV2Request): Observable<void>
-    checkResourceObjectComplianceV2({ resource, objectUuid }: CheckResourceObjectComplianceV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    checkResourceObjectComplianceV2({ resource, objectUuid }: CheckResourceObjectComplianceV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    checkResourceObjectComplianceV2({ resource, objectUuid }: CheckResourceObjectComplianceV2Request): Observable<void>;
+    checkResourceObjectComplianceV2(
+        { resource, objectUuid }: CheckResourceObjectComplianceV2Request,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    checkResourceObjectComplianceV2(
+        { resource, objectUuid }: CheckResourceObjectComplianceV2Request,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(resource, 'resource', 'checkResourceObjectComplianceV2');
         throwIfNullOrUndefined(objectUuid, 'objectUuid', 'checkResourceObjectComplianceV2');
 
-        return this.request<void>({
-            url: '/v2/compliance/{resource}/{objectUuid}'.replace('{resource}', encodeURI(resource)).replace('{objectUuid}', encodeURI(objectUuid)),
-            method: 'POST',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v2/compliance/{resource}/{objectUuid}'
+                    .replace('{resource}', encodeURI(resource))
+                    .replace('{objectUuid}', encodeURI(objectUuid)),
+                method: 'POST',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Initiate compliance Check for requested resource objects
      */
-    checkResourceObjectsComplianceV2({ resource, requestBody }: CheckResourceObjectsComplianceV2Request): Observable<void>
-    checkResourceObjectsComplianceV2({ resource, requestBody }: CheckResourceObjectsComplianceV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    checkResourceObjectsComplianceV2({ resource, requestBody }: CheckResourceObjectsComplianceV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    checkResourceObjectsComplianceV2({ resource, requestBody }: CheckResourceObjectsComplianceV2Request): Observable<void>;
+    checkResourceObjectsComplianceV2(
+        { resource, requestBody }: CheckResourceObjectsComplianceV2Request,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    checkResourceObjectsComplianceV2(
+        { resource, requestBody }: CheckResourceObjectsComplianceV2Request,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(resource, 'resource', 'checkResourceObjectsComplianceV2');
         throwIfNullOrUndefined(requestBody, 'requestBody', 'checkResourceObjectsComplianceV2');
 
@@ -102,27 +126,40 @@ export class ComplianceManagementV2Api extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>({
-            url: '/v2/compliance/{resource}'.replace('{resource}', encodeURI(resource)),
-            method: 'POST',
-            headers,
-            body: requestBody,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v2/compliance/{resource}'.replace('{resource}', encodeURI(resource)),
+                method: 'POST',
+                headers,
+                body: requestBody,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get the latest compliance check result for the specified resource object
      */
-    getComplianceCheckResultV2({ resource, objectUuid }: GetComplianceCheckResultV2Request): Observable<ComplianceCheckResultDto>
-    getComplianceCheckResultV2({ resource, objectUuid }: GetComplianceCheckResultV2Request, opts?: OperationOpts): Observable<AjaxResponse<ComplianceCheckResultDto>>
-    getComplianceCheckResultV2({ resource, objectUuid }: GetComplianceCheckResultV2Request, opts?: OperationOpts): Observable<ComplianceCheckResultDto | AjaxResponse<ComplianceCheckResultDto>> {
+    getComplianceCheckResultV2({ resource, objectUuid }: GetComplianceCheckResultV2Request): Observable<ComplianceCheckResultDto>;
+    getComplianceCheckResultV2(
+        { resource, objectUuid }: GetComplianceCheckResultV2Request,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<ComplianceCheckResultDto>>;
+    getComplianceCheckResultV2(
+        { resource, objectUuid }: GetComplianceCheckResultV2Request,
+        opts?: OperationOpts,
+    ): Observable<ComplianceCheckResultDto | AjaxResponse<ComplianceCheckResultDto>> {
         throwIfNullOrUndefined(resource, 'resource', 'getComplianceCheckResultV2');
         throwIfNullOrUndefined(objectUuid, 'objectUuid', 'getComplianceCheckResultV2');
 
-        return this.request<ComplianceCheckResultDto>({
-            url: '/v2/compliance/{resource}/{objectUuid}'.replace('{resource}', encodeURI(resource)).replace('{objectUuid}', encodeURI(objectUuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
-
+        return this.request<ComplianceCheckResultDto>(
+            {
+                url: '/v2/compliance/{resource}/{objectUuid}'
+                    .replace('{resource}', encodeURI(resource))
+                    .replace('{objectUuid}', encodeURI(objectUuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 }

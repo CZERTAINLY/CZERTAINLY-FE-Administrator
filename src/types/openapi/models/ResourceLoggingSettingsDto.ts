@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    Module,
-    Resource,
-} from './';
+import type { Module, Resource } from './';
 
 /**
  * @export

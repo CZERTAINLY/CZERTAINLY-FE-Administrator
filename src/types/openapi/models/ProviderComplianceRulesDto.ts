@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ComplianceGroupDto,
-    ComplianceRuleDto,
-} from './';
+import type { ComplianceGroupDto, ComplianceRuleDto } from './';
 
 /**
  * @export

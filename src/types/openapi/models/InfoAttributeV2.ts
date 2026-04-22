@@ -11,12 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-    AttributeType,
-    BaseAttributeContentDtoV2,
-    InfoAttributeProperties,
-} from './';
+import type { AttributeContentType, AttributeType, BaseAttributeContentDtoV2, InfoAttributeProperties } from './';
 
 /**
  * Info attribute contains content that is for information purpose or represents additional information for object (metadata). Its content can not be edited and is not send in requests to store.
@@ -73,5 +68,3 @@ export interface InfoAttributeV2 {
      */
     properties: InfoAttributeProperties;
 }
-
-

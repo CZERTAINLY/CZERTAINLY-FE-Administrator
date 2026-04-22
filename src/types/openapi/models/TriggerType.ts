@@ -12,12 +12,11 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
 export enum TriggerType {
     Event = 'event',
-    Manual = 'manual'
+    Manual = 'manual',
 }
-

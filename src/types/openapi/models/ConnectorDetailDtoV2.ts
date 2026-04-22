@@ -11,14 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AuthType,
-    ConnectorInterfaceDto,
-    ConnectorStatus,
-    ConnectorVersion,
-    FunctionGroupDto, ProxyDto,
-    ResponseAttribute,
-} from './';
+import type { AuthType, ConnectorInterfaceDto, ConnectorStatus, ConnectorVersion, FunctionGroupDto, ProxyDto, ResponseAttribute } from './';
 
 /**
  * @export
@@ -95,5 +88,3 @@ export interface ConnectorDetailDtoV2 {
      */
     proxy?: ProxyDto;
 }
-
-

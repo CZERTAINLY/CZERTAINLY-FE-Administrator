@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CertificateValidationCheck,
-    CertificateValidationStatus,
-} from './';
+import type { CertificateValidationCheck, CertificateValidationStatus } from './';
 
 /**
  * @export
@@ -40,5 +37,3 @@ export interface CertificateValidationCheckDto {
      */
     message?: string;
 }
-
-

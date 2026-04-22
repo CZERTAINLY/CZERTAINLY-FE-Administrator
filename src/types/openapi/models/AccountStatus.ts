@@ -12,13 +12,12 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
 export enum AccountStatus {
     Valid = 'valid',
     Deactivated = 'deactivated',
-    Revoked = 'revoked'
+    Revoked = 'revoked',
 }
-

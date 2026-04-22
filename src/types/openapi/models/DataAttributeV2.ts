@@ -87,5 +87,3 @@ export interface DataAttributeV2 {
      */
     attributeCallback?: AttributeCallback;
 }
-
-

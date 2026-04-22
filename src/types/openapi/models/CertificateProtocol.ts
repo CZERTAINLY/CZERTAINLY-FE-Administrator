@@ -12,13 +12,12 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
 export enum CertificateProtocol {
     Acme = 'acme',
     Scep = 'scep',
-    Cmp = 'cmp'
+    Cmp = 'cmp',
 }
-

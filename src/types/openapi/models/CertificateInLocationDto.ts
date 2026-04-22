@@ -11,12 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CertificateState,
-    CertificateValidationStatus,
-    MetadataResponseDto,
-    ResponseAttribute,
-} from './';
+import type { CertificateState, CertificateValidationStatus, MetadataResponseDto, ResponseAttribute } from './';
 
 /**
  * @export
@@ -78,5 +73,3 @@ export interface CertificateInLocationDto {
      */
     withKey?: boolean;
 }
-
-

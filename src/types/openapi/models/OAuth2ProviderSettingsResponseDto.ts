@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    JwkDto,
-} from './';
+import type { JwkDto } from './';
 
 /**
  * @export

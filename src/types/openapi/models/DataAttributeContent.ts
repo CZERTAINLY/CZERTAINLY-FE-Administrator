@@ -32,4 +32,17 @@ import type {
  * Content of the Attribute
  * @export
  */
-export type DataAttributeContent = BooleanAttributeContent | CodeBlockAttributeContent | CredentialAttributeContent | DateAttributeContent | DateTimeAttributeContent | FileAttributeContent | FloatAttributeContent | IntegerAttributeContent | ObjectAttributeContent | SecretAttributeContent | StringAttributeContent | TextAttributeContent | TimeAttributeContent;
+export type DataAttributeContent =
+    | BooleanAttributeContent
+    | CodeBlockAttributeContent
+    | CredentialAttributeContent
+    | DateAttributeContent
+    | DateTimeAttributeContent
+    | FileAttributeContent
+    | FloatAttributeContent
+    | IntegerAttributeContent
+    | ObjectAttributeContent
+    | SecretAttributeContent
+    | StringAttributeContent
+    | TextAttributeContent
+    | TimeAttributeContent;

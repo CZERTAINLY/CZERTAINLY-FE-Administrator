@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    DataAttributeV2,
-} from './';
+import type { DataAttributeV2 } from './';
 
 /**
  * @export

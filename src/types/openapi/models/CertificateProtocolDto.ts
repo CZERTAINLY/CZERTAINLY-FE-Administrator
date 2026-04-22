@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CertificateProtocol,
-} from './';
+import type { CertificateProtocol } from './';
 
 /**
  * @export
@@ -39,5 +37,3 @@ export interface CertificateProtocolDto {
      */
     additionalProtocolUuid?: string;
 }
-
-

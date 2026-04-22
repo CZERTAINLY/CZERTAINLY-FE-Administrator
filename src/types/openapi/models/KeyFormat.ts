@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -21,6 +21,5 @@ export enum KeyFormat {
     SubjectPublicKeyInfo = 'SubjectPublicKeyInfo',
     PrivateKeyInfo = 'PrivateKeyInfo',
     EncryptedPrivateKeyInfo = 'EncryptedPrivateKeyInfo',
-    Custom = 'Custom'
+    Custom = 'Custom',
 }
-

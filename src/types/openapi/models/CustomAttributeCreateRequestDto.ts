@@ -11,12 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContent,
-    AttributeContentType,
-    ProtectionLevel,
-    Resource,
-} from './';
+import type { AttributeContent, AttributeContentType, ProtectionLevel, Resource } from './';
 
 /**
  * @export
@@ -108,5 +103,3 @@ export interface CustomAttributeCreateRequestDto {
      */
     resources?: Array<Resource>;
 }
-
-

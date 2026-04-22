@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -81,6 +81,5 @@ export enum PlatformEnum {
     ApprovalStatusEnum = 'ApprovalStatusEnum',
     SecretType = 'SecretType',
     KeyStoreType = 'KeyStoreType',
-    SecretState = 'SecretState'
+    SecretState = 'SecretState',
 }
-

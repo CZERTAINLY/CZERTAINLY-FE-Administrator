@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -21,6 +21,5 @@ export enum HealthStatus {
     Degraded = 'DEGRADED',
     Down = 'DOWN',
     OutOfService = 'OUT_OF_SERVICE',
-    Unknown = 'UNKNOWN'
+    Unknown = 'UNKNOWN',
 }
-

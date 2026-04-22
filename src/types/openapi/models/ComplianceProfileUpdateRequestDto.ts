@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ProviderComplianceRulesRequestDto,
-    RequestAttribute,
-} from './';
+import type { ProviderComplianceRulesRequestDto, RequestAttribute } from './';
 
 /**
  * @export

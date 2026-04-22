@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-} from './';
+import type { AttributeContentType } from './';
 
 /**
  * Time attribute content in predefined format
@@ -40,5 +38,3 @@ export interface TimeAttributeContentV3 {
      */
     contentType: AttributeContentType;
 }
-
-

@@ -15,52 +15,54 @@ import type { Observable } from 'rxjs';
 import type { AjaxResponse } from 'rxjs/ajax';
 import { BaseAPI } from '../runtime';
 import type { OperationOpts } from '../runtime';
-import type {
-    ActuatorHealthDto,
-    AuthenticationServiceExceptionDto,
-    CoreInfoResponseDto,
-    ErrorMessageDto,
-} from '../models';
+import type { ActuatorHealthDto, AuthenticationServiceExceptionDto, CoreInfoResponseDto, ErrorMessageDto } from '../models';
 
 /**
  * no description
  */
 export class InfoApi extends BaseAPI {
-
     /**
      * Health liveness check endpoint
      */
-    getHealthLiveness(): Observable<ActuatorHealthDto>
-    getHealthLiveness(opts?: OperationOpts): Observable<AjaxResponse<ActuatorHealthDto>>
+    getHealthLiveness(): Observable<ActuatorHealthDto>;
+    getHealthLiveness(opts?: OperationOpts): Observable<AjaxResponse<ActuatorHealthDto>>;
     getHealthLiveness(opts?: OperationOpts): Observable<ActuatorHealthDto | AjaxResponse<ActuatorHealthDto>> {
-        return this.request<ActuatorHealthDto>({
-            url: '/v1/health/liveness',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<ActuatorHealthDto>(
+            {
+                url: '/v1/health/liveness',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Health readiness check endpoint
      */
-    getHealthReadiness(): Observable<ActuatorHealthDto>
-    getHealthReadiness(opts?: OperationOpts): Observable<AjaxResponse<ActuatorHealthDto>>
+    getHealthReadiness(): Observable<ActuatorHealthDto>;
+    getHealthReadiness(opts?: OperationOpts): Observable<AjaxResponse<ActuatorHealthDto>>;
     getHealthReadiness(opts?: OperationOpts): Observable<ActuatorHealthDto | AjaxResponse<ActuatorHealthDto>> {
-        return this.request<ActuatorHealthDto>({
-            url: '/v1/health/readiness',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<ActuatorHealthDto>(
+            {
+                url: '/v1/health/readiness',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get information about running CZERTAINLY Application
      */
-    getInfo(): Observable<CoreInfoResponseDto>
-    getInfo(opts?: OperationOpts): Observable<AjaxResponse<CoreInfoResponseDto>>
+    getInfo(): Observable<CoreInfoResponseDto>;
+    getInfo(opts?: OperationOpts): Observable<AjaxResponse<CoreInfoResponseDto>>;
     getInfo(opts?: OperationOpts): Observable<CoreInfoResponseDto | AjaxResponse<CoreInfoResponseDto>> {
-        return this.request<CoreInfoResponseDto>({
-            url: '/v1/info',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
-
+        return this.request<CoreInfoResponseDto>(
+            {
+                url: '/v1/info',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 }

@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ConnectorDtoV2,
-} from './';
+import type { ConnectorDtoV2 } from './';
 
 /**
  * @export

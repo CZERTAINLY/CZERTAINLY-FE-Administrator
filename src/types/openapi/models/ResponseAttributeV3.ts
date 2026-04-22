@@ -11,11 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-    AttributeType,
-    AttributeVersion,
-} from './';
+import type { AttributeContentType, AttributeType, AttributeVersion } from './';
 
 /**
  * @export
@@ -59,5 +55,3 @@ export interface ResponseAttributeV3 {
      */
     version: AttributeVersion;
 }
-
-

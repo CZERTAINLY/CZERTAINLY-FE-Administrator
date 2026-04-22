@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ConditionDto,
-    Resource,
-} from './';
+import type { ConditionDto, Resource } from './';
 
 /**
  * @export
@@ -52,5 +49,3 @@ export interface RuleDetailDto {
      */
     conditions: Array<ConditionDto>;
 }
-
-

@@ -15,7 +15,6 @@
             "!**/monocart-report",
             "!**/node_modules",
             "!.claude",
-            "!src/types/openapi",
             "!src/resources/fonts/fontawesome/css",
             "!src/setupProxy.js",
             "!.github",
@@ -50,6 +49,7 @@
     },
     "linter": {
         "enabled": true,
+        "includes": ["**", "!src/types/openapi/**"],
         "rules": {
             "recommended": true,
             "a11y": {

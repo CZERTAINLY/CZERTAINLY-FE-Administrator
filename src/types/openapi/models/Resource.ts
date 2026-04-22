@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -77,4 +77,3 @@ export enum Resource {
     Secrets = 'secrets',
     TrustedCertificates = 'trustedCertificates',
 }
-

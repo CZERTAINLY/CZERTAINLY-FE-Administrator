@@ -12,12 +12,11 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
 export enum ProtectionLevel {
     None = 'none',
-    Encrypted = 'encrypted'
+    Encrypted = 'encrypted',
 }
-

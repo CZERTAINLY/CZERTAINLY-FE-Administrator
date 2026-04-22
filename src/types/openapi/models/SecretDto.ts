@@ -11,12 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ComplianceStatus,
-    NameAndUuidDto,
-    SecretState,
-    SecretType,
-} from './';
+import type { ComplianceStatus, NameAndUuidDto, SecretState, SecretType } from './';
 
 /**
  * @export
@@ -90,5 +85,3 @@ export interface SecretDto {
      */
     complianceStatus: ComplianceStatus;
 }
-
-
