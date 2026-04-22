@@ -8,6 +8,7 @@ import {
     ArrowUpFromLine,
     Users,
     User,
+    UserCheck,
     CircleMinus,
     ArrowDownToLine,
     Repeat2,
@@ -15,11 +16,28 @@ import {
     SquareMinus,
     Check,
     Plug,
+    ShieldCheck,
 } from 'lucide-react';
 import { useLayoutEffect } from 'react';
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
-export type ModalIcon = 'delete' | 'info' | 'warning' | 'success' | 'error' | 'users' | 'user' | 'download' | 'plug' | React.ReactNode;
+export type ModalIcon =
+    | 'delete'
+    | 'destroy'
+    | 'info'
+    | 'warning'
+    | 'check'
+    | 'upload'
+    | 'users'
+    | 'user'
+    | 'user-check'
+    | 'shield-check'
+    | 'download'
+    | 'refresh'
+    | 'shuffle'
+    | 'minus'
+    | 'plug'
+    | React.ReactNode;
 
 export interface DialogButton {
     key?: string;
@@ -97,6 +115,12 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
                 break;
             case 'user':
                 iconElement = <User {...buttonProps} />;
+                break;
+            case 'user-check':
+                iconElement = <UserCheck {...buttonProps} />;
+                break;
+            case 'shield-check':
+                iconElement = <ShieldCheck {...buttonProps} />;
                 break;
             case 'destroy':
                 iconElement = <CircleMinus {...buttonProps} />;

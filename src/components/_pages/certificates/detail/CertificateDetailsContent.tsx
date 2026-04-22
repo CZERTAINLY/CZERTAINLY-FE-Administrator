@@ -30,9 +30,7 @@ import {
     CertificateState as CertStatus,
     CertificateSubjectType,
     CertificateValidationResultDto,
-    CertificateValidationStatus,
     CertificateProtocol,
-    ComplianceStatus,
     PlatformEnum,
 } from 'types/openapi';
 import CertificateDownloadForm from './CertificateDownloadForm';
@@ -762,7 +760,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                         onChange={(value) => setOwnerUuid(value as string)}
                     />
                 }
-                icon="user"
+                icon="user-check"
                 size="md"
                 toggle={onCancelOwnerUpdate}
                 buttons={[
@@ -792,7 +790,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                         label="RA Profile"
                     />
                 }
-                icon="plug"
+                icon="shield-check"
                 size="md"
                 toggle={onCancelRaProfileUpdate}
                 buttons={[

@@ -12,7 +12,10 @@ import {
     ArrowDownToLine,
     Users,
     User,
+    UserCheck,
+    UserCog,
     Boxes,
+    Repeat,
     Repeat2,
     MinusSquare,
     Info,
@@ -35,6 +38,8 @@ import {
     Archive,
     PackageOpen,
     SquareMinus,
+    Unplug,
+    ShieldCheck,
 } from 'lucide-react';
 import EditIcon from 'components/icons/EditIcon';
 import type { IconName } from 'types/icons';
@@ -79,4 +84,9 @@ export const iconRegistry: Record<IconName, React.ComponentType<{ size?: number 
     rekey: Shuffle,
     archive: Archive,
     unarchive: PackageOpen,
+    'user-check': UserCheck,
+    'user-cog': UserCog,
+    'shield-check': ShieldCheck,
+    unplug: Unplug,
+    repeat: Repeat,
 };
