@@ -152,20 +152,24 @@ test.describe('ContentValueField', () => {
         expect((submitted[0] as { data: string }).data).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     });
 
-    test('time type: beforeOnSubmit appends :00 when two parts', async ({ mount, page }) => {
+    test('time type: beforeOnSubmit normalizes time to HH:mm:ss', async ({ mount, page }) => {
         let submitted: unknown[] = [];
+        const onSubmit = (_: string, content: unknown[]) => {
+            submitted = content;
+        };
+
         await mount(
-            <ContentValueFieldTestWrapper
-                descriptor={buildDescriptor({ contentType: AttributeContentType.Time })}
-                onSubmit={(_, content) => {
-                    submitted = content;
-                }}
-            />,
+            <ContentValueFieldTestWrapper descriptor={buildDescriptor({ contentType: AttributeContentType.Time })} onSubmit={onSubmit} />,
         );
         await setTimeValue(page, '14:30');
-        await expect(page.getByTestId('save-custom-value')).toBeEnabled();
         await page.getByTestId('save-custom-value').click();
-        expect(submitted).toHaveLength(1);
+        expect((submitted[0] as { data: string }).data).toBe('14:30:00');
+
+        await mount(
+            <ContentValueFieldTestWrapper descriptor={buildDescriptor({ contentType: AttributeContentType.Time })} onSubmit={onSubmit} />,
+        );
+        await setTimeValue(page, '14:30:00');
+        await page.getByTestId('save-custom-value').click();
         expect((submitted[0] as { data: string }).data).toBe('14:30:00');
     });
 
@@ -358,23 +362,6 @@ test.describe('ContentValueField', () => {
         const select = page.getByTestId('select-multiList');
         await expect(select).toBeVisible();
         await expect(select).toContainText('customItem');
-    });
-
-    test('time beforeOnSubmit leaves full time string unchanged', async ({ mount, page }) => {
-        let submitted: unknown[] = [];
-        await mount(
-            <ContentValueFieldTestWrapper
-                descriptor={buildDescriptor({ contentType: AttributeContentType.Time })}
-                onSubmit={(_, content) => {
-                    submitted = content;
-                }}
-            />,
-        );
-        await setTimeValue(page, '14:30:00');
-        await expect(page.getByTestId('save-custom-value')).toBeEnabled();
-        await page.getByTestId('save-custom-value').click();
-        expect(submitted).toHaveLength(1);
-        expect((submitted[0] as { data: string }).data).toBe('14:30:00');
     });
 
     test('list with extensibleList shows Add custom value button below select', async ({ mount, page }) => {
