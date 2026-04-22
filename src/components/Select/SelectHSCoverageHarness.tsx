@@ -13,7 +13,7 @@ export function SelectHSSelectValueChangeHarness() {
 
     useLayoutEffect(() => {
         const state = { close: 0, destroy: 0, autoInit: 0 };
-        (window as any).__hsState = state;
+        (globalThis as any).__hsState = state;
         const instance = {
             isOpened: () => true,
             close: () => {
@@ -23,15 +23,15 @@ export function SelectHSSelectValueChangeHarness() {
                 state.destroy += 1;
             },
         };
-        (window as any).HSSelect = {
+        (globalThis as any).HSSelect = {
             getInstance: () => instance,
             autoInit: () => {
                 state.autoInit += 1;
             },
         };
         return () => {
-            delete (window as any).__hsState;
-            delete (window as any).HSSelect;
+            delete (globalThis as any).__hsState;
+            delete (globalThis as any).HSSelect;
         };
     }, []);
 
@@ -59,23 +59,109 @@ export function SelectTooltipSyncHarness() {
           </div>
         `;
         document.body.appendChild(dropdown);
-        (window as any).__tooltipCalls = 0;
-        (window as any).HSSelect = {
+        (globalThis as any).__tooltipCalls = 0;
+        (globalThis as any).HSSelect = {
             getInstance: () => ({ dropdown }),
             autoInit: () => {},
         };
-        (window as any).HSTooltip = {
+        (globalThis as any).HSTooltip = {
             autoInit: () => {
-                (window as any).__tooltipCalls += 1;
+                (globalThis as any).__tooltipCalls += 1;
             },
         };
         return () => {
             dropdown.remove();
-            delete (window as any).__tooltipCalls;
-            delete (window as any).HSSelect;
-            delete (window as any).HSTooltip;
+            delete (globalThis as any).__tooltipCalls;
+            delete (globalThis as any).HSSelect;
+            delete (globalThis as any).HSTooltip;
         };
     }, []);
 
     return <Select id="hs-tooltip-sync" value="" onChange={() => {}} options={options} />;
+}
+
+// --------------------------------------------------------------------------------------------------------------
+// Parameterized harness for scenarios where the <Select> options arrive AFTER the component has mounted.
+// Covers both single and multi modes and captures the native <select>'s state at each HSSelect.autoInit() call
+// so tests can verify syncNativeSelection runs before HSSelect re-initializes.
+// --------------------------------------------------------------------------------------------------------------
+type LateOptionsCapture = string | string[];
+
+interface LateOptionsHarnessProps {
+    mode: 'single' | 'multi';
+    id: string;
+    stateKey: string;
+    loadTestId: string;
+    loadOptions: { value: string; label: string }[];
+    initialSingleValue?: string;
+    initialMultiValue?: { value: string; label: string }[];
+}
+
+export function SelectLateOptionsHarness({
+    mode,
+    id,
+    stateKey,
+    loadTestId,
+    loadOptions,
+    initialSingleValue,
+    initialMultiValue,
+}: LateOptionsHarnessProps) {
+    const [options, setOptions] = useState<{ value: string; label: string }[]>([]);
+
+    useLayoutEffect(() => {
+        const state: { destroy: number; autoInit: number; initialized: boolean; captures: LateOptionsCapture[] } = {
+            destroy: 0,
+            autoInit: 0,
+            initialized: false,
+            captures: [],
+        };
+        (globalThis as any)[stateKey] = state;
+        const instanceFor = (el: HTMLSelectElement) => ({
+            isOpened: () => false,
+            close: () => {},
+            destroy: () => {
+                state.destroy += 1;
+                // Simulate real HSSelect clearing selection on destroy.
+                if (mode === 'multi') {
+                    Array.from(el.options).forEach((o) => {
+                        o.selected = false;
+                    });
+                } else {
+                    el.value = '';
+                }
+            },
+        });
+        (globalThis as any).HSSelect = {
+            // Real HSSelect has no instance until autoInit() has run; mirror that so the initial
+            // optionsChanged pass takes the no-instance branch rather than destroying a phantom widget.
+            getInstance: (el: HTMLSelectElement) => (state.initialized ? instanceFor(el) : undefined),
+            autoInit: () => {
+                state.autoInit += 1;
+                state.initialized = true;
+                const sel = document.getElementById(id) as HTMLSelectElement | null;
+                if (mode === 'multi') {
+                    state.captures.push(sel ? Array.from(sel.selectedOptions).map((o) => o.value) : []);
+                } else {
+                    state.captures.push(sel?.value ?? '');
+                }
+            },
+        };
+        return () => {
+            delete (globalThis as any)[stateKey];
+            delete (globalThis as any).HSSelect;
+        };
+    }, [id, stateKey, mode]);
+
+    return (
+        <div>
+            <button data-testid={loadTestId} onClick={() => setOptions(loadOptions)}>
+                Load Options
+            </button>
+            {mode === 'multi' ? (
+                <Select id={id} value={initialMultiValue ?? []} onChange={() => {}} options={options} isMulti={true} />
+            ) : (
+                <Select id={id} value={initialSingleValue ?? ''} onChange={() => {}} options={options} />
+            )}
+        </div>
+    );
 }
