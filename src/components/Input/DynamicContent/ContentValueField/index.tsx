@@ -254,7 +254,8 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
                 : undefined
             : undefined;
 
-        setValue(descriptor.name, initialValue ?? descriptorValue ?? ContentFieldConfiguration[descriptor.contentType].initial);
+        const scalarDefault = descriptor.properties.list ? undefined : ContentFieldConfiguration[descriptor.contentType].initial;
+        setValue(descriptor.name, initialValue ?? descriptorValue ?? scalarDefault);
     }, [descriptor, setValue, initialContent]);
 
     const fieldStepValue = useMemo(() => {

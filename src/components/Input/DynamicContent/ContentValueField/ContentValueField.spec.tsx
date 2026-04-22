@@ -152,21 +152,30 @@ test.describe('ContentValueField', () => {
         expect((submitted[0] as { data: string }).data).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     });
 
-    test('time type: beforeOnSubmit normalizes time to HH:mm:ss', async ({ mount, page }) => {
+    test('time type: beforeOnSubmit appends :00 when two parts', async ({ mount, page }) => {
         let submitted: unknown[] = [];
-        const onSubmit = (_: string, content: unknown[]) => {
-            submitted = content;
-        };
-
         await mount(
-            <ContentValueFieldTestWrapper descriptor={buildDescriptor({ contentType: AttributeContentType.Time })} onSubmit={onSubmit} />,
+            <ContentValueFieldTestWrapper
+                descriptor={buildDescriptor({ contentType: AttributeContentType.Time })}
+                onSubmit={(_, content) => {
+                    submitted = content;
+                }}
+            />,
         );
         await setTimeValue(page, '14:30');
         await page.getByTestId('save-custom-value').click();
         expect((submitted[0] as { data: string }).data).toBe('14:30:00');
+    });
 
+    test('time type: beforeOnSubmit leaves full time string unchanged', async ({ mount, page }) => {
+        let submitted: unknown[] = [];
         await mount(
-            <ContentValueFieldTestWrapper descriptor={buildDescriptor({ contentType: AttributeContentType.Time })} onSubmit={onSubmit} />,
+            <ContentValueFieldTestWrapper
+                descriptor={buildDescriptor({ contentType: AttributeContentType.Time })}
+                onSubmit={(_, content) => {
+                    submitted = content;
+                }}
+            />,
         );
         await setTimeValue(page, '14:30:00');
         await page.getByTestId('save-custom-value').click();
@@ -362,6 +371,132 @@ test.describe('ContentValueField', () => {
         const select = page.getByTestId('select-multiList');
         await expect(select).toBeVisible();
         await expect(select).toContainText('customItem');
+    });
+
+    test('list single select: selecting option submits correct value', async ({ mount, page }) => {
+        let submitted: unknown[] = [];
+        const descriptor = buildListDescriptor({
+            name: 'singleList',
+            content: [{ data: 'opt1' }, { data: 'opt2' }],
+        });
+        await mount(
+            <ContentValueFieldTestWrapper
+                descriptor={descriptor}
+                onSubmit={(_, c) => {
+                    submitted = c;
+                }}
+            />,
+        );
+
+        await page.locator('select#singleList').evaluate((el: HTMLSelectElement) => {
+            el.value = 'opt1';
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        await page.getByTestId('save-custom-value').click();
+        expect(submitted).toEqual([{ data: 'opt1' }]);
+    });
+
+    test('list multiSelect: selecting one option submits correct value', async ({ mount, page }) => {
+        let submitted: unknown[] = [];
+        const descriptor = buildListDescriptor({
+            name: 'multiList',
+            multiSelect: true,
+            content: [{ data: 'opt1' }, { data: 'opt2' }],
+        });
+        await mount(
+            <ContentValueFieldTestWrapper
+                descriptor={descriptor}
+                onSubmit={(_, c) => {
+                    submitted = c;
+                }}
+            />,
+        );
+
+        await page.locator('select#multiList').evaluate((el: HTMLSelectElement) => {
+            const opt = Array.from(el.options).find((o) => o.value === 'opt1');
+            if (opt) opt.selected = true;
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        await page.getByTestId('save-custom-value').click();
+        expect(submitted).toEqual([{ data: 'opt1' }]);
+    });
+
+    test('list multiSelect: selecting multiple options submits all', async ({ mount, page }) => {
+        let submitted: unknown[] = [];
+        const descriptor = buildListDescriptor({
+            name: 'multiList',
+            multiSelect: true,
+            content: [{ data: 'opt1' }, { data: 'opt2' }],
+        });
+        await mount(
+            <ContentValueFieldTestWrapper
+                descriptor={descriptor}
+                onSubmit={(_, c) => {
+                    submitted = c;
+                }}
+            />,
+        );
+
+        await page.locator('select#multiList').evaluate((el: HTMLSelectElement) => {
+            Array.from(el.options).forEach((o) => {
+                if (o.value === 'opt1' || o.value === 'opt2') o.selected = true;
+            });
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        await page.getByTestId('save-custom-value').click();
+        expect(submitted).toEqual([{ data: 'opt1' }, { data: 'opt2' }]);
+    });
+
+    test('list multiSelect: deselecting all disables Save', async ({ mount, page }) => {
+        const descriptor = buildListDescriptor({
+            name: 'multiList',
+            multiSelect: true,
+            content: [{ data: 'opt1' }, { data: 'opt2' }],
+        });
+        await mount(<ContentValueFieldTestWrapper descriptor={descriptor} />);
+
+        await page.locator('select#multiList').evaluate((el: HTMLSelectElement) => {
+            const opt = Array.from(el.options).find((o) => o.value === 'opt1');
+            if (opt) opt.selected = true;
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+        await expect(page.getByTestId('save-custom-value')).toBeEnabled();
+
+        await page.locator('select#multiList').evaluate((el: HTMLSelectElement) => {
+            Array.from(el.options).forEach((o) => (o.selected = false));
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+        await expect(page.getByTestId('save-custom-value')).toBeDisabled();
+    });
+
+    test('list multiSelect Integer: values are parsed to numbers', async ({ mount, page }) => {
+        let submitted: unknown[] = [];
+        const descriptor = buildListDescriptor({
+            name: 'intList',
+            contentType: AttributeContentType.Integer,
+            multiSelect: true,
+            content: [{ data: '42' }, { data: '7' }],
+        });
+        await mount(
+            <ContentValueFieldTestWrapper
+                descriptor={descriptor}
+                onSubmit={(_, c) => {
+                    submitted = c;
+                }}
+            />,
+        );
+
+        await page.locator('select#intList').evaluate((el: HTMLSelectElement) => {
+            const opt = Array.from(el.options).find((o) => o.value === '42');
+            if (opt) opt.selected = true;
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        await page.getByTestId('save-custom-value').click();
+        expect(submitted).toEqual([{ data: 42 }]);
     });
 
     test('list with extensibleList shows Add custom value button below select', async ({ mount, page }) => {
