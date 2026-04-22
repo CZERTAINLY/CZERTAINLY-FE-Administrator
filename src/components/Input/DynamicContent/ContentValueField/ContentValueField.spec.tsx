@@ -377,7 +377,7 @@ test.describe('ContentValueField', () => {
         expect((submitted[0] as { data: string }).data).toBe('14:30:00');
     });
 
-    test('list with extensibleList shows Add custom option in select', async ({ mount, page }) => {
+    test('list with extensibleList shows Add custom value button below select', async ({ mount, page }) => {
         const descriptor = buildDescriptor({
             name: 'extList',
             contentType: AttributeContentType.String,
@@ -393,10 +393,7 @@ test.describe('ContentValueField', () => {
         });
 
         await mount(<ContentValueFieldTestWrapper descriptor={descriptor} />);
-        await page.getByTestId('select-extList').click();
-        const dropdown = page.locator('.hs-select-dropdown').last();
-        const addCustomOption = dropdown.locator('.hs-tooltip-toggle').filter({ hasText: '+ Add custom' });
-        await expect(addCustomOption).toHaveCount(1);
+        await expect(page.getByRole('button', { name: /add custom value/i })).toBeVisible();
     });
 
     test('number zero is valid content', async ({ mount, page }) => {
@@ -416,7 +413,7 @@ test.describe('ContentValueField', () => {
         expect((submitted[0] as { data: unknown }).data).toBe('0');
     });
 
-    test('multiSelect list with __add_custom__ opens AddCustomValuePanel and filters value', async ({ mount, page }) => {
+    test('multiSelect extensibleList: Add custom value button opens AddCustomValuePanel', async ({ mount, page }) => {
         const descriptor = buildDescriptor({
             name: 'multiExtList',
             contentType: AttributeContentType.String,
@@ -434,22 +431,11 @@ test.describe('ContentValueField', () => {
 
         await mount(<ContentValueFieldTestWrapper descriptor={descriptor} />);
 
-        const select = page.locator('select#multiExtList');
-        await expect(select).toBeAttached();
-
-        await select.evaluate((el: HTMLSelectElement) => {
-            const options = Array.from(el.options);
-            const first = options.find((o) => o.value && o.value !== '__add_custom__');
-            const addCustom = options.find((o) => o.value === '__add_custom__');
-            if (first) first.selected = true;
-            if (addCustom) addCustom.selected = true;
-            el.dispatchEvent(new Event('change', { bubbles: true }));
-        });
-
+        await page.getByRole('button', { name: /add custom value/i }).click();
         await expect(page.getByTestId('multiExtList-add-custom-panel')).toBeVisible();
     });
 
-    test('single-select list with __add_custom__ opens AddCustomValuePanel', async ({ mount, page }) => {
+    test('single-select extensibleList: Add custom value button opens AddCustomValuePanel', async ({ mount, page }) => {
         const descriptor = buildDescriptor({
             name: 'singleExtList',
             contentType: AttributeContentType.String,
@@ -467,17 +453,7 @@ test.describe('ContentValueField', () => {
 
         await mount(<ContentValueFieldTestWrapper descriptor={descriptor} />);
 
-        const select = page.locator('select#singleExtList');
-        await expect(select).toBeAttached();
-
-        await select.evaluate((el: HTMLSelectElement) => {
-            const addCustom = Array.from(el.options).find((o) => o.value === '__add_custom__');
-            if (addCustom) {
-                el.value = addCustom.value;
-            }
-            el.dispatchEvent(new Event('change', { bubbles: true }));
-        });
-
+        await page.getByRole('button', { name: /add custom value/i }).click();
         await expect(page.getByTestId('singleExtList-add-custom-panel')).toBeVisible();
     });
 
