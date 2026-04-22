@@ -42,6 +42,10 @@ function ListValueField({ descriptor, field, options, inputClassName }: ValueFie
     const isExtensible = descriptor.properties.extensibleList === true;
     const multiSelect = descriptor.properties.multiSelect;
 
+    useEffect(() => {
+        setShowAddCustom(false);
+    }, [descriptor.name, isExtensible]);
+
     const handleListChange = (v: any) => {
         if (multiSelect) {
             const arr = Array.isArray(v) ? v : [];
