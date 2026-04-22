@@ -193,7 +193,7 @@ describe('timeQualityConfigurations epics', () => {
         const emitted = await runEpic(
             TimeQualityConfigurationsEpicIndex.Create,
             timeQualityConfigurationActions.createTimeQualityConfiguration({
-                timeQualityConfigurationCreateRequestDto: {} as any,
+                timeQualityConfigurationRequestDto: {} as any,
             }),
             {},
             2,
@@ -208,7 +208,7 @@ describe('timeQualityConfigurations epics', () => {
         const emitted = await runEpic(
             TimeQualityConfigurationsEpicIndex.Create,
             timeQualityConfigurationActions.createTimeQualityConfiguration({
-                timeQualityConfigurationCreateRequestDto: {} as any,
+                timeQualityConfigurationRequestDto: {} as any,
             }),
             {
                 timeQualityConfigurations: {
@@ -227,7 +227,7 @@ describe('timeQualityConfigurations epics', () => {
             TimeQualityConfigurationsEpicIndex.Update,
             timeQualityConfigurationActions.updateTimeQualityConfiguration({
                 uuid: 'c-1',
-                timeQualityConfigurationUpdateRequestDto: {} as any,
+                timeQualityConfigurationRequestDto: {} as any,
             }),
             {},
             2,
@@ -243,7 +243,7 @@ describe('timeQualityConfigurations epics', () => {
             TimeQualityConfigurationsEpicIndex.Update,
             timeQualityConfigurationActions.updateTimeQualityConfiguration({
                 uuid: 'c-1',
-                timeQualityConfigurationUpdateRequestDto: {} as any,
+                timeQualityConfigurationRequestDto: {} as any,
             }),
             {
                 timeQualityConfigurations: {

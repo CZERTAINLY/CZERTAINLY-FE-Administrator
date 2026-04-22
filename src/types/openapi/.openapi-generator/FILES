@@ -428,6 +428,7 @@ models/ProxyRequestDto.ts
 models/ProxyStatus.ts
 models/ProxyUpdateRequestDto.ts
 models/PushToLocationRequestDto.ts
+models/QcType.ts
 models/RaProfileAcmeDetailResponseDto.ts
 models/RaProfileAssociationRequestDto.ts
 models/RaProfileCertificateValidationSettingsDto.ts
@@ -532,10 +533,9 @@ models/TextAttributeContentV2.ts
 models/TextAttributeContentV3.ts
 models/TimeAttributeContentV2.ts
 models/TimeAttributeContentV3.ts
-models/TimeQualityConfigurationCreateRequestDto.ts
 models/TimeQualityConfigurationDto.ts
 models/TimeQualityConfigurationListDto.ts
-models/TimeQualityConfigurationUpdateRequestDto.ts
+models/TimeQualityConfigurationRequestDto.ts
 models/TimestampingWorkflowDto.ts
 models/TimestampingWorkflowRequestDto.ts
 models/TokenInstanceDetailDto.ts

@@ -100,7 +100,7 @@ describe('timeQualityConfigurations slice', () => {
     });
 
     test('createTimeQualityConfiguration sets isCreating', () => {
-        const next = reducer(initialState, actions.createTimeQualityConfiguration({ timeQualityConfigurationCreateRequestDto: {} as any }));
+        const next = reducer(initialState, actions.createTimeQualityConfiguration({ timeQualityConfigurationRequestDto: {} as any }));
         expect(next.isCreating).toBe(true);
     });
 
@@ -120,7 +120,7 @@ describe('timeQualityConfigurations slice', () => {
     test('updateTimeQualityConfiguration sets isUpdating', () => {
         const next = reducer(
             initialState,
-            actions.updateTimeQualityConfiguration({ uuid: 'c-1', timeQualityConfigurationUpdateRequestDto: {} as any }),
+            actions.updateTimeQualityConfiguration({ uuid: 'c-1', timeQualityConfigurationRequestDto: {} as any }),
         );
         expect(next.isUpdating).toBe(true);
     });

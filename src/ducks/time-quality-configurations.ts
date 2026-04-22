@@ -2,10 +2,9 @@ import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
     SearchFieldDataByGroupDto,
     SimplifiedSigningProfileDto,
-    TimeQualityConfigurationCreateRequestDto,
     TimeQualityConfigurationDto,
     TimeQualityConfigurationListDto,
-    TimeQualityConfigurationUpdateRequestDto,
+    TimeQualityConfigurationRequestDto,
 } from 'types/openapi';
 import { BulkActionMessageDto } from 'types/openapi/models/BulkActionMessageDto';
 import { SearchRequestModel } from 'types/certificate';
@@ -141,7 +140,7 @@ export const slice = createSlice({
 
         createTimeQualityConfiguration: (
             state,
-            action: PayloadAction<{ timeQualityConfigurationCreateRequestDto: TimeQualityConfigurationCreateRequestDto }>,
+            action: PayloadAction<{ timeQualityConfigurationRequestDto: TimeQualityConfigurationRequestDto }>,
         ) => {
             state.isCreating = true;
         },
@@ -161,7 +160,7 @@ export const slice = createSlice({
             state,
             action: PayloadAction<{
                 uuid: string;
-                timeQualityConfigurationUpdateRequestDto: TimeQualityConfigurationUpdateRequestDto;
+                timeQualityConfigurationRequestDto: TimeQualityConfigurationRequestDto;
             }>,
         ) => {
             state.isUpdating = true;

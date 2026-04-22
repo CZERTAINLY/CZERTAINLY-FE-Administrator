@@ -169,9 +169,9 @@ export const TimeQualityConfigurationForm = () => {
             };
 
             if (editMode && id) {
-                dispatch(tqcActions.updateTimeQualityConfiguration({ uuid: id, timeQualityConfigurationUpdateRequestDto: requestDto }));
+                dispatch(tqcActions.updateTimeQualityConfiguration({ uuid: id, timeQualityConfigurationRequestDto: requestDto }));
             } else {
-                dispatch(tqcActions.createTimeQualityConfiguration({ timeQualityConfigurationCreateRequestDto: requestDto }));
+                dispatch(tqcActions.createTimeQualityConfiguration({ timeQualityConfigurationRequestDto: requestDto }));
             }
         },
         [dispatch, editMode, id, multipleResourceCustomAttributes],

@@ -98,7 +98,7 @@ const createTimeQualityConfiguration: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.timeQualityConfigurations
                 .createTimeQualityConfiguration({
-                    timeQualityConfigurationCreateRequestDto: action.payload.timeQualityConfigurationCreateRequestDto,
+                    timeQualityConfigurationRequestDto: action.payload.timeQualityConfigurationRequestDto,
                 })
                 .pipe(
                     mergeMap((created) =>
@@ -127,7 +127,7 @@ const updateTimeQualityConfiguration: AppEpic = (action$, state$, deps) => {
             deps.apiClients.timeQualityConfigurations
                 .updateTimeQualityConfiguration({
                     uuid: action.payload.uuid,
-                    timeQualityConfigurationUpdateRequestDto: action.payload.timeQualityConfigurationUpdateRequestDto,
+                    timeQualityConfigurationRequestDto: action.payload.timeQualityConfigurationRequestDto,
                 })
                 .pipe(
                     mergeMap((updated) =>
