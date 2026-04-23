@@ -1,8 +1,13 @@
 import Button from 'components/Button';
 import Badge from 'components/Badge';
 import type { TRuleGroupType } from 'types/complianceProfiles';
-import type { ComplianceGroupListDto, ComplianceProfileDtoV2, ComplianceRuleListDto, Resource } from 'types/openapi';
-import { ComplianceRuleAvailabilityStatus } from 'types/openapi/models/ComplianceRuleAvailabilityStatus';
+import {
+    type ComplianceGroupListDto,
+    type ComplianceProfileDtoV2,
+    type ComplianceRuleListDto,
+    ComplianceRuleAvailabilityStatus,
+    type Resource,
+} from 'types/openapi';
 import { capitalize } from 'utils/common-utils';
 import { Info } from 'lucide-react';
 

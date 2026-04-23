@@ -3,14 +3,14 @@
 /* Local Inter variable fonts (replaces Google Fonts) */
 @font-face {
     font-family: 'Inter';
-    src: url('./resources/fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('truetype');
+    src: url('./resources/fonts/Inter/Inter-VariableFont_opsz,wght.woff2') format('woff2');
     font-weight: 100 900;
     font-style: normal;
     font-display: swap;
 }
 @font-face {
     font-family: 'Inter';
-    src: url('./resources/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype');
+    src: url('./resources/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.woff2') format('woff2');
     font-weight: 100 900;
     font-style: italic;
     font-display: swap;

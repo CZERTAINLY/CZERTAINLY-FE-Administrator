@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { actions as alertActions } from 'ducks/alerts';
 import { isObjectSame } from 'utils/common-utils';
 
 interface WindowSizes {
@@ -66,12 +67,10 @@ export const useCopyToClipboard = () => {
             successMessage: string = 'Content was copied to clipboard',
             errorMessage: string = 'Failed to copy content to clipboard',
         ) => {
-            import('ducks/alerts').then(({ actions: alertActions }) => {
-                navigator.clipboard
-                    .writeText(text)
-                    .then(() => dispatch(alertActions.success(successMessage)))
-                    .catch(() => dispatch(alertActions.error(errorMessage)));
-            });
+            navigator.clipboard
+                .writeText(text)
+                .then(() => dispatch(alertActions.success(successMessage)))
+                .catch(() => dispatch(alertActions.error(errorMessage)));
         },
         [dispatch],
     );
