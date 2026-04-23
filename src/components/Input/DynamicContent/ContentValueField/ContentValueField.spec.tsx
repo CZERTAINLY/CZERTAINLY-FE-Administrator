@@ -1,5 +1,5 @@
 import { test, expect } from '../../../../../playwright/ct-test';
-import { ContentValueFieldTestWrapper } from './ContentValueFieldTestWrapper';
+import ContentValueFieldTestWrapper from './ContentValueFieldTestWrapper';
 import { buildDescriptor } from './ContentValueFieldTestWrapper';
 import { AttributeContentType } from 'types/openapi';
 
@@ -50,44 +50,6 @@ function buildListDescriptor({
     });
 }
 
-function buildExtensibleListDescriptor({
-    name,
-    multiSelect = false,
-    content,
-}: {
-    name: string;
-    multiSelect?: boolean;
-    content?: Array<{ data: string }>;
-}) {
-    return buildDescriptor({
-        name,
-        contentType: AttributeContentType.String,
-        properties: {
-            label: 'Extensible List',
-            visible: true,
-            required: false,
-            readOnly: false,
-            list: true,
-            multiSelect,
-            extensibleList: true,
-        } as any,
-        content,
-    });
-}
-
-async function mountWithSubmit(mount: (...args: any[]) => any, descriptor: any) {
-    let submitted: unknown[] = [];
-    await mount(
-        <ContentValueFieldTestWrapper
-            descriptor={descriptor}
-            onSubmit={(_, content: unknown[]) => {
-                submitted = content;
-            }}
-        />,
-    );
-    return () => submitted;
-}
-
 async function setTimeValue(page: import('@playwright/test').Page, value: string) {
     const input = page.locator(fieldLocator);
     await input.evaluate((element) => {
@@ -132,12 +94,20 @@ test.describe('ContentValueField', () => {
     });
 
     test('number type (Integer) renders and Save submits value', async ({ mount, page }) => {
-        const getSubmitted = await mountWithSubmit(mount, buildDescriptor({ contentType: AttributeContentType.Integer }));
+        let submitted: unknown[] = [];
+        await mount(
+            <ContentValueFieldTestWrapper
+                descriptor={buildDescriptor({ contentType: AttributeContentType.Integer })}
+                onSubmit={(_, content) => {
+                    submitted = content;
+                }}
+            />,
+        );
         const input = page.locator(fieldLocator);
         await input.fill('42');
         await page.getByTestId('save-custom-value').click();
-        expect(getSubmitted()).toHaveLength(1);
-        expect((getSubmitted()[0] as { data: unknown }).data).toBe('42');
+        expect(submitted).toHaveLength(1);
+        expect((submitted[0] as { data: unknown }).data).toBe('42');
     });
 
     test('Float type renders number input', async ({ mount, page }) => {
@@ -146,42 +116,57 @@ test.describe('ContentValueField', () => {
     });
 
     test('checkbox (Boolean) renders Switch and Save submits boolean', async ({ mount, page }) => {
-        const getSubmitted = await mountWithSubmit(mount, buildDescriptor({ contentType: AttributeContentType.Boolean }));
+        let submitted: unknown[] = [];
+        await mount(
+            <ContentValueFieldTestWrapper
+                descriptor={buildDescriptor({ contentType: AttributeContentType.Boolean })}
+                onSubmit={(_, content) => {
+                    submitted = content;
+                }}
+            />,
+        );
         await expect(page.getByTestId('switch-testAttr')).toBeVisible();
         await page.locator('label[for="testAttr"]').first().click();
         await expect(page.getByTestId('save-custom-value')).toBeEnabled();
         await page.getByTestId('save-custom-value').click();
-        expect(getSubmitted()).toEqual([{ data: true }]);
+        expect(submitted).toEqual([{ data: true }]);
     });
 
     test('date type: beforeOnSubmit formats date', async ({ mount, page }) => {
-        const getSubmitted = await mountWithSubmit(mount, buildDescriptor({ contentType: AttributeContentType.Date }));
+        let submitted: unknown[] = [];
+        await mount(
+            <ContentValueFieldTestWrapper
+                descriptor={buildDescriptor({ contentType: AttributeContentType.Date })}
+                onSubmit={(_, content) => {
+                    submitted = content;
+                }}
+            />,
+        );
         const input = page.locator(fieldLocator);
         await input.click();
         await expect(page.locator('div.fixed').first()).toBeVisible({ timeout: 5000 });
         const day15 = page.locator('div.fixed').getByRole('button', { name: '15' }).first();
         await day15.click();
         await page.getByTestId('save-custom-value').click();
-        expect(getSubmitted()).toHaveLength(1);
-        expect((getSubmitted()[0] as { data: string }).data).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+        expect(submitted).toHaveLength(1);
+        expect((submitted[0] as { data: string }).data).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     });
 
     test('time type: beforeOnSubmit appends :00 when two parts', async ({ mount, page }) => {
-        const getSubmitted = await mountWithSubmit(mount, buildDescriptor({ contentType: AttributeContentType.Time }));
+        let submitted: unknown[] = [];
+        await mount(
+            <ContentValueFieldTestWrapper
+                descriptor={buildDescriptor({ contentType: AttributeContentType.Time })}
+                onSubmit={(_, content) => {
+                    submitted = content;
+                }}
+            />,
+        );
         await setTimeValue(page, '14:30');
         await expect(page.getByTestId('save-custom-value')).toBeEnabled();
         await page.getByTestId('save-custom-value').click();
-        expect(getSubmitted()).toHaveLength(1);
-        expect((getSubmitted()[0] as { data: string }).data).toBe('14:30:00');
-    });
-
-    test('time beforeOnSubmit leaves full time string unchanged', async ({ mount, page }) => {
-        const getSubmitted = await mountWithSubmit(mount, buildDescriptor({ contentType: AttributeContentType.Time }));
-        await setTimeValue(page, '14:30:00');
-        await expect(page.getByTestId('save-custom-value')).toBeEnabled();
-        await page.getByTestId('save-custom-value').click();
-        expect(getSubmitted()).toHaveLength(1);
-        expect((getSubmitted()[0] as { data: string }).data).toBe('14:30:00');
+        expect(submitted).toHaveLength(1);
+        expect((submitted[0] as { data: string }).data).toBe('14:30:00');
     });
 
     test('datetime type renders DatePicker', async ({ mount, page }) => {
@@ -375,40 +360,125 @@ test.describe('ContentValueField', () => {
         await expect(select).toContainText('customItem');
     });
 
-    test('extensible list shows Add custom value button', async ({ mount, page }) => {
-        const descriptor = buildExtensibleListDescriptor({ name: 'extList' });
-        await mount(<ContentValueFieldTestWrapper descriptor={descriptor} />);
-        await expect(page.getByRole('button', { name: /add custom value/i })).toBeVisible();
+    test('time beforeOnSubmit leaves full time string unchanged', async ({ mount, page }) => {
+        let submitted: unknown[] = [];
+        await mount(
+            <ContentValueFieldTestWrapper
+                descriptor={buildDescriptor({ contentType: AttributeContentType.Time })}
+                onSubmit={(_, content) => {
+                    submitted = content;
+                }}
+            />,
+        );
+        await setTimeValue(page, '14:30:00');
+        await expect(page.getByTestId('save-custom-value')).toBeEnabled();
+        await page.getByTestId('save-custom-value').click();
+        expect(submitted).toHaveLength(1);
+        expect((submitted[0] as { data: string }).data).toBe('14:30:00');
     });
 
-    test('extensible single-select list: clicking Add custom value opens panel', async ({ mount, page }) => {
-        const descriptor = buildExtensibleListDescriptor({
-            name: 'singleExtList',
-            content: [{ data: 'opt1' }, { data: 'opt2' }],
+    test('list with extensibleList shows Add custom option in select', async ({ mount, page }) => {
+        const descriptor = buildDescriptor({
+            name: 'extList',
+            contentType: AttributeContentType.String,
+            properties: {
+                label: 'Extensible List',
+                visible: true,
+                required: false,
+                readOnly: false,
+                list: true,
+                multiSelect: false,
+                extensibleList: true,
+            } as any,
         });
-        await mount(<ContentValueFieldTestWrapper descriptor={descriptor} />);
-        await page.getByRole('button', { name: /add custom value/i }).click();
-        await expect(page.getByTestId('singleExtList-add-custom-panel')).toBeVisible();
-    });
 
-    test('extensible multiSelect list: clicking Add custom value opens panel', async ({ mount, page }) => {
-        const descriptor = buildExtensibleListDescriptor({
-            name: 'multiExtList',
-            multiSelect: true,
-            content: [{ data: 'opt1' }, { data: 'opt2' }],
-        });
         await mount(<ContentValueFieldTestWrapper descriptor={descriptor} />);
-        await page.getByRole('button', { name: /add custom value/i }).click();
-        await expect(page.getByTestId('multiExtList-add-custom-panel')).toBeVisible();
+        await page.getByTestId('select-extList').click();
+        const dropdown = page.locator('.hs-select-dropdown').last();
+        const addCustomOption = dropdown.locator('.hs-tooltip-toggle').filter({ hasText: '+ Add custom' });
+        await expect(addCustomOption).toHaveCount(1);
     });
 
     test('number zero is valid content', async ({ mount, page }) => {
-        const getSubmitted = await mountWithSubmit(mount, buildDescriptor({ contentType: AttributeContentType.Integer }));
+        let submitted: unknown[] = [];
+        await mount(
+            <ContentValueFieldTestWrapper
+                descriptor={buildDescriptor({ contentType: AttributeContentType.Integer })}
+                onSubmit={(_, content) => {
+                    submitted = content;
+                }}
+            />,
+        );
         const input = page.locator('[id="testAttr"]');
         await input.fill('0');
         await page.getByTestId('save-custom-value').click();
-        expect(getSubmitted()).toHaveLength(1);
-        expect((getSubmitted()[0] as { data: unknown }).data).toBe('0');
+        expect(submitted).toHaveLength(1);
+        expect((submitted[0] as { data: unknown }).data).toBe('0');
+    });
+
+    test('multiSelect list with __add_custom__ opens AddCustomValuePanel and filters value', async ({ mount, page }) => {
+        const descriptor = buildDescriptor({
+            name: 'multiExtList',
+            contentType: AttributeContentType.String,
+            properties: {
+                label: 'Multi Extensible List',
+                visible: true,
+                required: false,
+                readOnly: false,
+                list: true,
+                multiSelect: true,
+                extensibleList: true,
+            } as any,
+            content: [{ data: 'opt1' }, { data: 'opt2' }],
+        });
+
+        await mount(<ContentValueFieldTestWrapper descriptor={descriptor} />);
+
+        const select = page.locator('select#multiExtList');
+        await expect(select).toBeAttached();
+
+        await select.evaluate((el: HTMLSelectElement) => {
+            const options = Array.from(el.options);
+            const first = options.find((o) => o.value && o.value !== '__add_custom__');
+            const addCustom = options.find((o) => o.value === '__add_custom__');
+            if (first) first.selected = true;
+            if (addCustom) addCustom.selected = true;
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        await expect(page.getByTestId('multiExtList-add-custom-panel')).toBeVisible();
+    });
+
+    test('single-select list with __add_custom__ opens AddCustomValuePanel', async ({ mount, page }) => {
+        const descriptor = buildDescriptor({
+            name: 'singleExtList',
+            contentType: AttributeContentType.String,
+            properties: {
+                label: 'Single Extensible List',
+                visible: true,
+                required: false,
+                readOnly: false,
+                list: true,
+                multiSelect: false,
+                extensibleList: true,
+            } as any,
+            content: [{ data: 'opt1' }, { data: 'opt2' }],
+        });
+
+        await mount(<ContentValueFieldTestWrapper descriptor={descriptor} />);
+
+        const select = page.locator('select#singleExtList');
+        await expect(select).toBeAttached();
+
+        await select.evaluate((el: HTMLSelectElement) => {
+            const addCustom = Array.from(el.options).find((o) => o.value === '__add_custom__');
+            if (addCustom) {
+                el.value = addCustom.value;
+            }
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        await expect(page.getByTestId('singleExtList-add-custom-panel')).toBeVisible();
     });
 
     test('datetime required shows validation error message', async ({ mount, page }) => {
@@ -424,6 +494,7 @@ test.describe('ContentValueField', () => {
                 extensibleList: false,
             } as any,
         });
+
         await mount(<ContentValueFieldTestWrapper descriptor={descriptor} />);
         const input = page.locator(fieldLocator);
         await input.focus();

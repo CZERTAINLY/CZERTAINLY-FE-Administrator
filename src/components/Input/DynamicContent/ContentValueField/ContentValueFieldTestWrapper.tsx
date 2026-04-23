@@ -25,7 +25,6 @@ export function buildDescriptor(overrides: Partial<CustomAttributeModel> = {}): 
     const base: CustomAttributeModel = {
         uuid: 'test-uuid',
         name: 'testAttr',
-        version: 1,
         type: AttributeType.Custom,
         contentType: AttributeContentType.String,
         content: [],
@@ -38,7 +37,7 @@ export function buildDescriptor(overrides: Partial<CustomAttributeModel> = {}): 
     };
 }
 
-export function ContentValueFieldTestWrapper({ id, descriptor, initialContent, onSubmit = () => {} }: ContentValueFieldTestWrapperProps) {
+function ContentValueFieldTestWrapper({ id, descriptor, initialContent, onSubmit = () => {} }: ContentValueFieldTestWrapperProps) {
     const methods = ReactHookForm.useForm({
         defaultValues: {
             [descriptor.name]: undefined,
@@ -51,3 +50,6 @@ export function ContentValueFieldTestWrapper({ id, descriptor, initialContent, o
         </ReactHookForm.FormProvider>
     );
 }
+
+export { ContentValueFieldTestWrapper };
+export default ContentValueFieldTestWrapper;
