@@ -1,9 +1,6 @@
-import 'jszip';
-
 import { Buffer } from 'buffer';
 import saveAs from 'file-saver';
 
-import JSZip from 'jszip';
 import type { CertificateContentResponseModel, CertificateDetailResponseModel } from 'types/certificate';
 
 export function downloadFile(content: any, fileName: string, type?: string) {
@@ -26,11 +23,12 @@ export function downloadFile(content: any, fileName: string, type?: string) {
     element.click();
 }
 
-export function downloadFileZip(
+export async function downloadFileZip(
     certificateUuids: string[],
     certificates: CertificateDetailResponseModel[] | CertificateContentResponseModel[],
     fileType: string,
 ) {
+    const { default: JSZip } = await import('jszip');
     const zip = new JSZip();
 
     for (const i of certificateUuids) {
@@ -51,9 +49,8 @@ export function downloadFileZip(
         zip.file(certificate.commonName.replace('*.', '_.') + '_' + certificate.serialNumber + '.' + fileType, content);
     }
 
-    zip.generateAsync({ type: 'blob' }).then((content) => {
-        saveAs(content, 'CertificateDownload ' + new Date().toISOString().replace(' ', '_') + '.zip');
-    });
+    const blob = await zip.generateAsync({ type: 'blob' });
+    saveAs(blob, 'CertificateDownload ' + new Date().toISOString().replace(' ', '_') + '.zip');
 }
 
 export function formatPEM(pemString: string) {
