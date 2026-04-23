@@ -1204,9 +1204,9 @@ export default function RaProfileDetail() {
                 body={
                     <div>
                         <p>
-                            You are about to disassociate approval profile
-                            <b>{` ${confirmDeassociateApprovalProfileDialog?.associatedApprovalProfileName} `}</b>
-                            from RA profile {raProfile?.name}. Is this what you want to do?
+                            You are about to disassociate approval profile{' '}
+                            <b>{confirmDeassociateApprovalProfileDialog?.associatedApprovalProfileName}</b> from RA profile{' '}
+                            {raProfile?.name}. Is this what you want to do?
                         </p>
                         <p>
                             <b className="text-red-600">Warning:</b> This will remove approval process for all certificate actions on this

@@ -7,7 +7,7 @@ import { extractError } from 'utils/net';
 
 const normalizeUrl = (url: string): string => {
     let endIndex = url.length;
-    while (endIndex > 0 && url.charCodeAt(endIndex - 1) === 47) {
+    while (endIndex > 0 && (url.codePointAt(endIndex - 1) ?? -1) === 47) {
         endIndex -= 1;
     }
     return endIndex === url.length ? url : url.slice(0, endIndex);

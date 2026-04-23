@@ -545,7 +545,7 @@ export default function FilterWidget({
         }
         function renderNumberInput() {
             const numericValue = Number(filterValue);
-            const displayValue = isNaN(numericValue) ? '' : numericValue;
+            const displayValue = Number.isNaN(numericValue) ? '' : numericValue;
 
             return (
                 <TextInput

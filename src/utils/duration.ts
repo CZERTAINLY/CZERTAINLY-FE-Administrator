@@ -47,7 +47,7 @@ function getDurationFromIso8601String(input: string): Duration {
         return duration;
     }
     function parseMatch(value: RegExpExecArray | null): number {
-        return value ? parseFloat(value[1]) : 0;
+        return value ? Number.parseFloat(value[1]) : 0;
     }
 
     const weeksMatch = /(\d{1,10}(?:\.\d{1,10})?)W/.exec(input);
@@ -86,7 +86,7 @@ function getDurationFromInputString(input: string) {
     };
 
     for (const [, value, unit] of matches) {
-        const num = parseInt(value, 10);
+        const num = Number.parseInt(value, 10);
         switch (unit.toLowerCase()) {
             case 'm':
                 duration.minutes += num;

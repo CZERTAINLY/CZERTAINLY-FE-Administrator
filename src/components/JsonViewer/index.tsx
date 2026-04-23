@@ -20,7 +20,7 @@ const COLORS = {
 };
 
 const escapeHtml = (text: string) =>
-    text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
 
 const isObjectKeyAtPosition = (source: string, tokenEndIndex: number) => {
     let cursor = tokenEndIndex;

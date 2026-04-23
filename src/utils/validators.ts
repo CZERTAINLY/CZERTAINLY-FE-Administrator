@@ -283,8 +283,8 @@ export const validatePostgresPosixRegex = (value: string): string => {
             if (!POSIX_CLASSES.has(name)) {
                 return `Unknown POSIX class [:${name}:].`;
             }
-            // jump to closing :]
-            i = end + 1;
+            // jump to closing :] — intentional for-loop skip-ahead (i++ runs after this)
+            i = end + 1; // NOSONAR
         }
 
         // Validate {m}, {m,}, {m,n}
@@ -301,7 +301,7 @@ export const validatePostgresPosixRegex = (value: string): string => {
                 const n = Number(nStr);
                 if (Number.isNaN(n) || m > n) return `Invalid quantifier range "{${body}}".`;
             }
-            i = close; // skip to }
+            i = close; // NOSONAR - intentional for-loop skip-ahead, i++ runs after this
         }
     }
 
@@ -330,7 +330,7 @@ export const validatePostgresPosixRegex = (value: string): string => {
 
         // odd => this '\' is unescaped
         if (bs % 2 === 1) {
-            const d = value.charCodeAt(i + 1) - 48; // '1'..'9' -> 1..9
+            const d = (value.codePointAt(i + 1) ?? 0) - 48; // '1'..'9' -> 1..9
             if (d >= 1 && d <= 9) backrefs.push(d);
         }
     }

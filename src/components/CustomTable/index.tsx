@@ -300,13 +300,15 @@ function CustomTable({
 
                     switch (sortCol.sortType) {
                         case 'date': {
-                            const aDate = new Date(aVal.replace(/ at /g, ' '));
-                            const bDate = new Date(bVal.replace(/ at /g, ' '));
+                            const aDate = new Date(aVal.replaceAll(' at ', ' '));
+                            const bDate = new Date(bVal.replaceAll(' at ', ' '));
                             return sortDirection === 'asc' ? aDate.getTime() - bDate.getTime() : bDate.getTime() - aDate.getTime();
                         }
 
                         case 'numeric':
-                            return sortDirection === 'asc' ? parseFloat(aVal) - parseFloat(bVal) : parseFloat(bVal) - parseFloat(aVal);
+                            return sortDirection === 'asc'
+                                ? Number.parseFloat(aVal) - Number.parseFloat(bVal)
+                                : Number.parseFloat(bVal) - Number.parseFloat(aVal);
 
                         default:
                             if (aVal === bVal) return 0;
