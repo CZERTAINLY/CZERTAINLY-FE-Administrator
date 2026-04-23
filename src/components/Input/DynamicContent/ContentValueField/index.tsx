@@ -67,13 +67,12 @@ function ListValueField({ descriptor, field, options, inputClassName }: ValueFie
             ? field.value.map((v: string | number | boolean) => ({ value: v, label: formatListLabel(v) }))
             : field.value;
 
-    const currentValues = multiSelect
-        ? Array.isArray(field.value)
-            ? field.value
-            : []
-        : field.value != null && field.value !== ''
-          ? [field.value]
-          : [];
+    let currentValues: (string | number | boolean)[];
+    if (multiSelect) {
+        currentValues = Array.isArray(field.value) ? field.value : [];
+    } else {
+        currentValues = field.value != null && field.value !== '' ? [field.value] : [];
+    }
     const seen = new Set(options.map((o: { value: string }) => String(o.value)));
     const extra = currentValues
         .filter((v: string | number | boolean) => !seen.has(String(v)))
