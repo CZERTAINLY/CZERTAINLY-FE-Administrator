@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import Select from 'components/Select';
 import Label from 'components/Label';
@@ -33,12 +33,15 @@ export function AttributeFieldSelect({
     const { control } = useFormContext<Record<string, any>>();
     const [showAddCustom, setShowAddCustom] = useState(false);
     const [singleSelectKey, setSingleSelectKey] = useState(0);
+    const fieldValueRef = useRef<any>(undefined);
 
     const handleSingleSelectChange = useCallback(
         (fieldOnChange: (v: any) => void) => (newValue: any) => {
             if (newValue === '__add_new__') {
                 onSelectChangeSingle(fieldOnChange)(newValue);
-                fieldOnChange(undefined);
+                if (!fieldValueRef.current) {
+                    fieldOnChange(undefined);
+                }
                 setSingleSelectKey((k) => k + 1);
             } else {
                 onSelectChangeSingle(fieldOnChange)(newValue);
@@ -53,6 +56,7 @@ export function AttributeFieldSelect({
             control={control}
             rules={{ validate: buildAttributeValidators(descriptor) }}
             render={({ field, fieldState }) => {
+                fieldValueRef.current = field.value;
                 const selectValue = getSelectValueFromField(field.value, descriptor.properties.multiSelect);
                 const invalidClass = fieldState.isTouched && fieldState.invalid ? 'border-red-500' : '';
 
