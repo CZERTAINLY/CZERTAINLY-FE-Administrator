@@ -5,6 +5,7 @@
     "private": true,
     "type": "module",
     "dependencies": {
+        "@czertainly/openapi-types": "file:./src/types/openapi",
         "@floating-ui/dom": "^1.7.6",
         "@preline/input-number": "^4.1.3",
         "@preline/overlay": "^4.1.3",

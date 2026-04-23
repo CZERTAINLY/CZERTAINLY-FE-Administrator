@@ -53,6 +53,10 @@ export default defineConfig(async ({ mode }) => {
         resolve: {
             // Aliases match the structure of import paths in tsconfig.js
             alias: [
+                // Route openapi imports through the @czertainly/openapi-types
+                // file: dep so Vite pre-bundles the whole generated tree
+                // (~600 files) into a single cached chunk for dev.
+                { find: /^types\/openapi(?=$|\/)/, replacement: '@czertainly/openapi-types' },
                 { find: 'utils/', replacement: path.resolve(__dirname, './src/utils/') + '/' },
                 { find: 'types/', replacement: path.resolve(__dirname, './src/types/') + '/' },
                 { find: 'components/', replacement: path.resolve(__dirname, './src/components/') + '/' },
@@ -60,6 +64,16 @@ export default defineConfig(async ({ mode }) => {
                 { find: 'ducks', replacement: path.resolve(__dirname, './src/ducks') },
                 { find: 'src/', replacement: path.resolve(__dirname, './src/') + '/' },
                 { find: 'playwright/', replacement: path.resolve(__dirname, './playwright/') + '/' },
+            ],
+        },
+        optimizeDeps: {
+            include: [
+                '@czertainly/openapi-types',
+                '@czertainly/openapi-types/utils',
+                '@czertainly/openapi-types/apis/TokenInstanceControllerApi',
+                '@czertainly/openapi-types/models',
+                '@czertainly/openapi-types/models/Resource',
+                '@czertainly/openapi-types/models/ComplianceRuleAvailabilityStatus',
             ],
         },
         css: {

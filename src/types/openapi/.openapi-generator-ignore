@@ -21,3 +21,7 @@
 #docs/*.md
 # Then explicitly reverse the ignore rule for a single file:
 #!docs/README.md
+
+# Keep the package.json that registers this directory as a local npm
+# package so Vite pre-bundles the barrel at dev time.
+package.json
