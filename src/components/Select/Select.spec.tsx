@@ -780,6 +780,75 @@ test.describe('Select', () => {
         });
     });
 
+    test('should show clear button on multi-select when at least 1 item is selected', async ({ mount }) => {
+        const options = [
+            { value: '1', label: 'One' },
+            { value: '2', label: 'Two' },
+        ];
+        const component = await mount(
+            <div>
+                <Select id="test-select" value={[{ value: '1', label: 'One' }]} onChange={() => {}} options={options} isMulti={true} />
+            </div>,
+        );
+        await expect(component.getByTestId('select-test-select-clear')).toBeAttached();
+    });
+
+    test('should not show clear button on multi-select when no items are selected', async ({ mount }) => {
+        const options = [
+            { value: '1', label: 'One' },
+            { value: '2', label: 'Two' },
+        ];
+        const component = await mount(
+            <div>
+                <Select id="test-select" value={[]} onChange={() => {}} options={options} isMulti={true} />
+            </div>,
+        );
+        await expect(component.locator('[data-testid="select-test-select-clear"]')).toHaveCount(0);
+    });
+
+    test('should call onChange(undefined) when multi-select clear button is clicked', async ({ mount }) => {
+        let received: { value: string | number; label: string }[] | undefined = [{ value: '1', label: 'One' }];
+        const options = [
+            { value: '1', label: 'One' },
+            { value: '2', label: 'Two' },
+        ];
+        const component = await mount(
+            <div>
+                <Select
+                    id="test-select"
+                    value={[{ value: '1', label: 'One' }]}
+                    onChange={(v) => (received = v)}
+                    options={options}
+                    isMulti={true}
+                />
+            </div>,
+        );
+        const clearBtn = component.getByTestId('select-test-select-clear');
+        await expect(clearBtn).toBeAttached();
+        await clearBtn.click({ force: true });
+        expect(received).toBeUndefined();
+    });
+
+    test('should not show clear button on multi-select when isClearable is explicitly false', async ({ mount }) => {
+        const options = [
+            { value: '1', label: 'One' },
+            { value: '2', label: 'Two' },
+        ];
+        const component = await mount(
+            <div>
+                <Select
+                    id="test-select"
+                    value={[{ value: '1', label: 'One' }]}
+                    onChange={() => {}}
+                    options={options}
+                    isMulti={true}
+                    isClearable={false}
+                />
+            </div>,
+        );
+        await expect(component.locator('[data-testid="select-test-select-clear"]')).toHaveCount(0);
+    });
+
     test('should accept option descriptions for dropdown rendering', async ({ mount }) => {
         const options = [
             { value: 'v1', label: 'Version 1 (Original)', description: '2026-01-01 10:20:30' },

@@ -1,5 +1,8 @@
-export const SELECT_WRAPPER_CLASSES =
-    'relative ps-2 pe-9 min-h-11 flex items-center flex-wrap w-full bg-white border border-gray-200 rounded-lg text-start text-sm hover:bg-gray-50 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800 [&>*:not(.hs-select-dropdown)]:max-w-full';
+const SELECT_WRAPPER_BASE =
+    'relative ps-2 min-h-11 flex items-center flex-wrap w-full bg-white border border-gray-200 rounded-lg text-start text-sm hover:bg-gray-50 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800 [&>*:not(.hs-select-dropdown)]:max-w-full';
+
+export const SELECT_WRAPPER_CLASSES = `${SELECT_WRAPPER_BASE} pe-9`;
+export const SELECT_WRAPPER_CLEARABLE_CLASSES = `${SELECT_WRAPPER_BASE} pe-14`;
 
 export const SELECT_TAGS_INPUT_CLASSES =
     'py-2.5 px-1 flex-1 min-w-[80px] bg-transparent border-0 text-[var(--dark-gray-color)] placeholder-gray-400 focus:ring-0 text-sm outline-none dark:text-neutral-200 dark:placeholder-neutral-500 order-1';
