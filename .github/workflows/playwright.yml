@@ -11,8 +11,10 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     strategy:
+      # Keep all browser jobs running on main even if one fails
       fail-fast: false
       matrix:
+        # PRs: chromium only (fast feedback). Push to main / manual dispatch: full matrix.
         browser: ${{ github.event_name == 'pull_request' && fromJSON('["chromium"]') || fromJSON('["chromium", "firefox", "webkit"]') }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
