@@ -218,6 +218,36 @@ test.describe('AttributeFieldSelect', () => {
         await expect(select).toHaveValue('cred-a');
     });
 
+    test('onSelectChangeMulti: selecting __add_new__ with other items removes __add_new__ and keeps others', async ({ mount, page }) => {
+        const descriptor = minimalDescriptor({
+            properties: { ...defaultProperties, multiSelect: true, label: 'Multi Credential' },
+        } as any);
+        const options = [
+            { label: 'Option A', value: 'a' },
+            { label: 'Option B', value: 'b' },
+        ];
+
+        await mount(
+            <AttributeFieldSelectTestWrapper
+                name="testSelect"
+                descriptor={descriptor}
+                options={options}
+                addNewAttributeValue={{ label: '+ Add new', value: '__add_new__' }}
+            />,
+        );
+
+        const select = page.getByTestId('select-testSelectSelect-input');
+
+        await select.evaluate((el: HTMLSelectElement) => {
+            Array.from(el.options).forEach((opt) => {
+                opt.selected = opt.value === 'a' || opt.value === '__add_new__';
+            });
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        await expect(select).toHaveValues(['a']);
+    });
+
     test('extensible list adds extra option for current value not in options', async ({ mount, page }) => {
         const descriptor = minimalDescriptor({
             properties: { ...defaultProperties, list: true, extensibleList: true, label: 'Extensible' },
