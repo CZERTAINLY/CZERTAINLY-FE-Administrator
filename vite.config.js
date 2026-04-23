@@ -70,6 +70,8 @@ export default defineConfig(async ({ mode }) => {
             include: [
                 '@czertainly/openapi-types',
                 '@czertainly/openapi-types/utils',
+                // Deep-imported in src/api.ts (excluded from the barrel due to a name
+                // collision with TokenInstanceManagementApi); pre-bundle it explicitly.
                 '@czertainly/openapi-types/apis/TokenInstanceControllerApi',
             ],
         },

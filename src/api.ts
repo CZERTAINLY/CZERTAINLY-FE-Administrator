@@ -50,6 +50,8 @@ import {
     VaultProfileManagementApi,
     TrustedCertificateManagementApi,
 } from 'types/openapi';
+// Deep import: the openapi barrel only re-exports TokenInstanceManagementApi because
+// both modules export overlapping request interfaces that would collide via `export *`.
 import { TokenInstanceControllerApi } from 'types/openapi/apis/TokenInstanceControllerApi';
 import {
     ActuatorApi,
@@ -207,11 +209,15 @@ export const backendClient: ApiClients = new Proxy({} as ApiClients, {
     getOwnPropertyDescriptor(_target, prop: string | symbol) {
         const key = prop as ApiClientKey;
         if (!Object.hasOwn(overrides, key) && !Object.hasOwn(factories, key)) return undefined;
+        // Whole-object iteration (Object.keys/entries, spread, devtools logging) triggers
+        // this trap for every key; only surface already-resolved values so unresolved
+        // factory keys stay lazy. Real reads go through the `get` trap.
+        const isResolved = Object.hasOwn(overrides, key) || cache.has(key);
         return {
             enumerable: true,
             configurable: true,
             writable: true,
-            value: resolve(key),
+            value: isResolved ? resolve(key) : undefined,
         };
     },
 });
