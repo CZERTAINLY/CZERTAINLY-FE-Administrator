@@ -33,8 +33,10 @@ function NotificationsOverview() {
                                   <Check size={16} />
                               </Button>
                               <div>
-                                  <span className="text-sm leading-[16px] font-medium text-gray-800 mr-2">{notification.message}</span>
-                                  <span className="text-xs leading-[16px] text-gray-500 mr-2">{formatTimeAgo(notification.sentAt)}</span>
+                                  <div className="text-sm leading-[16px] font-medium text-gray-800">{notification.message}</div>
+                                  <span className="text-xs leading-[16px] text-gray-500 mr-2 whitespace-nowrap">
+                                      {formatTimeAgo(notification.sentAt)}
+                                  </span>
                                   <Button
                                       color="secondary"
                                       className="!rounded-full !p-0.5 relative top-[1px]"
@@ -81,7 +83,7 @@ function NotificationsOverview() {
                     noBorder
                     hideWidgetButtons={true}
                 >
-                    <div className="max-h-[360px] overflow-y-auto">{notificationsList}</div>
+                    <div className="max-h-[360px] overflow-y-auto pt-2">{notificationsList}</div>
                     <div className="sticky bottom-0 bg-white pt-2 border-t border-gray-200">
                         <Link to="/notifications" className="w-full" onClick={() => dropdownRef.current?.click()}>
                             <Button color="secondary" className="w-full justify-center">
