@@ -229,4 +229,31 @@ test.describe('ContentDescriptorField', () => {
         await input.fill('new value');
         await expect(input).toHaveValue('new value');
     });
+
+    test('removing the only content field clears required error and re-enables form validity', async ({ mount, page }) => {
+        await mount(
+            <ContentDescriptorFieldTestWrapper
+                isList={false}
+                contentType={AttributeContentType.String}
+                defaultContent={[{ data: '' }]}
+                showSubmitButton
+            />,
+        );
+
+        const input = page.getByPlaceholder('Default Content');
+        await input.focus();
+        await input.blur();
+        await expect(page.getByText('Required Field').first()).toBeVisible({ timeout: 5000 });
+        await expect(page.getByTestId('form-submit')).toBeDisabled();
+
+        const removeBtn = page
+            .getByRole('button')
+            .filter({ has: page.locator('svg') })
+            .filter({ hasNotText: 'Add Content' });
+        await removeBtn.click();
+
+        await expect(page.getByPlaceholder('Default Content')).not.toBeVisible();
+        await expect(page.getByText('Required Field')).toHaveCount(0);
+        await expect(page.getByTestId('form-submit')).toBeEnabled();
+    });
 });

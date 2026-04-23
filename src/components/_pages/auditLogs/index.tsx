@@ -15,7 +15,7 @@ import CustomTable, { type TableDataRow } from 'components/CustomTable';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import type { SearchRequestModel } from 'types/certificate';
 import PagedList from 'components/PagedList/PagedList';
-import { type AuditLogDto, PlatformEnum } from 'types/openapi/models';
+import { type AuditLogDto, PlatformEnum } from 'types/openapi';
 import { auditLogsDetailRowHeaders, auditLogsRowHeaders, createAuditLogDetailData, createAuditLogsList } from './utils';
 
 type AuditLogDetailItem = {
