@@ -829,6 +829,26 @@ test.describe('Select', () => {
         expect(received).toBeUndefined();
     });
 
+    test('should not show clear button on multi-select when isClearable is explicitly false', async ({ mount }) => {
+        const options = [
+            { value: '1', label: 'One' },
+            { value: '2', label: 'Two' },
+        ];
+        const component = await mount(
+            <div>
+                <Select
+                    id="test-select"
+                    value={[{ value: '1', label: 'One' }]}
+                    onChange={() => {}}
+                    options={options}
+                    isMulti={true}
+                    isClearable={false}
+                />
+            </div>,
+        );
+        await expect(component.locator('[data-testid="select-test-select-clear"]')).toHaveCount(0);
+    });
+
     test('should accept option descriptions for dropdown rendering', async ({ mount }) => {
         const options = [
             { value: 'v1', label: 'Version 1 (Original)', description: '2026-01-01 10:20:30' },

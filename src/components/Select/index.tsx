@@ -398,8 +398,8 @@ function Select({
         ? Array.isArray(value) && value.length > 0
         : getValueFromProp != null && getValueFromProp !== '' && getValueFromProp !== placeholder;
 
-    const effectiveClearable = isClearable || isMulti;
-    const multiSelectWrapperClasses = isMulti && hasValue ? SELECT_WRAPPER_CLEARABLE_CLASSES : SELECT_WRAPPER_CLASSES;
+    const effectiveClearable = isClearable ?? isMulti;
+    const multiSelectWrapperClasses = isMulti && effectiveClearable && hasValue ? SELECT_WRAPPER_CLEARABLE_CLASSES : SELECT_WRAPPER_CLASSES;
 
     return (
         <div data-testid={dataTestId ?? `select-${id}`}>
