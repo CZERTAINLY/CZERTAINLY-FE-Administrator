@@ -22,7 +22,7 @@ import {
     transformRaProfileResponseDtoToModel,
     transformRaProfileScepDetailResponseDtoToModel,
 } from './transform/ra-profiles';
-import { Resource } from 'types/openapi/models/Resource';
+import { Resource } from 'types/openapi';
 
 const listRaProfiles: AppEpic = (action$, state$, deps) => {
     return action$.pipe(

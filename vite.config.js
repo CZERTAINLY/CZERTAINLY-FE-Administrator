@@ -71,9 +71,6 @@ export default defineConfig(async ({ mode }) => {
                 '@czertainly/openapi-types',
                 '@czertainly/openapi-types/utils',
                 '@czertainly/openapi-types/apis/TokenInstanceControllerApi',
-                '@czertainly/openapi-types/models',
-                '@czertainly/openapi-types/models/Resource',
-                '@czertainly/openapi-types/models/ComplianceRuleAvailabilityStatus',
             ],
         },
         css: {

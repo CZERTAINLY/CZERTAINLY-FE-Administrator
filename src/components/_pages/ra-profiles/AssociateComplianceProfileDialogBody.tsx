@@ -13,7 +13,7 @@ import Label from 'components/Label';
 
 import { actions, selectors } from 'ducks/compliance-profiles';
 import type { RaProfileResponseModel } from 'types/ra-profiles';
-import { Resource } from 'types/openapi/models/Resource';
+import { Resource } from 'types/openapi';
 import Container from 'components/Container';
 
 interface Props {
