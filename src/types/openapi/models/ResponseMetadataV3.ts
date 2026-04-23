@@ -11,13 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-    AttributeType,
-    AttributeVersion,
-    BaseAttributeContentDtoV3,
-    NameAndUuidDto,
-} from './';
+import type { AttributeContentType, AttributeType, AttributeVersion, BaseAttributeContentDtoV3, NameAndUuidDto } from './';
 
 /**
  * Response metadata attribute instance with content
@@ -73,5 +67,3 @@ export interface ResponseMetadataV3 {
      */
     version: AttributeVersion;
 }
-
-

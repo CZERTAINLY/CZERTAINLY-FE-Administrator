@@ -11,11 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    Resource,
-    ResourceEvent,
-    TriggerType,
-} from './';
+import type { Resource, ResourceEvent, TriggerType } from './';
 
 /**
  * @export
@@ -65,5 +61,3 @@ export interface TriggerDto {
      */
     event?: ResourceEvent;
 }
-
-

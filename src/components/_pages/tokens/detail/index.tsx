@@ -1,10 +1,10 @@
 import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from 'components/Attributes/AttributeViewer';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import TokenStatusBadge from 'components/_pages/tokens/TokenStatusBadge';
 
 import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions as keyActions, selectors as keySelectors } from 'ducks/cryptographic-keys';
 import { actions, selectors } from 'ducks/tokens';

@@ -63,7 +63,7 @@ export interface KeyEventHistoryDto {
      * @type {{ [key: string]: any; }}
      * @memberof KeyEventHistoryDto
      */
-    additionalInformation?: { [key: string]: any; };
+    additionalInformation?: { [key: string]: any };
 }
 
 /**
@@ -80,7 +80,7 @@ export enum KeyEventHistoryDtoEventEnum {
     EncryptData = 'Encrypt Data',
     DecryptData = 'Decrypt Data',
     EnableKey = 'Enable Key',
-    DisableKey = 'Disable Key'
+    DisableKey = 'Disable Key',
 }
 /**
  * @export
@@ -88,6 +88,5 @@ export enum KeyEventHistoryDtoEventEnum {
  */
 export enum KeyEventHistoryDtoStatusEnum {
     Success = 'SUCCESS',
-    Failed = 'FAILED'
+    Failed = 'FAILED',
 }
-

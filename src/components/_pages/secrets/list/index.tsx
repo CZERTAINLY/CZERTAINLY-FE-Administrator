@@ -2,14 +2,14 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
-import { TableDataRow, TableHeader } from 'components/CustomTable';
+import type { TableDataRow, TableHeader } from 'components/CustomTable';
 import Badge from 'components/Badge';
 import PagedList from 'components/PagedList/PagedList';
 import Dialog from 'components/Dialog';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import Select from 'components/Select';
 
-import { ApiClients } from '../../../../api';
+import type { ApiClients } from '../../../../api';
 import { actions, selectors } from 'ducks/secrets';
 import { EntityType } from 'ducks/filters';
 import { selectors as pagingSelectors } from 'ducks/paging';
@@ -18,7 +18,7 @@ import { actions as userActions, selectors as userSelectors } from 'ducks/users'
 import { actions as groupActions, selectors as groupSelectors } from 'ducks/certificateGroups';
 import { actions as vaultProfileActions, selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
 
-import { SearchRequestModel } from 'types/certificate';
+import type { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { ComplianceStatus, PlatformEnum, Resource } from 'types/openapi';
 

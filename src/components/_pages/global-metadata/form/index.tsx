@@ -11,7 +11,7 @@ import Button from 'components/Button';
 import Container from 'components/Container';
 import Checkbox from 'components/Checkbox';
 import TextInput from 'components/TextInput';
-import { GlobalMetadataCreateRequestModel, GlobalMetadataUpdateRequestModel } from 'types/globalMetadata';
+import type { GlobalMetadataCreateRequestModel, GlobalMetadataUpdateRequestModel } from 'types/globalMetadata';
 import { AttributeContentType, PlatformEnum } from 'types/openapi';
 import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';

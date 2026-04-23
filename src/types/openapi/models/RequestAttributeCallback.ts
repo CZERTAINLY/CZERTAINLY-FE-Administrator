@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    PaginationRequestDto,
-} from './';
+import type { PaginationRequestDto } from './';
 
 /**
  * @export
@@ -37,25 +35,25 @@ export interface RequestAttributeCallback {
      * @type {{ [key: string]: any; }}
      * @memberof RequestAttributeCallback
      */
-    pathVariable?: { [key: string]: any; };
+    pathVariable?: { [key: string]: any };
     /**
      * Map of the query parameters supported by the callback method
      * @type {{ [key: string]: any; }}
      * @memberof RequestAttributeCallback
      */
-    requestParameter?: { [key: string]: any; };
+    requestParameter?: { [key: string]: any };
     /**
      * Request body for the callback method
      * @type {{ [key: string]: any; }}
      * @memberof RequestAttributeCallback
      */
-    body?: { [key: string]: any; };
+    body?: { [key: string]: any };
     /**
      * Filter for the resource callback method
      * @type {{ [key: string]: any; }}
      * @memberof RequestAttributeCallback
      */
-    filter?: { [key: string]: any; };
+    filter?: { [key: string]: any };
     /**
      * Pagination of the callback response
      * @type {PaginationRequestDto}

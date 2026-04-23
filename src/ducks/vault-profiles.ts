@@ -1,6 +1,6 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { VaultProfileDetailDto, VaultProfileDto, VaultProfileRequestDto, VaultProfileUpdateRequestDto } from 'types/openapi';
-import { SearchRequestModel } from 'types/certificate';
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { VaultProfileDetailDto, VaultProfileDto, VaultProfileRequestDto, VaultProfileUpdateRequestDto } from 'types/openapi';
+import type { SearchRequestModel } from 'types/certificate';
 import type { AttributeDescriptorModel } from 'types/attributes';
 
 export type State = {
@@ -49,7 +49,7 @@ export const slice = createSlice({
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
             Object.keys(state).forEach((key) => {
-                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+                if (!Object.hasOwn(initialState, key)) (state as any)[key] = undefined;
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));

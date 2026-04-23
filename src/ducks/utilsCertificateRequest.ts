@@ -1,5 +1,5 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ParseRequestRequestDtoParseTypeEnum, ParseRequestResponseDto } from '../types/openapi/utils';
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { ParseRequestRequestDtoParseTypeEnum, ParseRequestResponseDto } from '../types/openapi/utils';
 
 export type State = {
     parsedCertificateRequest?: ParseRequestResponseDto;

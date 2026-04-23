@@ -1,8 +1,8 @@
 import { getEnumLabel } from 'ducks/enums';
 import Badge from 'components/Badge';
-import { SearchFieldListModel, SearchFieldModel } from 'types/certificate';
-import { EnumItemDto } from 'types/enums';
-import { AttributeContentType, ConditionItemDto, FilterFieldType } from 'types/openapi';
+import type { SearchFieldListModel, SearchFieldModel } from 'types/certificate';
+import type { EnumItemDto } from 'types/enums';
+import { AttributeContentType, type ConditionItemDto, FilterFieldType } from 'types/openapi';
 import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
 
 type RenderVariant = 'badge' | 'small';

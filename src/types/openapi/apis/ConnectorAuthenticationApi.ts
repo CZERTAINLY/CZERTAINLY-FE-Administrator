@@ -15,12 +15,7 @@ import type { Observable } from 'rxjs';
 import type { AjaxResponse } from 'rxjs/ajax';
 import { BaseAPI, throwIfNullOrUndefined } from '../runtime';
 import type { OperationOpts, HttpHeaders } from '../runtime';
-import type {
-    AuthenticationServiceExceptionDto,
-    DataAttribute,
-    ErrorMessageDto,
-    RequestAttribute,
-} from '../models';
+import type { AuthenticationServiceExceptionDto, DataAttribute, ErrorMessageDto, RequestAttribute } from '../models';
 
 export interface ValidateApiKeyAuthAttributesRequest {
     requestAttribute: Array<RequestAttribute>;
@@ -42,145 +37,194 @@ export interface ValidateJWTAuthAttributesRequest {
  * no description
  */
 export class ConnectorAuthenticationApi extends BaseAPI {
-
     /**
      * Get API Key auth Attributes
      */
-    getApiKeyAuthAttributes(): Observable<Array<DataAttribute>>
-    getApiKeyAuthAttributes(opts?: OperationOpts): Observable<AjaxResponse<Array<DataAttribute>>>
+    getApiKeyAuthAttributes(): Observable<Array<DataAttribute>>;
+    getApiKeyAuthAttributes(opts?: OperationOpts): Observable<AjaxResponse<Array<DataAttribute>>>;
     getApiKeyAuthAttributes(opts?: OperationOpts): Observable<Array<DataAttribute> | AjaxResponse<Array<DataAttribute>>> {
-        return this.request<Array<DataAttribute>>({
-            url: '/v1/connectors/auth/attributes/apiKey',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<DataAttribute>>(
+            {
+                url: '/v1/connectors/auth/attributes/apiKey',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get list of Authentication Types
      */
-    getAuthenticationTypes(): Observable<Array<string>>
-    getAuthenticationTypes(opts?: OperationOpts): Observable<AjaxResponse<Array<string>>>
+    getAuthenticationTypes(): Observable<Array<string>>;
+    getAuthenticationTypes(opts?: OperationOpts): Observable<AjaxResponse<Array<string>>>;
     getAuthenticationTypes(opts?: OperationOpts): Observable<Array<string> | AjaxResponse<Array<string>>> {
-        return this.request<Array<string>>({
-            url: '/v1/connectors/auth/types',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<string>>(
+            {
+                url: '/v1/connectors/auth/types',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get basic auth Attributes
      */
-    getBasicAuthAttributes(): Observable<Array<DataAttribute>>
-    getBasicAuthAttributes(opts?: OperationOpts): Observable<AjaxResponse<Array<DataAttribute>>>
+    getBasicAuthAttributes(): Observable<Array<DataAttribute>>;
+    getBasicAuthAttributes(opts?: OperationOpts): Observable<AjaxResponse<Array<DataAttribute>>>;
     getBasicAuthAttributes(opts?: OperationOpts): Observable<Array<DataAttribute> | AjaxResponse<Array<DataAttribute>>> {
-        return this.request<Array<DataAttribute>>({
-            url: '/v1/connectors/auth/attributes/basic',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<DataAttribute>>(
+            {
+                url: '/v1/connectors/auth/attributes/basic',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get Attributes for certificate auth
      */
-    getCertificateAttributes(): Observable<Array<DataAttribute>>
-    getCertificateAttributes(opts?: OperationOpts): Observable<AjaxResponse<Array<DataAttribute>>>
+    getCertificateAttributes(): Observable<Array<DataAttribute>>;
+    getCertificateAttributes(opts?: OperationOpts): Observable<AjaxResponse<Array<DataAttribute>>>;
     getCertificateAttributes(opts?: OperationOpts): Observable<Array<DataAttribute> | AjaxResponse<Array<DataAttribute>>> {
-        return this.request<Array<DataAttribute>>({
-            url: '/v1/connectors/auth/attributes/certificate',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<DataAttribute>>(
+            {
+                url: '/v1/connectors/auth/attributes/certificate',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get JWT auth Attributes
      */
-    getJWTAuthAttributes(): Observable<Array<DataAttribute>>
-    getJWTAuthAttributes(opts?: OperationOpts): Observable<AjaxResponse<Array<DataAttribute>>>
+    getJWTAuthAttributes(): Observable<Array<DataAttribute>>;
+    getJWTAuthAttributes(opts?: OperationOpts): Observable<AjaxResponse<Array<DataAttribute>>>;
     getJWTAuthAttributes(opts?: OperationOpts): Observable<Array<DataAttribute> | AjaxResponse<Array<DataAttribute>>> {
-        return this.request<Array<DataAttribute>>({
-            url: '/v1/connectors/auth/attributes/jwt',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<DataAttribute>>(
+            {
+                url: '/v1/connectors/auth/attributes/jwt',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Validate API Key Attributes
      */
-    validateApiKeyAuthAttributes({ requestAttribute }: ValidateApiKeyAuthAttributesRequest): Observable<void>
-    validateApiKeyAuthAttributes({ requestAttribute }: ValidateApiKeyAuthAttributesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    validateApiKeyAuthAttributes({ requestAttribute }: ValidateApiKeyAuthAttributesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    validateApiKeyAuthAttributes({ requestAttribute }: ValidateApiKeyAuthAttributesRequest): Observable<void>;
+    validateApiKeyAuthAttributes(
+        { requestAttribute }: ValidateApiKeyAuthAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    validateApiKeyAuthAttributes(
+        { requestAttribute }: ValidateApiKeyAuthAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(requestAttribute, 'requestAttribute', 'validateApiKeyAuthAttributes');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>({
-            url: '/v1/connectors/auth/attributes/apiKey/validate',
-            method: 'POST',
-            headers,
-            body: requestAttribute,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/connectors/auth/attributes/apiKey/validate',
+                method: 'POST',
+                headers,
+                body: requestAttribute,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Validate basic auth Attributes
      */
-    validateBasicAuthAttributes({ requestAttribute }: ValidateBasicAuthAttributesRequest): Observable<void>
-    validateBasicAuthAttributes({ requestAttribute }: ValidateBasicAuthAttributesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    validateBasicAuthAttributes({ requestAttribute }: ValidateBasicAuthAttributesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    validateBasicAuthAttributes({ requestAttribute }: ValidateBasicAuthAttributesRequest): Observable<void>;
+    validateBasicAuthAttributes(
+        { requestAttribute }: ValidateBasicAuthAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    validateBasicAuthAttributes(
+        { requestAttribute }: ValidateBasicAuthAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(requestAttribute, 'requestAttribute', 'validateBasicAuthAttributes');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>({
-            url: '/v1/connectors/auth/attributes/basic/validate',
-            method: 'POST',
-            headers,
-            body: requestAttribute,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/connectors/auth/attributes/basic/validate',
+                method: 'POST',
+                headers,
+                body: requestAttribute,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Validate certificate auth Attributes
      */
-    validateCertificateAttributes({ requestAttribute }: ValidateCertificateAttributesRequest): Observable<void>
-    validateCertificateAttributes({ requestAttribute }: ValidateCertificateAttributesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    validateCertificateAttributes({ requestAttribute }: ValidateCertificateAttributesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    validateCertificateAttributes({ requestAttribute }: ValidateCertificateAttributesRequest): Observable<void>;
+    validateCertificateAttributes(
+        { requestAttribute }: ValidateCertificateAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    validateCertificateAttributes(
+        { requestAttribute }: ValidateCertificateAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(requestAttribute, 'requestAttribute', 'validateCertificateAttributes');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>({
-            url: '/v1/connectors/auth/attributes/certificate/validate',
-            method: 'POST',
-            headers,
-            body: requestAttribute,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/connectors/auth/attributes/certificate/validate',
+                method: 'POST',
+                headers,
+                body: requestAttribute,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Validate JWT auth Attributes
      */
-    validateJWTAuthAttributes({ requestAttribute }: ValidateJWTAuthAttributesRequest): Observable<void>
-    validateJWTAuthAttributes({ requestAttribute }: ValidateJWTAuthAttributesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    validateJWTAuthAttributes({ requestAttribute }: ValidateJWTAuthAttributesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    validateJWTAuthAttributes({ requestAttribute }: ValidateJWTAuthAttributesRequest): Observable<void>;
+    validateJWTAuthAttributes(
+        { requestAttribute }: ValidateJWTAuthAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    validateJWTAuthAttributes(
+        { requestAttribute }: ValidateJWTAuthAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(requestAttribute, 'requestAttribute', 'validateJWTAuthAttributes');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>({
-            url: '/v1/connectors/auth/attributes/jwt/validate',
-            method: 'POST',
-            headers,
-            body: requestAttribute,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<void>(
+            {
+                url: '/v1/connectors/auth/attributes/jwt/validate',
+                method: 'POST',
+                headers,
+                body: requestAttribute,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

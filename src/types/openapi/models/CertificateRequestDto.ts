@@ -11,12 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CertificateRequestFormat,
-    CertificateType,
-    ComplianceStatus,
-    ResponseAttribute,
-} from './';
+import type { CertificateRequestFormat, CertificateType, ComplianceStatus, ResponseAttribute } from './';
 
 /**
  * @export
@@ -82,7 +77,7 @@ export interface CertificateRequestDto {
      * @type {{ [key: string]: Array<string>; }}
      * @memberof CertificateRequestDto
      */
-    subjectAlternativeNames?: { [key: string]: Array<string>; };
+    subjectAlternativeNames?: { [key: string]: Array<string> };
     /**
      * CSR Attributes
      * @type {Array<ResponseAttribute>}
@@ -120,5 +115,3 @@ export interface CertificateRequestDto {
      */
     complianceStatus: ComplianceStatus;
 }
-
-

@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import Button, { ButtonColor } from 'components/Button';
+import Button, { type ButtonColor } from 'components/Button';
 import Spinner from 'components/Spinner';
 
 interface Props {

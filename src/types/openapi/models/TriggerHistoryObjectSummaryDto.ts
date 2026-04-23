@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    TriggerHistoryObjectTriggerSummaryDto,
-} from './';
+import type { TriggerHistoryObjectTriggerSummaryDto } from './';
 
 /**
  * @export

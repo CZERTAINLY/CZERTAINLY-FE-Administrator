@@ -11,11 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-    AttributeVersion,
-    BaseAttributeContentDtoV3,
-} from './';
+import type { AttributeContentType, AttributeVersion, BaseAttributeContentDtoV3 } from './';
 
 /**
  * @export
@@ -52,5 +48,3 @@ export interface RequestAttributeV3 {
      */
     version: AttributeVersion;
 }
-
-

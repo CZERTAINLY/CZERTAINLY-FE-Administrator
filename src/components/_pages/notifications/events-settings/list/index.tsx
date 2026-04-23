@@ -1,6 +1,6 @@
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import { getEnumLabel, selectors as enumSelectors } from 'ducks/enums';
 import { actions as settingsActions, selectors as settingsSelectors } from 'ducks/settings';
 import { actions as resourceActions, selectors as resourceSelectors } from 'ducks/resource';
@@ -9,7 +9,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Select from 'components/Select';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { PlatformEnum, Resource } from 'types/openapi';
+import { PlatformEnum, type Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { useHasEventsResourceOptions } from 'utils/rules';
 

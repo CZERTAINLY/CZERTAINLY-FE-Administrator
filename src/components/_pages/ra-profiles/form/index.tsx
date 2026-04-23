@@ -13,8 +13,8 @@ import { useNavigate, useParams } from 'react-router';
 import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
-import { AttributeDescriptorModel } from 'types/attributes';
-import { RaProfileResponseModel } from 'types/ra-profiles';
+import type { AttributeDescriptorModel } from 'types/attributes';
+import type { RaProfileResponseModel } from 'types/ra-profiles';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
 

@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeResource,
-    CertificateType,
-} from './';
+import type { AttributeResource, CertificateType } from './';
 
 /**
  * Content data for resource object attribute containing certificate content
@@ -53,5 +50,3 @@ export interface ResourceCertificateContentData {
      */
     content?: string;
 }
-
-

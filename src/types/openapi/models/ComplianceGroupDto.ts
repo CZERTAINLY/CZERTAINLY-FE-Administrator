@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ComplianceRuleAvailabilityStatus,
-    Resource,
-} from './';
+import type { ComplianceRuleAvailabilityStatus, Resource } from './';
 
 /**
  * @export
@@ -58,5 +55,3 @@ export interface ComplianceGroupDto {
      */
     resource?: Resource;
 }
-
-

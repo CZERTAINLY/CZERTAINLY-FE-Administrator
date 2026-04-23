@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -20,6 +20,5 @@ export enum AttributeValueTarget {
     PathVariable = 'pathVariable',
     RequestParameter = 'requestParameter',
     Body = 'body',
-    Filter = 'filter'
+    Filter = 'filter',
 }
-

@@ -1,7 +1,7 @@
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { PlatformEnum, SecretState, SecretType } from 'types/openapi';
+import { PlatformEnum, SecretState, type SecretType } from 'types/openapi';
 
 export function getSecretStatusColor(status: SecretState): string {
     switch (status) {

@@ -1,7 +1,7 @@
 import React from 'react';
 import * as ReactHookForm from 'react-hook-form';
 import ContentDescriptorField from './index';
-import { AttributeContentType } from 'types/openapi';
+import type { AttributeContentType } from 'types/openapi';
 
 export interface ContentDescriptorFieldTestWrapperProps {
     isList: boolean;

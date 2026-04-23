@@ -1,4 +1,4 @@
-import Dialog, { DialogButton } from 'components/Dialog';
+import Dialog, { type DialogButton } from 'components/Dialog';
 import { actions, selectors } from 'ducks/user-interface';
 import type { GlobalModalModel } from 'types/user-interface';
 import type { Dispatch } from '@reduxjs/toolkit';

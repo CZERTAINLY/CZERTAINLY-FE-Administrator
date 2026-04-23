@@ -1,6 +1,6 @@
 import { catchError, filter, map, switchMap } from 'rxjs/operators';
 
-import { AppEpic } from 'ducks';
+import type { AppEpic } from 'ducks';
 
 import { defer, of } from 'rxjs';
 import { extractError } from 'utils/net';

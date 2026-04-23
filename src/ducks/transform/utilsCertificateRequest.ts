@@ -1,6 +1,6 @@
 import { isX509CertificateRequestAsn1Data } from 'types/utilsCertificate';
-import { CertificateDetailResponseModel } from '../../types/certificate';
-import { ParseRequestResponseDto } from '../../types/openapi/utils';
+import type { CertificateDetailResponseModel } from '../../types/certificate';
+import type { ParseRequestResponseDto } from '../../types/openapi/utils';
 import { isPkcs10RequestBasicData } from '../../types/utilsCertificateRequest';
 import { emptyCertificate } from '../../utils/certificate';
 

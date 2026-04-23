@@ -1,5 +1,5 @@
 import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
-import { TableDataRow, TableHeader } from 'components/CustomTable';
+import type { TableDataRow, TableHeader } from 'components/CustomTable';
 import PagedList from 'components/PagedList/PagedList';
 import Dialog from 'components/Dialog';
 import NotificationProfileForm from '../form';
@@ -11,9 +11,9 @@ import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import Badge from 'components/Badge';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import { EntityType } from 'ducks/filters';
-import { SearchRequestModel } from 'types/certificate';
+import type { SearchRequestModel } from 'types/certificate';
 import { PlatformEnum } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 

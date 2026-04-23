@@ -1,5 +1,5 @@
 import type { CustomAttributeModel, DataAttributeModel } from 'types/attributes';
-import { AttributeConstraintType, AttributeContentType, RangeAttributeConstraintData } from 'types/openapi';
+import { AttributeConstraintType, AttributeContentType, type RangeAttributeConstraintData } from 'types/openapi';
 import { isCustomAttributeModel, isDataAttributeModel } from 'types/attributes';
 import type { RegexpAttributeConstraintModel } from 'types/attributes';
 import { getFormattedDateTime } from 'utils/dateUtil';

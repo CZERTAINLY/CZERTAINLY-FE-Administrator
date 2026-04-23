@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import TextInput from 'components/TextInput';
 import DatePicker from 'components/DatePicker';
 import Switch from 'components/Switch';

@@ -11,12 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ComplianceRuleAvailabilityStatus,
-    ConditionItemDto,
-    Resource,
-    ResponseAttribute,
-} from './';
+import type { ComplianceRuleAvailabilityStatus, ConditionItemDto, Resource, ResponseAttribute } from './';
 
 /**
  * @export
@@ -90,5 +85,3 @@ export interface ComplianceRuleDto {
      */
     conditionItems?: Array<ConditionItemDto>;
 }
-
-

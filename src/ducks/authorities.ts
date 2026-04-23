@@ -1,9 +1,9 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-import { AttributeDescriptorModel } from 'types/attributes';
-import { AuthorityRequestModel, AuthorityResponseModel, AuthorityUpdateRequestModel } from 'types/authorities';
-import { BulkActionModel, ConnectorResponseModel } from 'types/connectors';
-import { FunctionGroupCode } from 'types/openapi';
+import type { AttributeDescriptorModel } from 'types/attributes';
+import type { AuthorityRequestModel, AuthorityResponseModel, AuthorityUpdateRequestModel } from 'types/authorities';
+import type { BulkActionModel, ConnectorResponseModel } from 'types/connectors';
+import type { FunctionGroupCode } from 'types/openapi';
 
 export type State = {
     checkedRows: string[];
@@ -66,7 +66,7 @@ export const slice = createSlice({
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
             Object.keys(state).forEach((key) => {
-                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+                if (!Object.hasOwn(initialState, key)) (state as any)[key] = undefined;
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));

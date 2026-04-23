@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import * as ReactHookForm from 'react-hook-form';
 import { Provider } from 'react-redux';
 import { createMockStore } from 'utils/test-helpers';

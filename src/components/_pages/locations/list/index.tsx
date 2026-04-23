@@ -9,14 +9,14 @@ import { EntityType } from 'ducks/filters';
 import { actions, selectors } from 'ducks/locations';
 import { selectors as pagingSelectors } from 'ducks/paging';
 
-import { ApiClients } from '../../../../api';
-import { TableDataRow, TableHeader } from 'components/CustomTable';
+import type { ApiClients } from '../../../../api';
+import type { TableDataRow, TableHeader } from 'components/CustomTable';
 import PagedList from 'components/PagedList/PagedList';
 import LocationForm from '../form';
 import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
-import { WidgetButtonProps } from 'components/WidgetButtons';
-import { SearchRequestModel } from 'types/certificate';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
+import type { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
 function LocationList() {

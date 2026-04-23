@@ -1,6 +1,6 @@
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import { useMemo } from 'react';
-import { AttributeDescriptorModel, AttributeResponseModel, isDataAttributeModel } from 'types/attributes';
+import { type AttributeDescriptorModel, type AttributeResponseModel, isDataAttributeModel } from 'types/attributes';
 import { getAttributeContent } from 'utils/attributes/attributes';
 
 export interface Props {

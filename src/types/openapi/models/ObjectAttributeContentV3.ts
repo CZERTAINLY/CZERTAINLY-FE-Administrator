@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-} from './';
+import type { AttributeContentType } from './';
 
 /**
  * Object attribute content for data with custom structure
@@ -39,5 +37,3 @@ export interface ObjectAttributeContentV3 {
      */
     contentType: AttributeContentType;
 }
-
-

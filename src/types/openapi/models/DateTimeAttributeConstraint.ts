@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeConstraintType,
-    DateTimeAttributeConstraintData,
-} from './';
+import type { AttributeConstraintType, DateTimeAttributeConstraintData } from './';
 
 /**
  * DateTime attribute constraint to specify boundaries for date value
@@ -47,5 +44,3 @@ export interface DateTimeAttributeConstraint {
      */
     data?: DateTimeAttributeConstraintData;
 }
-
-

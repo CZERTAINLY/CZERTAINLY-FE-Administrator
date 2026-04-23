@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ProxyStatus,
-} from './';
+import type { ProxyStatus } from './';
 
 /**
  * @export
@@ -51,5 +49,3 @@ export interface ProxyListDto {
      */
     lastActivity?: string;
 }
-
-

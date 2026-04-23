@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -23,6 +23,5 @@ export enum SecretState {
     Revoked = 'revoked',
     PendingApproval = 'pendingApproval',
     Rejected = 'rejected',
-    Failed = 'failed'
+    Failed = 'failed',
 }
-

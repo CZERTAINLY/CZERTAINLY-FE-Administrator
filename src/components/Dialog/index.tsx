@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import Button, { ButtonColor, ButtonVariant } from 'components/Button';
+import Button, { type ButtonColor, type ButtonVariant } from 'components/Button';
 import {
     Trash2,
     Info,

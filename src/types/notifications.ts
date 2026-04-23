@@ -1,5 +1,5 @@
-import { AttributeMappingModel, AttributeRequestModel, AttributeResponseModel } from './attributes';
-import { NotificationDto as NotificationDtoOpenApi, NotificationInstanceDto, NotificationInstanceRequestDto } from './openapi';
+import type { AttributeMappingModel, AttributeRequestModel, AttributeResponseModel } from './attributes';
+import type { NotificationDto as NotificationDtoOpenApi, NotificationInstanceDto, NotificationInstanceRequestDto } from './openapi';
 
 export type NotificationDto = NotificationDtoOpenApi;
 export type NotificationModel = NotificationDto;

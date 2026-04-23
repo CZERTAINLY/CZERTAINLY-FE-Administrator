@@ -1,4 +1,4 @@
-import Badge, { BadgeColor } from 'components/Badge';
+import Badge, { type BadgeColor } from 'components/Badge';
 import { ApprovalDetailDtoStatusEnum, ApprovalDtoStatusEnum, ApprovalStepRecipientDtoStatusEnum } from 'types/openapi';
 
 interface Props {

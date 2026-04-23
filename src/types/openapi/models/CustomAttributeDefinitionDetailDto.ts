@@ -11,14 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContent,
-    AttributeContentType,
-    AttributeType,
-    AttributeVersion,
-    ProtectionLevel,
-    Resource,
-} from './';
+import type { AttributeContent, AttributeContentType, AttributeType, AttributeVersion, ProtectionLevel, Resource } from './';
 
 /**
  * @export
@@ -134,5 +127,3 @@ export interface CustomAttributeDefinitionDetailDto {
      */
     extensibleList?: boolean;
 }
-
-

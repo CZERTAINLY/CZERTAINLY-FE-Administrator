@@ -12,7 +12,7 @@ import { actions, selectors } from 'ducks/compliance-profiles';
 
 import cn from 'classnames';
 
-import { Resource } from 'types/openapi';
+import type { Resource } from 'types/openapi';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { validateRequired } from 'utils/validators';
 

@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import { Handle, Position } from 'reactflow';
 import Button from 'components/Button';
-import { EntityNodeProps } from 'types/flowchart';
+import type { EntityNodeProps } from 'types/flowchart';
 import { CertificateValidationStatus } from 'types/openapi';
 import { useCopyToClipboard } from 'utils/common-hooks';
 import {
@@ -316,7 +316,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                         onClick={() => {
                                             if (data.deleteAction) {
                                                 switch (data.deleteAction.disableCondition) {
-                                                    case 'SingleChild':
+                                                    case 'SingleChild': {
                                                         const totalSiblings = flowChartNoedesState?.filter(
                                                             (node) =>
                                                                 node.parentId === thisNodeState?.parentId &&
@@ -333,6 +333,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                                             return;
                                                         }
                                                         break;
+                                                    }
                                                 }
 
                                                 data.deleteAction.action();

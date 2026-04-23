@@ -1,5 +1,5 @@
-import { AttributeRequestModel, AttributeResponseModel } from './attributes';
-import { CredentialDto, CredentialRequestDto, CredentialUpdateRequestDto } from './openapi';
+import type { AttributeRequestModel, AttributeResponseModel } from './attributes';
+import type { CredentialDto, CredentialRequestDto, CredentialUpdateRequestDto } from './openapi';
 
 export type CredentialResponseDto = CredentialDto;
 export type CredentialResponseModel = Omit<CredentialResponseDto, 'attributes | customAttributes'> & {

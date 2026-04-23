@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -20,6 +20,5 @@ export enum ConnectorStatus {
     WaitingForApproval = 'waitingForApproval',
     Connected = 'connected',
     Failed = 'failed',
-    Offline = 'offline'
+    Offline = 'offline',
 }
-

@@ -11,11 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ComplianceStatus,
-    GroupDto,
-    KeyItemDto,
-} from './';
+import type { ComplianceStatus, GroupDto, KeyItemDto } from './';
 
 /**
  * @export
@@ -107,5 +103,3 @@ export interface KeyDto {
      */
     complianceStatus: ComplianceStatus;
 }
-
-

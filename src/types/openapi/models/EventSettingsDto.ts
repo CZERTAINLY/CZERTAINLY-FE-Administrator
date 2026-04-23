@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ResourceEvent,
-} from './';
+import type { ResourceEvent } from './';
 
 /**
  * DTO representing settings of single event
@@ -34,5 +32,3 @@ export interface EventSettingsDto {
      */
     triggerUuids: Array<string>;
 }
-
-

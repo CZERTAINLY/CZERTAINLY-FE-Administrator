@@ -1,7 +1,7 @@
 import { EMPTY, of } from 'rxjs';
 import { filter, switchMap } from 'rxjs/operators';
 
-import { AppEpic } from 'ducks';
+import type { AppEpic } from 'ducks';
 
 import { AjaxError } from 'rxjs/ajax';
 import { extractError } from 'utils/net';

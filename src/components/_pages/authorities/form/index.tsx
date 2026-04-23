@@ -19,9 +19,9 @@ import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
 import Breadcrumb from 'components/Breadcrumb';
-import { AttributeDescriptorModel } from 'types/attributes';
-import { AuthorityResponseModel } from 'types/authorities';
-import { ConnectorResponseModel } from 'types/connectors';
+import type { AttributeDescriptorModel } from 'types/attributes';
+import type { AuthorityResponseModel } from 'types/authorities';
+import type { ConnectorResponseModel } from 'types/connectors';
 import { FunctionGroupCode, PlatformEnum, Resource } from 'types/openapi';
 import { getEnumLabel, selectors as enumSelectors } from 'ducks/enums';
 

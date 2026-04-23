@@ -1,4 +1,4 @@
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 
 import Dialog from 'components/Dialog';
 import Checkbox from 'components/Checkbox';
@@ -7,10 +7,11 @@ import SimpleBar from 'simplebar-react';
 import { Plus, Trash2, Check, X } from 'lucide-react';
 
 import { actions as authActions, selectors as authSelectors } from 'ducks/auth';
-import React, { useCallback, useMemo, useState } from 'react';
+import type React from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { AuthResourceModel } from 'types/auth';
-import { ObjectPermissionsResponseModel, ResourcePermissionsResponseModel, SubjectPermissionsModel } from 'types/roles';
+import type { AuthResourceModel } from 'types/auth';
+import type { ObjectPermissionsResponseModel, ResourcePermissionsResponseModel, SubjectPermissionsModel } from 'types/roles';
 import cn from 'classnames';
 import Container from 'components/Container';
 

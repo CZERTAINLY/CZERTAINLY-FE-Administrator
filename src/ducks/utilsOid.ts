@@ -1,5 +1,5 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { OidInfoResponseDto } from '../types/openapi/utils';
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { OidInfoResponseDto } from '../types/openapi/utils';
 
 export type State = {
     oidInfo?: OidInfoResponseDto;

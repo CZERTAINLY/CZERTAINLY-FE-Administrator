@@ -9,7 +9,7 @@ type Props = {
 };
 
 const TOKEN_REGEX =
-    /("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(?=\s*:)|"(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"|\btrue\b|\bfalse\b|\bnull\b|-?\d+(?:\.\d+)?(?:[eE][+\-]?\d+)?)/g;
+    /("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(?=\s*:)|"(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"|\btrue\b|\bfalse\b|\bnull\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g;
 
 const COLORS = {
     key: '#7AA2F7',

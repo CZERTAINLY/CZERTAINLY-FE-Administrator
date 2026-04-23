@@ -93,5 +93,5 @@ export interface CbomDetailDto {
      * @type {{ [key: string]: any; }}
      * @memberof CbomDetailDto
      */
-    content: { [key: string]: any; };
+    content: { [key: string]: any };
 }

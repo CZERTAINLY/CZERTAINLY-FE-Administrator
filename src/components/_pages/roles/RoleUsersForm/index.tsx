@@ -10,7 +10,7 @@ import Widget from 'components/Widget';
 import { actions as rolesActions, selectors as rolesSelectors } from 'ducks/roles';
 import { actions as userActions, selectors as usersSelectors } from 'ducks/users';
 
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 
 interface RoleUsersFormProps {
     roleId?: string;

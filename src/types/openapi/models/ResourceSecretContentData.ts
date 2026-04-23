@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeResource,
-    SecretContent,
-} from './';
+import type { AttributeResource, SecretContent } from './';
 
 /**
  * Content data for resource object attribute containing secret content
@@ -47,5 +44,3 @@ export interface ResourceSecretContentData {
      */
     content?: SecretContent;
 }
-
-

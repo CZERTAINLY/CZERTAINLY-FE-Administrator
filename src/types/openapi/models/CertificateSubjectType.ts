@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -20,6 +20,5 @@ export enum CertificateSubjectType {
     EndEntity = 'endEntity',
     SelfSignedEndEntity = 'selfSignedEndEntity',
     IntermediateCa = 'intermediateCa',
-    RootCa = 'rootCa'
+    RootCa = 'rootCa',
 }
-

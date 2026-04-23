@@ -21,18 +21,18 @@ import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
-    ApiKeySecretContent,
-    BasicAuthSecretContent,
-    GenericSecretContent,
-    JwtTokenSecretContent,
-    KeyStoreSecretContent,
+    type ApiKeySecretContent,
+    type BasicAuthSecretContent,
+    type GenericSecretContent,
+    type JwtTokenSecretContent,
+    type KeyStoreSecretContent,
     KeyStoreType,
-    KeyValueSecretContent,
+    type KeyValueSecretContent,
     PlatformEnum,
-    PrivateKeySecretContent,
+    type PrivateKeySecretContent,
     Resource,
-    SecretDetailDto,
-    SecretKeySecretContent,
+    type SecretDetailDto,
+    type SecretKeySecretContent,
     SecretType,
 } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';

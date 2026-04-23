@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CertificateRevocationReason,
-    RequestAttribute,
-} from './';
+import type { CertificateRevocationReason, RequestAttribute } from './';
 
 /**
  * @export
@@ -40,5 +37,3 @@ export interface ClientCertificateRevocationDto {
      */
     destroyKey?: boolean;
 }
-
-

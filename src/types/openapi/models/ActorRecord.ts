@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ActorType,
-    AuthMethod,
-} from './';
+import type { ActorType, AuthMethod } from './';
 
 /**
  * @export
@@ -42,5 +39,3 @@ export interface ActorRecord {
      */
     name?: string;
 }
-
-

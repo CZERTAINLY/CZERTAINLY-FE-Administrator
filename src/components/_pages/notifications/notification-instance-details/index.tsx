@@ -1,8 +1,8 @@
 import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from 'components/Attributes/AttributeViewer';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as notificationsActions, selectors as notificationsSelectors } from 'ducks/notifications';

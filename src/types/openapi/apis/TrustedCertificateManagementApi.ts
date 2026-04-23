@@ -39,13 +39,18 @@ export interface GetTrustedCertificateRequest {
  * no description
  */
 export class TrustedCertificateManagementApi extends BaseAPI {
-
     /**
      * Create a new Trusted Certificate
      */
-    createTrustedCertificate({ trustedCertificateRequestDto }: CreateTrustedCertificateRequest): Observable<UuidDto>
-    createTrustedCertificate({ trustedCertificateRequestDto }: CreateTrustedCertificateRequest, opts?: OperationOpts): Observable<AjaxResponse<UuidDto>>
-    createTrustedCertificate({ trustedCertificateRequestDto }: CreateTrustedCertificateRequest, opts?: OperationOpts): Observable<UuidDto | AjaxResponse<UuidDto>> {
+    createTrustedCertificate({ trustedCertificateRequestDto }: CreateTrustedCertificateRequest): Observable<UuidDto>;
+    createTrustedCertificate(
+        { trustedCertificateRequestDto }: CreateTrustedCertificateRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<UuidDto>>;
+    createTrustedCertificate(
+        { trustedCertificateRequestDto }: CreateTrustedCertificateRequest,
+        opts?: OperationOpts,
+    ): Observable<UuidDto | AjaxResponse<UuidDto>> {
         throwIfNullOrUndefined(trustedCertificateRequestDto, 'trustedCertificateRequestDto', 'createTrustedCertificate');
 
         const headers: HttpHeaders = {
@@ -53,19 +58,22 @@ export class TrustedCertificateManagementApi extends BaseAPI {
             ...(this.configuration.apiKey && { 'ssl-client-cert': this.configuration.apiKey('ssl-client-cert') }), // CertificateAuth authentication
         };
 
-        return this.request<UuidDto>({
-            url: '/v1/trustedCertificates',
-            method: 'POST',
-            headers,
-            body: trustedCertificateRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<UuidDto>(
+            {
+                url: '/v1/trustedCertificates',
+                method: 'POST',
+                headers,
+                body: trustedCertificateRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Delete a Trusted Certificate
      */
-    deleteTrustedCertificate({ uuid }: DeleteTrustedCertificateRequest): Observable<void>
-    deleteTrustedCertificate({ uuid }: DeleteTrustedCertificateRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    deleteTrustedCertificate({ uuid }: DeleteTrustedCertificateRequest): Observable<void>;
+    deleteTrustedCertificate({ uuid }: DeleteTrustedCertificateRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteTrustedCertificate({ uuid }: DeleteTrustedCertificateRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'deleteTrustedCertificate');
 
@@ -73,47 +81,58 @@ export class TrustedCertificateManagementApi extends BaseAPI {
             ...(this.configuration.apiKey && { 'ssl-client-cert': this.configuration.apiKey('ssl-client-cert') }), // CertificateAuth authentication
         };
 
-        return this.request<void>({
-            url: '/v1/trustedCertificates/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'DELETE',
-            headers,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/trustedCertificates/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
+                headers,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get details of a Trusted Certificate
      */
-    getTrustedCertificate({ uuid }: GetTrustedCertificateRequest): Observable<TrustedCertificateDto>
-    getTrustedCertificate({ uuid }: GetTrustedCertificateRequest, opts?: OperationOpts): Observable<AjaxResponse<TrustedCertificateDto>>
-    getTrustedCertificate({ uuid }: GetTrustedCertificateRequest, opts?: OperationOpts): Observable<TrustedCertificateDto | AjaxResponse<TrustedCertificateDto>> {
+    getTrustedCertificate({ uuid }: GetTrustedCertificateRequest): Observable<TrustedCertificateDto>;
+    getTrustedCertificate({ uuid }: GetTrustedCertificateRequest, opts?: OperationOpts): Observable<AjaxResponse<TrustedCertificateDto>>;
+    getTrustedCertificate(
+        { uuid }: GetTrustedCertificateRequest,
+        opts?: OperationOpts,
+    ): Observable<TrustedCertificateDto | AjaxResponse<TrustedCertificateDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getTrustedCertificate');
 
         const headers: HttpHeaders = {
             ...(this.configuration.apiKey && { 'ssl-client-cert': this.configuration.apiKey('ssl-client-cert') }), // CertificateAuth authentication
         };
 
-        return this.request<TrustedCertificateDto>({
-            url: '/v1/trustedCertificates/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'GET',
-            headers,
-        }, opts?.responseOpts);
-    };
+        return this.request<TrustedCertificateDto>(
+            {
+                url: '/v1/trustedCertificates/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
+                headers,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List Trusted Certificates
      */
-    listTrustedCertificates(): Observable<Array<TrustedCertificateDto>>
-    listTrustedCertificates(opts?: OperationOpts): Observable<AjaxResponse<Array<TrustedCertificateDto>>>
+    listTrustedCertificates(): Observable<Array<TrustedCertificateDto>>;
+    listTrustedCertificates(opts?: OperationOpts): Observable<AjaxResponse<Array<TrustedCertificateDto>>>;
     listTrustedCertificates(opts?: OperationOpts): Observable<Array<TrustedCertificateDto> | AjaxResponse<Array<TrustedCertificateDto>>> {
         const headers: HttpHeaders = {
             ...(this.configuration.apiKey && { 'ssl-client-cert': this.configuration.apiKey('ssl-client-cert') }), // CertificateAuth authentication
         };
 
-        return this.request<Array<TrustedCertificateDto>>({
-            url: '/v1/trustedCertificates',
-            method: 'GET',
-            headers,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<Array<TrustedCertificateDto>>(
+            {
+                url: '/v1/trustedCertificates',
+                method: 'GET',
+                headers,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

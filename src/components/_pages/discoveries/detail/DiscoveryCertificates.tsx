@@ -1,4 +1,4 @@
-import { TableDataRow, TableHeader } from 'components/CustomTable';
+import type { TableDataRow, TableHeader } from 'components/CustomTable';
 
 import Widget from 'components/Widget';
 import Dialog from 'components/Dialog';
@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import Button from 'components/Button';
 
-import { TriggerHistorySummaryModel } from 'types/rules';
+import type { TriggerHistorySummaryModel } from 'types/rules';
 import { dateFormatter } from 'utils/dateUtil';
 import PagedCustomTable from '../../../CustomTable/PagedCustomTable';
 import TabLayout from '../../../Layout/TabLayout';

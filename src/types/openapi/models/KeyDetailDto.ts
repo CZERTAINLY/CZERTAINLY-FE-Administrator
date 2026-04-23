@@ -11,13 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ComplianceStatus,
-    GroupDto,
-    KeyAssociationDto,
-    KeyItemDetailDto,
-    ResponseAttribute,
-} from './';
+import type { ComplianceStatus, GroupDto, KeyAssociationDto, KeyItemDetailDto, ResponseAttribute } from './';
 
 /**
  * @export
@@ -121,5 +115,3 @@ export interface KeyDetailDto {
      */
     complianceStatus: ComplianceStatus;
 }
-
-

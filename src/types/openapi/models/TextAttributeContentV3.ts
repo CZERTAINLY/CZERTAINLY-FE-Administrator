@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-} from './';
+import type { AttributeContentType } from './';
 
 /**
  * Text attribute content used to store longer formatted strings
@@ -40,5 +38,3 @@ export interface TextAttributeContentV3 {
      */
     contentType: AttributeContentType;
 }
-
-

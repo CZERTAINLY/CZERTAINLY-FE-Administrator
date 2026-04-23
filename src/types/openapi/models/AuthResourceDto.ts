@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AuthActionDto,
-    Resource,
-} from './';
+import type { AuthActionDto, Resource } from './';
 
 /**
  * @export
@@ -58,5 +55,3 @@ export interface AuthResourceDto {
      */
     actions: Array<AuthActionDto>;
 }
-
-
