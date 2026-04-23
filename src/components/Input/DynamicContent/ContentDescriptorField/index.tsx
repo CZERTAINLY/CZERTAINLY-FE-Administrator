@@ -48,7 +48,7 @@ function DescriptorInputControl({
         );
     }
     if (inputType === 'datetime-local') {
-        const dateValue = field.value ? (field.value.includes('T') ? field.value : field.value.replace(' ', 'T')) : undefined;
+        const dateValue = field.value ? field.value.replace(' ', 'T') : undefined;
         return (
             <DatePicker
                 id={name}
@@ -129,6 +129,7 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
                             key={name}
                             name={name}
                             control={control}
+                            shouldUnregister
                             rules={
                                 ContentFieldConfiguration[contentType].validators
                                     ? buildValidationRules([
