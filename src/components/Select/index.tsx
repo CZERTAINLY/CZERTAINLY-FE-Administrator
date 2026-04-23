@@ -4,6 +4,7 @@ import Button from 'components/Button';
 import cn from 'classnames';
 import {
     SELECT_WRAPPER_CLASSES,
+    SELECT_WRAPPER_CLEARABLE_CLASSES,
     SELECT_TAGS_INPUT_CLASSES,
     SELECT_TAGS_ITEM_TEMPLATE,
     SELECT_SEARCH_CLASSES,
@@ -397,6 +398,9 @@ function Select({
         ? Array.isArray(value) && value.length > 0
         : getValueFromProp != null && getValueFromProp !== '' && getValueFromProp !== placeholder;
 
+    const effectiveClearable = isClearable || isMulti;
+    const multiSelectWrapperClasses = isMulti && hasValue ? SELECT_WRAPPER_CLEARABLE_CLASSES : SELECT_WRAPPER_CLASSES;
+
     return (
         <div data-testid={dataTestId ?? `select-${id}`}>
             {label && <Label htmlFor={id} title={label} required={required} />}
@@ -422,7 +426,7 @@ function Select({
                     data-hs-select={JSON.stringify({
                         ...(isMulti && {
                             mode: 'tags',
-                            wrapperClasses: SELECT_WRAPPER_CLASSES,
+                            wrapperClasses: multiSelectWrapperClasses,
                             tagsInputClasses: SELECT_TAGS_INPUT_CLASSES,
                             tagsItemTemplate: SELECT_TAGS_ITEM_TEMPLATE,
                         }),
@@ -432,7 +436,7 @@ function Select({
                         searchWrapperClasses: SELECT_SEARCH_WRAPPER_CLASSES,
                         placeholder: hasOptions ? placeholder : 'No options',
                         toggleTag: '<button type="button" aria-expanded="false"></button>',
-                        toggleClasses: `${isClearable && hasValue ? 'pe-14' : 'pe-9'} ${SELECT_TOGGLE_CLASSES_BASE}`,
+                        toggleClasses: `${!isMulti && isClearable && hasValue ? 'pe-14' : 'pe-9'} ${SELECT_TOGGLE_CLASSES_BASE}`,
                         dropdownClasses: `${SELECT_DROPDOWN_CLASSES_BASE} ${
                             dropdownWidth ? SELECT_DROPDOWN_FIXED_WIDTH_CLASSES : 'w-full'
                         } ${hasSearch ? 'px-1 pb-1' : 'p-1'}`,
@@ -493,7 +497,7 @@ function Select({
                         );
                     })}
                 </select>
-                {isClearable && hasValue && !isMulti && (
+                {effectiveClearable && hasValue && (
                     <Button
                         id={`${id}-clear`}
                         type="button"
