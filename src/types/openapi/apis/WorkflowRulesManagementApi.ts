@@ -74,32 +74,37 @@ export interface UpdateRuleRequest {
  * no description
  */
 export class WorkflowRulesManagementApi extends BaseAPI {
-
     /**
      * Create Condition
      */
-    createCondition({ conditionRequestDto }: CreateConditionRequest): Observable<ConditionDto>
-    createCondition({ conditionRequestDto }: CreateConditionRequest, opts?: OperationOpts): Observable<AjaxResponse<ConditionDto>>
-    createCondition({ conditionRequestDto }: CreateConditionRequest, opts?: OperationOpts): Observable<ConditionDto | AjaxResponse<ConditionDto>> {
+    createCondition({ conditionRequestDto }: CreateConditionRequest): Observable<ConditionDto>;
+    createCondition({ conditionRequestDto }: CreateConditionRequest, opts?: OperationOpts): Observable<AjaxResponse<ConditionDto>>;
+    createCondition(
+        { conditionRequestDto }: CreateConditionRequest,
+        opts?: OperationOpts,
+    ): Observable<ConditionDto | AjaxResponse<ConditionDto>> {
         throwIfNullOrUndefined(conditionRequestDto, 'conditionRequestDto', 'createCondition');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<ConditionDto>({
-            url: '/v1/workflows/conditions',
-            method: 'POST',
-            headers,
-            body: conditionRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<ConditionDto>(
+            {
+                url: '/v1/workflows/conditions',
+                method: 'POST',
+                headers,
+                body: conditionRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Create Rule
      */
-    createRule({ ruleRequestDto }: CreateRuleRequest): Observable<RuleDetailDto>
-    createRule({ ruleRequestDto }: CreateRuleRequest, opts?: OperationOpts): Observable<AjaxResponse<RuleDetailDto>>
+    createRule({ ruleRequestDto }: CreateRuleRequest): Observable<RuleDetailDto>;
+    createRule({ ruleRequestDto }: CreateRuleRequest, opts?: OperationOpts): Observable<AjaxResponse<RuleDetailDto>>;
     createRule({ ruleRequestDto }: CreateRuleRequest, opts?: OperationOpts): Observable<RuleDetailDto | AjaxResponse<RuleDetailDto>> {
         throwIfNullOrUndefined(ruleRequestDto, 'ruleRequestDto', 'createRule');
 
@@ -107,112 +112,144 @@ export class WorkflowRulesManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<RuleDetailDto>({
-            url: '/v1/workflows/rules',
-            method: 'POST',
-            headers,
-            body: ruleRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<RuleDetailDto>(
+            {
+                url: '/v1/workflows/rules',
+                method: 'POST',
+                headers,
+                body: ruleRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Delete Condition
      */
-    deleteCondition({ conditionUuid }: DeleteConditionRequest): Observable<void>
-    deleteCondition({ conditionUuid }: DeleteConditionRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    deleteCondition({ conditionUuid }: DeleteConditionRequest): Observable<void>;
+    deleteCondition({ conditionUuid }: DeleteConditionRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteCondition({ conditionUuid }: DeleteConditionRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(conditionUuid, 'conditionUuid', 'deleteCondition');
 
-        return this.request<void>({
-            url: '/v1/workflows/conditions/{conditionUuid}'.replace('{conditionUuid}', encodeURI(conditionUuid)),
-            method: 'DELETE',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/workflows/conditions/{conditionUuid}'.replace('{conditionUuid}', encodeURI(conditionUuid)),
+                method: 'DELETE',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Delete Rule
      */
-    deleteRule({ ruleUuid }: DeleteRuleRequest): Observable<void>
-    deleteRule({ ruleUuid }: DeleteRuleRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    deleteRule({ ruleUuid }: DeleteRuleRequest): Observable<void>;
+    deleteRule({ ruleUuid }: DeleteRuleRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteRule({ ruleUuid }: DeleteRuleRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(ruleUuid, 'ruleUuid', 'deleteRule');
 
-        return this.request<void>({
-            url: '/v1/workflows/rules/{ruleUuid}'.replace('{ruleUuid}', encodeURI(ruleUuid)),
-            method: 'DELETE',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/workflows/rules/{ruleUuid}'.replace('{ruleUuid}', encodeURI(ruleUuid)),
+                method: 'DELETE',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get Condition details
      */
-    getCondition({ conditionUuid }: GetConditionRequest): Observable<ConditionDto>
-    getCondition({ conditionUuid }: GetConditionRequest, opts?: OperationOpts): Observable<AjaxResponse<ConditionDto>>
+    getCondition({ conditionUuid }: GetConditionRequest): Observable<ConditionDto>;
+    getCondition({ conditionUuid }: GetConditionRequest, opts?: OperationOpts): Observable<AjaxResponse<ConditionDto>>;
     getCondition({ conditionUuid }: GetConditionRequest, opts?: OperationOpts): Observable<ConditionDto | AjaxResponse<ConditionDto>> {
         throwIfNullOrUndefined(conditionUuid, 'conditionUuid', 'getCondition');
 
-        return this.request<ConditionDto>({
-            url: '/v1/workflows/conditions/{conditionUuid}'.replace('{conditionUuid}', encodeURI(conditionUuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<ConditionDto>(
+            {
+                url: '/v1/workflows/conditions/{conditionUuid}'.replace('{conditionUuid}', encodeURI(conditionUuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get Rule details
      */
-    getRule({ ruleUuid }: GetRuleRequest): Observable<RuleDetailDto>
-    getRule({ ruleUuid }: GetRuleRequest, opts?: OperationOpts): Observable<AjaxResponse<RuleDetailDto>>
+    getRule({ ruleUuid }: GetRuleRequest): Observable<RuleDetailDto>;
+    getRule({ ruleUuid }: GetRuleRequest, opts?: OperationOpts): Observable<AjaxResponse<RuleDetailDto>>;
     getRule({ ruleUuid }: GetRuleRequest, opts?: OperationOpts): Observable<RuleDetailDto | AjaxResponse<RuleDetailDto>> {
         throwIfNullOrUndefined(ruleUuid, 'ruleUuid', 'getRule');
 
-        return this.request<RuleDetailDto>({
-            url: '/v1/workflows/rules/{ruleUuid}'.replace('{ruleUuid}', encodeURI(ruleUuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<RuleDetailDto>(
+            {
+                url: '/v1/workflows/rules/{ruleUuid}'.replace('{ruleUuid}', encodeURI(ruleUuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List Conditions
      */
-    listConditions({ resource }: ListConditionsRequest): Observable<Array<ConditionDto>>
-    listConditions({ resource }: ListConditionsRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<ConditionDto>>>
-    listConditions({ resource }: ListConditionsRequest, opts?: OperationOpts): Observable<Array<ConditionDto> | AjaxResponse<Array<ConditionDto>>> {
-
+    listConditions({ resource }: ListConditionsRequest): Observable<Array<ConditionDto>>;
+    listConditions({ resource }: ListConditionsRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<ConditionDto>>>;
+    listConditions(
+        { resource }: ListConditionsRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<ConditionDto> | AjaxResponse<Array<ConditionDto>>> {
         const query: HttpQuery = {};
 
-        if (resource != null) { query['resource'] = resource; }
+        if (resource != null) {
+            query['resource'] = resource;
+        }
 
-        return this.request<Array<ConditionDto>>({
-            url: '/v1/workflows/conditions',
-            method: 'GET',
-            query,
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<ConditionDto>>(
+            {
+                url: '/v1/workflows/conditions',
+                method: 'GET',
+                query,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List Rules
      */
-    listRules({ resource }: ListRulesRequest): Observable<Array<RuleDto>>
-    listRules({ resource }: ListRulesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<RuleDto>>>
+    listRules({ resource }: ListRulesRequest): Observable<Array<RuleDto>>;
+    listRules({ resource }: ListRulesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<RuleDto>>>;
     listRules({ resource }: ListRulesRequest, opts?: OperationOpts): Observable<Array<RuleDto> | AjaxResponse<Array<RuleDto>>> {
-
         const query: HttpQuery = {};
 
-        if (resource != null) { query['resource'] = resource; }
+        if (resource != null) {
+            query['resource'] = resource;
+        }
 
-        return this.request<Array<RuleDto>>({
-            url: '/v1/workflows/rules',
-            method: 'GET',
-            query,
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<RuleDto>>(
+            {
+                url: '/v1/workflows/rules',
+                method: 'GET',
+                query,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Update Condition
      */
-    updateCondition({ conditionUuid, updateConditionRequestDto }: UpdateConditionRequest): Observable<ConditionDto>
-    updateCondition({ conditionUuid, updateConditionRequestDto }: UpdateConditionRequest, opts?: OperationOpts): Observable<AjaxResponse<ConditionDto>>
-    updateCondition({ conditionUuid, updateConditionRequestDto }: UpdateConditionRequest, opts?: OperationOpts): Observable<ConditionDto | AjaxResponse<ConditionDto>> {
+    updateCondition({ conditionUuid, updateConditionRequestDto }: UpdateConditionRequest): Observable<ConditionDto>;
+    updateCondition(
+        { conditionUuid, updateConditionRequestDto }: UpdateConditionRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<ConditionDto>>;
+    updateCondition(
+        { conditionUuid, updateConditionRequestDto }: UpdateConditionRequest,
+        opts?: OperationOpts,
+    ): Observable<ConditionDto | AjaxResponse<ConditionDto>> {
         throwIfNullOrUndefined(conditionUuid, 'conditionUuid', 'updateCondition');
         throwIfNullOrUndefined(updateConditionRequestDto, 'updateConditionRequestDto', 'updateCondition');
 
@@ -220,20 +257,26 @@ export class WorkflowRulesManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<ConditionDto>({
-            url: '/v1/workflows/conditions/{conditionUuid}'.replace('{conditionUuid}', encodeURI(conditionUuid)),
-            method: 'PUT',
-            headers,
-            body: updateConditionRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<ConditionDto>(
+            {
+                url: '/v1/workflows/conditions/{conditionUuid}'.replace('{conditionUuid}', encodeURI(conditionUuid)),
+                method: 'PUT',
+                headers,
+                body: updateConditionRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Update Rule
      */
-    updateRule({ ruleUuid, updateRuleRequestDto }: UpdateRuleRequest): Observable<RuleDetailDto>
-    updateRule({ ruleUuid, updateRuleRequestDto }: UpdateRuleRequest, opts?: OperationOpts): Observable<AjaxResponse<RuleDetailDto>>
-    updateRule({ ruleUuid, updateRuleRequestDto }: UpdateRuleRequest, opts?: OperationOpts): Observable<RuleDetailDto | AjaxResponse<RuleDetailDto>> {
+    updateRule({ ruleUuid, updateRuleRequestDto }: UpdateRuleRequest): Observable<RuleDetailDto>;
+    updateRule({ ruleUuid, updateRuleRequestDto }: UpdateRuleRequest, opts?: OperationOpts): Observable<AjaxResponse<RuleDetailDto>>;
+    updateRule(
+        { ruleUuid, updateRuleRequestDto }: UpdateRuleRequest,
+        opts?: OperationOpts,
+    ): Observable<RuleDetailDto | AjaxResponse<RuleDetailDto>> {
         throwIfNullOrUndefined(ruleUuid, 'ruleUuid', 'updateRule');
         throwIfNullOrUndefined(updateRuleRequestDto, 'updateRuleRequestDto', 'updateRule');
 
@@ -241,12 +284,14 @@ export class WorkflowRulesManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<RuleDetailDto>({
-            url: '/v1/workflows/rules/{ruleUuid}'.replace('{ruleUuid}', encodeURI(ruleUuid)),
-            method: 'PUT',
-            headers,
-            body: updateRuleRequestDto,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<RuleDetailDto>(
+            {
+                url: '/v1/workflows/rules/{ruleUuid}'.replace('{ruleUuid}', encodeURI(ruleUuid)),
+                method: 'PUT',
+                headers,
+                body: updateRuleRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

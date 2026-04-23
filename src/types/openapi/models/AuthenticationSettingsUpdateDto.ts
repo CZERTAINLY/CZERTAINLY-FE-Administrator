@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    OAuth2ProviderSettingsDto,
-} from './';
+import type { OAuth2ProviderSettingsDto } from './';
 
 /**
  * @export

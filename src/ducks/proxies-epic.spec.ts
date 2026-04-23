@@ -1,4 +1,4 @@
-import { Action } from 'redux';
+import type { Action } from 'redux';
 import { Subject, lastValueFrom, of, throwError } from 'rxjs';
 import { toArray } from 'rxjs/operators';
 import { StateObservable } from 'redux-observable';
@@ -9,7 +9,7 @@ import { actions as alertActions } from './alerts';
 import { actions as appRedirectActions } from './app-redirect';
 import { actions as proxiesActions } from './proxies';
 import { actions as userInterfaceActions } from './user-interface';
-import { AppEpic, EpicDependencies } from './index';
+import type { AppEpic, EpicDependencies } from './index';
 import {
     bulkDeleteProxies,
     createProxy,

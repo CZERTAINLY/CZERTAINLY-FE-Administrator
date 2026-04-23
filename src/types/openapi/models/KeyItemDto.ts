@@ -11,15 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ComplianceStatus,
-    GroupDto,
-    KeyAlgorithm,
-    KeyFormat,
-    KeyState,
-    KeyType,
-    KeyUsage,
-} from './';
+import type { ComplianceStatus, GroupDto, KeyAlgorithm, KeyFormat, KeyState, KeyType, KeyUsage } from './';
 
 /**
  * @export
@@ -159,5 +151,3 @@ export interface KeyItemDto {
      */
     complianceStatus: ComplianceStatus;
 }
-
-

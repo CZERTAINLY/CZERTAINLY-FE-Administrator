@@ -25,7 +25,7 @@ import {
 } from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { PlatformEnum, RecipientType } from 'types/openapi';
-import { NotificationProfileUpdateRequestModel } from 'types/notification-profiles';
+import type { NotificationProfileUpdateRequestModel } from 'types/notification-profiles';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { getInputStringFromIso8601String, getIso8601StringFromInputString } from 'utils/duration';
 import TextInput from 'components/TextInput';

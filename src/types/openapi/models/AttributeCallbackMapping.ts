@@ -11,11 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-    AttributeType,
-    AttributeValueTarget,
-} from './';
+import type { AttributeContentType, AttributeType, AttributeValueTarget } from './';
 
 /**
  * @export
@@ -35,7 +31,7 @@ export interface AttributeCallbackMapping {
      */
     attributeType?: AttributeType;
     /**
-     * Type of the attribute content. 
+     * Type of the attribute content.
      * @type {AttributeContentType}
      * @memberof AttributeCallbackMapping
      */
@@ -58,5 +54,3 @@ export interface AttributeCallbackMapping {
      */
     value?: any | null;
 }
-
-

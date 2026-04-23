@@ -11,11 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ProtectionMethod,
-    ProtocolCertificateAssociationsRequestDto,
-    RequestAttribute,
-} from './';
+import type { ProtectionMethod, ProtocolCertificateAssociationsRequestDto, RequestAttribute } from './';
 
 /**
  * @export
@@ -103,6 +99,5 @@ export interface CmpProfileRequestDto {
 export enum CmpProfileRequestDtoVariantEnum {
     V2 = 'v2',
     V23gpp = 'v2_3gpp',
-    V3 = 'v3'
+    V3 = 'v3',
 }
-

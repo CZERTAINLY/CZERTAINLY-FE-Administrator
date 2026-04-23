@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-    CodeBlockAttributeContentData,
-} from './';
+import type { AttributeContentType, CodeBlockAttributeContentData } from './';
 
 /**
  * Codeblock attribute content to store encoded snippets of programming language code
@@ -41,5 +38,3 @@ export interface CodeBlockAttributeContentV3 {
      */
     contentType: AttributeContentType;
 }
-
-

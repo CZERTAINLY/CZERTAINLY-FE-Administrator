@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -22,6 +22,5 @@ export enum ProxyStatus {
     Failed = 'failed',
     WaitingForInstallation = 'waitingForInstallation',
     Connected = 'connected',
-    Disconnected = 'disconnected'
+    Disconnected = 'disconnected',
 }
-

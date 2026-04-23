@@ -6,9 +6,9 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
-import { Resource, TriggerDto, PlatformEnum, ResourceEvent } from 'types/openapi';
+import { type Resource, type TriggerDto, PlatformEnum, type ResourceEvent } from 'types/openapi';
 
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Button from 'components/Button';
 import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
 import { ArrowUp, ArrowDown, Trash2 } from 'lucide-react';

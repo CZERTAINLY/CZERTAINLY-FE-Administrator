@@ -1,5 +1,5 @@
 import type { SearchFieldListModel } from 'types/certificate';
-import { AttributeContentType, FilterFieldSource } from 'types/openapi';
+import { AttributeContentType, type FilterFieldSource } from 'types/openapi';
 
 export function makeSearchFieldList(source: FilterFieldSource, fields: Record<string, any>[]): SearchFieldListModel[] {
     return [{ filterFieldSource: source, searchFieldData: fields.map((f) => ({ conditions: [], ...f })) }] as SearchFieldListModel[];

@@ -71,143 +71,210 @@ export interface UpdateTriggerRequest {
  * no description
  */
 export class WorkflowTriggersManagementApi extends BaseAPI {
-
     /**
      * Associate event with triggers
      */
-    associateEventTriggers({ triggerEventAssociationRequestDto }: AssociateEventTriggersRequest): Observable<void>
-    associateEventTriggers({ triggerEventAssociationRequestDto }: AssociateEventTriggersRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    associateEventTriggers({ triggerEventAssociationRequestDto }: AssociateEventTriggersRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    associateEventTriggers({ triggerEventAssociationRequestDto }: AssociateEventTriggersRequest): Observable<void>;
+    associateEventTriggers(
+        { triggerEventAssociationRequestDto }: AssociateEventTriggersRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    associateEventTriggers(
+        { triggerEventAssociationRequestDto }: AssociateEventTriggersRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(triggerEventAssociationRequestDto, 'triggerEventAssociationRequestDto', 'associateEventTriggers');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>({
-            url: '/v1/workflows/events',
-            method: 'POST',
-            headers,
-            body: triggerEventAssociationRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/workflows/events',
+                method: 'POST',
+                headers,
+                body: triggerEventAssociationRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Create Trigger
      */
-    createTrigger({ triggerRequestDto }: CreateTriggerRequest): Observable<TriggerDetailDto>
-    createTrigger({ triggerRequestDto }: CreateTriggerRequest, opts?: OperationOpts): Observable<AjaxResponse<TriggerDetailDto>>
-    createTrigger({ triggerRequestDto }: CreateTriggerRequest, opts?: OperationOpts): Observable<TriggerDetailDto | AjaxResponse<TriggerDetailDto>> {
+    createTrigger({ triggerRequestDto }: CreateTriggerRequest): Observable<TriggerDetailDto>;
+    createTrigger({ triggerRequestDto }: CreateTriggerRequest, opts?: OperationOpts): Observable<AjaxResponse<TriggerDetailDto>>;
+    createTrigger(
+        { triggerRequestDto }: CreateTriggerRequest,
+        opts?: OperationOpts,
+    ): Observable<TriggerDetailDto | AjaxResponse<TriggerDetailDto>> {
         throwIfNullOrUndefined(triggerRequestDto, 'triggerRequestDto', 'createTrigger');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<TriggerDetailDto>({
-            url: '/v1/workflows/triggers',
-            method: 'POST',
-            headers,
-            body: triggerRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<TriggerDetailDto>(
+            {
+                url: '/v1/workflows/triggers',
+                method: 'POST',
+                headers,
+                body: triggerRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Delete Trigger
      */
-    deleteTrigger({ triggerUuid }: DeleteTriggerRequest): Observable<void>
-    deleteTrigger({ triggerUuid }: DeleteTriggerRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    deleteTrigger({ triggerUuid }: DeleteTriggerRequest): Observable<void>;
+    deleteTrigger({ triggerUuid }: DeleteTriggerRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteTrigger({ triggerUuid }: DeleteTriggerRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(triggerUuid, 'triggerUuid', 'deleteTrigger');
 
-        return this.request<void>({
-            url: '/v1/workflows/triggers/{triggerUuid}'.replace('{triggerUuid}', encodeURI(triggerUuid)),
-            method: 'DELETE',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/workflows/triggers/{triggerUuid}'.replace('{triggerUuid}', encodeURI(triggerUuid)),
+                method: 'DELETE',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get event triggers associations for resource object
      */
-    getEventTriggersAssociations({ resource, associationObjectUuid }: GetEventTriggersAssociationsRequest): Observable<{ [key: string]: Array<string>; }>
-    getEventTriggersAssociations({ resource, associationObjectUuid }: GetEventTriggersAssociationsRequest, opts?: OperationOpts): Observable<AjaxResponse<{ [key: string]: Array<string>; }>>
-    getEventTriggersAssociations({ resource, associationObjectUuid }: GetEventTriggersAssociationsRequest, opts?: OperationOpts): Observable<{ [key: string]: Array<string>; } | AjaxResponse<{ [key: string]: Array<string>; }>> {
+    getEventTriggersAssociations({
+        resource,
+        associationObjectUuid,
+    }: GetEventTriggersAssociationsRequest): Observable<{ [key: string]: Array<string> }>;
+    getEventTriggersAssociations(
+        { resource, associationObjectUuid }: GetEventTriggersAssociationsRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<{ [key: string]: Array<string> }>>;
+    getEventTriggersAssociations(
+        { resource, associationObjectUuid }: GetEventTriggersAssociationsRequest,
+        opts?: OperationOpts,
+    ): Observable<{ [key: string]: Array<string> } | AjaxResponse<{ [key: string]: Array<string> }>> {
         throwIfNullOrUndefined(resource, 'resource', 'getEventTriggersAssociations');
         throwIfNullOrUndefined(associationObjectUuid, 'associationObjectUuid', 'getEventTriggersAssociations');
 
-        return this.request<{ [key: string]: Array<string>; }>({
-            url: '/v1/workflows/events/{resource}/{associationObjectUuid}'.replace('{resource}', encodeURI(resource)).replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<{ [key: string]: Array<string> }>(
+            {
+                url: '/v1/workflows/events/{resource}/{associationObjectUuid}'
+                    .replace('{resource}', encodeURI(resource))
+                    .replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get Trigger details
      */
-    getTrigger({ triggerUuid }: GetTriggerRequest): Observable<TriggerDetailDto>
-    getTrigger({ triggerUuid }: GetTriggerRequest, opts?: OperationOpts): Observable<AjaxResponse<TriggerDetailDto>>
+    getTrigger({ triggerUuid }: GetTriggerRequest): Observable<TriggerDetailDto>;
+    getTrigger({ triggerUuid }: GetTriggerRequest, opts?: OperationOpts): Observable<AjaxResponse<TriggerDetailDto>>;
     getTrigger({ triggerUuid }: GetTriggerRequest, opts?: OperationOpts): Observable<TriggerDetailDto | AjaxResponse<TriggerDetailDto>> {
         throwIfNullOrUndefined(triggerUuid, 'triggerUuid', 'getTrigger');
 
-        return this.request<TriggerDetailDto>({
-            url: '/v1/workflows/triggers/{triggerUuid}'.replace('{triggerUuid}', encodeURI(triggerUuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<TriggerDetailDto>(
+            {
+                url: '/v1/workflows/triggers/{triggerUuid}'.replace('{triggerUuid}', encodeURI(triggerUuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get Trigger History
      */
-    getTriggerHistory({ triggerUuid, associationObjectUuid }: GetTriggerHistoryRequest): Observable<Array<TriggerHistoryDto>>
-    getTriggerHistory({ triggerUuid, associationObjectUuid }: GetTriggerHistoryRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<TriggerHistoryDto>>>
-    getTriggerHistory({ triggerUuid, associationObjectUuid }: GetTriggerHistoryRequest, opts?: OperationOpts): Observable<Array<TriggerHistoryDto> | AjaxResponse<Array<TriggerHistoryDto>>> {
+    getTriggerHistory({ triggerUuid, associationObjectUuid }: GetTriggerHistoryRequest): Observable<Array<TriggerHistoryDto>>;
+    getTriggerHistory(
+        { triggerUuid, associationObjectUuid }: GetTriggerHistoryRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<TriggerHistoryDto>>>;
+    getTriggerHistory(
+        { triggerUuid, associationObjectUuid }: GetTriggerHistoryRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<TriggerHistoryDto> | AjaxResponse<Array<TriggerHistoryDto>>> {
         throwIfNullOrUndefined(triggerUuid, 'triggerUuid', 'getTriggerHistory');
         throwIfNullOrUndefined(associationObjectUuid, 'associationObjectUuid', 'getTriggerHistory');
 
-        return this.request<Array<TriggerHistoryDto>>({
-            url: '/v1/workflows/triggers/{triggerUuid}/history/{associationObjectUuid}'.replace('{triggerUuid}', encodeURI(triggerUuid)).replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<TriggerHistoryDto>>(
+            {
+                url: '/v1/workflows/triggers/{triggerUuid}/history/{associationObjectUuid}'
+                    .replace('{triggerUuid}', encodeURI(triggerUuid))
+                    .replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get Trigger History Summary
      */
-    getTriggerHistorySummary({ associationObjectUuid }: GetTriggerHistorySummaryRequest): Observable<TriggerHistorySummaryDto>
-    getTriggerHistorySummary({ associationObjectUuid }: GetTriggerHistorySummaryRequest, opts?: OperationOpts): Observable<AjaxResponse<TriggerHistorySummaryDto>>
-    getTriggerHistorySummary({ associationObjectUuid }: GetTriggerHistorySummaryRequest, opts?: OperationOpts): Observable<TriggerHistorySummaryDto | AjaxResponse<TriggerHistorySummaryDto>> {
+    getTriggerHistorySummary({ associationObjectUuid }: GetTriggerHistorySummaryRequest): Observable<TriggerHistorySummaryDto>;
+    getTriggerHistorySummary(
+        { associationObjectUuid }: GetTriggerHistorySummaryRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<TriggerHistorySummaryDto>>;
+    getTriggerHistorySummary(
+        { associationObjectUuid }: GetTriggerHistorySummaryRequest,
+        opts?: OperationOpts,
+    ): Observable<TriggerHistorySummaryDto | AjaxResponse<TriggerHistorySummaryDto>> {
         throwIfNullOrUndefined(associationObjectUuid, 'associationObjectUuid', 'getTriggerHistorySummary');
 
-        return this.request<TriggerHistorySummaryDto>({
-            url: '/v1/workflows/triggers/history/{associationObjectUuid}'.replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<TriggerHistorySummaryDto>(
+            {
+                url: '/v1/workflows/triggers/history/{associationObjectUuid}'.replace(
+                    '{associationObjectUuid}',
+                    encodeURI(associationObjectUuid),
+                ),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List Triggers
      */
-    listTriggers({ resource }: ListTriggersRequest): Observable<Array<TriggerDto>>
-    listTriggers({ resource }: ListTriggersRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<TriggerDto>>>
+    listTriggers({ resource }: ListTriggersRequest): Observable<Array<TriggerDto>>;
+    listTriggers({ resource }: ListTriggersRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<TriggerDto>>>;
     listTriggers({ resource }: ListTriggersRequest, opts?: OperationOpts): Observable<Array<TriggerDto> | AjaxResponse<Array<TriggerDto>>> {
-
         const query: HttpQuery = {};
 
-        if (resource != null) { query['resource'] = resource; }
+        if (resource != null) {
+            query['resource'] = resource;
+        }
 
-        return this.request<Array<TriggerDto>>({
-            url: '/v1/workflows/triggers',
-            method: 'GET',
-            query,
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<TriggerDto>>(
+            {
+                url: '/v1/workflows/triggers',
+                method: 'GET',
+                query,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Update Trigger
      */
-    updateTrigger({ triggerUuid, updateTriggerRequestDto }: UpdateTriggerRequest): Observable<TriggerDetailDto>
-    updateTrigger({ triggerUuid, updateTriggerRequestDto }: UpdateTriggerRequest, opts?: OperationOpts): Observable<AjaxResponse<TriggerDetailDto>>
-    updateTrigger({ triggerUuid, updateTriggerRequestDto }: UpdateTriggerRequest, opts?: OperationOpts): Observable<TriggerDetailDto | AjaxResponse<TriggerDetailDto>> {
+    updateTrigger({ triggerUuid, updateTriggerRequestDto }: UpdateTriggerRequest): Observable<TriggerDetailDto>;
+    updateTrigger(
+        { triggerUuid, updateTriggerRequestDto }: UpdateTriggerRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<TriggerDetailDto>>;
+    updateTrigger(
+        { triggerUuid, updateTriggerRequestDto }: UpdateTriggerRequest,
+        opts?: OperationOpts,
+    ): Observable<TriggerDetailDto | AjaxResponse<TriggerDetailDto>> {
         throwIfNullOrUndefined(triggerUuid, 'triggerUuid', 'updateTrigger');
         throwIfNullOrUndefined(updateTriggerRequestDto, 'updateTriggerRequestDto', 'updateTrigger');
 
@@ -215,12 +282,14 @@ export class WorkflowTriggersManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<TriggerDetailDto>({
-            url: '/v1/workflows/triggers/{triggerUuid}'.replace('{triggerUuid}', encodeURI(triggerUuid)),
-            method: 'PUT',
-            headers,
-            body: updateTriggerRequestDto,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<TriggerDetailDto>(
+            {
+                url: '/v1/workflows/triggers/{triggerUuid}'.replace('{triggerUuid}', encodeURI(triggerUuid)),
+                method: 'PUT',
+                headers,
+                body: updateTriggerRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

@@ -12,12 +12,11 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
 export enum ProtectionMethod {
     SharedSecret = 'sharedSecret',
-    Signature = 'signature'
+    Signature = 'signature',
 }
-

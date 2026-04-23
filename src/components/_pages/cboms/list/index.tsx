@@ -2,19 +2,19 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import { firstValueFrom } from 'rxjs';
-import WidgetButtons, { WidgetButtonProps } from 'components/WidgetButtons';
+import WidgetButtons, { type WidgetButtonProps } from 'components/WidgetButtons';
 import Dialog from 'components/Dialog';
 import { useCopyToClipboard, useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import CbomUploadDialog from '../CbomUploadDialog';
 import { actions as alertActions } from 'ducks/alerts';
 import { actions, selectors } from 'ducks/cbom';
 import PagedList from 'components/PagedList/PagedList';
-import { TableDataRow, TableHeader } from 'components/CustomTable';
+import type { TableDataRow, TableHeader } from 'components/CustomTable';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { SearchRequestModel } from 'types/certificate';
-import { ApiClients, backendClient } from 'src/api';
+import type { SearchRequestModel } from 'types/certificate';
+import { type ApiClients, backendClient } from 'src/api';
 import { EntityType } from 'ducks/filters';
-import { CbomDetailDto } from 'types/openapi';
+import type { CbomDetailDto } from 'types/openapi';
 
 const toFiniteNumber = (value: unknown): number => {
     const parsed = typeof value === 'number' ? value : Number(value);

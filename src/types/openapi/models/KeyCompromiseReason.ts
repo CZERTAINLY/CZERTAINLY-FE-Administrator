@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -20,6 +20,5 @@ export enum KeyCompromiseReason {
     Disclosure = 'disclosure',
     Modification = 'modification',
     Substitution = 'substitution',
-    UseOfSensitiveData = 'use_of_sensitive_data'
+    UseOfSensitiveData = 'use_of_sensitive_data',
 }
-

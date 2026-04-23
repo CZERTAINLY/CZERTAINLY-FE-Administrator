@@ -1,10 +1,10 @@
-import CustomTable, { TableHeader, TableDataRow } from 'components/CustomTable';
+import CustomTable, { type TableHeader, type TableDataRow } from 'components/CustomTable';
 import Widget from 'components/Widget';
-import WidgetButtons, { WidgetButtonProps } from 'components/WidgetButtons';
+import WidgetButtons, { type WidgetButtonProps } from 'components/WidgetButtons';
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { ComplianceProfileDtoV2, PlatformEnum, Resource } from 'types/openapi/models';
+import { type ComplianceProfileDtoV2, PlatformEnum, type Resource } from 'types/openapi/models';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
 import { actions, selectors } from 'ducks/compliance-profiles';

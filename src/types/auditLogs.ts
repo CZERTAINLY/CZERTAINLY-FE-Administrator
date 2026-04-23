@@ -1,4 +1,4 @@
-import { AuditLogDto as AuditLogDtoOpenApi, AuditLogResponseDto } from './openapi';
+import type { AuditLogDto as AuditLogDtoOpenApi, AuditLogResponseDto } from './openapi';
 
 export type AuditLogItemDto = AuditLogDtoOpenApi;
 export type AuditLogItemModel = AuditLogItemDto;

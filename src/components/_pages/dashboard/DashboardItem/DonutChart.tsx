@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import Widget from 'components/Widget';
-import { EntityType, actions } from 'ducks/filters';
+import { type EntityType, actions } from 'ducks/filters';
 import ReactApexChart from 'react-apexcharts';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 import SimpleBar from 'simplebar-react';
-import { SearchFilterModel } from 'types/certificate';
-import { DashboardDict } from 'types/statisticsDashboard';
+import type { SearchFilterModel } from 'types/certificate';
+import type { DashboardDict } from 'types/statisticsDashboard';
 import { getValues, useGetLabels, getDefaultColors } from 'utils/dashboard';
 
 export interface ColorOptions {
@@ -55,9 +55,7 @@ function DonutChart({
         },
         dataLabels: {
             enabled: false,
-            formatter: function (val: any, opts: any) {
-                return opts.w.config.series[opts.seriesIndex];
-            },
+            formatter: (val: any, opts: any) => opts.w.config.series[opts.seriesIndex],
         },
         chart: {
             width: '100%',
@@ -76,7 +74,7 @@ function DonutChart({
         },
         tooltip: {
             enabled: true,
-            custom: function ({ series, seriesIndex, dataPointIndex, w }: any) {
+            custom: ({ series, seriesIndex, dataPointIndex, w }: any) => {
                 const label = w.globals.labels[seriesIndex];
                 const value = series[seriesIndex];
                 const color = w.globals.colors[seriesIndex];

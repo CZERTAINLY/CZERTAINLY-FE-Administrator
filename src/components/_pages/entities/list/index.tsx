@@ -6,14 +6,14 @@ import Badge from 'components/Badge';
 
 import { actions, selectors } from 'ducks/entities';
 
-import { ApiClients } from '../../../../api';
-import { TableDataRow, TableHeader } from 'components/CustomTable';
+import type { ApiClients } from '../../../../api';
+import type { TableDataRow, TableHeader } from 'components/CustomTable';
 import PagedList from 'components/PagedList/PagedList';
 import EntityForm from '../form';
 import Dialog from 'components/Dialog';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import { EntityType } from 'ducks/filters';
-import { SearchRequestModel } from 'types/certificate';
+import type { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
 function EntityList() {

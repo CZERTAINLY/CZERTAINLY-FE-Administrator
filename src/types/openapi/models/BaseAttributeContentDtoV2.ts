@@ -32,4 +32,17 @@ import type {
  * Base Attribute ContentV2 definition
  * @export
  */
-export type BaseAttributeContentDtoV2 = BooleanAttributeContentV2 | CodeBlockAttributeContentV2 | CredentialAttributeContentV2 | DateAttributeContentV2 | DateTimeAttributeContentV2 | FileAttributeContentV2 | FloatAttributeContentV2 | IntegerAttributeContentV2 | ObjectAttributeContentV2 | SecretAttributeContentV2 | StringAttributeContentV2 | TextAttributeContentV2 | TimeAttributeContentV2;
+export type BaseAttributeContentDtoV2 =
+    | BooleanAttributeContentV2
+    | CodeBlockAttributeContentV2
+    | CredentialAttributeContentV2
+    | DateAttributeContentV2
+    | DateTimeAttributeContentV2
+    | FileAttributeContentV2
+    | FloatAttributeContentV2
+    | IntegerAttributeContentV2
+    | ObjectAttributeContentV2
+    | SecretAttributeContentV2
+    | StringAttributeContentV2
+    | TextAttributeContentV2
+    | TimeAttributeContentV2;

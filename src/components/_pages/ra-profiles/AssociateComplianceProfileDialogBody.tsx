@@ -12,7 +12,7 @@ import Spinner from 'components/Spinner';
 import Label from 'components/Label';
 
 import { actions, selectors } from 'ducks/compliance-profiles';
-import { RaProfileResponseModel } from 'types/ra-profiles';
+import type { RaProfileResponseModel } from 'types/ra-profiles';
 import { Resource } from 'types/openapi/models/Resource';
 import Container from 'components/Container';
 

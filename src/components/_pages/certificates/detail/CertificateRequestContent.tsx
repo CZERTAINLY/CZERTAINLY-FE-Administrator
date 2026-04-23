@@ -1,21 +1,21 @@
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Buffer } from 'buffer';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Widget from 'components/Widget';
 import Container from 'components/Container';
 import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from 'components/Attributes/AttributeViewer';
 import ComplianceCheckResultWidget from 'components/_pages/certificates/ComplianceCheckResultWidget/ComplianceCheckResultWidget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import { formatPEM, downloadFile } from 'utils/certificate';
 import { useCopyToClipboard } from 'utils/common-hooks';
-import { CertificateDetailResponseModel } from 'types/certificate';
+import type { CertificateDetailResponseModel } from 'types/certificate';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import Asn1Dialog from '../Asn1Dialog/Asn1Dialog';
-import { AttributeResponseModel } from 'types/attributes';
+import type { AttributeResponseModel } from 'types/attributes';
 import { Download } from 'lucide-react';
 import Dropdown from 'components/Dropdown';
 

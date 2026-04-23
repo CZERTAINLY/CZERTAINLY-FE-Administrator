@@ -7,23 +7,23 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-    AttributeCallbackMappingModel,
-    AttributeDescriptorModel,
-    AttributeResponseModel,
-    CodeBlockAttributeContentDataModel,
-    CustomAttributeModel,
-    DataAttributeModel,
-    FileAttributeContentModel,
-    GroupAttributeModel,
-    InfoAttributeModel,
+    type AttributeCallbackMappingModel,
+    type AttributeDescriptorModel,
+    type AttributeResponseModel,
+    type CodeBlockAttributeContentDataModel,
+    type CustomAttributeModel,
+    type DataAttributeModel,
+    type FileAttributeContentModel,
+    type GroupAttributeModel,
+    type InfoAttributeModel,
     isAttributeDescriptorModel,
     isCustomAttributeModel,
     isDataAttributeModel,
     isGroupAttributeModel,
     isInfoAttributeModel,
 } from 'types/attributes';
-import { CallbackAttributeModel } from 'types/connectors';
-import { AttributeContentType, AttributeValueTarget, FunctionGroupCode, Resource } from 'types/openapi';
+import type { CallbackAttributeModel } from 'types/connectors';
+import { AttributeContentType, AttributeValueTarget, type FunctionGroupCode, type Resource } from 'types/openapi';
 import { base64ToUtf8 } from 'utils/common-utils';
 import { Attribute } from './Attribute';
 import CustomAttributeAddSelect from 'components/Attributes/AttributeEditor/CustomAttributeAddSelect';
@@ -209,7 +209,7 @@ function AttributeEditorInner({
 
             if (!path.includes('.')) return getObjectPropertyValue(attributes.find((a) => a.name === path)?.content, 'value');
 
-            let spath = path.split('.');
+            const spath = path.split('.');
 
             return getObjectPropertyValue(attributes.find((a) => a.name === spath[0])?.content, spath.slice(1).join('.'));
         },
@@ -297,8 +297,8 @@ function AttributeEditorInner({
                                 value = resolved;
                             }
                         }
-                        if (typeof value === 'object' && value !== null && value.hasOwnProperty('data')) value = value.data;
-                        if (typeof value === 'object' && value !== null && value.hasOwnProperty('uuid') && typeof value.uuid === 'string') {
+                        if (typeof value === 'object' && value !== null && Object.hasOwn(value, 'data')) value = value.data;
+                        if (typeof value === 'object' && value !== null && Object.hasOwn(value, 'uuid') && typeof value.uuid === 'string') {
                             value = value.uuid;
                         }
                     }
@@ -504,7 +504,7 @@ function AttributeEditorInner({
             forceDefaultDescriptorValue: boolean,
             wasDeletedLocally: boolean = false,
         ) => {
-            let formAttributeValue = undefined;
+            let formAttributeValue;
             // For re-added attributes, we want empty values but still need access to descriptor options for selects
             // So we use a separate flag for value setting vs options access
             const shouldUseAttributeValues = !wasDeletedLocally;
@@ -845,7 +845,7 @@ function AttributeEditorInner({
 
                     // if there is any attribute changed on which the current descriptor depends, clear the form field and perform the callback
                     if (changedAttributes[attributeName]) {
-                        let mappings = buildCallbackMappings(descriptor);
+                        const mappings = buildCallbackMappings(descriptor);
 
                         if (mappings) {
                             const formAttributeName = `__attributes__${id}__.${descriptor.name}`;

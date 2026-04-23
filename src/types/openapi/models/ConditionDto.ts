@@ -11,11 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ConditionItemDto,
-    ConditionType,
-    Resource,
-} from './';
+import type { ConditionItemDto, ConditionType, Resource } from './';
 
 /**
  * @export
@@ -59,5 +55,3 @@ export interface ConditionDto {
      */
     items: Array<ConditionItemDto>;
 }
-
-

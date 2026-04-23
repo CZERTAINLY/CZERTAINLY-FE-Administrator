@@ -1,11 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import type React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { AddNewAttributeList, AddNewAttributeType } from 'types/user-interface';
+import { AddNewAttributeList, type AddNewAttributeType } from 'types/user-interface';
 import {
-    CustomAttributeModel,
-    DataAttributeModel,
-    InfoAttributeModel,
+    type CustomAttributeModel,
+    type DataAttributeModel,
+    type InfoAttributeModel,
     isCustomAttributeModel,
     isDataAttributeModel,
 } from 'types/attributes';

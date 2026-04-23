@@ -29,4 +29,12 @@ import type {
  * Secret content dependent on secret type
  * @export
  */
-export type SecretContent = ApiKeySecretContent | BasicAuthSecretContent | GenericSecretContent | JwtTokenSecretContent | KeyStoreSecretContent | KeyValueSecretContent | PrivateKeySecretContent | SecretKeySecretContent;
+export type SecretContent =
+    | ApiKeySecretContent
+    | BasicAuthSecretContent
+    | GenericSecretContent
+    | JwtTokenSecretContent
+    | KeyStoreSecretContent
+    | KeyValueSecretContent
+    | PrivateKeySecretContent
+    | SecretKeySecretContent;

@@ -1,5 +1,5 @@
-import { AttributeRequestModel, AttributeResponseModel } from './attributes';
-import { EntityInstanceDto, EntityInstanceRequestDto, EntityInstanceUpdateRequestDto } from './openapi';
+import type { AttributeRequestModel, AttributeResponseModel } from './attributes';
+import type { EntityInstanceDto, EntityInstanceRequestDto, EntityInstanceUpdateRequestDto } from './openapi';
 
 export type EntityResponseDto = EntityInstanceDto;
 export type EntityResponseModel = Omit<EntityResponseDto, 'attributes | customAttributes'> & {

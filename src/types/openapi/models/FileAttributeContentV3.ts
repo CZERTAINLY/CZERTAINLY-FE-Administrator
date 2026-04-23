@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-    FileAttributeContentData,
-} from './';
+import type { AttributeContentType, FileAttributeContentData } from './';
 
 /**
  * File attribute content for storing encoded file content with additional info
@@ -41,5 +38,3 @@ export interface FileAttributeContentV3 {
      */
     contentType: AttributeContentType;
 }
-
-

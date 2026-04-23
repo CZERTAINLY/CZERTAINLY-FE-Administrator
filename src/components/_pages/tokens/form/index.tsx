@@ -18,10 +18,10 @@ import { useNavigate, useParams } from 'react-router';
 import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
-import { AttributeDescriptorModel } from 'types/attributes';
-import { ConnectorResponseModel } from 'types/connectors';
+import type { AttributeDescriptorModel } from 'types/attributes';
+import type { ConnectorResponseModel } from 'types/connectors';
 import { FunctionGroupCode, Resource } from 'types/openapi';
-import { TokenDetailResponseDto } from 'types/tokens';
+import type { TokenDetailResponseDto } from 'types/tokens';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
 

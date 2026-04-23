@@ -11,11 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContent,
-    ProtectionLevel,
-    Resource,
-} from './';
+import type { AttributeContent, ProtectionLevel, Resource } from './';
 
 /**
  * @export
@@ -95,5 +91,3 @@ export interface CustomAttributeUpdateRequestDto {
      */
     extensibleList?: boolean;
 }
-
-

@@ -56,12 +56,11 @@ export interface ListProxiesRequest {
  * no description
  */
 export class ProxyManagementApi extends BaseAPI {
-
     /**
      * Create a new Proxy
      */
-    createProxy({ proxyRequestDto }: CreateProxyRequest): Observable<UuidDto>
-    createProxy({ proxyRequestDto }: CreateProxyRequest, opts?: OperationOpts): Observable<AjaxResponse<UuidDto>>
+    createProxy({ proxyRequestDto }: CreateProxyRequest): Observable<UuidDto>;
+    createProxy({ proxyRequestDto }: CreateProxyRequest, opts?: OperationOpts): Observable<AjaxResponse<UuidDto>>;
     createProxy({ proxyRequestDto }: CreateProxyRequest, opts?: OperationOpts): Observable<UuidDto | AjaxResponse<UuidDto>> {
         throwIfNullOrUndefined(proxyRequestDto, 'proxyRequestDto', 'createProxy');
 
@@ -69,33 +68,39 @@ export class ProxyManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<UuidDto>({
-            url: '/v1/proxies',
-            method: 'POST',
-            headers,
-            body: proxyRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<UuidDto>(
+            {
+                url: '/v1/proxies',
+                method: 'POST',
+                headers,
+                body: proxyRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Delete a Proxy
      */
-    deleteProxy({ uuid }: DeleteProxyRequest): Observable<void>
-    deleteProxy({ uuid }: DeleteProxyRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    deleteProxy({ uuid }: DeleteProxyRequest): Observable<void>;
+    deleteProxy({ uuid }: DeleteProxyRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteProxy({ uuid }: DeleteProxyRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'deleteProxy');
 
-        return this.request<void>({
-            url: '/v1/proxies/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'DELETE',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/proxies/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Edit a Proxy
      */
-    editProxy({ uuid, proxyUpdateRequestDto }: EditProxyRequest): Observable<ProxyDto>
-    editProxy({ uuid, proxyUpdateRequestDto }: EditProxyRequest, opts?: OperationOpts): Observable<AjaxResponse<ProxyDto>>
+    editProxy({ uuid, proxyUpdateRequestDto }: EditProxyRequest): Observable<ProxyDto>;
+    editProxy({ uuid, proxyUpdateRequestDto }: EditProxyRequest, opts?: OperationOpts): Observable<AjaxResponse<ProxyDto>>;
     editProxy({ uuid, proxyUpdateRequestDto }: EditProxyRequest, opts?: OperationOpts): Observable<ProxyDto | AjaxResponse<ProxyDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'editProxy');
         throwIfNullOrUndefined(proxyUpdateRequestDto, 'proxyUpdateRequestDto', 'editProxy');
@@ -104,58 +109,76 @@ export class ProxyManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<ProxyDto>({
-            url: '/v1/proxies/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'PUT',
-            headers,
-            body: proxyUpdateRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<ProxyDto>(
+            {
+                url: '/v1/proxies/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PUT',
+                headers,
+                body: proxyUpdateRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get instructions to install a Proxy
      */
-    getInstallationInstructions({ uuid }: GetInstallationInstructionsRequest): Observable<ProxyInstallInstructionsDto>
-    getInstallationInstructions({ uuid }: GetInstallationInstructionsRequest, opts?: OperationOpts): Observable<AjaxResponse<ProxyInstallInstructionsDto>>
-    getInstallationInstructions({ uuid }: GetInstallationInstructionsRequest, opts?: OperationOpts): Observable<ProxyInstallInstructionsDto | AjaxResponse<ProxyInstallInstructionsDto>> {
+    getInstallationInstructions({ uuid }: GetInstallationInstructionsRequest): Observable<ProxyInstallInstructionsDto>;
+    getInstallationInstructions(
+        { uuid }: GetInstallationInstructionsRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<ProxyInstallInstructionsDto>>;
+    getInstallationInstructions(
+        { uuid }: GetInstallationInstructionsRequest,
+        opts?: OperationOpts,
+    ): Observable<ProxyInstallInstructionsDto | AjaxResponse<ProxyInstallInstructionsDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getInstallationInstructions');
 
-        return this.request<ProxyInstallInstructionsDto>({
-            url: '/v1/proxies/{uuid}/instructions'.replace('{uuid}', encodeURI(uuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<ProxyInstallInstructionsDto>(
+            {
+                url: '/v1/proxies/{uuid}/instructions'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get details of a Proxy
      */
-    getProxy({ uuid }: GetProxyRequest): Observable<ProxyDto>
-    getProxy({ uuid }: GetProxyRequest, opts?: OperationOpts): Observable<AjaxResponse<ProxyDto>>
+    getProxy({ uuid }: GetProxyRequest): Observable<ProxyDto>;
+    getProxy({ uuid }: GetProxyRequest, opts?: OperationOpts): Observable<AjaxResponse<ProxyDto>>;
     getProxy({ uuid }: GetProxyRequest, opts?: OperationOpts): Observable<ProxyDto | AjaxResponse<ProxyDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getProxy');
 
-        return this.request<ProxyDto>({
-            url: '/v1/proxies/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<ProxyDto>(
+            {
+                url: '/v1/proxies/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List Proxies by Function Group and Kind
      */
-    listProxies({ status }: ListProxiesRequest): Observable<Array<ProxyListDto>>
-    listProxies({ status }: ListProxiesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<ProxyListDto>>>
+    listProxies({ status }: ListProxiesRequest): Observable<Array<ProxyListDto>>;
+    listProxies({ status }: ListProxiesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<ProxyListDto>>>;
     listProxies({ status }: ListProxiesRequest, opts?: OperationOpts): Observable<Array<ProxyListDto> | AjaxResponse<Array<ProxyListDto>>> {
-
         const query: HttpQuery = {};
 
-        if (status != null) { query['status'] = status; }
+        if (status != null) {
+            query['status'] = status;
+        }
 
-        return this.request<Array<ProxyListDto>>({
-            url: '/v1/proxies',
-            method: 'GET',
-            query,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<Array<ProxyListDto>>(
+            {
+                url: '/v1/proxies',
+                method: 'GET',
+                query,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

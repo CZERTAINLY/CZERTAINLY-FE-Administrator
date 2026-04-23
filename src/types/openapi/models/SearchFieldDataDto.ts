@@ -11,12 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-    FilterConditionOperator,
-    FilterFieldType,
-    PlatformEnum,
-} from './';
+import type { AttributeContentType, FilterConditionOperator, FilterFieldType, PlatformEnum } from './';
 
 /**
  * @export
@@ -71,5 +66,3 @@ export interface SearchFieldDataDto {
      */
     multiValue?: boolean;
 }
-
-

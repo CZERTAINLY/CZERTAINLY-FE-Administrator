@@ -1,19 +1,19 @@
-import { EntityType, selectors as filterSelectors } from 'ducks/filters';
+import { type EntityType, selectors as filterSelectors } from 'ducks/filters';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
-import { ApiClients } from 'src/api';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import type { ApiClients } from 'src/api';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import FilterWidget from 'components/FilterWidget';
 import Widget from 'components/Widget';
 import type { IconName } from 'types/icons';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/paging';
-import { Observable } from 'rxjs';
-import { SearchFieldListModel, SearchFilterModel, SearchRequestModel } from 'types/certificate';
-import { LockWidgetNameEnum } from 'types/user-interface';
+import type { Observable } from 'rxjs';
+import type { SearchFieldListModel, SearchFilterModel, SearchRequestModel } from 'types/certificate';
+import type { LockWidgetNameEnum } from 'types/user-interface';
 
 interface Props {
     entity: EntityType;

@@ -21,7 +21,7 @@ export function jsxInnerText(obj: React.ReactNode): string {
 
             if (children) {
                 if (Array.isArray(children)) {
-                    children.forEach(function (o) {
+                    children.forEach((o) => {
                         buf += jsxInnerText(o);
                     });
                 } else {

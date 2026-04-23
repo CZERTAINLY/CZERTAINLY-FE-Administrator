@@ -1,11 +1,11 @@
-import { AttributeRequestModel, AttributeResponseModel } from './attributes';
-import {
+import type { AttributeRequestModel, AttributeResponseModel } from './attributes';
+import type {
     AcmeProfileDto,
     AcmeProfileEditRequestDto as AcmeProfileEditRequestDtoOpenApi,
     AcmeProfileListDto,
     AcmeProfileRequestDto,
 } from './openapi';
-import { RaProfileSimplifiedModel } from './ra-profiles';
+import type { RaProfileSimplifiedModel } from './ra-profiles';
 
 export type AcmeProfileAddRequestDto = AcmeProfileRequestDto;
 export type AcmeProfileAddRequestModel = Omit<

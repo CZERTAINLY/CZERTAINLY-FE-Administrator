@@ -4,14 +4,14 @@ import { Link, useParams } from 'react-router';
 import { firstValueFrom } from 'rxjs';
 import Breadcrumb from 'components/Breadcrumb';
 import Container from 'components/Container';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Spinner from 'components/Spinner';
 import Widget from 'components/Widget';
 import WidgetButtons from 'components/WidgetButtons';
 import { backendClient } from 'src/api';
 import { actions as alertActions } from 'ducks/alerts';
 import { actions, selectors } from 'ducks/cbom';
-import { CbomDetailDto, CbomDto } from 'types/openapi';
+import type { CbomDetailDto, CbomDto } from 'types/openapi';
 import { useCopyToClipboard } from 'utils/common-hooks';
 import { dateFormatter } from 'utils/dateUtil';
 

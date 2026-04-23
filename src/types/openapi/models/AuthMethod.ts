@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -22,6 +22,5 @@ export enum AuthMethod {
     Token = 'token',
     Session = 'session',
     ApiKey = 'apiKey',
-    UserProxy = 'userProxy'
+    UserProxy = 'userProxy',
 }
-

@@ -9,10 +9,10 @@ import { selectors as pagingSelectors } from 'ducks/paging';
 import { actions, selectors } from 'ducks/scheduler';
 
 import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
-import { TableDataRow, TableHeader } from 'components/CustomTable';
+import type { TableDataRow, TableHeader } from 'components/CustomTable';
 import PagedList from 'components/PagedList/PagedList';
-import { WidgetButtonProps } from 'components/WidgetButtons';
-import { SearchRequestModel } from 'types/certificate';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
+import type { SearchRequestModel } from 'types/certificate';
 import { PlatformEnum, SchedulerJobExecutionStatus } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 

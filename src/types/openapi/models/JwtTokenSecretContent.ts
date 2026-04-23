@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    SecretType,
-} from './';
+import type { SecretType } from './';
 
 /**
  * Secret representing JWT Token
@@ -34,5 +32,3 @@ export interface JwtTokenSecretContent {
      */
     content: string;
 }
-
-

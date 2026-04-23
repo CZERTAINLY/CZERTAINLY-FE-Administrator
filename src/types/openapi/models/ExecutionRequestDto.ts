@@ -11,11 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ExecutionItemRequestDto,
-    ExecutionType,
-    Resource,
-} from './';
+import type { ExecutionItemRequestDto, ExecutionType, Resource } from './';
 
 /**
  * @export
@@ -53,5 +49,3 @@ export interface ExecutionRequestDto {
      */
     items: Array<ExecutionItemRequestDto>;
 }
-
-

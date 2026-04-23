@@ -63,7 +63,7 @@ export interface CertificateEventHistoryDto {
      * @type {{ [key: string]: any; }}
      * @memberof CertificateEventHistoryDto
      */
-    additionalInformation?: { [key: string]: any; };
+    additionalInformation?: { [key: string]: any };
 }
 
 /**
@@ -89,7 +89,7 @@ export enum CertificateEventHistoryDtoEventEnum {
     CertificateDiscovered = 'Certificate Discovered',
     UpdateLocation = 'Update Location',
     ArchiveCertificate = 'Archive certificate',
-    UnarchiveCertificate = 'Unarchive certificate'
+    UnarchiveCertificate = 'Unarchive certificate',
 }
 /**
  * @export
@@ -97,6 +97,5 @@ export enum CertificateEventHistoryDtoEventEnum {
  */
 export enum CertificateEventHistoryDtoStatusEnum {
     Success = 'SUCCESS',
-    Failed = 'FAILED'
+    Failed = 'FAILED',
 }
-

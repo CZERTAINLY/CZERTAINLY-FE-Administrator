@@ -1,6 +1,6 @@
 import AttributeEditor from 'components/Attributes/AttributeEditor';
 import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from 'components/Attributes/AttributeViewer';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import ProgressButton from 'components/ProgressButton';
 import Spinner from 'components/Spinner';
@@ -8,18 +8,18 @@ import StatusBadge from 'components/StatusBadge';
 import CertificateList from 'components/_pages/certificates/list';
 
 import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/locations';
 import { actions as raActions, selectors as raSelectors } from 'ducks/ra-profiles';
-import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { type Dispatch, type SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import LocationForm from '../form';
 import Badge from 'components/Badge';
-import { AttributeDescriptorModel } from 'types/attributes';
+import type { AttributeDescriptorModel } from 'types/attributes';
 import Button from 'components/Button';
 import { buildValidationRules } from 'utils/validators-helper';
 import { collectFormAttributes, getAttributeContent } from 'utils/attributes/attributes';

@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -20,6 +20,5 @@ export enum CertificateRelationType {
     Renewal = 'renewal',
     Rekey = 'rekey',
     Replacement = 'replacement',
-    Pending = 'pending'
+    Pending = 'pending',
 }
-

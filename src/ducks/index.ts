@@ -1,6 +1,6 @@
-import { ApiClients } from '../api';
-import { AnyAction } from 'redux';
-import { Epic, combineEpics } from 'redux-observable';
+import type { ApiClients } from '../api';
+import type { AnyAction } from 'redux';
+import { type Epic, combineEpics } from 'redux-observable';
 import acmeAccountsEpics from './acme-accounts-epics';
 import acmeProfilesEpics from './acme-profiles-epics';
 import cmpProfilesEpics from './cmp-profiles-epics';
@@ -36,7 +36,7 @@ import notificationsEpics from './notifications-epics';
 import notificationProfilesEpics from './notification-profiles-epics';
 import oidsEpics from './oid-epics';
 import raProfilesEpics from './ra-profiles-epics';
-import { reducers } from './reducers';
+import type { reducers } from './reducers';
 import resourcesEpics from './resource-epics';
 import rolesEpics from './roles-epics';
 import rulesEpics from './rules-epics';

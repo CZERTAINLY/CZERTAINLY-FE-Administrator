@@ -1,6 +1,6 @@
-import React from 'react';
+import type React from 'react';
 import Button from 'components/Button';
-import { LegendItem } from '..';
+import type { LegendItem } from '..';
 import { Rocket, Book, Filter, Zap, Settings, FileText, Award, User, KeyRound, Users, CreditCard, Stamp, MapPin } from 'lucide-react';
 
 const iconMap: Record<string, React.ComponentType<{ size?: number; color?: string }>> = {

@@ -4,18 +4,18 @@ import { EntityType, selectors as filterSelectors } from 'ducks/filters';
 import { actions as userInterfaceActions } from '../../../ducks/user-interface';
 
 import { useCallback, useMemo } from 'react';
-import React from 'react';
+import type React from 'react';
 import { useNavigate } from 'react-router';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import { ApiClients } from '../../../api';
-import { WidgetButtonProps } from 'components/WidgetButtons';
-import CustomTable, { TableDataRow } from 'components/CustomTable';
+import type { ApiClients } from '../../../api';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
+import CustomTable, { type TableDataRow } from 'components/CustomTable';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { SearchRequestModel } from 'types/certificate';
+import type { SearchRequestModel } from 'types/certificate';
 import PagedList from 'components/PagedList/PagedList';
-import { AuditLogDto, PlatformEnum } from 'types/openapi/models';
+import { type AuditLogDto, PlatformEnum } from 'types/openapi/models';
 import { auditLogsDetailRowHeaders, auditLogsRowHeaders, createAuditLogDetailData, createAuditLogsList } from './utils';
 
 type AuditLogDetailItem = {

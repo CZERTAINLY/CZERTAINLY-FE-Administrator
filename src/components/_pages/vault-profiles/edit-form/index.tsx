@@ -13,9 +13,9 @@ import { actions as customAttributesActions, selectors as customAttributesSelect
 import { actions as vaultProfileActions, selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
 import { actions as vaultActions, selectors as vaultSelectors } from 'ducks/vaults';
 
-import { AttributeDescriptorModel } from 'types/attributes';
-import { SearchRequestModel } from 'types/certificate';
-import { FunctionGroupCode, Resource, VaultInstanceDto, VaultProfileDetailDto } from 'types/openapi';
+import type { AttributeDescriptorModel } from 'types/attributes';
+import type { SearchRequestModel } from 'types/certificate';
+import { FunctionGroupCode, Resource, type VaultInstanceDto, type VaultProfileDetailDto } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 

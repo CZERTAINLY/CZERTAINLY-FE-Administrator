@@ -9,13 +9,13 @@ import Breadcrumb from 'components/Breadcrumb';
 import Button from 'components/Button';
 import Container from 'components/Container';
 import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import EditIcon from 'components/icons/EditIcon';
 import Select from 'components/Select';
 import TabLayout from 'components/Layout/TabLayout';
 import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import ComplianceCheckResultWidget from 'components/_pages/certificates/ComplianceCheckResultWidget/ComplianceCheckResultWidget';
 import CertificateStatus from 'components/_pages/certificates/CertificateStatus';
 
@@ -28,8 +28,8 @@ import { actions as userActions, selectors as userSelectors } from 'ducks/users'
 import { actions as vaultProfileActions, selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { ComplianceStatus, PlatformEnum, Resource, SecretState, SyncVaultProfileDto } from 'types/openapi';
-import { AttributeResponseModel } from 'types/attributes';
+import { ComplianceStatus, PlatformEnum, Resource, SecretState, type SyncVaultProfileDto } from 'types/openapi';
+import type { AttributeResponseModel } from 'types/attributes';
 
 import { dateFormatter } from 'utils/dateUtil';
 import { createWidgetDetailHeaders } from 'utils/widget';

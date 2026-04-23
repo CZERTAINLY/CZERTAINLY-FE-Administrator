@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -20,6 +20,5 @@ export enum FilterFieldSource {
     Meta = 'meta',
     Custom = 'custom',
     Data = 'data',
-    Property = 'property'
+    Property = 'property',
 }
-

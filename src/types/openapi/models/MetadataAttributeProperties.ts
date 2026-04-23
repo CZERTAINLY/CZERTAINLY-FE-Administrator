@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ProtectionLevel,
-} from './';
+import type { ProtectionLevel } from './';
 
 /**
  * @export
@@ -57,5 +55,3 @@ export interface MetadataAttributeProperties {
      */
     protectionLevel?: ProtectionLevel;
 }
-
-

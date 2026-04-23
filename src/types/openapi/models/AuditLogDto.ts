@@ -11,14 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ActorRecord,
-    Module,
-    Operation,
-    OperationResult,
-    ResourceRecord,
-    SourceRecord,
-} from './';
+import type { ActorRecord, Module, Operation, OperationResult, ResourceRecord, SourceRecord } from './';
 
 /**
  * @export
@@ -107,7 +100,5 @@ export interface AuditLogDto {
      * @type {{ [key: string]: any; }}
      * @memberof AuditLogDto
      */
-    additionalData?: { [key: string]: any; };
+    additionalData?: { [key: string]: any };
 }
-
-

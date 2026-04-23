@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { SettingsPlatformModel } from 'types/settings';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import type { SettingsPlatformModel } from 'types/settings';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Switch from 'components/Switch';
 import { renderExpiringThresholdLabel, renderValidationFrequencyLabel } from 'utils/certificate-validation';
 

@@ -1,4 +1,4 @@
-import { AppEpic } from 'ducks';
+import type { AppEpic } from 'ducks';
 import { slice } from 'ducks/oids';
 import { catchError, filter, mergeMap, of, switchMap } from 'rxjs';
 import { store } from '../App';

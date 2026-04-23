@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ConnectorVersion,
-    FunctionGroupDto,
-} from './';
+import type { ConnectorVersion, FunctionGroupDto } from './';
 
 /**
  * @export
@@ -46,5 +43,3 @@ export interface ConnectInfoV1 {
      */
     functionGroups: Array<FunctionGroupDto>;
 }
-
-

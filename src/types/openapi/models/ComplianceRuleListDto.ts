@@ -11,11 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    BaseAttributeDto,
-    ConditionItemDto,
-    Resource,
-} from './';
+import type { BaseAttributeDto, ConditionItemDto, Resource } from './';
 
 /**
  * @export
@@ -89,5 +85,3 @@ export interface ComplianceRuleListDto {
      */
     conditionItems?: Array<ConditionItemDto>;
 }
-
-

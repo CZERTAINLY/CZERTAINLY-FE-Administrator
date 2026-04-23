@@ -11,11 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CertificateRelationType,
-    CertificateState,
-    CertificateType,
-} from './';
+import type { CertificateRelationType, CertificateState, CertificateType } from './';
 
 /**
  * @export
@@ -119,5 +115,3 @@ export interface CertificateSimpleDto {
      */
     notAfter?: string;
 }
-
-

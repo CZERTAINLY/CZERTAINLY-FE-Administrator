@@ -1,7 +1,7 @@
 import Button from 'components/Button';
 import Badge from 'components/Badge';
-import { TRuleGroupType } from 'types/complianceProfiles';
-import { ComplianceGroupListDto, ComplianceProfileDtoV2, ComplianceRuleListDto, Resource } from 'types/openapi';
+import type { TRuleGroupType } from 'types/complianceProfiles';
+import type { ComplianceGroupListDto, ComplianceProfileDtoV2, ComplianceRuleListDto, Resource } from 'types/openapi';
 import { ComplianceRuleAvailabilityStatus } from 'types/openapi/models/ComplianceRuleAvailabilityStatus';
 import { capitalize } from 'utils/common-utils';
 import { Info } from 'lucide-react';
@@ -81,7 +81,7 @@ export const getAssignedProviderListOfGroupsAndRules = (
     const providerRulesAndGroupsList = profile.providerRules
         .filter((providerRule) => (providerUuid ? providerRule.connectorUuid === providerUuid : true))
         .filter((providerRule) => (kind ? providerRule.kind === kind : true))
-        .map((providerRule) => {
+        .flatMap((providerRule) => {
             return [
                 ...providerRule.rules
                     .filter((rule) => (resource ? rule.resource === resource : true))
@@ -106,8 +106,7 @@ export const getAssignedProviderListOfGroupsAndRules = (
                         },
                     })),
             ];
-        })
-        .flat();
+        });
     return providerRulesAndGroupsList as TRuleGroupType[];
 };
 

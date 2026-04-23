@@ -2,19 +2,19 @@ import Widget from 'components/Widget';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { ApiClients } from 'src/api';
+import type { ApiClients } from 'src/api';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { EntityType, actions as filterActions, selectors } from 'ducks/filters';
+import { type EntityType, actions as filterActions, selectors } from 'ducks/filters';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'components/Select';
 import Button from 'components/Button';
 import Label from 'components/Label';
 import TextInput from 'components/TextInput';
 import Badge from 'components/Badge';
-import { Observable } from 'rxjs';
-import { SearchFieldListModel } from 'types/certificate';
-import { AttributeContentType, FilterFieldSource, FilterFieldType, PlatformEnum } from 'types/openapi';
-import { ExecutionItemModel, ExecutionItemRequestModel } from 'types/rules';
+import type { Observable } from 'rxjs';
+import type { SearchFieldListModel } from 'types/certificate';
+import { AttributeContentType, type FilterFieldSource, FilterFieldType, PlatformEnum } from 'types/openapi';
+import type { ExecutionItemModel, ExecutionItemRequestModel } from 'types/rules';
 import { getFormTypeFromAttributeContentType, getFormTypeFromFilterFieldType } from 'utils/common-utils';
 import {
     checkIfFieldAttributeTypeIsDate,

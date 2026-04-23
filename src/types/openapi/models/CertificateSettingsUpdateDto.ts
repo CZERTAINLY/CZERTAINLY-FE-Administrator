@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CertificateValidationSettingsUpdateDto,
-} from './';
+import type { CertificateValidationSettingsUpdateDto } from './';
 
 /**
  * @export

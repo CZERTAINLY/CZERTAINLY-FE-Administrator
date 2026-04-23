@@ -12,12 +12,11 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
 export enum CertificateRequestFormat {
     Pkcs10 = 'pkcs10',
-    Crmf = 'crmf'
+    Crmf = 'crmf',
 }
-

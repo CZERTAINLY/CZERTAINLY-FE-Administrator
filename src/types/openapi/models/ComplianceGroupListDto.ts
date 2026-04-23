@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    Resource,
-} from './';
+import type { Resource } from './';
 
 /**
  * @export
@@ -57,5 +55,3 @@ export interface ComplianceGroupListDto {
      */
     resource?: Resource;
 }
-
-
