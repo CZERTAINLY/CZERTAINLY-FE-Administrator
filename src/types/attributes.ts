@@ -54,7 +54,7 @@ import {
     type TextAttributeContentV3,
     type TimeAttributeContentV2,
     type TimeAttributeContentV3,
-} from './openapi';
+} from 'types/openapi';
 
 // Union types for backward compatibility (when version is unknown)
 type BooleanAttributeContent = BooleanAttributeContentV2 | BooleanAttributeContentV3;

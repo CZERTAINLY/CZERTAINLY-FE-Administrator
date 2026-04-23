@@ -121,7 +121,7 @@ export interface ApiClients {
 
 type ApiClientKey = keyof ApiClients;
 
-const factories: Partial<Record<ApiClientKey, () => unknown>> = {
+const factories: Partial<{ [K in ApiClientKey]: () => ApiClients[K] }> = {
     auth: () => new AuthenticationManagementApi(configuration),
     users: () => new UserManagementApi(configuration),
     roles: () => new RoleManagementApi(configuration),
@@ -174,21 +174,23 @@ const factories: Partial<Record<ApiClientKey, () => unknown>> = {
     secrets: () => new SecretManagementApi(configuration),
 };
 
-const overrides: Partial<Record<ApiClientKey, unknown>> = {};
+const overrides: Partial<Record<ApiClientKey, unknown>> = Object.create(null);
 const cache = new Map<ApiClientKey, unknown>();
+
+const resolve = (key: ApiClientKey): unknown => {
+    if (Object.hasOwn(overrides, key)) return overrides[key];
+    if (cache.has(key)) return cache.get(key);
+    if (Object.hasOwn(factories, key)) {
+        const instance = factories[key]!();
+        cache.set(key, instance);
+        return instance;
+    }
+    return undefined;
+};
 
 export const backendClient: ApiClients = new Proxy({} as ApiClients, {
     get(_target, prop: string | symbol) {
-        const key = prop as ApiClientKey;
-        if (key in overrides) return overrides[key];
-        if (cache.has(key)) return cache.get(key);
-        const factory = factories[key];
-        if (factory) {
-            const instance = factory();
-            cache.set(key, instance);
-            return instance;
-        }
-        return undefined;
+        return resolve(prop as ApiClientKey);
     },
     set(_target, prop: string | symbol, value) {
         const key = prop as ApiClientKey;
@@ -197,7 +199,20 @@ export const backendClient: ApiClients = new Proxy({} as ApiClients, {
     },
     has(_target, prop: string | symbol) {
         const key = prop as ApiClientKey;
-        return key in overrides || cache.has(key) || key in factories;
+        return Object.hasOwn(overrides, key) || cache.has(key) || Object.hasOwn(factories, key);
+    },
+    ownKeys() {
+        return Array.from(new Set<string>([...Object.keys(factories), ...Object.keys(overrides)]));
+    },
+    getOwnPropertyDescriptor(_target, prop: string | symbol) {
+        const key = prop as ApiClientKey;
+        if (!Object.hasOwn(overrides, key) && !Object.hasOwn(factories, key)) return undefined;
+        return {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: resolve(key),
+        };
     },
 });
 
