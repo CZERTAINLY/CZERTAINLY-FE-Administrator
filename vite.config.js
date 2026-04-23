@@ -12,8 +12,9 @@ async function loadProxyConfig() {
         return {};
     }
 }
-export default defineConfig(async () => {
+export default defineConfig(async ({ mode }) => {
     const proxyConfig = await loadProxyConfig();
+    const coverageEnabled = process.env.COVERAGE === 'true' || mode === 'test';
     return {
         define: {
             __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
@@ -24,6 +25,29 @@ export default defineConfig(async () => {
         },
         build: {
             outDir: 'build',
+            rolldownOptions: {
+                output: {
+                    advancedChunks: {
+                        groups: [
+                            { name: 'react-vendor', test: /[\\/]node_modules[\\/](react|react-dom|react-router|scheduler)[\\/]/ },
+                            {
+                                name: 'redux-vendor',
+                                test: /[\\/]node_modules[\\/](@reduxjs|react-redux|redux|redux-observable|rxjs|reselect|immer)[\\/]/,
+                            },
+                            { name: 'reactflow-vendor', test: /[\\/]node_modules[\\/](reactflow|@reactflow|dagre|graphlib)[\\/]/ },
+                            { name: 'apexcharts-vendor', test: /[\\/]node_modules[\\/](apexcharts|react-apexcharts)[\\/]/ },
+                            {
+                                name: 'editor-vendor',
+                                test: /[\\/]node_modules[\\/](highlight\.js|marked|react-simple-code-editor|html-react-parser|dompurify)[\\/]/,
+                            },
+                            { name: 'preline-vendor', test: /[\\/]node_modules[\\/](preline|@preline|@floating-ui)[\\/]/ },
+                            { name: 'cron-vendor', test: /[\\/]node_modules[\\/](cron-parser|cronstrue|cron-expression-validator)[\\/]/ },
+                            { name: 'form-vendor', test: /[\\/]node_modules[\\/](react-hook-form|regexp-tree)[\\/]/ },
+                            { name: 'vendor', test: /[\\/]node_modules[\\/]/ },
+                        ],
+                    },
+                },
+            },
         },
         base: './',
         resolve: {
@@ -49,12 +73,13 @@ export default defineConfig(async () => {
         },
         plugins: [
             react(),
-            istanbul({
-                requireEnv: false, // or set via env var
-                include: ['src/**/*'],
-                exclude: ['node_modules/**/*'],
-            }),
+            coverageEnabled &&
+                istanbul({
+                    requireEnv: false,
+                    include: ['src/**/*'],
+                    exclude: ['node_modules/**/*'],
+                }),
             tailwindcss(),
-        ],
+        ].filter(Boolean),
     };
 });
