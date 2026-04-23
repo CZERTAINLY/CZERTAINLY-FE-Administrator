@@ -48,7 +48,7 @@ function DescriptorInputControl({
         );
     }
     if (inputType === 'datetime-local') {
-        const dateValue = field.value ? (field.value.includes('T') ? field.value : field.value.replace(' ', 'T')) : undefined;
+        const dateValue = field.value ? field.value.replace(' ', 'T') : undefined;
         return (
             <DatePicker
                 id={name}
