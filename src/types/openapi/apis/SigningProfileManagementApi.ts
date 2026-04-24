@@ -21,6 +21,7 @@ import type {
     BaseAttributeDto,
     BulkActionMessageDto,
     CertificateDto,
+    DataAttribute,
     ErrorMessageDto,
     PaginationResponseDtoSigningProfileListDto,
     PaginationResponseDtoSigningRecordListDto,
@@ -370,6 +371,26 @@ export class SigningProfileManagementApi extends BaseAPI {
         return this.request<Array<BaseAttributeDto>>({
             url: '/v1/signingProfiles/certificates/{certificateUuid}/signatureAttributes'.replace('{certificateUuid}', encodeURI(certificateUuid)),
             method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Queries the Signature Formatter Connector for its available formatter attribute descriptors with connector default values. The signingProfileUuid parameter is used for authorization only and does not affect the returned descriptors.
+     * Get formatter attribute descriptors from a Signature Formatter Connector
+     */
+    listSignatureFormatterConnectorAttributes({ connectorUuid, signingProfileUuid }: ListSignatureFormatterConnectorAttributesRequest): Observable<Array<DataAttribute>>
+    listSignatureFormatterConnectorAttributes({ connectorUuid, signingProfileUuid }: ListSignatureFormatterConnectorAttributesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<DataAttribute>>>
+    listSignatureFormatterConnectorAttributes({ connectorUuid, signingProfileUuid }: ListSignatureFormatterConnectorAttributesRequest, opts?: OperationOpts): Observable<Array<DataAttribute> | AjaxResponse<Array<DataAttribute>>> {
+        throwIfNullOrUndefined(connectorUuid, 'connectorUuid', 'listSignatureFormatterConnectorAttributes');
+
+        const query: HttpQuery = {};
+
+        if (signingProfileUuid != null) { query['signingProfileUuid'] = signingProfileUuid; }
+
+        return this.request<Array<DataAttribute>>({
+            url: '/v1/signingProfiles/signatureFormatterConnectors/{connectorUuid}/formatterAttributes'.replace('{connectorUuid}', encodeURI(connectorUuid)),
+            method: 'GET',
+            query,
         }, opts?.responseOpts);
     };
 

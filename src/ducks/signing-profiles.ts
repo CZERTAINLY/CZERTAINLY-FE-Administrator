@@ -27,6 +27,7 @@ export type State = {
     supportedProtocols: SigningProtocol[];
     signingCertificates: CertificateDto[];
     signingOperationAttributeDescriptors: BaseAttributeDto[];
+    signatureFormatterConnectorAttributeDescriptors: BaseAttributeDto[];
     signingRecords?: PaginationResponseDtoSigningRecordListDto;
 
     searchableFields?: SearchFieldDataByGroupDto[];
@@ -39,6 +40,7 @@ export type State = {
     isFetchingSupportedProtocols: boolean;
     isFetchingSigningCertificates: boolean;
     isFetchingSignatureAttributes: boolean;
+    isFetchingSignatureFormatterConnectorAttributes: boolean;
     isFetchingSigningRecords: boolean;
     isCreating: boolean;
     isDeleting: boolean;
@@ -64,6 +66,7 @@ export const initialState: State = {
     supportedProtocols: [],
     signingCertificates: [],
     signingOperationAttributeDescriptors: [],
+    signatureFormatterConnectorAttributeDescriptors: [],
 
     isFetchingList: false,
     isFetchingDetail: false,
@@ -73,6 +76,7 @@ export const initialState: State = {
     isFetchingSupportedProtocols: false,
     isFetchingSigningCertificates: false,
     isFetchingSignatureAttributes: false,
+    isFetchingSignatureFormatterConnectorAttributes: false,
     isFetchingSigningRecords: false,
     isCreating: false,
     isDeleting: false,
@@ -444,6 +448,24 @@ export const slice = createSlice({
             state.isFetchingSignatureAttributes = false;
         },
 
+        // Signature formatter connector attribute descriptors
+        listSignatureFormatterConnectorAttributes: (
+            state,
+            action: PayloadAction<{ connectorUuid: string; signingProfileUuid?: string }>,
+        ) => {
+            state.isFetchingSignatureFormatterConnectorAttributes = true;
+            state.signatureFormatterConnectorAttributeDescriptors = [];
+        },
+
+        listSignatureFormatterConnectorAttributesSuccess: (state, action: PayloadAction<{ attributeDescriptors: BaseAttributeDto[] }>) => {
+            state.isFetchingSignatureFormatterConnectorAttributes = false;
+            state.signatureFormatterConnectorAttributeDescriptors = action.payload.attributeDescriptors;
+        },
+
+        listSignatureFormatterConnectorAttributesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingSignatureFormatterConnectorAttributes = false;
+        },
+
         // Signing records
         listSigningRecordsForSigningProfile: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isFetchingSigningRecords = true;
@@ -472,6 +494,10 @@ const tspActivationDetails = createSelector(state, (state) => state.tspActivatio
 const supportedProtocols = createSelector(state, (state) => state.supportedProtocols);
 const signingCertificates = createSelector(state, (state) => state.signingCertificates);
 const signingOperationAttributeDescriptors = createSelector(state, (state) => state.signingOperationAttributeDescriptors);
+const signatureFormatterConnectorAttributeDescriptors = createSelector(
+    state,
+    (state) => state.signatureFormatterConnectorAttributeDescriptors,
+);
 const signingRecords = createSelector(state, (state) => state.signingRecords);
 const searchableFields = createSelector(state, (state) => state.searchableFields);
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
@@ -485,6 +511,10 @@ const isFetchingTspActivationDetails = createSelector(state, (state) => state.is
 const isFetchingSupportedProtocols = createSelector(state, (state) => state.isFetchingSupportedProtocols);
 const isFetchingSigningCertificates = createSelector(state, (state) => state.isFetchingSigningCertificates);
 const isFetchingSignatureAttributes = createSelector(state, (state) => state.isFetchingSignatureAttributes);
+const isFetchingSignatureFormatterConnectorAttributes = createSelector(
+    state,
+    (state) => state.isFetchingSignatureFormatterConnectorAttributes,
+);
 const isFetchingSigningRecords = createSelector(state, (state) => state.isFetchingSigningRecords);
 const isCreating = createSelector(state, (state) => state.isCreating);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
@@ -510,6 +540,7 @@ export const selectors = {
     supportedProtocols,
     signingCertificates,
     signingOperationAttributeDescriptors,
+    signatureFormatterConnectorAttributeDescriptors,
     signingRecords,
     searchableFields,
     isFetchingList,
@@ -520,6 +551,7 @@ export const selectors = {
     isFetchingSupportedProtocols,
     isFetchingSigningCertificates,
     isFetchingSignatureAttributes,
+    isFetchingSignatureFormatterConnectorAttributes,
     isFetchingSigningRecords,
     isCreating,
     isDeleting,

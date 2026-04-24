@@ -8,7 +8,8 @@ import { actions as alertActions } from './alerts';
 import { actions as appRedirectActions } from './app-redirect';
 import { EntityType } from './filters';
 import { actions as pagingActions } from './paging';
-import { slice } from './signing-profiles';
+import { selectors, slice } from './signing-profiles';
+import { isTimestampingWorkflow } from 'utils/type-guards';
 import { transformSearchRequestModelToDto } from './transform/certificates';
 import { actions as userInterfaceActions } from './user-interface';
 import { store } from '../App';
@@ -446,6 +447,45 @@ const listSignatureAttributesForCertificate: AppEpic = (action$, state$, deps) =
     );
 };
 
+const listSignatureFormatterConnectorAttributes: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.listSignatureFormatterConnectorAttributes.match),
+        switchMap((action) =>
+            deps.apiClients.signingProfiles
+                .listSignatureFormatterConnectorAttributes({
+                    connectorUuid: action.payload.connectorUuid,
+                    signingProfileUuid: action.payload.signingProfileUuid,
+                })
+                .pipe(
+                    map((descriptors) => {
+                        const profile = selectors.signingProfile(state$.value);
+                        const savedAttrs =
+                            profile && isTimestampingWorkflow(profile.workflow)
+                                ? (profile.workflow.signatureFormatterConnectorAttributes ?? [])
+                                : [];
+
+                        const savedContentByUuid = new Map(
+                            savedAttrs.filter((a) => 'content' in a).map((a) => [a.uuid, (a as any).content]),
+                        );
+                        const merged = descriptors.map((descriptor) => {
+                            const savedContent = savedContentByUuid.get(descriptor.uuid);
+                            return savedContent !== undefined ? { ...descriptor, content: savedContent } : descriptor;
+                        });
+
+                        return slice.actions.listSignatureFormatterConnectorAttributesSuccess({ attributeDescriptors: merged });
+                    }),
+                    catchError((error) =>
+                        of(
+                            slice.actions.listSignatureFormatterConnectorAttributesFailure({
+                                error: extractError(error, 'Failed to get formatter attributes for connector'),
+                            }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
 const listSigningRecordsForSigningProfile: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listSigningRecordsForSigningProfile.match),
@@ -488,6 +528,7 @@ const epics = [
     listSupportedProtocols,
     listSigningCertificates,
     listSignatureAttributesForCertificate,
+    listSignatureFormatterConnectorAttributes,
     listSigningRecordsForSigningProfile,
 ];
 

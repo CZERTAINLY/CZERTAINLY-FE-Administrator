@@ -12,6 +12,7 @@ import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
+import AttributeViewer from 'components/Attributes/AttributeViewer';
 import TabLayout from 'components/Layout/TabLayout';
 
 import { actions, selectors } from 'ducks/signing-profiles';
@@ -271,6 +272,13 @@ export default function SigningProfileDetail() {
                     ) : (
                         <span className="text-gray-400 text-sm">Not configured</span>
                     ),
+                ],
+            },
+            {
+                id: 'connectorUuid',
+                columns: [
+                    'Signature Formatter Connector UUID',
+                    timestampingWorkflow.signatureFormatterConnector?.uuid ?? <span className="text-gray-400 text-sm">—</span>,
                 ],
             },
             {
@@ -579,13 +587,22 @@ export default function SigningProfileDetail() {
                         {
                             title: workflowTabTitle,
                             content: (
-                                <Widget title="Timestamping Workflow Configuration" titleSize="large">
-                                    {workflowData.length > 0 ? (
-                                        <CustomTable headers={detailHeaders} data={workflowData} />
-                                    ) : (
-                                        <p className="text-gray-400 text-sm">No workflow configuration available.</p>
-                                    )}
-                                </Widget>
+                                <>
+                                    <Widget title="Timestamping Workflow Configuration" titleSize="large">
+                                        {workflowData.length > 0 ? (
+                                            <CustomTable headers={detailHeaders} data={workflowData} />
+                                        ) : (
+                                            <p className="text-gray-400 text-sm">No workflow configuration available.</p>
+                                        )}
+                                    </Widget>
+                                    {timestampingWorkflow?.signatureFormatterConnector &&
+                                        timestampingWorkflow.signatureFormatterConnectorAttributes &&
+                                        timestampingWorkflow.signatureFormatterConnectorAttributes.length > 0 && (
+                                            <Widget title="Signature Formatter Connector Attributes" titleSize="large">
+                                                <AttributeViewer attributes={timestampingWorkflow.signatureFormatterConnectorAttributes} />
+                                            </Widget>
+                                        )}
+                                </>
                             ),
                         },
                         {

@@ -117,6 +117,13 @@ export default function SigningProfileForm() {
     const signingOperationAttributeDescriptors = useSelector(signingProfileSelectors.signingOperationAttributeDescriptors);
     const isFetchingSignatureAttributes = useSelector(signingProfileSelectors.isFetchingSignatureAttributes);
 
+    const signatureFormatterConnectorAttributeDescriptors = useSelector(
+        signingProfileSelectors.signatureFormatterConnectorAttributeDescriptors,
+    );
+    const isFetchingSignatureFormatterConnectorAttributes = useSelector(
+        signingProfileSelectors.isFetchingSignatureFormatterConnectorAttributes,
+    );
+
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
     const multipleResourceCustomAttributes = useSelector(
         customAttributesSelectors.multipleResourceCustomAttributes([Resource.SigningProfiles]),
@@ -242,6 +249,7 @@ export default function SigningProfileForm() {
     const managedSigningTypeValue = useWatch({ control, name: 'managedSigningType' });
     const qualifiedTimestampValue = useWatch({ control, name: 'qualifiedTimestamp' });
     const certificateUuidValue = useWatch({ control, name: 'certificateUuid' });
+    const signatureFormatterConnectorUuidValue = useWatch({ control, name: 'signatureFormatterConnectorUuid' });
 
     const isFirstQualifiedTimestampRender = useRef(true);
     useEffect(() => {
@@ -330,6 +338,24 @@ export default function SigningProfileForm() {
         dispatch(signingProfileActions.listSignatureAttributesForCertificate({ certificateUuid: certificateUuidValue }));
     }, [dispatch, certificateUuidValue]);
 
+    useEffect(() => {
+        if (!signatureFormatterConnectorUuidValue) return;
+        dispatch(
+            signingProfileActions.listSignatureFormatterConnectorAttributes({
+                connectorUuid: signatureFormatterConnectorUuidValue,
+                signingProfileUuid: editMode ? id : undefined,
+            }),
+        );
+    }, [dispatch, signatureFormatterConnectorUuidValue, editMode, id]);
+
+    const signatureFormatterConnectorAttributes = useMemo(
+        () =>
+            editMode && isTimestampingWorkflow(signingProfile?.workflow)
+                ? signingProfile?.workflow.signatureFormatterConnectorAttributes
+                : undefined,
+        [editMode, signingProfile?.workflow],
+    );
+
     // ── Policy ID helpers ─────────────────────────────────────────────────────
 
     const addPolicyId = useCallback(() => {
@@ -354,11 +380,16 @@ export default function SigningProfileForm() {
             );
 
             const signingOpAttrs = collectFormAttributes('signingOperationAttrs', signingOperationAttributeDescriptors, values);
+            const formatterConnectorAttrs = collectFormAttributes(
+                'signatureFormatterConnectorAttrs',
+                signatureFormatterConnectorAttributeDescriptors,
+                values,
+            );
 
             const workflowRequest: TimestampingWorkflowRequestDto = {
                 type: values.workflowType,
                 signatureFormatterConnectorUuid: values.signatureFormatterConnectorUuid || undefined,
-                signatureFormatterConnectorAttributes: [],
+                signatureFormatterConnectorAttributes: formatterConnectorAttrs,
                 qualifiedTimestamp: values.qualifiedTimestamp,
                 timeQualityConfigurationUuid: values.timeQualityConfigurationUuid || undefined,
                 defaultPolicyId: values.defaultPolicyId || undefined,
@@ -387,7 +418,15 @@ export default function SigningProfileForm() {
                 dispatch(signingProfileActions.createSigningProfile({ signingProfileRequestDto: requestDto }));
             }
         },
-        [dispatch, editMode, id, allowedPolicyIds, multipleResourceCustomAttributes, signingOperationAttributeDescriptors],
+        [
+            dispatch,
+            editMode,
+            id,
+            allowedPolicyIds,
+            multipleResourceCustomAttributes,
+            signingOperationAttributeDescriptors,
+            signatureFormatterConnectorAttributeDescriptors,
+        ],
     );
 
     const onCancel = useCallback(() => {
@@ -489,10 +528,21 @@ export default function SigningProfileForm() {
                 )}
             />
 
-            <p className="text-xs text-gray-500 mt-1">
-                Connector attribute configuration will be available once Signature Formatter connectors are registered with the required
-                interface and feature flag.
-            </p>
+            {signatureFormatterConnectorUuidValue && (
+                <Widget title="Signature Formatter Connector Attributes" noBorder busy={isFetchingSignatureFormatterConnectorAttributes}>
+                    {signatureFormatterConnectorAttributeDescriptors.length > 0 ? (
+                        <AttributeEditor
+                            id="signatureFormatterConnectorAttrs"
+                            attributeDescriptors={signatureFormatterConnectorAttributeDescriptors as any}
+                            attributes={signatureFormatterConnectorAttributes}
+                        />
+                    ) : (
+                        !isFetchingSignatureFormatterConnectorAttributes && (
+                            <p className="text-xs text-gray-500">No attributes available for the selected connector.</p>
+                        )
+                    )}
+                </Widget>
+            )}
 
             <div className="flex items-center gap-x-3 mt-2">
                 <Controller
