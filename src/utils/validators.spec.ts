@@ -21,6 +21,11 @@ import {
     validatePostgresPosixRegex,
 } from './validators';
 
+const REQUIRED_FIELD_MSG = 'Required Field';
+const INVALID_IP_MSG = 'Value must be a valid ip address';
+const INVALID_OID_MSG = 'Must be a dot-separated numeric OID (e.g. 1.2.840.113549.1.1.11)';
+const UNSUPPORTED_REGEX_TOKEN_MSG = 'Unsupported regex token';
+
 describe('validators', () => {
     describe('validateRequired', () => {
         test('should return undefined for non-empty value', () => {
@@ -31,10 +36,10 @@ describe('validators', () => {
         });
 
         test('should return error for empty value', () => {
-            expect(validateRequired()('')).toBe('Required Field');
-            expect(validateRequired()(undefined)).toBe('Required Field');
-            expect(validateRequired()(null)).toBe('Required Field');
-            expect(validateRequired()([])).toBe('Required Field');
+            expect(validateRequired()('')).toBe(REQUIRED_FIELD_MSG);
+            expect(validateRequired()(undefined)).toBe(REQUIRED_FIELD_MSG);
+            expect(validateRequired()(null)).toBe(REQUIRED_FIELD_MSG);
+            expect(validateRequired()([])).toBe(REQUIRED_FIELD_MSG);
         });
 
         test('should accept false as valid', () => {
@@ -231,7 +236,7 @@ describe('validators', () => {
     describe('composeValidators', () => {
         test('should return first error from validators', () => {
             const validator = composeValidators(validateRequired(), validateEmail());
-            expect(validator('')).toBe('Required Field');
+            expect(validator('')).toBe(REQUIRED_FIELD_MSG);
             expect(validator('invalid')).toBe('Value must be a valid email address');
             expect(validator('test@example.com')).toBeUndefined();
         });
@@ -332,9 +337,9 @@ describe('validators', () => {
         });
 
         test('should reject invalid IP', () => {
-            expect(validateCustomIp('256.1.1.1')).toBe('Value must be a valid ip address');
-            expect(validateCustomIp('not-an-ip')).toBe('Value must be a valid ip address');
-            expect(validateCustomIp('1.2.3')).toBe('Value must be a valid ip address');
+            expect(validateCustomIp('256.1.1.1')).toBe(INVALID_IP_MSG);
+            expect(validateCustomIp('not-an-ip')).toBe(INVALID_IP_MSG);
+            expect(validateCustomIp('1.2.3')).toBe(INVALID_IP_MSG);
         });
     });
 
@@ -357,19 +362,19 @@ describe('validators', () => {
         });
 
         test('should reject OIDs with a first segment > 2', () => {
-            expect(validateOid()('3.1.1')).toBe('Must be a dot-separated numeric OID (e.g. 1.2.840.113549.1.1.11)');
+            expect(validateOid()('3.1.1')).toBe(INVALID_OID_MSG);
         });
 
         test('should reject non-numeric values', () => {
-            expect(validateOid()('invalid')).toBe('Must be a dot-separated numeric OID (e.g. 1.2.840.113549.1.1.11)');
+            expect(validateOid()('invalid')).toBe(INVALID_OID_MSG);
         });
 
         test('should reject a single-segment OID', () => {
-            expect(validateOid()('1')).toBe('Must be a dot-separated numeric OID (e.g. 1.2.840.113549.1.1.11)');
+            expect(validateOid()('1')).toBe(INVALID_OID_MSG);
         });
 
         test('should reject OIDs with leading zero in a non-first segment', () => {
-            expect(validateOid()('1.01.2')).toBe('Must be a dot-separated numeric OID (e.g. 1.2.840.113549.1.1.11)');
+            expect(validateOid()('1.01.2')).toBe(INVALID_OID_MSG);
         });
     });
 
@@ -437,13 +442,13 @@ describe('validators', () => {
         test('returns error for forbidden lookahead token (?=', () => {
             const result = validatePostgresPosixRegex('abc(?=def)');
             expect(result).toBeTruthy();
-            expect(result).toContain('Unsupported regex token');
+            expect(result).toContain(UNSUPPORTED_REGEX_TOKEN_MSG);
         });
 
         test('returns error for forbidden non-capturing group (?:', () => {
             const result = validatePostgresPosixRegex('(?:abc)');
             expect(result).toBeTruthy();
-            expect(result).toContain('Unsupported regex token');
+            expect(result).toContain(UNSUPPORTED_REGEX_TOKEN_MSG);
         });
 
         test(String.raw`returns error for forbidden backslash sequence \Q`, () => {
@@ -526,7 +531,7 @@ describe('validators', () => {
             // The first two form an escaped backslash; the trailing \Q is unescaped and forbidden.
             const result = validatePostgresPosixRegex(String.raw`\\\Q`);
             expect(result).toBeTruthy();
-            expect(result).toContain('Unsupported regex token');
+            expect(result).toContain(UNSUPPORTED_REGEX_TOKEN_MSG);
         });
 
         test('ignores forbidden token preceded by an odd number of backslashes (escaped)', () => {
