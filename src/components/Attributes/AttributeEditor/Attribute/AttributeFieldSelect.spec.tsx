@@ -163,6 +163,143 @@ test.describe('AttributeFieldSelect', () => {
         await expect(page.locator('.hs-select-option-row', { hasText: 'Add new' })).toBeVisible();
     });
 
+    test('selecting __add_new__ when field is empty resets Select to placeholder', async ({ mount, page }) => {
+        const descriptor = minimalDescriptor({
+            properties: { ...defaultProperties, label: 'Credential' },
+        } as any);
+        const options = [{ label: 'Credential A', value: 'cred-a' }];
+
+        await mount(
+            <AttributeFieldSelectTestWrapper
+                name="testSelect"
+                descriptor={descriptor}
+                options={options}
+                addNewAttributeValue={{ label: '+ Add new', value: '__add_new__' }}
+            />,
+        );
+
+        const select = page.getByTestId('select-testSelectSelect-input');
+
+        await select.evaluate((el: HTMLSelectElement) => {
+            el.value = '__add_new__';
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        await expect(select).toHaveValue('');
+    });
+
+    test('selecting __add_new__ when field has a value preserves the previous selection', async ({ mount, page }) => {
+        const descriptor = minimalDescriptor({
+            properties: { ...defaultProperties, label: 'Credential' },
+        } as any);
+        const options = [
+            { label: 'Credential A', value: 'cred-a' },
+            { label: 'Credential B', value: 'cred-b' },
+        ];
+
+        await mount(
+            <AttributeFieldSelectTestWrapper
+                name="testSelect"
+                descriptor={descriptor}
+                options={options}
+                addNewAttributeValue={{ label: '+ Add new', value: '__add_new__' }}
+                defaultValues={{ testSelect: 'cred-a' }}
+            />,
+        );
+
+        const select = page.getByTestId('select-testSelectSelect-input');
+        await expect(select).toHaveValue('cred-a');
+
+        await select.evaluate((el: HTMLSelectElement) => {
+            el.value = '__add_new__';
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        await expect(select).toHaveValue('cred-a');
+    });
+
+    test('onSelectChangeMulti: selecting __add_new__ with other items removes __add_new__ and keeps others', async ({ mount, page }) => {
+        const descriptor = minimalDescriptor({
+            properties: { ...defaultProperties, multiSelect: true, label: 'Multi Credential' },
+        } as any);
+        const options = [
+            { label: 'Option A', value: 'a' },
+            { label: 'Option B', value: 'b' },
+        ];
+
+        await mount(
+            <AttributeFieldSelectTestWrapper
+                name="testSelect"
+                descriptor={descriptor}
+                options={options}
+                addNewAttributeValue={{ label: '+ Add new', value: '__add_new__' }}
+            />,
+        );
+
+        const select = page.getByTestId('select-testSelectSelect-input');
+
+        await select.evaluate((el: HTMLSelectElement) => {
+            Array.from(el.options).forEach((opt) => {
+                opt.selected = opt.value === 'a' || opt.value === '__add_new__';
+            });
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        await expect(select).toHaveValues(['a']);
+    });
+
+    test('onSelectChangeMulti: selecting only __add_new__ does not add it to the field', async ({ mount, page }) => {
+        const descriptor = minimalDescriptor({
+            properties: { ...defaultProperties, multiSelect: true, label: 'Multi Credential' },
+        } as any);
+        const options = [{ label: 'Option A', value: 'a' }];
+
+        await mount(
+            <AttributeFieldSelectTestWrapper
+                name="testSelect"
+                descriptor={descriptor}
+                options={options}
+                addNewAttributeValue={{ label: '+ Add new', value: '__add_new__' }}
+            />,
+        );
+
+        const clearBtn = page.getByTestId('select-testSelectSelect-clear');
+        await expect(clearBtn).toHaveCount(0);
+
+        const select = page.getByTestId('select-testSelectSelect-input');
+        await select.evaluate((el: HTMLSelectElement) => {
+            Array.from(el.options).forEach((opt) => {
+                opt.selected = opt.value === '__add_new__';
+            });
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        await expect(clearBtn).toHaveCount(0);
+    });
+
+    test('onSelectChangeMulti: selecting regular options updates the field', async ({ mount, page }) => {
+        const descriptor = minimalDescriptor({
+            properties: { ...defaultProperties, multiSelect: true, label: 'Multi Select' },
+        } as any);
+        const options = [
+            { label: 'Option A', value: 'a' },
+            { label: 'Option B', value: 'b' },
+        ];
+
+        await mount(<AttributeFieldSelectTestWrapper name="testSelect" descriptor={descriptor} options={options} />);
+
+        const select = page.getByTestId('select-testSelectSelect-input');
+        await select.evaluate((el: HTMLSelectElement) => {
+            Array.from(el.options).forEach((opt) => {
+                opt.selected = opt.value === 'a' || opt.value === 'b';
+            });
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        await expect(select).toHaveValues(['a', 'b']);
+        await expect(page.getByTestId('select-testSelectSelect-clear')).toBeAttached();
+    });
+
     test('extensible list adds extra option for current value not in options', async ({ mount, page }) => {
         const descriptor = minimalDescriptor({
             properties: { ...defaultProperties, list: true, extensibleList: true, label: 'Extensible' },
@@ -179,5 +316,27 @@ test.describe('AttributeFieldSelect', () => {
         await page.getByTestId('select-testSelectSelect').click();
         await expect(page.locator('.hs-select-option-row', { hasText: 'Known' })).toBeVisible();
         await expect(page.locator('.hs-select-option-row', { hasText: 'extra' })).toBeVisible();
+    });
+
+    test('extensible list multi-select adds extra options for current values not in options', async ({ mount, page }) => {
+        const descriptor = minimalDescriptor({
+            properties: { ...defaultProperties, multiSelect: true, extensibleList: true, label: 'Extensible Multi' },
+        } as any);
+
+        await mount(
+            <AttributeFieldSelectTestWrapper
+                name="testSelect"
+                descriptor={descriptor}
+                options={[{ label: 'Known', value: 'known' }]}
+                defaultValues={{ testSelect: ['custom1', 'custom2'] }}
+            />,
+        );
+
+        const selectOptions = await page.getByTestId('select-testSelectSelect-input').evaluate((el: HTMLSelectElement) =>
+            Array.from(el.options)
+                .filter((o) => o.value !== '')
+                .map((o) => o.value),
+        );
+        expect(selectOptions).toEqual(expect.arrayContaining(['known', 'custom1', 'custom2']));
     });
 });
