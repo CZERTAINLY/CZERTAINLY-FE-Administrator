@@ -8,8 +8,11 @@ type Props = {
     paddingTop?: number;
 };
 
-const TOKEN_REGEX =
-    /("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(?=\s*:)|"(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"|\btrue\b|\bfalse\b|\bnull\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g;
+const STRING_CHAR = '\\\\u[\\da-fA-F]{4}|\\\\[^u]|[^\\\\"]';
+const JSON_STRING = `"(?:${STRING_CHAR})*"`;
+const JSON_KEY = `${JSON_STRING}(?=\\s*:)`;
+const JSON_NUMBER = '-?\\d+(?:\\.\\d+)?(?:[eE][+-]?\\d+)?';
+const TOKEN_REGEX = new RegExp(`(${JSON_KEY}|${JSON_STRING}|\\btrue\\b|\\bfalse\\b|\\bnull\\b|${JSON_NUMBER})`, 'g');
 
 const COLORS = {
     key: '#7AA2F7',
@@ -41,7 +44,7 @@ const highlightJson = (source: string): string => {
 
         result += escapeHtml(source.slice(previousIndex, index));
 
-        let color = COLORS.string;
+        let color: string;
 
         if (token.startsWith('"')) {
             color = isObjectKeyAtPosition(source, index + token.length) ? COLORS.key : COLORS.string;

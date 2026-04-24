@@ -440,9 +440,8 @@ export default function RaProfileDetail() {
 
     const approvalProfilesData: TableDataRow[] = useMemo(
         () =>
-            !associatedApprovalProfiles
-                ? []
-                : (associatedApprovalProfiles || []).map((profile) => ({
+            associatedApprovalProfiles
+                ? (associatedApprovalProfiles || []).map((profile) => ({
                       id: profile.uuid,
                       columns: [
                           <Link key="name" to={`../../../approvalprofiles/detail/${profile.uuid}`}>
@@ -472,7 +471,8 @@ export default function RaProfileDetail() {
                               ]}
                           />,
                       ],
-                  })),
+                  }))
+                : [],
         [associatedApprovalProfiles],
     );
 
@@ -496,9 +496,8 @@ export default function RaProfileDetail() {
 
     const complianceProfileData: TableDataRow[] = useMemo(
         () =>
-            !associatedComplianceProfiles
-                ? []
-                : (associatedComplianceProfiles || []).map((profile) => ({
+            associatedComplianceProfiles
+                ? (associatedComplianceProfiles || []).map((profile) => ({
                       id: profile.uuid,
                       columns: [
                           <Link key="name" to={`../../../complianceprofiles/detail/${profile.uuid}`}>
@@ -522,7 +521,8 @@ export default function RaProfileDetail() {
                               ]}
                           />,
                       ],
-                  })),
+                  }))
+                : [],
         [associatedComplianceProfiles, onDissociateComplianceProfile],
     );
 
@@ -582,9 +582,8 @@ export default function RaProfileDetail() {
 
     const acmeProfileData: TableDataRow[] = useMemo(
         () =>
-            !acmeDetails
-                ? []
-                : [
+            acmeDetails
+                ? [
                       {
                           id: 'uuid',
                           columns: ['UUID', acmeDetails.uuid || ''],
@@ -597,15 +596,15 @@ export default function RaProfileDetail() {
                           id: 'Directory URL',
                           columns: ['Directory URL', acmeDetails.directoryUrl || ''],
                       },
-                  ],
+                  ]
+                : [],
         [acmeDetails],
     );
 
     const cmpProfileData: TableDataRow[] = useMemo(
         () =>
-            !cmpDetails
-                ? []
-                : [
+            cmpDetails
+                ? [
                       {
                           id: 'uuid',
                           columns: ['UUID', cmpDetails.uuid || ''],
@@ -618,15 +617,15 @@ export default function RaProfileDetail() {
                           id: 'URL',
                           columns: ['CMP URL', cmpDetails.cmpUrl || ''],
                       },
-                  ],
+                  ]
+                : [],
         [cmpDetails],
     );
 
     const scepProfileData: TableDataRow[] = useMemo(
         () =>
-            !scepDetails
-                ? []
-                : [
+            scepDetails
+                ? [
                       {
                           id: 'uuid',
                           columns: ['UUID', scepDetails.uuid || ''],
@@ -639,7 +638,8 @@ export default function RaProfileDetail() {
                           id: 'URL',
                           columns: ['URL', scepDetails.url || ''],
                       },
-                  ],
+                  ]
+                : [],
         [scepDetails],
     );
 
@@ -690,16 +690,14 @@ export default function RaProfileDetail() {
                     <></>,
                     <></>,
 
-                    !acmeDetails || !acmeDetails.acmeAvailable ? (
-                        <>ACME is not active</>
-                    ) : (
+                    acmeDetails?.acmeAvailable ? (
                         <>
                             <b>Protocol settings</b>
                             <br />
                             <br />
                             <CustomTable hasHeader={false} headers={protocolProfileHeaders} data={acmeProfileData} />
 
-                            {acmeDetails && acmeDetails.issueCertificateAttributes && acmeDetails.issueCertificateAttributes.length > 0 ? (
+                            {acmeDetails?.issueCertificateAttributes && acmeDetails.issueCertificateAttributes.length > 0 ? (
                                 <>
                                     <b>Settings for certificate issuing</b>
                                     <br />
@@ -710,9 +708,7 @@ export default function RaProfileDetail() {
                                 <></>
                             )}
 
-                            {acmeDetails &&
-                            acmeDetails.revokeCertificateAttributes &&
-                            acmeDetails.revokeCertificateAttributes.length > 0 ? (
+                            {acmeDetails?.revokeCertificateAttributes && acmeDetails.revokeCertificateAttributes.length > 0 ? (
                                 <>
                                     <b>Settings for certificate revocation</b>
                                     <br />
@@ -723,6 +719,8 @@ export default function RaProfileDetail() {
                                 <></>
                             )}
                         </>
+                    ) : (
+                        <>ACME is not active</>
                     ),
                 ],
             },
@@ -745,16 +743,14 @@ export default function RaProfileDetail() {
                     <></>,
                     <></>,
 
-                    !scepDetails || !scepDetails.scepAvailable ? (
-                        <>SCEP is not active</>
-                    ) : (
+                    scepDetails?.scepAvailable ? (
                         <>
                             <b>Protocol settings</b>
                             <br />
                             <br />
                             <CustomTable hasHeader={false} headers={protocolProfileHeaders} data={scepProfileData} />
 
-                            {scepDetails && scepDetails.issueCertificateAttributes && scepDetails.issueCertificateAttributes.length > 0 ? (
+                            {scepDetails?.issueCertificateAttributes && scepDetails.issueCertificateAttributes.length > 0 ? (
                                 <>
                                     <b>Settings for certificate issuing</b>
                                     <br />
@@ -765,6 +761,8 @@ export default function RaProfileDetail() {
                                 <></>
                             )}
                         </>
+                    ) : (
+                        <>SCEP is not active</>
                     ),
                 ],
             },
@@ -787,16 +785,14 @@ export default function RaProfileDetail() {
                     <></>,
                     <></>,
                     <></>,
-                    !cmpDetails || !cmpDetails.cmpAvailable ? (
-                        <>CMP is not active</>
-                    ) : (
+                    cmpDetails?.cmpAvailable ? (
                         <>
                             <b>Protocol settings</b>
                             <br />
                             <br />
                             <CustomTable hasHeader={false} headers={protocolProfileHeaders} data={cmpProfileData} />
 
-                            {cmpDetails && cmpDetails.issueCertificateAttributes && cmpDetails.issueCertificateAttributes.length > 0 ? (
+                            {cmpDetails?.issueCertificateAttributes && cmpDetails.issueCertificateAttributes.length > 0 ? (
                                 <>
                                     <b>Settings for certificate issuing</b>
                                     <br />
@@ -807,7 +803,7 @@ export default function RaProfileDetail() {
                                 <></>
                             )}
 
-                            {cmpDetails && cmpDetails.revokeCertificateAttributes && cmpDetails.revokeCertificateAttributes.length > 0 ? (
+                            {cmpDetails?.revokeCertificateAttributes && cmpDetails.revokeCertificateAttributes.length > 0 ? (
                                 <>
                                     <b>Settings for certificate revocation</b>
                                     <br />
@@ -818,6 +814,8 @@ export default function RaProfileDetail() {
                                 <></>
                             )}
                         </>
+                    ) : (
+                        <>CMP is not active</>
                     ),
                 ],
             },
@@ -1005,10 +1003,10 @@ export default function RaProfileDetail() {
                             content: (
                                 <Container className="md:flex-row">
                                     <Widget title="RA Profile Attributes" titleSize="large" lockSize="large" className="w-full md:w-1/2">
-                                        {!raProfile || !raProfile.attributes || raProfile.attributes.length === 0 ? (
-                                            <></>
-                                        ) : (
+                                        {raProfile?.attributes && raProfile.attributes.length > 0 ? (
                                             <AttributeViewer attributes={raProfile?.attributes} />
+                                        ) : (
+                                            <></>
                                         )}
                                     </Widget>
                                     {raProfile && (

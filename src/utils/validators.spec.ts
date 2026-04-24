@@ -81,6 +81,32 @@ describe('validators', () => {
             expect(validator({ data: '2048', reference: 'RSA_2048' })).toBeUndefined();
             expect(validator({ data: 'abc', reference: 'LABEL' })).toBeTruthy();
         });
+
+        test('should return undefined for null value', () => {
+            const validator = validatePattern(/^\d+$/);
+            expect(validator(null)).toBeUndefined();
+        });
+
+        test('should return undefined for an empty array', () => {
+            const validator = validatePattern(/^\d+$/);
+            expect(validator([])).toBeUndefined();
+        });
+
+        test('should unwrap {label, value} objects inside an array', () => {
+            const validator = validatePattern(/^\d+$/);
+            expect(
+                validator([
+                    { label: '1', value: { data: '1' } },
+                    { label: '2', value: { data: '2' } },
+                ]),
+            ).toBeUndefined();
+            expect(
+                validator([
+                    { label: '1', value: { data: '1' } },
+                    { label: 'x', value: { data: 'x' } },
+                ]),
+            ).toBeTruthy();
+        });
     });
 
     describe('validateInteger', () => {
@@ -132,6 +158,10 @@ describe('validators', () => {
             expect(validateDuration()('   ')).toBeUndefined();
         });
 
+        test('should accept undefined value', () => {
+            expect(validateDuration()(undefined as unknown as string)).toBeUndefined();
+        });
+
         test('should reject invalid duration', () => {
             expect(validateDuration()('invalid')).toBeTruthy();
             expect(validateDuration()('1x')).toBeTruthy();
@@ -141,6 +171,12 @@ describe('validators', () => {
             const validator = validateDuration(['h', 'm']);
             expect(validator('1h 30m')).toBeUndefined();
             expect(validator('1d')).toBeTruthy();
+        });
+
+        test('should produce an error mentioning the configured denominations', () => {
+            const result = validateDuration(['h', 'm'])('invalid');
+            expect(result).toContain('0h');
+            expect(result).toContain('0m');
         });
     });
 
@@ -204,12 +240,40 @@ describe('validators', () => {
             const validator = composeValidators(validateRequired(), undefined, null, validateEmail());
             expect(validator('test@example.com')).toBeUndefined();
         });
+
+        test('should return undefined when no validators are passed', () => {
+            expect(composeValidators()('anything')).toBeUndefined();
+        });
+
+        test('should return undefined when all validators pass', () => {
+            const validator = composeValidators(validateRequired(), validateLength(1, 20));
+            expect(validator('hello')).toBeUndefined();
+        });
+
+        test('should pass value, allValues and fieldState through to each validator', () => {
+            const captured: Array<[unknown, unknown, unknown]> = [];
+            const spy = (value: unknown, allValues: unknown, fieldState: unknown) => {
+                captured.push([value, allValues, fieldState]);
+                return undefined;
+            };
+            const allValues = { other: 42 };
+            const fieldState = { touched: true };
+            composeValidators(spy, spy)('v', allValues, fieldState);
+            expect(captured).toEqual([
+                ['v', allValues, fieldState],
+                ['v', allValues, fieldState],
+            ]);
+        });
     });
 
     describe('validateRoutelessUrl', () => {
         test('should accept valid urls', () => {
             expect(validateRoutelessUrl()('localhost:8443')).toBeUndefined();
             expect(validateRoutelessUrl()('https://example.com')).toBeUndefined();
+        });
+
+        test('should accept empty value', () => {
+            expect(validateRoutelessUrl()('')).toBeUndefined();
         });
 
         test('should reject invalid urls', () => {
@@ -222,8 +286,16 @@ describe('validators', () => {
             expect(validateUrlWithRoute('')).toBeUndefined();
         });
 
+        test('should accept undefined value', () => {
+            expect(validateUrlWithRoute(undefined as unknown as string)).toBeUndefined();
+        });
+
         test('should accept valid url with path', () => {
             expect(validateUrlWithRoute('https://example.com/path')).toBeUndefined();
+        });
+
+        test('should accept url without protocol', () => {
+            expect(validateUrlWithRoute('example.com/path')).toBeUndefined();
         });
 
         test('should reject invalid url', () => {
@@ -237,6 +309,11 @@ describe('validators', () => {
             expect(validateAlphaNumericWithSpecialChars()(`O'Brien`)).toBeUndefined();
         });
 
+        test('should accept accented Latin characters', () => {
+            expect(validateAlphaNumericWithSpecialChars()('Jáchym')).toBeUndefined();
+            expect(validateAlphaNumericWithSpecialChars()('Žluťoučký kůň')).toBeUndefined();
+        });
+
         test('should reject invalid format', () => {
             expect(validateAlphaNumericWithSpecialChars()('invalid@char')).toBeTruthy();
         });
@@ -246,11 +323,18 @@ describe('validators', () => {
         test('should accept valid IP', () => {
             expect(validateCustomIp('192.168.1.1')).toBeUndefined();
             expect(validateCustomIp('255.255.255.255')).toBeUndefined();
+            expect(validateCustomIp('0.0.0.0')).toBeUndefined();
+        });
+
+        test('should accept empty value', () => {
+            expect(validateCustomIp('')).toBeUndefined();
+            expect(validateCustomIp(undefined as unknown as string)).toBeUndefined();
         });
 
         test('should reject invalid IP', () => {
             expect(validateCustomIp('256.1.1.1')).toBe('Value must be a valid ip address');
             expect(validateCustomIp('not-an-ip')).toBe('Value must be a valid ip address');
+            expect(validateCustomIp('1.2.3')).toBe('Value must be a valid ip address');
         });
     });
 
@@ -266,12 +350,26 @@ describe('validators', () => {
     });
 
     describe('validateOid', () => {
-        test('should accept valid OID', () => {
-            expect(validateOid()('1.2.3.4')).toBeUndefined();
+        test('should accept valid OIDs starting with 0, 1 or 2', () => {
+            expect(validateOid()('0.9.2342.19200300.100.1.1')).toBeUndefined();
+            expect(validateOid()('1.2.840.113549.1.1.11')).toBeUndefined();
+            expect(validateOid()('2.5.4.3')).toBeUndefined();
         });
 
-        test('should reject invalid OID', () => {
+        test('should reject OIDs with a first segment > 2', () => {
+            expect(validateOid()('3.1.1')).toBe('Must be a dot-separated numeric OID (e.g. 1.2.840.113549.1.1.11)');
+        });
+
+        test('should reject non-numeric values', () => {
             expect(validateOid()('invalid')).toBe('Must be a dot-separated numeric OID (e.g. 1.2.840.113549.1.1.11)');
+        });
+
+        test('should reject a single-segment OID', () => {
+            expect(validateOid()('1')).toBe('Must be a dot-separated numeric OID (e.g. 1.2.840.113549.1.1.11)');
+        });
+
+        test('should reject OIDs with leading zero in a non-first segment', () => {
+            expect(validateOid()('1.01.2')).toBe('Must be a dot-separated numeric OID (e.g. 1.2.840.113549.1.1.11)');
         });
     });
 
@@ -288,16 +386,32 @@ describe('validators', () => {
 
     describe('validateQuartzCronExpression', () => {
         test('should accept empty value', () => {
-            const validator = validateQuartzCronExpression(undefined);
+            const validator = validateQuartzCronExpression();
             expect(validator('')).toBeUndefined();
         });
         test('should accept valid cron expression', () => {
-            const validator = validateQuartzCronExpression(undefined);
+            const validator = validateQuartzCronExpression();
             expect(validator('0 0 12 * * ?')).toBeUndefined();
         });
-        test('should reject invalid cron', () => {
-            const validator = validateQuartzCronExpression(undefined);
-            expect(validator('not cron')).toBeTruthy();
+        test('should reject invalid cron with a string error message', () => {
+            const validator = validateQuartzCronExpression();
+            const result = validator('not cron');
+            expect(result).toBeTruthy();
+            expect(typeof result).toBe('string');
+        });
+        test('should join array error messages into a single string', () => {
+            const validator = validateQuartzCronExpression();
+            const result = validator('60 0 * * * ?');
+            expect(typeof result).toBe('string');
+            expect(result).toContain('Minute and Second');
+        });
+        test('should return a generic message when the cron validator throws', () => {
+            const validator = validateQuartzCronExpression();
+            expect(validator({} as unknown as string)).toBe('Unknown error, please check the cron expression.');
+        });
+        test('should unwrap {label, value} objects before validating the cron expression', () => {
+            const validator = validateQuartzCronExpression();
+            expect(validator({ label: 'noon', value: { data: '0 0 12 * * ?' } } as unknown as string)).toBeUndefined();
         });
     });
 
@@ -405,6 +519,21 @@ describe('validators', () => {
 
         test('returns empty string for complex valid POSIX pattern', () => {
             expect(validatePostgresPosixRegex(String.raw`^([[:alpha:]]+)\s[[:digit:]]{2,4}$`)).toBe('');
+        });
+
+        test('flags forbidden token preceded by an even number of backslashes', () => {
+            // String.raw`\\\Q` is 4 chars: \, \, \, Q
+            // The first two form an escaped backslash; the trailing \Q is unescaped and forbidden.
+            const result = validatePostgresPosixRegex(String.raw`\\\Q`);
+            expect(result).toBeTruthy();
+            expect(result).toContain('Unsupported regex token');
+        });
+
+        test('ignores forbidden token preceded by an odd number of backslashes (escaped)', () => {
+            // String.raw`a\\Q` is 4 chars: a, \, \, Q.
+            // The forbidden seq "\Q" is at index 2, preceded by a single backslash -> escaped.
+            // The pattern should NOT be flagged for the forbidden "\Q" token.
+            expect(validatePostgresPosixRegex(String.raw`a\\Q`)).toBe('');
         });
     });
 });
