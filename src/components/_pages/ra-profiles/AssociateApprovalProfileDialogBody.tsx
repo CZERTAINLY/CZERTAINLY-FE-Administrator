@@ -6,7 +6,7 @@ import Button from 'components/Button';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { RaProfileResponseModel } from 'types/ra-profiles';
+import type { RaProfileResponseModel } from 'types/ra-profiles';
 import { buildValidationRules } from 'utils/validators-helper';
 import { validateRequired } from 'utils/validators';
 import cn from 'classnames';

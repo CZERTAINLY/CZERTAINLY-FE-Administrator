@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -21,6 +21,5 @@ export enum FeatureFlag {
     OpenMetrics = 'openMetrics',
     SecretVersioning = 'secretVersioning',
     SecretRotation = 'secretRotation',
-    Timestamping = 'timestamping'
+    Timestamping = 'timestamping',
 }
-

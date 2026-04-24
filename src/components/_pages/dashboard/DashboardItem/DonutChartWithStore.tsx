@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router';
 import { createMockStore } from 'utils/test-helpers';

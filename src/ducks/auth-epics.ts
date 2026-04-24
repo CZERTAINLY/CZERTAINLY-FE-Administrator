@@ -1,7 +1,7 @@
 import { of } from 'rxjs';
 import { catchError, filter, map, switchMap } from 'rxjs/operators';
 
-import { AppEpic } from 'ducks';
+import type { AppEpic } from 'ducks';
 import { actions as notificationActions } from 'ducks/notifications';
 
 import { actions as appRedirectActions } from './app-redirect';

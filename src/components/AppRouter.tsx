@@ -1,153 +1,173 @@
 import { selectors } from 'ducks/auth';
 import { featureFlags } from 'utils/feature-flags';
-import { useMemo } from 'react';
+import { lazy, Suspense, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { HashRouter, Navigate, Route, Routes } from 'react-router';
-
-import AuditLogs from './_pages/auditLogs';
-import CertificatesDashboard from './_pages/dashboard/CertificatesDashboard';
-import SecretsDashboard from './_pages/dashboard/SecretsDashboard';
-import AuthenticationSettings from './_pages/auth-settings';
-import OAuth2ProviderDetail from './_pages/auth-settings/detail';
-
-import LoggingSettings from './_pages/logging-settings';
-
-import { TrustedCertificateDetail } from './_pages/trusted-certificates/detail/TrustedCertificateDetail';
-import { TrustedCertificatesList } from './_pages/trusted-certificates/list/TrustedCertificateList';
-
-import AcmeAccountDetail from './_pages/acme-accounts/detail';
-import AcmeAccountsList from './_pages/acme-accounts/list';
-
-import AcmeProfileDetail from './_pages/acme-profiles/detail';
-import AcmeProfilesList from './_pages/acme-profiles/list';
-
-import AuthorityDetail from './_pages/authorities/detail';
-import AuthoritiesList from './_pages/authorities/list';
-import AuthorityForm from './_pages/authorities/form';
-
-import CertificateDetail from './_pages/certificates/detail';
-import CertificateEdit from './_pages/certificates/form';
-import CertificatesList from './_pages/certificates/list';
-
-import ComplianceProfileDetail from './_pages/compliance-profiles/detail';
-import ComplianceProfilesList from './_pages/compliance-profiles/list';
-
-import ConnectorDetail from './_pages/connectors/detail';
-import ConnectorsList from './_pages/connectors/list';
-
-import { ProxyDetail } from './_pages/proxies/detail/ProxyDetail';
-import { ProxiesList } from './_pages/proxies/list/ProxiesList';
-
-import ApprovalProfileDetails from './_pages/approval-profiles/detail';
-import ApprovalProfiles from './_pages/approval-profiles/list';
-
-import ApprovalDetails from './_pages/approvals/details';
-import ApprovalsList from './_pages/approvals/list';
-
-import CredentialDetail from './_pages/credentials/detail';
-import CredentialsList from './_pages/credentials/list';
-
-import CryptographicKeyDetail from './_pages/cryptographic-keys/detail';
-import CryptographicKeyList from './_pages/cryptographic-keys/list';
-import SecretsList from './_pages/secrets/list';
-import SecretDetail from './_pages/secrets/detail';
-
-import CustomAttributesDetail from './_pages/custom-attributes/detail';
-import CustomAttributesList from './_pages/custom-attributes/list';
-
-import DiscoveryDetail from './_pages/discoveries/detail';
-import DiscoveriesList from './_pages/discoveries/list';
-
-import EntityDetail from './_pages/entities/detail';
-import EntitiesList from './_pages/entities/list';
-
-import ScepProfileDetail from './_pages/scep-profiles/detail';
-import ScepProfilesList from './_pages/scep-profiles/list';
-
-import CmpProfileDetails from './_pages/cmp-profiles/details';
-import CmpProfilesList from './_pages/cmp-profiles/list';
-
-import { TspProfileDetail } from './_pages/tsp-profiles/detail/TspProfileDetail';
-import { TspProfileForm } from './_pages/tsp-profiles/form/TspProfileForm';
-import { TspProfilesList } from './_pages/tsp-profiles/list/TspProfilesList';
-
-import { TimeQualityConfigurationDetail } from './_pages/time-quality-configurations/detail/TimeQualityConfigurationDetail';
-import { TimeQualityConfigurationForm } from './_pages/time-quality-configurations/form/TimeQualityConfigurationForm';
-import { TimeQualityConfigurationsList } from './_pages/time-quality-configurations/list/TimeQualityConfigurationsList';
-
-import GlobalMetadataDetail from './_pages/global-metadata/detail';
-import GlobalMetadataList from './_pages/global-metadata/list';
-
-import GroupDetail from './_pages/group/detail';
-import GroupList from './_pages/group/list';
-
-import LocationDetail from './_pages/locations/detail';
-import LocationsList from './_pages/locations/list';
-
-import RaProfileDetail from './_pages/ra-profiles/detail';
-import RaProfilesList from './_pages/ra-profiles/list';
-
-import PlatformSettingsDetail from './_pages/platform-settings/detail';
-
-import RoleDetail from './_pages/roles/detail';
-import RolesList from './_pages/roles/list';
-import RolePermissions from './_pages/roles/RolePermissionsForm';
-
-import TokenProfileDetail from './_pages/token-profiles/detail';
-import TokenProfileList from './_pages/token-profiles/list';
-
-import TokenDetail from './_pages/tokens/detail';
-import TokenList from './_pages/tokens/list';
-
-import UserProfileDetail from './_pages/user-profile/detail';
-
-import UserDetail from './_pages/users/detail';
-import UsersList from './_pages/users/list';
-
-import NotificationsList from './_pages/notifications/list';
-import NotificationInstanceDetail from './_pages/notifications/notification-instance-details';
-import EventsSettings from './_pages/notifications/events-settings';
-
-import NotificationProfileDetail from './_pages/notifications/notification-profiles/detail';
-import NotificationProfilesList from './_pages/notifications/notification-profiles/list';
-
-import ConditionDetails from './_pages/conditions/details';
-
-import ExecutionDetails from './_pages/executions/details';
-import ExecutionForm from './_pages/executions/form';
-
-import ActionDetails from './_pages/actions/detail';
-import ActionsList from './_pages/actions/list';
-
-import TriggerDetails from './_pages/triggers/details';
-import TriggerList from './_pages/triggers/list';
-
-import RuleDetails from './_pages/rules/detail';
-import RulesList from './_pages/rules/list';
-
-import SchedulerJobDetail from './_pages/scheduler/detail';
-import SchedulerJobsList from './_pages/scheduler/list';
 
 import AppRedirect from './AppRedirect';
 import Layout from './Layout';
 import Spinner from './Spinner';
 
 import { Resource } from 'types/openapi';
-import CustomOIDList from 'components/_pages/custom-oid/list';
-import CustomOIDDetail from 'components/_pages/custom-oid/detail';
 import Login from './_pages/login';
-import VaultsList from './_pages/vaults/list';
-import VaultDetail from './_pages/vaults/detail';
-import VaultProfilesList from './_pages/vault-profiles/list';
-import VaultProfileDetail from './_pages/vault-profiles/detail';
 
-import SigningProfilesList from './_pages/signing-profiles/list/SigningProfilesList';
-import SigningProfileForm from './_pages/signing-profiles/form/SigningProfileForm';
-import SigningProfileDetail from './_pages/signing-profiles/detail/SigningProfileDetail';
+const AuditLogs = lazy(() => import('./_pages/auditLogs'));
+const CertificatesDashboard = lazy(() => import('./_pages/dashboard/CertificatesDashboard'));
+const SecretsDashboard = lazy(() => import('./_pages/dashboard/SecretsDashboard'));
+const AuthenticationSettings = lazy(() => import('./_pages/auth-settings'));
+const OAuth2ProviderDetail = lazy(() => import('./_pages/auth-settings/detail'));
 
-import CbomsList from './_pages/cboms/list';
-import CbomDetail from 'components/_pages/cboms/detail';
-import CbomVersionsHistory from 'components/_pages/cboms/versions';
+const LoggingSettings = lazy(() => import('./_pages/logging-settings'));
+
+const TrustedCertificateDetail = lazy(() =>
+    import('./_pages/trusted-certificates/detail/TrustedCertificateDetail').then((m) => ({ default: m.TrustedCertificateDetail })),
+);
+const TrustedCertificatesList = lazy(() =>
+    import('./_pages/trusted-certificates/list/TrustedCertificateList').then((m) => ({ default: m.TrustedCertificatesList })),
+);
+
+const AcmeAccountDetail = lazy(() => import('./_pages/acme-accounts/detail'));
+const AcmeAccountsList = lazy(() => import('./_pages/acme-accounts/list'));
+
+const AcmeProfileDetail = lazy(() => import('./_pages/acme-profiles/detail'));
+const AcmeProfilesList = lazy(() => import('./_pages/acme-profiles/list'));
+
+const AuthorityDetail = lazy(() => import('./_pages/authorities/detail'));
+const AuthoritiesList = lazy(() => import('./_pages/authorities/list'));
+const AuthorityForm = lazy(() => import('./_pages/authorities/form'));
+
+const CertificateDetail = lazy(() => import('./_pages/certificates/detail'));
+const CertificateEdit = lazy(() => import('./_pages/certificates/form'));
+const CertificatesList = lazy(() => import('./_pages/certificates/list'));
+
+const ComplianceProfileDetail = lazy(() => import('./_pages/compliance-profiles/detail'));
+const ComplianceProfilesList = lazy(() => import('./_pages/compliance-profiles/list'));
+
+const ConnectorDetail = lazy(() => import('./_pages/connectors/detail'));
+const ConnectorsList = lazy(() => import('./_pages/connectors/list'));
+
+const ProxyDetail = lazy(() => import('./_pages/proxies/detail/ProxyDetail').then((m) => ({ default: m.ProxyDetail })));
+const ProxiesList = lazy(() => import('./_pages/proxies/list/ProxiesList').then((m) => ({ default: m.ProxiesList })));
+
+const ApprovalProfileDetails = lazy(() => import('./_pages/approval-profiles/detail'));
+const ApprovalProfiles = lazy(() => import('./_pages/approval-profiles/list'));
+
+const ApprovalDetails = lazy(() => import('./_pages/approvals/details'));
+const ApprovalsList = lazy(() => import('./_pages/approvals/list'));
+
+const CredentialDetail = lazy(() => import('./_pages/credentials/detail'));
+const CredentialsList = lazy(() => import('./_pages/credentials/list'));
+
+const CryptographicKeyDetail = lazy(() => import('./_pages/cryptographic-keys/detail'));
+const CryptographicKeyList = lazy(() => import('./_pages/cryptographic-keys/list'));
+const SecretsList = lazy(() => import('./_pages/secrets/list'));
+const SecretDetail = lazy(() => import('./_pages/secrets/detail'));
+
+const CustomAttributesDetail = lazy(() => import('./_pages/custom-attributes/detail'));
+const CustomAttributesList = lazy(() => import('./_pages/custom-attributes/list'));
+
+const DiscoveryDetail = lazy(() => import('./_pages/discoveries/detail'));
+const DiscoveriesList = lazy(() => import('./_pages/discoveries/list'));
+
+const EntityDetail = lazy(() => import('./_pages/entities/detail'));
+const EntitiesList = lazy(() => import('./_pages/entities/list'));
+
+const ScepProfileDetail = lazy(() => import('./_pages/scep-profiles/detail'));
+const ScepProfilesList = lazy(() => import('./_pages/scep-profiles/list'));
+
+const CmpProfileDetails = lazy(() => import('./_pages/cmp-profiles/details'));
+const CmpProfilesList = lazy(() => import('./_pages/cmp-profiles/list'));
+
+const TspProfileDetail = lazy(() => import('./_pages/tsp-profiles/detail/TspProfileDetail').then((m) => ({ default: m.TspProfileDetail })));
+const TspProfileForm = lazy(() => import('./_pages/tsp-profiles/form/TspProfileForm').then((m) => ({ default: m.TspProfileForm })));
+const TspProfilesList = lazy(() => import('./_pages/tsp-profiles/list/TspProfilesList').then((m) => ({ default: m.TspProfilesList })));
+
+const TimeQualityConfigurationDetail = lazy(() =>
+    import('./_pages/time-quality-configurations/detail/TimeQualityConfigurationDetail').then((m) => ({
+        default: m.TimeQualityConfigurationDetail,
+    })),
+);
+const TimeQualityConfigurationForm = lazy(() =>
+    import('./_pages/time-quality-configurations/form/TimeQualityConfigurationForm').then((m) => ({
+        default: m.TimeQualityConfigurationForm,
+    })),
+);
+const TimeQualityConfigurationsList = lazy(() =>
+    import('./_pages/time-quality-configurations/list/TimeQualityConfigurationsList').then((m) => ({
+        default: m.TimeQualityConfigurationsList,
+    })),
+);
+
+const GlobalMetadataDetail = lazy(() => import('./_pages/global-metadata/detail'));
+const GlobalMetadataList = lazy(() => import('./_pages/global-metadata/list'));
+
+const GroupDetail = lazy(() => import('./_pages/group/detail'));
+const GroupList = lazy(() => import('./_pages/group/list'));
+
+const LocationDetail = lazy(() => import('./_pages/locations/detail'));
+const LocationsList = lazy(() => import('./_pages/locations/list'));
+
+const RaProfileDetail = lazy(() => import('./_pages/ra-profiles/detail'));
+const RaProfilesList = lazy(() => import('./_pages/ra-profiles/list'));
+
+const PlatformSettingsDetail = lazy(() => import('./_pages/platform-settings/detail'));
+
+const RoleDetail = lazy(() => import('./_pages/roles/detail'));
+const RolesList = lazy(() => import('./_pages/roles/list'));
+const RolePermissions = lazy(() => import('./_pages/roles/RolePermissionsForm'));
+
+const TokenProfileDetail = lazy(() => import('./_pages/token-profiles/detail'));
+const TokenProfileList = lazy(() => import('./_pages/token-profiles/list'));
+
+const TokenDetail = lazy(() => import('./_pages/tokens/detail'));
+const TokenList = lazy(() => import('./_pages/tokens/list'));
+
+const UserProfileDetail = lazy(() => import('./_pages/user-profile/detail'));
+
+const UserDetail = lazy(() => import('./_pages/users/detail'));
+const UsersList = lazy(() => import('./_pages/users/list'));
+
+const NotificationsList = lazy(() => import('./_pages/notifications/list'));
+const NotificationInstanceDetail = lazy(() => import('./_pages/notifications/notification-instance-details'));
+const EventsSettings = lazy(() => import('./_pages/notifications/events-settings'));
+
+const NotificationProfileDetail = lazy(() => import('./_pages/notifications/notification-profiles/detail'));
+const NotificationProfilesList = lazy(() => import('./_pages/notifications/notification-profiles/list'));
+
+const ConditionDetails = lazy(() => import('./_pages/conditions/details'));
+
+const ExecutionDetails = lazy(() => import('./_pages/executions/details'));
+const ExecutionForm = lazy(() => import('./_pages/executions/form'));
+
+const ActionDetails = lazy(() => import('./_pages/actions/detail'));
+const ActionsList = lazy(() => import('./_pages/actions/list'));
+
+const TriggerDetails = lazy(() => import('./_pages/triggers/details'));
+const TriggerList = lazy(() => import('./_pages/triggers/list'));
+
+const RuleDetails = lazy(() => import('./_pages/rules/detail'));
+const RulesList = lazy(() => import('./_pages/rules/list'));
+
+const SchedulerJobDetail = lazy(() => import('./_pages/scheduler/detail'));
+const SchedulerJobsList = lazy(() => import('./_pages/scheduler/list'));
+
+const CustomOIDList = lazy(() => import('components/_pages/custom-oid/list'));
+const CustomOIDDetail = lazy(() => import('components/_pages/custom-oid/detail'));
+
+const VaultsList = lazy(() => import('./_pages/vaults/list'));
+const VaultDetail = lazy(() => import('./_pages/vaults/detail'));
+const VaultProfilesList = lazy(() => import('./_pages/vault-profiles/list'));
+const VaultProfileDetail = lazy(() => import('./_pages/vault-profiles/detail'));
+
+const SigningProfilesList = lazy(() => import('./_pages/signing-profiles/list/SigningProfilesList'));
+const SigningProfileForm = lazy(() => import('./_pages/signing-profiles/form/SigningProfileForm'));
+const SigningProfileDetail = lazy(() => import('./_pages/signing-profiles/detail/SigningProfileDetail'));
+
+const CbomsList = lazy(() => import('./_pages/cboms/list'));
+const CbomDetail = lazy(() => import('components/_pages/cboms/detail'));
+const CbomVersionsHistory = lazy(() => import('components/_pages/cboms/versions'));
+
+const RouteFallback = () => <Spinner size="xl" />;
 
 export default function AppRouter() {
     const profile = useSelector(selectors.profile);
@@ -446,10 +466,12 @@ export default function AppRouter() {
         <HashRouter>
             <AppRedirect />
 
-            <Routes>
-                <Route path="/login" element={<Login />} />
-                {profile ? appRoutes : <Route path="*" element={<Spinner size="xl" />} />}
-            </Routes>
+            <Suspense fallback={<RouteFallback />}>
+                <Routes>
+                    <Route path="/login" element={<Login />} />
+                    {profile ? appRoutes : <Route path="*" element={<Spinner size="xl" />} />}
+                </Routes>
+            </Suspense>
         </HashRouter>
     );
 }

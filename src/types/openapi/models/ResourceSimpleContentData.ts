@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeResource,
-    ResponseAttribute,
-} from './';
+import type { AttributeResource, ResponseAttribute } from './';
 
 /**
  * Content data for resource object defined by its attributes
@@ -47,5 +44,3 @@ export interface ResourceSimpleContentData {
      */
     attributes?: Array<ResponseAttribute>;
 }
-
-

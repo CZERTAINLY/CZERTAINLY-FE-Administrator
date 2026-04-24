@@ -1,5 +1,5 @@
-import { TokenInstanceDetailDto, TokenInstanceDto, TokenInstanceStatusDetailDto } from 'types/openapi';
-import {
+import type { TokenInstanceDetailDto, TokenInstanceDto, TokenInstanceStatusDetailDto } from 'types/openapi';
+import type {
     TokenDetailResponseModel,
     TokenInstanceStatusComponentResponseDto,
     TokenInstanceStatusComponentResponseModel,

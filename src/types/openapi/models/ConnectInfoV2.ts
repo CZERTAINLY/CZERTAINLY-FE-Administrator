@@ -11,11 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ConnectorInfo,
-    ConnectorInterfaceInfo,
-    ConnectorVersion,
-} from './';
+import type { ConnectorInfo, ConnectorInterfaceInfo, ConnectorVersion } from './';
 
 /**
  * @export
@@ -53,5 +49,3 @@ export interface ConnectInfoV2 {
      */
     interfaces: Array<ConnectorInterfaceInfo>;
 }
-
-

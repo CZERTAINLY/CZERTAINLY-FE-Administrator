@@ -21,5 +21,5 @@ export interface CbomUploadRequestDto {
      * @type {{ [key: string]: any; }}
      * @memberof CbomUploadRequestDto
      */
-    content: { [key: string]: any; };
+    content: { [key: string]: any };
 }

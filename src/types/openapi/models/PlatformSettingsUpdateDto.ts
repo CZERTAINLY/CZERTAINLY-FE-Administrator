@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CertificateSettingsUpdateDto,
-    UtilsSettingsDto,
-} from './';
+import type { CertificateSettingsUpdateDto, UtilsSettingsDto } from './';
 
 /**
  * @export

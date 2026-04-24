@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -21,6 +21,5 @@ export enum AttributeType {
     Group = 'group',
     Info = 'info',
     Meta = 'meta',
-    Custom = 'custom'
+    Custom = 'custom',
 }
-

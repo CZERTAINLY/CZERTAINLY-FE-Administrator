@@ -11,12 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    DiscoveryStatus,
-    MetadataResponseDto,
-    ResponseAttribute,
-    TriggerDto,
-} from './';
+import type { DiscoveryStatus, MetadataResponseDto, ResponseAttribute, TriggerDto } from './';
 
 /**
  * @export
@@ -120,5 +115,3 @@ export interface DiscoveryHistoryDetailDto {
      */
     triggers: Array<TriggerDto>;
 }
-
-

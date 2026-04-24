@@ -1,5 +1,5 @@
 import Badge from 'components/Badge';
-import { ProxyStatus } from 'types/openapi';
+import type { ProxyStatus } from 'types/openapi';
 import { getProxyStatusColor, getProxyStatus } from 'utils/proxy';
 
 interface ProxyStatusBadgeProps {

@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    SchedulerJobExecutionStatus,
-} from './';
+import type { SchedulerJobExecutionStatus } from './';
 
 /**
  * @export
@@ -79,5 +77,3 @@ export interface ScheduledJobDetailDto {
      */
     objectData?: any | null;
 }
-
-

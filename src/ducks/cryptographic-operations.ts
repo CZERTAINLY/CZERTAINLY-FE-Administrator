@@ -1,6 +1,6 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AttributeDescriptorModel } from 'types/attributes';
-import {
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { AttributeDescriptorModel } from 'types/attributes';
+import type {
     CryptographicKeyRandomDataRequestModel,
     CryptographicKeyRandomDataResponseModel,
     CryptographicKeySignDataRequestModel,
@@ -8,7 +8,7 @@ import {
     CryptographicKeyVerifyDataRequestModel,
     CryptographicKeyVerifyResponseModel,
 } from 'types/cryptographic-operations';
-import { KeyAlgorithm } from 'types/openapi';
+import type { KeyAlgorithm } from 'types/openapi';
 import { downloadFile } from 'utils/download';
 
 export type State = {
@@ -53,7 +53,7 @@ export const slice = createSlice({
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
             Object.keys(state).forEach((key) => {
-                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+                if (!Object.hasOwn(initialState, key)) (state as any)[key] = undefined;
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));

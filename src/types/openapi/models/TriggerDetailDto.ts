@@ -11,13 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ActionDetailDto,
-    Resource,
-    ResourceEvent,
-    RuleDetailDto,
-    TriggerType,
-} from './';
+import type { ActionDetailDto, Resource, ResourceEvent, RuleDetailDto, TriggerType } from './';
 
 /**
  * @export
@@ -79,5 +73,3 @@ export interface TriggerDetailDto {
      */
     actions: Array<ActionDetailDto>;
 }
-
-

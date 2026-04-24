@@ -1,7 +1,7 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ComplianceProfileListModel } from 'types/complianceProfiles';
-import { BulkActionModel } from 'types/connectors';
-import {
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { ComplianceProfileListModel } from 'types/complianceProfiles';
+import type { BulkActionModel } from 'types/connectors';
+import type {
     ComplianceCheckResultDto,
     ComplianceGroupListDto,
     ComplianceInternalRuleRequestDto,
@@ -14,7 +14,7 @@ import {
     Resource,
     ResourceObjectDto,
 } from 'types/openapi';
-import { AppState } from 'ducks';
+import type { AppState } from 'ducks';
 
 export type State = {
     checkedRows: string[];
@@ -109,7 +109,7 @@ export const slice = createSlice({
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
             Object.keys(state).forEach((key) => {
-                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+                if (!Object.hasOwn(initialState, key)) (state as any)[key] = undefined;
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));

@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import * as ReactHookForm from 'react-hook-form';
 import { AttributeFieldSelect } from './AttributeFieldSelect';
 import type { DataAttributeModel } from 'types/attributes';
@@ -29,8 +29,18 @@ export function AttributeFieldSelectTestWrapper({
         },
     });
 
-    const onSelectChangeMulti = (fieldOnChange: (v: unknown) => void) => (newValue: unknown) => fieldOnChange(newValue);
-    const onSelectChangeSingle = (fieldOnChange: (v: unknown) => void) => (newValue: unknown) => fieldOnChange(newValue);
+    const onSelectChangeMulti = (fieldOnChange: (v: unknown) => void) => (newValue: unknown) => {
+        if (Array.isArray(newValue) && newValue.some((v: any) => v.value === '__add_new__')) {
+            const filtered = newValue.filter((v: any) => v.value !== '__add_new__');
+            fieldOnChange(filtered.length > 0 ? filtered : undefined);
+            return;
+        }
+        fieldOnChange(newValue);
+    };
+    const onSelectChangeSingle = (fieldOnChange: (v: unknown) => void) => (newValue: unknown) => {
+        if (newValue === '__add_new__') return; // simulate production: modal opens, field unchanged
+        fieldOnChange(newValue);
+    };
 
     return (
         <ReactHookForm.FormProvider {...methods}>

@@ -245,7 +245,7 @@ export interface CertificateDetailDto {
      * @type {{ [key: string]: Array<string>; }}
      * @memberof CertificateDetailDto
      */
-    subjectAlternativeNames?: { [key: string]: Array<string>; };
+    subjectAlternativeNames?: { [key: string]: Array<string> };
     /**
      * Locations associated to the Certificate
      * @type {Array<LocationDto>}
@@ -319,5 +319,3 @@ export interface CertificateDetailDto {
      */
     qcStatements?: CertificateQcStatementsDto;
 }
-
-

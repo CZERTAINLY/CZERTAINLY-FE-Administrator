@@ -1,4 +1,4 @@
-import {
+import type {
     AcmeAccountListResponseDto as AcmeAccountListResponseDtoOpenApi,
     AcmeAccountResponseDto as AcmeAccountResponseDtoOpenApi,
 } from './openapi';

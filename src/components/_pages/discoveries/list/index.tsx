@@ -8,15 +8,15 @@ import { actions, selectors } from 'ducks/discoveries';
 import { EntityType } from 'ducks/filters';
 import { dateFormatter, durationFormatter } from 'utils/dateUtil';
 
-import { ApiClients } from '../../../../api';
-import { TableDataRow, TableHeader } from 'components/CustomTable';
+import type { ApiClients } from '../../../../api';
+import type { TableDataRow, TableHeader } from 'components/CustomTable';
 import PagedList from 'components/PagedList/PagedList';
-import { SearchRequestModel } from 'types/certificate';
+import type { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import DiscoveryStatus from '../DiscoveryStatus';
 import Dialog from 'components/Dialog';
 import DiscoveryForm from '../form';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 
 function DiscoveryList() {

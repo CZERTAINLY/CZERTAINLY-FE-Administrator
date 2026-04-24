@@ -11,14 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ConnectInfoV1,
-    ConnectInfoV2,
-    ConnectorInfo,
-    ConnectorInterfaceInfo,
-    ConnectorVersion,
-    FunctionGroupDto,
-} from './';
+import type { ConnectInfoV1, ConnectInfoV2, ConnectorInfo, ConnectorInterfaceInfo, ConnectorVersion, FunctionGroupDto } from './';
 
 /**
  * @type ConnectInfoDto

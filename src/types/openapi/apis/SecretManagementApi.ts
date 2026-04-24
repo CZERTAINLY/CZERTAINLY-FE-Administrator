@@ -89,13 +89,18 @@ export interface UpdateSecretObjectsRequest {
  * no description
  */
 export class SecretManagementApi extends BaseAPI {
-
     /**
      * Add vault profile to secret
      */
-    addVaultProfileToSecret({ uuid, vaultProfileUuid, requestAttribute }: AddVaultProfileToSecretRequest): Observable<void>
-    addVaultProfileToSecret({ uuid, vaultProfileUuid, requestAttribute }: AddVaultProfileToSecretRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    addVaultProfileToSecret({ uuid, vaultProfileUuid, requestAttribute }: AddVaultProfileToSecretRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    addVaultProfileToSecret({ uuid, vaultProfileUuid, requestAttribute }: AddVaultProfileToSecretRequest): Observable<void>;
+    addVaultProfileToSecret(
+        { uuid, vaultProfileUuid, requestAttribute }: AddVaultProfileToSecretRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    addVaultProfileToSecret(
+        { uuid, vaultProfileUuid, requestAttribute }: AddVaultProfileToSecretRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'addVaultProfileToSecret');
         throwIfNullOrUndefined(vaultProfileUuid, 'vaultProfileUuid', 'addVaultProfileToSecret');
         throwIfNullOrUndefined(requestAttribute, 'requestAttribute', 'addVaultProfileToSecret');
@@ -104,20 +109,31 @@ export class SecretManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>({
-            url: '/v1/secrets/{uuid}/syncVaultProfiles/{vaultProfileUuid}'.replace('{uuid}', encodeURI(uuid)).replace('{vaultProfileUuid}', encodeURI(vaultProfileUuid)),
-            method: 'PATCH',
-            headers,
-            body: requestAttribute,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/secrets/{uuid}/syncVaultProfiles/{vaultProfileUuid}'
+                    .replace('{uuid}', encodeURI(uuid))
+                    .replace('{vaultProfileUuid}', encodeURI(vaultProfileUuid)),
+                method: 'PATCH',
+                headers,
+                body: requestAttribute,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Create a new secret
      */
-    createSecret({ vaultProfileUuid, vaultUuid, secretRequestDto }: CreateSecretRequest): Observable<SecretDetailDto>
-    createSecret({ vaultProfileUuid, vaultUuid, secretRequestDto }: CreateSecretRequest, opts?: OperationOpts): Observable<AjaxResponse<SecretDetailDto>>
-    createSecret({ vaultProfileUuid, vaultUuid, secretRequestDto }: CreateSecretRequest, opts?: OperationOpts): Observable<SecretDetailDto | AjaxResponse<SecretDetailDto>> {
+    createSecret({ vaultProfileUuid, vaultUuid, secretRequestDto }: CreateSecretRequest): Observable<SecretDetailDto>;
+    createSecret(
+        { vaultProfileUuid, vaultUuid, secretRequestDto }: CreateSecretRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<SecretDetailDto>>;
+    createSecret(
+        { vaultProfileUuid, vaultUuid, secretRequestDto }: CreateSecretRequest,
+        opts?: OperationOpts,
+    ): Observable<SecretDetailDto | AjaxResponse<SecretDetailDto>> {
         throwIfNullOrUndefined(vaultProfileUuid, 'vaultProfileUuid', 'createSecret');
         throwIfNullOrUndefined(vaultUuid, 'vaultUuid', 'createSecret');
         throwIfNullOrUndefined(secretRequestDto, 'secretRequestDto', 'createSecret');
@@ -126,151 +142,202 @@ export class SecretManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<SecretDetailDto>({
-            url: '/v1/vaults/{vaultUuid}/vaultProfiles/{vaultProfileUuid}/secrets'.replace('{vaultProfileUuid}', encodeURI(vaultProfileUuid)).replace('{vaultUuid}', encodeURI(vaultUuid)),
-            method: 'POST',
-            headers,
-            body: secretRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<SecretDetailDto>(
+            {
+                url: '/v1/vaults/{vaultUuid}/vaultProfiles/{vaultProfileUuid}/secrets'
+                    .replace('{vaultProfileUuid}', encodeURI(vaultProfileUuid))
+                    .replace('{vaultUuid}', encodeURI(vaultUuid)),
+                method: 'POST',
+                headers,
+                body: secretRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Delete a secret
      */
-    deleteSecret({ uuid }: DeleteSecretRequest): Observable<void>
-    deleteSecret({ uuid }: DeleteSecretRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    deleteSecret({ uuid }: DeleteSecretRequest): Observable<void>;
+    deleteSecret({ uuid }: DeleteSecretRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteSecret({ uuid }: DeleteSecretRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'deleteSecret');
 
-        return this.request<void>({
-            url: '/v1/secrets/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'DELETE',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/secrets/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Disable a secret
      */
-    disableSecret({ uuid }: DisableSecretRequest): Observable<void>
-    disableSecret({ uuid }: DisableSecretRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    disableSecret({ uuid }: DisableSecretRequest): Observable<void>;
+    disableSecret({ uuid }: DisableSecretRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     disableSecret({ uuid }: DisableSecretRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'disableSecret');
 
-        return this.request<void>({
-            url: '/v1/secrets/{uuid}/disable'.replace('{uuid}', encodeURI(uuid)),
-            method: 'PATCH',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/secrets/{uuid}/disable'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Enable a secret
      */
-    enableSecret({ uuid }: EnableSecretRequest): Observable<void>
-    enableSecret({ uuid }: EnableSecretRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    enableSecret({ uuid }: EnableSecretRequest): Observable<void>;
+    enableSecret({ uuid }: EnableSecretRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     enableSecret({ uuid }: EnableSecretRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'enableSecret');
 
-        return this.request<void>({
-            url: '/v1/secrets/{uuid}/enable'.replace('{uuid}', encodeURI(uuid)),
-            method: 'PATCH',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/secrets/{uuid}/enable'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get secret content
      */
-    getSecretContent({ uuid }: GetSecretContentRequest): Observable<SecretContent>
-    getSecretContent({ uuid }: GetSecretContentRequest, opts?: OperationOpts): Observable<AjaxResponse<SecretContent>>
+    getSecretContent({ uuid }: GetSecretContentRequest): Observable<SecretContent>;
+    getSecretContent({ uuid }: GetSecretContentRequest, opts?: OperationOpts): Observable<AjaxResponse<SecretContent>>;
     getSecretContent({ uuid }: GetSecretContentRequest, opts?: OperationOpts): Observable<SecretContent | AjaxResponse<SecretContent>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getSecretContent');
 
-        return this.request<SecretContent>({
-            url: '/v1/secrets/{uuid}/content'.replace('{uuid}', encodeURI(uuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<SecretContent>(
+            {
+                url: '/v1/secrets/{uuid}/content'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get secret details
      */
-    getSecretDetails({ uuid }: GetSecretDetailsRequest): Observable<SecretDetailDto>
-    getSecretDetails({ uuid }: GetSecretDetailsRequest, opts?: OperationOpts): Observable<AjaxResponse<SecretDetailDto>>
+    getSecretDetails({ uuid }: GetSecretDetailsRequest): Observable<SecretDetailDto>;
+    getSecretDetails({ uuid }: GetSecretDetailsRequest, opts?: OperationOpts): Observable<AjaxResponse<SecretDetailDto>>;
     getSecretDetails({ uuid }: GetSecretDetailsRequest, opts?: OperationOpts): Observable<SecretDetailDto | AjaxResponse<SecretDetailDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getSecretDetails');
 
-        return this.request<SecretDetailDto>({
-            url: '/v1/secrets/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<SecretDetailDto>(
+            {
+                url: '/v1/secrets/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List search filters for secrets
      */
-    getSecretSearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>
-    getSecretSearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
-    getSecretSearchableFields(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
-        return this.request<Array<SearchFieldDataByGroupDto>>({
-            url: '/v1/secrets/search',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+    getSecretSearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>;
+    getSecretSearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>;
+    getSecretSearchableFields(
+        opts?: OperationOpts,
+    ): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
+        return this.request<Array<SearchFieldDataByGroupDto>>(
+            {
+                url: '/v1/secrets/search',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get secret versions
      */
-    getSecretVersions({ uuid }: GetSecretVersionsRequest): Observable<Array<SecretVersionDto>>
-    getSecretVersions({ uuid }: GetSecretVersionsRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<SecretVersionDto>>>
-    getSecretVersions({ uuid }: GetSecretVersionsRequest, opts?: OperationOpts): Observable<Array<SecretVersionDto> | AjaxResponse<Array<SecretVersionDto>>> {
+    getSecretVersions({ uuid }: GetSecretVersionsRequest): Observable<Array<SecretVersionDto>>;
+    getSecretVersions({ uuid }: GetSecretVersionsRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<SecretVersionDto>>>;
+    getSecretVersions(
+        { uuid }: GetSecretVersionsRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<SecretVersionDto> | AjaxResponse<Array<SecretVersionDto>>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getSecretVersions');
 
-        return this.request<Array<SecretVersionDto>>({
-            url: '/v1/secrets/{uuid}/versions'.replace('{uuid}', encodeURI(uuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<SecretVersionDto>>(
+            {
+                url: '/v1/secrets/{uuid}/versions'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List secrets
      */
-    listSecrets({ searchRequestDto }: ListSecretsRequest): Observable<PaginationResponseDtoSecretDto>
-    listSecrets({ searchRequestDto }: ListSecretsRequest, opts?: OperationOpts): Observable<AjaxResponse<PaginationResponseDtoSecretDto>>
-    listSecrets({ searchRequestDto }: ListSecretsRequest, opts?: OperationOpts): Observable<PaginationResponseDtoSecretDto | AjaxResponse<PaginationResponseDtoSecretDto>> {
+    listSecrets({ searchRequestDto }: ListSecretsRequest): Observable<PaginationResponseDtoSecretDto>;
+    listSecrets({ searchRequestDto }: ListSecretsRequest, opts?: OperationOpts): Observable<AjaxResponse<PaginationResponseDtoSecretDto>>;
+    listSecrets(
+        { searchRequestDto }: ListSecretsRequest,
+        opts?: OperationOpts,
+    ): Observable<PaginationResponseDtoSecretDto | AjaxResponse<PaginationResponseDtoSecretDto>> {
         throwIfNullOrUndefined(searchRequestDto, 'searchRequestDto', 'listSecrets');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<PaginationResponseDtoSecretDto>({
-            url: '/v1/secrets',
-            method: 'POST',
-            headers,
-            body: searchRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<PaginationResponseDtoSecretDto>(
+            {
+                url: '/v1/secrets',
+                method: 'POST',
+                headers,
+                body: searchRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Remove vault profile from secret
      */
-    removeVaultProfileFromSecret({ uuid, vaultProfileUuid }: RemoveVaultProfileFromSecretRequest): Observable<void>
-    removeVaultProfileFromSecret({ uuid, vaultProfileUuid }: RemoveVaultProfileFromSecretRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    removeVaultProfileFromSecret({ uuid, vaultProfileUuid }: RemoveVaultProfileFromSecretRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    removeVaultProfileFromSecret({ uuid, vaultProfileUuid }: RemoveVaultProfileFromSecretRequest): Observable<void>;
+    removeVaultProfileFromSecret(
+        { uuid, vaultProfileUuid }: RemoveVaultProfileFromSecretRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    removeVaultProfileFromSecret(
+        { uuid, vaultProfileUuid }: RemoveVaultProfileFromSecretRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'removeVaultProfileFromSecret');
         throwIfNullOrUndefined(vaultProfileUuid, 'vaultProfileUuid', 'removeVaultProfileFromSecret');
 
-        return this.request<void>({
-            url: '/v1/secrets/{uuid}/syncVaultProfiles/{vaultProfileUuid}'.replace('{uuid}', encodeURI(uuid)).replace('{vaultProfileUuid}', encodeURI(vaultProfileUuid)),
-            method: 'DELETE',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/secrets/{uuid}/syncVaultProfiles/{vaultProfileUuid}'
+                    .replace('{uuid}', encodeURI(uuid))
+                    .replace('{vaultProfileUuid}', encodeURI(vaultProfileUuid)),
+                method: 'DELETE',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Update an existing secret
      */
-    updateSecret({ uuid, secretUpdateRequestDto }: UpdateSecretRequest): Observable<SecretDetailDto>
-    updateSecret({ uuid, secretUpdateRequestDto }: UpdateSecretRequest, opts?: OperationOpts): Observable<AjaxResponse<SecretDetailDto>>
-    updateSecret({ uuid, secretUpdateRequestDto }: UpdateSecretRequest, opts?: OperationOpts): Observable<SecretDetailDto | AjaxResponse<SecretDetailDto>> {
+    updateSecret({ uuid, secretUpdateRequestDto }: UpdateSecretRequest): Observable<SecretDetailDto>;
+    updateSecret({ uuid, secretUpdateRequestDto }: UpdateSecretRequest, opts?: OperationOpts): Observable<AjaxResponse<SecretDetailDto>>;
+    updateSecret(
+        { uuid, secretUpdateRequestDto }: UpdateSecretRequest,
+        opts?: OperationOpts,
+    ): Observable<SecretDetailDto | AjaxResponse<SecretDetailDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'updateSecret');
         throwIfNullOrUndefined(secretUpdateRequestDto, 'secretUpdateRequestDto', 'updateSecret');
 
@@ -278,20 +345,29 @@ export class SecretManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<SecretDetailDto>({
-            url: '/v1/secrets/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'PUT',
-            headers,
-            body: secretUpdateRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<SecretDetailDto>(
+            {
+                url: '/v1/secrets/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PUT',
+                headers,
+                body: secretUpdateRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Update Secret Objects
      */
-    updateSecretObjects({ uuid, secretUpdateObjectsDto }: UpdateSecretObjectsRequest): Observable<void>
-    updateSecretObjects({ uuid, secretUpdateObjectsDto }: UpdateSecretObjectsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    updateSecretObjects({ uuid, secretUpdateObjectsDto }: UpdateSecretObjectsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    updateSecretObjects({ uuid, secretUpdateObjectsDto }: UpdateSecretObjectsRequest): Observable<void>;
+    updateSecretObjects(
+        { uuid, secretUpdateObjectsDto }: UpdateSecretObjectsRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    updateSecretObjects(
+        { uuid, secretUpdateObjectsDto }: UpdateSecretObjectsRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'updateSecretObjects');
         throwIfNullOrUndefined(secretUpdateObjectsDto, 'secretUpdateObjectsDto', 'updateSecretObjects');
 
@@ -299,12 +375,14 @@ export class SecretManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>({
-            url: '/v1/secrets/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'PATCH',
-            headers,
-            body: secretUpdateObjectsDto,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<void>(
+            {
+                url: '/v1/secrets/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
+                headers,
+                body: secretUpdateObjectsDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

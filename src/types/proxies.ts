@@ -1,4 +1,4 @@
-import {
+import type {
     ProxyDto,
     ProxyListDto as ProxyListDtoOpenApi,
     ProxyRequestDto as ProxyRequestDtoOpenApi,

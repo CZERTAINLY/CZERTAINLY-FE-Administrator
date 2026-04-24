@@ -32,6 +32,5 @@ export enum ActuatorHealthDtoStatusEnum {
     Unknown = 'UNKNOWN',
     Up = 'UP',
     Down = 'DOWN',
-    OutOfService = 'OUT_OF_SERVICE'
+    OutOfService = 'OUT_OF_SERVICE',
 }
-

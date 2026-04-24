@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeConstraintType,
-} from './';
+import type { AttributeConstraintType } from './';
 
 /**
  * RegExp attribute constraint to restrict string value by regular expression
@@ -46,5 +44,3 @@ export interface RegexpAttributeConstraint {
      */
     data?: string;
 }
-
-

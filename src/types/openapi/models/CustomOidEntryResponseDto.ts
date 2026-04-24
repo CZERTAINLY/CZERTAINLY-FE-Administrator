@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    OidCategory,
-} from './';
+import type { OidCategory } from './';
 
 /**
  * @export
@@ -45,5 +43,3 @@ export interface CustomOidEntryResponseDto {
      */
     category: OidCategory;
 }
-
-

@@ -55,67 +55,90 @@ export interface ListCustomOidEntriesRequest {
  * no description
  */
 export class CustomOIDManagementApi extends BaseAPI {
-
     /**
      * Bulk delete customOID entries
      */
-    bulkDeleteCustomOidEntry({ requestBody }: BulkDeleteCustomOidEntryRequest): Observable<void>
-    bulkDeleteCustomOidEntry({ requestBody }: BulkDeleteCustomOidEntryRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    bulkDeleteCustomOidEntry({ requestBody }: BulkDeleteCustomOidEntryRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    bulkDeleteCustomOidEntry({ requestBody }: BulkDeleteCustomOidEntryRequest): Observable<void>;
+    bulkDeleteCustomOidEntry({ requestBody }: BulkDeleteCustomOidEntryRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
+    bulkDeleteCustomOidEntry(
+        { requestBody }: BulkDeleteCustomOidEntryRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDeleteCustomOidEntry');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>({
-            url: '/v1/oids',
-            method: 'DELETE',
-            headers,
-            body: requestBody,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/oids',
+                method: 'DELETE',
+                headers,
+                body: requestBody,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Create a new custom OID entry
      */
-    createCustomOidEntry({ customOidEntryRequestDto }: CreateCustomOidEntryRequest): Observable<CustomOidEntryDetailResponseDto>
-    createCustomOidEntry({ customOidEntryRequestDto }: CreateCustomOidEntryRequest, opts?: OperationOpts): Observable<AjaxResponse<CustomOidEntryDetailResponseDto>>
-    createCustomOidEntry({ customOidEntryRequestDto }: CreateCustomOidEntryRequest, opts?: OperationOpts): Observable<CustomOidEntryDetailResponseDto | AjaxResponse<CustomOidEntryDetailResponseDto>> {
+    createCustomOidEntry({ customOidEntryRequestDto }: CreateCustomOidEntryRequest): Observable<CustomOidEntryDetailResponseDto>;
+    createCustomOidEntry(
+        { customOidEntryRequestDto }: CreateCustomOidEntryRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<CustomOidEntryDetailResponseDto>>;
+    createCustomOidEntry(
+        { customOidEntryRequestDto }: CreateCustomOidEntryRequest,
+        opts?: OperationOpts,
+    ): Observable<CustomOidEntryDetailResponseDto | AjaxResponse<CustomOidEntryDetailResponseDto>> {
         throwIfNullOrUndefined(customOidEntryRequestDto, 'customOidEntryRequestDto', 'createCustomOidEntry');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<CustomOidEntryDetailResponseDto>({
-            url: '/v1/oids',
-            method: 'POST',
-            headers,
-            body: customOidEntryRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<CustomOidEntryDetailResponseDto>(
+            {
+                url: '/v1/oids',
+                method: 'POST',
+                headers,
+                body: customOidEntryRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Delete a custom OID entry by OID
      */
-    deleteCustomOidEntry({ oid }: DeleteCustomOidEntryRequest): Observable<void>
-    deleteCustomOidEntry({ oid }: DeleteCustomOidEntryRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    deleteCustomOidEntry({ oid }: DeleteCustomOidEntryRequest): Observable<void>;
+    deleteCustomOidEntry({ oid }: DeleteCustomOidEntryRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteCustomOidEntry({ oid }: DeleteCustomOidEntryRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(oid, 'oid', 'deleteCustomOidEntry');
 
-        return this.request<void>({
-            url: '/v1/oids/{oid}'.replace('{oid}', encodeURI(oid)),
-            method: 'DELETE',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/oids/{oid}'.replace('{oid}', encodeURI(oid)),
+                method: 'DELETE',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Edit an existing custom OID entry
      */
-    editCustomOidEntry({ oid, customOidEntryUpdateRequestDto }: EditCustomOidEntryRequest): Observable<CustomOidEntryDetailResponseDto>
-    editCustomOidEntry({ oid, customOidEntryUpdateRequestDto }: EditCustomOidEntryRequest, opts?: OperationOpts): Observable<AjaxResponse<CustomOidEntryDetailResponseDto>>
-    editCustomOidEntry({ oid, customOidEntryUpdateRequestDto }: EditCustomOidEntryRequest, opts?: OperationOpts): Observable<CustomOidEntryDetailResponseDto | AjaxResponse<CustomOidEntryDetailResponseDto>> {
+    editCustomOidEntry({ oid, customOidEntryUpdateRequestDto }: EditCustomOidEntryRequest): Observable<CustomOidEntryDetailResponseDto>;
+    editCustomOidEntry(
+        { oid, customOidEntryUpdateRequestDto }: EditCustomOidEntryRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<CustomOidEntryDetailResponseDto>>;
+    editCustomOidEntry(
+        { oid, customOidEntryUpdateRequestDto }: EditCustomOidEntryRequest,
+        opts?: OperationOpts,
+    ): Observable<CustomOidEntryDetailResponseDto | AjaxResponse<CustomOidEntryDetailResponseDto>> {
         throwIfNullOrUndefined(oid, 'oid', 'editCustomOidEntry');
         throwIfNullOrUndefined(customOidEntryUpdateRequestDto, 'customOidEntryUpdateRequestDto', 'editCustomOidEntry');
 
@@ -123,58 +146,80 @@ export class CustomOIDManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<CustomOidEntryDetailResponseDto>({
-            url: '/v1/oids/{oid}'.replace('{oid}', encodeURI(oid)),
-            method: 'PUT',
-            headers,
-            body: customOidEntryUpdateRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<CustomOidEntryDetailResponseDto>(
+            {
+                url: '/v1/oids/{oid}'.replace('{oid}', encodeURI(oid)),
+                method: 'PUT',
+                headers,
+                body: customOidEntryUpdateRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get custom OID entry by OID
      */
-    getCustomOidEntry({ oid }: GetCustomOidEntryRequest): Observable<CustomOidEntryDetailResponseDto>
-    getCustomOidEntry({ oid }: GetCustomOidEntryRequest, opts?: OperationOpts): Observable<AjaxResponse<CustomOidEntryDetailResponseDto>>
-    getCustomOidEntry({ oid }: GetCustomOidEntryRequest, opts?: OperationOpts): Observable<CustomOidEntryDetailResponseDto | AjaxResponse<CustomOidEntryDetailResponseDto>> {
+    getCustomOidEntry({ oid }: GetCustomOidEntryRequest): Observable<CustomOidEntryDetailResponseDto>;
+    getCustomOidEntry({ oid }: GetCustomOidEntryRequest, opts?: OperationOpts): Observable<AjaxResponse<CustomOidEntryDetailResponseDto>>;
+    getCustomOidEntry(
+        { oid }: GetCustomOidEntryRequest,
+        opts?: OperationOpts,
+    ): Observable<CustomOidEntryDetailResponseDto | AjaxResponse<CustomOidEntryDetailResponseDto>> {
         throwIfNullOrUndefined(oid, 'oid', 'getCustomOidEntry');
 
-        return this.request<CustomOidEntryDetailResponseDto>({
-            url: '/v1/oids/{oid}'.replace('{oid}', encodeURI(oid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<CustomOidEntryDetailResponseDto>(
+            {
+                url: '/v1/oids/{oid}'.replace('{oid}', encodeURI(oid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get searchable filter fields for custom OID entries
      */
-    getCustomOidEntrySearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>
-    getCustomOidEntrySearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
-    getCustomOidEntrySearchableFields(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
-        return this.request<Array<SearchFieldDataByGroupDto>>({
-            url: '/v1/oids/search',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+    getCustomOidEntrySearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>;
+    getCustomOidEntrySearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>;
+    getCustomOidEntrySearchableFields(
+        opts?: OperationOpts,
+    ): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
+        return this.request<Array<SearchFieldDataByGroupDto>>(
+            {
+                url: '/v1/oids/search',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List custom OID entries with filtering and pagination
      */
-    listCustomOidEntries({ searchRequestDto }: ListCustomOidEntriesRequest): Observable<CustomOidEntryListResponseDto>
-    listCustomOidEntries({ searchRequestDto }: ListCustomOidEntriesRequest, opts?: OperationOpts): Observable<AjaxResponse<CustomOidEntryListResponseDto>>
-    listCustomOidEntries({ searchRequestDto }: ListCustomOidEntriesRequest, opts?: OperationOpts): Observable<CustomOidEntryListResponseDto | AjaxResponse<CustomOidEntryListResponseDto>> {
+    listCustomOidEntries({ searchRequestDto }: ListCustomOidEntriesRequest): Observable<CustomOidEntryListResponseDto>;
+    listCustomOidEntries(
+        { searchRequestDto }: ListCustomOidEntriesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<CustomOidEntryListResponseDto>>;
+    listCustomOidEntries(
+        { searchRequestDto }: ListCustomOidEntriesRequest,
+        opts?: OperationOpts,
+    ): Observable<CustomOidEntryListResponseDto | AjaxResponse<CustomOidEntryListResponseDto>> {
         throwIfNullOrUndefined(searchRequestDto, 'searchRequestDto', 'listCustomOidEntries');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<CustomOidEntryListResponseDto>({
-            url: '/v1/oids/list',
-            method: 'POST',
-            headers,
-            body: searchRequestDto,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<CustomOidEntryListResponseDto>(
+            {
+                url: '/v1/oids/list',
+                method: 'POST',
+                headers,
+                body: searchRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

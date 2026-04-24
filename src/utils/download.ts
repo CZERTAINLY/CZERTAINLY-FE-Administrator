@@ -1,10 +1,17 @@
-import 'jszip';
-
 import { Buffer } from 'buffer';
-import saveAs from 'file-saver';
 
-import JSZip from 'jszip';
-import { CertificateContentResponseModel, CertificateDetailResponseModel } from 'types/certificate';
+import type { CertificateContentResponseModel, CertificateDetailResponseModel } from 'types/certificate';
+
+function triggerBlobDownload(blob: Blob, fileName: string) {
+    const url = URL.createObjectURL(blob);
+    const element = document.createElement('a');
+    element.href = url;
+    element.download = fileName;
+    document.body.appendChild(element);
+    element.click();
+    element.remove();
+    URL.revokeObjectURL(url);
+}
 
 export function downloadFile(content: any, fileName: string, type?: string) {
     const element = document.createElement('a');
@@ -30,29 +37,33 @@ export function downloadFileZip(
     certificateUuids: string[],
     certificates: CertificateDetailResponseModel[] | CertificateContentResponseModel[],
     fileType: string,
-) {
-    const zip = new JSZip();
+): void {
+    void (async () => {
+        const { default: JSZip } = await import('jszip');
+        const zip = new JSZip();
 
-    for (let i of certificateUuids) {
-        const certificate = (certificates as Array<CertificateDetailResponseModel | CertificateContentResponseModel>).find(
-            (c) => c.uuid === i,
-        );
+        for (const i of certificateUuids) {
+            const certificate = (certificates as Array<CertificateDetailResponseModel | CertificateContentResponseModel>).find(
+                (c) => c.uuid === i,
+            );
 
-        if (!certificate) continue;
+            if (!certificate) continue;
 
-        let content: string | Uint8Array;
+            let content: string | Uint8Array;
 
-        if (fileType === 'pem') {
-            content = formatPEM(certificate.certificateContent || '');
-        } else {
-            content = new Uint8Array(Buffer.from(certificate.certificateContent || '', 'base64'));
+            if (fileType === 'pem') {
+                content = formatPEM(certificate.certificateContent || '');
+            } else {
+                content = new Uint8Array(Buffer.from(certificate.certificateContent || '', 'base64'));
+            }
+
+            zip.file(certificate.commonName.replace('*.', '_.') + '_' + certificate.serialNumber + '.' + fileType, content);
         }
 
-        zip.file(certificate.commonName.replace('*.', '_.') + '_' + certificate.serialNumber + '.' + fileType, content);
-    }
-
-    zip.generateAsync({ type: 'blob' }).then((content) => {
-        saveAs(content, 'CertificateDownload ' + new Date().toISOString().replace(' ', '_') + '.zip');
+        const blob = await zip.generateAsync({ type: 'blob' });
+        triggerBlobDownload(blob, 'CertificateDownload ' + new Date().toISOString().replace(' ', '_') + '.zip');
+    })().catch((err) => {
+        console.error('Failed to build certificate zip', err);
     });
 }
 

@@ -66,108 +66,140 @@ export interface UpdatePlatformSettingsRequest {
  * no description
  */
 export class SettingsApi extends BaseAPI {
-
     /**
      * Get authentication settings
      */
-    getAuthenticationSettings(): Observable<AuthenticationSettingsDto>
-    getAuthenticationSettings(opts?: OperationOpts): Observable<AjaxResponse<AuthenticationSettingsDto>>
+    getAuthenticationSettings(): Observable<AuthenticationSettingsDto>;
+    getAuthenticationSettings(opts?: OperationOpts): Observable<AjaxResponse<AuthenticationSettingsDto>>;
     getAuthenticationSettings(opts?: OperationOpts): Observable<AuthenticationSettingsDto | AjaxResponse<AuthenticationSettingsDto>> {
-        return this.request<AuthenticationSettingsDto>({
-            url: '/v1/settings/authentication',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<AuthenticationSettingsDto>(
+            {
+                url: '/v1/settings/authentication',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get events settings
      */
-    getEventsSettings(): Observable<EventsSettingsDto>
-    getEventsSettings(opts?: OperationOpts): Observable<AjaxResponse<EventsSettingsDto>>
+    getEventsSettings(): Observable<EventsSettingsDto>;
+    getEventsSettings(opts?: OperationOpts): Observable<AjaxResponse<EventsSettingsDto>>;
     getEventsSettings(opts?: OperationOpts): Observable<EventsSettingsDto | AjaxResponse<EventsSettingsDto>> {
-        return this.request<EventsSettingsDto>({
-            url: '/v1/settings/events',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<EventsSettingsDto>(
+            {
+                url: '/v1/settings/events',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get logging settings
      */
-    getLoggingSettings(): Observable<LoggingSettingsDto>
-    getLoggingSettings(opts?: OperationOpts): Observable<AjaxResponse<LoggingSettingsDto>>
+    getLoggingSettings(): Observable<LoggingSettingsDto>;
+    getLoggingSettings(opts?: OperationOpts): Observable<AjaxResponse<LoggingSettingsDto>>;
     getLoggingSettings(opts?: OperationOpts): Observable<LoggingSettingsDto | AjaxResponse<LoggingSettingsDto>> {
-        return this.request<LoggingSettingsDto>({
-            url: '/v1/settings/logging',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<LoggingSettingsDto>(
+            {
+                url: '/v1/settings/logging',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get OAuth2 Provider settings
      */
-    getOAuth2ProviderSettings({ providerName }: GetOAuth2ProviderSettingsRequest): Observable<OAuth2ProviderSettingsResponseDto>
-    getOAuth2ProviderSettings({ providerName }: GetOAuth2ProviderSettingsRequest, opts?: OperationOpts): Observable<AjaxResponse<OAuth2ProviderSettingsResponseDto>>
-    getOAuth2ProviderSettings({ providerName }: GetOAuth2ProviderSettingsRequest, opts?: OperationOpts): Observable<OAuth2ProviderSettingsResponseDto | AjaxResponse<OAuth2ProviderSettingsResponseDto>> {
+    getOAuth2ProviderSettings({ providerName }: GetOAuth2ProviderSettingsRequest): Observable<OAuth2ProviderSettingsResponseDto>;
+    getOAuth2ProviderSettings(
+        { providerName }: GetOAuth2ProviderSettingsRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<OAuth2ProviderSettingsResponseDto>>;
+    getOAuth2ProviderSettings(
+        { providerName }: GetOAuth2ProviderSettingsRequest,
+        opts?: OperationOpts,
+    ): Observable<OAuth2ProviderSettingsResponseDto | AjaxResponse<OAuth2ProviderSettingsResponseDto>> {
         throwIfNullOrUndefined(providerName, 'providerName', 'getOAuth2ProviderSettings');
 
-        return this.request<OAuth2ProviderSettingsResponseDto>({
-            url: '/v1/settings/authentication/oauth2Providers/{providerName}'.replace('{providerName}', encodeURI(providerName)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<OAuth2ProviderSettingsResponseDto>(
+            {
+                url: '/v1/settings/authentication/oauth2Providers/{providerName}'.replace('{providerName}', encodeURI(providerName)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get platform settings
      */
-    getPlatformSettings(): Observable<PlatformSettingsDto>
-    getPlatformSettings(opts?: OperationOpts): Observable<AjaxResponse<PlatformSettingsDto>>
+    getPlatformSettings(): Observable<PlatformSettingsDto>;
+    getPlatformSettings(opts?: OperationOpts): Observable<AjaxResponse<PlatformSettingsDto>>;
     getPlatformSettings(opts?: OperationOpts): Observable<PlatformSettingsDto | AjaxResponse<PlatformSettingsDto>> {
-        return this.request<PlatformSettingsDto>({
-            url: '/v1/settings/platform',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<PlatformSettingsDto>(
+            {
+                url: '/v1/settings/platform',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Remove OAuth2 Provider
      */
-    removeOAuth2Provider({ providerName }: RemoveOAuth2ProviderRequest): Observable<void>
-    removeOAuth2Provider({ providerName }: RemoveOAuth2ProviderRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    removeOAuth2Provider({ providerName }: RemoveOAuth2ProviderRequest): Observable<void>;
+    removeOAuth2Provider({ providerName }: RemoveOAuth2ProviderRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     removeOAuth2Provider({ providerName }: RemoveOAuth2ProviderRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(providerName, 'providerName', 'removeOAuth2Provider');
 
-        return this.request<void>({
-            url: '/v1/settings/authentication/oauth2Providers/{providerName}'.replace('{providerName}', encodeURI(providerName)),
-            method: 'DELETE',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/settings/authentication/oauth2Providers/{providerName}'.replace('{providerName}', encodeURI(providerName)),
+                method: 'DELETE',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Update authentication settings
      */
-    updateAuthenticationSettings({ authenticationSettingsUpdateDto }: UpdateAuthenticationSettingsRequest): Observable<void>
-    updateAuthenticationSettings({ authenticationSettingsUpdateDto }: UpdateAuthenticationSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    updateAuthenticationSettings({ authenticationSettingsUpdateDto }: UpdateAuthenticationSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    updateAuthenticationSettings({ authenticationSettingsUpdateDto }: UpdateAuthenticationSettingsRequest): Observable<void>;
+    updateAuthenticationSettings(
+        { authenticationSettingsUpdateDto }: UpdateAuthenticationSettingsRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    updateAuthenticationSettings(
+        { authenticationSettingsUpdateDto }: UpdateAuthenticationSettingsRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(authenticationSettingsUpdateDto, 'authenticationSettingsUpdateDto', 'updateAuthenticationSettings');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>({
-            url: '/v1/settings/authentication',
-            method: 'PUT',
-            headers,
-            body: authenticationSettingsUpdateDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/settings/authentication',
+                method: 'PUT',
+                headers,
+                body: authenticationSettingsUpdateDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Update single event settings
      */
-    updateEventSettings({ eventSettingsDto }: UpdateEventSettingsRequest): Observable<void>
-    updateEventSettings({ eventSettingsDto }: UpdateEventSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    updateEventSettings({ eventSettingsDto }: UpdateEventSettingsRequest): Observable<void>;
+    updateEventSettings({ eventSettingsDto }: UpdateEventSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     updateEventSettings({ eventSettingsDto }: UpdateEventSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(eventSettingsDto, 'eventSettingsDto', 'updateEventSettings');
 
@@ -175,19 +207,22 @@ export class SettingsApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>({
-            url: '/v1/settings/events',
-            method: 'PATCH',
-            headers,
-            body: eventSettingsDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/settings/events',
+                method: 'PATCH',
+                headers,
+                body: eventSettingsDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Update multiple events settings
      */
-    updateEventsSettings({ eventsSettingsDto }: UpdateEventsSettingsRequest): Observable<void>
-    updateEventsSettings({ eventsSettingsDto }: UpdateEventsSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    updateEventsSettings({ eventsSettingsDto }: UpdateEventsSettingsRequest): Observable<void>;
+    updateEventsSettings({ eventsSettingsDto }: UpdateEventsSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     updateEventsSettings({ eventsSettingsDto }: UpdateEventsSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(eventsSettingsDto, 'eventsSettingsDto', 'updateEventsSettings');
 
@@ -195,40 +230,58 @@ export class SettingsApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>({
-            url: '/v1/settings/events',
-            method: 'PUT',
-            headers,
-            body: eventsSettingsDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/settings/events',
+                method: 'PUT',
+                headers,
+                body: eventsSettingsDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Update logging settings
      */
-    updateLoggingSettings({ loggingSettingsDto }: UpdateLoggingSettingsRequest): Observable<void>
-    updateLoggingSettings({ loggingSettingsDto }: UpdateLoggingSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    updateLoggingSettings({ loggingSettingsDto }: UpdateLoggingSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    updateLoggingSettings({ loggingSettingsDto }: UpdateLoggingSettingsRequest): Observable<void>;
+    updateLoggingSettings(
+        { loggingSettingsDto }: UpdateLoggingSettingsRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    updateLoggingSettings(
+        { loggingSettingsDto }: UpdateLoggingSettingsRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(loggingSettingsDto, 'loggingSettingsDto', 'updateLoggingSettings');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>({
-            url: '/v1/settings/logging',
-            method: 'PUT',
-            headers,
-            body: loggingSettingsDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/settings/logging',
+                method: 'PUT',
+                headers,
+                body: loggingSettingsDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Update OAuth2 Provider settings
      */
-    updateOAuth2ProviderSettings({ providerName, oAuth2ProviderSettingsUpdateDto }: UpdateOAuth2ProviderSettingsRequest): Observable<void>
-    updateOAuth2ProviderSettings({ providerName, oAuth2ProviderSettingsUpdateDto }: UpdateOAuth2ProviderSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    updateOAuth2ProviderSettings({ providerName, oAuth2ProviderSettingsUpdateDto }: UpdateOAuth2ProviderSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    updateOAuth2ProviderSettings({ providerName, oAuth2ProviderSettingsUpdateDto }: UpdateOAuth2ProviderSettingsRequest): Observable<void>;
+    updateOAuth2ProviderSettings(
+        { providerName, oAuth2ProviderSettingsUpdateDto }: UpdateOAuth2ProviderSettingsRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    updateOAuth2ProviderSettings(
+        { providerName, oAuth2ProviderSettingsUpdateDto }: UpdateOAuth2ProviderSettingsRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(providerName, 'providerName', 'updateOAuth2ProviderSettings');
         throwIfNullOrUndefined(oAuth2ProviderSettingsUpdateDto, 'oAuth2ProviderSettingsUpdateDto', 'updateOAuth2ProviderSettings');
 
@@ -236,32 +289,43 @@ export class SettingsApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>({
-            url: '/v1/settings/authentication/oauth2Providers/{providerName}'.replace('{providerName}', encodeURI(providerName)),
-            method: 'PUT',
-            headers,
-            body: oAuth2ProviderSettingsUpdateDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/settings/authentication/oauth2Providers/{providerName}'.replace('{providerName}', encodeURI(providerName)),
+                method: 'PUT',
+                headers,
+                body: oAuth2ProviderSettingsUpdateDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Update platform settings
      */
-    updatePlatformSettings({ platformSettingsUpdateDto }: UpdatePlatformSettingsRequest): Observable<void>
-    updatePlatformSettings({ platformSettingsUpdateDto }: UpdatePlatformSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    updatePlatformSettings({ platformSettingsUpdateDto }: UpdatePlatformSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    updatePlatformSettings({ platformSettingsUpdateDto }: UpdatePlatformSettingsRequest): Observable<void>;
+    updatePlatformSettings(
+        { platformSettingsUpdateDto }: UpdatePlatformSettingsRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    updatePlatformSettings(
+        { platformSettingsUpdateDto }: UpdatePlatformSettingsRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(platformSettingsUpdateDto, 'platformSettingsUpdateDto', 'updatePlatformSettings');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>({
-            url: '/v1/settings/platform',
-            method: 'PUT',
-            headers,
-            body: platformSettingsUpdateDto,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<void>(
+            {
+                url: '/v1/settings/platform',
+                method: 'PUT',
+                headers,
+                body: platformSettingsUpdateDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

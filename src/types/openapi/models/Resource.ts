@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -79,6 +79,5 @@ export enum Resource {
     SigningRecords = 'signingRecords',
     SigningProfiles = 'signingProfiles',
     TimeQualityConfigurations = 'timeQualityConfigurations',
-    TspProfiles = 'tspProfiles'
+    TspProfiles = 'tspProfiles',
 }
-

@@ -11,16 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ComplianceStatus,
-    KeyAlgorithm,
-    KeyCompromiseReason,
-    KeyFormat,
-    KeyState,
-    KeyType,
-    KeyUsage,
-    MetadataResponseDto,
-} from './';
+import type { ComplianceStatus, KeyAlgorithm, KeyCompromiseReason, KeyFormat, KeyState, KeyType, KeyUsage, MetadataResponseDto } from './';
 
 /**
  * @export
@@ -112,5 +103,3 @@ export interface KeyItemDetailDto {
      */
     complianceStatus: ComplianceStatus;
 }
-
-

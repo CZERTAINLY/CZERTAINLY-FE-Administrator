@@ -1,4 +1,4 @@
-import {
+import type {
     AttributeDescriptorCollectionDto,
     AttributeDescriptorCollectionModel,
     AttributeDescriptorDto,
@@ -11,8 +11,8 @@ import {
     CustomAttributeDto,
     CustomAttributeModel,
 } from 'types/attributes';
-import { CallbackAttributeDto, CallbackAttributeModel, HealthDto, HealthModel } from 'types/connectors';
-import { AttributeMappingDto, HealthInfo, HealthInfoComponent, HealthStatus, ResponseAttributeV2 } from 'types/openapi';
+import type { CallbackAttributeDto, CallbackAttributeModel, HealthDto, HealthModel } from 'types/connectors';
+import { type AttributeMappingDto, type HealthInfo, type HealthInfoComponent, HealthStatus, type ResponseAttributeV2 } from 'types/openapi';
 
 export function transformAttributeResponseDtoToModel(attribute: AttributeResponseDto): AttributeResponseModel {
     if ('content' in attribute) {

@@ -1,7 +1,7 @@
 import { of } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 
-import { AppEpic } from 'ducks';
+import type { AppEpic } from 'ducks';
 import { extractError } from 'utils/net';
 
 import { LockWidgetNameEnum } from 'types/user-interface';

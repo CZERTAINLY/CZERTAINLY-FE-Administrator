@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -20,6 +20,5 @@ export enum OidCategory {
     RdnAttributeType = 'rdnAttributeType',
     ExtendedKeyUsage = 'extendedKeyUsage',
     QcStatement = 'qcStatement',
-    Generic = 'generic'
+    Generic = 'generic',
 }
-

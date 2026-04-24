@@ -326,7 +326,7 @@ test.describe('Select', () => {
     });
 
     test('should call onChange with empty string when single select is cleared to Choose', async ({ mount }) => {
-        let received: string | undefined = undefined;
+        let received: string | undefined;
         const options = [
             { value: '1', label: 'Option 1' },
             { value: '2', label: 'Option 2' },
@@ -546,7 +546,7 @@ test.describe('Select', () => {
     });
 
     test('should call multi onChange with undefined when all options deselected', async ({ mount }) => {
-        let received: { value: string; label: string }[] | undefined = undefined;
+        let received: { value: string; label: string }[] | undefined;
         const options = [
             { value: '1', label: 'One' },
             { value: '2', label: 'Two' },
@@ -778,6 +778,75 @@ test.describe('Select', () => {
         await runLateOptionsTest(page, 'load-no-value-options', '__hsLateNoValueState', (capture) => {
             expect(capture).toBe('');
         });
+    });
+
+    test('should show clear button on multi-select when at least 1 item is selected', async ({ mount }) => {
+        const options = [
+            { value: '1', label: 'One' },
+            { value: '2', label: 'Two' },
+        ];
+        const component = await mount(
+            <div>
+                <Select id="test-select" value={[{ value: '1', label: 'One' }]} onChange={() => {}} options={options} isMulti={true} />
+            </div>,
+        );
+        await expect(component.getByTestId('select-test-select-clear')).toBeAttached();
+    });
+
+    test('should not show clear button on multi-select when no items are selected', async ({ mount }) => {
+        const options = [
+            { value: '1', label: 'One' },
+            { value: '2', label: 'Two' },
+        ];
+        const component = await mount(
+            <div>
+                <Select id="test-select" value={[]} onChange={() => {}} options={options} isMulti={true} />
+            </div>,
+        );
+        await expect(component.locator('[data-testid="select-test-select-clear"]')).toHaveCount(0);
+    });
+
+    test('should call onChange(undefined) when multi-select clear button is clicked', async ({ mount }) => {
+        let received: { value: string | number; label: string }[] | undefined = [{ value: '1', label: 'One' }];
+        const options = [
+            { value: '1', label: 'One' },
+            { value: '2', label: 'Two' },
+        ];
+        const component = await mount(
+            <div>
+                <Select
+                    id="test-select"
+                    value={[{ value: '1', label: 'One' }]}
+                    onChange={(v) => (received = v)}
+                    options={options}
+                    isMulti={true}
+                />
+            </div>,
+        );
+        const clearBtn = component.getByTestId('select-test-select-clear');
+        await expect(clearBtn).toBeAttached();
+        await clearBtn.click({ force: true });
+        expect(received).toBeUndefined();
+    });
+
+    test('should not show clear button on multi-select when isClearable is explicitly false', async ({ mount }) => {
+        const options = [
+            { value: '1', label: 'One' },
+            { value: '2', label: 'Two' },
+        ];
+        const component = await mount(
+            <div>
+                <Select
+                    id="test-select"
+                    value={[{ value: '1', label: 'One' }]}
+                    onChange={() => {}}
+                    options={options}
+                    isMulti={true}
+                    isClearable={false}
+                />
+            </div>,
+        );
+        await expect(component.locator('[data-testid="select-test-select-clear"]')).toHaveCount(0);
     });
 
     test('should accept option descriptions for dropdown rendering', async ({ mount }) => {

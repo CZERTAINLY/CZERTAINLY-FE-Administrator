@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CustomOidEntryDetailResponseDtoAdditionalProperties,
-    OidCategory,
-} from './';
+import type { CustomOidEntryDetailResponseDtoAdditionalProperties, OidCategory } from './';
 
 /**
  * @export
@@ -51,5 +48,3 @@ export interface CustomOidEntryDetailResponseDto {
      */
     additionalProperties?: CustomOidEntryDetailResponseDtoAdditionalProperties;
 }
-
-

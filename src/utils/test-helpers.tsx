@@ -1,9 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router';
-import React from 'react';
+import type React from 'react';
 import { testReducers, testInitialState } from 'ducks/test-reducers';
-import { ApiClients } from '../api';
+import type { ApiClients } from '../api';
 
 /**
  * Creates a mock Redux store for testing

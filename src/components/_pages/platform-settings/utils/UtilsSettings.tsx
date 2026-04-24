@@ -1,10 +1,10 @@
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 
 import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from 'ducks/utilsActuator';
 import { actions as cbomActuatorActions, selectors as cbomActuatorSelectors } from 'ducks/cbomActuator';
 import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { SettingsPlatformModel } from 'types/settings';
+import type { SettingsPlatformModel } from 'types/settings';
 import { AlertCircle } from 'lucide-react';
 
 const StatusIcon = ({ ok }: { ok?: boolean }) =>

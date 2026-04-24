@@ -1,4 +1,4 @@
-import { AppEpic } from 'ducks';
+import type { AppEpic } from 'ducks';
 
 import { actions as settingsActions } from 'ducks/settings';
 import { debounceTime, filter, map, mergeMap, take } from 'rxjs/operators';

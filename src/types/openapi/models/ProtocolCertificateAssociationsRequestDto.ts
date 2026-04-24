@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    RequestAttribute,
-} from './';
+import type { RequestAttribute } from './';
 
 /**
  * @export

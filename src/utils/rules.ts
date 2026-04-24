@@ -1,13 +1,13 @@
 import { getEnumLabel } from 'ducks/enums';
 import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { SearchFilterModel } from 'types/certificate';
-import { ConditionItemModel } from 'types/rules';
+import type { SearchFilterModel } from 'types/certificate';
+import type { ConditionItemModel } from 'types/rules';
 // import { EntityType, actions as filterActions } from 'ducks/filters';
 import { selectors as enumSelectors } from 'ducks/enums';
 import { actions as resourceActions, selectors as resourceSelectors } from 'ducks/resource';
 import { PlatformEnum, Resource } from 'types/openapi';
-import { ResourceModel } from 'types/resource';
+import type { ResourceModel } from 'types/resource';
 
 export const filterToConditionItems = (filter: SearchFilterModel[]): ConditionItemModel[] => {
     return filter.map((filter) => ({

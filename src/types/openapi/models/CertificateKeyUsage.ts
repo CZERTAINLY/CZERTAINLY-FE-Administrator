@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -25,6 +25,5 @@ export enum CertificateKeyUsage {
     KeyCertSign = 'keyCertSign',
     CRlSign = 'cRLSign',
     EncipherOnly = 'encipherOnly',
-    DecipherOnly = 'decipherOnly'
+    DecipherOnly = 'decipherOnly',
 }
-

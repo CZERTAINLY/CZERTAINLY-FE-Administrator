@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -25,6 +25,5 @@ export enum FunctionGroupCode {
     ComplianceProvider = 'complianceProvider',
     ComplianceProviderV2 = 'complianceProviderV2',
     CryptographyProvider = 'cryptographyProvider',
-    NotificationProvider = 'notificationProvider'
+    NotificationProvider = 'notificationProvider',
 }
-

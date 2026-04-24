@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CertificateRequestFormat,
-} from './';
+import type { CertificateRequestFormat } from './';
 
 /**
  * @export
@@ -39,5 +37,3 @@ export interface ClientCertificateRenewRequestDto {
      */
     format?: CertificateRequestFormat;
 }
-
-

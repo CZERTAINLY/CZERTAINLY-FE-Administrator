@@ -11,12 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ComplianceConnectorAndGroupsDto,
-    ComplianceConnectorAndRulesDto,
-    ResponseAttribute,
-    SimplifiedRaProfileDto,
-} from './';
+import type { ComplianceConnectorAndGroupsDto, ComplianceConnectorAndRulesDto, ResponseAttribute, SimplifiedRaProfileDto } from './';
 
 /**
  * @export

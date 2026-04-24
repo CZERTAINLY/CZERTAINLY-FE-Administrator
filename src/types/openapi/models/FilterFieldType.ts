@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -22,6 +22,5 @@ export enum FilterFieldType {
     List = 'list',
     Date = 'date',
     Datetime = 'datetime',
-    Boolean = 'boolean'
+    Boolean = 'boolean',
 }
-

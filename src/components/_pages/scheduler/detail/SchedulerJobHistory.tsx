@@ -4,14 +4,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions, selectors } from 'ducks/scheduler';
 
-import { TableDataRow, TableHeader } from 'components/CustomTable';
+import type { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import PagedList from 'components/PagedList/PagedList';
 import { EntityType } from 'ducks/filters';
 import { useNavigate } from 'react-router';
 import Button from 'components/Button';
 import Badge from 'components/Badge';
-import { SearchRequestModel } from 'types/certificate';
+import type { SearchRequestModel } from 'types/certificate';
 import { PlatformEnum, SchedulerJobExecutionStatus } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { Info, ArrowRight } from 'lucide-react';

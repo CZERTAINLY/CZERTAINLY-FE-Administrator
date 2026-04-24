@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import Spinner from 'components/Spinner';
 import Badge from 'components/Badge';
 import { AttributeContentType, ExecutionType, FilterFieldType, PlatformEnum } from 'types/openapi';
-import { ExecutionItemModel } from 'types/rules';
+import type { ExecutionItemModel } from 'types/rules';
 import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
 
 interface ExecutionsItemsListProps {

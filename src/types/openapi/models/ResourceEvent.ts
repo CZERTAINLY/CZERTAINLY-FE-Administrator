@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -25,6 +25,5 @@ export enum ResourceEvent {
     DiscoveryFinished = 'discovery_finished',
     ApprovalRequested = 'approval_requested',
     ApprovalClosed = 'approval_closed',
-    ScheduledJobFinished = 'scheduled_job_finished'
+    ScheduledJobFinished = 'scheduled_job_finished',
 }
-

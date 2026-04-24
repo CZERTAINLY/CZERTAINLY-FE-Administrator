@@ -15,7 +15,7 @@ export const validateRequired = () => (value: any) => {
 };
 
 const getValueFromObject = (value: any) => {
-    if (typeof value === 'object' && value && value.hasOwnProperty('label') && value.hasOwnProperty('value')) {
+    if (typeof value === 'object' && value && Object.hasOwn(value, 'label') && Object.hasOwn(value, 'value')) {
         return value['value']['data'];
     }
     // Attribute content objects from list (select) fields are stored as {data, reference}.
@@ -95,7 +95,7 @@ export const validateQuartzCronExpression = (cronExpression: string | undefined)
     const validationInput = getValueFromObject(value);
 
     try {
-        let validObj: { isValid: boolean; errorMessage: Array<string> } = cronValidator.isValidCronExpression(validationInput, {
+        const validObj: { isValid: boolean; errorMessage: Array<string> } = cronValidator.isValidCronExpression(validationInput, {
             error: true,
         });
         let uniqueErrors: string[] = [];
@@ -364,7 +364,7 @@ export const validateNtpServers = () => (value: string | string[]) => {
     if (servers.length === 0 || (servers.length === 1 && servers[0] === '')) return undefined;
 
     const hostnameOrIpRegex =
-        /^(([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}|[a-zA-Z0-9\-]+|(25[0-5]|2[0-4]\d|[01]?\d\d?)(\.(25[0-5]|2[0-4]\d|[01]?\d\d?)){3})$/;
+        /^(([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}|[a-zA-Z0-9-]+|(25[0-5]|2[0-4]\d|[01]?\d\d?)(\.(25[0-5]|2[0-4]\d|[01]?\d\d?)){3})$/;
     const invalid = servers.filter((s) => !hostnameOrIpRegex.test(s));
     if (invalid.length > 0) {
         return `Value must be a comma-separated list of valid NTP server addresses (IP or hostname)`;

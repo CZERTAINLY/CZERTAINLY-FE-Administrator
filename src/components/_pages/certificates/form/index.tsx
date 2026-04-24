@@ -8,7 +8,7 @@ import { actions as connectorActions } from 'ducks/connectors';
 import { selectors as cryptographyOperationSelectors } from 'ducks/cryptographic-operations';
 import { actions as raProfileActions, selectors as raProfileSelectors } from 'ducks/ra-profiles';
 import { actions as tokenProfileActions } from 'ducks/token-profiles';
-import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
@@ -16,8 +16,8 @@ import { useNavigate } from 'react-router';
 import Button from 'components/Button';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 
-import { AttributeDescriptorModel, isDataAttributeModel } from 'types/attributes';
-import { CertificateDetailResponseModel } from '../../../../types/certificate';
+import { type AttributeDescriptorModel, isDataAttributeModel } from 'types/attributes';
+import type { CertificateDetailResponseModel } from '../../../../types/certificate';
 import { CertificateRequestFormat, Resource } from '../../../../types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 

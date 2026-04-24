@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import Select from 'components/Select';
 import Label from 'components/Label';
@@ -31,6 +32,23 @@ export function AttributeFieldSelect({
 }: AttributeFieldSelectProps): React.ReactNode {
     const { control } = useFormContext<Record<string, any>>();
     const [showAddCustom, setShowAddCustom] = useState(false);
+    const [singleSelectKey, setSingleSelectKey] = useState(0);
+    const fieldValueRef = useRef<any>(undefined);
+
+    const handleSingleSelectChange = useCallback(
+        (fieldOnChange: (v: any) => void) => (newValue: any) => {
+            if (newValue === '__add_new__') {
+                onSelectChangeSingle(fieldOnChange)(newValue);
+                if (!fieldValueRef.current) {
+                    fieldOnChange(undefined);
+                }
+                setSingleSelectKey((k) => k + 1);
+            } else {
+                onSelectChangeSingle(fieldOnChange)(newValue);
+            }
+        },
+        [onSelectChangeSingle],
+    );
 
     return (
         <Controller
@@ -38,6 +56,7 @@ export function AttributeFieldSelect({
             control={control}
             rules={{ validate: buildAttributeValidators(descriptor) }}
             render={({ field, fieldState }) => {
+                fieldValueRef.current = field.value;
                 const selectValue = getSelectValueFromField(field.value, descriptor.properties.multiSelect);
                 const invalidClass = fieldState.isTouched && fieldState.invalid ? 'border-red-500' : '';
 
@@ -88,9 +107,10 @@ export function AttributeFieldSelect({
                                     />
                                 ) : (
                                     <Select
+                                        key={singleSelectKey}
                                         id={`${name}Select`}
                                         value={selectValue as string | number | { value: string | number; label: string }}
-                                        onChange={onSelectChangeSingle(field.onChange)}
+                                        onChange={handleSingleSelectChange(field.onChange)}
                                         options={selectOptions as { label: string; value: string | number | object }[]}
                                         placeholder={`Select ${descriptor.properties.label}`}
                                         isDisabled={descriptor.properties.readOnly || busy || showAddCustom}

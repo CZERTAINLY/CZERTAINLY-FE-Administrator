@@ -6,7 +6,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 
 import Button from 'components/Button';
-import { AttributeDescriptorModel } from 'types/attributes';
+import type { AttributeDescriptorModel } from 'types/attributes';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import TabLayout from '../../../../Layout/TabLayout';

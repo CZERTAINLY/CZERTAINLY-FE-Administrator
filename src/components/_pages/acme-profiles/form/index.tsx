@@ -20,9 +20,9 @@ import Container from 'components/Container';
 import Checkbox from 'components/Checkbox';
 import TextInput from 'components/TextInput';
 import TextArea from 'components/TextArea';
-import { AcmeProfileAddRequestModel, AcmeProfileEditRequestModel, AcmeProfileResponseModel } from 'types/acme-profiles';
-import { AttributeDescriptorModel } from 'types/attributes';
-import { RaProfileSimplifiedModel } from 'types/ra-profiles';
+import type { AcmeProfileAddRequestModel, AcmeProfileEditRequestModel, AcmeProfileResponseModel } from 'types/acme-profiles';
+import type { AttributeDescriptorModel } from 'types/attributes';
+import type { RaProfileSimplifiedModel } from 'types/ra-profiles';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
 

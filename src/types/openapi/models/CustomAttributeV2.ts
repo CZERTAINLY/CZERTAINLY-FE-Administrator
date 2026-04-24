@@ -11,12 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-    AttributeType,
-    BaseAttributeContentDtoV2,
-    CustomAttributeProperties,
-} from './';
+import type { AttributeContentType, AttributeType, BaseAttributeContentDtoV2, CustomAttributeProperties } from './';
 
 /**
  * Custom attribute allows to store and transfer dynamic data. Its content can be edited and send in requests to store.
@@ -73,5 +68,3 @@ export interface CustomAttributeV2 {
      */
     properties: CustomAttributeProperties;
 }
-
-

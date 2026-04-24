@@ -200,5 +200,3 @@ export interface CertificateDto {
      */
     archived?: boolean;
 }
-
-

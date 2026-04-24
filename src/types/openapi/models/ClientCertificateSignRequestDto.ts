@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CertificateRequestFormat,
-    RequestAttribute,
-} from './';
+import type { CertificateRequestFormat, RequestAttribute } from './';
 
 /**
  * @export
@@ -88,5 +85,3 @@ export interface ClientCertificateSignRequestDto {
      */
     customAttributes?: Array<RequestAttribute>;
 }
-
-

@@ -1,5 +1,5 @@
-import { AttributeRequestModel, AttributeResponseModel } from './attributes';
-import { AuthorityInstanceDto, AuthorityInstanceRequestDto, AuthorityInstanceUpdateRequestDto } from './openapi';
+import type { AttributeRequestModel, AttributeResponseModel } from './attributes';
+import type { AuthorityInstanceDto, AuthorityInstanceRequestDto, AuthorityInstanceUpdateRequestDto } from './openapi';
 
 export type AuthorityRequestDto = AuthorityInstanceRequestDto;
 export type AuthorityRequestModel = Omit<AuthorityRequestDto, 'attributes | customAttributes'> & {

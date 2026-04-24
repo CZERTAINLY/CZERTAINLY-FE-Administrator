@@ -1,6 +1,6 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { EnumItemModel, PlatformEnumModel } from 'types/enums';
-import { PlatformEnum } from 'types/openapi';
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { EnumItemModel, PlatformEnumModel } from 'types/enums';
+import type { PlatformEnum } from 'types/openapi';
 
 export type State = {
     platformEnums: PlatformEnumModel;

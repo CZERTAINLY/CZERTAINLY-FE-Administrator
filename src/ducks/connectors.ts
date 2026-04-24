@@ -1,8 +1,8 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-import { AttributeDescriptorCollectionModel, AttributeDescriptorModel } from 'types/attributes';
+import type { AttributeDescriptorCollectionModel, AttributeDescriptorModel } from 'types/attributes';
 
-import {
+import type {
     BulkActionModel,
     CallbackConnectorModel,
     CallbackResourceModel,
@@ -13,8 +13,8 @@ import {
     FunctionGroupModel,
     HealthModel,
 } from 'types/connectors';
-import { ConnectorStatus, FunctionGroupCode } from 'types/openapi';
-import { SearchRequestModel } from 'types/certificate';
+import { ConnectorStatus, type FunctionGroupCode } from 'types/openapi';
+import type { SearchRequestModel } from 'types/certificate';
 
 export type State = {
     checkedRows: string[];
@@ -106,7 +106,7 @@ export const slice = createSlice({
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
             Object.keys(state).forEach((key) => {
-                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+                if (!Object.hasOwn(initialState, key)) (state as any)[key] = undefined;
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
@@ -206,8 +206,8 @@ export const slice = createSlice({
         ) => {
             if (
                 state.connectorAttributes &&
-                state.connectorAttributes.hasOwnProperty(action.payload.functionGroup) &&
-                state.connectorAttributes[action.payload.functionGroup]!.hasOwnProperty(action.payload.kind)
+                Object.hasOwn(state.connectorAttributes, action.payload.functionGroup) &&
+                Object.hasOwn(state.connectorAttributes[action.payload.functionGroup]!, action.payload.kind)
             ) {
                 delete state.connectorAttributes![action.payload.functionGroup]![action.payload.kind];
             }

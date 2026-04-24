@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -28,6 +28,5 @@ export enum ConnectorInterface {
     Notification = 'notification',
     Secret = 'secret',
     SignatureFormatting = 'signatureFormatting',
-    Signing = 'signing'
+    Signing = 'signing',
 }
-

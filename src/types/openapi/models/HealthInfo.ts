@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    HealthInfoComponent,
-    HealthStatus,
-} from './';
+import type { HealthInfoComponent, HealthStatus } from './';
 
 /**
  * @export
@@ -32,7 +29,5 @@ export interface HealthInfo {
      * @type {{ [key: string]: HealthInfoComponent; }}
      * @memberof HealthInfo
      */
-    components?: { [key: string]: HealthInfoComponent; };
+    components?: { [key: string]: HealthInfoComponent };
 }
-
-

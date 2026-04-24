@@ -5,7 +5,7 @@ import Select from 'components/Select';
 import Label from 'components/Label';
 import { actions, selectors } from 'ducks/compliance-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { ComplianceProfileDtoV2, ComplianceRuleAvailabilityStatus, PlatformEnum, Resource } from 'types/openapi';
+import { type ComplianceProfileDtoV2, type ComplianceRuleAvailabilityStatus, PlatformEnum, type Resource } from 'types/openapi';
 import CustomTable from 'components/CustomTable';
 import WidgetButtons from 'components/WidgetButtons';
 import { useParams } from 'react-router';
@@ -22,7 +22,7 @@ import {
 } from 'utils/compliance-profile';
 import { ResourceBadges } from 'components/_pages/compliance-profiles/detail/Components/ResourceBadges';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { TRuleGroupType } from 'types/complianceProfiles';
+import type { TRuleGroupType } from 'types/complianceProfiles';
 import Badge from 'components/Badge';
 
 interface Props {

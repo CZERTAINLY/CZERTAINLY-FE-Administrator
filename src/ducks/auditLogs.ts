@@ -1,6 +1,6 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AuditLogItemModel } from 'types/auditLogs';
-import { SearchRequestModel, SearchFilterModel } from 'types/certificate';
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { AuditLogItemModel } from 'types/auditLogs';
+import type { SearchRequestModel, SearchFilterModel } from 'types/certificate';
 
 export type State = {
     auditLogs: AuditLogItemModel[];

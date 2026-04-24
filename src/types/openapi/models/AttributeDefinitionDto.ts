@@ -11,11 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-    AttributeVersion,
-    ProtectionLevel,
-} from './';
+import type { AttributeContentType, AttributeVersion, ProtectionLevel } from './';
 
 /**
  * @export
@@ -65,5 +61,3 @@ export interface AttributeDefinitionDto {
      */
     version?: AttributeVersion;
 }
-
-

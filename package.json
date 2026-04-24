@@ -5,6 +5,7 @@
     "private": true,
     "type": "module",
     "dependencies": {
+        "@czertainly/openapi-types": "file:./src/types/openapi",
         "@floating-ui/dom": "^1.7.6",
         "@preline/input-number": "^4.1.3",
         "@preline/overlay": "^4.1.3",
@@ -23,7 +24,6 @@
         "czertainly-administrator": "file:",
         "dagre": "^0.8.5",
         "dompurify": "^3.3.3",
-        "file-saver": "^2.0.5",
         "highlight.js": "^11.11.1",
         "html-react-parser": "^6.0.1",
         "js-yaml": "^4.1.1",
@@ -53,7 +53,9 @@
         "start": "vite",
         "build": "vite build",
         "serve": "vite preview",
-        "lint": "eslint ./src && prettier --check \"**/**.{ts,js,cjs,tsx}\" \"*.{json,md,yml}\"",
+        "lint": "biome check .",
+        "format": "biome format --write .",
+        "format:check": "biome format .",
         "test": "npm run test:all",
         "test:vitest": "vitest run",
         "test:vitest:ui": "vitest --ui",
@@ -68,15 +70,9 @@
         "test:all": "npm run test:vitest && npm run test:playwright",
         "test:cov": "npm run test:vitest:cov && npm run test:chromium",
         "prepare": "husky",
-        "generate-types": "openapi-generator-cli generate --generator-key typescript-rxjs-remote && prettier --write \"src/types/openapi/apis/*.ts\" && prettier --write \"src/types/openapi/models/*.ts\"",
-        "generate-types-local": "openapi-generator-cli generate --generator-key typescript-rxjs-local && prettier --write \"src/types/openapi/apis/*.ts\" && prettier --write \"src/types/openapi/models/*.ts\"",
-        "generate-types-utils": "openapi-generator-cli generate --generator-key typescript-rxjs-utils && prettier --write \"src/types/openapi/utils/apis/*.ts\" && prettier --write \"src/types/openapi/utils/models/*.ts\""
-    },
-    "eslintConfig": {
-        "extends": [
-            "react-app",
-            "react-app/jest"
-        ]
+        "generate-types": "openapi-generator-cli generate --generator-key typescript-rxjs-remote && biome format --write src/types/openapi",
+        "generate-types-local": "openapi-generator-cli generate --generator-key typescript-rxjs-local && biome format --write src/types/openapi",
+        "generate-types-utils": "openapi-generator-cli generate --generator-key typescript-rxjs-utils && biome format --write src/types/openapi/utils"
     },
     "browserslist": {
         "production": [
@@ -91,51 +87,39 @@
         ]
     },
     "devDependencies": {
+        "@biomejs/biome": "2.4.13",
         "@openapitools/openapi-generator-cli": "^2.31.1",
         "@playwright/experimental-ct-react": "^1.59.1",
         "@playwright/test": "^1.59.1",
         "@tailwindcss/forms": "^0.5.11",
         "@types/dagre": "^0.7.54",
-        "@types/file-saver": "^2.0.7",
         "@types/js-yaml": "^4.0.9",
         "@types/lodash.debounce": "^4.0.9",
         "@types/node": "^25.5.2",
         "@types/react": "^19.2.14",
         "@types/react-dom": "^19.2.3",
-        "@typescript-eslint/parser": "^8.58.1",
-        "@vitejs/plugin-react": "^6.0.1",
+        "@vitejs/plugin-react-swc": "^4.3.0",
         "@vitest/coverage-v8": "^4.1.3",
         "@vitest/ui": "^4.1.3",
         "babel-plugin-istanbul": "^8.0.0",
-        "eslint": "^9.39.2",
-        "eslint-config-prettier": "^10.1.8",
-        "eslint-plugin-jsx-a11y": "^6.10.2",
-        "eslint-plugin-prettier": "^5.5.5",
-        "eslint-plugin-react-hooks": "^7.0.1",
         "happy-dom": "^20.8.9",
         "husky": "^9.1.7",
         "lint-staged": "^16.4.0",
         "monocart-coverage-reports": "^2.12.9",
         "monocart-reporter": "^2.10.0",
         "nyc": "^18.0.0",
-        "prettier": "^3.8.1",
         "typescript": "^6.0.2",
         "vite": "^8.0.7",
-        "vite-plugin-eslint": "^1.8.1",
         "vite-plugin-istanbul": "^8.0.0",
         "vitest": "^4.1.3"
     },
     "overrides": {
-        "typescript": "^6.0.2",
+        "typescript": "$typescript",
         "nodemailer": "^8.0.5"
     },
     "lint-staged": {
-        "*.{ts,tsx,js,cjs}": [
-            "eslint --fix",
-            "prettier --write"
-        ],
-        "*.{json,md,yml}": [
-            "prettier --write"
+        "*.{ts,tsx,js,cjs,jsx,mjs,json}": [
+            "biome check --write --no-errors-on-unmatched"
         ]
     }
 }

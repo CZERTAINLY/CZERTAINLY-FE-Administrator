@@ -12,7 +12,7 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
@@ -29,6 +29,5 @@ export enum Module {
     Scheduler = 'scheduler',
     Secrets = 'secrets',
     Signing = 'signing',
-    Workflows = 'workflows'
+    Workflows = 'workflows',
 }
-

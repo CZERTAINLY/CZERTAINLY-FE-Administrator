@@ -5,7 +5,7 @@ import Button from 'components/Button';
 import { Copy, Download, Eye, Info, X } from 'lucide-react';
 import Breadcrumb from 'components/Breadcrumb';
 import Container from 'components/Container';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import JsonViewer from 'components/JsonViewer';
 import Select from 'components/Select';
@@ -16,7 +16,7 @@ import TabLayout from 'components/Layout/TabLayout';
 import Widget from 'components/Widget';
 import { EntityType } from 'ducks/filters';
 import { actions, selectors } from 'ducks/cbom';
-import { DashboardDict } from 'types/statisticsDashboard';
+import type { DashboardDict } from 'types/statisticsDashboard';
 import { dateFormatter } from 'utils/dateUtil';
 import { getDonutChartColorsByRandomNumberOfOptions } from 'utils/dashboard';
 

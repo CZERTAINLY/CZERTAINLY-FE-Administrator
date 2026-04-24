@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import React from 'react';
+import type React from 'react';
 import Button from 'components/Button';
 import type { IconName } from 'types/icons';
 import { iconRegistry } from 'utils/icons';

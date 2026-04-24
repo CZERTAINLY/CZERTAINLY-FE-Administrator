@@ -1,14 +1,14 @@
-import { ApiClients } from '../../api';
+import type { ApiClients } from '../../api';
 import FilterWidget from 'components/FilterWidget';
 import FilterWidgetRuleAction from 'components/FilterWidgetRuleAction';
-import { ExecutionFormValues } from 'components/_pages/executions/form';
+import type { ExecutionFormValues } from 'components/_pages/executions/form';
 import { EntityType, actions as filterActions } from 'ducks/filters';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { Resource } from 'types/openapi';
+import type { Resource } from 'types/openapi';
 import { filterToConditionItems } from 'utils/rules';
-import { ConditionFormValues } from '../_pages/conditions/form';
+import type { ConditionFormValues } from '../_pages/conditions/form';
 
 type FormType = 'conditionItem' | 'executionItem';
 

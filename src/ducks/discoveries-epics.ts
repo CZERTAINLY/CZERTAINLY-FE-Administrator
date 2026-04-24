@@ -1,8 +1,8 @@
-import { AppEpic } from 'ducks';
+import type { AppEpic } from 'ducks';
 import { iif, of } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 import { extractError } from 'utils/net';
-import { FunctionGroupCode, UuidDto } from '../types/openapi';
+import { FunctionGroupCode, type UuidDto } from '../types/openapi';
 import { actions as alertActions } from './alerts';
 import { actions as appRedirectActions } from './app-redirect';
 import { actions as userInterfaceActions } from './user-interface';

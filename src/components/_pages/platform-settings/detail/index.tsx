@@ -2,7 +2,7 @@ import CertificateSettings from 'components/_pages/platform-settings/certificate
 import UtilsSettings from 'components/_pages/platform-settings/utils/UtilsSettings';
 import TabLayout from 'components/Layout/TabLayout';
 import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/settings';
 import { useCallback, useEffect, useMemo, useState } from 'react';

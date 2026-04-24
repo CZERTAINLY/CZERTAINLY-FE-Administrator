@@ -40,12 +40,11 @@ export interface PurgeAuditLogsRequest {
  * no description
  */
 export class AuditLogApi extends BaseAPI {
-
     /**
      * Export Audit logs
      */
-    exportAuditLogs({ searchFilterRequestDto }: ExportAuditLogsRequest): Observable<Blob>
-    exportAuditLogs({ searchFilterRequestDto }: ExportAuditLogsRequest, opts?: OperationOpts): Observable<AjaxResponse<Blob>>
+    exportAuditLogs({ searchFilterRequestDto }: ExportAuditLogsRequest): Observable<Blob>;
+    exportAuditLogs({ searchFilterRequestDto }: ExportAuditLogsRequest, opts?: OperationOpts): Observable<AjaxResponse<Blob>>;
     exportAuditLogs({ searchFilterRequestDto }: ExportAuditLogsRequest, opts?: OperationOpts): Observable<Blob | AjaxResponse<Blob>> {
         throwIfNullOrUndefined(searchFilterRequestDto, 'searchFilterRequestDto', 'exportAuditLogs');
 
@@ -53,52 +52,66 @@ export class AuditLogApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<Blob>({
-            url: '/v1/auditLogs/export',
-            method: 'POST',
-            headers,
-            body: searchFilterRequestDto,
-            responseType: 'blob',
-        }, opts?.responseOpts);
-    };
+        return this.request<Blob>(
+            {
+                url: '/v1/auditLogs/export',
+                method: 'POST',
+                headers,
+                body: searchFilterRequestDto,
+                responseType: 'blob',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get Audit logs searchable fields information
      */
-    getAuditLogSearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>
-    getAuditLogSearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
-    getAuditLogSearchableFields(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
-        return this.request<Array<SearchFieldDataByGroupDto>>({
-            url: '/v1/auditLogs/search',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+    getAuditLogSearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>;
+    getAuditLogSearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>;
+    getAuditLogSearchableFields(
+        opts?: OperationOpts,
+    ): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
+        return this.request<Array<SearchFieldDataByGroupDto>>(
+            {
+                url: '/v1/auditLogs/search',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List Audit logs
      */
-    listAuditLogs({ searchRequestDto }: ListAuditLogsRequest): Observable<AuditLogResponseDto>
-    listAuditLogs({ searchRequestDto }: ListAuditLogsRequest, opts?: OperationOpts): Observable<AjaxResponse<AuditLogResponseDto>>
-    listAuditLogs({ searchRequestDto }: ListAuditLogsRequest, opts?: OperationOpts): Observable<AuditLogResponseDto | AjaxResponse<AuditLogResponseDto>> {
+    listAuditLogs({ searchRequestDto }: ListAuditLogsRequest): Observable<AuditLogResponseDto>;
+    listAuditLogs({ searchRequestDto }: ListAuditLogsRequest, opts?: OperationOpts): Observable<AjaxResponse<AuditLogResponseDto>>;
+    listAuditLogs(
+        { searchRequestDto }: ListAuditLogsRequest,
+        opts?: OperationOpts,
+    ): Observable<AuditLogResponseDto | AjaxResponse<AuditLogResponseDto>> {
         throwIfNullOrUndefined(searchRequestDto, 'searchRequestDto', 'listAuditLogs');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<AuditLogResponseDto>({
-            url: '/v1/auditLogs',
-            method: 'POST',
-            headers,
-            body: searchRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<AuditLogResponseDto>(
+            {
+                url: '/v1/auditLogs',
+                method: 'POST',
+                headers,
+                body: searchRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Purge Audit logs
      */
-    purgeAuditLogs({ searchFilterRequestDto }: PurgeAuditLogsRequest): Observable<void>
-    purgeAuditLogs({ searchFilterRequestDto }: PurgeAuditLogsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    purgeAuditLogs({ searchFilterRequestDto }: PurgeAuditLogsRequest): Observable<void>;
+    purgeAuditLogs({ searchFilterRequestDto }: PurgeAuditLogsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     purgeAuditLogs({ searchFilterRequestDto }: PurgeAuditLogsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(searchFilterRequestDto, 'searchFilterRequestDto', 'purgeAuditLogs');
 
@@ -106,12 +119,14 @@ export class AuditLogApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>({
-            url: '/v1/auditLogs/purge',
-            method: 'POST',
-            headers,
-            body: searchFilterRequestDto,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<void>(
+            {
+                url: '/v1/auditLogs/purge',
+                method: 'POST',
+                headers,
+                body: searchFilterRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

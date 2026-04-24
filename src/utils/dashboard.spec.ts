@@ -1,5 +1,5 @@
 import { act, createElement, useEffect } from 'react';
-import { createRoot, Root } from 'react-dom/client';
+import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { CertificateState, PlatformEnum, SecretState, SecretType } from 'types/openapi';
 import {

@@ -1,11 +1,11 @@
 import AttributeViewer from 'components/Attributes/AttributeViewer';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import ProgressButton from 'components/ProgressButton';
 import StatusBadge from 'components/StatusBadge';
 
 import Widget from 'components/Widget';
-import WidgetButtons, { WidgetButtonProps } from 'components/WidgetButtons';
+import WidgetButtons, { type WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions as approvalProfileActions } from 'ducks/approval-profiles';
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';

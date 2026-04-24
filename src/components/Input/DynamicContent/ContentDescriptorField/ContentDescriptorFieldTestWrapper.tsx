@@ -1,13 +1,14 @@
 import React from 'react';
 import * as ReactHookForm from 'react-hook-form';
 import ContentDescriptorField from './index';
-import { AttributeContentType } from 'types/openapi';
+import type { AttributeContentType } from 'types/openapi';
 
 export interface ContentDescriptorFieldTestWrapperProps {
     isList: boolean;
     contentType: AttributeContentType;
     defaultContent?: unknown[];
     readOnly?: boolean;
+    showSubmitButton?: boolean;
 }
 
 export function ContentDescriptorFieldTestWrapper({
@@ -15,6 +16,7 @@ export function ContentDescriptorFieldTestWrapper({
     contentType,
     defaultContent = [{ data: '' }],
     readOnly = false,
+    showSubmitButton = false,
 }: ContentDescriptorFieldTestWrapperProps) {
     const methods = ReactHookForm.useForm({
         defaultValues: {
@@ -23,9 +25,17 @@ export function ContentDescriptorFieldTestWrapper({
         },
         mode: 'onTouched',
     });
+    const {
+        formState: { isValid },
+    } = methods;
     return (
         <ReactHookForm.FormProvider {...methods}>
             <ContentDescriptorField isList={isList} contentType={contentType} />
+            {showSubmitButton && (
+                <button type="submit" disabled={!isValid} data-testid="form-submit">
+                    Submit
+                </button>
+            )}
         </ReactHookForm.FormProvider>
     );
 }
