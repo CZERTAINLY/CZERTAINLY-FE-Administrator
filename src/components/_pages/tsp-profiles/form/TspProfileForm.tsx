@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 
@@ -126,11 +126,10 @@ export const TspProfileForm = () => {
         return {
             name: tspProfile.name || '',
             description: tspProfile.description || '',
-            defaultSigningProfile:
-                optionsForSigningProfiles.find((opt) => opt.value === tspProfile.defaultSigningProfile?.uuid)?.value || '',
+            defaultSigningProfile: tspProfile.defaultSigningProfile?.uuid || '',
             ...transformAttributes(attributeInitialValues ?? []),
         };
-    }, [editMode, id, tspProfile, isFetchingDetail, optionsForSigningProfiles, multipleResourceCustomAttributes]);
+    }, [editMode, id, tspProfile, isFetchingDetail, multipleResourceCustomAttributes]);
 
     useEffect(() => {
         if (valuesToReset && lastResetIdRef.current !== id) {
