@@ -59,7 +59,8 @@ enum SigningProfilesEpicIndex {
     ListSupportedProtocols = 17,
     ListSigningCertificates = 18,
     ListSignatureAttributes = 19,
-    ListSigningRecords = 20,
+    ListSignatureFormatterConnectorAttributes = 20,
+    ListSigningRecords = 21,
 }
 
 vi.mock('../App', () => ({
