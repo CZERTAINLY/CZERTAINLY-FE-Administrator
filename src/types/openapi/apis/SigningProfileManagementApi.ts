@@ -130,350 +130,502 @@ export interface UpdateSigningProfileRequest {
  * no description
  */
 export class SigningProfileManagementApi extends BaseAPI {
-
     /**
      * Activate TSP for Signing Profile
      */
-    activateTsp({ signingProfileUuid, tspProfileUuid }: ActivateTspRequest): Observable<TspActivationDetailDto>
-    activateTsp({ signingProfileUuid, tspProfileUuid }: ActivateTspRequest, opts?: OperationOpts): Observable<AjaxResponse<TspActivationDetailDto>>
-    activateTsp({ signingProfileUuid, tspProfileUuid }: ActivateTspRequest, opts?: OperationOpts): Observable<TspActivationDetailDto | AjaxResponse<TspActivationDetailDto>> {
+    activateTsp({ signingProfileUuid, tspProfileUuid }: ActivateTspRequest): Observable<TspActivationDetailDto>;
+    activateTsp(
+        { signingProfileUuid, tspProfileUuid }: ActivateTspRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<TspActivationDetailDto>>;
+    activateTsp(
+        { signingProfileUuid, tspProfileUuid }: ActivateTspRequest,
+        opts?: OperationOpts,
+    ): Observable<TspActivationDetailDto | AjaxResponse<TspActivationDetailDto>> {
         throwIfNullOrUndefined(signingProfileUuid, 'signingProfileUuid', 'activateTsp');
         throwIfNullOrUndefined(tspProfileUuid, 'tspProfileUuid', 'activateTsp');
 
-        return this.request<TspActivationDetailDto>({
-            url: '/v1/signingProfiles/{signingProfileUuid}/protocols/tsp/activate/{tspProfileUuid}'.replace('{signingProfileUuid}', encodeURI(signingProfileUuid)).replace('{tspProfileUuid}', encodeURI(tspProfileUuid)),
-            method: 'PATCH',
-        }, opts?.responseOpts);
-    };
+        return this.request<TspActivationDetailDto>(
+            {
+                url: '/v1/signingProfiles/{signingProfileUuid}/protocols/tsp/activate/{tspProfileUuid}'
+                    .replace('{signingProfileUuid}', encodeURI(signingProfileUuid))
+                    .replace('{tspProfileUuid}', encodeURI(tspProfileUuid)),
+                method: 'PATCH',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Associate Signing Profile with the Approval Profile
      */
-    associateWithApprovalProfile({ signingProfileUuid, approvalProfileUuid }: AssociateWithApprovalProfileRequest): Observable<void>
-    associateWithApprovalProfile({ signingProfileUuid, approvalProfileUuid }: AssociateWithApprovalProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    associateWithApprovalProfile({ signingProfileUuid, approvalProfileUuid }: AssociateWithApprovalProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    associateWithApprovalProfile({ signingProfileUuid, approvalProfileUuid }: AssociateWithApprovalProfileRequest): Observable<void>;
+    associateWithApprovalProfile(
+        { signingProfileUuid, approvalProfileUuid }: AssociateWithApprovalProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    associateWithApprovalProfile(
+        { signingProfileUuid, approvalProfileUuid }: AssociateWithApprovalProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(signingProfileUuid, 'signingProfileUuid', 'associateWithApprovalProfile');
         throwIfNullOrUndefined(approvalProfileUuid, 'approvalProfileUuid', 'associateWithApprovalProfile');
 
-        return this.request<void>({
-            url: '/v1/signingProfiles/{signingProfileUuid}/approvalProfiles/{approvalProfileUuid}'.replace('{signingProfileUuid}', encodeURI(signingProfileUuid)).replace('{approvalProfileUuid}', encodeURI(approvalProfileUuid)),
-            method: 'PATCH',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/signingProfiles/{signingProfileUuid}/approvalProfiles/{approvalProfileUuid}'
+                    .replace('{signingProfileUuid}', encodeURI(signingProfileUuid))
+                    .replace('{approvalProfileUuid}', encodeURI(approvalProfileUuid)),
+                method: 'PATCH',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Delete multiple Signing Profiles
      */
-    bulkDeleteSigningProfiles({ requestBody }: BulkDeleteSigningProfilesRequest): Observable<Array<BulkActionMessageDto>>
-    bulkDeleteSigningProfiles({ requestBody }: BulkDeleteSigningProfilesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BulkActionMessageDto>>>
-    bulkDeleteSigningProfiles({ requestBody }: BulkDeleteSigningProfilesRequest, opts?: OperationOpts): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
+    bulkDeleteSigningProfiles({ requestBody }: BulkDeleteSigningProfilesRequest): Observable<Array<BulkActionMessageDto>>;
+    bulkDeleteSigningProfiles(
+        { requestBody }: BulkDeleteSigningProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<BulkActionMessageDto>>>;
+    bulkDeleteSigningProfiles(
+        { requestBody }: BulkDeleteSigningProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
         throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDeleteSigningProfiles');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<Array<BulkActionMessageDto>>({
-            url: '/v1/signingProfiles',
-            method: 'DELETE',
-            headers,
-            body: requestBody,
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<BulkActionMessageDto>>(
+            {
+                url: '/v1/signingProfiles',
+                method: 'DELETE',
+                headers,
+                body: requestBody,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Disable multiple Signing Profiles
      */
-    bulkDisableSigningProfiles({ requestBody }: BulkDisableSigningProfilesRequest): Observable<Array<BulkActionMessageDto>>
-    bulkDisableSigningProfiles({ requestBody }: BulkDisableSigningProfilesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BulkActionMessageDto>>>
-    bulkDisableSigningProfiles({ requestBody }: BulkDisableSigningProfilesRequest, opts?: OperationOpts): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
+    bulkDisableSigningProfiles({ requestBody }: BulkDisableSigningProfilesRequest): Observable<Array<BulkActionMessageDto>>;
+    bulkDisableSigningProfiles(
+        { requestBody }: BulkDisableSigningProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<BulkActionMessageDto>>>;
+    bulkDisableSigningProfiles(
+        { requestBody }: BulkDisableSigningProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
         throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDisableSigningProfiles');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<Array<BulkActionMessageDto>>({
-            url: '/v1/signingProfiles/disable',
-            method: 'PATCH',
-            headers,
-            body: requestBody,
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<BulkActionMessageDto>>(
+            {
+                url: '/v1/signingProfiles/disable',
+                method: 'PATCH',
+                headers,
+                body: requestBody,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Enable multiple Signing Profiles
      */
-    bulkEnableSigningProfiles({ requestBody }: BulkEnableSigningProfilesRequest): Observable<Array<BulkActionMessageDto>>
-    bulkEnableSigningProfiles({ requestBody }: BulkEnableSigningProfilesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BulkActionMessageDto>>>
-    bulkEnableSigningProfiles({ requestBody }: BulkEnableSigningProfilesRequest, opts?: OperationOpts): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
+    bulkEnableSigningProfiles({ requestBody }: BulkEnableSigningProfilesRequest): Observable<Array<BulkActionMessageDto>>;
+    bulkEnableSigningProfiles(
+        { requestBody }: BulkEnableSigningProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<BulkActionMessageDto>>>;
+    bulkEnableSigningProfiles(
+        { requestBody }: BulkEnableSigningProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
         throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkEnableSigningProfiles');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<Array<BulkActionMessageDto>>({
-            url: '/v1/signingProfiles/enable',
-            method: 'PATCH',
-            headers,
-            body: requestBody,
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<BulkActionMessageDto>>(
+            {
+                url: '/v1/signingProfiles/enable',
+                method: 'PATCH',
+                headers,
+                body: requestBody,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Add new Signing Profile
      */
-    createSigningProfile({ signingProfileRequestDto }: CreateSigningProfileRequest): Observable<SigningProfileDto>
-    createSigningProfile({ signingProfileRequestDto }: CreateSigningProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<SigningProfileDto>>
-    createSigningProfile({ signingProfileRequestDto }: CreateSigningProfileRequest, opts?: OperationOpts): Observable<SigningProfileDto | AjaxResponse<SigningProfileDto>> {
+    createSigningProfile({ signingProfileRequestDto }: CreateSigningProfileRequest): Observable<SigningProfileDto>;
+    createSigningProfile(
+        { signingProfileRequestDto }: CreateSigningProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<SigningProfileDto>>;
+    createSigningProfile(
+        { signingProfileRequestDto }: CreateSigningProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<SigningProfileDto | AjaxResponse<SigningProfileDto>> {
         throwIfNullOrUndefined(signingProfileRequestDto, 'signingProfileRequestDto', 'createSigningProfile');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<SigningProfileDto>({
-            url: '/v1/signingProfiles',
-            method: 'POST',
-            headers,
-            body: signingProfileRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<SigningProfileDto>(
+            {
+                url: '/v1/signingProfiles',
+                method: 'POST',
+                headers,
+                body: signingProfileRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Deactivate TSP for Signing Profile
      */
-    deactivateTsp({ uuid }: DeactivateTspRequest): Observable<void>
-    deactivateTsp({ uuid }: DeactivateTspRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    deactivateTsp({ uuid }: DeactivateTspRequest): Observable<void>;
+    deactivateTsp({ uuid }: DeactivateTspRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deactivateTsp({ uuid }: DeactivateTspRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'deactivateTsp');
 
-        return this.request<void>({
-            url: '/v1/signingProfiles/{uuid}/protocols/tsp/deactivate'.replace('{uuid}', encodeURI(uuid)),
-            method: 'PATCH',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/signingProfiles/{uuid}/protocols/tsp/deactivate'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Delete Signing Profile
      */
-    deleteSigningProfile({ uuid }: DeleteSigningProfileRequest): Observable<void>
-    deleteSigningProfile({ uuid }: DeleteSigningProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    deleteSigningProfile({ uuid }: DeleteSigningProfileRequest): Observable<void>;
+    deleteSigningProfile({ uuid }: DeleteSigningProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteSigningProfile({ uuid }: DeleteSigningProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'deleteSigningProfile');
 
-        return this.request<void>({
-            url: '/v1/signingProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'DELETE',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/signingProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Disable Signing Profile
      */
-    disableSigningProfile({ uuid }: DisableSigningProfileRequest): Observable<void>
-    disableSigningProfile({ uuid }: DisableSigningProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    disableSigningProfile({ uuid }: DisableSigningProfileRequest): Observable<void>;
+    disableSigningProfile({ uuid }: DisableSigningProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     disableSigningProfile({ uuid }: DisableSigningProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'disableSigningProfile');
 
-        return this.request<void>({
-            url: '/v1/signingProfiles/{uuid}/disable'.replace('{uuid}', encodeURI(uuid)),
-            method: 'PATCH',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/signingProfiles/{uuid}/disable'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Disassociate Signing Profile with the Approval Profile
      */
-    disassociateFromApprovalProfile({ signingProfileUuid, approvalProfileUuid }: DisassociateFromApprovalProfileRequest): Observable<void>
-    disassociateFromApprovalProfile({ signingProfileUuid, approvalProfileUuid }: DisassociateFromApprovalProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    disassociateFromApprovalProfile({ signingProfileUuid, approvalProfileUuid }: DisassociateFromApprovalProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    disassociateFromApprovalProfile({ signingProfileUuid, approvalProfileUuid }: DisassociateFromApprovalProfileRequest): Observable<void>;
+    disassociateFromApprovalProfile(
+        { signingProfileUuid, approvalProfileUuid }: DisassociateFromApprovalProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    disassociateFromApprovalProfile(
+        { signingProfileUuid, approvalProfileUuid }: DisassociateFromApprovalProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(signingProfileUuid, 'signingProfileUuid', 'disassociateFromApprovalProfile');
         throwIfNullOrUndefined(approvalProfileUuid, 'approvalProfileUuid', 'disassociateFromApprovalProfile');
 
-        return this.request<void>({
-            url: '/v1/signingProfiles/{signingProfileUuid}/approvalProfiles/{approvalProfileUuid}'.replace('{signingProfileUuid}', encodeURI(signingProfileUuid)).replace('{approvalProfileUuid}', encodeURI(approvalProfileUuid)),
-            method: 'DELETE',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/signingProfiles/{signingProfileUuid}/approvalProfiles/{approvalProfileUuid}'
+                    .replace('{signingProfileUuid}', encodeURI(signingProfileUuid))
+                    .replace('{approvalProfileUuid}', encodeURI(approvalProfileUuid)),
+                method: 'DELETE',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Enable Signing Profile
      */
-    enableSigningProfile({ uuid }: EnableSigningProfileRequest): Observable<void>
-    enableSigningProfile({ uuid }: EnableSigningProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    enableSigningProfile({ uuid }: EnableSigningProfileRequest): Observable<void>;
+    enableSigningProfile({ uuid }: EnableSigningProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     enableSigningProfile({ uuid }: EnableSigningProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'enableSigningProfile');
 
-        return this.request<void>({
-            url: '/v1/signingProfiles/{uuid}/enable'.replace('{uuid}', encodeURI(uuid)),
-            method: 'PATCH',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: '/v1/signingProfiles/{uuid}/enable'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List of Approval Profiles associated with the Signing Profile
      */
-    getAssociatedApprovalProfiles({ uuid }: GetAssociatedApprovalProfilesRequest): Observable<Array<ApprovalProfileDto>>
-    getAssociatedApprovalProfiles({ uuid }: GetAssociatedApprovalProfilesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<ApprovalProfileDto>>>
-    getAssociatedApprovalProfiles({ uuid }: GetAssociatedApprovalProfilesRequest, opts?: OperationOpts): Observable<Array<ApprovalProfileDto> | AjaxResponse<Array<ApprovalProfileDto>>> {
+    getAssociatedApprovalProfiles({ uuid }: GetAssociatedApprovalProfilesRequest): Observable<Array<ApprovalProfileDto>>;
+    getAssociatedApprovalProfiles(
+        { uuid }: GetAssociatedApprovalProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<ApprovalProfileDto>>>;
+    getAssociatedApprovalProfiles(
+        { uuid }: GetAssociatedApprovalProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<ApprovalProfileDto> | AjaxResponse<Array<ApprovalProfileDto>>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getAssociatedApprovalProfiles');
 
-        return this.request<Array<ApprovalProfileDto>>({
-            url: '/v1/signingProfiles/{uuid}/approvalProfiles'.replace('{uuid}', encodeURI(uuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<ApprovalProfileDto>>(
+            {
+                url: '/v1/signingProfiles/{uuid}/approvalProfiles'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Details of a Signing Profile. If no specific version is provided, the latest version will be returned.
      */
-    getSigningProfile({ uuid, version }: GetSigningProfileRequest): Observable<SigningProfileDto>
-    getSigningProfile({ uuid, version }: GetSigningProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<SigningProfileDto>>
-    getSigningProfile({ uuid, version }: GetSigningProfileRequest, opts?: OperationOpts): Observable<SigningProfileDto | AjaxResponse<SigningProfileDto>> {
+    getSigningProfile({ uuid, version }: GetSigningProfileRequest): Observable<SigningProfileDto>;
+    getSigningProfile({ uuid, version }: GetSigningProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<SigningProfileDto>>;
+    getSigningProfile(
+        { uuid, version }: GetSigningProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<SigningProfileDto | AjaxResponse<SigningProfileDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getSigningProfile');
 
         const query: HttpQuery = {};
 
-        if (version != null) { query['version'] = version; }
+        if (version != null) {
+            query['version'] = version;
+        }
 
-        return this.request<SigningProfileDto>({
-            url: '/v1/signingProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'GET',
-            query,
-        }, opts?.responseOpts);
-    };
+        return this.request<SigningProfileDto>(
+            {
+                url: '/v1/signingProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
+                query,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get the activation details of the Timestamping Protocol (TSP) for Signing Profile
      */
-    getTspActivationDetails({ uuid }: GetTspActivationDetailsRequest): Observable<TspActivationDetailDto>
-    getTspActivationDetails({ uuid }: GetTspActivationDetailsRequest, opts?: OperationOpts): Observable<AjaxResponse<TspActivationDetailDto>>
-    getTspActivationDetails({ uuid }: GetTspActivationDetailsRequest, opts?: OperationOpts): Observable<TspActivationDetailDto | AjaxResponse<TspActivationDetailDto>> {
+    getTspActivationDetails({ uuid }: GetTspActivationDetailsRequest): Observable<TspActivationDetailDto>;
+    getTspActivationDetails(
+        { uuid }: GetTspActivationDetailsRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<TspActivationDetailDto>>;
+    getTspActivationDetails(
+        { uuid }: GetTspActivationDetailsRequest,
+        opts?: OperationOpts,
+    ): Observable<TspActivationDetailDto | AjaxResponse<TspActivationDetailDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getTspActivationDetails');
 
-        return this.request<TspActivationDetailDto>({
-            url: '/v1/signingProfiles/{uuid}/protocols/tsp'.replace('{uuid}', encodeURI(uuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<TspActivationDetailDto>(
+            {
+                url: '/v1/signingProfiles/{uuid}/protocols/tsp'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Returns the signing operation attribute descriptors (e.g. signature scheme, digest algorithm) derived from the key algorithm of the given certificate. Intended for use during Signing Profile creation to populate the signingOperationAttributes field.
      * Get signing operation attribute descriptors for a certificate
      */
-    listSignatureAttributesForCertificate({ certificateUuid }: ListSignatureAttributesForCertificateRequest): Observable<Array<BaseAttributeDto>>
-    listSignatureAttributesForCertificate({ certificateUuid }: ListSignatureAttributesForCertificateRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BaseAttributeDto>>>
-    listSignatureAttributesForCertificate({ certificateUuid }: ListSignatureAttributesForCertificateRequest, opts?: OperationOpts): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
+    listSignatureAttributesForCertificate({
+        certificateUuid,
+    }: ListSignatureAttributesForCertificateRequest): Observable<Array<BaseAttributeDto>>;
+    listSignatureAttributesForCertificate(
+        { certificateUuid }: ListSignatureAttributesForCertificateRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<BaseAttributeDto>>>;
+    listSignatureAttributesForCertificate(
+        { certificateUuid }: ListSignatureAttributesForCertificateRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
         throwIfNullOrUndefined(certificateUuid, 'certificateUuid', 'listSignatureAttributesForCertificate');
 
-        return this.request<Array<BaseAttributeDto>>({
-            url: '/v1/signingProfiles/certificates/{certificateUuid}/signatureAttributes'.replace('{certificateUuid}', encodeURI(certificateUuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<BaseAttributeDto>>(
+            {
+                url: '/v1/signingProfiles/certificates/{certificateUuid}/signatureAttributes'.replace(
+                    '{certificateUuid}',
+                    encodeURI(certificateUuid),
+                ),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Queries the Signature Formatter Connector for its available formatter attribute descriptors with connector default values. The signingProfileUuid parameter is used for authorization only and does not affect the returned descriptors.
      * Get formatter attribute descriptors from a Signature Formatter Connector
      */
-    listSignatureFormatterConnectorAttributes({ connectorUuid, signingProfileUuid }: ListSignatureFormatterConnectorAttributesRequest): Observable<Array<DataAttribute>>
-    listSignatureFormatterConnectorAttributes({ connectorUuid, signingProfileUuid }: ListSignatureFormatterConnectorAttributesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<DataAttribute>>>
-    listSignatureFormatterConnectorAttributes({ connectorUuid, signingProfileUuid }: ListSignatureFormatterConnectorAttributesRequest, opts?: OperationOpts): Observable<Array<DataAttribute> | AjaxResponse<Array<DataAttribute>>> {
+    listSignatureFormatterConnectorAttributes({
+        connectorUuid,
+        signingProfileUuid,
+    }: ListSignatureFormatterConnectorAttributesRequest): Observable<Array<BaseAttributeDto>>;
+    listSignatureFormatterConnectorAttributes(
+        { connectorUuid, signingProfileUuid }: ListSignatureFormatterConnectorAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<BaseAttributeDto>>>;
+    listSignatureFormatterConnectorAttributes(
+        { connectorUuid, signingProfileUuid }: ListSignatureFormatterConnectorAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
         throwIfNullOrUndefined(connectorUuid, 'connectorUuid', 'listSignatureFormatterConnectorAttributes');
 
         const query: HttpQuery = {};
 
-        if (signingProfileUuid != null) { query['signingProfileUuid'] = signingProfileUuid; }
+        if (signingProfileUuid != null) {
+            query['signingProfileUuid'] = signingProfileUuid;
+        }
 
-        return this.request<Array<DataAttribute>>({
-            url: '/v1/signingProfiles/signatureFormatterConnectors/{connectorUuid}/formatterAttributes'.replace('{connectorUuid}', encodeURI(connectorUuid)),
-            method: 'GET',
-            query,
-        }, opts?.responseOpts);
-    };
-
-    /**
-     * Queries the Signature Formatter Connector for its available formatter attribute descriptors with connector default values. The signingProfileUuid parameter is used for authorization only and does not affect the returned descriptors.
-     * Get formatter attribute descriptors from a Signature Formatter Connector
-     */
-    listSignatureFormatterConnectorAttributes({ connectorUuid, signingProfileUuid }: ListSignatureFormatterConnectorAttributesRequest): Observable<Array<BaseAttributeDto>>
-    listSignatureFormatterConnectorAttributes({ connectorUuid, signingProfileUuid }: ListSignatureFormatterConnectorAttributesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BaseAttributeDto>>>
-    listSignatureFormatterConnectorAttributes({ connectorUuid, signingProfileUuid }: ListSignatureFormatterConnectorAttributesRequest, opts?: OperationOpts): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
-        throwIfNullOrUndefined(connectorUuid, 'connectorUuid', 'listSignatureFormatterConnectorAttributes');
-
-        const query: HttpQuery = {};
-
-        if (signingProfileUuid != null) { query['signingProfileUuid'] = signingProfileUuid; }
-
-        return this.request<Array<BaseAttributeDto>>({
-            url: '/v1/signingProfiles/signatureFormatterConnectors/{connectorUuid}/formatterAttributes'.replace('{connectorUuid}', encodeURI(connectorUuid)),
-            method: 'GET',
-            query,
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<BaseAttributeDto>>(
+            {
+                url: '/v1/signingProfiles/signatureFormatterConnectors/{connectorUuid}/formatterAttributes'.replace(
+                    '{connectorUuid}',
+                    encodeURI(connectorUuid),
+                ),
+                method: 'GET',
+                query,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get list of certificates eligible to be used for digital signing
      */
-    listSigningCertificates({ signingWorkflowType, qualifiedTimestamp }: ListSigningCertificatesRequest): Observable<Array<CertificateDto>>
-    listSigningCertificates({ signingWorkflowType, qualifiedTimestamp }: ListSigningCertificatesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<CertificateDto>>>
-    listSigningCertificates({ signingWorkflowType, qualifiedTimestamp }: ListSigningCertificatesRequest, opts?: OperationOpts): Observable<Array<CertificateDto> | AjaxResponse<Array<CertificateDto>>> {
+    listSigningCertificates({ signingWorkflowType, qualifiedTimestamp }: ListSigningCertificatesRequest): Observable<Array<CertificateDto>>;
+    listSigningCertificates(
+        { signingWorkflowType, qualifiedTimestamp }: ListSigningCertificatesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<CertificateDto>>>;
+    listSigningCertificates(
+        { signingWorkflowType, qualifiedTimestamp }: ListSigningCertificatesRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<CertificateDto> | AjaxResponse<Array<CertificateDto>>> {
         throwIfNullOrUndefined(signingWorkflowType, 'signingWorkflowType', 'listSigningCertificates');
 
-        const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
-            'signingWorkflowType': signingWorkflowType,
+        const query: HttpQuery = {
+            // required parameters are used directly since they are already checked by throwIfNullOrUndefined
+            signingWorkflowType: signingWorkflowType,
         };
 
-        if (qualifiedTimestamp != null) { query['qualifiedTimestamp'] = qualifiedTimestamp; }
+        if (qualifiedTimestamp != null) {
+            query['qualifiedTimestamp'] = qualifiedTimestamp;
+        }
 
-        return this.request<Array<CertificateDto>>({
-            url: '/v1/signingProfiles/signingCertificates',
-            method: 'GET',
-            query,
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<CertificateDto>>(
+            {
+                url: '/v1/signingProfiles/signingCertificates',
+                method: 'GET',
+                query,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List search filters for Signing Profiles
      */
-    listSigningProfileSearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>
-    listSigningProfileSearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
-    listSigningProfileSearchableFields(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
-        return this.request<Array<SearchFieldDataByGroupDto>>({
-            url: '/v1/signingProfiles/search',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+    listSigningProfileSearchableFields(): Observable<Array<SearchFieldDataByGroupDto>>;
+    listSigningProfileSearchableFields(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>;
+    listSigningProfileSearchableFields(
+        opts?: OperationOpts,
+    ): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
+        return this.request<Array<SearchFieldDataByGroupDto>>(
+            {
+                url: '/v1/signingProfiles/search',
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List of available Signing Profiles
      */
-    listSigningProfiles({ searchRequestDto }: ListSigningProfilesRequest): Observable<PaginationResponseDtoSigningProfileListDto>
-    listSigningProfiles({ searchRequestDto }: ListSigningProfilesRequest, opts?: OperationOpts): Observable<AjaxResponse<PaginationResponseDtoSigningProfileListDto>>
-    listSigningProfiles({ searchRequestDto }: ListSigningProfilesRequest, opts?: OperationOpts): Observable<PaginationResponseDtoSigningProfileListDto | AjaxResponse<PaginationResponseDtoSigningProfileListDto>> {
+    listSigningProfiles({ searchRequestDto }: ListSigningProfilesRequest): Observable<PaginationResponseDtoSigningProfileListDto>;
+    listSigningProfiles(
+        { searchRequestDto }: ListSigningProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<PaginationResponseDtoSigningProfileListDto>>;
+    listSigningProfiles(
+        { searchRequestDto }: ListSigningProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<PaginationResponseDtoSigningProfileListDto | AjaxResponse<PaginationResponseDtoSigningProfileListDto>> {
         throwIfNullOrUndefined(searchRequestDto, 'searchRequestDto', 'listSigningProfiles');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<PaginationResponseDtoSigningProfileListDto>({
-            url: '/v1/signingProfiles/list',
-            method: 'POST',
-            headers,
-            body: searchRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<PaginationResponseDtoSigningProfileListDto>(
+            {
+                url: '/v1/signingProfiles/list',
+                method: 'POST',
+                headers,
+                body: searchRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Returns a paginated, filterable list of all Signing Records that were produced using this Signing Profile. Supports the same search and pagination parameters as the top-level Signing Records listing.
      * List Signing Records produced under a Signing Profile
      */
-    listSigningRecordsForSigningProfile({ uuid, searchRequestDto }: ListSigningRecordsForSigningProfileRequest): Observable<PaginationResponseDtoSigningRecordListDto>
-    listSigningRecordsForSigningProfile({ uuid, searchRequestDto }: ListSigningRecordsForSigningProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<PaginationResponseDtoSigningRecordListDto>>
-    listSigningRecordsForSigningProfile({ uuid, searchRequestDto }: ListSigningRecordsForSigningProfileRequest, opts?: OperationOpts): Observable<PaginationResponseDtoSigningRecordListDto | AjaxResponse<PaginationResponseDtoSigningRecordListDto>> {
+    listSigningRecordsForSigningProfile({
+        uuid,
+        searchRequestDto,
+    }: ListSigningRecordsForSigningProfileRequest): Observable<PaginationResponseDtoSigningRecordListDto>;
+    listSigningRecordsForSigningProfile(
+        { uuid, searchRequestDto }: ListSigningRecordsForSigningProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<PaginationResponseDtoSigningRecordListDto>>;
+    listSigningRecordsForSigningProfile(
+        { uuid, searchRequestDto }: ListSigningRecordsForSigningProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<PaginationResponseDtoSigningRecordListDto | AjaxResponse<PaginationResponseDtoSigningRecordListDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'listSigningRecordsForSigningProfile');
         throwIfNullOrUndefined(searchRequestDto, 'searchRequestDto', 'listSigningRecordsForSigningProfile');
 
@@ -481,40 +633,59 @@ export class SigningProfileManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<PaginationResponseDtoSigningRecordListDto>({
-            url: '/v1/signingProfiles/{uuid}/signingRecords'.replace('{uuid}', encodeURI(uuid)),
-            method: 'POST',
-            headers,
-            body: searchRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<PaginationResponseDtoSigningRecordListDto>(
+            {
+                url: '/v1/signingProfiles/{uuid}/signingRecords'.replace('{uuid}', encodeURI(uuid)),
+                method: 'POST',
+                headers,
+                body: searchRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List signing protocols supported for a given workflow type
      */
-    listSupportedProtocols({ workflowType }: ListSupportedProtocolsRequest): Observable<Array<SigningProtocol>>
-    listSupportedProtocols({ workflowType }: ListSupportedProtocolsRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<SigningProtocol>>>
-    listSupportedProtocols({ workflowType }: ListSupportedProtocolsRequest, opts?: OperationOpts): Observable<Array<SigningProtocol> | AjaxResponse<Array<SigningProtocol>>> {
+    listSupportedProtocols({ workflowType }: ListSupportedProtocolsRequest): Observable<Array<SigningProtocol>>;
+    listSupportedProtocols(
+        { workflowType }: ListSupportedProtocolsRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<SigningProtocol>>>;
+    listSupportedProtocols(
+        { workflowType }: ListSupportedProtocolsRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<SigningProtocol> | AjaxResponse<Array<SigningProtocol>>> {
         throwIfNullOrUndefined(workflowType, 'workflowType', 'listSupportedProtocols');
 
-        const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
-            'workflowType': workflowType,
+        const query: HttpQuery = {
+            // required parameters are used directly since they are already checked by throwIfNullOrUndefined
+            workflowType: workflowType,
         };
 
-        return this.request<Array<SigningProtocol>>({
-            url: '/v1/signingProfiles/supportedProtocols',
-            method: 'GET',
-            query,
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<SigningProtocol>>(
+            {
+                url: '/v1/signingProfiles/supportedProtocols',
+                method: 'GET',
+                query,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Request to update an existing Signing Profile. If there are existing Signing Records produced using this Signing Profile, creates a new version of Signing Profile. Otherwise updates the latest version in-place.
      * Update Signing Profile
      */
-    updateSigningProfile({ uuid, signingProfileRequestDto }: UpdateSigningProfileRequest): Observable<SigningProfileDto>
-    updateSigningProfile({ uuid, signingProfileRequestDto }: UpdateSigningProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<SigningProfileDto>>
-    updateSigningProfile({ uuid, signingProfileRequestDto }: UpdateSigningProfileRequest, opts?: OperationOpts): Observable<SigningProfileDto | AjaxResponse<SigningProfileDto>> {
+    updateSigningProfile({ uuid, signingProfileRequestDto }: UpdateSigningProfileRequest): Observable<SigningProfileDto>;
+    updateSigningProfile(
+        { uuid, signingProfileRequestDto }: UpdateSigningProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<SigningProfileDto>>;
+    updateSigningProfile(
+        { uuid, signingProfileRequestDto }: UpdateSigningProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<SigningProfileDto | AjaxResponse<SigningProfileDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'updateSigningProfile');
         throwIfNullOrUndefined(signingProfileRequestDto, 'signingProfileRequestDto', 'updateSigningProfile');
 
@@ -522,12 +693,14 @@ export class SigningProfileManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<SigningProfileDto>({
-            url: '/v1/signingProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-            method: 'PUT',
-            headers,
-            body: signingProfileRequestDto,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<SigningProfileDto>(
+            {
+                url: '/v1/signingProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PUT',
+                headers,
+                body: signingProfileRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 }
