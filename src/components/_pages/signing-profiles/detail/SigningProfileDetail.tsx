@@ -6,11 +6,11 @@ import Breadcrumb from 'components/Breadcrumb';
 import Button from 'components/Button';
 import ProgressButton from 'components/ProgressButton';
 import Container from 'components/Container';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
 import AttributeViewer from 'components/Attributes/AttributeViewer';
 import TabLayout from 'components/Layout/TabLayout';
@@ -22,15 +22,15 @@ import Select from 'components/Select';
 import AssociateApprovalProfileDialogBody from '../AssociateApprovalProfileDialogBody';
 
 import {
-    DigestAlgorithm,
+    type DigestAlgorithm,
     ManagedSigningType,
     PlatformEnum,
     Resource,
     SigningProtocol,
     SigningScheme,
     SigningWorkflowType,
-    StaticKeyManagedSigningDto,
-    TimestampingWorkflowDto,
+    type StaticKeyManagedSigningDto,
+    type TimestampingWorkflowDto,
 } from 'types/openapi';
 import { isStaticKeyManagedSigning, isTimestampingWorkflow } from 'utils/type-guards';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -448,7 +448,7 @@ export default function SigningProfileDetail() {
             {
                 id: 'tsp',
                 columns: [
-                    'Timestamping Protocol (TSP)',
+                    'Timestamping Protocol (TSA)',
                     <StatusBadge enabled={tspActivationDetails?.available ?? false} />,
                     <ProgressButton
                         type="button"
