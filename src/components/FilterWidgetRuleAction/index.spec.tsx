@@ -5,6 +5,7 @@ import {
     countFieldDef,
     createdAtDatetimeFieldDef,
     customAttrFieldDef,
+    datesListFieldDef,
     defaultMockAvailableFilters,
     expiresAtFieldDef,
     groupsFieldDef,
@@ -395,6 +396,34 @@ test.describe('FilterWidgetRuleAction', () => {
         expect(actions.current).toHaveLength(1);
         expect(Array.isArray(firstAction(actions.current).data)).toBe(true);
         expect(firstAction(actions.current).data[0]).toContain('2026-03-01T10:00:00');
+    });
+
+    test('date list execution item with plain-date data pre-selects matching ISO option', async ({ mount, page }) => {
+        const actions = await mountWithActions(mount, {
+            availableFilters: makeSearchFieldList(FilterFieldSource.Custom, [datesListFieldDef]),
+            ExecutionsList: [{ fieldSource: FilterFieldSource.Custom, fieldIdentifier: 'customDates', data: ['2026-03-29'] }],
+        });
+
+        await clickBadgeAndExpectUpdate(page, 'Custom Dates');
+
+        const selectedValues = await getSelectedNativeValues(page);
+        expect(selectedValues).toContain('2026-03-29T00:00:00Z');
+
+        await page.getByRole('button', { name: 'Update', exact: true }).click();
+        expect(Array.isArray(firstAction(actions.current).data)).toBe(true);
+        expect(firstAction(actions.current).data[0]).toBe('2026-03-29');
+    });
+
+    test('date list scalar execution item wraps value for multi-select and pre-selects', async ({ mount, page }) => {
+        await mountWithActions(mount, {
+            availableFilters: makeSearchFieldList(FilterFieldSource.Custom, [datesListFieldDef]),
+            ExecutionsList: [{ fieldSource: FilterFieldSource.Custom, fieldIdentifier: 'customDates', data: '2026-03-29' }],
+        });
+
+        await clickBadgeAndExpectUpdate(page, 'Custom Dates');
+
+        const selectedValues = await getSelectedNativeValues(page);
+        expect(selectedValues).toContain('2026-03-29T00:00:00Z');
     });
 
     test('date scalar execution item hydrates formatted date input and keeps update enabled', async ({ mount, page }) => {

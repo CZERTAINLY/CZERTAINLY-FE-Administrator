@@ -35,7 +35,10 @@ function formatBadgeDataValue(v: any, field: any, platformEnums: Record<string, 
     if (typeof v === 'object' && v !== null) {
         if (v.name) return v.name;
         if (field && checkIfFieldAttributeTypeIsDate(field)) {
-            return v.label ? getFormattedDateTime(v.label) : getFormattedDateTime(v);
+            const labelStr = v.label ?? v;
+            return field.attributeContentType === AttributeContentType.Date
+                ? getFormattedDate(labelStr as string)
+                : getFormattedDateTime(labelStr as string);
         }
         return v.label ?? String(v);
     }
@@ -54,10 +57,11 @@ function mapFieldValueToOption(
     normalizeValue: (v: any) => SelectableValue = (x) => x,
 ): { label: string; value: SelectableValue } {
     if (typeof v === 'string') {
-        return {
-            label: checkIfFieldAttributeTypeIsDate(fieldRef) ? getFormattedDateTime(v) : v,
-            value: v,
-        };
+        let label = v;
+        if (checkIfFieldAttributeTypeIsDate(fieldRef)) {
+            label = fieldRef?.attributeContentType === AttributeContentType.Date ? getFormattedDate(v) : getFormattedDateTime(v);
+        }
+        return { label, value: v };
     }
     if (checkIfFieldAttributeTypeIsDate(fieldRef)) {
         return { label: v.label, value: v.value };
@@ -387,10 +391,26 @@ export default function FilterWidgetRuleAction({
     }, [currentField, normalizeSelectValue]);
     const updateFilterValueDateTime = useCallback((currentFieldThis: any, currentActionData: any) => {
         if (currentFieldThis.type === 'list') {
+            // Compare only the YYYY-MM-DD part: saved data uses plain dates, API field values use ISO strings.
+            const findMatchingFieldOption = (v: any): { label: string; value: any } => {
+                const rawStr = typeof v === 'object' && v !== null && v.value !== undefined ? String(v.value) : String(v);
+                const datePart = rawStr.split('T')[0];
+                if (Array.isArray(currentFieldThis.value)) {
+                    const matched = currentFieldThis.value.find(
+                        (fv: any) => (typeof fv === 'string' ? fv : String(fv)).split('T')[0] === datePart,
+                    );
+                    if (matched !== undefined) {
+                        return mapFieldValueToOption(matched, currentFieldThis);
+                    }
+                }
+                return mapFieldValueToOption(v, currentFieldThis);
+            };
+
             if (Array.isArray(currentActionData)) {
-                setFilterValue(currentActionData.map((v: any) => mapFieldValueToOption(v, currentFieldThis)));
+                setFilterValue(currentActionData.map(findMatchingFieldOption));
             } else {
-                setFilterValue({ label: getFormattedDateTime(currentActionData as unknown as string), value: currentActionData });
+                const resolved = findMatchingFieldOption(currentActionData);
+                setFilterValue(currentFieldThis.multiValue ? [resolved] : resolved);
             }
         } else {
             setFilterValue(getFormattedDateByType(currentActionData as unknown as string, currentFieldThis.attributeContentType));
