@@ -1,19 +1,20 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import {
-    ApprovalProfileDto,
-    BaseAttributeDto,
-    CertificateDto,
-    PaginationResponseDtoSigningRecordListDto,
-    SearchFieldDataByGroupDto,
-    SigningProfileDto,
-    SigningProfileListDto,
-    SigningProfileRequestDto,
+    type ApprovalProfileDto,
+    type BaseAttributeDto,
+    type CertificateDto,
+    type PaginationResponseDtoSigningRecordListDto,
+    type SearchFieldDataByGroupDto,
+    type SigningProfileDto,
+    type SigningProfileListDto,
+    type SigningProfileRequestDto,
     SigningProtocol,
-    SigningWorkflowType,
-    TspActivationDetailDto,
+    type SigningWorkflowType,
+    type TspActivationDetailDto,
 } from 'types/openapi';
-import { BulkActionMessageDto } from 'types/openapi/models/BulkActionMessageDto';
-import { SearchRequestModel } from 'types/certificate';
+import type { BulkActionMessageDto } from 'types/openapi/models/BulkActionMessageDto';
+import type { SearchRequestModel } from 'types/certificate';
+import type { ConnectorResponseModel } from 'types/connectors';
 
 export type State = {
     deleteErrorMessage: string;
@@ -28,6 +29,7 @@ export type State = {
     signingCertificates: CertificateDto[];
     signingOperationAttributeDescriptors: BaseAttributeDto[];
     signatureFormatterConnectorAttributeDescriptors: BaseAttributeDto[];
+    signatureFormatterConnectors: ConnectorResponseModel[];
     signingRecords?: PaginationResponseDtoSigningRecordListDto;
 
     searchableFields?: SearchFieldDataByGroupDto[];
@@ -41,6 +43,7 @@ export type State = {
     isFetchingSigningCertificates: boolean;
     isFetchingSignatureAttributes: boolean;
     isFetchingSignatureFormatterConnectorAttributes: boolean;
+    isFetchingSignatureFormatterConnectors: boolean;
     isFetchingSigningRecords: boolean;
     isCreating: boolean;
     isDeleting: boolean;
@@ -67,6 +70,7 @@ export const initialState: State = {
     signingCertificates: [],
     signingOperationAttributeDescriptors: [],
     signatureFormatterConnectorAttributeDescriptors: [],
+    signatureFormatterConnectors: [],
 
     isFetchingList: false,
     isFetchingDetail: false,
@@ -77,6 +81,7 @@ export const initialState: State = {
     isFetchingSigningCertificates: false,
     isFetchingSignatureAttributes: false,
     isFetchingSignatureFormatterConnectorAttributes: false,
+    isFetchingSignatureFormatterConnectors: false,
     isFetchingSigningRecords: false,
     isCreating: false,
     isDeleting: false,
@@ -100,7 +105,7 @@ export const slice = createSlice({
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
             Object.keys(state).forEach((key) => {
-                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+                if (!Object.hasOwn(initialState, key)) (state as any)[key] = undefined;
             });
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
         },
@@ -466,6 +471,21 @@ export const slice = createSlice({
             state.isFetchingSignatureFormatterConnectorAttributes = false;
         },
 
+        // Signature formatter connectors (filtered by feature)
+        listSignatureFormatterConnectors: (state, action: PayloadAction<{ workflowType: SigningWorkflowType }>) => {
+            state.isFetchingSignatureFormatterConnectors = true;
+            state.signatureFormatterConnectors = [];
+        },
+
+        listSignatureFormatterConnectorsSuccess: (state, action: PayloadAction<{ connectors: ConnectorResponseModel[] }>) => {
+            state.isFetchingSignatureFormatterConnectors = false;
+            state.signatureFormatterConnectors = action.payload.connectors;
+        },
+
+        listSignatureFormatterConnectorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingSignatureFormatterConnectors = false;
+        },
+
         // Signing records
         listSigningRecordsForSigningProfile: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isFetchingSigningRecords = true;
@@ -498,6 +518,7 @@ const signatureFormatterConnectorAttributeDescriptors = createSelector(
     state,
     (state) => state.signatureFormatterConnectorAttributeDescriptors,
 );
+const signatureFormatterConnectors = createSelector(state, (state) => state.signatureFormatterConnectors);
 const signingRecords = createSelector(state, (state) => state.signingRecords);
 const searchableFields = createSelector(state, (state) => state.searchableFields);
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
@@ -515,6 +536,7 @@ const isFetchingSignatureFormatterConnectorAttributes = createSelector(
     state,
     (state) => state.isFetchingSignatureFormatterConnectorAttributes,
 );
+const isFetchingSignatureFormatterConnectors = createSelector(state, (state) => state.isFetchingSignatureFormatterConnectors);
 const isFetchingSigningRecords = createSelector(state, (state) => state.isFetchingSigningRecords);
 const isCreating = createSelector(state, (state) => state.isCreating);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
@@ -541,6 +563,7 @@ export const selectors = {
     signingCertificates,
     signingOperationAttributeDescriptors,
     signatureFormatterConnectorAttributeDescriptors,
+    signatureFormatterConnectors,
     signingRecords,
     searchableFields,
     isFetchingList,
@@ -552,6 +575,7 @@ export const selectors = {
     isFetchingSigningCertificates,
     isFetchingSignatureAttributes,
     isFetchingSignatureFormatterConnectorAttributes,
+    isFetchingSignatureFormatterConnectors,
     isFetchingSigningRecords,
     isCreating,
     isDeleting,

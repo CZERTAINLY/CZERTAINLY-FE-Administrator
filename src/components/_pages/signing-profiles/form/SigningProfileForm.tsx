@@ -15,7 +15,6 @@ import TabLayout from 'components/Layout/TabLayout';
 
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { actions as connectorActions, selectors as connectorSelectors } from 'ducks/connectors';
 import { actions as signingProfileActions, selectors as signingProfileSelectors } from 'ducks/signing-profiles';
 import { actions as tqcActions, selectors as tqcSelectors } from 'ducks/time-quality-configurations';
 
@@ -26,8 +25,8 @@ import {
     Resource,
     SigningScheme,
     SigningWorkflowType,
-    TimestampingWorkflowRequestDto,
-    StaticKeyManagedSigningRequestDto,
+    type TimestampingWorkflowRequestDto,
+    type StaticKeyManagedSigningRequestDto,
 } from 'types/openapi';
 import { isStaticKeyManagedSigning, isTimestampingWorkflow } from 'utils/type-guards';
 import { collectFormAttributes, mapProfileAttribute, transformAttributes } from 'utils/attributes/attributes';
@@ -105,8 +104,8 @@ export default function SigningProfileForm() {
     const isCreating = useSelector(signingProfileSelectors.isCreating);
     const isUpdating = useSelector(signingProfileSelectors.isUpdating);
 
-    const connectors = useSelector(connectorSelectors.connectors);
-    const isFetchingConnectors = useSelector(connectorSelectors.isFetchingList);
+    const connectors = useSelector(signingProfileSelectors.signatureFormatterConnectors);
+    const isFetchingConnectors = useSelector(signingProfileSelectors.isFetchingSignatureFormatterConnectors);
 
     const timeQualityConfigurations = useSelector(tqcSelectors.timeQualityConfigurations);
     const isFetchingTqcList = useSelector(tqcSelectors.isFetchingList);
@@ -160,7 +159,7 @@ export default function SigningProfileForm() {
     // ── Load data on mount ────────────────────────────────────────────────────
 
     useEffect(() => {
-        dispatch(connectorActions.listConnectorsMerge({}));
+        dispatch(signingProfileActions.listSignatureFormatterConnectors({ workflowType: WORKFLOW_TYPE }));
         dispatch(signingProfileActions.listSigningCertificates({ workflowType: WORKFLOW_TYPE }));
         dispatch(signingProfileActions.listSupportedProtocols({ workflowType: WORKFLOW_TYPE }));
         dispatch(tqcActions.listTimeQualityConfigurations({}));

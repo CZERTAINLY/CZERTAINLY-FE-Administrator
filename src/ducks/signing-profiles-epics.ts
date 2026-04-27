@@ -1,4 +1,4 @@
-import { AppEpic } from 'ducks';
+import type { AppEpic } from 'ducks';
 import { of } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 import { extractError } from 'utils/net';
@@ -11,6 +11,8 @@ import { actions as pagingActions } from './paging';
 import { selectors, slice } from './signing-profiles';
 import { isTimestampingWorkflow } from 'utils/type-guards';
 import { transformSearchRequestModelToDto } from './transform/certificates';
+import { transformConnectorDtoV2ToModel } from './transform/connectors';
+import { ConnectorInterface, FilterConditionOperator, FilterFieldSource, SigningWorkflowType } from 'types/openapi';
 import { actions as userInterfaceActions } from './user-interface';
 import { store } from '../App';
 
@@ -507,6 +509,59 @@ const listSigningRecordsForSigningProfile: AppEpic = (action$, state$, deps) => 
     );
 };
 
+const workflowTypeToConnectorFeature: Partial<Record<SigningWorkflowType, string>> = {
+    [SigningWorkflowType.Timestamping]: 'timestamping',
+};
+
+const listSignatureFormatterConnectors: AppEpic = (action$, _state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.listSignatureFormatterConnectors.match),
+        switchMap((action) => {
+            const featureValue = workflowTypeToConnectorFeature[action.payload.workflowType];
+            const featureFilter = featureValue
+                ? [
+                      {
+                          fieldSource: FilterFieldSource.Property,
+                          fieldIdentifier: 'CONNECTOR_FEATURES',
+                          condition: FilterConditionOperator.Contains,
+                          value: featureValue,
+                      },
+                  ]
+                : [];
+            return deps.apiClients.connectorsV2
+                .listConnectorsV2({
+                    searchRequestDto: {
+                        pageNumber: 1,
+                        itemsPerPage: 1000,
+                        filters: [
+                            ...featureFilter,
+                            {
+                                fieldSource: FilterFieldSource.Property,
+                                fieldIdentifier: 'CONNECTOR_INTERFACE',
+                                condition: FilterConditionOperator.Equals,
+                                value: ConnectorInterface.SignatureFormatting,
+                            },
+                        ],
+                    },
+                })
+                .pipe(
+                    map((page) =>
+                        slice.actions.listSignatureFormatterConnectorsSuccess({
+                            connectors: page.items.map(transformConnectorDtoV2ToModel),
+                        }),
+                    ),
+                    catchError((error) =>
+                        of(
+                            slice.actions.listSignatureFormatterConnectorsFailure({
+                                error: extractError(error, 'Failed to get signature formatter connectors'),
+                            }),
+                        ),
+                    ),
+                );
+        }),
+    );
+};
+
 const epics = [
     listSigningProfiles,
     getSigningProfile,
@@ -529,6 +584,7 @@ const epics = [
     listSigningCertificates,
     listSignatureAttributesForCertificate,
     listSignatureFormatterConnectorAttributes,
+    listSignatureFormatterConnectors,
     listSigningRecordsForSigningProfile,
 ];
 
