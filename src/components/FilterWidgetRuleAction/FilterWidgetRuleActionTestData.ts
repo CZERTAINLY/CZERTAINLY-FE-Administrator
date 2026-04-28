@@ -102,6 +102,16 @@ export const issuedOnDateFieldDef = {
     attributeContentType: AttributeContentType.Date,
 };
 
+// Date list field with ISO-string options — saved data normalizes to plain YYYY-MM-DD, requiring date-part matching.
+export const datesListFieldDef = {
+    fieldIdentifier: 'customDates',
+    fieldLabel: 'Custom Dates',
+    type: 'list' as const,
+    multiValue: true,
+    attributeContentType: AttributeContentType.Date,
+    value: ['2026-02-20T00:00:00Z', '2026-03-29T00:00:00Z', '2026-04-13T00:00:00Z'],
+};
+
 export const createdAtDatetimeFieldDef = {
     fieldIdentifier: 'createdAt',
     fieldLabel: 'Created At',
