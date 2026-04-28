@@ -53,9 +53,7 @@ test.describe('Tooltip', () => {
         );
 
         await expect(component.getByText('Button')).toBeVisible();
-
-        const wrapper = component.locator('.hs-tooltip');
-        await expect(wrapper).toHaveClass(/pointer-events-none/);
+        await expect(component).toHaveClass(/pointer-events-none/);
 
         const tooltip = component.locator('[role="tooltip"]');
         await expect(tooltip).toHaveCount(1);
