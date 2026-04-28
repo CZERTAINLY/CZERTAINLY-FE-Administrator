@@ -74,4 +74,6 @@ export enum Resource {
     Vaults = 'vaults',
     VaultProfiles = 'vaultProfiles',
     Secrets = 'secrets',
+    TrustedCertificates = 'trustedCertificates',
+    Proxies = 'proxies',
 }
