@@ -105,11 +105,15 @@ export function SendNotificationExecutionItems({ mode, isUpdating, notificationP
                 </Container>
             </div>
 
-            {selectedProfiles.map((profile, i) => (
-                <Badge key={profile.value + i}>
-                    {getBadgeContent(i, profile.label, profile.value, selectedProfiles.length <= 1 && mode === 'detail')}
-                </Badge>
-            ))}
+            {selectedProfiles.length > 0 && (
+                <div className="flex gap-2 flex-wrap pt-2">
+                    {selectedProfiles.map((profile, i) => (
+                        <Badge key={profile.value + i}>
+                            {getBadgeContent(i, profile.label, profile.value, selectedProfiles.length <= 1 && mode === 'detail')}
+                        </Badge>
+                    ))}
+                </div>
+            )}
         </Widget>
     );
 }
