@@ -24,6 +24,7 @@ import { actions as groupActions, selectors as groupSelectors } from 'ducks/cert
 import { actions as complianceProfileActions } from 'ducks/compliance-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as secretsActions, selectors as secretsSelectors } from 'ducks/secrets';
+import { SecretContentDialog } from '../SecretContentDialog/SecretContentDialog';
 import { actions as userActions, selectors as userSelectors } from 'ducks/users';
 import { actions as vaultProfileActions, selectors as vaultProfileSelectors } from 'ducks/vault-profiles';
 
@@ -45,7 +46,9 @@ function SecretDetail() {
 
     const secret = useSelector(secretsSelectors.secret);
     const versions = useSelector(secretsSelectors.versions);
+    const secretContent = useSelector(secretsSelectors.secretContent);
     const isFetchingDetail = useSelector(secretsSelectors.isFetchingDetail);
+    const isFetchingContent = useSelector(secretsSelectors.isFetchingContent);
     const isDeleting = useSelector(secretsSelectors.isDeleting);
     const isUpdating = useSelector(secretsSelectors.isUpdating);
     const approvals = useSelector(approvalSelectors.approvals);
@@ -59,6 +62,7 @@ function SecretDetail() {
     const groups = useSelector(groupSelectors.certificateGroups);
     const vaultProfiles = useSelector(vaultProfileSelectors.vaultProfiles);
 
+    const [isShowContentOpen, setIsShowContentOpen] = useState(false);
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [confirmEnable, setConfirmEnable] = useState(false);
     const [confirmDisable, setConfirmDisable] = useState(false);
@@ -178,6 +182,15 @@ function SecretDetail() {
     }, []);
     const widgetButtons: WidgetButtonProps[] = useMemo(
         () => [
+            {
+                icon: 'eye',
+                disabled: !secret || !secret.enabled,
+                tooltip: 'Show Content',
+                onClick: () => {
+                    setIsShowContentOpen(true);
+                    if (secret) dispatch(secretsActions.getSecretContent({ uuid: secret.uuid }));
+                },
+            },
             {
                 icon: 'check',
                 disabled: !secret || secret.enabled,
@@ -841,6 +854,28 @@ function SecretDetail() {
                 toggle={() => setSelectedAttributesInfo(null)}
                 buttons={[]}
                 size="xl"
+            />
+
+            <Dialog
+                isOpen={isShowContentOpen}
+                caption={`Secret Content: ${secret?.name ?? ''}`}
+                body={<SecretContentDialog content={secretContent} isFetching={isFetchingContent} />}
+                toggle={() => {
+                    setIsShowContentOpen(false);
+                    dispatch(secretsActions.clearSecretContent());
+                }}
+                size="xl"
+                buttons={[
+                    {
+                        color: 'secondary',
+                        variant: 'outline',
+                        onClick: () => {
+                            setIsShowContentOpen(false);
+                            dispatch(secretsActions.clearSecretContent());
+                        },
+                        body: 'Close',
+                    },
+                ]}
             />
         </div>
     );

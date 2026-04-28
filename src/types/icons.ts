@@ -42,4 +42,5 @@ export type IconName =
     | 'user-cog'
     | 'shield-check'
     | 'unplug'
-    | 'repeat';
+    | 'repeat'
+    | 'eye';

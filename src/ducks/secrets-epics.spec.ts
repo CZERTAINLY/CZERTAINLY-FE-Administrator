@@ -20,6 +20,7 @@ type EpicDeps = {
             listSecrets: (args: any) => any;
             getSecretDetails: (args: any) => any;
             getSecretVersions: (args: any) => any;
+            getSecretContent: (args: any) => any;
             createSecret: (args: any) => any;
             deleteSecret: (args: any) => any;
             enableSecret: (args: any) => any;
@@ -39,16 +40,17 @@ enum SecretsEpicIndex {
     ListSecrets = 0,
     GetDetail = 1,
     GetVersions = 2,
-    GetCreationAttributes = 3,
-    Create = 4,
-    Delete = 5,
-    Enable = 6,
-    Disable = 7,
-    Update = 8,
-    UpdateObjects = 9,
-    AddSyncVaultProfile = 10,
-    RemoveSyncVaultProfile = 11,
-    GetSyncVaultProfileAttributes = 12,
+    GetContent = 3,
+    GetCreationAttributes = 4,
+    Create = 5,
+    Delete = 6,
+    Enable = 7,
+    Disable = 8,
+    Update = 9,
+    UpdateObjects = 10,
+    AddSyncVaultProfile = 11,
+    RemoveSyncVaultProfile = 12,
+    GetSyncVaultProfileAttributes = 13,
 }
 
 async function runEpic(
@@ -70,6 +72,7 @@ async function runEpic(
             }),
         getSecretDetails: () => of({ uuid: 's-1', name: 'Secret' }),
         getSecretVersions: () => of([{ version: 1 }]),
+        getSecretContent: () => of({ type: 'generic', content: 'secret-value' }),
         createSecret: () => of({ uuid: 's-1', name: 'Secret' }),
         deleteSecret: () => of(null),
         enableSecret: () => of(null),
@@ -120,6 +123,30 @@ describe('secrets epics', () => {
         expect(emitted[0].type).toBe(secretsActions.listSecretsFailure.type);
         expect(emitted[1]).toEqual(pagingActions.listFailure(EntityType.SECRET));
         expect(emitted[2].type).toBe(userInterfaceActions.insertWidgetLock.type);
+    });
+
+    test('getSecretContent success emits getSecretContentSuccess', async () => {
+        const emitted = await runEpic(SecretsEpicIndex.GetContent, secretsActions.getSecretContent({ uuid: 's-1' }), {}, 1);
+
+        expect(emitted[0].type).toBe(secretsActions.getSecretContentSuccess.type);
+        expect((emitted[0] as any).payload.content).toEqual({ type: 'generic', content: 'secret-value' });
+    });
+
+    test('getSecretContent failure emits getSecretContentFailure and fetchError', async () => {
+        const err = new Error('failed');
+        const emitted = await runEpic(
+            SecretsEpicIndex.GetContent,
+            secretsActions.getSecretContent({ uuid: 's-1' }),
+            {
+                secrets: {
+                    getSecretContent: () => throwError(() => err),
+                } as any,
+            },
+            2,
+        );
+
+        expect(emitted[0].type).toBe(secretsActions.getSecretContentFailure.type);
+        expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to get Secret content' }));
     });
 
     test('createSecret success emits createSecretSuccess, redirect and success alert', async () => {

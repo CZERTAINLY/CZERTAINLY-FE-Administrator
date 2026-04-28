@@ -341,6 +341,25 @@ const getSyncVaultProfileAttributes: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const getSecretContent: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getSecretContent.match),
+        switchMap((action: ReturnType<typeof slice.actions.getSecretContent>) =>
+            deps.apiClients.secrets.getSecretContent({ uuid: action.payload.uuid }).pipe(
+                map((content) => slice.actions.getSecretContentSuccess({ content })),
+                catchError((err) =>
+                    of(
+                        slice.actions.getSecretContentFailure({
+                            error: extractError(err, 'Failed to get Secret content'),
+                        }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to get Secret content' }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 const createSecret: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.createSecret.match),
@@ -377,6 +396,7 @@ const epics = [
     listSecrets,
     getSecretDetail,
     getSecretVersions,
+    getSecretContent,
     listSecretAttributes,
     createSecret,
     deleteSecret,

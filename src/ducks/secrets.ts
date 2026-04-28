@@ -2,6 +2,7 @@ import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolki
 import type { SearchRequestModel } from 'types/certificate';
 import type { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
 import type {
+    SecretContent,
     SecretDetailDto,
     SecretDto,
     SecretRequestDto,
@@ -15,6 +16,7 @@ export type State = {
     secrets: SecretDto[];
     secret?: SecretDetailDto;
     versions: SecretVersionDto[];
+    secretContent?: SecretContent;
 
     secretCreationAttributeDescriptors: AttributeDescriptorModel[];
     isFetchingSecretCreationAttributes: boolean;
@@ -24,6 +26,7 @@ export type State = {
     isFetchingList: boolean;
     isFetchingDetail: boolean;
     isFetchingVersions: boolean;
+    isFetchingContent: boolean;
 
     isCreating: boolean;
     createSecretSucceeded: boolean;
@@ -46,6 +49,7 @@ export const initialState: State = {
     isFetchingList: false,
     isFetchingDetail: false,
     isFetchingVersions: false,
+    isFetchingContent: false,
 
     isCreating: false,
     createSecretSucceeded: false,
@@ -73,6 +77,25 @@ export const slice = createSlice({
         clearSecret: (state, action: PayloadAction<void>) => {
             state.secret = undefined;
             state.versions = [];
+            state.secretContent = undefined;
+        },
+
+        getSecretContent: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.secretContent = undefined;
+            state.isFetchingContent = true;
+        },
+
+        getSecretContentSuccess: (state, action: PayloadAction<{ content: SecretContent }>) => {
+            state.secretContent = action.payload.content;
+            state.isFetchingContent = false;
+        },
+
+        getSecretContentFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingContent = false;
+        },
+
+        clearSecretContent: (state) => {
+            state.secretContent = undefined;
         },
 
         listSecrets: (state, action: PayloadAction<SearchRequestModel>) => {
@@ -278,10 +301,12 @@ const state = (reduxStore: any): State => reduxStore?.[slice.name];
 const secrets = createSelector(state, (state) => state.secrets);
 const secret = createSelector(state, (state) => state.secret);
 const versions = createSelector(state, (state) => state.versions);
+const secretContent = createSelector(state, (state) => state.secretContent);
 
 const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isFetchingVersions = createSelector(state, (state) => state.isFetchingVersions);
+const isFetchingContent = createSelector(state, (state) => state.isFetchingContent);
 
 const isCreating = createSelector(state, (state) => state.isCreating);
 const createSecretSucceeded = createSelector(state, (state) => state.createSecretSucceeded);
@@ -302,10 +327,12 @@ export const selectors = {
     secrets,
     secret,
     versions,
+    secretContent,
 
     isFetchingList,
     isFetchingDetail,
     isFetchingVersions,
+    isFetchingContent,
 
     isCreating,
     createSecretSucceeded,
