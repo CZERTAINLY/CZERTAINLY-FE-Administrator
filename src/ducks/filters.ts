@@ -26,6 +26,7 @@ export enum EntityType {
     SECRET,
     SIGNING_PROFILE,
     TIME_QUALITY_CONFIGURATION,
+    TSP_PROFILE,
 }
 
 export type Filter = {

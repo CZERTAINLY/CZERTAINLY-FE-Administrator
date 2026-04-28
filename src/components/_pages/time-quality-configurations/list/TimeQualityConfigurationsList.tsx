@@ -2,21 +2,23 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
 
-import Container from 'components/Container';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import type { ApiClients } from 'src/api';
+import type { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import ForceDeleteErrorTable from 'components/ForceDeleteErrorTable';
-import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import PagedList from 'components/PagedList/PagedList';
 
+import { EntityType } from 'ducks/filters';
+import { selectors as pagingSelectors } from 'ducks/paging';
 import { actions, selectors } from 'ducks/time-quality-configurations';
+import type { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
 export const TimeQualityConfigurationsList = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const checkedRows = useSelector(selectors.checkedRows);
+    const checkedRows = useSelector(pagingSelectors.checkedRows(EntityType.TIME_QUALITY_CONFIGURATION));
     const timeQualityConfigurations = useSelector(selectors.timeQualityConfigurations);
     const bulkDeleteErrorMessages = useSelector(selectors.bulkDeleteErrorMessages);
 
@@ -26,17 +28,7 @@ export const TimeQualityConfigurationsList = () => {
 
     const isBusy = isFetching || isDeleting || isBulkDeleting;
 
-    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [showDeleteErrors, setShowDeleteErrors] = useState<boolean>(false);
-
-    const getFreshData = useCallback(() => {
-        dispatch(actions.setCheckedRows({ checkedRows: [] }));
-        dispatch(actions.listTimeQualityConfigurations());
-    }, [dispatch]);
-
-    useEffect(() => {
-        getFreshData();
-    }, [getFreshData]);
 
     useEffect(() => {
         if (bulkDeleteErrorMessages.length > 0) {
@@ -44,18 +36,9 @@ export const TimeQualityConfigurationsList = () => {
         }
     }, [bulkDeleteErrorMessages]);
 
-    const onAddClick = useCallback(() => {
-        navigate('./add');
-    }, [navigate]);
-
-    const onDeleteConfirmed = useCallback(() => {
-        dispatch(actions.bulkDeleteTimeQualityConfigurations({ uuids: checkedRows }));
-        setConfirmDelete(false);
-    }, [checkedRows, dispatch]);
-
-    const setCheckedRowsHandler = useCallback(
-        (rows: (string | number)[]) => {
-            dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
+    const onListCallback = useCallback(
+        (filters: SearchRequestModel) => {
+            dispatch(actions.listTimeQualityConfigurations(filters));
         },
         [dispatch],
     );
@@ -64,26 +47,6 @@ export const TimeQualityConfigurationsList = () => {
         dispatch(actions.clearDeleteErrorMessages());
         setShowDeleteErrors(false);
     }, [dispatch]);
-
-    const buttons: WidgetButtonProps[] = useMemo(
-        () => [
-            {
-                id: 'create',
-                icon: 'plus',
-                disabled: false,
-                tooltip: 'Create',
-                onClick: onAddClick,
-            },
-            {
-                id: 'delete',
-                icon: 'trash',
-                disabled: checkedRows.length === 0,
-                tooltip: 'Delete',
-                onClick: () => setConfirmDelete(true),
-            },
-        ],
-        [checkedRows, onAddClick],
-    );
 
     const tableHeader: TableHeader[] = useMemo(
         () => [
@@ -120,35 +83,36 @@ export const TimeQualityConfigurationsList = () => {
     );
 
     return (
-        <Container>
-            <Widget
+        <>
+            <PagedList
+                entity={EntityType.TIME_QUALITY_CONFIGURATION}
+                onListCallback={onListCallback}
+                onDeleteCallback={(uuids) => dispatch(actions.bulkDeleteTimeQualityConfigurations({ uuids }))}
+                headers={tableHeader}
+                data={tableData}
+                isBusy={isBusy}
                 title="List of Time Quality Configurations"
-                busy={isBusy}
-                widgetLockName={LockWidgetNameEnum.ListOfTimeQualityConfigurations}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshData}
-            >
-                <CustomTable
-                    headers={tableHeader}
-                    data={tableData}
-                    onCheckedRowsChanged={setCheckedRowsHandler}
-                    canSearch={true}
-                    hasCheckboxes={true}
-                    hasPagination={true}
-                />
-            </Widget>
-
-            <Dialog
-                isOpen={confirmDelete}
-                caption={`Delete ${checkedRows.length > 1 ? 'Time Quality Configurations' : 'a Time Quality Configuration'}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? 'Time Quality Configurations' : 'a Time Quality Configuration'}. Is this what you want to do?`}
-                toggle={() => setConfirmDelete(false)}
-                icon="delete"
-                buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                ]}
+                entityNameSingular="Time Quality Configuration"
+                entityNamePlural="Time Quality Configurations"
+                filterTitle="Time Quality Configurations Filter"
+                pageWidgetLockName={LockWidgetNameEnum.ListOfTimeQualityConfigurations}
+                getAvailableFiltersApi={useCallback(
+                    (apiClients: ApiClients) => apiClients.timeQualityConfigurations.listTimeQualityConfigurationSearchableFields(),
+                    [],
+                )}
+                additionalButtons={useMemo(
+                    () => [
+                        {
+                            icon: 'plus' as const,
+                            disabled: false,
+                            tooltip: 'Create Time Quality Configuration',
+                            onClick: () => navigate('./add'),
+                        },
+                    ],
+                    [navigate],
+                )}
+                addHidden
+                hasCheckboxes
             />
 
             <Dialog
@@ -165,6 +129,6 @@ export const TimeQualityConfigurationsList = () => {
                 toggle={onCloseDeleteErrors}
                 buttons={[{ color: 'secondary', variant: 'outline', onClick: onCloseDeleteErrors, body: 'Close' }]}
             />
-        </Container>
+        </>
     );
 };

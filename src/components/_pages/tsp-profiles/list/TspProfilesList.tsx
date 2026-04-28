@@ -2,15 +2,17 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
 
-import Container from 'components/Container';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import type { ApiClients } from 'src/api';
+import type { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import ForceDeleteErrorTable from 'components/ForceDeleteErrorTable';
+import PagedList from 'components/PagedList/PagedList';
 import StatusBadge from 'components/StatusBadge';
-import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
 
+import { EntityType } from 'ducks/filters';
+import { selectors as pagingSelectors } from 'ducks/paging';
 import { actions, selectors } from 'ducks/tsp-profiles';
+import type { SearchRequestModel } from 'types/certificate';
 import { Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
@@ -18,7 +20,7 @@ export const TspProfilesList = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const checkedRows = useSelector(selectors.checkedRows);
+    const checkedRows = useSelector(pagingSelectors.checkedRows(EntityType.TSP_PROFILE));
     const tspProfiles = useSelector(selectors.tspProfiles);
     const bulkDeleteErrorMessages = useSelector(selectors.bulkDeleteErrorMessages);
 
@@ -30,17 +32,7 @@ export const TspProfilesList = () => {
 
     const isBusy = isFetching || isDeleting || isBulkDeleting || isBulkEnabling || isBulkDisabling;
 
-    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [showDeleteErrors, setShowDeleteErrors] = useState<boolean>(false);
-
-    const getFreshData = useCallback(() => {
-        dispatch(actions.setCheckedRows({ checkedRows: [] }));
-        dispatch(actions.listTspProfiles());
-    }, [dispatch]);
-
-    useEffect(() => {
-        getFreshData();
-    }, [getFreshData]);
 
     useEffect(() => {
         if (bulkDeleteErrorMessages.length > 0) {
@@ -48,9 +40,12 @@ export const TspProfilesList = () => {
         }
     }, [bulkDeleteErrorMessages]);
 
-    const onAddClick = useCallback(() => {
-        navigate('./add');
-    }, [navigate]);
+    const onListCallback = useCallback(
+        (filters: SearchRequestModel) => {
+            dispatch(actions.listTspProfiles(filters));
+        },
+        [dispatch],
+    );
 
     const onEnableClick = useCallback(() => {
         dispatch(actions.bulkEnableTspProfiles({ uuids: checkedRows }));
@@ -60,56 +55,10 @@ export const TspProfilesList = () => {
         dispatch(actions.bulkDisableTspProfiles({ uuids: checkedRows }));
     }, [checkedRows, dispatch]);
 
-    const onDeleteConfirmed = useCallback(() => {
-        dispatch(actions.bulkDeleteTspProfiles({ uuids: checkedRows }));
-        setConfirmDelete(false);
-    }, [checkedRows, dispatch]);
-
-    const setCheckedRows = useCallback(
-        (rows: (string | number)[]) => {
-            dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
-        },
-        [dispatch],
-    );
-
     const onCloseDeleteErrors = useCallback(() => {
         dispatch(actions.clearDeleteErrorMessages());
         setShowDeleteErrors(false);
     }, [dispatch]);
-
-    const buttons: WidgetButtonProps[] = useMemo(
-        () => [
-            {
-                id: 'create',
-                icon: 'plus',
-                disabled: false,
-                tooltip: 'Create',
-                onClick: onAddClick,
-            },
-            {
-                id: 'delete',
-                icon: 'trash',
-                disabled: checkedRows.length === 0,
-                tooltip: 'Delete',
-                onClick: () => setConfirmDelete(true),
-            },
-            {
-                id: 'enable',
-                icon: 'check',
-                disabled: checkedRows.length === 0,
-                tooltip: 'Enable',
-                onClick: onEnableClick,
-            },
-            {
-                id: 'disable',
-                icon: 'times',
-                disabled: checkedRows.length === 0,
-                tooltip: 'Disable',
-                onClick: onDisableClick,
-            },
-        ],
-        [checkedRows, onAddClick, onEnableClick, onDisableClick],
-    );
 
     const tableHeader: TableHeader[] = useMemo(
         () => [
@@ -170,35 +119,48 @@ export const TspProfilesList = () => {
     );
 
     return (
-        <Container>
-            <Widget
+        <>
+            <PagedList
+                entity={EntityType.TSP_PROFILE}
+                onListCallback={onListCallback}
+                onDeleteCallback={(uuids) => dispatch(actions.bulkDeleteTspProfiles({ uuids }))}
+                headers={tableHeader}
+                data={tableData}
+                isBusy={isBusy}
                 title="List of TSP Profiles"
-                busy={isBusy}
-                widgetLockName={LockWidgetNameEnum.ListOfTspProfiles}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshData}
-            >
-                <CustomTable
-                    headers={tableHeader}
-                    data={tableData}
-                    onCheckedRowsChanged={setCheckedRows}
-                    canSearch={true}
-                    hasCheckboxes={true}
-                    hasPagination={true}
-                />
-            </Widget>
-
-            <Dialog
-                isOpen={confirmDelete}
-                caption={`Delete ${checkedRows.length > 1 ? 'TSP Profiles' : 'a TSP Profile'}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? 'TSP Profiles' : 'a TSP Profile'}. Is this what you want to do?`}
-                toggle={() => setConfirmDelete(false)}
-                icon="delete"
-                buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                ]}
+                entityNameSingular="TSP Profile"
+                entityNamePlural="TSP Profiles"
+                filterTitle="TSP Profiles Filter"
+                pageWidgetLockName={LockWidgetNameEnum.ListOfTspProfiles}
+                getAvailableFiltersApi={useCallback(
+                    (apiClients: ApiClients) => apiClients.tspProfiles.listTspProfileSearchableFields(),
+                    [],
+                )}
+                additionalButtons={useMemo(
+                    () => [
+                        {
+                            icon: 'plus' as const,
+                            disabled: false,
+                            tooltip: 'Create TSP Profile',
+                            onClick: () => navigate('./add'),
+                        },
+                        {
+                            icon: 'check' as const,
+                            disabled: checkedRows.length === 0,
+                            tooltip: 'Enable',
+                            onClick: onEnableClick,
+                        },
+                        {
+                            icon: 'times' as const,
+                            disabled: checkedRows.length === 0,
+                            tooltip: 'Disable',
+                            onClick: onDisableClick,
+                        },
+                    ],
+                    [checkedRows, navigate, onEnableClick, onDisableClick],
+                )}
+                addHidden
+                hasCheckboxes
             />
 
             <Dialog
@@ -215,6 +177,6 @@ export const TspProfilesList = () => {
                 toggle={onCloseDeleteErrors}
                 buttons={[{ color: 'secondary', variant: 'outline', onClick: onCloseDeleteErrors, body: 'Close' }]}
             />
-        </Container>
+        </>
     );
 };

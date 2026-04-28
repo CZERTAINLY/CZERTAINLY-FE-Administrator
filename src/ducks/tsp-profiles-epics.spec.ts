@@ -7,6 +7,8 @@ import { actions as tspProfileActions } from './tsp-profiles';
 import { actions as appRedirectActions } from './app-redirect';
 import { actions as alertActions } from './alerts';
 import { actions as userInterfaceActions } from './user-interface';
+import { actions as pagingActions } from './paging';
+import { EntityType } from './filters';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
 type EpicDeps = {
@@ -87,7 +89,7 @@ async function runEpic(
 
 describe('tspProfiles epics', () => {
     test('listTspProfiles success emits listSuccess and removeWidgetLock', async () => {
-        const emitted = await runEpic(TspProfilesEpicIndex.List, tspProfileActions.listTspProfiles(), {}, 2);
+        const emitted = await runEpic(TspProfilesEpicIndex.List, tspProfileActions.listTspProfiles(), {}, 3);
 
         expect(emitted[0]).toEqual(
             tspProfileActions.listTspProfilesSuccess({
@@ -95,7 +97,8 @@ describe('tspProfiles epics', () => {
                 totalItems: 1,
             }),
         );
-        expect(emitted[1]).toEqual(userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfTspProfiles));
+        expect(emitted[1]).toEqual(pagingActions.listSuccess({ entity: EntityType.TSP_PROFILE, totalItems: 1 }));
+        expect(emitted[2]).toEqual(userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfTspProfiles));
     });
 
     test('listTspProfiles failure emits listFailure and insertWidgetLock', async () => {
@@ -108,11 +111,12 @@ describe('tspProfiles epics', () => {
                     listTspProfiles: () => throwError(() => err),
                 } as any,
             },
-            2,
+            3,
         );
 
         expect(emitted[0].type).toBe(tspProfileActions.listTspProfilesFailure.type);
-        expect(emitted[1].type).toBe(userInterfaceActions.insertWidgetLock.type);
+        expect(emitted[1].type).toBe(pagingActions.listFailure.type);
+        expect(emitted[2].type).toBe(userInterfaceActions.insertWidgetLock.type);
     });
 
     test('getTspProfile success emits getSuccess and removeWidgetLock', async () => {

@@ -1,33 +1,42 @@
-import { AppEpic } from 'ducks';
+import type { AppEpic } from 'ducks';
 import { of } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 import { extractError } from 'utils/net';
-import { SearchRequestDto } from 'types/openapi';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { slice } from './tsp-profiles';
 import { actions as appRedirectActions } from './app-redirect';
 import { actions as alertActions } from './alerts';
 import { actions as userInterfaceActions } from './user-interface';
+import { actions as pagingActions } from './paging';
+import { EntityType } from './filters';
+import { transformSearchRequestModelToDto } from './transform/certificates';
+import { store } from '../App';
+
+const defaultSearch = { pageNumber: 1, itemsPerPage: 10, filters: [] };
 
 const listTspProfiles: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listTspProfiles.match),
-        switchMap(() => {
-            const searchRequest: SearchRequestDto = { filters: [] };
-            return deps.apiClients.tspProfiles.listTspProfiles({ searchRequestDto: searchRequest }).pipe(
+        switchMap((action) => {
+            const search = action.payload ?? defaultSearch;
+            const searchRequestDto = transformSearchRequestModelToDto(search);
+            store.dispatch(pagingActions.list(EntityType.TSP_PROFILE));
+            return deps.apiClients.tspProfiles.listTspProfiles({ searchRequestDto }).pipe(
                 switchMap((response) =>
                     of(
                         slice.actions.listTspProfilesSuccess({
                             tspProfiles: response.items ?? [],
                             totalItems: response.totalItems ?? 0,
                         }),
+                        pagingActions.listSuccess({ entity: EntityType.TSP_PROFILE, totalItems: response.totalItems ?? 0 }),
                         userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfTspProfiles),
                     ),
                 ),
                 catchError((error) =>
                     of(
                         slice.actions.listTspProfilesFailure({ error: extractError(error, 'Failed to get TSP Profiles list') }),
+                        pagingActions.listFailure(EntityType.TSP_PROFILE),
                         userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfTspProfiles),
                     ),
                 ),

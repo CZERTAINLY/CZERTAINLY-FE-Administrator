@@ -7,14 +7,15 @@ import Dialog from 'components/Dialog';
 import ForceDeleteErrorTable from 'components/ForceDeleteErrorTable';
 import StatusBadge from 'components/StatusBadge';
 import PagedList from 'components/PagedList/PagedList';
-import { TableDataRow, TableHeader } from 'components/CustomTable';
+import type { TableDataRow, TableHeader } from 'components/CustomTable';
 
+import type { ApiClients } from '../../../../api';
 import { actions, selectors } from 'ducks/signing-profiles';
 import { selectors as pagingSelectors } from 'ducks/paging';
 import { EntityType } from 'ducks/filters';
 import { Resource, SigningWorkflowType } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { SearchRequestModel } from 'types/certificate';
+import type { SearchRequestModel } from 'types/certificate';
 
 const workflowTypeLabels: Record<SigningWorkflowType, string> = {
     [SigningWorkflowType.Timestamping]: 'Timestamping',
@@ -137,6 +138,11 @@ export default function SigningProfilesList() {
                 isBusy={isBusy}
                 onListCallback={onListCallback}
                 pageWidgetLockName={LockWidgetNameEnum.ListOfSigningProfiles}
+                filterTitle="Signing Profiles Filter"
+                getAvailableFiltersApi={useCallback(
+                    (apiClients: ApiClients) => apiClients.signingProfiles.listSigningProfileSearchableFields(),
+                    [],
+                )}
                 onDeleteCallback={(uuids) => {
                     dispatch(actions.bulkDeleteSigningProfiles({ uuids }));
                 }}
