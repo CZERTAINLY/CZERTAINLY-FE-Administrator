@@ -22,8 +22,8 @@ const headers: TableHeader[] = [
     { id: 'action', content: 'Action' },
 ];
 
-function makeCopyButton(value: string, label: string, copyToClipboard: (text: string, msg: string) => void) {
-    return (
+function buildRows(content: SecretContent, copyToClipboard: (text: string, msg: string) => void): TableDataRow[] {
+    const copyButton = (value: string, label: string) => (
         <Button
             key="copy"
             variant="transparent"
@@ -35,17 +35,15 @@ function makeCopyButton(value: string, label: string, copyToClipboard: (text: st
             <Copy size={16} />
         </Button>
     );
-}
 
-function buildRows(content: SecretContent, copyToClipboard: (text: string, msg: string) => void): TableDataRow[] {
-    const row = (label: string, value: string): TableDataRow => ({
+    const row = (label: string, value: string, multiline = false): TableDataRow => ({
         id: label,
         columns: [
             label,
-            <span key="v" className="font-mono break-all">
+            <span key="copyToClipboardValue" className={multiline ? 'font-mono break-all whitespace-pre-wrap' : 'font-mono break-all'}>
                 {value}
             </span>,
-            makeCopyButton(value, label, copyToClipboard),
+            copyButton(value, label),
         ],
     });
 
@@ -64,7 +62,7 @@ function buildRows(content: SecretContent, copyToClipboard: (text: string, msg: 
         }
         case SecretType.PrivateKey: {
             const c = content as PrivateKeySecretContent;
-            return [row('Private Key (PEM, BASE64)', c.content)];
+            return [row('Private Key (PEM, BASE64)', c.content, true)];
         }
         case SecretType.SecretKey: {
             const c = content as SecretKeySecretContent;
@@ -83,7 +81,7 @@ function buildRows(content: SecretContent, copyToClipboard: (text: string, msg: 
         }
         case SecretType.Generic: {
             const c = content as GenericSecretContent;
-            return [row('Content', c.content)];
+            return [row('Content', c.content, true)];
         }
         default:
             return [];

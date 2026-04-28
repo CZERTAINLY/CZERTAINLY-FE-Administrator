@@ -1,6 +1,6 @@
 import type { AppEpic } from 'ducks';
 import { type Observable, of } from 'rxjs';
-import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { catchError, filter, map, mergeMap, switchMap, takeUntil } from 'rxjs/operators';
 
 import type { AttributeDescriptorDto, AttributeDescriptorModel } from 'types/attributes';
 import type { SecretType, VaultProfileManagementApi } from 'types/openapi';
@@ -355,6 +355,7 @@ const getSecretContent: AppEpic = (action$, state$, deps) => {
                         appRedirectActions.fetchError({ error: err, message: 'Failed to get Secret content' }),
                     ),
                 ),
+                takeUntil(action$.pipe(filter((a) => slice.actions.clearSecret.match(a) || slice.actions.clearSecretContent.match(a)))),
             ),
         ),
     );

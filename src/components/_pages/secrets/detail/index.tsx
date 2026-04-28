@@ -184,7 +184,7 @@ function SecretDetail() {
         () => [
             {
                 icon: 'eye',
-                disabled: !secret || !secret.enabled,
+                disabled: !secret?.enabled,
                 tooltip: 'Show Content',
                 onClick: () => {
                     setIsShowContentOpen(true);
@@ -199,7 +199,7 @@ function SecretDetail() {
             },
             {
                 icon: 'times',
-                disabled: !secret || !secret.enabled,
+                disabled: !secret?.enabled,
                 tooltip: 'Disable',
                 onClick: () => setConfirmDisable(true),
             },
@@ -301,7 +301,7 @@ function SecretDetail() {
     );
 
     const syncVaultProfilesData: TableDataRow[] = useMemo(() => {
-        if (!secret || !secret.syncVaultProfiles) return [];
+        if (!secret?.syncVaultProfiles) return [];
 
         return secret.syncVaultProfiles.map((profile) => {
             const vaultUuid = vaultProfiles.find((p) => p.uuid === profile.uuid)?.vaultInstance?.uuid ?? undefined;
@@ -458,6 +458,20 @@ function SecretDetail() {
         const sourceVaultProfileVaultUuid =
             vaultProfiles.find((p) => p.uuid === secret?.sourceVaultProfile?.uuid)?.vaultInstance?.uuid ?? undefined;
 
+        const sourceVaultProfileCell = secret?.sourceVaultProfile ? (
+            sourceVaultProfileVaultUuid ? (
+                <Link
+                    to={`/${Resource.VaultProfiles.toLowerCase()}/detail/${sourceVaultProfileVaultUuid}/${secret.sourceVaultProfile.uuid}`}
+                >
+                    {secret.sourceVaultProfile.name}
+                </Link>
+            ) : (
+                secret.sourceVaultProfile.name
+            )
+        ) : (
+            'Unassigned'
+        );
+
         return [
             {
                 id: 'uuid',
@@ -523,19 +537,7 @@ function SecretDetail() {
                 id: 'sourceVaultProfile',
                 columns: [
                     'Source Vault profile',
-                    secret?.sourceVaultProfile ? (
-                        sourceVaultProfileVaultUuid ? (
-                            <Link
-                                to={`/${Resource.VaultProfiles.toLowerCase()}/detail/${sourceVaultProfileVaultUuid}/${secret.sourceVaultProfile.uuid}`}
-                            >
-                                {secret.sourceVaultProfile.name}
-                            </Link>
-                        ) : (
-                            secret.sourceVaultProfile.name
-                        )
-                    ) : (
-                        'Unassigned'
-                    ),
+                    sourceVaultProfileCell,
                     <div key="source-vault-profile-actions" className="flex">
                         <Button
                             variant="transparent"

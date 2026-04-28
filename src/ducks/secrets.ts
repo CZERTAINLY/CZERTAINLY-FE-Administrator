@@ -78,6 +78,7 @@ export const slice = createSlice({
             state.secret = undefined;
             state.versions = [];
             state.secretContent = undefined;
+            state.isFetchingContent = false;
         },
 
         getSecretContent: (state, action: PayloadAction<{ uuid: string }>) => {
