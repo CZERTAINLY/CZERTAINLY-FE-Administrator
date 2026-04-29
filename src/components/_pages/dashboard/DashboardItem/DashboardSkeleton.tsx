@@ -6,13 +6,13 @@ const legendWidths = ['75%', '55%', '85%', '60%', '70%'];
 
 function CountBadgeSkeleton({ withSwitch = false }: { withSwitch?: boolean }) {
     return (
-        <div className={`${cardClass} h-full`}>
-            <div className={`${barClass} h-5 max-w-28 w-full mb-4`} />
-            <div className={`${barClass} h-9 max-w-20 w-full`} />
+        <div className={`${cardClass} h-full`} data-testid="count-badge-skeleton">
+            <div className={`${barClass} h-5 w-28 mb-4`} />
+            <div className={`${barClass} h-9 w-20`} />
             {withSwitch && (
-                <div className="flex items-center gap-2 mt-5">
-                    <div className={`${barClass} h-4 max-w-28 w-full rounded-full`} />
-                    <div className={`${barClass} h-7 max-w-12 w-full rounded-full`} />
+                <div className="flex items-center gap-2 mt-5" data-testid="switch-skeleton">
+                    <div className={`${barClass} h-4 w-28 rounded-full`} />
+                    <div className={`${barClass} h-7 w-12 rounded-full`} />
                 </div>
             )}
         </div>
@@ -21,7 +21,7 @@ function CountBadgeSkeleton({ withSwitch = false }: { withSwitch?: boolean }) {
 
 function DonutChartSkeleton() {
     return (
-        <div className={cardClass}>
+        <div className={cardClass} data-testid="donut-chart-skeleton">
             <div className={`${barClass} h-4 w-44 mb-4`} />
             <div className="grid grid-cols-1 items-center justify-items-center gap-4 md:grid-cols-[100px_minmax(0,1fr)] md:justify-items-stretch">
                 {/* Donut ring */}
