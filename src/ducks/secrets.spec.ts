@@ -60,6 +60,47 @@ describe('secrets slice', () => {
         expect(next.isFetchingDetail).toBe(false);
     });
 
+    test('getSecretContent / success / failure update content and flags', () => {
+        let next = reducer(
+            { ...initialState, secretContent: { type: 'generic', content: 'old' } as any },
+            actions.getSecretContent({ uuid: 's-1' }),
+        );
+        expect(next.secretContent).toBeUndefined();
+        expect(next.isFetchingContent).toBe(true);
+
+        const content = { type: 'generic', content: 'secret-value' } as any;
+        next = reducer(next, actions.getSecretContentSuccess({ content }));
+        expect(next.isFetchingContent).toBe(false);
+        expect(next.secretContent).toEqual(content);
+
+        next = reducer({ ...next, isFetchingContent: true }, actions.getSecretContentFailure({ error: 'err' }));
+        expect(next.isFetchingContent).toBe(false);
+        expect(next.secretContent).toEqual(content);
+    });
+
+    test('clearSecretContent clears secretContent but leaves other state intact', () => {
+        const detail = { uuid: 's-1' } as any;
+        const content = { type: 'generic', content: 'value' } as any;
+        const next = reducer({ ...initialState, secret: detail, secretContent: content }, actions.clearSecretContent());
+        expect(next.secretContent).toBeUndefined();
+        expect(next.secret).toEqual(detail);
+    });
+
+    test('clearSecret also clears secretContent', () => {
+        const next = reducer(
+            {
+                ...initialState,
+                secret: { uuid: 's-1' } as any,
+                versions: [{ uuid: 'v-1' } as any],
+                secretContent: { type: 'generic', content: 'val' } as any,
+            },
+            actions.clearSecret(),
+        );
+        expect(next.secret).toBeUndefined();
+        expect(next.versions).toEqual([]);
+        expect(next.secretContent).toBeUndefined();
+    });
+
     test('getSecretVersions / success / failure update versions and flags', () => {
         let next = reducer(initialState, actions.getSecretVersions({ uuid: 's-1' }));
         expect(next.isFetchingVersions).toBe(true);
@@ -211,14 +252,17 @@ describe('secrets slice', () => {
 
 describe('secrets selectors', () => {
     test('selectors read values from secrets state', () => {
+        const content = { type: 'generic', content: 'value' } as any;
         const secretsState = {
             ...initialState,
             secrets: [{ uuid: 's-1' } as any],
             secret: { uuid: 's-1' } as any,
             versions: [{ uuid: 'v-1' } as any],
+            secretContent: content,
             isFetchingList: true,
             isFetchingDetail: true,
             isFetchingVersions: true,
+            isFetchingContent: true,
             isCreating: true,
             isUpdating: true,
             isDeleting: true,
@@ -231,9 +275,11 @@ describe('secrets selectors', () => {
         expect(selectors.secrets(state)).toEqual(secretsState.secrets);
         expect(selectors.secret(state)).toEqual(secretsState.secret);
         expect(selectors.versions(state)).toEqual(secretsState.versions);
+        expect(selectors.secretContent(state)).toEqual(content);
         expect(selectors.isFetchingList(state)).toBe(true);
         expect(selectors.isFetchingDetail(state)).toBe(true);
         expect(selectors.isFetchingVersions(state)).toBe(true);
+        expect(selectors.isFetchingContent(state)).toBe(true);
         expect(selectors.isCreating(state)).toBe(true);
         expect(selectors.isUpdating(state)).toBe(true);
         expect(selectors.isDeleting(state)).toBe(true);
