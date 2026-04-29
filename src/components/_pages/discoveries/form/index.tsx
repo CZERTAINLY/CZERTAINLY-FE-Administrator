@@ -280,7 +280,7 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
                             <Controller
                                 name="cronExpression"
                                 control={control}
-                                rules={buildValidationRules([validateRequired(), validateQuartzCronExpression(watchedCronExpression)])}
+                                rules={buildValidationRules([validateRequired(), validateQuartzCronExpression()])}
                                 render={({ field, fieldState }) => (
                                     <div className="mb-4 space-y-4">
                                         <TextInput

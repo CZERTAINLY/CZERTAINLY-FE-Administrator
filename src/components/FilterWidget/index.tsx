@@ -2,12 +2,12 @@ import Widget from 'components/Widget';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import type { ApiClients } from '../../api';
+import type { ApiClients } from 'src/api';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as alertActions } from 'ducks/alerts';
 import { type EntityType, actions, selectors } from 'ducks/filters';
 import { useDispatch, useSelector } from 'react-redux';
-import Select, { type SingleValue, type MultiValue } from 'components/Select';
+import Select, { type SingleValue, type MultiValue, type OptionValue } from 'components/Select';
 import TextInput from 'components/TextInput';
 import type { Observable } from 'rxjs';
 import type { SearchFieldListModel, SearchFilterModel } from 'types/certificate';
@@ -19,7 +19,7 @@ import {
     PlatformEnum,
     type SearchFilterRequestDto,
 } from 'types/openapi';
-import { getFormTypeFromAttributeContentType, getFormTypeFromFilterFieldType, getStepValue } from 'utils/common-utils';
+import { getFormTypeFromAttributeContentType, getFormTypeFromFilterFieldType } from 'utils/common-utils';
 import {
     checkIfFieldAttributeTypeIsDate,
     checkIfFieldOperatorIsInterval,
@@ -38,7 +38,18 @@ import Badge from 'components/Badge';
 import { validateDuration, validatePostgresPosixRegex } from 'utils/validators';
 import Label from 'components/Label';
 
-const deepCopy = <T,>(value: T): T => (value == null ? value : JSON.parse(JSON.stringify(value)));
+const deepCopy = <T,>(value: T): T => (value == null ? value : structuredClone(value));
+
+function mapFilterToRequestDto(f: SearchFilterModel): SearchFilterRequestDto {
+    return {
+        fieldSource: f.fieldSource,
+        fieldIdentifier: f.fieldIdentifier,
+        condition: f.condition,
+        value: Array.isArray(f.value)
+            ? f.value.map((v: any) => (typeof v === 'object' && v !== null && Object.hasOwn(v, 'name') ? v.name : v))
+            : f.value,
+    };
+}
 
 const noValue: { [condition in FilterConditionOperator]: boolean } = {
     [FilterConditionOperator.Equals]: false,
@@ -57,15 +68,17 @@ const noValue: { [condition in FilterConditionOperator]: boolean } = {
     [FilterConditionOperator.NotMatches]: false,
     [FilterConditionOperator.Empty]: true,
     [FilterConditionOperator.NotEmpty]: true,
-    [FilterConditionOperator.Success]: true,
-    [FilterConditionOperator.Failed]: true,
-    [FilterConditionOperator.Unknown]: true,
-    [FilterConditionOperator.NotChecked]: true,
+    [FilterConditionOperator.CountEqual]: false,
+    [FilterConditionOperator.CountNotEqual]: false,
+    [FilterConditionOperator.CountGreaterThan]: false,
+    [FilterConditionOperator.CountLessThan]: false,
 };
+
+type FieldData = NonNullable<SearchFieldListModel['searchFieldData']>[number];
 
 interface ObjectValueOptions {
     label: string;
-    value: string | any;
+    value: any;
 }
 
 interface Props {
@@ -218,32 +231,29 @@ export default function FilterWidget({
 
         if (!field.multiValue) {
             const value = currentFilters[selectedFilter].value;
-            const label = field.platformEnum
-                ? platformEnums[field.platformEnum][(value ?? '') as string].label
-                : checkIfFieldAttributeTypeIsDate(field)
-                  ? getFormattedDateTime(value as unknown as string)
-                  : value;
-            setFilterValue({ label, value });
+            const computeLabel = () => {
+                if (field.platformEnum) return platformEnums[field.platformEnum][(value ?? '') as string].label;
+                if (checkIfFieldAttributeTypeIsDate(field)) return getFormattedDateTime(value as unknown as string);
+                return value;
+            };
+            setFilterValue({ label: computeLabel(), value });
             return;
         }
 
         if (Array.isArray(currentFilters[selectedFilter].value)) {
             const currentValue = currentFilters[selectedFilter]?.value as Array<object>;
             const newFilterValue = currentValue.map((v: any) => {
-                let label = '';
-                let value = '';
+                const value = v;
+                let label: string;
                 if (typeof v === 'string') {
                     if (checkIfFieldAttributeTypeIsDate(field)) {
                         label = getFormattedDateTime(v);
                     } else {
                         label = field.platformEnum ? getEnumLabel(platformEnums[field.platformEnum], v) : v;
                     }
-                    value = v;
                 } else {
                     label = v?.name || JSON.stringify(v);
-                    value = v;
                 }
-
                 return { label, value };
             });
 
@@ -259,15 +269,6 @@ export default function FilterWidget({
         searchGroupEnum,
         filterConditionsRequiredNumberInput,
     ]);
-
-    const onUnselectFiltersClick = useCallback(
-        (e: React.MouseEvent<HTMLDivElement>) => {
-            if ((e.target as HTMLDivElement).id === 'unselectFilters') {
-                setSelectedFilter(-1);
-            }
-        },
-        [setSelectedFilter],
-    );
 
     const onUpdateFilterClick = useCallback(() => {
         if (!filterGroup || !filterField || !filterCondition) {
@@ -295,22 +296,21 @@ export default function FilterWidget({
             .find((f) => f?.filterFieldSource === filterGroup.value)
             ?.searchFieldData?.find((f) => f?.fieldIdentifier === filterField.value);
 
-        let value;
-        if (filterValue) {
-            if (typeof filterValue === 'number') {
-                value = filterValue;
-            } else if (typeof filterValue === 'string') {
+        const computeValue = (): unknown => {
+            if (filterValue == null || filterValue === '') return undefined;
+            if (typeof filterValue === 'number') return filterValue;
+            if (typeof filterValue === 'string') {
                 if (field?.type && checkIfFieldTypeIsDate(field.type) && checkIfFieldOperatorIsInterval(filterCondition.value)) {
-                    value = getIso8601StringFromDurationString(filterValue);
-                } else if (field?.attributeContentType && checkIfFieldAttributeTypeIsDate(field)) {
-                    value = getFormattedUtc(field.attributeContentType, filterValue);
-                } else {
-                    value = field?.type && checkIfFieldTypeIsDate(field.type) ? getFormattedUtc(field.type, filterValue) : filterValue;
+                    return getIso8601StringFromDurationString(filterValue);
                 }
-            } else {
-                value = Array.isArray(filterValue) ? filterValue.map((v) => v.value) : (filterValue as any).value;
+                if (field?.attributeContentType && checkIfFieldAttributeTypeIsDate(field)) {
+                    return getFormattedUtc(field.attributeContentType, filterValue);
+                }
+                return field?.type && checkIfFieldTypeIsDate(field.type) ? getFormattedUtc(field.type, filterValue) : filterValue;
             }
-        }
+            return Array.isArray(filterValue) ? filterValue.map((v) => v.value) : (filterValue as any).value;
+        };
+        const value = computeValue();
 
         const updatedFilterItem: SearchFilterModel = {
             fieldSource: filterGroup.value,
@@ -326,22 +326,7 @@ export default function FilterWidget({
 
         dispatch(actions.setCurrentFilters({ entity, currentFilters: newFilters }));
         if (onFilterUpdate) {
-            const filtersWithItemNames: SearchFilterRequestDto[] = newFilters.map((f) => {
-                return {
-                    fieldSource: f.fieldSource,
-                    fieldIdentifier: f.fieldIdentifier,
-                    condition: f.condition,
-                    value: Array.isArray(f.value)
-                        ? f.value.map((v) => {
-                              if (typeof v === 'object' && Object.hasOwn(v, 'name')) {
-                                  return v.name;
-                              }
-                              return v;
-                          })
-                        : f.value,
-                };
-            });
-            onFilterUpdate(filtersWithItemNames);
+            onFilterUpdate(newFilters.map(mapFilterToRequestDto));
             setSelectedFilter(-1);
         }
     }, [
@@ -368,22 +353,7 @@ export default function FilterWidget({
             }
             setSelectedFilter(-1);
             if (onFilterUpdate) {
-                const filtersWithItemNames: SearchFilterRequestDto[] = newFilters.map((f) => {
-                    return {
-                        fieldSource: f.fieldSource,
-                        fieldIdentifier: f.fieldIdentifier,
-                        condition: f.condition,
-                        value: Array.isArray(f.value)
-                            ? f.value.map((v) => {
-                                  if (typeof v === 'object' && Object.hasOwn(v, 'name')) {
-                                      return v.name;
-                                  }
-                                  return v;
-                              })
-                            : f.value,
-                    };
-                });
-                onFilterUpdate(filtersWithItemNames);
+                onFilterUpdate(newFilters.map(mapFilterToRequestDto));
             }
         },
         [currentFilters, dispatch, entity, onFilterUpdate],
@@ -406,8 +376,8 @@ export default function FilterWidget({
     const isValidValue = useMemo(() => {
         if (checkIfFieldOperatorIsInterval(filterCondition?.value)) return !validateDuration()(filterValue as unknown as string);
 
-        // Check regex validation for MATCHES or NOT_MATCHES condition
-        const isRegex = filterCondition?.value === 'MATCHES' || filterCondition?.value === 'NOT_MATCHES';
+        const isRegex =
+            filterCondition?.value === FilterConditionOperator.Matches || filterCondition?.value === FilterConditionOperator.NotMatches;
         if (isRegex) {
             return !regexError;
         }
@@ -420,20 +390,17 @@ export default function FilterWidget({
 
         if (Array.isArray(currentField?.value)) {
             return currentField?.value?.map((v) => {
-                let label = '';
-                let value = '';
+                const value = v;
+                let label: string;
                 if (typeof v === 'string') {
                     if (checkIfFieldAttributeTypeIsDate(currentField)) {
                         label = getFormattedDateTime(v);
                     } else {
                         label = currentField?.platformEnum ? getEnumLabel(platformEnums[currentField.platformEnum], v) : v;
                     }
-                    value = v;
                 } else {
                     label = v?.name || JSON.stringify(v);
-                    value = v;
                 }
-
                 return { label, value };
             });
         }
@@ -443,7 +410,7 @@ export default function FilterWidget({
 
     const getBadgeContent = useCallback(
         (itemNumber: number, fieldSource: string, fieldCondition: string, label: string, value: string) => {
-            if (isFetchingAvailableFilters || busyBadges) return <></>;
+            if (isFetchingAvailableFilters || busyBadges) return null;
             return (
                 <React.Fragment key={itemNumber}>
                     <b>{getEnumLabel(searchGroupEnum, fieldSource)}&nbsp;</b>'{label}'&nbsp;
@@ -462,7 +429,7 @@ export default function FilterWidget({
                     <TextInput
                         id="valueSelect"
                         type="text"
-                        value={filterValue?.toString() ?? ''}
+                        value={(filterValue as string | number | null | undefined)?.toString() ?? ''}
                         onChange={(value) => {
                             setFilterValue(deepCopy(value));
                         }}
@@ -473,26 +440,21 @@ export default function FilterWidget({
             );
         }
         function renderTextOrDateInput() {
-            const isRegex = filterCondition?.value === 'MATCHES' || filterCondition?.value === 'NOT_MATCHES';
+            const isRegex =
+                filterCondition?.value === FilterConditionOperator.Matches || filterCondition?.value === FilterConditionOperator.NotMatches;
+            type TextInputType = 'text' | 'textarea' | 'number' | 'email' | 'password' | 'date' | 'time' | 'datetime-local';
+            let inputType: TextInputType = 'text';
+            if (currentField?.attributeContentType && checkIfFieldAttributeTypeIsDate(currentField)) {
+                inputType = getFormTypeFromAttributeContentType(currentField.attributeContentType) as TextInputType;
+            } else if (currentField?.type) {
+                inputType = getFormTypeFromFilterFieldType(currentField.type) as TextInputType;
+            }
             return (
                 <>
                     <TextInput
                         id="valueSelect"
-                        type={
-                            currentField?.attributeContentType && checkIfFieldAttributeTypeIsDate(currentField)
-                                ? getFormTypeFromAttributeContentType(currentField?.attributeContentType)
-                                : currentField?.type
-                                  ? getFormTypeFromFilterFieldType(currentField?.type)
-                                  : 'text'
-                        }
-                        step={
-                            currentField?.attributeContentType
-                                ? getStepValue(currentField?.attributeContentType)
-                                : currentField?.type
-                                  ? getStepValue(currentField?.type)
-                                  : undefined
-                        }
-                        value={filterValue?.toString() ?? ''}
+                        type={inputType}
+                        value={(filterValue as string | number | null | undefined)?.toString() ?? ''}
                         onChange={(value: string) => {
                             setFilterValue(deepCopy(value));
 
@@ -515,9 +477,13 @@ export default function FilterWidget({
             return (
                 <Select
                     id="valueSelect"
-                    options={filterField ? booleanOptions : []}
+                    options={filterField ? (booleanOptions as unknown as { value: OptionValue; label: string }[]) : []}
                     value={filterValue ?? null}
-                    onChange={(e) => {
+                    onChange={(e: OptionValue | { value: OptionValue; label: string } | null) => {
+                        if (e == null) {
+                            setFilterValue(undefined);
+                            return;
+                        }
                         setFilterValue({ label: e, value: e });
                     }}
                     isDisabled={!filterField || !filterCondition || noValue[filterCondition.value]}
@@ -532,10 +498,10 @@ export default function FilterWidget({
                     id="valueSelect"
                     options={objectValueOptions}
                     value={filterValue ?? null}
-                    onChange={(e) => {
+                    onChange={(e: any) => {
                         setFilterValue(e);
                     }}
-                    isMulti={currentField?.multiValue}
+                    isMulti={currentField?.multiValue as any}
                     isClearable
                     isDisabled={!filterField || !filterCondition || noValue[filterCondition.value]}
                     isSearchable
@@ -545,7 +511,7 @@ export default function FilterWidget({
         }
         function renderNumberInput() {
             const numericValue = Number(filterValue);
-            const displayValue = isNaN(numericValue) ? '' : numericValue;
+            const displayValue = Number.isNaN(numericValue) ? '' : numericValue;
 
             return (
                 <TextInput
@@ -553,7 +519,6 @@ export default function FilterWidget({
                     type="number"
                     value={displayValue.toString()}
                     onChange={(value) => {
-                        // Only allow integer values
                         if (value === '' || /^\d+$/.test(value)) {
                             setFilterValue(value === '' ? undefined : Number(value));
                         }
@@ -594,173 +559,153 @@ export default function FilterWidget({
         regexError,
     ]);
 
+    function getFilterBadgeValue(f: SearchFilterModel, field: FieldData | undefined): string {
+        function mapArrayValue(v: any): any {
+            if (field?.platformEnum) return platformEnums[field.platformEnum][v]?.label ?? v;
+            if (v?.name) return v.name;
+            if (field?.type && checkIfFieldTypeIsDate(field.type) && checkIfFieldOperatorIsInterval(f.condition)) {
+                return getIso8601StringFromDurationString(v as string);
+            }
+            if (field?.attributeContentType === AttributeContentType.Date) return getFormattedDate(v);
+            if (field?.attributeContentType === AttributeContentType.Datetime) return getFormattedDateTime(v);
+            return v;
+        }
+
+        function mapValue(): any {
+            if (f.value == null || f.value === '') return '';
+            if (typeof f.value === 'number') return f.value;
+            if (field?.type && checkIfFieldTypeIsDate(field.type) && checkIfFieldOperatorIsInterval(f.condition)) {
+                return getDurationStringFromIso8601String(f.value as unknown as string);
+            }
+            if (field?.platformEnum) return platformEnums[field.platformEnum][f.value as unknown as string]?.label;
+            if (
+                field?.attributeContentType === AttributeContentType.Date ||
+                (field?.type === FilterFieldType.Date && field?.attributeContentType !== AttributeContentType.Datetime)
+            ) {
+                return getFormattedDate(f.value as unknown as string);
+            }
+            if (field?.attributeContentType === AttributeContentType.Datetime || field?.type === FilterFieldType.Datetime) {
+                return getFormattedDateTime(f.value as unknown as string);
+            }
+            return f.value;
+        }
+
+        if (field?.type === FilterFieldType.Boolean) return `'${booleanOptions.find((b) => !!f.value === b.value)?.label}'`;
+        if (Array.isArray(f.value)) return `'${f.value.map((v) => mapArrayValue(v)).join(' OR ')}'`;
+        return `'${mapValue()}'`;
+    }
+
     return (
-        <>
-            <Widget title={title} busy={isFetchingAvailableFilters} titleSize="large">
-                <div
-                    id="unselectFilters"
-                    role="button"
-                    tabIndex={0}
-                    onClick={onUnselectFiltersClick}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            onUnselectFiltersClick({ target: { id: 'unselectFilters' } } as unknown as React.MouseEvent<HTMLDivElement>);
-                        }
-                    }}
-                >
-                    <div className="flex flex-row gap-2 mb-4 items-end">
-                        <div className={`grid w-full ${filterGridCols === 2 ? 'grid-cols-2 gap-4' : 'grid-cols-4 gap-2'}`}>
-                            <Select
-                                id="group"
-                                label="Filter Field Source"
-                                options={availableFilters.map((f) => ({
-                                    label: getEnumLabel(searchGroupEnum, f.filterFieldSource),
-                                    value: f.filterFieldSource,
-                                }))}
-                                onChange={(e) => {
-                                    setFilterGroup({ label: e, value: e });
-                                    setFilterField(undefined);
-                                    setFilterCondition(undefined);
-                                    setFilterValue(undefined);
-                                    setRegexError('');
-                                }}
-                                value={filterGroup || null}
-                                // isClearable
-                            />
-                            <Select
-                                label="Filter Field"
-                                id="field"
-                                options={currentFields?.map((f) => ({ label: f.fieldLabel, value: f.fieldIdentifier })) || []}
-                                onChange={(e) => {
-                                    setFilterField({ label: e, value: e });
-                                    setFilterCondition(undefined);
-                                    setFilterValue(undefined);
-                                    setRegexError('');
-                                }}
-                                value={filterField || null}
-                                isDisabled={!filterGroup}
-                                isSearchable
-                                // isClearable
-                            />
+        <Widget title={title} busy={isFetchingAvailableFilters} titleSize="large">
+            <div className="block w-full text-left">
+                <div className="flex flex-row gap-2 mb-4 items-end">
+                    <div className={`grid w-full ${filterGridCols === 2 ? 'grid-cols-2 gap-4' : 'grid-cols-4 gap-2'}`}>
+                        <Select
+                            id="group"
+                            label="Filter Field Source"
+                            options={availableFilters.map((f) => ({
+                                label: getEnumLabel(searchGroupEnum, f.filterFieldSource),
+                                value: f.filterFieldSource,
+                            }))}
+                            onChange={(e) => {
+                                setFilterGroup({ label: e as string, value: e as FilterFieldSource });
+                                setFilterField(undefined);
+                                setFilterCondition(undefined);
+                                setFilterValue(undefined);
+                                setRegexError('');
+                            }}
+                            value={filterGroup || null}
+                        />
+                        <Select
+                            label="Filter Field"
+                            id="field"
+                            options={
+                                currentFields?.map((f) => ({
+                                    label: f.fieldLabel,
+                                    value: f.fieldIdentifier,
+                                })) || []
+                            }
+                            onChange={(e) => {
+                                setFilterField({ label: e as string, value: e as string });
+                                setFilterCondition(undefined);
+                                setFilterValue(undefined);
+                                setRegexError('');
+                            }}
+                            value={filterField || null}
+                            isDisabled={!filterGroup}
+                            isSearchable
+                        />
 
-                            <Select
-                                id="conditions"
-                                label="Filter Condition"
-                                options={
-                                    filterField
-                                        ? currentField?.conditions.map((c) => ({
-                                              label: getEnumLabel(FilterConditionOperatorEnum, c),
-                                              value: c,
-                                          }))
-                                        : []
-                                }
-                                onChange={(e) => {
-                                    setFilterCondition({ label: e, value: e });
-                                    setFilterValue(undefined);
-                                    setRegexError('');
-                                }}
-                                value={filterCondition || null}
-                                isDisabled={!filterField}
-                                isSearchable
-                            />
+                        <Select
+                            id="conditions"
+                            label="Filter Condition"
+                            options={
+                                filterField
+                                    ? currentField?.conditions.map((c) => ({
+                                          label: getEnumLabel(FilterConditionOperatorEnum, c),
+                                          value: c,
+                                      }))
+                                    : []
+                            }
+                            onChange={(e) => {
+                                setFilterCondition({ label: e as string, value: e as FilterConditionOperator });
+                                setFilterValue(undefined);
+                                setRegexError('');
+                            }}
+                            value={filterCondition || null}
+                            isDisabled={!filterField}
+                            isSearchable
+                        />
 
-                            <div>
-                                <Label htmlFor="valueSelect">Filter Value</Label>
-                                {renderFilterValueInput()}
-                            </div>
+                        <div>
+                            <Label htmlFor="valueSelect">Filter Value</Label>
+                            {renderFilterValueInput()}
                         </div>
-                        <Button
-                            id="addFilter"
-                            disabled={
-                                !filterField || !filterCondition || !isValidValue || (!noValue[filterCondition.value] && !filterValue)
-                            }
-                            onClick={onUpdateFilterClick}
-                            className="py-3 min-w-[62px]"
-                        >
-                            {selectedFilter === -1 ? 'Add' : 'Update'}
-                        </Button>
                     </div>
-                    <div className="flex gap-2 flex-wrap">
-                        {currentFilters.map((f, i) => {
-                            const field = availableFilters
-                                .find((a) => a.filterFieldSource === f.fieldSource)
-                                ?.searchFieldData?.find((s) => s.fieldIdentifier === f.fieldIdentifier);
-                            const label = field ? field.fieldLabel : f.fieldIdentifier;
-                            let value = '';
-
-                            function mapArrayValue(v: any) {
-                                if (field?.platformEnum) {
-                                    return platformEnums[field.platformEnum][v]?.label ?? v;
-                                }
-                                if (v?.name) return v.name;
-                                if (field?.type && checkIfFieldTypeIsDate(field.type) && checkIfFieldOperatorIsInterval(f.condition)) {
-                                    return getIso8601StringFromDurationString(v as string);
-                                }
-                                if (field && field?.attributeContentType === AttributeContentType.Date) return getFormattedDate(v);
-                                if (field && field?.attributeContentType === AttributeContentType.Datetime) return getFormattedDateTime(v);
-                                return v;
-                            }
-
-                            function mapValue() {
-                                if (!f.value) {
-                                    return '';
-                                }
-                                if (typeof f.value === 'number') {
-                                    return f.value;
-                                }
-                                if (field?.type && checkIfFieldTypeIsDate(field.type) && checkIfFieldOperatorIsInterval(f.condition)) {
-                                    return getDurationStringFromIso8601String(f.value as unknown as string);
-                                }
-                                if (field?.platformEnum) {
-                                    return platformEnums[field.platformEnum][f.value as unknown as string]?.label;
-                                }
-                                if (
-                                    (field && field?.attributeContentType === AttributeContentType.Date) ||
-                                    (field?.type === FilterFieldType.Date && field?.attributeContentType !== AttributeContentType.Datetime)
-                                ) {
-                                    return getFormattedDate(f.value as unknown as string);
-                                }
-                                if (
-                                    (field && field?.attributeContentType === AttributeContentType.Datetime) ||
-                                    field?.type === FilterFieldType.Datetime
-                                ) {
-                                    return getFormattedDateTime(f.value as unknown as string);
-                                }
-                                return f.value;
-                            }
-                            if (field && field.type === FilterFieldType.Boolean) {
-                                value = `'${booleanOptions.find((b) => !!f.value === b.value)?.label}'`;
-                            } else if (Array.isArray(f.value)) {
-                                value = `'${f.value.map((v) => mapArrayValue(v)).join(' OR ')}'`;
-                            } else {
-                                value = `'${mapValue()}'`;
-                            }
-                            return (
-                                <Badge
-                                    key={f.fieldIdentifier + i}
-                                    onClick={() => toggleFilter(i)}
-                                    color={selectedFilter === i ? 'primary' : 'secondary'}
-                                    onRemove={() => {
-                                        if (disableBadgeRemove) return;
-                                        onRemoveFilterClick(i);
-                                    }}
-                                    size="medium"
-                                >
-                                    {!isFetchingAvailableFilters &&
-                                        !busyBadges &&
-                                        getBadgeContent(i, f.fieldSource, f.condition, label, value)}
-                                </Badge>
-                            );
-                        })}
-                    </div>
+                    <Button
+                        id="addFilter"
+                        disabled={
+                            !filterField ||
+                            !filterCondition ||
+                            !isValidValue ||
+                            (!noValue[filterCondition.value] && (filterValue == null || filterValue === ''))
+                        }
+                        onClick={onUpdateFilterClick}
+                        className="py-3 min-w-[62px]"
+                    >
+                        {selectedFilter === -1 ? 'Add' : 'Update'}
+                    </Button>
                 </div>
-                {extraFilterComponent && (
-                    <>
-                        <div className="border-t border-gray-200 my-4"></div>
-                        <div className="mt-4">{extraFilterComponent}</div>
-                    </>
-                )}
-            </Widget>
-        </>
+                <div className="flex gap-2 flex-wrap">
+                    {currentFilters.map((f, i) => {
+                        const field = availableFilters
+                            .find((a) => a.filterFieldSource === f.fieldSource)
+                            ?.searchFieldData?.find((s) => s.fieldIdentifier === f.fieldIdentifier);
+                        const label = field ? field.fieldLabel : f.fieldIdentifier;
+                        const value = getFilterBadgeValue(f, field);
+                        return (
+                            <Badge
+                                key={f.fieldIdentifier + i}
+                                onClick={() => toggleFilter(i)}
+                                color={selectedFilter === i ? 'primary' : 'secondary'}
+                                onRemove={() => {
+                                    if (disableBadgeRemove) return;
+                                    onRemoveFilterClick(i);
+                                }}
+                                size="medium"
+                            >
+                                {!isFetchingAvailableFilters && !busyBadges && getBadgeContent(i, f.fieldSource, f.condition, label, value)}
+                            </Badge>
+                        );
+                    })}
+                </div>
+            </div>
+            {extraFilterComponent && (
+                <>
+                    <div className="border-t border-gray-200 my-4"></div>
+                    <div className="mt-4">{extraFilterComponent}</div>
+                </>
+            )}
+        </Widget>
     );
 }

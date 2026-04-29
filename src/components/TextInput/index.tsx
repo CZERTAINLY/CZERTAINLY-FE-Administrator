@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { useRef, useEffect, useId, useState } from 'react';
+import { type ReactNode, useEffect, useId, useRef, useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import Label from 'components/Label';
 import DatePicker from 'components/DatePicker';
@@ -15,13 +15,13 @@ interface Props {
     placeholder?: string;
     disabled?: boolean;
     id?: string;
-    type?: 'text' | 'textarea' | 'number' | 'email' | 'password' | 'date' | 'time';
+    type?: 'text' | 'textarea' | 'number' | 'email' | 'password' | 'date' | 'time' | 'datetime-local';
     invalid?: boolean;
     error?: string;
     label?: string;
     className?: string;
     required?: boolean;
-    buttonRight?: React.ReactNode;
+    buttonRight?: ReactNode;
     dataTestId?: string;
 }
 
@@ -46,7 +46,7 @@ function TextInput({
     const [passwordVisible, setPasswordVisible] = useState(false);
     const passwordToggleTargetId = type === 'password' ? id || `text-input-password-${generatedId.replaceAll(':', '')}` : null;
 
-    // Disable autofill by making field readOnly on mount, then removing it on focus
+    // Disable autofill by making the field readOnly on mount, then removing it on focus
     useEffect(() => {
         if (inputRef.current && type !== 'password' && type !== 'date') {
             inputRef.current.setAttribute('readonly', 'readonly');
@@ -117,7 +117,11 @@ function TextInput({
         );
     }
 
-    const resolvedType = type === 'password' ? (passwordVisible ? 'text' : 'password') : type;
+    const resolveType = () => {
+        if (type !== 'password') return type;
+        return passwordVisible ? 'text' : 'password';
+    };
+    const resolvedType = resolveType();
 
     return (
         <>
