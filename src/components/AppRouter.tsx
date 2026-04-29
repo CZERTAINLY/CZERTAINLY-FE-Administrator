@@ -81,6 +81,22 @@ const CmpProfilesList = lazy(() => import('./_pages/cmp-profiles/list'));
 const GlobalMetadataDetail = lazy(() => import('./_pages/global-metadata/detail'));
 const GlobalMetadataList = lazy(() => import('./_pages/global-metadata/list'));
 
+const TimeQualityConfigurationDetail = lazy(() =>
+    import('./_pages/time-quality-configurations/detail/TimeQualityConfigurationDetail').then((m) => ({
+        default: m.TimeQualityConfigurationDetail,
+    })),
+);
+const TimeQualityConfigurationForm = lazy(() =>
+    import('./_pages/time-quality-configurations/form/TimeQualityConfigurationForm').then((m) => ({
+        default: m.TimeQualityConfigurationForm,
+    })),
+);
+const TimeQualityConfigurationsList = lazy(() =>
+    import('./_pages/time-quality-configurations/list/TimeQualityConfigurationsList').then((m) => ({
+        default: m.TimeQualityConfigurationsList,
+    })),
+);
+
 const GroupDetail = lazy(() => import('./_pages/group/detail'));
 const GroupList = lazy(() => import('./_pages/group/list'));
 
@@ -263,6 +279,21 @@ export default function AppRouter() {
                         element={<Navigate to={`/${Resource.CmpProfiles.toLowerCase()}`} />}
                     />
                     <Route path={`/${Resource.CmpProfiles.toLowerCase()}/detail/:id`} element={<CmpProfileDetails />} />
+
+                    <Route path={`/${Resource.TimeQualityConfigurations.toLowerCase()}`} element={<TimeQualityConfigurationsList />} />
+                    <Route
+                        path={`/${Resource.TimeQualityConfigurations.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.TimeQualityConfigurations.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.TimeQualityConfigurations.toLowerCase()}/add`} element={<TimeQualityConfigurationForm />} />
+                    <Route
+                        path={`/${Resource.TimeQualityConfigurations.toLowerCase()}/edit/:id`}
+                        element={<TimeQualityConfigurationForm />}
+                    />
+                    <Route
+                        path={`/${Resource.TimeQualityConfigurations.toLowerCase()}/detail/:id`}
+                        element={<TimeQualityConfigurationDetail />}
+                    />
 
                     <Route path={`/${Resource.Groups.toLowerCase()}`} element={<GroupList />} />
                     <Route

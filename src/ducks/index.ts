@@ -58,6 +58,7 @@ import loginEpics from './login-epics';
 import secretsEpics from './secrets-epics';
 import vaultProfilesEpics from './vault-profiles-epics';
 import vaultsEpics from './vaults-epics';
+import timeQualityConfigurationsEpics from './time-quality-configurations-epics';
 
 export interface EpicDependencies {
     apiClients: ApiClients;
@@ -120,4 +121,5 @@ export const epics = combineEpics(
     ...secretsEpics,
     ...vaultProfilesEpics,
     ...vaultsEpics,
+    ...timeQualityConfigurationsEpics,
 );
