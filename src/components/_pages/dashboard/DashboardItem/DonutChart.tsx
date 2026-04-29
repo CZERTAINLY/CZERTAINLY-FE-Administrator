@@ -128,16 +128,16 @@ function DonutChart({
     );
     let chartContainerClassName = 'relative aspect-square w-[200px] max-w-full';
     let layoutClassName =
-        'grid h-full grid-cols-1 items-center justify-items-center gap-4 lg:grid-cols-[minmax(0,200px)_minmax(0,1fr)] lg:justify-items-stretch';
+        'grid h-full grid-cols-1 items-center justify-items-center gap-4 md:grid-cols-[minmax(0,200px)_minmax(0,1fr)] md:justify-items-stretch';
 
     if (isFixedChartSize) {
         chartContainerClassName = 'relative h-[100px] w-[100px]';
         layoutClassName =
-            'grid h-full grid-cols-1 items-center justify-items-center gap-4 lg:grid-cols-[100px_minmax(0,1fr)] lg:justify-items-stretch';
+            'grid h-full grid-cols-1 items-center justify-items-center gap-4 md:grid-cols-[100px_minmax(0,1fr)] md:justify-items-stretch';
     } else if (shrinkOnSmallScreen) {
         chartContainerClassName = 'relative aspect-square w-full min-w-[96px] max-w-[200px]';
         layoutClassName =
-            'grid h-full grid-cols-1 items-center justify-items-center gap-4 lg:grid-cols-[minmax(96px,40%)_minmax(0,1fr)] lg:justify-items-stretch';
+            'grid h-full grid-cols-1 items-center justify-items-center gap-4 md:grid-cols-[minmax(96px,40%)_minmax(0,1fr)] md:justify-items-stretch';
     }
 
     useEffect(() => {
@@ -179,12 +179,12 @@ function DonutChart({
         observer.observe(container);
 
         const raf = requestAnimationFrame(updateOverlayMetrics);
-        const delayedUpdate = window.setTimeout(updateOverlayMetrics, 120);
+        const delayedUpdate = globalThis.setTimeout(updateOverlayMetrics, 120);
 
         return () => {
             observer.disconnect();
             cancelAnimationFrame(raf);
-            window.clearTimeout(delayedUpdate);
+            globalThis.clearTimeout(delayedUpdate);
         };
     }, [chartSize, shrinkOnSmallScreen]);
 
@@ -210,11 +210,11 @@ function DonutChart({
                     )}
                 </div>
                 <SimpleBar forceVisible="y" style={{ height: '180px', width: '100%' }}>
-                    <div className={isFixedChartSize ? 'flex-1 flex justify-end' : 'flex-1'}>
+                    <div className={isFixedChartSize ? 'flex-1 flex justify-end md:justify-center' : 'flex-1'}>
                         <div
                             className={
                                 isFixedChartSize
-                                    ? 'space-y-1.5 h-full w-full max-w-[220px] overflow-y-auto'
+                                    ? 'space-y-1.5 h-full w-full md:w-auto md:max-w-[220px] overflow-y-auto'
                                     : 'space-y-1.5 h-full w-full overflow-y-auto'
                             }
                         >

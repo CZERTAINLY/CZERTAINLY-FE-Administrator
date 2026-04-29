@@ -1,4 +1,4 @@
-import Spinner from 'components/Spinner';
+import DashboardSkeleton from '../DashboardItem/DashboardSkeleton';
 import { selectors as enumSelectors } from 'ducks/enums';
 import { actions, selectors } from 'ducks/statisticsDashboard';
 import { EntityType } from 'ducks/filters';
@@ -33,16 +33,20 @@ function SecretsDashboard() {
         return Object.keys(obj).length === 0;
     }
 
+    if (isFetching || dashboard === null) {
+        return <DashboardSkeleton countBadges={3} charts={5} />;
+    }
+
     return (
         <div>
             <div className="flex flex-row gap-4 md:gap-8 mb-4 md:mb-8 flex-wrap" data-testid="secrets-dashboard-counts">
-                <div className="flex-1">
+                <div className="flex-1 min-w-[180px]">
                     <CountBadge data={dashboard?.totalSecrets} title="Secrets" link="../secrets" />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-[180px]">
                     <CountBadge data={dashboard?.totalVaultInstances} title="Vaults" link="../vaults" />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-[180px]">
                     <CountBadge data={dashboard?.totalVaultProfiles} title="Vault Profiles" link="../vaultprofiles" />
                 </div>
             </div>
@@ -173,8 +177,6 @@ function SecretsDashboard() {
                     />
                 )}
             </div>
-
-            <Spinner active={isFetching || dashboard === null} />
         </div>
     );
 }
