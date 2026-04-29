@@ -51,7 +51,7 @@ interface BaseProps {
 interface SingleSelectProps extends BaseProps {
     isMulti?: false;
     value: OptionValue | { value: OptionValue; label: string } | null;
-    onChange: (value: OptionValue | { value: OptionValue; label: string }) => void;
+    onChange: (value: OptionValue | { value: OptionValue; label: string } | null) => void;
 }
 
 interface MultiSelectProps extends BaseProps {
@@ -463,7 +463,7 @@ function Select({
                         } else {
                             const selectedValue = e.target.value;
                             if (selectedValue === '') {
-                                (onChange as SingleSelectProps['onChange'])('' as any);
+                                (onChange as SingleSelectProps['onChange'])(null);
                                 return;
                             }
                             const matchedOption = (options || []).find((opt) => getOptionValueString(opt.value) === selectedValue);
@@ -502,7 +502,11 @@ function Select({
                         className="!p-0 absolute top-1/2 end-8 -translate-y-1/2"
                         data-testid={dataTestId ? `${dataTestId}-clear` : `select-${id}-clear`}
                         onClick={() => {
-                            (onChange as MultiSelectProps['onChange'])(undefined);
+                            if (isMulti) {
+                                (onChange as MultiSelectProps['onChange'])(undefined);
+                            } else {
+                                (onChange as SingleSelectProps['onChange'])(null);
+                            }
                         }}
                         aria-label="Clear selection"
                     >

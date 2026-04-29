@@ -297,7 +297,7 @@ export default function FilterWidget({
             ?.searchFieldData?.find((f) => f?.fieldIdentifier === filterField.value);
 
         const computeValue = (): unknown => {
-            if (!filterValue) return undefined;
+            if (filterValue == null || filterValue === '') return undefined;
             if (typeof filterValue === 'number') return filterValue;
             if (typeof filterValue === 'string') {
                 if (field?.type && checkIfFieldTypeIsDate(field.type) && checkIfFieldOperatorIsInterval(filterCondition.value)) {
@@ -479,7 +479,11 @@ export default function FilterWidget({
                     id="valueSelect"
                     options={filterField ? (booleanOptions as unknown as { value: OptionValue; label: string }[]) : []}
                     value={filterValue ?? null}
-                    onChange={(e: OptionValue | { value: OptionValue; label: string }) => {
+                    onChange={(e: OptionValue | { value: OptionValue; label: string } | null) => {
+                        if (e == null) {
+                            setFilterValue(undefined);
+                            return;
+                        }
                         setFilterValue({ label: e, value: e });
                     }}
                     isDisabled={!filterField || !filterCondition || noValue[filterCondition.value]}
@@ -568,7 +572,7 @@ export default function FilterWidget({
         }
 
         function mapValue(): any {
-            if (!f.value) return '';
+            if (f.value == null || f.value === '') return '';
             if (typeof f.value === 'number') return f.value;
             if (field?.type && checkIfFieldTypeIsDate(field.type) && checkIfFieldOperatorIsInterval(f.condition)) {
                 return getDurationStringFromIso8601String(f.value as unknown as string);
@@ -660,7 +664,12 @@ export default function FilterWidget({
                     </div>
                     <Button
                         id="addFilter"
-                        disabled={!filterField || !filterCondition || !isValidValue || (!noValue[filterCondition.value] && !filterValue)}
+                        disabled={
+                            !filterField ||
+                            !filterCondition ||
+                            !isValidValue ||
+                            (!noValue[filterCondition.value] && (filterValue == null || filterValue === ''))
+                        }
                         onClick={onUpdateFilterClick}
                         className="py-3 min-w-[62px]"
                     >
