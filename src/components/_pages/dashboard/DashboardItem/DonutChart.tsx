@@ -179,12 +179,12 @@ function DonutChart({
         observer.observe(container);
 
         const raf = requestAnimationFrame(updateOverlayMetrics);
-        const delayedUpdate = window.setTimeout(updateOverlayMetrics, 120);
+        const delayedUpdate = globalThis.setTimeout(updateOverlayMetrics, 120);
 
         return () => {
             observer.disconnect();
             cancelAnimationFrame(raf);
-            window.clearTimeout(delayedUpdate);
+            globalThis.clearTimeout(delayedUpdate);
         };
     }, [chartSize, shrinkOnSmallScreen]);
 

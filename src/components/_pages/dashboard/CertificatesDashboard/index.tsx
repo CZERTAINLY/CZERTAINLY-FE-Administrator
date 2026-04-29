@@ -179,7 +179,7 @@ function CertificatesDashboard() {
                                         fieldSource: FilterFieldSource.Property,
                                         condition: FilterConditionOperator.Greater,
                                         fieldIdentifier: 'NOT_AFTER',
-                                        value: JSON.parse(JSON.stringify(getDateInString(90))),
+                                        value: structuredClone(getDateInString(90)),
                                     },
                                 ];
                             }
@@ -189,7 +189,7 @@ function CertificatesDashboard() {
                                         fieldSource: FilterFieldSource.Property,
                                         condition: FilterConditionOperator.Lesser,
                                         fieldIdentifier: 'NOT_AFTER',
-                                        value: JSON.parse(JSON.stringify(getDateInString(0))),
+                                        value: structuredClone(getDateInString(0)),
                                     },
                                 ];
                             }
@@ -208,13 +208,13 @@ function CertificatesDashboard() {
                                         fieldSource: FilterFieldSource.Property,
                                         condition: FilterConditionOperator.Greater,
                                         fieldIdentifier: 'NOT_AFTER',
-                                        value: JSON.parse(JSON.stringify(getDateInString(+labels[index] - 30))),
+                                        value: structuredClone(getDateInString(+labels[index] - 30)),
                                     },
                                     {
                                         fieldSource: FilterFieldSource.Property,
                                         condition: FilterConditionOperator.Lesser,
                                         fieldIdentifier: 'NOT_AFTER',
-                                        value: JSON.parse(JSON.stringify(getDateInString(+labels[index]))),
+                                        value: structuredClone(getDateInString(+labels[index])),
                                     },
                                 ];
                             }
@@ -223,13 +223,13 @@ function CertificatesDashboard() {
                                     fieldSource: FilterFieldSource.Property,
                                     condition: FilterConditionOperator.Greater,
                                     fieldIdentifier: 'NOT_AFTER',
-                                    value: JSON.parse(JSON.stringify(getDateInString(+labels[index] - 10))),
+                                    value: structuredClone(getDateInString(+labels[index] - 10)),
                                 },
                                 {
                                     fieldSource: FilterFieldSource.Property,
                                     condition: FilterConditionOperator.Lesser,
                                     fieldIdentifier: 'NOT_AFTER',
-                                    value: JSON.parse(JSON.stringify(getDateInString(+labels[index]))),
+                                    value: structuredClone(getDateInString(+labels[index])),
                                 },
                             ];
                         }}

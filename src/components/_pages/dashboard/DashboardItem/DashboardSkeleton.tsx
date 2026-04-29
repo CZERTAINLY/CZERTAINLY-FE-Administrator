@@ -31,8 +31,8 @@ function DonutChartSkeleton() {
                     className="flex flex-col gap-4 overflow-hidden w-full ml-auto md:mx-auto"
                     style={{ height: '180px', maxWidth: '220px' }}
                 >
-                    {legendWidths.map((w, i) => (
-                        <div key={i} className="flex items-center gap-2">
+                    {legendWidths.map((w) => (
+                        <div key={w} className="flex items-center gap-2">
                             <div className={`${barClass} h-2 w-2 rounded-full flex-shrink-0`} />
                             <div className={`${barClass} h-4`} style={{ width: w }} />
                         </div>
@@ -53,15 +53,15 @@ function DashboardSkeleton({ countBadges, charts, firstBadgeWithSwitch = false }
     return (
         <div>
             <div className="flex flex-row gap-4 md:gap-8 mb-4 md:mb-8 flex-wrap">
-                {[...Array(countBadges)].map((_, i) => (
-                    <div key={i} className="flex-1 min-w-[180px]">
+                {[...new Array(countBadges)].map((_, i) => (
+                    <div key={`badge-${i}`} className="flex-1 min-w-[180px]">
                         <CountBadgeSkeleton withSwitch={i === 0 && firstBadgeWithSwitch} />
                     </div>
                 ))}
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
-                {[...Array(charts)].map((_, i) => (
-                    <DonutChartSkeleton key={i} />
+                {[...new Array(charts)].map((_, i) => (
+                    <DonutChartSkeleton key={`chart-${i}`} />
                 ))}
             </div>
         </div>
