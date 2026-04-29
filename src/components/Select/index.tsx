@@ -463,7 +463,7 @@ function Select({
                         } else {
                             const selectedValue = e.target.value;
                             if (selectedValue === '') {
-                                (onChange as SingleSelectProps['onChange'])(null);
+                                (onChange as SingleSelectProps['onChange'])('');
                                 return;
                             }
                             const matchedOption = (options || []).find((opt) => getOptionValueString(opt.value) === selectedValue);
@@ -505,7 +505,7 @@ function Select({
                             if (isMulti) {
                                 (onChange as MultiSelectProps['onChange'])(undefined);
                             } else {
-                                (onChange as SingleSelectProps['onChange'])(null);
+                                (onChange as SingleSelectProps['onChange'])('');
                             }
                         }}
                         aria-label="Clear selection"
