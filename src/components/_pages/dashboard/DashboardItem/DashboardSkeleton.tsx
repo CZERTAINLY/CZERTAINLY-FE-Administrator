@@ -1,0 +1,71 @@
+const cardClass =
+    'rounded-xl border border-gray-200 dark:border-neutral-700 p-4 md:p-5 shadow-2xs bg-white dark:bg-neutral-900 animate-pulse';
+const barClass = 'rounded bg-gray-200 dark:bg-neutral-700';
+
+const legendWidths = ['75%', '55%', '85%', '60%', '70%'];
+
+function CountBadgeSkeleton({ withSwitch = false }: { withSwitch?: boolean }) {
+    return (
+        <div className={`${cardClass} h-full`}>
+            <div className={`${barClass} h-5 max-w-28 w-full mb-4`} />
+            <div className={`${barClass} h-9 max-w-20 w-full`} />
+            {withSwitch && (
+                <div className="flex items-center gap-2 mt-5">
+                    <div className={`${barClass} h-4 max-w-28 w-full rounded-full`} />
+                    <div className={`${barClass} h-7 max-w-12 w-full rounded-full`} />
+                </div>
+            )}
+        </div>
+    );
+}
+
+function DonutChartSkeleton() {
+    return (
+        <div className={cardClass}>
+            <div className={`${barClass} h-4 w-44 mb-4`} />
+            <div className="grid grid-cols-1 items-center justify-items-center gap-4 md:grid-cols-[100px_minmax(0,1fr)] md:justify-items-stretch">
+                {/* Donut ring */}
+                <div className="h-[90px] w-[90px] rounded-full border-[14px] border-gray-200 dark:border-neutral-700 flex-shrink-0" />
+                {/* Legend */}
+                <div
+                    className="flex flex-col gap-4 overflow-hidden w-full ml-auto md:mx-auto"
+                    style={{ height: '180px', maxWidth: '220px' }}
+                >
+                    {legendWidths.map((w, i) => (
+                        <div key={i} className="flex items-center gap-2">
+                            <div className={`${barClass} h-2 w-2 rounded-full flex-shrink-0`} />
+                            <div className={`${barClass} h-4`} style={{ width: w }} />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+interface Props {
+    countBadges: number;
+    charts: number;
+    firstBadgeWithSwitch?: boolean;
+}
+
+function DashboardSkeleton({ countBadges, charts, firstBadgeWithSwitch = false }: Props) {
+    return (
+        <div>
+            <div className="flex flex-row gap-4 md:gap-8 mb-4 md:mb-8 flex-wrap">
+                {[...Array(countBadges)].map((_, i) => (
+                    <div key={i} className="flex-1 min-w-[180px]">
+                        <CountBadgeSkeleton withSwitch={i === 0 && firstBadgeWithSwitch} />
+                    </div>
+                ))}
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
+                {[...Array(charts)].map((_, i) => (
+                    <DonutChartSkeleton key={i} />
+                ))}
+            </div>
+        </div>
+    );
+}
+
+export default DashboardSkeleton;
