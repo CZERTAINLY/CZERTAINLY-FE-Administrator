@@ -26,13 +26,17 @@ function getInputStringFromDuration(duration: Duration): string {
 function getIso8601StringFromDuration(duration: Duration): string {
     const { days, hours, minutes, seconds } = duration;
 
-    const timeParts = [hours ? `${hours}H` : '', minutes ? `${minutes}M` : '', seconds ? `${seconds}S` : ''].filter((el) => el).join('');
+    const timeParts = [hours ? `${hours}H` : '', minutes ? `${minutes}M` : '', seconds ? `${seconds}S` : ''].filter(Boolean).join('');
 
     const dayPart = days ? `${days}D` : '';
     const timePart = timeParts ? `T${timeParts}` : '';
     const result = `P${dayPart}${timePart}`;
 
-    return result !== 'P' ? result : 'PT0S';
+    return result === 'P' ? 'PT0S' : result;
+}
+
+function parseMatch(value: RegExpExecArray | null): number {
+    return value ? Number.parseFloat(value[1]) : 0;
 }
 
 function getDurationFromIso8601String(input: string): Duration {
@@ -45,9 +49,6 @@ function getDurationFromIso8601String(input: string): Duration {
 
     if (!input || typeof input !== 'string' || !input.startsWith('P')) {
         return duration;
-    }
-    function parseMatch(value: RegExpExecArray | null): number {
-        return value ? parseFloat(value[1]) : 0;
     }
 
     const weeksMatch = /(\d{1,10}(?:\.\d{1,10})?)W/.exec(input);
@@ -86,7 +87,7 @@ function getDurationFromInputString(input: string) {
     };
 
     for (const [, value, unit] of matches) {
-        const num = parseInt(value, 10);
+        const num = Number.parseInt(value, 10);
         switch (unit.toLowerCase()) {
             case 'm':
                 duration.minutes += num;

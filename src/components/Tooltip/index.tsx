@@ -17,11 +17,7 @@ interface Props {
 function Tooltip({ content, placement = 'bottom', children, className, triggerClassName, contentClassName, disabled = false }: Props) {
     useEffect(() => {
         (window as any).HSTooltip?.autoInit();
-    }, [disabled]);
-
-    if (disabled) {
-        return children;
-    }
+    }, []);
 
     const getArrowClasses = () => {
         const baseClasses = 'absolute w-0 h-0 border-4';
@@ -39,7 +35,7 @@ function Tooltip({ content, placement = 'bottom', children, className, triggerCl
     };
 
     return (
-        <div className="hs-tooltip [--placement:bottom] inline-block">
+        <div className={cn('hs-tooltip [--placement:bottom] inline-block', disabled && 'pointer-events-none')}>
             {children}
             <span
                 className={cn(

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo } from 'react';
+import { type CSSProperties, useEffect, useMemo, useRef } from 'react';
 import Label from 'components/Label';
 import Button from 'components/Button';
 import cn from 'classnames';
@@ -50,8 +50,8 @@ interface BaseProps {
 
 interface SingleSelectProps extends BaseProps {
     isMulti?: false;
-    value: string | number | object | { value: string | number | object; label: string };
-    onChange: (value: string | number | object | { value: string | number | object; label: string }) => void;
+    value: OptionValue | { value: OptionValue; label: string } | null;
+    onChange: (value: OptionValue | { value: OptionValue; label: string } | null) => void;
 }
 
 interface MultiSelectProps extends BaseProps {
@@ -100,7 +100,7 @@ const valuesMatch = (val1: any, val2: any): boolean => {
         return val1.name === val2;
     }
 
-    if (typeof val1 === 'string' && typeof val2 === 'object' && val2 !== null && val2?.name) {
+    if (typeof val1 === 'string' && typeof val2 === 'object' && val2?.name) {
         return val1 === val2.name;
     }
 
@@ -176,6 +176,7 @@ function Select({
         | object
         | { value: string | number | object; label: string }
         | { value: string | number; label: string }[]
+        | null
         | undefined
     >(undefined);
     const isInitializedRef = useRef(false);
@@ -213,9 +214,7 @@ function Select({
                 if (prev.length !== curr.length) return true;
                 return prev.some((p, i) => !valuesMatch(p.value, curr[i]?.value));
             } else {
-                const prev = previousValueRef.current;
-                const curr = getValueFromProp;
-                return !valuesMatch(prev, curr);
+                return !valuesMatch(previousValueRef.current, getValueFromProp);
             }
         })();
 
@@ -265,7 +264,7 @@ function Select({
             previousValueRef.current = value;
             return cleanup;
         }
-    }, [optionsKey, value, id, isMulti, getValueFromProp]);
+    }, [optionsKey, value, isMulti, getValueFromProp]);
 
     useEffect(() => {
         const select = selectRef.current;
@@ -387,13 +386,13 @@ function Select({
         observer.observe(select.parentNode, { childList: true, subtree: true });
         requestAnimationFrame(() => setTitlesAndTooltips());
         return () => observer.disconnect();
-    }, [options, isMulti, id, colorizeVersionLabel, showOptionDescriptionInDropdown]);
+    }, [options, colorizeVersionLabel, showOptionDescriptionInDropdown]);
 
     const hasOptions = options && options.length > 0;
 
     const hasSearch = isSearchable && !isMulti;
 
-    // Check if there's a selected value for clear button
+    // Check if there's a selected value for a clear button
     const hasValue = isMulti
         ? Array.isArray(value) && value.length > 0
         : getValueFromProp != null && getValueFromProp !== '' && getValueFromProp !== placeholder;
@@ -408,7 +407,7 @@ function Select({
                 className={cn('relative', className)}
                 style={{
                     ...(minWidth ? { minWidth: `${minWidth}px` } : {}),
-                    ...(dropdownWidth ? ({ '--select-dropdown-width': `${dropdownWidth}px` } as React.CSSProperties) : {}),
+                    ...(dropdownWidth ? ({ '--select-dropdown-width': `${dropdownWidth}px` } as CSSProperties) : {}),
                 }}
             >
                 <select
@@ -464,7 +463,7 @@ function Select({
                         } else {
                             const selectedValue = e.target.value;
                             if (selectedValue === '') {
-                                (onChange as SingleSelectProps['onChange'])('' as any);
+                                (onChange as SingleSelectProps['onChange'])('');
                                 return;
                             }
                             const matchedOption = (options || []).find((opt) => getOptionValueString(opt.value) === selectedValue);
@@ -480,10 +479,7 @@ function Select({
                               (value as { value: string | number; label: string }[]).some((v) => {
                                   return valuesMatch(v.value, option.value);
                               })
-                            : (() => {
-                                  const currentValue = getValueFromProp;
-                                  return valuesMatch(option.value, currentValue);
-                              })();
+                            : valuesMatch(option.value, getValueFromProp);
                         return (
                             <option
                                 key={optionValueString || index}
@@ -506,7 +502,11 @@ function Select({
                         className="!p-0 absolute top-1/2 end-8 -translate-y-1/2"
                         data-testid={dataTestId ? `${dataTestId}-clear` : `select-${id}-clear`}
                         onClick={() => {
-                            (onChange as MultiSelectProps['onChange'])(undefined);
+                            if (isMulti) {
+                                (onChange as MultiSelectProps['onChange'])(undefined);
+                            } else {
+                                (onChange as SingleSelectProps['onChange'])('');
+                            }
                         }}
                         aria-label="Clear selection"
                     >

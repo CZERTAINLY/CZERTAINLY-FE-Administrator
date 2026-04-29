@@ -40,6 +40,7 @@ import {
     SquareMinus,
     Unplug,
     ShieldCheck,
+    Eye,
 } from 'lucide-react';
 import EditIcon from 'components/icons/EditIcon';
 import type { IconName } from 'types/icons';
@@ -89,4 +90,5 @@ export const iconRegistry: Record<IconName, React.ComponentType<{ size?: number 
     'shield-check': ShieldCheck,
     unplug: Unplug,
     repeat: Repeat,
+    eye: Eye,
 };

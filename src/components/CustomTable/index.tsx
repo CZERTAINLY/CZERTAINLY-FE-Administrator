@@ -11,7 +11,6 @@ import type { TableDataRow, TableHeader } from './types';
 import Select from 'components/Select';
 import Pagination from 'components/Pagination';
 import Checkbox from 'components/Checkbox';
-import Button from 'components/Button';
 import SimpleBar from 'simplebar-react';
 import cn from 'classnames';
 import { useLocation } from 'react-router';
@@ -192,12 +191,12 @@ function CustomTable({
     const handleRowDetailClick = useCallback(
         (rowId: string | number) => {
             const row = tblData.find((r) => r.id === rowId);
-            if (!row || !row.detailColumns || row.detailColumns.length === 0) {
+            if (!row || !row.detailColumns?.length) {
                 return;
             }
 
             const detailTableHeaders: TableHeader[] =
-                detailHeaders && detailHeaders.length === row.detailColumns.length
+                detailHeaders?.length === row.detailColumns.length
                     ? detailHeaders
                     : row.detailColumns.map((_, index) => ({
                           id: `detail-${index}`,
@@ -300,13 +299,15 @@ function CustomTable({
 
                     switch (sortCol.sortType) {
                         case 'date': {
-                            const aDate = new Date(aVal.replace(/ at /g, ' '));
-                            const bDate = new Date(bVal.replace(/ at /g, ' '));
+                            const aDate = new Date(aVal.replaceAll(' at ', ' '));
+                            const bDate = new Date(bVal.replaceAll(' at ', ' '));
                             return sortDirection === 'asc' ? aDate.getTime() - bDate.getTime() : bDate.getTime() - aDate.getTime();
                         }
 
                         case 'numeric':
-                            return sortDirection === 'asc' ? parseFloat(aVal) - parseFloat(bVal) : parseFloat(bVal) - parseFloat(aVal);
+                            return sortDirection === 'asc'
+                                ? Number.parseFloat(aVal) - Number.parseFloat(bVal)
+                                : Number.parseFloat(bVal) - Number.parseFloat(aVal);
 
                         default:
                             if (aVal === bVal) return 0;
@@ -360,7 +361,7 @@ function CustomTable({
                 hasDetails &&
                 target.localName !== 'input' &&
                 target.localName !== 'button' &&
-                (target.localName !== 'i' || target.hasAttribute('data-expander'))
+                (target.localName !== 'i' || 'expander' in target.dataset)
             ) {
                 if (expandedRow === rowId) {
                     setExpandedRow(undefined);
@@ -378,7 +379,7 @@ function CustomTable({
 
             if (disableSelectionControls) return;
 
-            const id = e.currentTarget.getAttribute('data-id');
+            const id = (e.currentTarget as HTMLElement).dataset.id;
             if (!id) return;
 
             if (!multiSelect) {
@@ -437,7 +438,7 @@ function CustomTable({
         (e: React.MouseEvent<HTMLTableCellElement>) => {
             if (!tblHeaders) return;
 
-            const sortColumn = e.currentTarget.getAttribute('data-id');
+            const sortColumn = e.currentTarget.dataset.id;
 
             const hdr = tblHeaders?.find((header) => header.id === sortColumn);
             if (!hdr) return;
@@ -517,7 +518,7 @@ function CustomTable({
                     {...(header.sortable ? { onClick: onColumnSortClick } : {})}
                     style={{
                         ...(header.width ? { width: header.width } : {}),
-                        ...(header.maxWidth != null ? { maxWidth: `${header.maxWidth}px` } : {}),
+                        ...(header.maxWidth == null ? {} : { maxWidth: `${header.maxWidth}px` }),
                         ...(header.align ? { textAlign: header.align } : {}),
                     }}
                 >
@@ -602,7 +603,7 @@ function CustomTable({
 
                         {row.columns.map((column, index) => (
                             <TableRowCell
-                                key={index}
+                                key={tblHeaders?.[index]?.id ?? index}
                                 column={column}
                                 index={index}
                                 row={row}
@@ -701,17 +702,16 @@ function CustomTable({
                             {paginationData ? (
                                 <div>
                                     Showing {(paginationData.page - 1) * paginationData.pageSize + 1} to{' '}
-                                    {(paginationData.page - 1) * paginationData.pageSize + paginationData.loadedPageSize >
-                                    paginationData.totalItems
-                                        ? paginationData.totalItems
-                                        : (paginationData.page - 1) * paginationData.pageSize + paginationData.loadedPageSize}{' '}
+                                    {Math.min(
+                                        (paginationData.page - 1) * paginationData.pageSize + paginationData.loadedPageSize,
+                                        paginationData.totalItems,
+                                    )}{' '}
                                     items of {paginationData.totalItems}
                                 </div>
                             ) : (
                                 <div>
                                     Showing {(page - 1) * pageSize + (tblData.length > 0 ? 1 : 0)} to{' '}
-                                    {(page - 1) * pageSize + pageSize > tblData.length ? tblData.length : (page - 1) * pageSize + pageSize}{' '}
-                                    of {tblData.length} entries
+                                    {Math.min((page - 1) * pageSize + pageSize, tblData.length)} of {tblData.length} entries
                                 </div>
                             )}
 

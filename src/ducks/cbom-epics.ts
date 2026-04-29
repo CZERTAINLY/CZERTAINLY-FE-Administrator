@@ -26,8 +26,8 @@ const normalizeCbomUploadErrorMessage = (message: string): string => {
     }
 
     return message
-        .replace(/\balready exists(?:\s+already exists)+\b/gi, 'already exists')
-        .replace(/\s{2,}/g, ' ')
+        .replaceAll(/\balready exists(?:\s+already exists)+\b/gi, 'already exists')
+        .replaceAll(/\s{2,}/g, ' ')
         .trim();
 };
 
