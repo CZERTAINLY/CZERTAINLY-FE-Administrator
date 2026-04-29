@@ -53,14 +53,14 @@ function DashboardSkeleton({ countBadges, charts, firstBadgeWithSwitch = false }
     return (
         <div>
             <div className="flex flex-row gap-4 md:gap-8 mb-4 md:mb-8 flex-wrap">
-                {[...new Array(countBadges)].map((_, i) => (
+                {Array.from({ length: countBadges }).map((_, i) => (
                     <div key={`badge-${i}`} className="flex-1 min-w-[180px]">
                         <CountBadgeSkeleton withSwitch={i === 0 && firstBadgeWithSwitch} />
                     </div>
                 ))}
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
-                {[...new Array(charts)].map((_, i) => (
+                {Array.from({ length: charts }).map((_, i) => (
                     <DonutChartSkeleton key={`chart-${i}`} />
                 ))}
             </div>
