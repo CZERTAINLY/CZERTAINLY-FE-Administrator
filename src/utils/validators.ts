@@ -369,7 +369,8 @@ export const validateIso8601Duration = () => (value: unknown) => {
     if (typeof value !== 'string') return 'Value must be a valid ISO 8601 duration (e.g., PT1H)';
     const trimmed = value.trim();
     if (!trimmed) return undefined;
-    return /^P(?=\d|T\d)(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+(?:\.\d+)?S)?)?$/.test(trimmed)
+    if (trimmed === 'P' || trimmed.endsWith('T')) return 'Value must be a valid ISO 8601 duration (e.g., PT1H)';
+    return /^P(\d+D)?(T(\d+H)?(\d+M)?(\d+(?:\.\d+)?S)?)?$/.test(trimmed)
         ? undefined
         : 'Value must be a valid ISO 8601 duration (e.g., PT1H)';
 };
@@ -379,9 +380,12 @@ export const validateNtpServers = () => (value: string | string[] | undefined) =
     const servers = Array.isArray(value) ? value : value.split(',').map((s) => s.trim());
     if (servers.length === 0 || (servers.length === 1 && servers[0] === '')) return undefined;
 
-    const hostnameOrIpRegex =
-        /^(([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}|[a-zA-Z0-9-]+|(25[0-5]|2[0-4]\d|[01]?\d\d?)(\.(25[0-5]|2[0-4]\d|[01]?\d\d?)){3})$/;
-    const invalid = servers.filter((s) => !hostnameOrIpRegex.test(s));
+    const fqdnRegex = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+    const simpleHostRegex = /^[a-zA-Z0-9-]+$/;
+    const ipv4Regex = /^\d{1,3}(\.\d{1,3}){3}$/;
+    const isValidServer = (s: string) =>
+        fqdnRegex.test(s) || simpleHostRegex.test(s) || (ipv4Regex.test(s) && s.split('.').every((p) => Number(p) <= 255));
+    const invalid = servers.filter((s) => !isValidServer(s));
     if (invalid.length > 0) {
         return `Value must be a comma-separated list of valid NTP server addresses (IP or hostname)`;
     }

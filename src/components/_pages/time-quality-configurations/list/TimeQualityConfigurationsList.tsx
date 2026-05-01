@@ -72,11 +72,13 @@ export const TimeQualityConfigurationsList = () => {
             timeQualityConfigurations.map((config) => ({
                 id: config.uuid,
                 columns: [
-                    <span style={{ whiteSpace: 'nowrap' }}>
+                    <span key="name-link" style={{ whiteSpace: 'nowrap' }}>
                         <Link to={`./detail/${config.uuid}`}>{config.name}</Link>
                     </span>,
 
-                    <span className="text-sm text-gray-600">{config.ntpServers?.join(', ') || '—'}</span>,
+                    <span key="ntpServers-value" className="text-sm text-gray-600">
+                        {config.ntpServers?.join(', ') || '—'}
+                    </span>,
                 ],
             })),
         [timeQualityConfigurations],

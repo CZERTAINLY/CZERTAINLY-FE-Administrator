@@ -35,7 +35,8 @@ const DurationInput = ({ id, label, value, onChange, onBlur, required, invalid, 
     const handleBlur = useCallback(() => {
         const iso = getIso8601StringFromInputString(inputValue);
         // Only emit a non-trivial value; treat "PT0S" (from empty/invalid input) as empty
-        const parsed = inputValue.trim() === '' || iso === 'PT0S' ? '' : iso;
+        const isEmpty = inputValue.trim() === '' || iso === 'PT0S';
+        const parsed = isEmpty ? '' : iso;
         onChange(parsed);
         // Re-format the display value to canonical form
         setInputValue(parsed ? getInputStringFromIso8601String(parsed) : '');

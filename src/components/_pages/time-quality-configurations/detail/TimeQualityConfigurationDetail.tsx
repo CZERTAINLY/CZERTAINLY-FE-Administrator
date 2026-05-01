@@ -74,9 +74,8 @@ export const TimeQualityConfigurationDetail = () => {
 
     const generalData: TableDataRow[] = useMemo(
         () =>
-            !timeQualityConfiguration
-                ? []
-                : [
+            timeQualityConfiguration
+                ? [
                       {
                           id: 'uuid',
                           columns: ['UUID', timeQualityConfiguration.uuid],
@@ -89,27 +88,29 @@ export const TimeQualityConfigurationDetail = () => {
                           id: 'accuracy',
                           columns: [
                               'Accuracy',
-                              <span className="font-mono">{getInputStringFromIso8601String(timeQualityConfiguration.accuracy)}</span>,
+                              <span key="accuracy-value" className="font-mono">
+                                  {getInputStringFromIso8601String(timeQualityConfiguration.accuracy)}
+                              </span>,
                           ],
                       },
                       {
                           id: 'leapSecondGuard',
                           columns: ['Leap Second Guard', timeQualityConfiguration.leapSecondGuard ? 'Yes' : 'No'],
                       },
-                  ],
+                  ]
+                : [],
         [timeQualityConfiguration],
     );
 
     const ntpData: TableDataRow[] = useMemo(
         () =>
-            !timeQualityConfiguration
-                ? []
-                : [
+            timeQualityConfiguration
+                ? [
                       {
                           id: 'ntpServers',
                           columns: [
                               'NTP Servers',
-                              <ul className="list-disc list-inside">
+                              <ul key="ntpServers-list" className="list-disc list-inside">
                                   {timeQualityConfiguration.ntpServers.map((s) => (
                                       <li key={s} className="font-mono text-sm">
                                           {s}
@@ -124,7 +125,7 @@ export const TimeQualityConfigurationDetail = () => {
                                     id: 'ntpCheckInterval',
                                     columns: [
                                         'Check Interval',
-                                        <span className="font-mono">
+                                        <span key="ntpCheckInterval-value" className="font-mono">
                                             {getInputStringFromIso8601String(timeQualityConfiguration.ntpCheckInterval)}
                                         </span>,
                                     ],
@@ -137,43 +138,44 @@ export const TimeQualityConfigurationDetail = () => {
                                     id: 'ntpCheckTimeout',
                                     columns: [
                                         'Check Timeout',
-                                        <span className="font-mono">
+                                        <span key="ntpCheckTimeout-value" className="font-mono">
                                             {getInputStringFromIso8601String(timeQualityConfiguration.ntpCheckTimeout)}
                                         </span>,
                                     ],
                                 },
                             ]
                           : []),
-                      ...(timeQualityConfiguration.ntpSamplesPerServer !== undefined
-                          ? [
+                      ...(timeQualityConfiguration.ntpSamplesPerServer === undefined
+                          ? []
+                          : [
                                 {
                                     id: 'ntpSamplesPerServer',
                                     columns: ['Samples per Server', String(timeQualityConfiguration.ntpSamplesPerServer)],
                                 },
-                            ]
-                          : []),
-                      ...(timeQualityConfiguration.ntpServersMinReachable !== undefined
-                          ? [
+                            ]),
+                      ...(timeQualityConfiguration.ntpServersMinReachable === undefined
+                          ? []
+                          : [
                                 {
                                     id: 'ntpServersMinReachable',
                                     columns: ['Min Reachable Servers', String(timeQualityConfiguration.ntpServersMinReachable)],
                                 },
-                            ]
-                          : []),
+                            ]),
                       ...(timeQualityConfiguration.maxClockDrift
                           ? [
                                 {
                                     id: 'maxClockDrift',
                                     columns: [
                                         'Max Clock Drift',
-                                        <span className="font-mono">
+                                        <span key="maxClockDrift-value" className="font-mono">
                                             {getInputStringFromIso8601String(timeQualityConfiguration.maxClockDrift)}
                                         </span>,
                                     ],
                                 },
                             ]
                           : []),
-                  ],
+                  ]
+                : [],
         [timeQualityConfiguration],
     );
 
