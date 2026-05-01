@@ -74,12 +74,13 @@ function getDurationFromIso8601String(input: string): Duration {
     const seconds = parseMatch(secondsMatch);
 
     const totalSeconds = (((weeks * 7 + days) * 24 + hours) * 60 + minutes) * 60 + seconds;
+    const totalMs = Math.round(totalSeconds * 1000);
 
-    duration.days = Math.floor(totalSeconds / 86400);
-    duration.hours = Math.floor((totalSeconds % 86400) / 3600);
-    duration.minutes = Math.floor((totalSeconds % 3600) / 60);
-    duration.seconds = Math.floor(totalSeconds % 60);
-    duration.milliseconds = Math.round((totalSeconds % 1) * 1000);
+    duration.days = Math.floor(totalMs / 86400000);
+    duration.hours = Math.floor((totalMs % 86400000) / 3600000);
+    duration.minutes = Math.floor((totalMs % 3600000) / 60000);
+    duration.seconds = Math.floor((totalMs % 60000) / 1000);
+    duration.milliseconds = totalMs % 1000;
 
     return duration;
 }

@@ -562,6 +562,8 @@ describe('validators', () => {
         test('should reject invalid ISO 8601 durations', () => {
             expect(validateIso8601Duration()('1H')).toBe('Value must be a valid ISO 8601 duration (e.g., PT1H)');
             expect(validateIso8601Duration()('abc')).toBe('Value must be a valid ISO 8601 duration (e.g., PT1H)');
+            expect(validateIso8601Duration()('P1DT')).toBe('Value must be a valid ISO 8601 duration (e.g., PT1H)');
+            expect(validateIso8601Duration()('PT')).toBe('Value must be a valid ISO 8601 duration (e.g., PT1H)');
         });
     });
 

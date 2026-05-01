@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, type ChangeEvent } from 'react';
 import { getInputStringFromIso8601String, getIso8601StringFromInputString } from 'utils/duration';
 import cn from 'classnames';
 import { inputBaseClassName } from 'components/TextInput/inputStyles';
@@ -28,14 +28,14 @@ const DurationInput = ({ id, label, value, onChange, onBlur, required, invalid, 
         setInputValue(value ? getInputStringFromIso8601String(value) : '');
     }, [value]);
 
-    const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value);
     }, []);
 
     const handleBlur = useCallback(() => {
         const iso = getIso8601StringFromInputString(inputValue);
         // Only emit a non-trivial value; treat "PT0S" (from empty/invalid input) as empty
-        const parsed = inputValue.trim() === '' ? '' : iso === 'PT0S' && inputValue.trim() !== '0s' ? '' : iso;
+        const parsed = inputValue.trim() === '' || iso === 'PT0S' ? '' : iso;
         onChange(parsed);
         // Re-format the display value to canonical form
         setInputValue(parsed ? getInputStringFromIso8601String(parsed) : '');

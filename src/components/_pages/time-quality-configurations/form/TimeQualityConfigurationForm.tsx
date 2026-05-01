@@ -19,7 +19,13 @@ import { actions as tqcActions, selectors as tqcSelectors } from 'ducks/time-qua
 
 import { Resource } from 'types/openapi';
 import { collectFormAttributes, mapProfileAttribute, transformAttributes } from 'utils/attributes/attributes';
-import { validateAlphaNumericWithoutAccents, validateIso8601Duration, validateNtpServers, validateRequired } from 'utils/validators';
+import {
+    validateAlphaNumericWithoutAccents,
+    validateIso8601Duration,
+    validateNtpServers,
+    validatePositiveInteger,
+    validateRequired,
+} from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 
 interface FormValues {
@@ -339,6 +345,7 @@ export const TimeQualityConfigurationForm = () => {
                                         <Controller
                                             name="ntpSamplesPerServer"
                                             control={control}
+                                            rules={buildValidationRules([validatePositiveInteger()])}
                                             render={({ field, fieldState }) => (
                                                 <TextInput
                                                     {...field}
@@ -356,6 +363,7 @@ export const TimeQualityConfigurationForm = () => {
                                         <Controller
                                             name="ntpServersMinReachable"
                                             control={control}
+                                            rules={buildValidationRules([validatePositiveInteger()])}
                                             render={({ field, fieldState }) => (
                                                 <TextInput
                                                     {...field}

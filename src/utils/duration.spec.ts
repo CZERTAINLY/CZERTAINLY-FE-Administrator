@@ -39,6 +39,46 @@ describe('duration', () => {
             expect(getInputStringFromIso8601String('')).toBe('');
             expect(getInputStringFromIso8601String('invalid')).toBe('');
         });
+
+        test('should carry over seconds into minutes (PT90S)', () => {
+            const result = getInputStringFromIso8601String('PT90S');
+            expect(result).toContain('1m');
+            expect(result).toContain('30s');
+        });
+
+        test('should carry over minutes into hours (PT90M)', () => {
+            const result = getInputStringFromIso8601String('PT90M');
+            expect(result).toContain('1h');
+            expect(result).toContain('30m');
+        });
+
+        test('should carry over hours into days (PT25H)', () => {
+            const result = getInputStringFromIso8601String('PT25H');
+            expect(result).toContain('1d');
+            expect(result).toContain('1h');
+        });
+
+        test('should normalize weeks to days (P1W)', () => {
+            expect(getInputStringFromIso8601String('P1W')).toBe('7d');
+        });
+
+        test('should carry over fractional minutes (PT1.5M)', () => {
+            const result = getInputStringFromIso8601String('PT1.5M');
+            expect(result).toContain('1m');
+            expect(result).toContain('30s');
+        });
+
+        test('should carry over fractional hours (PT1.5H)', () => {
+            const result = getInputStringFromIso8601String('PT1.5H');
+            expect(result).toContain('1h');
+            expect(result).toContain('30m');
+        });
+
+        test('should not produce invalid 1000ms when seconds value rounds up (PT0.9995S)', () => {
+            const result = getInputStringFromIso8601String('PT0.9995S');
+            expect(result).not.toContain('1000ms');
+            expect(result).toBe('1s');
+        });
     });
 
     describe('getIso8601StringFromInputString', () => {
