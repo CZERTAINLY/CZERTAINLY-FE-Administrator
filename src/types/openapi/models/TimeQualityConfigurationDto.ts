@@ -56,7 +56,7 @@ export interface TimeQualityConfigurationDto {
      */
     ntpSamplesPerServer?: number;
     /**
-     * Timeout for a single NTP check, in ISO 8601 duration format
+     * Timeout for the entire NTP check cycle, in ISO 8601 duration format
      * @type {string}
      * @memberof TimeQualityConfigurationDto
      */

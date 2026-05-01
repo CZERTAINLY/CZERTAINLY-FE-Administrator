@@ -42,7 +42,7 @@ export interface TimeQualityConfigurationRequestDto {
      * @type {string}
      * @memberof TimeQualityConfigurationRequestDto
      */
-    ntpCheckInterval?: string;
+    ntpCheckInterval: string;
     /**
      * Number of NTP samples to take per server during each check
      * @type {number}
@@ -50,11 +50,11 @@ export interface TimeQualityConfigurationRequestDto {
      */
     ntpSamplesPerServer?: number;
     /**
-     * Timeout for a single NTP check, in ISO 8601 duration format
+     * Timeout for the entire NTP check cycle, in ISO 8601 duration format
      * @type {string}
      * @memberof TimeQualityConfigurationRequestDto
      */
-    ntpCheckTimeout?: string;
+    ntpCheckTimeout: string;
     /**
      * Minimum number of NTP servers that must be reachable
      * @type {number}
@@ -66,7 +66,7 @@ export interface TimeQualityConfigurationRequestDto {
      * @type {string}
      * @memberof TimeQualityConfigurationRequestDto
      */
-    maxClockDrift?: string;
+    maxClockDrift: string;
     /**
      * Whether to guard against leap second anomalies
      * @type {boolean}
