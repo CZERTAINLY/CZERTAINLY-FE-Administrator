@@ -549,6 +549,9 @@ describe('validators', () => {
             expect(validateIso8601Duration()('PT1H')).toBeUndefined();
             expect(validateIso8601Duration()('P1DT12H')).toBeUndefined();
             expect(validateIso8601Duration()('PT10M30S')).toBeUndefined();
+            expect(validateIso8601Duration()('PT0.5S')).toBeUndefined();
+            expect(validateIso8601Duration()('PT1.5S')).toBeUndefined();
+            expect(validateIso8601Duration()('PT10M0.5S')).toBeUndefined();
         });
 
         test('should accept empty value', () => {

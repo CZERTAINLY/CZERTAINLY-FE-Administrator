@@ -178,12 +178,15 @@ const bulkDeleteTimeQualityConfigurations: AppEpic = (action$, state$, deps) => 
         filter(slice.actions.bulkDeleteTimeQualityConfigurations.match),
         switchMap((action) =>
             deps.apiClients.timeQualityConfigurations.bulkDeleteTimeQualityConfigurations({ requestBody: action.payload.uuids }).pipe(
-                mergeMap((errors) =>
-                    of(
-                        slice.actions.bulkDeleteTimeQualityConfigurationsSuccess({ uuids: action.payload.uuids, errors }),
-                        alertActions.success('Selected Time Quality Configurations successfully deleted.'),
-                    ),
-                ),
+                mergeMap((errors) => {
+                    const successAction = slice.actions.bulkDeleteTimeQualityConfigurationsSuccess({
+                        uuids: action.payload.uuids,
+                        errors,
+                    });
+                    return errors.length === 0
+                        ? of(successAction, alertActions.success('Selected Time Quality Configurations successfully deleted.'))
+                        : of(successAction);
+                }),
                 catchError((error) =>
                     of(
                         slice.actions.bulkDeleteTimeQualityConfigurationsFailure({

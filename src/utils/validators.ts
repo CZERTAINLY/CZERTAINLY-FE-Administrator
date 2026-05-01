@@ -364,14 +364,17 @@ export const validatePostgresPosixRegex = (value: string): string => {
     );
 };
 
-export const validateIso8601Duration = () => (value: string) => {
-    if (!value?.trim()) return undefined;
-    return /^P(\d+D)?(T(\d+H)?(\d+M)?(\d+S)?)?$/.test(value) && value !== 'P'
+export const validateIso8601Duration = () => (value: unknown) => {
+    if (value === undefined || value === null) return undefined;
+    if (typeof value !== 'string') return 'Value must be a valid ISO 8601 duration (e.g., PT1H)';
+    const trimmed = value.trim();
+    if (!trimmed) return undefined;
+    return /^P(?=\d|T\d)(\d+D)?(T(\d+H)?(\d+M)?(\d+(?:\.\d+)?S)?)?$/.test(trimmed)
         ? undefined
         : 'Value must be a valid ISO 8601 duration (e.g., PT1H)';
 };
 
-export const validateNtpServers = () => (value: string | string[]) => {
+export const validateNtpServers = () => (value: string | string[] | undefined) => {
     if (!value) return undefined;
     const servers = Array.isArray(value) ? value : value.split(',').map((s) => s.trim());
     if (servers.length === 0 || (servers.length === 1 && servers[0] === '')) return undefined;

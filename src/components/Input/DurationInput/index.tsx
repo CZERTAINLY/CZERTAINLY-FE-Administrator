@@ -57,7 +57,7 @@ const DurationInput = ({ id, label, value, onChange, onBlur, required, invalid, 
                 onChange={handleChange}
                 onBlur={handleBlur}
                 disabled={disabled}
-                placeholder={placeholder ?? 'e.g. 1d 2h 30m 45s'}
+                placeholder={placeholder ?? 'e.g. 1d 2h 30m 45s 500ms'}
                 className={cn(
                     inputBaseClassName,
                     invalid && 'border-red-500 focus:border-red-500 focus:ring-red-500',
@@ -65,7 +65,9 @@ const DurationInput = ({ id, label, value, onChange, onBlur, required, invalid, 
                 )}
             />
             {error && <p className="text-xs text-red-600 mt-0.5">{error}</p>}
-            <p className="text-xs text-gray-400">Format: days (d), hours (h), minutes (m), seconds (s) — e.g. 1d 12h or 30m 15s</p>
+            <p className="text-xs text-gray-400">
+                Format: days (d), hours (h), minutes (m), seconds (s), milliseconds (ms) — e.g. 1d 12h or 30m 15s 500ms
+            </p>
         </div>
     );
 };

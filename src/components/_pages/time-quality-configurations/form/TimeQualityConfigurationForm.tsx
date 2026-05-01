@@ -160,7 +160,7 @@ export const TimeQualityConfigurationForm = () => {
                 ntpSamplesPerServer: values.ntpSamplesPerServer ? parseInt(values.ntpSamplesPerServer, 10) : undefined,
                 ntpServersMinReachable: values.ntpServersMinReachable ? parseInt(values.ntpServersMinReachable, 10) : undefined,
                 maxClockDrift: values.maxClockDrift || undefined,
-                leapSecondGuard: values.leapSecondGuard || undefined,
+                leapSecondGuard: values.leapSecondGuard,
                 customAttributes: collectFormAttributes(
                     'customTimeQualityConfiguration',
                     multipleResourceCustomAttributes[Resource.TimeQualityConfigurations],
@@ -274,7 +274,7 @@ export const TimeQualityConfigurationForm = () => {
                                     <Controller
                                         name="ntpServers"
                                         control={control}
-                                        rules={{ validate: validateNtpServers() }}
+                                        rules={{ validate: { required: validateRequired(), ntpServers: validateNtpServers() } }}
                                         render={({ field, fieldState }) => (
                                             <>
                                                 <MultipleValueTextInput

@@ -21,6 +21,16 @@ describe('duration', () => {
             expect(result).toContain('30m');
         });
 
+        test('should parse PT1.5S to 1s 500ms', () => {
+            const result = getInputStringFromIso8601String('PT1.5S');
+            expect(result).toContain('1s');
+            expect(result).toContain('500ms');
+        });
+
+        test('should parse PT0.1S to 100ms', () => {
+            expect(getInputStringFromIso8601String('PT0.1S')).toBe('100ms');
+        });
+
         test('should handle PT0S', () => {
             expect(getInputStringFromIso8601String('PT0S')).toBe('');
         });
@@ -49,6 +59,25 @@ describe('duration', () => {
             expect(result).toContain('1D');
             expect(result).toContain('2H');
             expect(result).toContain('30M');
+        });
+
+        test('should convert 500ms to PT0.5S', () => {
+            expect(getIso8601StringFromInputString('500ms')).toBe('PT0.5S');
+        });
+
+        test('should convert 1s 500ms to PT1.5S', () => {
+            expect(getIso8601StringFromInputString('1s 500ms')).toBe('PT1.5S');
+        });
+
+        test('should roundtrip with milliseconds', () => {
+            const input = '1d 2h 30m 45s 500ms';
+            const iso = getIso8601StringFromInputString(input);
+            const back = getInputStringFromIso8601String(iso);
+            expect(back).toContain('1d');
+            expect(back).toContain('2h');
+            expect(back).toContain('30m');
+            expect(back).toContain('45s');
+            expect(back).toContain('500ms');
         });
 
         test('should roundtrip', () => {
