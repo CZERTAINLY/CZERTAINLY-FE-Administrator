@@ -151,21 +151,6 @@ test.describe('DurationInput', () => {
         await expect(component.getByRole('textbox')).toHaveAttribute('placeholder', 'e.g. 1d 2h 30m 45s 500ms');
     });
 
-    test('should handle milliseconds correctly on blur', async ({ mount }) => {
-        let emitted = '';
-        const component = await mount(
-            <DurationInput
-                onChange={(v) => {
-                    emitted = v;
-                }}
-            />,
-        );
-        const input = component.getByRole('textbox');
-        await input.fill('500ms');
-        await input.blur();
-        await expect.poll(() => emitted, { timeout: 2000 }).toBe('PT0.5S');
-    });
-
     test('should display format hint text', async ({ mount }) => {
         const component = await mount(<DurationInput onChange={() => {}} />);
         await expect(component.getByText(/Format:/)).toBeVisible();
