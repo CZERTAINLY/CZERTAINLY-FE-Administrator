@@ -31,7 +31,7 @@ function getIso8601StringFromDuration(duration: Duration): string {
     let secondsPart = '';
     if (seconds || milliseconds) {
         const totalSeconds = seconds + milliseconds / 1000;
-        secondsPart = `${totalSeconds % 1 === 0 ? totalSeconds : totalSeconds}S`;
+        secondsPart = `${totalSeconds}S`;
     }
 
     const timeParts = [hours ? `${hours}H` : '', minutes ? `${minutes}M` : '', secondsPart].filter(Boolean).join('');

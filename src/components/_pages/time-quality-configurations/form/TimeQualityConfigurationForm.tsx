@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 
@@ -79,8 +79,7 @@ export const TimeQualityConfigurationForm = () => {
                 'customAttributes',
                 '__attributes__customTimeQualityConfiguration__',
             ),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [],
+        [timeQualityConfiguration, multipleResourceCustomAttributes],
     );
 
     const defaultValues = useMemo<FormValues>(
@@ -169,7 +168,12 @@ export const TimeQualityConfigurationForm = () => {
             };
 
             if (editMode && id) {
-                dispatch(tqcActions.updateTimeQualityConfiguration({ uuid: id, timeQualityConfigurationRequestDto: requestDto }));
+                dispatch(
+                    tqcActions.updateTimeQualityConfiguration({
+                        uuid: id,
+                        timeQualityConfigurationRequestDto: requestDto,
+                    }),
+                );
             } else {
                 dispatch(tqcActions.createTimeQualityConfiguration({ timeQualityConfigurationRequestDto: requestDto }));
             }
@@ -219,7 +223,6 @@ export const TimeQualityConfigurationForm = () => {
                                             type="text"
                                             label="Name"
                                             required
-                                            disabled={editMode}
                                             invalid={fieldState.error && fieldState.isTouched}
                                             error={getFieldErrorMessage(fieldState)}
                                         />
@@ -274,7 +277,12 @@ export const TimeQualityConfigurationForm = () => {
                                     <Controller
                                         name="ntpServers"
                                         control={control}
-                                        rules={{ validate: { required: validateRequired(), ntpServers: validateNtpServers() } }}
+                                        rules={{
+                                            validate: {
+                                                required: validateRequired(),
+                                                ntpServers: validateNtpServers(),
+                                            },
+                                        }}
                                         render={({ field, fieldState }) => (
                                             <>
                                                 <MultipleValueTextInput
