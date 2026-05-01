@@ -27,11 +27,11 @@ test.describe('ConnectionDetailsV1', () => {
         ] as any;
 
         const component = await mount(
-            withProviders(<ConnectionDetailsV1 url="http://connector-service" connectionDetails={connectionDetails} />),
+            withProviders(<ConnectionDetailsV1 url="https://connector-service" connectionDetails={connectionDetails} />),
         );
 
         await expect(component.getByText('URL')).toBeVisible();
-        await expect(component.getByText('http://connector-service')).toBeVisible();
+        await expect(component.getByText('https://connector-service')).toBeVisible();
 
         await expect(component.getByText('Connector Status')).toBeVisible();
         await expect(component.getByText('Connected')).toBeVisible();
@@ -52,7 +52,7 @@ test.describe('ConnectionDetailsV1', () => {
         ] as any;
 
         const component = await mount(
-            withProviders(<ConnectionDetailsV1 url="http://connector-service" connectionDetails={connectionDetails} />),
+            withProviders(<ConnectionDetailsV1 url="https://connector-service" connectionDetails={connectionDetails} />),
         );
 
         await expect(component.getByText('URL')).toBeVisible();

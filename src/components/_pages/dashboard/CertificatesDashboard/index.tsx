@@ -1,4 +1,4 @@
-import Spinner from 'components/Spinner';
+import DashboardSkeleton from '../DashboardItem/DashboardSkeleton';
 import { selectors as enumSelectors } from 'ducks/enums';
 import { actions as certificatesActions, selectors as certificatesSelectors } from 'ducks/certificates';
 import { actions as filterActions, EntityType } from 'ducks/filters';
@@ -49,10 +49,14 @@ function CertificatesDashboard() {
         return Object.keys(obj).length === 0;
     }
 
+    if (isFetching || dashboard === null) {
+        return <DashboardSkeleton countBadges={4} charts={6} firstBadgeWithSwitch />;
+    }
+
     return (
         <div>
             <div className="flex flex-row gap-4 md:gap-8 mb-4 md:mb-8 flex-wrap" data-testid="dashboard-counts">
-                <div className="flex-1">
+                <div className="flex-1 min-w-[180px]">
                     <CountBadge
                         data={dashboard?.totalCertificates}
                         title="Certificates"
@@ -68,13 +72,13 @@ function CertificatesDashboard() {
                         }
                     />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-[180px]">
                     <CountBadge data={dashboard?.totalGroups} title="Groups" link="../groups" />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-[180px]">
                     <CountBadge data={dashboard?.totalDiscoveries} title="Discoveries" link="../discoveries" />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-[180px]">
                     <CountBadge data={dashboard?.totalRaProfiles} title="RA Profiles" link="../raprofiles" />
                 </div>
             </div>
@@ -175,7 +179,7 @@ function CertificatesDashboard() {
                                         fieldSource: FilterFieldSource.Property,
                                         condition: FilterConditionOperator.Greater,
                                         fieldIdentifier: 'NOT_AFTER',
-                                        value: JSON.parse(JSON.stringify(getDateInString(90))),
+                                        value: structuredClone(getDateInString(90)),
                                     },
                                 ];
                             }
@@ -185,7 +189,7 @@ function CertificatesDashboard() {
                                         fieldSource: FilterFieldSource.Property,
                                         condition: FilterConditionOperator.Lesser,
                                         fieldIdentifier: 'NOT_AFTER',
-                                        value: JSON.parse(JSON.stringify(getDateInString(0))),
+                                        value: structuredClone(getDateInString(0)),
                                     },
                                 ];
                             }
@@ -204,13 +208,13 @@ function CertificatesDashboard() {
                                         fieldSource: FilterFieldSource.Property,
                                         condition: FilterConditionOperator.Greater,
                                         fieldIdentifier: 'NOT_AFTER',
-                                        value: JSON.parse(JSON.stringify(getDateInString(+labels[index] - 30))),
+                                        value: structuredClone(getDateInString(+labels[index] - 30)),
                                     },
                                     {
                                         fieldSource: FilterFieldSource.Property,
                                         condition: FilterConditionOperator.Lesser,
                                         fieldIdentifier: 'NOT_AFTER',
-                                        value: JSON.parse(JSON.stringify(getDateInString(+labels[index]))),
+                                        value: structuredClone(getDateInString(+labels[index])),
                                     },
                                 ];
                             }
@@ -219,13 +223,13 @@ function CertificatesDashboard() {
                                     fieldSource: FilterFieldSource.Property,
                                     condition: FilterConditionOperator.Greater,
                                     fieldIdentifier: 'NOT_AFTER',
-                                    value: JSON.parse(JSON.stringify(getDateInString(+labels[index] - 10))),
+                                    value: structuredClone(getDateInString(+labels[index] - 10)),
                                 },
                                 {
                                     fieldSource: FilterFieldSource.Property,
                                     condition: FilterConditionOperator.Lesser,
                                     fieldIdentifier: 'NOT_AFTER',
-                                    value: JSON.parse(JSON.stringify(getDateInString(+labels[index]))),
+                                    value: structuredClone(getDateInString(+labels[index])),
                                 },
                             ];
                         }}
@@ -337,8 +341,6 @@ function CertificatesDashboard() {
                     />
                 )}
             </div>
-
-            <Spinner active={isFetching || dashboard === null} />
         </div>
     );
 }

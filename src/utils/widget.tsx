@@ -45,7 +45,7 @@ export function createWidgetDetailHeaders(): TableHeader[] {
 
 export function createTableDataRow(label: string, value: string | null | undefined): TableDataRow {
     return {
-        id: label.toLowerCase().replace(/[^a-z0-9]/g, ''),
+        id: label.toLowerCase().replaceAll(/[^a-z0-9]/g, ''),
         columns: [label, value ?? ''],
     };
 }

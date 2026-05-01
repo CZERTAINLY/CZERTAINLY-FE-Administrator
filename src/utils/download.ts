@@ -18,7 +18,7 @@ export function downloadFile(content: any, fileName: string, type?: string) {
 
     var byteNumbers = new Array(content.length);
     for (var i = 0; i < content.length; i++) {
-        byteNumbers[i] = content.charCodeAt(i);
+        byteNumbers[i] = content.codePointAt(i) ?? 0;
     }
     var byteArray = new Uint8Array(byteNumbers);
 

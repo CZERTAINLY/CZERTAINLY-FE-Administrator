@@ -38,3 +38,6 @@ src/setupProxy.js
 /coverage-playwright/
 /coverage-vitest/
 /monocart-report/
+
+# SonarQube scanner output
+.scannerwork/

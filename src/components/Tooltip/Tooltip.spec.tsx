@@ -53,9 +53,10 @@ test.describe('Tooltip', () => {
         );
 
         await expect(component.getByText('Button')).toBeVisible();
+        await expect(component).toHaveClass(/pointer-events-none/);
 
         const tooltip = component.locator('[role="tooltip"]');
-        await expect(tooltip).toHaveCount(0);
+        await expect(tooltip).toHaveCount(1);
     });
 
     test('should support custom className', async ({ mount }) => {

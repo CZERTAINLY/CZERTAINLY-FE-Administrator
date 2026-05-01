@@ -9,19 +9,18 @@ export const composeValidators =
             .reduce((error, validator) => error || validator(value, allValues, fieldState), undefined);
 
 export const validateRequired = () => (value: any) => {
-    let isValid = !!(Array.isArray(value) ? value.length > 0 : value);
-    isValid = isValid || (typeof value === 'boolean' && value !== undefined);
+    const isValid = !!(Array.isArray(value) ? value.length > 0 : value) || typeof value === 'boolean';
     return isValid ? undefined : 'Required Field';
 };
 
 const getValueFromObject = (value: any) => {
     if (typeof value === 'object' && value && Object.hasOwn(value, 'label') && Object.hasOwn(value, 'value')) {
-        return value['value']['data'];
+        return value.value.data;
     }
     // Attribute content objects from list (select) fields are stored as {data, reference}.
     // Extract the primitive data value so pattern validators can test it correctly.
-    if (typeof value === 'object' && value?.hasOwnProperty('data')) {
-        return value['data'];
+    if (typeof value === 'object' && value && Object.hasOwn(value, 'data')) {
+        return value.data;
     }
     return value;
 };
@@ -61,16 +60,14 @@ export const validateRoutelessUrl = () =>
     validatePattern(/^((https?):\/\/)?[a-zA-Z0-9\-.]+(:\d+)?$/, 'Value must be a valid url. Example: http://localhost:8443');
 
 export const validateUrlWithRoute = (value: string) => {
-    return !value || new RegExp(/^(https?:\/\/)?([\w.-]+)(:\d+)?(\/[\w#.-]*)*\/?$/g).test(value) ? undefined : 'Value must be a valid url';
+    return !value || /^(https?:\/\/)?([\w.-]+)(:\d+)?(\/[\w#.-]*)*\/?$/.test(value) ? undefined : 'Value must be a valid url';
 };
 
+const IP_OCTET = String.raw`(?:25[0-5]|2[0-4]\d|[01]?\d\d?)`;
+const IP_REGEX = new RegExp(String.raw`^${IP_OCTET}\.${IP_OCTET}\.${IP_OCTET}\.${IP_OCTET}$`);
+
 export const validateCustomIp = (value: string) => {
-    return !value ||
-        new RegExp(
-            /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
-        ).test(value)
-        ? undefined
-        : 'Value must be a valid ip address';
+    return !value || IP_REGEX.test(value) ? undefined : 'Value must be a valid ip address';
 };
 
 export const validateLength = (min: number, max: number) => (value: any) => {
@@ -84,32 +81,25 @@ export const validateDuration =
     (denominations: ('d' | 'h' | 'm' | 's')[] = ['d', 'h', 'm', 's']) =>
     (value: string) => {
         if (!value?.trim()) return undefined;
-        const regexPattern = `^(\\d{1,10}\\s*[${denominations.join('')}]\\s*)+$`;
+        const regexPattern = String.raw`^(\d{1,10}\s*[${denominations.join('')}]\s*)+$`;
         const regex = new RegExp(regexPattern);
         return regex.test(value.trim())
             ? undefined
             : `Invalid duration. Should be formatted as: ${denominations.map((d) => '0' + d).join(' ')}.`;
     };
 
-export const validateQuartzCronExpression = (cronExpression: string | undefined) => (value: string) => {
+export const validateQuartzCronExpression = () => (value: string) => {
     const validationInput = getValueFromObject(value);
 
     try {
-        const validObj: { isValid: boolean; errorMessage: Array<string> } = cronValidator.isValidCronExpression(validationInput, {
+        const validObj: { isValid: boolean; errorMessage: string | string[] } = cronValidator.isValidCronExpression(validationInput, {
             error: true,
         });
-        let uniqueErrors: string[] = [];
 
-        if (Array.isArray(validObj.errorMessage)) {
-            uniqueErrors = validObj.errorMessage?.splice(0, validObj?.errorMessage?.length);
-        }
+        if (!validationInput || validObj.isValid) return undefined;
 
-        return !validationInput || validObj.isValid
-            ? undefined
-            : Array.isArray(validObj.errorMessage)
-              ? uniqueErrors.join(', ')
-              : validObj.errorMessage;
-    } catch (error) {
+        return Array.isArray(validObj.errorMessage) ? validObj.errorMessage.join(', ') : validObj.errorMessage;
+    } catch {
         return 'Unknown error, please check the cron expression.';
     }
 };
@@ -168,20 +158,20 @@ const FORBIDDEN_TOKENS = [
     '(?<',
     '(?#',
     // Unicode/Property escapes & named backrefs
-    '\\k<',
-    '\\N',
-    '\\p{',
-    '\\P{',
-    '\\u{',
-    '\\x{',
+    String.raw`\k<`,
+    String.raw`\N`,
+    String.raw`\p{`,
+    String.raw`\P{`,
+    String.raw`\u{`,
+    String.raw`\x{`,
     // PCRE specials
-    '\\Q',
-    '\\E',
-    '\\R',
-    '\\K',
-    '\\G',
-    '\\L',
-    '\\U',
+    String.raw`\Q`,
+    String.raw`\E`,
+    String.raw`\R`,
+    String.raw`\K`,
+    String.raw`\G`,
+    String.raw`\L`,
+    String.raw`\U`,
 ];
 
 // Valid POSIX classes (must be used as [[:name:]])
@@ -212,33 +202,32 @@ const hasUnescapedSequence = (haystack: string, seq: string): boolean => {
     return false;
 };
 
-export const validatePostgresPosixRegex = (value: string): string => {
-    if (!value) return '';
-
-    // 0) Quick JS parse for gross syntax errors (not authoritative for POSIX,
-    //    but catches obviously broken inputs like stray backslash at the end).
+// 0) Quick JS parse for gross syntax errors
+const checkJsParse = (value: string): string => {
     try {
         regexpTree.parse(`/${value}/`);
+        return '';
     } catch (error: any) {
         return `Invalid regex pattern: ${error?.message ?? error}`;
     }
+};
 
-    // 1) Forbid known non-POSIX/PCRE tokens outright
+// 1) Forbid known non-POSIX/PCRE tokens outright
+const checkForbiddenTokens = (value: string): string => {
     for (const tok of FORBIDDEN_TOKENS) {
-        // tokens starting with '\' must respect escape parity
         if (hasUnescapedSequence(value, tok)) {
             return `Unsupported regex token for PostgreSQL POSIX: "${tok}"`;
         }
     }
+    return '';
+};
 
-    // 2) Single-backslash rule from your screenshot
+// 2) Single-backslash rule — forbid \X for letters not valid in POSIX ARE
+const checkForbiddenEscapes = (value: string): string => {
     for (let i = 0; i < value.length - 1; i++) {
         if (value[i] !== '\\') continue;
-        // count consecutive backslashes ending at i
         let backslashes = 1;
         for (let j = i - 1; j >= 0 && value[j] === '\\'; j--) backslashes++;
-
-        // odd = real escape, even = escaped backslash
         if (backslashes % 2 === 1) {
             const next = value[i + 1];
             if (FORBIDDEN_AFTER_SINGLE_BACKSLASH.has(next)) {
@@ -246,102 +235,133 @@ export const validatePostgresPosixRegex = (value: string): string => {
             }
         }
     }
+    return '';
+};
 
-    // 3) Structural checks for (), [], and {m,n}
-    let paren = 0;
-    let inBracket = false;
+// Validate a POSIX character class starting at position i (the ':' after '[')
+const checkPosixClass = (value: string, i: number): { error: string; newIndex: number } => {
+    const end = value.indexOf(':]', i + 1);
+    if (end === -1) return { error: 'Unterminated POSIX character class.', newIndex: i };
+    const name = value.slice(i + 1, end);
+    if (!POSIX_CLASSES.has(name)) return { error: `Unknown POSIX class [:${name}:].`, newIndex: i };
+    return { error: '', newIndex: end + 1 };
+};
+
+// Validate a quantifier {m}, {m,}, or {m,n} starting at position i (the '{')
+const checkQuantifier = (value: string, i: number): { error: string; newIndex: number } => {
+    const close = value.indexOf('}', i + 1);
+    if (close === -1) return { error: 'Unterminated quantifier "{...}".', newIndex: i };
+    const body = value.slice(i + 1, close);
+    if (!/^\d+(,\d*)?$/.test(body)) {
+        return { error: `Invalid quantifier "{${body}}". Use {m}, {m,}, or {m,n}.`, newIndex: i };
+    }
+    const [mStr, nStr] = body.split(',');
+    const m = Number(mStr);
+    if (nStr?.length) {
+        const n = Number(nStr);
+        if (Number.isNaN(n) || m > n) return { error: `Invalid quantifier range "{${body}}".`, newIndex: i };
+    }
+    return { error: '', newIndex: close };
+};
+
+type StructureState = { paren: number; inBracket: boolean };
+
+const updateParenBalance = (ch: string, state: StructureState): string => {
+    if (state.inBracket) return '';
+    if (ch === '(') state.paren++;
+    else if (ch === ')') {
+        state.paren--;
+        if (state.paren < 0) return 'Unbalanced ")".';
+    }
+    return '';
+};
+
+const updateBracketState = (ch: string, state: StructureState): void => {
+    if (ch === '[' && !state.inBracket) state.inBracket = true;
+    else if (ch === ']' && state.inBracket) state.inBracket = false;
+};
+
+const tryPosixClassAt = (value: string, i: number, state: StructureState): { error: string; newIndex: number } => {
+    if (!state.inBracket || value[i] !== ':' || i === 0 || value[i - 1] !== '[') return { error: '', newIndex: i };
+    return checkPosixClass(value, i);
+};
+
+const tryQuantifierAt = (value: string, i: number, state: StructureState): { error: string; newIndex: number } => {
+    if (state.inBracket || value[i] !== '{') return { error: '', newIndex: i };
+    return checkQuantifier(value, i);
+};
+
+// 3) Structural checks for (), [], and {m,n}
+const checkStructure = (value: string): string => {
+    const state: StructureState = { paren: 0, inBracket: false };
 
     for (let i = 0; i < value.length; i++) {
         const ch = value[i];
 
-        // Skip escaped characters
         if (ch === '\\') {
-            i++;
+            i++; // NOSONAR - skip the escaped char
             continue;
         }
 
-        if (!inBracket && ch === '(') paren++;
-        else if (!inBracket && ch === ')') {
-            paren--;
-            if (paren < 0) return 'Unbalanced ")".';
-        }
+        const parenError = updateParenBalance(ch, state);
+        if (parenError) return parenError;
 
-        if (ch === '[') {
-            if (!inBracket) {
-                inBracket = true;
-            }
-        } else if (ch === ']' && inBracket) {
-            inBracket = false;
-        }
+        updateBracketState(ch, state);
 
-        // Validate POSIX classes only inside [...]
-        if (inBracket && ch === ':' && i > 0 && value[i - 1] === '[') {
-            // attempt to read [:name:]
-            const end = value.indexOf(':]', i + 1);
-            if (end === -1) return 'Unterminated POSIX character class.';
-            const name = value.slice(i + 1, end);
-            if (!POSIX_CLASSES.has(name)) {
-                return `Unknown POSIX class [:${name}:].`;
-            }
-            // jump to closing :]
-            i = end + 1;
-        }
+        const posix = tryPosixClassAt(value, i, state);
+        if (posix.error) return posix.error;
+        i = posix.newIndex; // NOSONAR - intentional for-loop skip-ahead
 
-        // Validate {m}, {m,}, {m,n}
-        if (!inBracket && ch === '{') {
-            const close = value.indexOf('}', i + 1);
-            if (close === -1) return 'Unterminated quantifier "{...}".';
-            const body = value.slice(i + 1, close);
-            if (!/^\d+(,\d*)?$/.test(body)) {
-                return `Invalid quantifier "{${body}}". Use {m}, {m,}, or {m,n}.`;
-            }
-            const [mStr, nStr] = body.split(',');
-            const m = Number(mStr);
-            if (nStr !== undefined && nStr.length) {
-                const n = Number(nStr);
-                if (Number.isNaN(n) || m > n) return `Invalid quantifier range "{${body}}".`;
-            }
-            i = close; // skip to }
-        }
+        const quant = tryQuantifierAt(value, i, state);
+        if (quant.error) return quant.error;
+        i = quant.newIndex; // NOSONAR - intentional for-loop skip-ahead
     }
 
-    if (inBracket) return 'Unterminated character class "[...]"';
-    if (paren !== 0) return 'Unbalanced parentheses "(...)"';
+    if (state.inBracket) return 'Unterminated character class "[...]"';
+    if (state.paren !== 0) return 'Unbalanced parentheses "(...)"';
+    return '';
+};
 
-    // 4) Backreferences \1..\9 are allowed in ARE only if that many groups exist
-    //    (basic check; not 100% perfect but helpful)
-    let groupCount = 0;
+// Count unescaped capturing groups in the pattern
+const countCapturingGroups = (value: string): number => {
+    let count = 0;
     for (let i = 0; i < value.length; i++) {
         if (value[i] === '\\') {
             i++;
             continue;
         }
-        if (value[i] === '(') groupCount++;
+        if (value[i] === '(') count++;
     }
+    return count;
+};
 
-    //    Find unescaped backreferences \1..\9 (again via backslash parity):
-    const backrefs: number[] = [];
+// 4) Backreferences \1..\9 must refer to existing capturing groups
+const checkBackreferences = (value: string): string => {
+    const groupCount = countCapturingGroups(value);
     for (let i = 0; i < value.length - 1; i++) {
         if (value[i] !== '\\') continue;
-
-        // count consecutive backslashes ending at position i
         let bs = 1;
         for (let j = i - 1; j >= 0 && value[j] === '\\'; j--) bs++;
-
-        // odd => this '\' is unescaped
         if (bs % 2 === 1) {
-            const d = value.charCodeAt(i + 1) - 48; // '1'..'9' -> 1..9
-            if (d >= 1 && d <= 9) backrefs.push(d);
+            const d = (value.codePointAt(i + 1) ?? 0) - 48; // '1'..'9' -> 1..9
+            if (d >= 1 && d <= 9 && d > groupCount) {
+                return `Backreference \\${d} refers to non-existent capturing group.`;
+            }
         }
     }
-
-    for (const d of backrefs) {
-        if (d > groupCount) {
-            return `Backreference \\${d} refers to non-existent capturing group.`;
-        }
-    }
-
     return '';
+};
+
+export const validatePostgresPosixRegex = (value: string): string => {
+    if (!value) return '';
+
+    return (
+        checkJsParse(value) ||
+        checkForbiddenTokens(value) ||
+        checkForbiddenEscapes(value) ||
+        checkStructure(value) ||
+        checkBackreferences(value)
+    );
 };
 
 export const validateIso8601Duration = () => (value: string) => {
