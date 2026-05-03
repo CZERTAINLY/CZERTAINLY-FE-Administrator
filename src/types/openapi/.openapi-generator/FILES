@@ -43,6 +43,7 @@ apis/ScheduledJobsManagementApi.ts
 apis/SecretManagementApi.ts
 apis/SettingsApi.ts
 apis/StatisticsDashboardApi.ts
+apis/TimeQualityConfigurationManagementApi.ts
 apis/TokenInstanceManagementApi.ts
 apis/TokenProfileManagementApi.ts
 apis/UserManagementApi.ts
@@ -388,6 +389,7 @@ models/PaginationRequestDto.ts
 models/PaginationResponseDtoCbomDto.ts
 models/PaginationResponseDtoConnectorDtoV2.ts
 models/PaginationResponseDtoSecretDto.ts
+models/PaginationResponseDtoTimeQualityConfigurationListDto.ts
 models/PaginationResponseDtoVaultInstanceDto.ts
 models/PaginationResponseDtoVaultProfileDto.ts
 models/PlatformEnum.ts
@@ -492,6 +494,9 @@ models/TextAttributeContentV2.ts
 models/TextAttributeContentV3.ts
 models/TimeAttributeContentV2.ts
 models/TimeAttributeContentV3.ts
+models/TimeQualityConfigurationDto.ts
+models/TimeQualityConfigurationListDto.ts
+models/TimeQualityConfigurationRequestDto.ts
 models/TokenInstanceDetailDto.ts
 models/TokenInstanceDto.ts
 models/TokenInstanceRequestDto.ts

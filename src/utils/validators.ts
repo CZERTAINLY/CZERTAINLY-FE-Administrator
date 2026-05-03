@@ -363,3 +363,31 @@ export const validatePostgresPosixRegex = (value: string): string => {
         checkBackreferences(value)
     );
 };
+
+export const validateIso8601Duration = () => (value: unknown) => {
+    if (value === undefined || value === null) return undefined;
+    if (typeof value !== 'string') return 'Value must be a valid ISO 8601 duration (e.g., PT1H)';
+    const trimmed = value.trim();
+    if (!trimmed) return undefined;
+    if (trimmed === 'P' || trimmed.endsWith('T')) return 'Value must be a valid ISO 8601 duration (e.g., PT1H)';
+    return /^P(\d+D)?(T(\d+H)?(\d+M)?(\d+(?:\.\d+)?S)?)?$/.test(trimmed)
+        ? undefined
+        : 'Value must be a valid ISO 8601 duration (e.g., PT1H)';
+};
+
+export const validateNtpServers = () => (value: string | string[] | undefined) => {
+    if (!value) return undefined;
+    const servers = Array.isArray(value) ? value : value.split(',').map((s) => s.trim());
+    if (servers.length === 0 || (servers.length === 1 && servers[0] === '')) return undefined;
+
+    const fqdnRegex = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+    const simpleHostRegex = /^[a-zA-Z0-9-]+$/;
+    const ipv4Regex = /^\d{1,3}(\.\d{1,3}){3}$/;
+    const isValidServer = (s: string) =>
+        fqdnRegex.test(s) || simpleHostRegex.test(s) || (ipv4Regex.test(s) && s.split('.').every((p) => Number(p) <= 255));
+    const invalid = servers.filter((s) => !isValidServer(s));
+    if (invalid.length > 0) {
+        return `Value must be a comma-separated list of valid NTP server addresses (IP or hostname)`;
+    }
+    return undefined;
+};

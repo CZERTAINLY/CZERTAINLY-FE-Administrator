@@ -19,6 +19,8 @@ import {
     validateOidCode,
     validateQuartzCronExpression,
     validatePostgresPosixRegex,
+    validateIso8601Duration,
+    validateNtpServers,
 } from './validators';
 
 const REQUIRED_FIELD_MSG = 'Required Field';
@@ -539,6 +541,50 @@ describe('validators', () => {
             // The forbidden seq "\Q" is at index 2, preceded by a single backslash -> escaped.
             // The pattern should NOT be flagged for the forbidden "\Q" token.
             expect(validatePostgresPosixRegex(String.raw`a\\Q`)).toBe('');
+        });
+    });
+
+    describe('validateIso8601Duration', () => {
+        test('should accept valid ISO 8601 durations', () => {
+            expect(validateIso8601Duration()('PT1H')).toBeUndefined();
+            expect(validateIso8601Duration()('P1DT12H')).toBeUndefined();
+            expect(validateIso8601Duration()('PT10M30S')).toBeUndefined();
+            expect(validateIso8601Duration()('PT0.5S')).toBeUndefined();
+            expect(validateIso8601Duration()('PT1.5S')).toBeUndefined();
+            expect(validateIso8601Duration()('PT10M0.5S')).toBeUndefined();
+        });
+
+        test('should accept empty value', () => {
+            expect(validateIso8601Duration()('')).toBeUndefined();
+            expect(validateIso8601Duration()(undefined)).toBeUndefined();
+        });
+
+        test('should reject invalid ISO 8601 durations', () => {
+            expect(validateIso8601Duration()('1H')).toBe('Value must be a valid ISO 8601 duration (e.g., PT1H)');
+            expect(validateIso8601Duration()('abc')).toBe('Value must be a valid ISO 8601 duration (e.g., PT1H)');
+            expect(validateIso8601Duration()('P1DT')).toBe('Value must be a valid ISO 8601 duration (e.g., PT1H)');
+            expect(validateIso8601Duration()('PT')).toBe('Value must be a valid ISO 8601 duration (e.g., PT1H)');
+        });
+    });
+
+    describe('validateNtpServers', () => {
+        test('should accept valid NTP servers list', () => {
+            expect(validateNtpServers()('pool.ntp.org')).toBeUndefined();
+            expect(validateNtpServers()('pool.ntp.org, 127.0.0.1, time.google.com')).toBeUndefined();
+        });
+
+        test('should accept empty value', () => {
+            expect(validateNtpServers()('')).toBeUndefined();
+            expect(validateNtpServers()(undefined)).toBeUndefined();
+        });
+
+        test('should reject invalid NTP servers', () => {
+            expect(validateNtpServers()('invalid@host')).toBe(
+                'Value must be a comma-separated list of valid NTP server addresses (IP or hostname)',
+            );
+            expect(validateNtpServers()('pool.ntp.org, invalid space')).toBe(
+                'Value must be a comma-separated list of valid NTP server addresses (IP or hostname)',
+            );
         });
     });
 });

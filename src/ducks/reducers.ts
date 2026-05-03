@@ -60,6 +60,7 @@ import { slice as cbomSlice } from './cbom';
 import { slice as secretsSlice } from './secrets';
 import { slice as vaultProfilesSlice } from './vault-profiles';
 import { slice as vaultsSlice } from './vaults';
+import { slice as timeQualityConfigurationsSlice } from './time-quality-configurations';
 
 export const reducers = combineReducers({
     [alertsSlice.name]: alertsSlice.reducer,
@@ -117,4 +118,5 @@ export const reducers = combineReducers({
     [secretsSlice.name]: secretsSlice.reducer,
     [vaultProfilesSlice.name]: vaultProfilesSlice.reducer,
     [vaultsSlice.name]: vaultsSlice.reducer,
+    [timeQualityConfigurationsSlice.name]: timeQualityConfigurationsSlice.reducer,
 });
