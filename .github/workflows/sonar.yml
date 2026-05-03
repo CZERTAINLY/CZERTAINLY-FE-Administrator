@@ -89,8 +89,8 @@ jobs:
           npm run lint
           npm run build
 
-          # Playwright deps
-          ./node_modules/.bin/playwright install --with-deps
+          # Playwright deps (CLI invocation, not npm install — --ignore-scripts does not apply)
+          npx --no-install playwright install --with-deps # NOSONAR
 
           npm run test:cov
 
