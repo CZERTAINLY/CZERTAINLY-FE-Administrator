@@ -5,9 +5,9 @@
             // Canonicalise to trailing-slash form before any relative resource is fetched,
             // so ./config.js and ./assets/* resolve against the correct base regardless of
             // whether the user entered the app with or without a trailing slash.
-            // Skip when the last path segment has an extension so direct hits to
-            // /index.html or similar file URLs aren't redirected to a 404.
-            if (!location.pathname.endsWith('/') && !/\.[^/]+$/.test(location.pathname)) {
+            // Skip when the last path segment looks like a file (contains a dot) so
+            // direct hits to /index.html or similar file URLs aren't redirected to a 404.
+            if (!location.pathname.endsWith('/') && !location.pathname.split('/').pop().includes('.')) {
                 location.replace(location.pathname + '/' + location.search + location.hash);
             }
         </script>
