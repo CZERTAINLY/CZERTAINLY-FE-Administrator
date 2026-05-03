@@ -220,6 +220,8 @@ export default function UserDetail() {
         [user],
     );
 
+    const isInitialLoad = isFetchingDetail && !user;
+
     return (
         <div>
             <Breadcrumb
@@ -231,16 +233,16 @@ export default function UserDetail() {
             <Widget widgetLockName={LockWidgetNameEnum.UserDetails} busy={isBusy} noBorder>
                 <Container>
                     <Widget title="User Details" widgetButtons={buttons} titleSize="large" refreshAction={getFreshUserDetails}>
-                        <CustomTable headers={detailHeaders} data={detailData} />
+                        <CustomTable headers={detailHeaders} data={detailData} isLoading={isInitialLoad} />
                     </Widget>
 
                     <Widget
                         title="User Certificate Details"
-                        busy={isFetchingDetail || isFetchingCertificateDetail}
+                        busy={!isInitialLoad && (isFetchingDetail || isFetchingCertificateDetail)}
                         titleSize="large"
                         refreshAction={user?.certificate?.uuid ? getFreshCertificateDetails : undefined}
                     >
-                        <CertificateAttributes certificate={certificate} />
+                        <CertificateAttributes certificate={certificate} isLoading={isInitialLoad} />
                     </Widget>
 
                     {user && (

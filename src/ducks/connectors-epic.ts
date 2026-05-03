@@ -11,6 +11,7 @@ import { actions as pagingActions } from './paging';
 import { EntityType } from './filters';
 
 import { slice } from './connectors';
+import { store } from '../App';
 
 import {
     transformAttributeDescriptorCollectionDtoToModel,
@@ -36,6 +37,7 @@ const listConnectors: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.listConnectors.match),
         switchMap((action) => {
+            store.dispatch(pagingActions.list(EntityType.CONNECTOR));
             const search = action.payload ?? { itemsPerPage: 10, pageNumber: 1, filters: [] };
             return deps.apiClients.connectorsV2
                 .listConnectorsV2({

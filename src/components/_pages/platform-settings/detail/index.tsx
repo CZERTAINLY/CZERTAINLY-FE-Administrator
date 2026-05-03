@@ -12,12 +12,6 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import Dialog from 'components/Dialog';
 import PlatformSettingsForm from '../form';
 
-// import Container from 'components/Container';
-// import Breadcrumb from 'components/Breadcrumb';
-
-// import Container from 'components/Container';
-// import Breadcrumb from 'components/Breadcrumb';
-
 export default function PlatformSettingsDetail() {
     const dispatch = useDispatch();
 
@@ -64,7 +58,6 @@ export default function PlatformSettingsDetail() {
         <div>
             <Widget
                 title="Platform Settings"
-                busy={isFetchingPlatform}
                 widgetLockName={LockWidgetNameEnum.PlatformSettings}
                 widgetButtons={buttons}
                 titleSize="large"
@@ -72,6 +65,7 @@ export default function PlatformSettingsDetail() {
             >
                 <TabLayout
                     noBorder
+                    isLoading={isFetchingPlatform}
                     tabs={[
                         {
                             title: 'Utils',

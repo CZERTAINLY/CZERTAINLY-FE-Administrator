@@ -14,6 +14,7 @@ import Checkbox from 'components/Checkbox';
 import SimpleBar from 'simplebar-react';
 import cn from 'classnames';
 import { useLocation } from 'react-router';
+import TableSkeleton from './TableSkeleton';
 
 export type { TableDataRow, TableHeader } from './types';
 
@@ -47,6 +48,7 @@ interface Props {
     disablePaginationControls?: boolean;
     disableSelectionControls?: boolean;
     disableSearchControls?: boolean;
+    isLoading?: boolean;
 }
 
 const emptyCheckedRows: (string | number)[] = [];
@@ -74,6 +76,7 @@ function CustomTable({
     disablePaginationControls = false,
     disableSelectionControls = false,
     disableSearchControls = false,
+    isLoading = false,
 }: Props) {
     const location = useLocation();
     const [tblHeaders, setTblHeaders] = useState<TableHeader[]>();
@@ -631,6 +634,17 @@ function CustomTable({
         handleRowDetailClick,
         disableSelectionControls,
     ]);
+
+    if (isLoading) {
+        return (
+            <TableSkeleton
+                columnsCount={headers.length}
+                hasCheckboxes={!!hasCheckboxes}
+                hasPagination={!!hasPagination}
+                canSearch={!!canSearch}
+            />
+        );
+    }
 
     return (
         <div data-testid="custom-table">
