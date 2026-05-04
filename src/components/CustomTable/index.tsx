@@ -635,52 +635,53 @@ function CustomTable({
         disableSelectionControls,
     ]);
 
-    if (isLoading) {
-        return (
-            <TableSkeleton
-                columnsCount={headers.length}
-                hasCheckboxes={!!hasCheckboxes}
-                hasPagination={!!hasPagination}
-                canSearch={!!canSearch}
-            />
-        );
-    }
-
     return (
         <div data-testid="custom-table">
-            {canSearch && (
-                <div className="flex justify-end mb-3">
-                    <div className="max-w-sm">
-                        <input
-                            id="search"
-                            placeholder="Search"
-                            onChange={(event) => setSearchKey(event.target.value)}
-                            type="text"
-                            disabled={disableSearchControls}
-                            className="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-                        />
-                    </div>
-                </div>
-            )}
-            {(hasHeader || body?.length > 0) && (
-                <div className="py-2">
-                    <SimpleBar forceVisible="x">
-                        <div className={cn('rounded-md', { 'border border-gray-100': hasHeader })}>
-                            <div className="min-w-full inline-block align-middle">
-                                <div className="overflow-hidden">
-                                    <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700 bg-white">
-                                        {hasHeader && (
-                                            <thead className="bg-gray-50 dark:bg-neutral-700">
-                                                <tr>{header}</tr>
-                                            </thead>
-                                        )}
-                                        <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">{body}</tbody>
-                                    </table>
-                                </div>
+            {isLoading ? (
+                <TableSkeleton
+                    columnsCount={headers.length}
+                    hasCheckboxes={!!hasCheckboxes}
+                    hasPagination={false}
+                    canSearch={!!canSearch}
+                    rowCount={paginationData ? paginationData.pageSize : pageSize}
+                />
+            ) : (
+                <>
+                    {canSearch && (
+                        <div className="flex justify-end mb-3">
+                            <div className="max-w-sm">
+                                <input
+                                    id="search"
+                                    placeholder="Search"
+                                    onChange={(event) => setSearchKey(event.target.value)}
+                                    type="text"
+                                    disabled={disableSearchControls}
+                                    className="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
+                                />
                             </div>
                         </div>
-                    </SimpleBar>
-                </div>
+                    )}
+                    {(hasHeader || body?.length > 0) && (
+                        <div className="py-2">
+                            <SimpleBar forceVisible="x">
+                                <div className={cn('rounded-md', { 'border border-gray-100': hasHeader })}>
+                                    <div className="min-w-full inline-block align-middle">
+                                        <div className="overflow-hidden">
+                                            <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700 bg-white">
+                                                {hasHeader && (
+                                                    <thead className="bg-gray-50 dark:bg-neutral-700">
+                                                        <tr>{header}</tr>
+                                                    </thead>
+                                                )}
+                                                <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">{body}</tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </SimpleBar>
+                        </div>
+                    )}
+                </>
             )}
             {hasPagination && (
                 <div className="flex justify-between items-center gap-2 mt-6">

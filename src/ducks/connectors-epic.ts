@@ -1,6 +1,6 @@
 import type { AppEpic } from 'ducks';
 import { of } from 'rxjs';
-import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { catchError, filter, map, mergeMap, startWith, switchMap } from 'rxjs/operators';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { ConnectorVersion } from 'types/openapi';
 import { extractError } from 'utils/net';
@@ -11,7 +11,6 @@ import { actions as pagingActions } from './paging';
 import { EntityType } from './filters';
 
 import { slice } from './connectors';
-import { store } from '../App';
 
 import {
     transformAttributeDescriptorCollectionDtoToModel,
@@ -37,7 +36,6 @@ const listConnectors: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.listConnectors.match),
         switchMap((action) => {
-            store.dispatch(pagingActions.list(EntityType.CONNECTOR));
             const search = action.payload ?? { itemsPerPage: 10, pageNumber: 1, filters: [] };
             return deps.apiClients.connectorsV2
                 .listConnectorsV2({
@@ -61,6 +59,7 @@ const listConnectors: AppEpic = (action$, state, deps) => {
                             userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorStore),
                         ),
                     ),
+                    startWith(pagingActions.list(EntityType.CONNECTOR)),
                 );
         }),
     );

@@ -8,9 +8,10 @@ type Props = {
     tabCount?: number;
     columnsCount?: number;
     noBorder?: boolean;
+    hasPagination?: boolean;
 };
 
-function TabLayoutSkeleton({ tabCount = 2, columnsCount = 4, noBorder = false }: Props) {
+function TabLayoutSkeleton({ tabCount = 2, columnsCount = 4, noBorder = false, hasPagination = true }: Props) {
     return (
         <Widget noBorder={noBorder} dataTestId="tab-layout-skeleton">
             <div className="animate-pulse flex gap-x-2 mb-1">
@@ -19,7 +20,7 @@ function TabLayoutSkeleton({ tabCount = 2, columnsCount = 4, noBorder = false }:
                 ))}
             </div>
             <hr className="my-4 border-gray-200" />
-            <TableSkeleton columnsCount={columnsCount} hasCheckboxes={false} hasPagination={true} />
+            <TableSkeleton columnsCount={columnsCount} hasCheckboxes={false} hasPagination={hasPagination} />
         </Widget>
     );
 }

@@ -1,3 +1,4 @@
+import DetailPageSkeleton from 'components/DetailPageSkeleton';
 import CertificateAttributes from 'components/CertificateAttributes';
 import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
@@ -221,6 +222,10 @@ export default function UserDetail() {
     );
 
     const isInitialLoad = isFetchingDetail && !user;
+
+    if (isFetchingDetail) {
+        return <DetailPageSkeleton layout="simple" buttonsCount={3} />;
+    }
 
     return (
         <div>

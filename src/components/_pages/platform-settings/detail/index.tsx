@@ -1,3 +1,4 @@
+import DetailPageSkeleton from 'components/DetailPageSkeleton';
 import CertificateSettings from 'components/_pages/platform-settings/certificates/CertificateSettings';
 import UtilsSettings from 'components/_pages/platform-settings/utils/UtilsSettings';
 import TabLayout from 'components/Layout/TabLayout';
@@ -53,6 +54,10 @@ export default function PlatformSettingsDetail() {
         ],
         [onEditClick],
     );
+
+    if (isFetchingPlatform) {
+        return <DetailPageSkeleton layout="tabs" tabCount={2} />;
+    }
 
     return (
         <div>
