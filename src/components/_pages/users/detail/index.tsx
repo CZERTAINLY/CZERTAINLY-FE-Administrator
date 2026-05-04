@@ -221,8 +221,6 @@ export default function UserDetail() {
         [user],
     );
 
-    const isInitialLoad = isFetchingDetail && !user;
-
     if (isFetchingDetail) {
         return <DetailPageSkeleton layout="simple" buttonsCount={3} />;
     }
@@ -238,16 +236,16 @@ export default function UserDetail() {
             <Widget widgetLockName={LockWidgetNameEnum.UserDetails} busy={isBusy} noBorder>
                 <Container>
                     <Widget title="User Details" widgetButtons={buttons} titleSize="large" refreshAction={getFreshUserDetails}>
-                        <CustomTable headers={detailHeaders} data={detailData} isLoading={isInitialLoad} />
+                        <CustomTable headers={detailHeaders} data={detailData} />
                     </Widget>
 
                     <Widget
                         title="User Certificate Details"
-                        busy={!isInitialLoad && (isFetchingDetail || isFetchingCertificateDetail)}
+                        busy={isFetchingCertificateDetail}
                         titleSize="large"
                         refreshAction={user?.certificate?.uuid ? getFreshCertificateDetails : undefined}
                     >
-                        <CertificateAttributes certificate={certificate} isLoading={isInitialLoad} />
+                        <CertificateAttributes certificate={certificate} />
                     </Widget>
 
                     {user && (
