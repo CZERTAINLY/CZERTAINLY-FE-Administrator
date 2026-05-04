@@ -292,6 +292,12 @@ const menuItemMappings: MenuItemMapping[] = [
             },
             { _key: '/custom-oids', name: 'Custom OIDs', link: '/custom-oids', requiredResources: [Resource.Settings] },
             {
+                _key: `/${Resource.TimeQualityConfigurations.toLowerCase()}`,
+                name: 'Time Quality',
+                link: `/${Resource.TimeQualityConfigurations.toLowerCase()}`,
+                requiredResources: [Resource.TimeQualityConfigurations],
+            },
+            {
                 _key: `/${Resource.TrustedCertificates.toLowerCase()}`,
                 name: 'Trusted Certificates',
                 link: `/${Resource.TrustedCertificates.toLowerCase()}`,

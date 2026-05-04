@@ -24,6 +24,7 @@ export enum EntityType {
     OID,
     CONNECTOR,
     SECRET,
+    TIME_QUALITY_CONFIGURATION,
 }
 
 export type Filter = {

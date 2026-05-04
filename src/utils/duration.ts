@@ -3,6 +3,7 @@ export type Duration = {
     hours: number;
     minutes: number;
     seconds: number;
+    milliseconds: number;
 };
 
 export function getInputStringFromIso8601String(string: string): string {
@@ -19,14 +20,21 @@ function getInputStringFromDuration(duration: Duration): string {
     if (duration.hours) parts.push(`${duration.hours}h`);
     if (duration.minutes) parts.push(`${duration.minutes}m`);
     if (duration.seconds) parts.push(`${duration.seconds}s`);
+    if (duration.milliseconds) parts.push(`${duration.milliseconds}ms`);
 
     return parts.join(' ');
 }
 
 function getIso8601StringFromDuration(duration: Duration): string {
-    const { days, hours, minutes, seconds } = duration;
+    const { days, hours, minutes, seconds, milliseconds } = duration;
 
-    const timeParts = [hours ? `${hours}H` : '', minutes ? `${minutes}M` : '', seconds ? `${seconds}S` : ''].filter(Boolean).join('');
+    let secondsPart = '';
+    if (seconds || milliseconds) {
+        const totalSeconds = seconds + milliseconds / 1000;
+        secondsPart = `${totalSeconds}S`;
+    }
+
+    const timeParts = [hours ? `${hours}H` : '', minutes ? `${minutes}M` : '', secondsPart].filter(Boolean).join('');
 
     const dayPart = days ? `${days}D` : '';
     const timePart = timeParts ? `T${timeParts}` : '';
@@ -45,6 +53,7 @@ function getDurationFromIso8601String(input: string): Duration {
         hours: 0,
         minutes: 0,
         seconds: 0,
+        milliseconds: 0,
     };
 
     if (!input || typeof input !== 'string' || !input.startsWith('P')) {
@@ -65,17 +74,20 @@ function getDurationFromIso8601String(input: string): Duration {
     const seconds = parseMatch(secondsMatch);
 
     const totalSeconds = (((weeks * 7 + days) * 24 + hours) * 60 + minutes) * 60 + seconds;
+    const totalMs = Math.round(totalSeconds * 1000);
 
-    duration.days = Math.floor(totalSeconds / 86400);
-    duration.hours = Math.floor((totalSeconds % 86400) / 3600);
-    duration.minutes = Math.floor((totalSeconds % 3600) / 60);
-    duration.seconds = totalSeconds % 60;
+    duration.days = Math.floor(totalMs / 86400000);
+    duration.hours = Math.floor((totalMs % 86400000) / 3600000);
+    duration.minutes = Math.floor((totalMs % 3600000) / 60000);
+    duration.seconds = Math.floor((totalMs % 60000) / 1000);
+    duration.milliseconds = totalMs % 1000;
 
     return duration;
 }
 
 function getDurationFromInputString(input: string) {
-    const regex = /(\d{1,10})\s*([dhms])/gi;
+    // Match "ms" before single-letter units to avoid ambiguity
+    const regex = /(\d{1,10})\s*(ms|[dhms])/gi;
 
     const matches = [...input.matchAll(regex)];
 
@@ -84,11 +96,15 @@ function getDurationFromInputString(input: string) {
         hours: 0,
         minutes: 0,
         seconds: 0,
+        milliseconds: 0,
     };
 
     for (const [, value, unit] of matches) {
         const num = Number.parseInt(value, 10);
         switch (unit.toLowerCase()) {
+            case 'ms':
+                duration.milliseconds += num;
+                break;
             case 'm':
                 duration.minutes += num;
                 break;
