@@ -14,6 +14,7 @@ import Checkbox from 'components/Checkbox';
 import SimpleBar from 'simplebar-react';
 import cn from 'classnames';
 import { useLocation } from 'react-router';
+import { TableProperties } from 'lucide-react';
 
 export type { TableDataRow, TableHeader } from './types';
 
@@ -191,7 +192,7 @@ function CustomTable({
     const handleRowDetailClick = useCallback(
         (rowId: string | number) => {
             const row = tblData.find((r) => r.id === rowId);
-            if (!row || !row.detailColumns?.length) {
+            if (!row?.detailColumns?.length) {
                 return;
             }
 
@@ -204,9 +205,9 @@ function CustomTable({
                           sortable: false,
                       }));
 
-            const processedColumns = row.detailColumns.map((col, index) => {
+            const processedColumns = row.detailColumns.map((col) => {
                 if (Array.isArray(col)) {
-                    return <div key={`detail-col-${index}`}>{col}</div>;
+                    return <div key={`detail-${rowId}-${col.map((c) => String(c)).join('-')}`}>{col}</div>;
                 }
                 return col;
             });
@@ -648,7 +649,7 @@ function CustomTable({
                     </div>
                 </div>
             )}
-            {(hasHeader || body?.length > 0) && (
+            {(hasHeader || body?.length > 0 || !data.length) && (
                 <div className="py-2">
                     <SimpleBar forceVisible="x">
                         <div className={cn('rounded-md', { 'border border-gray-100': hasHeader })}>
@@ -666,6 +667,23 @@ function CustomTable({
                             </div>
                         </div>
                     </SimpleBar>
+                    {body.length === 0 && (
+                        <div className="flex flex-col items-center justify-center gap-3 py-8">
+                            <div className="flex items-center justify-center w-14 h-14 rounded-full bg-gray-100 dark:bg-neutral-800">
+                                <TableProperties size={28} strokeWidth={1.5} className="text-gray-400 dark:text-neutral-500" />
+                            </div>
+                            <div className="flex flex-col items-center gap-1">
+                                <span className="text-sm font-medium text-gray-600 dark:text-neutral-400">
+                                    {data.length > 0 ? 'No matching items' : 'No items to show'}
+                                </span>
+                                <span className="text-xs text-gray-400 dark:text-neutral-500">
+                                    {data.length > 0
+                                        ? 'Try adjusting your search or filters to see results'
+                                        : 'There are no records to display here yet'}
+                                </span>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
             {hasPagination && (
@@ -697,7 +715,7 @@ function CustomTable({
                         />
                     )}
 
-                    {tblData?.length ? (
+                    {!!tblData?.length && (
                         <div className="text-sm">
                             {paginationData ? (
                                 <div>
@@ -721,11 +739,10 @@ function CustomTable({
                                 <></>
                             )}
                         </div>
-                    ) : (
-                        <div className="text-sm">No items to show</div>
                     )}
                 </div>
             )}
+
             {newRowWidgetProps && (
                 <NewRowWidget
                     selectHint={newRowWidgetProps.selectHint}
