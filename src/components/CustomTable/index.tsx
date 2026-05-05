@@ -229,7 +229,12 @@ function CustomTable({
                     size: 'xl',
                     title: caption,
                     content: (
-                        <CustomTable headers={detailTableHeaders} data={detailData} hasHeader={!!detailHeaders} hasPagination={false} />
+                        <CustomTable
+                            headers={detailTableHeaders}
+                            data={detailData}
+                            hasHeader={Boolean(detailHeaders)}
+                            hasPagination={false}
+                        />
                     ),
                     showCloseButton: true,
                 }),
@@ -640,9 +645,9 @@ function CustomTable({
             {isLoading ? (
                 <TableSkeleton
                     columnsCount={headers.length}
-                    hasCheckboxes={!!hasCheckboxes}
+                    hasCheckboxes={Boolean(hasCheckboxes)}
                     hasPagination={false}
-                    canSearch={!!canSearch}
+                    canSearch={Boolean(canSearch)}
                     rowCount={paginationData ? paginationData.pageSize : pageSize}
                 />
             ) : (

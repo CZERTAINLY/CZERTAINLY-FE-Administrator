@@ -274,7 +274,7 @@ function RaProfileList() {
             />
 
             <Dialog
-                isOpen={isAddModalOpen || !!editingRaProfileId}
+                isOpen={isAddModalOpen || Boolean(editingRaProfileId)}
                 toggle={handleCloseAddModal}
                 caption={editingRaProfileId ? 'Edit RA Profile' : 'Create RA Profile'}
                 size="xl"

@@ -71,7 +71,7 @@ const CronExpressionForm = ({
                                 value={field.value}
                                 onChange={field.onChange}
                                 onBlur={field.onBlur}
-                                invalid={!!fieldState.error && fieldState.isTouched}
+                                invalid={Boolean(fieldState.error) && fieldState.isTouched}
                                 error={fieldState.error?.message}
                                 required
                                 buttonRight={

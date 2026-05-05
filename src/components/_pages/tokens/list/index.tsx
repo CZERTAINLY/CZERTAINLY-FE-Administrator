@@ -249,7 +249,7 @@ function TokenList() {
             />
 
             <Dialog
-                isOpen={isAddModalOpen || !!editingTokenId}
+                isOpen={isAddModalOpen || Boolean(editingTokenId)}
                 toggle={handleCloseAddModal}
                 caption={editingTokenId ? 'Edit Token' : 'Create Token'}
                 size="xl"

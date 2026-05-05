@@ -281,7 +281,7 @@ export default function NotificationProfileDetail() {
                         <CustomTable headers={headers} data={notificationInstanceData} />
                     </Widget>
                 </Container>
-                {!!notificationProfile?.recipients?.length && (
+                {Boolean(notificationProfile?.recipients?.length) && (
                     <Widget title="Recipients" busy={isFetchingDetail || isFetchingNotificationInstanceDetail} titleSize="large">
                         <CustomTable headers={recipientHeaders} data={recipientsData} />
                     </Widget>

@@ -293,7 +293,7 @@ function TokenProfileList() {
             />
 
             <Dialog
-                isOpen={isAddModalOpen || !!editingTokenProfileId}
+                isOpen={isAddModalOpen || Boolean(editingTokenProfileId)}
                 toggle={handleCloseAddModal}
                 caption={editingTokenProfileId ? 'Edit Token Profile' : 'Create Token Profile'}
                 size="xl"

@@ -289,7 +289,7 @@ export default function UsersList() {
             />
 
             <Dialog
-                isOpen={isAddModalOpen || !!editingUserId}
+                isOpen={isAddModalOpen || Boolean(editingUserId)}
                 toggle={handleCloseAddModal}
                 caption={editingUserId ? 'Edit User' : 'Create User'}
                 size="xl"

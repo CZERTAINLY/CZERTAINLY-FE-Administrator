@@ -917,7 +917,7 @@ export default function CbomDetail() {
             />
 
             <Dialog
-                isOpen={!!locationModalData}
+                isOpen={Boolean(locationModalData)}
                 toggle={handleCloseLocationModal}
                 caption="Asset detail"
                 size="xl"

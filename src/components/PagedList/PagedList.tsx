@@ -189,12 +189,12 @@ function PagedList({
         const estimatedButtonCount = (!addHidden ? 1 : 0) + (onDeleteCallback ? 1 : 0) + (additionalButtons?.length ?? 0);
         return (
             <PagedListSkeleton
-                hasFilter={!!getAvailableFiltersApi && !!filterTitle}
+                hasFilter={Boolean(getAvailableFiltersApi) && Boolean(filterTitle)}
                 filterTitle={filterTitle}
                 buttonsCount={estimatedButtonCount}
                 columnsCount={headers.length}
                 hasCheckboxes={hasCheckboxes}
-                hasExtraFilter={!!extraFilterComponent}
+                hasExtraFilter={Boolean(extraFilterComponent)}
             />
         );
     }

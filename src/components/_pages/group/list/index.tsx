@@ -164,7 +164,7 @@ export default function GroupList() {
             />
 
             <Dialog
-                isOpen={isAddModalOpen || !!editingGroupId}
+                isOpen={isAddModalOpen || Boolean(editingGroupId)}
                 toggle={handleCloseAddModal}
                 caption={editingGroupId ? 'Edit Group' : 'Create Group'}
                 size="xl"

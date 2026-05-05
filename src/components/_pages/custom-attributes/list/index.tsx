@@ -197,7 +197,7 @@ export default function CustomAttributesList() {
             />
 
             <Dialog
-                isOpen={isAddModalOpen || !!editingCustomAttributeId}
+                isOpen={isAddModalOpen || Boolean(editingCustomAttributeId)}
                 toggle={handleCancelAddModal}
                 caption={editingCustomAttributeId ? 'Edit Custom Attribute' : 'Create Custom Attribute'}
                 size="xl"

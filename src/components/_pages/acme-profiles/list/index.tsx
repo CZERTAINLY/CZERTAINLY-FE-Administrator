@@ -259,7 +259,7 @@ export default function AdministratorsList() {
             />
 
             <Dialog
-                isOpen={isAddModalOpen || !!editingAcmeProfileId}
+                isOpen={isAddModalOpen || Boolean(editingAcmeProfileId)}
                 toggle={handleCloseAddModal}
                 caption={editingAcmeProfileId ? 'Edit ACME Profile' : 'Create ACME Profile'}
                 size="xl"

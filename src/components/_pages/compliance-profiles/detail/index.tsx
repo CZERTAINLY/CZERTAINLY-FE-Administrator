@@ -488,7 +488,7 @@ export default function ComplianceProfileDetail() {
             />
 
             <Dialog
-                isOpen={!!groupRuleAttributeData}
+                isOpen={Boolean(groupRuleAttributeData)}
                 caption={
                     <p>
                         Rule <span style={{ fontWeight: 'bold' }}>{groupRuleAttributeData?.ruleName}</span> attributes

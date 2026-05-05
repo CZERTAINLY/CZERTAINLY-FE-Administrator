@@ -343,7 +343,7 @@ export default function RaProfileDetail() {
             {
                 id: 'enable',
                 icon: 'check',
-                disabled: !!raProfile?.enabled,
+                disabled: Boolean(raProfile?.enabled),
                 tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
@@ -1005,7 +1005,7 @@ export default function RaProfileDetail() {
                                             />
                                         </Widget>
                                     ),
-                                    disabled: !!raProfile?.legacyAuthority,
+                                    disabled: Boolean(raProfile?.legacyAuthority),
                                 },
                                 {
                                     title: 'Attributes',

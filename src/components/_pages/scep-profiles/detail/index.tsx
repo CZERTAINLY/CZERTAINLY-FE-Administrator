@@ -204,7 +204,7 @@ export default function ScepProfileDetail() {
                               'Intune Enabled',
                               <Switch
                                   key="intuneEnabled"
-                                  checked={!!scepProfile.enableIntune}
+                                  checked={Boolean(scepProfile.enableIntune)}
                                   onChange={() => {}}
                                   disabled
                                   id="intuneEnabledSwitch"

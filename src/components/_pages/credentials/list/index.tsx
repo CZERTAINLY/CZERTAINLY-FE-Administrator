@@ -180,7 +180,7 @@ function CredentialList() {
             />
 
             <Dialog
-                isOpen={isAddModalOpen || !!editingCredentialId}
+                isOpen={isAddModalOpen || Boolean(editingCredentialId)}
                 toggle={handleCloseAddModal}
                 caption={editingCredentialId ? 'Edit Credential' : 'Create Credential'}
                 size="xl"

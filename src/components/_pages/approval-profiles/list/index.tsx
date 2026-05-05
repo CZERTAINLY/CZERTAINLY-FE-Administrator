@@ -149,7 +149,7 @@ export default function ApprovalProfilesList() {
             />
 
             <Dialog
-                isOpen={isAddModalOpen || !!editingApprovalProfileId}
+                isOpen={isAddModalOpen || Boolean(editingApprovalProfileId)}
                 toggle={handleCloseAddModal}
                 caption={editingApprovalProfileId ? 'Edit Approval Profile' : 'Create Approval Profile'}
                 size="xl"

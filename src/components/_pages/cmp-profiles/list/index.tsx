@@ -268,7 +268,7 @@ export default function AdministratorsList() {
             />
 
             <Dialog
-                isOpen={isAddModalOpen || !!editingCmpProfileId}
+                isOpen={isAddModalOpen || Boolean(editingCmpProfileId)}
                 toggle={handleCloseAddModal}
                 caption={editingCmpProfileId ? 'Edit CMP Profile' : 'Create CMP Profile'}
                 size="xl"

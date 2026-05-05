@@ -855,7 +855,7 @@ function SecretDetail() {
             />
 
             <Dialog
-                isOpen={!!selectedAttributesInfo}
+                isOpen={Boolean(selectedAttributesInfo)}
                 caption="Attributes Info"
                 body={<AttributeViewer attributes={selectedAttributesInfo ?? []} />}
                 toggle={() => setSelectedAttributesInfo(null)}

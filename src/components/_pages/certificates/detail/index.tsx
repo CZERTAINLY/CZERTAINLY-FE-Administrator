@@ -272,7 +272,7 @@ export default function CertificateDetail() {
         ],
     );
 
-    const isCertificateArchived = !!certificate?.archived;
+    const isCertificateArchived = Boolean(certificate?.archived);
 
     const transformCertificate = useCallback(() => {
         const { nodes, edges } = transformCertificateObjectToNodesAndEdges(
@@ -1277,7 +1277,7 @@ export default function CertificateDetail() {
             />
 
             <Dialog
-                isOpen={!!selectedAttributesInfo}
+                isOpen={Boolean(selectedAttributesInfo)}
                 caption="Attributes Info"
                 body={<AttributeViewer attributes={selectedAttributesInfo ?? []} />}
                 toggle={() => setSelectedAttributesInfo(null)}

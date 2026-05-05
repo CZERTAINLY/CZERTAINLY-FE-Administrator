@@ -231,7 +231,7 @@ export default function RolesList() {
             />
 
             <Dialog
-                isOpen={isAddModalOpen || !!editingRoleId}
+                isOpen={isAddModalOpen || Boolean(editingRoleId)}
                 toggle={handleCloseAddModal}
                 caption={editingRoleId ? 'Edit Role' : 'Create Role'}
                 size="xl"

@@ -151,7 +151,7 @@ export default function GlobalMetadataList() {
             <ConnectorMetadataDialog show={showPromote} setShow={setShowPromote} />
 
             <Dialog
-                isOpen={isAddModalOpen || !!editingGlobalMetadataId}
+                isOpen={isAddModalOpen || Boolean(editingGlobalMetadataId)}
                 toggle={handleCloseAddModal}
                 caption={editingGlobalMetadataId ? 'Edit Global Metadata' : 'Create Global Metadata'}
                 size="xl"
