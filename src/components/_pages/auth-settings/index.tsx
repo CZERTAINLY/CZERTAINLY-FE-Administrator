@@ -1,3 +1,4 @@
+import DetailPageSkeleton from 'components/DetailPageSkeleton';
 import JwkSetKeysTable from 'components/_pages/auth-settings/JwkSetKeysTable';
 import OAuth2ProviderForm from 'components/_pages/auth-settings/form';
 import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
@@ -185,6 +186,11 @@ const AuthenticationSettings = () => {
     const hasValuesChanged = useMemo(() => {
         return isDirty;
     }, [isDirty]);
+
+    if (isFetchingSettings && !authenticationSettings) {
+        return <DetailPageSkeleton layout="tabs" tabCount={2} showBreadcrumb={false} />;
+    }
+
     return (
         <Container>
             <TabLayout

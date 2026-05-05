@@ -86,7 +86,7 @@ export default function UserProfileDetail() {
     );
 
     if (isFetchingDetail) {
-        return <DetailPageSkeleton layout="simple" buttonsCount={1} />;
+        return <DetailPageSkeleton layout="simple" buttonsCount={1} showBreadcrumb={false} />;
     }
 
     return (

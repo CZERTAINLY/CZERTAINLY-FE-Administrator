@@ -12,6 +12,8 @@ interface Props {
     tabCount?: number;
     rowCount?: number;
     buttonsCount?: number;
+    tabWidgetButtonsCount?: number;
+    showBreadcrumb?: boolean;
 }
 
 function BreadcrumbSkeleton() {
@@ -44,11 +46,18 @@ function WidgetHeaderSkeleton({ buttonsCount = 0 }: { buttonsCount?: number }) {
     );
 }
 
-export default function DetailPageSkeleton({ layout = 'simple', tabCount = 5, rowCount = 8, buttonsCount = 2 }: Props) {
+export default function DetailPageSkeleton({
+    layout = 'simple',
+    tabCount = 5,
+    rowCount = 8,
+    buttonsCount = 2,
+    tabWidgetButtonsCount = 0,
+    showBreadcrumb = true,
+}: Props) {
     if (layout === 'simple') {
         return (
             <div data-testid="detail-page-skeleton">
-                <BreadcrumbSkeleton />
+                {showBreadcrumb && <BreadcrumbSkeleton />}
                 <div className="flex flex-col gap-4 md:gap-5 animate-pulse">
                     <div className={cardClass}>
                         <WidgetHeaderSkeleton buttonsCount={buttonsCount} />
@@ -66,7 +75,7 @@ export default function DetailPageSkeleton({ layout = 'simple', tabCount = 5, ro
     if (layout === 'split') {
         return (
             <div data-testid="detail-page-skeleton">
-                <BreadcrumbSkeleton />
+                {showBreadcrumb && <BreadcrumbSkeleton />}
                 <div className="animate-pulse flex flex-col gap-4 md:gap-5">
                     <div className="flex flex-col md:flex-row gap-4 md:gap-5">
                         <div className={`${cardClass} md:w-1/2`}>
@@ -92,8 +101,14 @@ export default function DetailPageSkeleton({ layout = 'simple', tabCount = 5, ro
 
     return (
         <div data-testid="detail-page-skeleton">
-            <BreadcrumbSkeleton />
-            <TabLayoutSkeleton tabCount={tabCount} columnsCount={2} hasPagination={false} />
+            {showBreadcrumb && <BreadcrumbSkeleton />}
+            <TabLayoutSkeleton
+                tabCount={tabCount}
+                columnsCount={2}
+                hasPagination={false}
+                rowCount={rowCount}
+                buttonsCount={tabWidgetButtonsCount}
+            />
         </div>
     );
 }

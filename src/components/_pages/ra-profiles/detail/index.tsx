@@ -931,129 +931,140 @@ export default function RaProfileDetail() {
         return data;
     }, [raProfile, platformSettings]);
 
-    if (isFetchingProfile) {
-        return <DetailPageSkeleton layout="tabs" tabCount={5} />;
-    }
-
     return (
         <div>
-            <Breadcrumb
-                items={[
-                    { label: 'RA Profiles', href: '/raprofiles' },
-                    { label: raProfile?.name || 'RA Profile Details', href: '' },
-                ]}
-            />
-            <Widget widgetLockName={LockWidgetNameEnum.RaProfileDetails} busy={isBusy} noBorder>
-                <TabLayout
-                    tabs={[
-                        {
-                            title: 'Details',
-                            content: (
-                                <Container className="md:flex-row">
-                                    <Widget
-                                        title="RA Profile Details"
-                                        busy={isFetchingProfile}
-                                        widgetButtons={buttons}
-                                        titleSize="large"
-                                        refreshAction={getFreshRaProfileDetail}
-                                        lockSize="large"
-                                        className="w-full md:w-1/2"
-                                    >
-                                        <CustomTable headers={detailHeaders} data={detailData} />
-                                    </Widget>
-                                    <Container className="w-full md:w-1/2 flex flex-col">
-                                        <Widget
-                                            title="Compliance Profiles"
-                                            busy={isFetchingAssociatedComplianceProfiles}
-                                            widgetButtons={complianceProfileButtons}
-                                            titleSize="large"
-                                            refreshAction={getFreshComplianceRaProfileDetail}
-                                            widgetLockName={LockWidgetNameEnum.RaProfileComplianceDetails}
-                                            lockSize="large"
-                                            dataTestId="compliance-profile-widget"
-                                        >
-                                            <CustomTable headers={complianceProfileHeaders} data={complianceProfileData} />
-                                        </Widget>
+            {isFetchingProfile ? (
+                <DetailPageSkeleton layout="tabs" tabCount={5} />
+            ) : (
+                <>
+                    <Breadcrumb
+                        items={[
+                            { label: 'RA Profiles', href: '/raprofiles' },
+                            { label: raProfile?.name || 'RA Profile Details', href: '' },
+                        ]}
+                    />
+                    <Widget widgetLockName={LockWidgetNameEnum.RaProfileDetails} busy={isBusy} noBorder>
+                        <TabLayout
+                            tabs={[
+                                {
+                                    title: 'Details',
+                                    content: (
+                                        <Container className="md:flex-row">
+                                            <Widget
+                                                title="RA Profile Details"
+                                                busy={isFetchingProfile}
+                                                widgetButtons={buttons}
+                                                titleSize="large"
+                                                refreshAction={getFreshRaProfileDetail}
+                                                lockSize="large"
+                                                className="w-full md:w-1/2"
+                                            >
+                                                <CustomTable headers={detailHeaders} data={detailData} />
+                                            </Widget>
+                                            <Container className="w-full md:w-1/2 flex flex-col">
+                                                <Widget
+                                                    title="Compliance Profiles"
+                                                    busy={isFetchingAssociatedComplianceProfiles}
+                                                    widgetButtons={complianceProfileButtons}
+                                                    titleSize="large"
+                                                    refreshAction={getFreshComplianceRaProfileDetail}
+                                                    widgetLockName={LockWidgetNameEnum.RaProfileComplianceDetails}
+                                                    lockSize="large"
+                                                    dataTestId="compliance-profile-widget"
+                                                >
+                                                    <CustomTable headers={complianceProfileHeaders} data={complianceProfileData} />
+                                                </Widget>
 
+                                                <Widget
+                                                    title="Approval Profiles"
+                                                    widgetButtons={approvalProfilesButtons}
+                                                    titleSize="large"
+                                                    refreshAction={getFreshAssociatedApprovalProfiles}
+                                                    lockSize="large"
+                                                    widgetLockName={LockWidgetNameEnum.ListOfApprovalProfiles}
+                                                >
+                                                    <CustomTable headers={approvalProfilesHeaders} data={approvalProfilesData} />
+                                                </Widget>
+                                            </Container>
+                                        </Container>
+                                    ),
+                                },
+                                {
+                                    title: 'Protocols',
+                                    content: !raProfile?.legacyAuthority && (
                                         <Widget
-                                            title="Approval Profiles"
-                                            widgetButtons={approvalProfilesButtons}
+                                            title="Available Protocols"
+                                            busy={isBusy || isWorkingWithProtocol}
                                             titleSize="large"
-                                            refreshAction={getFreshAssociatedApprovalProfiles}
-                                            lockSize="large"
-                                            widgetLockName={LockWidgetNameEnum.ListOfApprovalProfiles}
+                                            refreshAction={getFreshAvailableProtocols}
                                         >
-                                            <CustomTable headers={approvalProfilesHeaders} data={approvalProfilesData} />
+                                            <CustomTable
+                                                hasDetails={true}
+                                                headers={availableProtocolsHeaders}
+                                                data={availableProtocolsData}
+                                            />
                                         </Widget>
-                                    </Container>
-                                </Container>
-                            ),
-                        },
-                        {
-                            title: 'Protocols',
-                            content: !raProfile?.legacyAuthority && (
-                                <Widget
-                                    title="Available Protocols"
-                                    busy={isBusy || isWorkingWithProtocol}
-                                    titleSize="large"
-                                    refreshAction={getFreshAvailableProtocols}
-                                >
-                                    <CustomTable hasDetails={true} headers={availableProtocolsHeaders} data={availableProtocolsData} />
-                                </Widget>
-                            ),
-                            disabled: !!raProfile?.legacyAuthority,
-                        },
-                        {
-                            title: 'Attributes',
-                            content: (
-                                <Container className="md:flex-row">
-                                    <Widget title="RA Profile Attributes" titleSize="large" lockSize="large" className="w-full md:w-1/2">
-                                        {raProfile?.attributes && raProfile.attributes.length > 0 ? (
-                                            <AttributeViewer attributes={raProfile?.attributes} />
-                                        ) : (
-                                            <></>
-                                        )}
-                                    </Widget>
-                                    {raProfile && (
-                                        <CustomAttributeWidget
+                                    ),
+                                    disabled: !!raProfile?.legacyAuthority,
+                                },
+                                {
+                                    title: 'Attributes',
+                                    content: (
+                                        <Container className="md:flex-row">
+                                            <Widget
+                                                title="RA Profile Attributes"
+                                                titleSize="large"
+                                                lockSize="large"
+                                                className="w-full md:w-1/2"
+                                            >
+                                                {raProfile?.attributes && raProfile.attributes.length > 0 ? (
+                                                    <AttributeViewer attributes={raProfile?.attributes} />
+                                                ) : (
+                                                    <></>
+                                                )}
+                                            </Widget>
+                                            {raProfile && (
+                                                <CustomAttributeWidget
+                                                    resource={Resource.RaProfiles}
+                                                    resourceUuid={raProfile.uuid}
+                                                    attributes={raProfile.customAttributes}
+                                                    className="w-full md:w-1/2"
+                                                />
+                                            )}
+                                        </Container>
+                                    ),
+                                },
+                                {
+                                    title: 'Validation',
+                                    content: (
+                                        <Widget
+                                            title="Certificate Validation Details"
+                                            widgetButtons={certificateValidationButtons}
+                                            titleSize="large"
+                                            refreshAction={getFreshRaProfileDetail}
+                                            widgetLockName={LockWidgetNameEnum.PlatformSettings}
+                                            lockSize="large"
+                                        >
+                                            <CustomTable headers={certificateValidationHeaders} data={certificateValidationData} />
+                                        </Widget>
+                                    ),
+                                },
+                                {
+                                    title: 'Events',
+                                    content: raProfile && (
+                                        <EventsTable
+                                            mode="association"
                                             resource={Resource.RaProfiles}
                                             resourceUuid={raProfile.uuid}
-                                            attributes={raProfile.customAttributes}
-                                            className="w-full md:w-1/2"
+                                            widgetLocks={[LockWidgetNameEnum.EventSettings]}
                                         />
-                                    )}
-                                </Container>
-                            ),
-                        },
-                        {
-                            title: 'Validation',
-                            content: (
-                                <Widget
-                                    title="Certificate Validation Details"
-                                    widgetButtons={certificateValidationButtons}
-                                    titleSize="large"
-                                    refreshAction={getFreshRaProfileDetail}
-                                    widgetLockName={LockWidgetNameEnum.PlatformSettings}
-                                    lockSize="large"
-                                >
-                                    <CustomTable headers={certificateValidationHeaders} data={certificateValidationData} />
-                                </Widget>
-                            ),
-                        },
-                        {
-                            title: 'Events',
-                            content: raProfile && (
-                                <EventsTable
-                                    mode="association"
-                                    resource={Resource.RaProfiles}
-                                    resourceUuid={raProfile.uuid}
-                                    widgetLocks={[LockWidgetNameEnum.EventSettings]}
-                                />
-                            ),
-                        },
-                    ]}
-                />
-            </Widget>
+                                    ),
+                                },
+                            ]}
+                        />
+                    </Widget>
+                </>
+            )}
 
             <Dialog
                 isOpen={confirmDelete}

@@ -1,3 +1,4 @@
+import DetailPageSkeleton from 'components/DetailPageSkeleton';
 import ConditionAndSetFieldExecutionItemsViewer from 'components/ConditionAndSetFieldExecutionItemsViewer';
 import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
@@ -189,6 +190,10 @@ const ConditionDetails = () => {
             isFetchingConditionGroup,
         ],
     );
+
+    if (isFetchingConditionGroup && !conditionDetails) {
+        return <DetailPageSkeleton layout="simple" buttonsCount={1} />;
+    }
 
     return (
         <Container>

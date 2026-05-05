@@ -1,3 +1,4 @@
+import DetailPageSkeleton from 'components/DetailPageSkeleton';
 import { SendNotificationExecutionItems } from 'components/_pages/executions/SendNotificationExecutionItems';
 import ConditionAndSetFieldExecutionItemsViewer from 'components/ConditionAndSetFieldExecutionItemsViewer';
 import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
@@ -235,6 +236,10 @@ const ExecutionDetails = () => {
                 );
         }
     }, [executionDetails, isUpdatingDetails, onUpdateSendNotificationExecutionItems]);
+
+    if (isFetchingDetails && !executionDetails) {
+        return <DetailPageSkeleton layout="simple" buttonsCount={1} />;
+    }
 
     return (
         <Container>

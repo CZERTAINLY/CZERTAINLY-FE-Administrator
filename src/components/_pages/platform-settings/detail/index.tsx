@@ -56,7 +56,7 @@ export default function PlatformSettingsDetail() {
     );
 
     if (isFetchingPlatform) {
-        return <DetailPageSkeleton layout="tabs" tabCount={2} />;
+        return <DetailPageSkeleton layout="tabs" tabCount={2} rowCount={2} showBreadcrumb={false} tabWidgetButtonsCount={1} />;
     }
 
     return (
