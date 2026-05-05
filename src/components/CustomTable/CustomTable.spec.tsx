@@ -308,6 +308,25 @@ test.describe('CustomTable', () => {
         await expect(component.getByText('No items to show')).toBeVisible();
     });
 
+    test('should show No items to show with subtitle when data is empty', async ({ mount }) => {
+        const component = await mount(withProviders(<CustomTable headers={mockHeaders} data={[]} />));
+        await expect(component.getByText('No items to show')).toBeVisible();
+        await expect(component.getByText('There are no records to display here yet')).toBeVisible();
+    });
+
+    test('should show No matching items when search filters all rows out', async ({ mount }) => {
+        const component = await mount(withProviders(<CustomTable headers={mockHeaders} data={mockData} canSearch={true} />));
+        await component.getByPlaceholder('Search').fill('xyznonexistent');
+        await expect(component.getByText('No matching items')).toBeVisible();
+        await expect(component.getByText('Try adjusting your search or filters to see results')).toBeVisible();
+    });
+
+    test('should render empty state inside table when headers are visible', async ({ mount }) => {
+        const component = await mount(withProviders(<CustomTable headers={mockHeaders} data={[]} />));
+        await expect(component.locator('thead th')).toHaveCount(3);
+        await expect(component.getByText('No items to show')).toBeVisible();
+    });
+
     test('should show filtered count when search filters data', async ({ mount }) => {
         const component = await mount(
             withProviders(<CustomTable headers={mockHeaders} data={mockData} canSearch={true} hasPagination={true} />),
