@@ -93,7 +93,7 @@ export default function UsersList() {
     const isSystemUserSelected = useMemo(() => {
         return checkedRows.some((uuid) => {
             const user = users.find((user) => user.uuid === uuid);
-            return user && user.systemUser;
+            return user?.systemUser;
         });
     }, [checkedRows, users]);
 
@@ -114,7 +114,7 @@ export default function UsersList() {
         if (isCurrentUserSelected) return false;
         if (checkedRows.length > 1) return true;
         const user = users.find((user) => user.uuid === checkedRows[0]);
-        return (user && user.enabled) || false;
+        return user?.enabled ?? false;
     }, [checkedRows, users, isCurrentUserSelected]);
 
     const isRestricted = isSystemUserSelected || isCurrentUserSelected;

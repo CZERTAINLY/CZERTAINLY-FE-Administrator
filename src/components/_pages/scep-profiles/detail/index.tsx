@@ -381,7 +381,7 @@ export default function ScepProfileDetail() {
                         )}
                     </Container>
 
-                    {scepProfile && scepProfile.enableIntune && (
+                    {scepProfile?.enableIntune && (
                         <Widget title={'Intune Configuration'}>
                             <CustomTable headers={tableHeader} data={intuneDetailData} />
                         </Widget>

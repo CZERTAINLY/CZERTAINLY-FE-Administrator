@@ -96,7 +96,7 @@ export default function RolesList() {
     const isSystemRoleSelected = useMemo(() => {
         return checkedRows.some((uuid) => {
             const role = roles.find((role) => role.uuid === uuid);
-            return role && role.systemRole;
+            return role?.systemRole;
         });
     }, [checkedRows, roles]);
 

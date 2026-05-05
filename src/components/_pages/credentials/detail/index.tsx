@@ -160,7 +160,7 @@ function CredentialDetail() {
                         <CustomTable headers={detailHeaders} data={detailData} />
                     </Widget>
 
-                    {credential && credential.attributes && credential.attributes.length > 0 && (
+                    {(credential?.attributes?.length ?? 0) > 0 && (
                         <Widget title="Credential Attributes" titleSize="large">
                             <AttributeViewer attributes={credential?.attributes} />
                         </Widget>
