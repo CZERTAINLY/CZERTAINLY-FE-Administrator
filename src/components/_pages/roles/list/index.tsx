@@ -197,7 +197,7 @@ export default function RolesList() {
         <div>
             <Widget
                 title="List of Roles"
-                busy={isBusy && !(isFetching && roles.length === 0)}
+                busy={isBusy && (!isFetching || roles.length > 0)}
                 enableBusyOverlay
                 widgetLockName={LockWidgetNameEnum.ListOfRoles}
                 widgetButtons={buttons}

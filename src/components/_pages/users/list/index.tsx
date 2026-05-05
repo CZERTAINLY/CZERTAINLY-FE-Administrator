@@ -255,7 +255,7 @@ export default function UsersList() {
         <div>
             <Widget
                 title="List of Users"
-                busy={isBusy && !(isFetching && users.length === 0)}
+                busy={isBusy && (!isFetching || users.length > 0)}
                 enableBusyOverlay
                 widgetLockName={LockWidgetNameEnum.ListOfUsers}
                 widgetButtons={buttons}

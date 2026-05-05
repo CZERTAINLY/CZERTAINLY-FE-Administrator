@@ -121,7 +121,7 @@ const RulesList = () => {
                 titleSize="large"
                 title="Rules"
                 refreshAction={getFreshList}
-                busy={isBusy && !(isFetchingList && rules.length === 0)}
+                busy={isBusy && (!isFetchingList || rules.length > 0)}
                 widgetButtons={buttons}
                 widgetInfoCard={{
                     title: 'Information',

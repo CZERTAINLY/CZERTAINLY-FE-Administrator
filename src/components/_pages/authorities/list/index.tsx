@@ -149,7 +149,7 @@ function AuthorityList() {
         <Container data-testid="authority-list">
             <Widget
                 title="Authority Store"
-                busy={isBusy && !(isFetching && authorities.length === 0)}
+                busy={isBusy && (!isFetching || authorities.length > 0)}
                 widgetLockName={LockWidgetNameEnum.AuthorityStore}
                 widgetButtons={buttons}
                 titleSize="large"

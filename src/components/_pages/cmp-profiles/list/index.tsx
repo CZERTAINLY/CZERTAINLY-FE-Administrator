@@ -227,7 +227,7 @@ export default function AdministratorsList() {
         <Container>
             <Widget
                 title="List of CMP Profiles"
-                busy={isBusy && !(isFetching && cmpProfiles.length === 0)}
+                busy={isBusy && (!isFetching || cmpProfiles.length > 0)}
                 widgetLockName={LockWidgetNameEnum.ListOfCMPProfiles}
                 widgetButtons={buttons}
                 titleSize="large"

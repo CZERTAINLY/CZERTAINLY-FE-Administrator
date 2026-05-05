@@ -183,7 +183,7 @@ const TriggerList = () => {
                 titleSize="large"
                 title="Triggers"
                 refreshAction={getFreshList}
-                busy={isBusy && !(isFetchingList && triggers.length === 0)}
+                busy={isBusy && (!isFetchingList || triggers.length > 0)}
                 widgetButtons={buttons}
                 widgetInfoCard={{
                     title: 'Information',

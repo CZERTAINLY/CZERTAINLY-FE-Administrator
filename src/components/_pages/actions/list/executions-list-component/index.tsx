@@ -137,7 +137,7 @@ const ExecutionsList = () => {
                 titleSize="large"
                 title="Executions"
                 refreshAction={getFreshListActionGroups}
-                busy={isBusy && !(isFetchingList && executions.length === 0)}
+                busy={isBusy && (!isFetchingList || executions.length > 0)}
                 widgetButtons={buttons}
                 widgetInfoCard={{
                     title: 'Information',

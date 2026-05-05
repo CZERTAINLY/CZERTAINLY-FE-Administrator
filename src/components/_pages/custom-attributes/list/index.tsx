@@ -165,7 +165,7 @@ export default function CustomAttributesList() {
         <>
             <Widget
                 title="List of Custom Attributes"
-                busy={isBusy && !(isFetching && customAttributes.length === 0)}
+                busy={isBusy && (!isFetching || customAttributes.length > 0)}
                 widgetLockName={LockWidgetNameEnum.ListOfCustomAttributes}
                 widgetButtons={buttons}
                 titleSize="large"

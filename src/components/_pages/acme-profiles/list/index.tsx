@@ -215,7 +215,7 @@ export default function AdministratorsList() {
             <Widget
                 dataTestId="acme-profiles-list-widget"
                 title="List of ACME Profiles"
-                busy={isBusy && !(isFetching && acmeProfiles.length === 0)}
+                busy={isBusy && (!isFetching || acmeProfiles.length > 0)}
                 widgetLockName={LockWidgetNameEnum.ListOfACMEProfiles}
                 widgetButtons={buttons}
                 titleSize="large"

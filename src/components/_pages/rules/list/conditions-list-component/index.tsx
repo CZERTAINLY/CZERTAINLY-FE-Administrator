@@ -128,7 +128,7 @@ const ConditionsList = () => {
                 titleSize="large"
                 title="Conditions"
                 refreshAction={getFreshListConditionGroups}
-                busy={isBusy && !(isFetchingList && conditions.length === 0)}
+                busy={isBusy && (!isFetchingList || conditions.length > 0)}
                 widgetButtons={buttons}
                 widgetInfoCard={{
                     title: 'Information',

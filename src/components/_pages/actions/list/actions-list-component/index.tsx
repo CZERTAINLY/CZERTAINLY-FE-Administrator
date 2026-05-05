@@ -119,7 +119,7 @@ const ActionsList = () => {
             <Widget
                 titleSize="large"
                 title="Actions"
-                busy={isBusy && !(isFetchingList && actionsList.length === 0)}
+                busy={isBusy && (!isFetchingList || actionsList.length > 0)}
                 refreshAction={getFreshList}
                 widgetButtons={buttons}
                 widgetInfoCard={{

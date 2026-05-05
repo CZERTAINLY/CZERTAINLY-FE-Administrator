@@ -134,7 +134,7 @@ export default function GroupList() {
         <>
             <Widget
                 title="List of Groups"
-                busy={isBusy && !(isFetching && groups.length === 0)}
+                busy={isBusy && (!isFetching || groups.length > 0)}
                 widgetLockName={LockWidgetNameEnum.ListOfGroups}
                 widgetButtons={buttons}
                 titleSize="large"

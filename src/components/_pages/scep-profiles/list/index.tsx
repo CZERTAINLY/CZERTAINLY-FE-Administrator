@@ -226,7 +226,7 @@ export default function ScepProfiles() {
             <Widget
                 dataTestId="scep-profiles-list-widget"
                 title="List of SCEP Profiles"
-                busy={isBusy && !(isFetching && scepProfiles.length === 0)}
+                busy={isBusy && (!isFetching || scepProfiles.length > 0)}
                 widgetLockName={LockWidgetNameEnum.ListOfSCEPProfiles}
                 widgetButtons={buttons}
                 titleSize="large"
