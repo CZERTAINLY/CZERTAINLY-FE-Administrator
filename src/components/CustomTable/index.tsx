@@ -192,7 +192,7 @@ function CustomTable({
     const handleRowDetailClick = useCallback(
         (rowId: string | number) => {
             const row = tblData.find((r) => r.id === rowId);
-            if (!row || !row.detailColumns?.length) {
+            if (!row?.detailColumns?.length) {
                 return;
             }
 
@@ -205,9 +205,9 @@ function CustomTable({
                           sortable: false,
                       }));
 
-            const processedColumns = row.detailColumns.map((col, index) => {
+            const processedColumns = row.detailColumns.map((col) => {
                 if (Array.isArray(col)) {
-                    return <div key={`detail-col-${index}`}>{col}</div>;
+                    return <div key={`detail-${rowId}-${col.map((c) => String(c)).join('-')}`}>{col}</div>;
                 }
                 return col;
             });
