@@ -93,7 +93,7 @@ export default function UsersList() {
     const isSystemUserSelected = useMemo(() => {
         return checkedRows.some((uuid) => {
             const user = users.find((user) => user.uuid === uuid);
-            return user && user.systemUser;
+            return user?.systemUser;
         });
     }, [checkedRows, users]);
 
@@ -114,7 +114,7 @@ export default function UsersList() {
         if (isCurrentUserSelected) return false;
         if (checkedRows.length > 1) return true;
         const user = users.find((user) => user.uuid === checkedRows[0]);
-        return (user && user.enabled) || false;
+        return user?.enabled ?? false;
     }, [checkedRows, users, isCurrentUserSelected]);
 
     const isRestricted = isSystemUserSelected || isCurrentUserSelected;
@@ -255,7 +255,7 @@ export default function UsersList() {
         <div>
             <Widget
                 title="List of Users"
-                busy={isBusy}
+                busy={isBusy && (!isFetching || users.length > 0)}
                 enableBusyOverlay
                 widgetLockName={LockWidgetNameEnum.ListOfUsers}
                 widgetButtons={buttons}
@@ -272,6 +272,7 @@ export default function UsersList() {
                     disableSearchControls={isBusy}
                     disableSelectionControls={isBusy}
                     disablePaginationControls={isBusy}
+                    isLoading={isFetching && users.length === 0}
                 />
             </Widget>
 
@@ -288,7 +289,7 @@ export default function UsersList() {
             />
 
             <Dialog
-                isOpen={isAddModalOpen || !!editingUserId}
+                isOpen={isAddModalOpen || Boolean(editingUserId)}
                 toggle={handleCloseAddModal}
                 caption={editingUserId ? 'Edit User' : 'Create User'}
                 size="xl"

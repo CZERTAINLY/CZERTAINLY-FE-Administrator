@@ -1,3 +1,4 @@
+import DetailPageSkeleton from 'components/DetailPageSkeleton';
 import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from 'components/Attributes/AttributeViewer';
 import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
@@ -221,31 +222,41 @@ export default function TokenDetail() {
 
     return (
         <div>
-            <Breadcrumb
-                items={[
-                    { label: `${getEnumLabel(resourceEnum, Resource.Tokens)} Inventory`, href: '/tokens' },
-                    { label: token?.name || 'Token Details', href: '' },
-                ]}
-            />
-            <Widget widgetLockName={LockWidgetNameEnum.TokenDetails} busy={isBusy} noBorder>
-                <Container>
-                    <Widget title="Token Details" widgetButtons={buttons} titleSize="large" refreshAction={getFreshTokenDetails}>
-                        <CustomTable headers={detailHeaders} data={detailData} />
-                    </Widget>
+            {isFetching ? (
+                <DetailPageSkeleton layout="simple" buttonsCount={5} />
+            ) : (
+                <>
+                    <Breadcrumb
+                        items={[
+                            { label: `${getEnumLabel(resourceEnum, Resource.Tokens)} Inventory`, href: '/tokens' },
+                            { label: token?.name || 'Token Details', href: '' },
+                        ]}
+                    />
+                    <Widget widgetLockName={LockWidgetNameEnum.TokenDetails} busy={isBusy} noBorder>
+                        <Container>
+                            <Widget title="Token Details" widgetButtons={buttons} titleSize="large" refreshAction={getFreshTokenDetails}>
+                                <CustomTable headers={detailHeaders} data={detailData} />
+                            </Widget>
 
-                    <Widget title="Token Attributes" titleSize="large" refreshAction={getFreshAttributes}>
-                        <AttributeViewer attributes={token?.attributes} />
-                    </Widget>
+                            <Widget title="Token Attributes" titleSize="large" refreshAction={getFreshAttributes}>
+                                <AttributeViewer attributes={token?.attributes} />
+                            </Widget>
 
-                    {token && (
-                        <CustomAttributeWidget resource={Resource.Tokens} resourceUuid={token.uuid} attributes={token.customAttributes} />
-                    )}
+                            {token && (
+                                <CustomAttributeWidget
+                                    resource={Resource.Tokens}
+                                    resourceUuid={token.uuid}
+                                    attributes={token.customAttributes}
+                                />
+                            )}
 
-                    <Widget title="Metadata" titleSize="large">
-                        <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={token?.metadata} />
+                            <Widget title="Metadata" titleSize="large">
+                                <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={token?.metadata} />
+                            </Widget>
+                        </Container>
                     </Widget>
-                </Container>
-            </Widget>
+                </>
+            )}
 
             <Dialog
                 isOpen={confirmDelete}

@@ -119,7 +119,7 @@ export default function GlobalMetadataList() {
         <>
             <Widget
                 title="List of Global Metadata"
-                busy={isBusy}
+                busy={isBusy && (!isFetching || globalMetadata.length > 0)}
                 widgetLockName={LockWidgetNameEnum.ListOfGlobalMetadata}
                 widgetButtons={buttons}
                 titleSize="large"
@@ -132,6 +132,7 @@ export default function GlobalMetadataList() {
                     canSearch={true}
                     hasCheckboxes={true}
                     hasPagination={true}
+                    isLoading={isFetching && globalMetadata.length === 0}
                 />
             </Widget>
 
@@ -150,7 +151,7 @@ export default function GlobalMetadataList() {
             <ConnectorMetadataDialog show={showPromote} setShow={setShowPromote} />
 
             <Dialog
-                isOpen={isAddModalOpen || !!editingGlobalMetadataId}
+                isOpen={isAddModalOpen || Boolean(editingGlobalMetadataId)}
                 toggle={handleCloseAddModal}
                 caption={editingGlobalMetadataId ? 'Edit Global Metadata' : 'Create Global Metadata'}
                 size="xl"

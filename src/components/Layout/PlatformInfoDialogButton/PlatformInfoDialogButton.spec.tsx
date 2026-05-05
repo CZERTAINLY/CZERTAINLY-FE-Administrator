@@ -47,4 +47,19 @@ test.describe('PlatformInfoDialogButton', () => {
 
         await expect(page.getByTestId('platform-info-dialog').getByRole('button', { name: 'Close' })).toBeVisible();
     });
+
+    test('clicking Version Info button opens dialog', async ({ mount, page }) => {
+        const store = createMockStore(preloadedState as any);
+        await mount(withProviders(<PlatformInfoDialogLink />, { store }));
+
+        await page.getByTestId('footer-version-info-link').click();
+        await expect(page.getByTestId('platform-info-dialog')).toBeVisible();
+    });
+
+    test('shows copy button when data is loaded and not fetching', async ({ mount, page }) => {
+        const store = createMockStore(preloadedState as any);
+        await mount(withProviders(<PlatformInfoDialogLink forceOpen={true} />, { store }));
+
+        await expect(page.getByRole('button', { name: 'Version Info' })).toBeVisible();
+    });
 });

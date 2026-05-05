@@ -469,6 +469,42 @@ function alertsTestReducer(state: AlertsTestState = alertsTestInitialState, acti
     return state;
 }
 
+type PagingObject = { totalItems: number; checkedRows: string[]; isFetchingList: boolean; pageNumber: number; pageSize: number };
+type PagingEntry = { entity: number; paging: PagingObject };
+
+export type PagingsTestState = { pagings: PagingEntry[] };
+
+const EMPTY_PAGING_OBJ: PagingObject = { totalItems: 0, checkedRows: [], isFetchingList: false, pageNumber: 1, pageSize: 10 };
+
+const pagingsTestInitialState: PagingsTestState = { pagings: [] };
+
+function updatePaging(state: PagingsTestState, entity: number, fn: (p: PagingObject) => PagingObject): PagingsTestState {
+    const idx = state.pagings.findIndex((p) => p.entity === entity);
+    const existing = idx !== -1 ? state.pagings[idx].paging : EMPTY_PAGING_OBJ;
+    const next: PagingEntry = { entity, paging: fn(existing) };
+    if (idx !== -1) {
+        return { pagings: [...state.pagings.slice(0, idx), next, ...state.pagings.slice(idx + 1)] };
+    }
+    return { pagings: [...state.pagings, next] };
+}
+
+function pagingsTestReducer(state: PagingsTestState = pagingsTestInitialState, action: UnknownAction): PagingsTestState {
+    const a = action as { type: string; payload?: any };
+    if (a.type === 'pagings/list') return updatePaging(state, a.payload, (p) => ({ ...p, isFetchingList: true }));
+    if (a.type === 'pagings/listSuccess')
+        return updatePaging(state, a.payload?.entity, (p) => ({ ...p, isFetchingList: false, totalItems: a.payload?.totalItems ?? 0 }));
+    if (a.type === 'pagings/listFailure') return updatePaging(state, a.payload, (p) => ({ ...p, isFetchingList: false }));
+    if (a.type === 'pagings/setCheckedRows')
+        return updatePaging(state, a.payload?.entity, (p) => ({ ...p, checkedRows: a.payload?.checkedRows ?? [] }));
+    if (a.type === 'pagings/setPagination')
+        return updatePaging(state, a.payload?.entity, (p) => ({
+            ...p,
+            pageNumber: a.payload?.pageNumber ?? p.pageNumber,
+            pageSize: a.payload?.pageSize ?? p.pageSize,
+        }));
+    return state;
+}
+
 export const testReducers = combineReducers({
     userInterface: userInterfaceTestReducer,
     enums: enumsTestReducer,
@@ -482,6 +518,7 @@ export const testReducers = combineReducers({
     vaultProfiles: vaultProfilesTestReducer,
     tablePagination: tablePaginationTestReducer,
     alerts: alertsTestReducer,
+    pagings: pagingsTestReducer,
 });
 
 export const testInitialState = {
@@ -497,4 +534,5 @@ export const testInitialState = {
     vaultProfiles: vaultProfilesTestInitialState,
     tablePagination: tablePaginationTestInitialState,
     alerts: alertsTestInitialState,
+    pagings: pagingsTestInitialState,
 };

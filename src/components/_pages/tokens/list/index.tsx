@@ -195,14 +195,12 @@ function TokenList() {
         <>
             <Widget
                 title="Token Store"
-                busy={isBusy}
+                busy={isBusy && (!isFetching || tokens.length > 0)}
                 widgetLockName={LockWidgetNameEnum.TokenStore}
                 widgetButtons={buttons}
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
-
                 <CustomTable
                     headers={tokenRowHeader}
                     data={tokenList}
@@ -210,6 +208,7 @@ function TokenList() {
                     hasCheckboxes={true}
                     hasPagination={true}
                     canSearch={true}
+                    isLoading={isFetching && tokens.length === 0}
                 />
             </Widget>
 
@@ -250,7 +249,7 @@ function TokenList() {
             />
 
             <Dialog
-                isOpen={isAddModalOpen || !!editingTokenId}
+                isOpen={isAddModalOpen || Boolean(editingTokenId)}
                 toggle={handleCloseAddModal}
                 caption={editingTokenId ? 'Edit Token' : 'Create Token'}
                 size="xl"

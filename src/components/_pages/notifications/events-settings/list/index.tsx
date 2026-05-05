@@ -18,7 +18,7 @@ const EventsList = () => {
 
     const eventsSettings = useSelector(settingsSelectors.eventsSettings);
     const resourceEvents = useSelector(resourceSelectors.resourceEvents);
-    const isFetchingResourcesList = useSelector(resourceSelectors.isFetchingResourcesList);
+    const isFetchingResourceEvents = useSelector(resourceSelectors.isFetchingResourceEvents);
     const isFetchingEventsSetting = useSelector(settingsSelectors.isFetchingEventsSetting);
 
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
@@ -40,9 +40,11 @@ const EventsList = () => {
     }, [dispatch]);
 
     const isBusy = useMemo(
-        () => isFetchingEventsSetting || isFetchingResourcesList || isFetchingResourcesWithEventsList,
-        [isFetchingEventsSetting, isFetchingResourcesList, isFetchingResourcesWithEventsList],
+        () => isFetchingEventsSetting || isFetchingResourceEvents || isFetchingResourcesWithEventsList,
+        [isFetchingEventsSetting, isFetchingResourceEvents, isFetchingResourcesWithEventsList],
     );
+
+    const isInitialLoad = isFetchingResourceEvents && resourceEvents.length === 0;
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -125,14 +127,14 @@ const EventsList = () => {
             widgetButtons={buttons}
             widgetLockName={LockWidgetNameEnum.EventSettings}
             lockSize="large"
-            busy={isBusy}
+            busy={isBusy && !isInitialLoad}
             widgetInfoCard={{
                 title: 'Information',
                 description: 'When an Event is produced, assigned Triggers are fired',
             }}
         >
             <br />
-            <CustomTable headers={headers} data={dataRows} hasPagination={true} />
+            <CustomTable headers={headers} data={dataRows} hasPagination={true} isLoading={isInitialLoad} />
         </Widget>
     );
 };

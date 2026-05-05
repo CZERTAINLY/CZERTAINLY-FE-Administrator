@@ -125,7 +125,7 @@ export default function ApprovalProfilesList() {
         <Widget
             dataTestId="approval-profiles-list-widget"
             title="List of Approval Profiles"
-            busy={isBusy}
+            busy={isBusy && (!isFetchingList || profileApprovalList.length > 0)}
             widgetLockName={LockWidgetNameEnum.ListOfApprovalProfiles}
             widgetButtons={buttons}
             titleSize="large"
@@ -145,10 +145,11 @@ export default function ApprovalProfilesList() {
                     totalPages: profileApprovalListTotalItems ? Math.ceil(profileApprovalListTotalItems / pageSize) : 0,
                     page: pageNumber,
                 }}
+                isLoading={isFetchingList && profileApprovalList.length === 0}
             />
 
             <Dialog
-                isOpen={isAddModalOpen || !!editingApprovalProfileId}
+                isOpen={isAddModalOpen || Boolean(editingApprovalProfileId)}
                 toggle={handleCloseAddModal}
                 caption={editingApprovalProfileId ? 'Edit Approval Profile' : 'Create Approval Profile'}
                 size="xl"

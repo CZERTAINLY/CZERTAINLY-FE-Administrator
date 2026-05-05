@@ -1,3 +1,4 @@
+import DetailPageSkeleton from 'components/DetailPageSkeleton';
 import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from 'components/Attributes/AttributeViewer';
 import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
@@ -184,6 +185,10 @@ const NotificationInstanceDetails = () => {
                 : [],
         [notificationInstance, getMappingAttributesContentType, getCustomAttributeName],
     );
+
+    if (isFetchingNotificationInstanceDetail && !notificationInstance) {
+        return <DetailPageSkeleton layout="simple" buttonsCount={2} />;
+    }
 
     return (
         <div>

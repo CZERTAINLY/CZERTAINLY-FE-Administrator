@@ -1,3 +1,4 @@
+import DetailPageSkeleton from 'components/DetailPageSkeleton';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
@@ -608,6 +609,10 @@ export default function CbomDetail() {
         [activeTab],
     );
 
+    if (isFetching) {
+        return <DetailPageSkeleton layout="tabs" tabCount={3} />;
+    }
+
     const tabSwitchLoadingContent = (
         <Container>
             <div className="min-h-[260px] flex flex-col items-center justify-center gap-3">
@@ -912,7 +917,7 @@ export default function CbomDetail() {
             />
 
             <Dialog
-                isOpen={!!locationModalData}
+                isOpen={Boolean(locationModalData)}
                 toggle={handleCloseLocationModal}
                 caption="Asset detail"
                 size="xl"

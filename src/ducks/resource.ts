@@ -85,6 +85,7 @@ const resourcesWithComplianceProfiles = createSelector(resourcesList, (list) => 
 const resourceEvents = createSelector(state, (state) => state.resourceEvents);
 const allResourceEvents = createSelector(state, (state) => state.allResourceEvents);
 const isFetchingResourcesList = createSelector(state, (state) => state.isFetchingResourcesList);
+const isFetchingResourceEvents = createSelector(state, (state) => state.isFetchingResourceEvents);
 
 export const selectors = {
     resourcesList,
@@ -92,6 +93,7 @@ export const selectors = {
     resourceEvents,
     allResourceEvents,
     isFetchingResourcesList,
+    isFetchingResourceEvents,
 };
 
 export const actions = slice.actions;

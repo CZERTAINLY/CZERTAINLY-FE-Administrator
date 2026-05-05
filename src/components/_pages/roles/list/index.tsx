@@ -96,7 +96,7 @@ export default function RolesList() {
     const isSystemRoleSelected = useMemo(() => {
         return checkedRows.some((uuid) => {
             const role = roles.find((role) => role.uuid === uuid);
-            return role && role.systemRole;
+            return role?.systemRole;
         });
     }, [checkedRows, roles]);
 
@@ -197,7 +197,7 @@ export default function RolesList() {
         <div>
             <Widget
                 title="List of Roles"
-                busy={isBusy}
+                busy={isBusy && (!isFetching || roles.length > 0)}
                 enableBusyOverlay
                 widgetLockName={LockWidgetNameEnum.ListOfRoles}
                 widgetButtons={buttons}
@@ -214,6 +214,7 @@ export default function RolesList() {
                     disableSearchControls={isBusy}
                     disableSelectionControls={isBusy}
                     disablePaginationControls={isBusy}
+                    isLoading={isFetching && roles.length === 0}
                 />
             </Widget>
 
@@ -230,7 +231,7 @@ export default function RolesList() {
             />
 
             <Dialog
-                isOpen={isAddModalOpen || !!editingRoleId}
+                isOpen={isAddModalOpen || Boolean(editingRoleId)}
                 toggle={handleCloseAddModal}
                 caption={editingRoleId ? 'Edit Role' : 'Create Role'}
                 size="xl"

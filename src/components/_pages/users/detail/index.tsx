@@ -1,3 +1,4 @@
+import DetailPageSkeleton from 'components/DetailPageSkeleton';
 import CertificateAttributes from 'components/CertificateAttributes';
 import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
@@ -220,6 +221,10 @@ export default function UserDetail() {
         [user],
     );
 
+    if (isFetchingDetail) {
+        return <DetailPageSkeleton layout="simple" buttonsCount={3} />;
+    }
+
     return (
         <div>
             <Breadcrumb
@@ -236,7 +241,7 @@ export default function UserDetail() {
 
                     <Widget
                         title="User Certificate Details"
-                        busy={isFetchingDetail || isFetchingCertificateDetail}
+                        busy={isFetchingCertificateDetail}
                         titleSize="large"
                         refreshAction={user?.certificate?.uuid ? getFreshCertificateDetails : undefined}
                     >

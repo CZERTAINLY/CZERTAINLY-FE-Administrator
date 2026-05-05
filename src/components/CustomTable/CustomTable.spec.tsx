@@ -585,6 +585,24 @@ test.describe('CustomTable', () => {
         await rolesAfterSwitch.unmount();
     });
 
+    test('should render skeleton when isLoading is true', async ({ mount }) => {
+        const paginationData = {
+            page: 1,
+            totalItems: 20,
+            pageSize: 10,
+            loadedPageSize: 10,
+            totalPages: 2,
+            itemsPerPageOptions: [5, 10, 20],
+        };
+        const component = await mount(
+            withProviders(
+                <CustomTable headers={mockHeaders} data={mockData} isLoading={true} hasPagination={true} paginationData={paginationData} />,
+            ),
+        );
+        await expect(component.getByTestId('table-skeleton')).toBeVisible();
+        await expect(component.getByText(/Showing.*items of/)).toBeVisible();
+    });
+
     test('should keep separate internal pagination for different tables on same route', async ({ mount }) => {
         const manyRows = Array.from({ length: 30 }, (_, i) => ({
             id: i + 1,

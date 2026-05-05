@@ -18,6 +18,7 @@ import { createWidgetDetailHeaders } from 'utils/widget';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import Container from 'components/Container';
 import Breadcrumb from 'components/Breadcrumb';
+import DetailPageSkeleton from 'components/DetailPageSkeleton';
 
 function CredentialDetail() {
     const dispatch = useDispatch();
@@ -136,6 +137,10 @@ function CredentialDetail() {
         [credential],
     );
 
+    if (isFetching) {
+        return <DetailPageSkeleton layout="simple" buttonsCount={2} />;
+    }
+
     return (
         <div>
             <Breadcrumb
@@ -155,7 +160,7 @@ function CredentialDetail() {
                         <CustomTable headers={detailHeaders} data={detailData} />
                     </Widget>
 
-                    {credential && credential.attributes && credential.attributes.length > 0 && (
+                    {(credential?.attributes?.length ?? 0) > 0 && (
                         <Widget title="Credential Attributes" titleSize="large">
                             <AttributeViewer attributes={credential?.attributes} />
                         </Widget>

@@ -1,4 +1,5 @@
 import { Buffer } from 'buffer';
+import DetailPageSkeleton from 'components/DetailPageSkeleton';
 import AttributeEditor from 'components/Attributes/AttributeEditor';
 import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from 'components/Attributes/AttributeViewer';
 import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
@@ -271,7 +272,7 @@ export default function CertificateDetail() {
         ],
     );
 
-    const isCertificateArchived = !!certificate?.archived;
+    const isCertificateArchived = Boolean(certificate?.archived);
 
     const transformCertificate = useCallback(() => {
         const { nodes, edges } = transformCertificateObjectToNodesAndEdges(
@@ -1078,6 +1079,10 @@ export default function CertificateDetail() {
         [deviceType],
     );
 
+    if (isFetching) {
+        return <DetailPageSkeleton layout="tabs" tabCount={9} />;
+    }
+
     return (
         <div>
             <Breadcrumb
@@ -1272,7 +1277,7 @@ export default function CertificateDetail() {
             />
 
             <Dialog
-                isOpen={!!selectedAttributesInfo}
+                isOpen={Boolean(selectedAttributesInfo)}
                 caption="Attributes Info"
                 body={<AttributeViewer attributes={selectedAttributesInfo ?? []} />}
                 toggle={() => setSelectedAttributesInfo(null)}

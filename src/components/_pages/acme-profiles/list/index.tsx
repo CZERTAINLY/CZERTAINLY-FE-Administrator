@@ -215,7 +215,7 @@ export default function AdministratorsList() {
             <Widget
                 dataTestId="acme-profiles-list-widget"
                 title="List of ACME Profiles"
-                busy={isBusy}
+                busy={isBusy && (!isFetching || acmeProfiles.length > 0)}
                 widgetLockName={LockWidgetNameEnum.ListOfACMEProfiles}
                 widgetButtons={buttons}
                 titleSize="large"
@@ -228,6 +228,7 @@ export default function AdministratorsList() {
                     canSearch={true}
                     hasCheckboxes={true}
                     hasPagination={true}
+                    isLoading={isFetching && acmeProfiles.length === 0}
                 />
             </Widget>
 
@@ -258,7 +259,7 @@ export default function AdministratorsList() {
             />
 
             <Dialog
-                isOpen={isAddModalOpen || !!editingAcmeProfileId}
+                isOpen={isAddModalOpen || Boolean(editingAcmeProfileId)}
                 toggle={handleCloseAddModal}
                 caption={editingAcmeProfileId ? 'Edit ACME Profile' : 'Create ACME Profile'}
                 size="xl"

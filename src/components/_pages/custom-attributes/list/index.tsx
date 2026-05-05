@@ -165,7 +165,7 @@ export default function CustomAttributesList() {
         <>
             <Widget
                 title="List of Custom Attributes"
-                busy={isBusy}
+                busy={isBusy && (!isFetching || customAttributes.length > 0)}
                 widgetLockName={LockWidgetNameEnum.ListOfCustomAttributes}
                 widgetButtons={buttons}
                 titleSize="large"
@@ -178,6 +178,7 @@ export default function CustomAttributesList() {
                     canSearch={true}
                     hasCheckboxes={true}
                     hasPagination={true}
+                    isLoading={isFetching && customAttributes.length === 0}
                 />
             </Widget>
 
@@ -196,7 +197,7 @@ export default function CustomAttributesList() {
             />
 
             <Dialog
-                isOpen={isAddModalOpen || !!editingCustomAttributeId}
+                isOpen={isAddModalOpen || Boolean(editingCustomAttributeId)}
                 toggle={handleCancelAddModal}
                 caption={editingCustomAttributeId ? 'Edit Custom Attribute' : 'Create Custom Attribute'}
                 size="xl"

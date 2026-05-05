@@ -150,7 +150,7 @@ function CredentialList() {
         <>
             <Widget
                 title="Credential Store"
-                busy={isBusy}
+                busy={isBusy && (!isFetching || credentials.length > 0)}
                 widgetLockName={LockWidgetNameEnum.CredentialStore}
                 widgetButtons={buttons}
                 titleSize="large"
@@ -163,6 +163,7 @@ function CredentialList() {
                     hasCheckboxes={true}
                     hasPagination={true}
                     canSearch={true}
+                    isLoading={isFetching && credentials.length === 0}
                 />
             </Widget>
 
@@ -179,7 +180,7 @@ function CredentialList() {
             />
 
             <Dialog
-                isOpen={isAddModalOpen || !!editingCredentialId}
+                isOpen={isAddModalOpen || Boolean(editingCredentialId)}
                 toggle={handleCloseAddModal}
                 caption={editingCredentialId ? 'Edit Credential' : 'Create Credential'}
                 size="xl"
