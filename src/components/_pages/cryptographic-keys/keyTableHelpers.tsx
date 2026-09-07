@@ -22,10 +22,9 @@ export interface BuildKeyRowColumnsOpts {
 /**
  * The platform default column set for the cryptographic keys inventory.
  *
- * Three of these are not in the filter-field catalogue today — `CKI_ENABLED`, `CKI_CREATED` and
- * `CK_ASSOCIATIONS` have no `FilterField` entry — so they are shown by the default set but cannot
- * be picked, renamed or sorted until the catalogue carries them. They keep their natural
- * identifiers here so that adding the fields is the only change needed.
+ * `CK_ASSOCIATIONS` counts certificates joined on either `keyUuid` or `altKeyUuid`, which no
+ * `FilterField` can resolve to a scalar path, so the catalogue cannot publish it: it renders but
+ * cannot be picked or sorted, and `toStorableColumns` drops it so the default set still saves.
  */
 export const KEY_COLUMNS: ColumnDefinition[] = [
     {
