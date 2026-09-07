@@ -2,7 +2,7 @@ import { resetSliceState } from 'ducks/reducerUtils';
 import type { AppState } from 'ducks';
 import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { BulkActionModel } from 'types/connectors';
-import type { KeyUsage } from 'types/openapi';
+import { KeyUsage } from 'types/openapi';
 import type {
     TokenProfileAddRequestModel,
     TokenProfileDetailResponseModel,
@@ -143,6 +143,7 @@ export const slice = createSlice({
         ) => {
             if (state.supportedTokenProfileKeyUsagesTokenInstanceUuid !== action.payload.tokenInstanceUuid) return;
 
+            state.supportedTokenProfileKeyUsages = Object.values(KeyUsage);
             state.isFetchingSupportedTokenProfileKeyUsages = false;
         },
 

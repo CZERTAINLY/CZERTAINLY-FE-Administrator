@@ -157,6 +157,22 @@ describe('tokenProfiles slice', () => {
         expect(next.isFetchingSupportedTokenProfileKeyUsages).toBe(false);
     });
 
+    test('getSupportedTokenProfileKeyUsagesFailure_fallsBackToAllKeyUsages', () => {
+        // given
+        const tokenInstanceUuid = 'token-1';
+        const loadingState = reducer(initialState, actions.getSupportedTokenProfileKeyUsages({ tokenInstanceUuid }));
+
+        // when
+        const next = reducer(
+            loadingState,
+            actions.getSupportedTokenProfileKeyUsagesFailure({ tokenInstanceUuid, error: 'endpoint unavailable' }),
+        );
+
+        // then
+        expect(next.supportedTokenProfileKeyUsages).toEqual(Object.values(KeyUsage));
+        expect(next.isFetchingSupportedTokenProfileKeyUsages).toBe(false);
+    });
+
     test('clearSupportedTokenProfileKeyUsages_clearsSelectedTokenMetadata', () => {
         // given
         const loadedState = {
