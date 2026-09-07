@@ -6,10 +6,25 @@ import { actions as listScopeActions } from 'ducks/list-scopes';
 import type { AppState } from 'ducks';
 
 import type { ApiClients } from 'src/api';
-import CustomTable, { type TableDataRow, type TableHeader } from 'components/CustomTable';
+import CustomTable, { type SortDirection, type TableDataRow, type TableHeader } from 'components/CustomTable';
+import { buildTableRows, type CellRegistry } from 'components/CustomTable/columns';
 import Dialog from 'components/Dialog';
 import FilterWidget from 'components/FilterWidget';
+import ViewTabs from 'components/ViewTabs';
 import Widget from 'components/Widget';
+import type { ReactNode } from 'react';
+import type { ViewSlice } from 'types/listViews';
+import type { Resource } from 'types/openapi';
+import type { ColumnDefinition } from 'types/tableColumns';
+import { type ColumnSort, buildColumnHeaders } from 'utils/tableColumns';
+import {
+    buildListRequest,
+    getRenderableProperties,
+    isSameSort,
+    toColumnSortFromHeader,
+    toDisplayableSort,
+    withCatalogueSortability,
+} from './columnState';
 import PagedListSkeleton from './PagedListSkeleton';
 import type { IconName } from 'types/icons';
 import type { WidgetButtonProps } from 'components/WidgetButtons';
@@ -19,10 +34,27 @@ import type { Observable } from 'rxjs';
 import type { SearchFieldListModel, SearchFilterModel, SearchRequestModel } from 'types/certificate';
 import type { LockWidgetNameEnum } from 'types/user-interface';
 
-type Props = {
+/**
+ * Opts a page into the column pipeline. The host then owns the applied column set and ordering, and
+ * names both in the listing request; a page supplying none of this keeps passing `headers` and `data`.
+ */
+export interface ConfigurableColumns<TRow extends object> {
+    resource: Resource;
+    standardColumns: ColumnDefinition[];
+    rows: TRow[];
+    getRowId: (row: TRow) => string | number;
+    /** Also the gate on which property columns the picker offers; see `toCatalogueFields`. */
+    registry?: CellRegistry<TRow>;
+    rowOptions?: (row: TRow) => TableDataRow['options'];
+    headerInfo?: Readonly<Record<string, ReactNode>>;
+    resourceLabel?: string;
+}
+
+type Props<TRow extends object> = {
     entity: EntityType;
-    headers: TableHeader[];
-    data: TableDataRow[];
+    headers?: TableHeader[];
+    data?: TableDataRow[];
+    configurableColumns?: ConfigurableColumns<TRow>;
     isBusy?: boolean;
     multiSelect?: boolean;
     onDeleteCallback?: (uuids: string[], filters: SearchFilterModel[]) => void;
@@ -40,11 +72,21 @@ type Props = {
     hasDetails?: boolean;
     columnForDetail?: string;
     extraFilterComponent?: React.ReactNode;
+    /**
+     * Bumped by the page to make the host re-run its own request. A request the page assembled would
+     * omit the applied columns and ordering, blanking every attribute column and ignoring the sort.
+     */
+    refreshToken?: number;
 };
 
-function PagedList({
+const EMPTY_HEADERS: TableHeader[] = [];
+const EMPTY_ROWS: TableDataRow[] = [];
+const NO_COLUMNS: ColumnDefinition[] = [];
+
+function PagedList<TRow extends object>({
     headers,
     data,
+    configurableColumns,
     filterTitle,
     addHidden,
     entity,
@@ -63,7 +105,8 @@ function PagedList({
     hasDetails = false,
     columnForDetail,
     extraFilterComponent,
-}: Readonly<Props>) {
+    refreshToken,
+}: Readonly<Props<TRow>>) {
     const dispatch = useDispatch();
     const store = useStore<AppState>();
     const navigate = useNavigate();
@@ -79,6 +122,43 @@ function PagedList({
 
     const currentFilters = useSelector(filterSelectors.currentFilters(entity));
 
+    // `hasLoadedFilters` rather than `!isFetchingFilters`, which is also false before the first read.
+    const catalogue = useSelector(filterSelectors.availableFilters(entity));
+    const hasLoadedCatalogue = useSelector(filterSelectors.hasLoadedFilters(entity));
+
+    const [columnSelection, setColumnSelection] = useState<ColumnDefinition[]>(NO_COLUMNS);
+    const [sortSelection, setSortSelection] = useState<ColumnSort | undefined>(undefined);
+
+    // Taken apart rather than depended on whole: an unmemoised config would rebuild `getFreshData`
+    // every render, and the effect watching it would refetch forever.
+    const isColumnDriven = configurableColumns !== undefined;
+    const {
+        resource: columnsResource,
+        standardColumns,
+        rows: columnsRows,
+        getRowId,
+        registry,
+        rowOptions,
+        headerInfo,
+        resourceLabel,
+    } = configurableColumns ?? ({} as Partial<ConfigurableColumns<TRow>>);
+
+    const renderableProperties = useMemo(() => getRenderableProperties(registry), [registry]);
+
+    const sortableStandardColumns = useMemo(
+        () => (hasLoadedCatalogue ? withCatalogueSortability(standardColumns ?? NO_COLUMNS, catalogue) : (standardColumns ?? NO_COLUMNS)),
+        [hasLoadedCatalogue, standardColumns, catalogue],
+    );
+
+    // Holds only the deviation and falls back, so a config arriving after the first render cannot
+    // leave the table with no columns at all.
+    const appliedColumns = useMemo(
+        () => (columnSelection.length > 0 ? columnSelection : sortableStandardColumns),
+        [columnSelection, sortableStandardColumns],
+    );
+
+    const appliedSort = useMemo(() => toDisplayableSort(sortSelection, appliedColumns), [sortSelection, appliedColumns]);
+
     const totalItems = useSelector(selectors.totalItems(entity));
     const checkedRows = useSelector(selectors.checkedRows(entity));
     const isFetchingList = useSelector(selectors.isFetchingList(entity));
@@ -93,7 +173,6 @@ function PagedList({
 
     const [confirmDelete, setConfirmDelete] = useState(false);
     const hasLoadedOnce = useRef(false);
-    if (!isFetchingList && data.length > 0) hasLoadedOnce.current = true;
 
     const onCheckedRowsChanged = useCallback(
         (rows: (string | number)[]) => {
@@ -103,9 +182,26 @@ function PagedList({
     );
 
     const getFreshData = useCallback(() => {
-        onListCallback({ itemsPerPage: pageSize, pageNumber: effectivePageNumber, filters: currentFilters });
+        onListCallback(
+            buildListRequest(
+                { itemsPerPage: pageSize, pageNumber: effectivePageNumber, filters: currentFilters },
+                isColumnDriven ? appliedColumns : undefined,
+                appliedSort,
+            ),
+        );
         onCheckedRowsChanged([]);
-    }, [currentFilters, pageSize, effectivePageNumber, onListCallback, onCheckedRowsChanged]);
+    }, [
+        currentFilters,
+        pageSize,
+        effectivePageNumber,
+        onListCallback,
+        onCheckedRowsChanged,
+        isColumnDriven,
+        appliedColumns,
+        appliedSort,
+        // Read for its identity alone: a change means the page asked to refetch this request.
+        refreshToken,
+    ]);
 
     const onPageSizeChanged = useCallback(
         (pageSize: number) => {
@@ -140,6 +236,59 @@ function PagedList({
         onCheckedRowsChanged([]);
         getFreshData();
     }, [checkedRows, onDeleteCallback, currentFilters, onCheckedRowsChanged, getFreshData]);
+
+    /**
+     * Applies a view's columns, filters and ordering together. The first application leaves filters
+     * already in the duck alone: the strip opens its pinned view after a deep link has put its own
+     * filters there, and would replace them a moment after they were asked for.
+     */
+    const hasAppliedView = useRef(false);
+    const onApplyView = useCallback(
+        (slice: ViewSlice) => {
+            const isInitialApplication = !hasAppliedView.current;
+
+            hasAppliedView.current = true;
+            setColumnSelection(slice.columns);
+            setSortSelection(slice.sort);
+
+            if (!isInitialApplication || currentFilters.length === 0) {
+                dispatch(filterActions.setCurrentFilters({ entity, currentFilters: slice.filters }));
+            }
+
+            dispatch(actions.setPagination({ entity, pageSize, pageNumber: 1 }));
+            onCheckedRowsChanged([]);
+        },
+        [dispatch, entity, pageSize, onCheckedRowsChanged, currentFilters.length],
+    );
+
+    const onSortChanged = useCallback(
+        (key: string, direction: SortDirection) => {
+            const next = toColumnSortFromHeader(key, direction, appliedColumns);
+            // The table echoes the ordering its headers declare on mount; treating that as a change
+            // would refetch, rebuild the headers and echo again.
+            if (isSameSort(next, appliedSort)) return;
+
+            setSortSelection(next);
+            // Page 2 of one ordering is not page 2 of another.
+            dispatch(actions.setPagination({ entity, pageSize, pageNumber: 1 }));
+        },
+        [appliedColumns, appliedSort, dispatch, entity, pageSize],
+    );
+
+    const columnHeaders = useMemo(
+        () => (isColumnDriven ? buildColumnHeaders(appliedColumns, { sort: appliedSort, info: headerInfo }) : (headers ?? EMPTY_HEADERS)),
+        [isColumnDriven, appliedColumns, appliedSort, headerInfo, headers],
+    );
+
+    const columnRows = useMemo(
+        () =>
+            isColumnDriven && columnsRows && getRowId
+                ? buildTableRows(columnsRows, appliedColumns, { getRowId, registry, rowOptions })
+                : (data ?? EMPTY_ROWS),
+        [isColumnDriven, columnsRows, getRowId, registry, rowOptions, appliedColumns, data],
+    );
+
+    if (!isFetchingList && columnRows.length > 0) hasLoadedOnce.current = true;
 
     useEffect(() => {
         if (listedFiltersSnapshot === currentFiltersSnapshot) return;
@@ -187,12 +336,15 @@ function PagedList({
         return result.sort((a, b) => (a.icon === 'plus' ? -1 : 1));
     }, [checkedRows, additionalButtons, navigate, addHidden, onDeleteCallback]);
 
-    const hasNonDefaultViewState = currentFilters.length > 0 || pageNumber > 1 || pageSize !== 10;
+    // An applied ordering counts, or there would be no way back from it.
+    const hasNonDefaultViewState = currentFilters.length > 0 || pageNumber > 1 || pageSize !== 10 || appliedSort !== undefined;
 
     const onResetView = useCallback(() => {
         dispatch(filterActions.setCurrentFilters({ entity, currentFilters: [] }));
         dispatch(filterActions.setPreservedFilters({ entity, preservedFilters: [] }));
         dispatch(actions.resetPaging({ entity }));
+        // The columns stay: they belong to the tab the strip is on, and the strip offers Revert.
+        setSortSelection(undefined);
         const rootRoute = location.pathname.split('/')[1] ?? '';
         if (rootRoute) {
             dispatch(tablePaginationActions.clearPaginationByRootRoute({ rootRoute }));
@@ -210,14 +362,14 @@ function PagedList({
         [effectivePageNumber, totalItems, pageSize],
     );
 
-    if (isFetchingList && data.length === 0 && !hasLoadedOnce.current) {
+    if (isFetchingList && columnRows.length === 0 && !hasLoadedOnce.current) {
         const estimatedButtonCount = (addHidden ? 0 : 1) + (onDeleteCallback ? 1 : 0) + (additionalButtons?.length ?? 0);
         return (
             <PagedListSkeleton
                 hasFilter={Boolean(getAvailableFiltersApi) && Boolean(filterTitle)}
                 filterTitle={filterTitle}
                 buttonsCount={estimatedButtonCount}
-                columnsCount={headers.length}
+                columnsCount={columnHeaders.length}
                 hasCheckboxes={hasCheckboxes}
                 hasExtraFilter={Boolean(extraFilterComponent)}
             />
@@ -226,6 +378,22 @@ function PagedList({
 
     return (
         <div className="flex flex-col gap-4 md:gap-8">
+            {/* Above the filter widget: a view carries its own filters, so a tab contains the filter. */}
+            {columnsResource && standardColumns && (
+                <ViewTabs
+                    resource={columnsResource}
+                    catalogue={catalogue}
+                    isCatalogueLoaded={hasLoadedCatalogue}
+                    standardColumns={sortableStandardColumns}
+                    renderableProperties={renderableProperties}
+                    columns={appliedColumns}
+                    filters={currentFilters}
+                    sort={appliedSort}
+                    onApply={onApplyView}
+                    resourceLabel={resourceLabel}
+                />
+            )}
+
             {getAvailableFiltersApi && filterTitle && (
                 <FilterWidget
                     entity={entity}
@@ -237,7 +405,7 @@ function PagedList({
 
             <Widget
                 title={title}
-                busy={isBusy || (isFetchingList && data.length > 0)}
+                busy={isBusy || (isFetchingList && columnRows.length > 0)}
                 disableRefresh={isBusy || isFetchingList}
                 enableBusyOverlay
                 widgetLockName={pageWidgetLockName}
@@ -248,8 +416,9 @@ function PagedList({
                 hideWidgetButtons={hideWidgetButtons}
             >
                 <CustomTable
-                    headers={headers}
-                    data={data}
+                    headers={columnHeaders}
+                    data={columnRows}
+                    {...(isColumnDriven ? { onSortChanged, persistSort: false } : {})}
                     hasCheckboxes={hasCheckboxes}
                     hasDetails={hasDetails}
                     columnForDetail={columnForDetail}
@@ -259,7 +428,7 @@ function PagedList({
                     onPageChanged={onPageNumberChanged}
                     onCheckedRowsChanged={onCheckedRowsChanged}
                     onPageSizeChanged={onPageSizeChanged}
-                    isLoading={isFetchingList && data.length === 0}
+                    isLoading={isFetchingList && columnRows.length === 0}
                     disablePaginationControls={isBusy || isFetchingList}
                     disableSelectionControls={isBusy || isFetchingList}
                     disableSearchControls={isBusy || isFetchingList}

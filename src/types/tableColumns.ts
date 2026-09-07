@@ -30,22 +30,18 @@ export interface ColumnDefinition {
     sortable?: boolean;
     multiValue?: boolean;
     align?: 'left' | 'center' | 'right';
+    /**
+     * Renders the heading for screen readers only, leaving the header cell visually blank. The heading
+     * still has to exist: the column is pickable and sortable, so it needs a name in both places.
+     */
+    headingHidden?: boolean;
 }
 
 /**
- * A field the column catalogue offers, i.e. `GET /v1/{resource}/search` extended with the two flags
- * the list contract added. Both mirror the contract exactly, and stand in until the generated DTO in
- * `src/types/openapi` carries them.
+ * A catalogue field paired with the source it was published under. An identifier is unique only
+ * within its source, and the catalogue publishes the source per group rather than per field.
  */
-export interface ColumnCatalogueField extends SearchFieldDataDto {
-    /** Whether the field may be requested as a column of the listing. */
-    displayable?: boolean;
-    /** Whether the listing may be ordered by the field. */
-    sortable?: boolean;
-}
-
-/** A catalogue field paired with the source it was published under. */
-export interface SourcedCatalogueField extends ColumnCatalogueField {
+export interface SourcedCatalogueField extends SearchFieldDataDto {
     fieldSource: FilterFieldSource;
 }
 

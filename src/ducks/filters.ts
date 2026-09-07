@@ -42,6 +42,11 @@ type FilterObject = {
     currentFilters: SearchFilterModel[];
     preservedFilters: SearchFilterModel[];
     isFetchingFilters: boolean;
+    /**
+     * Whether a catalogue read has settled at least once, success or failure. `isFetchingFilters` is
+     * `false` both before the first read and after it, so it cannot tell the two apart.
+     */
+    hasLoadedFilters: boolean;
 };
 
 export type State = {
@@ -53,6 +58,7 @@ const EMPTY_FILTER: FilterObject = {
     currentFilters: [],
     preservedFilters: [],
     isFetchingFilters: false,
+    hasLoadedFilters: false,
 };
 
 export const initialState: State = {
@@ -95,7 +101,8 @@ export const slice = createSlice({
             }>,
         ) => {
             updateFilterState(state, action.payload.entity, (filter) => {
-                filter.availableFilters = [];
+                // The catalogue already held is kept: emptying it would leave a settled
+                // `hasLoadedFilters` beside no fields, and blank the filter widget for the round trip.
                 filter.isFetchingFilters = true;
             });
         },
@@ -104,12 +111,14 @@ export const slice = createSlice({
             updateFilterState(state, action.payload.entity, (filter) => {
                 filter.availableFilters = action.payload.availableFilters;
                 filter.isFetchingFilters = false;
+                filter.hasLoadedFilters = true;
             });
         },
 
         getAvailableFiltersFailure: (state, action: PayloadAction<{ entity: EntityType; error: string | undefined }>) => {
             updateFilterState(state, action.payload.entity, (filter) => {
                 filter.isFetchingFilters = false;
+                filter.hasLoadedFilters = true;
             });
         },
     },
@@ -125,6 +134,8 @@ const preservedFilters = (entity: EntityType) =>
     createSelector(state, (state) => (state?.filters.find((f) => f.entity === entity)?.filter ?? EMPTY_FILTER).preservedFilters);
 const isFetchingFilters = (entity: EntityType) =>
     createSelector(state, (state) => (state?.filters.find((f) => f.entity === entity)?.filter ?? EMPTY_FILTER).isFetchingFilters);
+const hasLoadedFilters = (entity: EntityType) =>
+    createSelector(state, (state) => (state?.filters.find((f) => f.entity === entity)?.filter ?? EMPTY_FILTER).hasLoadedFilters);
 
 export const selectors = {
     state,
@@ -133,6 +144,7 @@ export const selectors = {
     currentFilters,
     preservedFilters,
     isFetchingFilters,
+    hasLoadedFilters,
 };
 
 export const actions = slice.actions;

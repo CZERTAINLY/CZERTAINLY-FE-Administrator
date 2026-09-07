@@ -345,6 +345,20 @@ test.describe('ColumnPicker', () => {
         expect(saved[0][0].label).toBe('Serial');
     });
 
+    test('does not offer a property field the page cannot render', async ({ mount, page }) => {
+        await mount(<ColumnPickerTestWrapper columns={[]} catalogue={catalogue} renderableProperties={['property:COMMON_NAME']} />);
+
+        await expect(page.getByTestId('add-field-property:COMMON_NAME')).toBeVisible();
+        await expect(page.getByTestId('add-field-property:SERIAL_NUMBER')).toHaveCount(0);
+    });
+
+    test('still offers every attribute field when the gate is empty', async ({ mount, page }) => {
+        await mount(<ColumnPickerTestWrapper columns={[]} catalogue={catalogue} renderableProperties={[]} />);
+
+        await expect(page.getByTestId('add-field-custom:environment')).toBeVisible();
+        await expect(page.getByTestId('add-field-property:COMMON_NAME')).toHaveCount(0);
+    });
+
     test('cancel reports no columns at all', async ({ mount, page }) => {
         const saved: ColumnDefinition[][] = [];
         let closed = 0;

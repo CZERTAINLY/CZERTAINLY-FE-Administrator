@@ -1,12 +1,24 @@
 import { test, expect } from '../../../../playwright/ct-test';
 import {
-    buildCertificateRowColumns,
+    buildCertificateCellRegistry,
     buildCertificateDetailBaseRows,
     buildCertificateProtocolRows,
     CERTIFICATE_COLUMNS,
 } from './certificateTableHelpers';
+import { renderCell } from 'components/CustomTable/columns';
+import type { ColumnDefinition } from 'types/tableColumns';
 import type { CertificateListResponseModel, CertificateDetailResponseModel } from 'types/certificate';
 import { AttributeContentType, CertificateProtocol, type CertificateProtocolDto, CertificateType, FilterFieldSource } from 'types/openapi';
+
+/** The cells of one certificate row, assembled from the registry rather than through the host. */
+function buildCertificateRowColumns(
+    certificate: CertificateListResponseModel,
+    opts: Parameters<typeof buildCertificateCellRegistry>[0],
+    columns: ColumnDefinition[] = CERTIFICATE_COLUMNS,
+): React.ReactNode[] {
+    const registry = buildCertificateCellRegistry(opts);
+    return columns.map((column) => renderCell(certificate, column, registry));
+}
 
 const mockDateFormatter = (d: Date) => d.toISOString().slice(0, 10);
 const mockGetEnumLabel = (_e: any, key: string) => key;
