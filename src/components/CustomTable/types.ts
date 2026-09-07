@@ -12,6 +12,8 @@ export interface TableHeader {
      */
     info?: React.ReactNode;
     align?: 'left' | 'center' | 'right';
+    /** Renders the heading for screen readers only, leaving the header cell visually blank. */
+    headingHidden?: boolean;
     sortable?: boolean;
     sort?: SortDirection;
     sortType?: 'string' | 'numeric' | 'date';

@@ -131,6 +131,9 @@ export type State = {
     isUpdatingOwner: boolean;
     isUpdatingTrustedStatus: boolean;
 
+    /** Bumped whenever a mutation needs the listing re-read; the page forwards it as `refreshToken`. */
+    listRefreshToken: number;
+
     isBulkUpdatingGroup: boolean;
     isBulkUpdatingRaProfile: boolean;
     isBulkUpdatingOwner: boolean;
@@ -144,6 +147,7 @@ export type State = {
     isCheckingCompliance: boolean;
 
     isFetchingCsrAttributes: boolean;
+    csrAttributesError?: string;
 
     csrAttributeDescriptors: AttributeDescriptorModel[];
 
@@ -196,6 +200,8 @@ export const initialState: State = {
     isUpdatingOwner: false,
     isUpdatingTrustedStatus: false,
 
+    listRefreshToken: 0,
+
     isBulkUpdatingGroup: false,
     isBulkUpdatingRaProfile: false,
     isBulkUpdatingOwner: false,
@@ -209,6 +215,7 @@ export const initialState: State = {
     isCheckingCompliance: false,
 
     isFetchingCsrAttributes: false,
+    csrAttributesError: undefined,
 
     csrAttributeDescriptors: [],
 
@@ -756,6 +763,7 @@ export const slice = createSlice({
 
         bulkUpdateGroupSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
             state.isBulkUpdatingGroup = false;
+            state.listRefreshToken += 1;
         },
 
         bulkDeleteGroup: (state, action: PayloadAction<{ certificateUuids: string[] }>) => {
@@ -764,18 +772,26 @@ export const slice = createSlice({
 
         bulkDeleteGroupSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
             state.isBulkUpdatingGroup = false;
+            state.listRefreshToken += 1;
         },
 
         bulkUpdateGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isBulkUpdatingGroup = false;
         },
 
-        bulkUpdateRaProfile: (state, action: PayloadAction<{ authorityUuid: string; raProfileRequest: CertificateBulkObjectModel }>) => {
+        bulkUpdateRaProfile: (
+            state,
+            action: PayloadAction<{
+                authorityUuid: string;
+                raProfileRequest: CertificateBulkObjectModel;
+            }>,
+        ) => {
             state.isBulkUpdatingRaProfile = true;
         },
 
         bulkUpdateRaProfileSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
             state.isBulkUpdatingRaProfile = false;
+            state.listRefreshToken += 1;
         },
 
         bulkDeleteRaProfile: (state, action: PayloadAction<{ certificateUuids: string[] }>) => {
@@ -874,6 +890,7 @@ export const slice = createSlice({
 
         uploadCertificateSuccess: (state) => {
             state.isUploading = false;
+            state.listRefreshToken += 1;
         },
 
         uploadCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -954,6 +971,7 @@ export const slice = createSlice({
 
         getCsrAttributes: (state, action: PayloadAction<{ raProfileUuid: string }>) => {
             state.isFetchingCsrAttributes = true;
+            state.csrAttributesError = undefined;
             state.csrAttributeDescriptors = [];
         },
 
@@ -964,11 +982,13 @@ export const slice = createSlice({
 
         getCsrAttributesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingCsrAttributes = false;
+            state.csrAttributesError = action.payload.error ?? 'Failed to load the resolved request-attribute set.';
         },
 
         clearCsrAttributes: (state) => {
             state.csrAttributeDescriptors = [];
             state.isFetchingCsrAttributes = false;
+            state.csrAttributesError = undefined;
         },
 
         getCertificateContents: (state, action: PayloadAction<{ uuids: string[]; format: string }>) => {
@@ -1115,6 +1135,7 @@ const state = (reduxStore: AppState): State => reduxStore?.[slice.name];
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
 
 const certificates = createSelector(state, (state) => state.certificates);
+const listRefreshToken = createSelector(state, (state) => state.listRefreshToken);
 const certificateChain = createSelector(state, (state) => state.certificateChain);
 
 const certificateDetail = createSelector(state, (state) => state.certificateDetail);
@@ -1163,6 +1184,7 @@ const isFetchingValidationResult = createSelector(state, (state) => state.isFetc
 const validationResult = createSelector(state, (state) => state.validationResult);
 
 const isFetchingCsrAttributes = createSelector(state, (state) => state.isFetchingCsrAttributes);
+const csrAttributesError = createSelector(state, (state) => state.csrAttributesError);
 const csrAttributeDescriptors = createSelector(state, (state) => state.csrAttributeDescriptors);
 
 const isFetchingContents = createSelector(state, (state) => state.isFetchingContents);
@@ -1186,6 +1208,7 @@ export const selectors = {
     state,
     deleteErrorMessage,
     certificates,
+    listRefreshToken,
     certificateDetail,
     certificateRelations,
     isFetchingRelations,
@@ -1228,6 +1251,7 @@ export const selectors = {
     isFetchingValidationResult,
     validationResult,
     isFetchingCsrAttributes,
+    csrAttributesError,
     csrAttributeDescriptors,
     isFetchingContents,
     isFetchingApprovals,

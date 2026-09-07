@@ -34,12 +34,26 @@ export type ColumnCounterState = 'ok' | 'warning' | 'full';
  * Only fields the catalogue marks `displayable` are offered. An absent flag is not treated as a
  * yes: secret and encrypted content, and code blocks, are excluded server-side by that flag alone,
  * so guessing in its absence is what would put them in front of a user.
+ *
+ * @param renderableProperties the column keys the page has a cell renderer for. A property field
+ * outside that set is dropped: its value lives on the listing entry, so with no renderer the column
+ * could only ever show the empty state. Attribute sources render from projected values and are never
+ * gated. Omitted means no gate, which is what a page not yet on the pipeline wants.
  */
-export function toCatalogueFields(catalogue: SearchFieldDataByGroupDto[]): SourcedCatalogueField[] {
+export function toCatalogueFields(
+    catalogue: SearchFieldDataByGroupDto[],
+    renderableProperties?: ReadonlySet<string>,
+): SourcedCatalogueField[] {
+    const isOffered = (field: SourcedCatalogueField) =>
+        renderableProperties === undefined ||
+        field.fieldSource !== FilterFieldSource.Property ||
+        renderableProperties.has(getColumnKey(field));
+
     return catalogue.flatMap((group) =>
         (group.searchFieldData ?? [])
-            .filter((field) => (field as SourcedCatalogueField).displayable === true)
-            .map((field) => ({ ...field, fieldSource: group.filterFieldSource }) as SourcedCatalogueField),
+            .filter((field) => field.displayable === true)
+            .map((field) => ({ ...field, fieldSource: group.filterFieldSource }) as SourcedCatalogueField)
+            .filter(isOffered),
     );
 }
 
