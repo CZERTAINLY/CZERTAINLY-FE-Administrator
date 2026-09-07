@@ -25,10 +25,18 @@ describe('signingRecordsDashboard slice', () => {
 
     test('getStatisticsSuccess stores statistics and clears both fetching flags', () => {
         const seeded = { ...initialState, isFetching: true, isFetchingSeries: true };
-        const next = reducer(seeded, actions.getStatisticsSuccess({ statistics: { totalRetained: 3 } as any }));
+        const next = reducer(
+            seeded,
+            actions.getStatisticsSuccess({ statistics: { totalRetained: 3 } as any, asOf: '2026-07-29T12:37:41.123Z' }),
+        );
         expect(next.isFetching).toBe(false);
         expect(next.isFetchingSeries).toBe(false);
         expect(next.statistics).toEqual({ totalRetained: 3 });
+    });
+
+    test('getStatisticsSuccess records when the statistics were read', () => {
+        const next = reducer(initialState, actions.getStatisticsSuccess({ statistics: {} as any, asOf: '2026-07-29T12:37:41.123Z' }));
+        expect(next.statisticsAsOf).toBe('2026-07-29T12:37:41.123Z');
     });
 
     test('getStatisticsFailure clears both fetching flags', () => {
