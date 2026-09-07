@@ -623,7 +623,7 @@ describe('attributes utils', () => {
             const values = { __attributes__id1__: { [attributeName]: emptyValue } };
 
             // when
-            const result = collectFormAttributes('id1', descriptors, values);
+            const result = collectFormAttributes('id1', descriptors, values, undefined, { omitEmptyContent: true });
 
             // then
             expect(result).toEqual([]);
@@ -684,8 +684,12 @@ describe('attributes utils', () => {
             const valuesWithOnlyEmptyItems = { __attributes__id1__: { tags: [emptyValue] } };
 
             // when
-            const resultWithEmptyItem = collectFormAttributes('id1', descriptors, valuesWithEmptyItem);
-            const resultWithOnlyEmptyItems = collectFormAttributes('id1', descriptors, valuesWithOnlyEmptyItems);
+            const resultWithEmptyItem = collectFormAttributes('id1', descriptors, valuesWithEmptyItem, undefined, {
+                omitEmptyContent: true,
+            });
+            const resultWithOnlyEmptyItems = collectFormAttributes('id1', descriptors, valuesWithOnlyEmptyItems, undefined, {
+                omitEmptyContent: true,
+            });
 
             // then
             expect(resultWithEmptyItem[0].content).toEqual([{ data: populatedValue }]);
@@ -863,7 +867,10 @@ describe('attributes utils', () => {
             expect(result[0].content[0].data).toMatchObject({ uuid: 'cert-uuid-1', resource: 'certificates' });
         });
 
-        test('drops empty entries from non-resource list attributes', () => {
+        test('does not drop empty entries for non-resource list attributes', () => {
+            // given
+            // The stub filter is scoped to RESOURCE so primitive list types preserve
+            // whatever the form sends (no behavior change for STRING / TEXT / etc.).
             const descriptors = [
                 {
                     type: AttributeType.Data,
@@ -876,10 +883,12 @@ describe('attributes utils', () => {
             ] as any[];
             const values = { __attributes__id1__: { tags: ['', 'real-tag'] } };
 
+            // when
             const result = collectFormAttributes('id1', descriptors, values);
 
+            // then
             expect(result).toHaveLength(1);
-            expect(result[0].content).toEqual([{ data: 'real-tag' }]);
+            expect(result[0].content).toEqual([{ data: '' }, { data: 'real-tag' }]);
         });
     });
 
