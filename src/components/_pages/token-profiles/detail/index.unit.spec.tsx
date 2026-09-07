@@ -86,6 +86,8 @@ describe('TokenProfileDetail key-usage dialog', () => {
 
     test('opensDialog_andRequestsUsagesSupportedByTheProfileToken', async () => {
         // given
+        const supportedKeyUsages = [KeyUsage.Sign, KeyUsage.Verify];
+        state.tokenprofiles.supportedTokenProfileKeyUsages = supportedKeyUsages;
         await act(async () => {
             root.render(<TokenProfileDetail />);
         });
@@ -97,7 +99,9 @@ describe('TokenProfileDetail key-usage dialog', () => {
         });
 
         // then
-        expect(container.querySelector('[data-testid="key-usage-select"]')).not.toBeNull();
+        const keyUsageSelect = container.querySelector('[data-testid="key-usage-select"]') as HTMLElement;
+        expect(keyUsageSelect.dataset.supportedUsages).toBe(supportedKeyUsages.join(','));
+        expect(keyUsageSelect.dataset.disabled).toBe('false');
         expect(dispatch).toHaveBeenCalledWith({
             type: 'tokenprofiles/clearSupportedTokenProfileKeyUsages',
             payload: undefined,
@@ -106,5 +110,23 @@ describe('TokenProfileDetail key-usage dialog', () => {
             type: 'tokenprofiles/getSupportedTokenProfileKeyUsages',
             payload: { tokenInstanceUuid: 'token-1' },
         });
+    });
+
+    test('opensDialog_withKeyUsageSelectDisabled_whileSupportedUsagesAreLoading', async () => {
+        // given
+        state.tokenprofiles.isFetchingSupportedTokenProfileKeyUsages = true;
+        await act(async () => {
+            root.render(<TokenProfileDetail />);
+        });
+        const updateKeyUsagesButton = container.querySelector('button[title="Update Key Usages"]') as HTMLButtonElement;
+
+        // when
+        await act(async () => {
+            updateKeyUsagesButton.click();
+        });
+
+        // then
+        const keyUsageSelect = container.querySelector('[data-testid="key-usage-select"]') as HTMLElement;
+        expect(keyUsageSelect.dataset.disabled).toBe('true');
     });
 });
