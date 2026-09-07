@@ -371,8 +371,8 @@ export class TokenProfileManagementApi extends BaseAPI {
 
         return this.request<Array<KeyUsage>>(
             {
-                url: '/v1/tokens/{tokenInstanceUuid}/tokenProfile/keyUsages'.replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid)),
-                method: 'POST',
+                url: '/v1/tokens/{tokenInstanceUuid}/tokenProfiles/keyUsages'.replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
