@@ -200,6 +200,7 @@ const getTokenProfileAttributesDescriptors: AppEpic = (action$, state, deps) => 
                 catchError((err) =>
                     of(
                         slice.actions.getTokenProfileAttributesDescriptorsFailure({
+                            tokenUuid: action.payload.tokenUuid,
                             error: extractError(err, 'Failed to get Token Profile Attribute Descriptor list'),
                         }),
                         appRedirectActions.fetchError({ error: err, message: 'Failed to get Token Profile Attribute Descriptor list' }),

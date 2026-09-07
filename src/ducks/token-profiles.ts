@@ -20,10 +20,13 @@ export type State = {
 
     tokenProfile?: TokenProfileDetailResponseModel;
     tokenProfiles: TokenProfileResponseModel[];
+    supportedTokenProfileKeyUsages: KeyUsage[];
+    supportedTokenProfileKeyUsagesTokenInstanceUuid?: string;
 
     isFetchingList: boolean;
     isFetchingDetail: boolean;
     isFetchingAttributes: boolean;
+    isFetchingSupportedTokenProfileKeyUsages: boolean;
     isUpdatingKeyUsage: boolean;
     isBulkUpdatingKeyUsage: boolean;
 
@@ -46,10 +49,12 @@ export const initialState: State = {
     bulkDeleteErrorMessages: [],
 
     tokenProfiles: [],
+    supportedTokenProfileKeyUsages: [],
 
     isFetchingList: false,
     isFetchingDetail: false,
     isFetchingAttributes: false,
+    isFetchingSupportedTokenProfileKeyUsages: false,
     isUpdatingKeyUsage: false,
     isBulkUpdatingKeyUsage: false,
     isCreating: false,
@@ -111,6 +116,34 @@ export const slice = createSlice({
 
         getTokenProfileDetailFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingDetail = false;
+        },
+
+        clearSupportedTokenProfileKeyUsages: (state, action: PayloadAction<void>) => {
+            state.supportedTokenProfileKeyUsages = [];
+            state.supportedTokenProfileKeyUsagesTokenInstanceUuid = undefined;
+            state.isFetchingSupportedTokenProfileKeyUsages = false;
+        },
+
+        getSupportedTokenProfileKeyUsages: (state, action: PayloadAction<{ tokenInstanceUuid: string }>) => {
+            state.supportedTokenProfileKeyUsages = [];
+            state.supportedTokenProfileKeyUsagesTokenInstanceUuid = action.payload.tokenInstanceUuid;
+            state.isFetchingSupportedTokenProfileKeyUsages = true;
+        },
+
+        getSupportedTokenProfileKeyUsagesSuccess: (state, action: PayloadAction<{ tokenInstanceUuid: string; keyUsages: KeyUsage[] }>) => {
+            if (state.supportedTokenProfileKeyUsagesTokenInstanceUuid !== action.payload.tokenInstanceUuid) return;
+
+            state.supportedTokenProfileKeyUsages = action.payload.keyUsages;
+            state.isFetchingSupportedTokenProfileKeyUsages = false;
+        },
+
+        getSupportedTokenProfileKeyUsagesFailure: (
+            state,
+            action: PayloadAction<{ tokenInstanceUuid: string; error: string | undefined }>,
+        ) => {
+            if (state.supportedTokenProfileKeyUsagesTokenInstanceUuid !== action.payload.tokenInstanceUuid) return;
+
+            state.isFetchingSupportedTokenProfileKeyUsages = false;
         },
 
         createTokenProfile: (
@@ -306,10 +339,16 @@ const checkedRows = createSelector(state, (state: State) => state.checkedRows);
 
 const tokenProfile = createSelector(state, (state: State) => state.tokenProfile);
 const tokenProfiles = createSelector(state, (state: State) => state.tokenProfiles);
+const supportedTokenProfileKeyUsages = createSelector(state, (state: State) => state.supportedTokenProfileKeyUsages);
+const supportedTokenProfileKeyUsagesTokenInstanceUuid = createSelector(
+    state,
+    (state: State) => state.supportedTokenProfileKeyUsagesTokenInstanceUuid,
+);
 
 const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
 const isFetchingAttributes = createSelector(state, (state: State) => state.isFetchingAttributes);
+const isFetchingSupportedTokenProfileKeyUsages = createSelector(state, (state: State) => state.isFetchingSupportedTokenProfileKeyUsages);
 const isCreating = createSelector(state, (state: State) => state.isCreating);
 const createTokenProfileSucceeded = createSelector(state, (state: State) => state.createTokenProfileSucceeded);
 const isDeleting = createSelector(state, (state: State) => state.isDeleting);
@@ -330,10 +369,13 @@ export const selectors = {
 
     tokenProfile,
     tokenProfiles,
+    supportedTokenProfileKeyUsages,
+    supportedTokenProfileKeyUsagesTokenInstanceUuid,
 
     isFetchingList,
     isFetchingDetail,
     isFetchingAttributes,
+    isFetchingSupportedTokenProfileKeyUsages,
     isCreating,
     createTokenProfileSucceeded,
     isDeleting,

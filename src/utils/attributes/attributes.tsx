@@ -348,6 +348,9 @@ function stripEmptyResourceContent(
     return content;
 }
 
+const isEmptyAttributeContentItem = (item: FormAttributeContentItem): boolean =>
+    item.data === undefined || item.data === null || item.data === '';
+
 function shouldSkipAttribute(
     attribute: string,
     attributes: Record<string, unknown>,
@@ -389,9 +392,14 @@ export function collectFormAttributes(
 
         if (descriptor.contentType === AttributeContentType.Resource) {
             content = stripEmptyResourceContent(content);
+        } else if (Array.isArray(content)) {
+            content = content.filter((item) => !isEmptyAttributeContentItem(item));
+        } else if (isEmptyAttributeContentItem(content)) {
+            content = undefined;
         }
 
         if (content === undefined) continue;
+        if (Array.isArray(content) && content.length === 0 && descriptor.contentType !== AttributeContentType.Resource) continue;
         if (!Array.isArray(content) && content.data === undefined) continue;
 
         const contentArray = Array.isArray(content) ? content : [content];

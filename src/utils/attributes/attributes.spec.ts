@@ -606,6 +606,29 @@ describe('attributes utils', () => {
             expect(result).toEqual([]);
         });
 
+        test('omits attributes with empty scalar data', () => {
+            // given
+            const attributeName = 'slotId';
+            const emptyValue = '';
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: attributeName,
+                    uuid: 'u-slot-id',
+                    contentType: AttributeContentType.Integer,
+                    content: [],
+                    properties: { required: false, label: 'Slot ID', readOnly: false, visible: true, list: false },
+                },
+            ] as any[];
+            const values = { __attributes__id1__: { [attributeName]: emptyValue } };
+
+            // when
+            const result = collectFormAttributes('id1', descriptors, values);
+
+            // then
+            expect(result).toEqual([]);
+        });
+
         test('processes Custom attribute descriptors', () => {
             const descriptors = [
                 {
@@ -641,6 +664,32 @@ describe('attributes utils', () => {
             const result = collectFormAttributes('id1', descriptors, values);
             expect(result).toHaveLength(1);
             expect(result[0].content).toEqual([{ data: 'a' }, { data: 'b' }]);
+        });
+
+        test('omits empty items from multi-value attributes', () => {
+            // given
+            const populatedValue = 'active';
+            const emptyValue = '';
+            const descriptors = [
+                {
+                    type: AttributeType.Data,
+                    name: 'tags',
+                    uuid: 'u-tags',
+                    contentType: AttributeContentType.String,
+                    content: [],
+                    properties: { required: false, label: 'Tags', readOnly: false, visible: true, list: true, multiSelect: true },
+                },
+            ] as any[];
+            const valuesWithEmptyItem = { __attributes__id1__: { tags: [populatedValue, emptyValue] } };
+            const valuesWithOnlyEmptyItems = { __attributes__id1__: { tags: [emptyValue] } };
+
+            // when
+            const resultWithEmptyItem = collectFormAttributes('id1', descriptors, valuesWithEmptyItem);
+            const resultWithOnlyEmptyItems = collectFormAttributes('id1', descriptors, valuesWithOnlyEmptyItems);
+
+            // then
+            expect(resultWithEmptyItem[0].content).toEqual([{ data: populatedValue }]);
+            expect(resultWithOnlyEmptyItems).toEqual([]);
         });
 
         test('supports schemaVersion V3 on descriptor', () => {
@@ -814,9 +863,7 @@ describe('attributes utils', () => {
             expect(result[0].content[0].data).toMatchObject({ uuid: 'cert-uuid-1', resource: 'certificates' });
         });
 
-        test('does not drop empty entries for non-resource list attributes', () => {
-            // Defensive: the stub-filter is scoped to RESOURCE so primitive list types preserve
-            // whatever the form sends today (no behaviour change for STRING / TEXT / etc.).
+        test('drops empty entries from non-resource list attributes', () => {
             const descriptors = [
                 {
                     type: AttributeType.Data,
@@ -832,9 +879,7 @@ describe('attributes utils', () => {
             const result = collectFormAttributes('id1', descriptors, values);
 
             expect(result).toHaveLength(1);
-            expect(result[0].content).toHaveLength(2);
-            expect(result[0].content[0].data).toBe('');
-            expect(result[0].content[1].data).toBe('real-tag');
+            expect(result[0].content).toEqual([{ data: 'real-tag' }]);
         });
     });
 

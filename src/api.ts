@@ -43,7 +43,6 @@ import {
     SettingsApi,
     StatisticsDashboardApi,
     TokenInstanceManagementApi,
-    TokenProfileManagementApi,
     UserManagementApi,
     WorkflowActionsManagementApi,
     WorkflowEventManagementApi,
@@ -67,6 +66,7 @@ import {
     OIDUtilsAPIApi,
 } from 'types/openapi/utils';
 import { TokenInstanceAttributesApi } from './types/token-instance-api';
+import { TokenProfileManagementApi } from './types/token-profile-api';
 
 const apiUrl = (globalThis as typeof globalThis & { __ENV__?: Env }).__ENV__?.API_URL || '/api';
 const configuration = new Configuration({ basePath: apiUrl });

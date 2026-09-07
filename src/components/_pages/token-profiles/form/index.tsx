@@ -24,7 +24,8 @@ import { selectors as enumSelectors, getEnumLabel, getEnumDescription } from 'du
 import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
-import { KeyUsage, PlatformEnum, Resource } from '../../../../types/openapi';
+import { PlatformEnum, Resource } from '../../../../types/openapi';
+import type { KeyUsage } from '../../../../types/openapi';
 import TabLayout from '../../../Layout/TabLayout';
 import TextInput from 'components/TextInput';
 import TextArea from 'components/TextArea';
@@ -45,6 +46,17 @@ interface FormValues {
     enabled: boolean;
     // Attribute fields are registered dynamically by AttributeEditor.
     [attributeField: `__attributes__${string}`]: unknown;
+}
+
+export function getSupportedTokenProfileKeyUsageOptions(
+    supportedKeyUsages: KeyUsage[] = [],
+    keyUsageEnum: Parameters<typeof getEnumLabel>[0],
+): { value: KeyUsage; label: string; description?: string }[] {
+    return supportedKeyUsages.map((usage) => ({
+        value: usage,
+        label: getEnumLabel(keyUsageEnum, usage),
+        description: getEnumDescription(keyUsageEnum, usage),
+    }));
 }
 
 export default function TokenProfileForm({
@@ -70,6 +82,8 @@ export default function TokenProfileForm({
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
 
     const keyUsageEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyUsage));
+    const supportedTokenProfileKeyUsages = useSelector(tokenProfilesSelectors.supportedTokenProfileKeyUsages) ?? [];
+    const isFetchingSupportedTokenProfileKeyUsages = useSelector(tokenProfilesSelectors.isFetchingSupportedTokenProfileKeyUsages);
     const isFetchingTokenProfileAttributes = useSelector(tokensSelectors.isFetchingTokenProfileAttributesDescriptors);
 
     const isFetchingDetail = useSelector(tokenProfilesSelectors.isFetchingDetail);
@@ -81,8 +95,21 @@ export default function TokenProfileForm({
     const [tokenProfile, setTokenProfile] = useState<TokenProfileDetailResponseModel>();
 
     const isBusy = useMemo(
-        () => isFetchingDetail || isCreating || isUpdating || isFetchingTokenProfileAttributes || isFetchingResourceCustomAttributes,
-        [isCreating, isFetchingDetail, isUpdating, isFetchingTokenProfileAttributes, isFetchingResourceCustomAttributes],
+        () =>
+            isFetchingDetail ||
+            isCreating ||
+            isUpdating ||
+            isFetchingTokenProfileAttributes ||
+            isFetchingSupportedTokenProfileKeyUsages ||
+            isFetchingResourceCustomAttributes,
+        [
+            isCreating,
+            isFetchingDetail,
+            isUpdating,
+            isFetchingTokenProfileAttributes,
+            isFetchingSupportedTokenProfileKeyUsages,
+            isFetchingResourceCustomAttributes,
+        ],
     );
 
     const previousIdRef = useRef<string | undefined>(undefined);
@@ -90,6 +117,7 @@ export default function TokenProfileForm({
     useEffect(() => {
         dispatch(tokensActions.listTokens());
         dispatch(tokensActions.clearTokenProfileAttributesDescriptors());
+        dispatch(tokenProfilesActions.clearSupportedTokenProfileKeyUsages());
         dispatch(connectorActions.clearCallbackData());
     }, [dispatch]);
 
@@ -113,6 +141,11 @@ export default function TokenProfileForm({
         if (editMode && tokenProfileSelector && tokenProfileSelector.uuid === id) {
             setTokenProfile(tokenProfileSelector);
             dispatch(tokensActions.getTokenProfileAttributesDescriptors({ tokenUuid: tokenProfileSelector.tokenInstanceUuid }));
+            dispatch(
+                tokenProfilesActions.getSupportedTokenProfileKeyUsages({
+                    tokenInstanceUuid: tokenProfileSelector.tokenInstanceUuid,
+                }),
+            );
         }
     }, [dispatch, editMode, id, tokenProfileSelector]);
 
@@ -192,11 +225,25 @@ export default function TokenProfileForm({
                     setValue(key as `__attributes__${string}`, undefined);
                 }
             });
+            setValue('usages', [], { shouldDirty: true, shouldValidate: true });
             dispatch(tokensActions.clearTokenProfileAttributesDescriptors());
-            dispatch(tokensActions.getTokenProfileAttributesDescriptors({ tokenUuid }));
+            dispatch(tokenProfilesActions.clearSupportedTokenProfileKeyUsages());
+            if (tokenUuid) {
+                dispatch(tokensActions.getTokenProfileAttributesDescriptors({ tokenUuid }));
+                dispatch(tokenProfilesActions.getSupportedTokenProfileKeyUsages({ tokenInstanceUuid: tokenUuid }));
+            }
         },
         [dispatch, getValues, setValue],
     );
+
+    useEffect(() => {
+        if (!editMode && tokenId) {
+            dispatch(tokensActions.clearTokenProfileAttributesDescriptors());
+            dispatch(tokensActions.getTokenProfileAttributesDescriptors({ tokenUuid: tokenId }));
+            dispatch(tokenProfilesActions.clearSupportedTokenProfileKeyUsages());
+            dispatch(tokenProfilesActions.getSupportedTokenProfileKeyUsages({ tokenInstanceUuid: tokenId }));
+        }
+    }, [dispatch, editMode, tokenId]);
 
     const onSubmit = useCallback(
         (values: FormValues) => {
@@ -264,17 +311,10 @@ export default function TokenProfileForm({
         );
     }, [isBusy, resourceCustomAttributes, tokenProfile]);
 
-    const keyUsageOptions = useMemo(() => {
-        const options: { value: KeyUsage; label: string; description?: string }[] = [];
-        for (const key in KeyUsage) {
-            options.push({
-                value: KeyUsage[key as keyof typeof KeyUsage],
-                label: getEnumLabel(keyUsageEnum, KeyUsage[key as keyof typeof KeyUsage]),
-                description: getEnumDescription(keyUsageEnum, KeyUsage[key as keyof typeof KeyUsage]),
-            });
-        }
-        return options;
-    }, [keyUsageEnum]);
+    const keyUsageOptions = useMemo(
+        () => getSupportedTokenProfileKeyUsageOptions(supportedTokenProfileKeyUsages, keyUsageEnum),
+        [keyUsageEnum, supportedTokenProfileKeyUsages],
+    );
 
     return (
         <FormProvider {...methods}>
@@ -382,6 +422,7 @@ export default function TokenProfileForm({
                                                 field.onChange(value);
                                             }}
                                             options={keyUsageOptions}
+                                            isDisabled={isFetchingSupportedTokenProfileKeyUsages || !watchedToken}
                                             placeholder="Select Key Usages"
                                             placement="bottom"
                                             showOptionDescriptionInDropdown
@@ -407,10 +448,12 @@ export default function TokenProfileForm({
                                     content: tokenProfileAttributeDescriptors ? (
                                         <AttributeEditor
                                             id="token-profile"
-                                            callbackParentUuid={tokenProfile?.tokenInstanceUuid || watchedToken}
+                                            callbackParentUuid={watchedToken}
                                             callbackResource={Resource.TokenProfiles}
                                             attributeDescriptors={tokenProfileAttributeDescriptors}
-                                            attributes={tokenProfile?.attributes}
+                                            attributes={
+                                                tokenProfile?.tokenInstanceUuid === watchedToken ? tokenProfile.attributes : undefined
+                                            }
                                             groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
                                             setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
                                         />
@@ -444,7 +487,7 @@ export default function TokenProfileForm({
                                 title={editMode ? 'Update' : 'Create'}
                                 inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                 inProgress={isSubmitting}
-                                disabled={!isDirty || isSubmitting || !isValid}
+                                disabled={!isDirty || isSubmitting || !isValid || isBusy}
                                 type="submit"
                             />
                         </Container>

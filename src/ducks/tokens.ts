@@ -40,6 +40,7 @@ export type State = {
     tokenProviderAttributeDescriptorsByQueryKey: Record<string, AttributeDescriptorModel[]>;
     tokenProviderAttributesQueryKey?: string;
     tokenProfileAttributeDescriptors?: AttributeDescriptorModel[];
+    tokenProfileAttributesTokenUuid?: string;
 
     isFetchingTokenProviders: boolean;
     isFetchingTokenProviderAttributeDescriptors: boolean;
@@ -125,6 +126,8 @@ export const slice = createSlice({
 
         clearTokenProfileAttributesDescriptors: (state, action: PayloadAction<void>) => {
             state.tokenProfileAttributeDescriptors = [];
+            state.tokenProfileAttributesTokenUuid = undefined;
+            state.isFetchingTokenProfileAttributesDescriptors = false;
         },
 
         listTokenProviders: (state, action: PayloadAction<void>) => {
@@ -176,6 +179,8 @@ export const slice = createSlice({
         },
 
         getTokenProfileAttributesDescriptors: (state, action: PayloadAction<{ tokenUuid: string }>) => {
+            state.tokenProfileAttributeDescriptors = [];
+            state.tokenProfileAttributesTokenUuid = action.payload.tokenUuid;
             state.isFetchingTokenProfileAttributesDescriptors = true;
         },
 
@@ -183,11 +188,15 @@ export const slice = createSlice({
             state,
             action: PayloadAction<{ tokenUuid: string; attributesDescriptors: AttributeDescriptorModel[] }>,
         ) => {
+            if (state.tokenProfileAttributesTokenUuid !== action.payload.tokenUuid) return;
+
             state.isFetchingTokenProfileAttributesDescriptors = false;
             state.tokenProfileAttributeDescriptors = action.payload.attributesDescriptors;
         },
 
-        getTokenProfileAttributesDescriptorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+        getTokenProfileAttributesDescriptorsFailure: (state, action: PayloadAction<{ tokenUuid: string; error: string | undefined }>) => {
+            if (state.tokenProfileAttributesTokenUuid !== action.payload.tokenUuid) return;
+
             state.isFetchingTokenProfileAttributesDescriptors = false;
         },
 
