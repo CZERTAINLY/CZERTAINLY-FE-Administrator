@@ -56,6 +56,20 @@ test.describe('TimeSeriesChart', () => {
         await expect(page.getByTestId('landed-on-redirect')).toBeVisible();
     });
 
+    test('the y-axis labels counts as distinct whole numbers', async ({ mount }) => {
+        const component = await mount(
+            <TimeSeriesChartWithStore
+                title="Signings over Time"
+                data={{ '2026-06-18T00:00:00Z': 1, '2026-06-18T01:00:00Z': 2, '2026-06-18T02:00:00Z': 2 }}
+                entity={EntityType.SIGNING_RECORD}
+                redirect="/signingrecords"
+                onSetFilter={() => []}
+            />,
+        );
+        const ticks = component.locator('.recharts-yAxis-tick-labels .recharts-cartesian-axis-tick-value');
+        await expect(ticks).toHaveText(['0', '1', '2']);
+    });
+
     test('clicking empty plot space does not navigate', async ({ mount, page }) => {
         const component = await mount(
             <TimeSeriesChartNavHarness title="Signings over Time" data={data} entity={EntityType.SIGNING_RECORD} onSetFilter={() => []} />,

@@ -19,7 +19,10 @@ describe('signing-records-dashboard epics', () => {
         const emitted = await (getSigningRecordStatistics as any)(action$, of({}) as any, deps)
             .pipe(toArray())
             .toPromise();
-        expect(emitted).toEqual([slice.actions.getStatisticsSuccess({ statistics: stats as any })]);
+        expect(emitted).toHaveLength(1);
+        expect(emitted[0].type).toBe(slice.actions.getStatisticsSuccess.type);
+        expect((emitted[0] as any).payload.statistics).toEqual(stats);
+        expect(Date.parse((emitted[0] as any).payload.asOf)).not.toBeNaN();
     });
 
     test('setPeriod success forwards the chosen period to the API and emits success', async () => {
