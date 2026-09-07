@@ -290,11 +290,29 @@ function authTestReducer(state: AuthTestState | undefined, _action: UnknownActio
     return state ?? authTestInitialState;
 }
 
+export type LoginTestState = {
+    loginMethods?: Array<{ name: string; loginUrl: string }>;
+    isFetching: boolean;
+    error?: string;
+};
+
+const loginTestInitialState: LoginTestState = { isFetching: false };
+
+/** The login page's providers come preloaded; the fetch belongs to an epic, which component tests do not run. */
+function loginTestReducer(state: LoginTestState | undefined, _action: UnknownAction): LoginTestState {
+    return state ?? loginTestInitialState;
+}
+
 export type BrandingTestState = {
     branding?: Record<string, string | undefined>;
+    /** The anonymous read, as the login page and the brand token layer see it. Nullable, as the response is. */
+    publicBranding?: Record<string, string | null | undefined | boolean>;
+    /** Whether that read failed. A failure settles publicBranding on the platform default, which looks identical. */
+    publicBrandingReadFailed?: boolean;
     /** What a save or a reset put on the wire. Kept apart from `branding` so a preloaded value is not mistaken for it. */
     sentBranding?: Record<string, string | undefined>;
     isFetchingBranding: boolean;
+    isFetchingPublicBranding?: boolean;
     isUpdatingBranding: boolean;
     isResettingBranding: boolean;
     updateSucceeded: boolean;
@@ -302,7 +320,8 @@ export type BrandingTestState = {
     error?: string;
 };
 
-const brandingTestInitialState: BrandingTestState = {
+/** Exported so a wrapper can preload one field without restating every flag. */
+export const brandingTestInitialState: BrandingTestState = {
     isFetchingBranding: false,
     isUpdatingBranding: false,
     isResettingBranding: false,
@@ -321,6 +340,16 @@ function brandingTestReducer(state: BrandingTestState = brandingTestInitialState
             return { ...state, sentBranding: a.payload?.branding, isUpdatingBranding: false, updateSucceeded: true };
         case 'branding/resetBranding':
             return { ...state, sentBranding: {}, branding: {}, isResettingBranding: false, resetSucceeded: true };
+        // The anonymous read has no epic here, so a test drives it by dispatching the success action directly, which
+        // is what lets one mount cover both "no branding yet" and the response that follows.
+        case 'branding/getPublicBrandingSuccess':
+            return {
+                ...state,
+                publicBranding: (action as { payload?: { branding: BrandingTestState['publicBranding'] } }).payload?.branding,
+                publicBrandingReadFailed: false,
+            };
+        case 'branding/getPublicBrandingFailure':
+            return { ...state, publicBrandingReadFailed: true };
         default:
             return state;
     }
@@ -1312,6 +1341,7 @@ export const testReducers = combineReducers({
     comments: commentsTestReducer,
     listViews: listViewsTestReducer,
     branding: brandingTestReducer,
+    login: loginTestReducer,
 });
 
 export const testInitialState = {
@@ -1350,4 +1380,5 @@ export const testInitialState = {
     comments: commentsTestInitialState,
     listViews: listViewsTestInitialState,
     branding: brandingTestInitialState,
+    login: loginTestInitialState,
 };
