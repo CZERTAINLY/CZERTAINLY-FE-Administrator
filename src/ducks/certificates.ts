@@ -131,10 +131,7 @@ export type State = {
     isUpdatingOwner: boolean;
     isUpdatingTrustedStatus: boolean;
 
-    /**
-     * Bumped whenever a mutation of this inventory needs the listing re-read. The page forwards it to
-     * `PagedList` as `refreshToken`, whose doc says why the epic cannot dispatch the refetch itself.
-     */
+    /** Bumped whenever a mutation needs the listing re-read; the page forwards it as `refreshToken`. */
     listRefreshToken: number;
 
     isBulkUpdatingGroup: boolean;

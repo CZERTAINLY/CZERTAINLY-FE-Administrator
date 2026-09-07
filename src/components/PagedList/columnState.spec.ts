@@ -93,8 +93,6 @@ describe('getRenderableProperties', () => {
 describe('buildListRequest', () => {
     const base = { itemsPerPage: 10, pageNumber: 1, filters: [] };
 
-    // With no columns and no ordering the request must be byte-identical to one written before the
-    // contract carried either field, so both are absent from the object rather than present and empty.
     it('omits both new fields for a page that is not on the pipeline', () => {
         const request = buildListRequest(base);
 
@@ -173,7 +171,6 @@ describe('toDisplayableSort', () => {
 });
 
 describe('withCatalogueSortability', () => {
-    /** As a page ships it: no `sortable`; see `withCatalogueSortability`. */
     const standard: ColumnDefinition[] = [
         { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'COMMON_NAME', catalogueLabel: 'Common Name' },
         { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'CK_ASSOCIATIONS', catalogueLabel: 'Associations' },
@@ -193,16 +190,10 @@ describe('withCatalogueSortability', () => {
         expect(withCatalogueSortability(standard, catalogue)[0].sortable).toBe(true);
     });
 
-    /**
-     * Asserted as "not sortable" rather than as `false`: absent and `false` are the same answer to
-     * every reader of the flag, both being `sortable === true` failures, so the merge leaves an
-     * already-unsortable column alone rather than writing `false` over its absence.
-     */
     it('leaves a column the catalogue cannot order on unsortable', () => {
         expect(withCatalogueSortability(standard, catalogue)[1].sortable).not.toBe(true);
     });
 
-    /** Absent is not the same as false, and the safe reading of an unpublished field is unsortable. */
     it('treats a column the catalogue does not publish as unsortable', () => {
         const unpublished = [
             { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'PRIVATE_KEY', catalogueLabel: 'Has private key' },
@@ -217,11 +208,6 @@ describe('withCatalogueSortability', () => {
         expect(withCatalogueSortability(stale, catalogue)[0].sortable).toBe(false);
     });
 
-    /**
-     * The page's display choices are not the catalogue's business. Taking the catalogue's label here
-     * would rename the headings of a tab nobody edited - `COMMON_NAME` is published as "Subject Common
-     * Name" above, while the page ships "Common Name".
-     */
     it('keeps every display property the page shipped', () => {
         const shipped: ColumnDefinition[] = [
             {
@@ -236,7 +222,6 @@ describe('withCatalogueSortability', () => {
         expect(withCatalogueSortability(shipped, catalogue)[0]).toEqual({ ...shipped[0], sortable: true });
     });
 
-    /** Whether the API can order by a field is a separate question from whether the picker offers it. */
     it('takes sortability from a field the catalogue does not offer as a column', () => {
         const hidden = [
             {
@@ -255,7 +240,6 @@ describe('withCatalogueSortability', () => {
         expect(merged[0]).toBe(agreed[0]);
     });
 
-    /** Nothing published means nothing to merge, so the columns come back as they went in. */
     it('leaves the set alone when the catalogue has not published anything', () => {
         const merged = withCatalogueSortability(standard, []);
 

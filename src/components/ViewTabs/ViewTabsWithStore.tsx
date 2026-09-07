@@ -24,7 +24,7 @@ type Props = Readonly<{
     withheldCatalogue?: boolean;
     /** Passed straight through, so a test can say the catalogue read has settled on nothing. */
     isCatalogueLoaded?: boolean;
-    /** The renderable-property gate, as an array: a `Set` does not survive the props boundary. */
+    /** As an array: a `Set` does not survive the props boundary. */
     renderableProperties?: string[];
     /** What the drift buttons below change, i.e. an edit the page made outside the view. */
     driftColumn?: ColumnDefinition;

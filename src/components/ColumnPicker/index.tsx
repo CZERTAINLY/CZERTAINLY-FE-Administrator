@@ -30,7 +30,7 @@ export type ColumnPickerProps = Readonly<{
     columns: ColumnDefinition[];
     /** The platform default set, offered inside the dialog as "Reset to Standard columns". */
     standardColumns?: ColumnDefinition[];
-    /** The column keys the page has a cell renderer for; the gate `toCatalogueFields` applies. Omitted means no gate. */
+    /** The column keys the page has a cell renderer for; the gate `toCatalogueFields` applies. */
     renderableProperties?: ReadonlySet<string>;
     /** Named in the dialog caption, e.g. "Certificates". */
     resourceLabel?: string;

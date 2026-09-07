@@ -96,12 +96,6 @@ describe('buildCertificateCellRegistry', () => {
         onPendingAction: () => undefined,
     };
 
-    /**
-     * The registry decides whether the picker offers a property column: a field whose value the list
-     * DTO does not carry could only ever render the empty state, so it is registered nowhere. This
-     * pins both halves — a field that gains a renderer becomes pickable, and one that loses its value
-     * on the DTO must lose its renderer with it.
-     */
     it('registers every catalogued certificate property field whose value the list DTO carries', async () => {
         const { buildCertificateCellRegistry } = await import('./certificateTableHelpers');
 

@@ -58,8 +58,6 @@ export default function CertificateList({
     const navigate = useNavigate();
 
     const certificates = useSelector(selectors.certificates);
-    // Bumped by the duck on each mutation that needs the listing re-read; see `refreshToken`.
-
     const listRefreshToken = useSelector(selectors.listRefreshToken);
     const checkedRows = useSelector(pagingSelectors.checkedRows(EntityType.CERTIFICATE));
     const users = useSelector(userSelectors.users);
@@ -248,8 +246,7 @@ export default function CertificateList({
         [isLinkDisabled, selectCertsOnly, currentFilters, dispatch, certificateTypeEnum],
     );
 
-    // The State legend rides beside the heading rather than inside it: a sortable heading is itself a
-    // button, and a toggletip nested in one would be a control inside a control.
+    // Beside the heading rather than inside it: a sortable heading is itself a button.
     const headerInfo = useMemo(
         () => ({
             'property:CERTIFICATE_STATE': (
@@ -263,11 +260,8 @@ export default function CertificateList({
         [],
     );
 
-    /*
-     * Off in the certificate-picker mode the locations page mounts: a dialog that selects certificates
-     * is not the inventory, and the user's own saved inventory views have no business shaping a picker.
-     * Memoised because the host takes the config apart and refetches when its parts change.
-     */
+    // Off in the certificate-picker mode the locations page mounts: a dialog that selects certificates
+    // is not the inventory. Memoised because the host refetches when the config's parts change.
     const configurableColumns = useMemo(
         () =>
             selectCertsOnly
@@ -284,8 +278,7 @@ export default function CertificateList({
         [selectCertsOnly, certificates, registry, headerInfo],
     );
 
-    // The picker mode renders the same platform column set, fixed: one source of truth for both paths,
-    // so the dialog cannot drift from the inventory it is picking out of.
+    // The same platform column set, fixed, so the dialog cannot drift from the inventory.
     const pickerHeaders = useMemo(
         () => (selectCertsOnly ? buildColumnHeaders(CERTIFICATE_COLUMNS, { info: headerInfo }) : undefined),
         [selectCertsOnly, headerInfo],
@@ -301,8 +294,7 @@ export default function CertificateList({
 
     const onListCallback = useCallback(
         (filters: SearchRequestModel) => {
-            // The stored request is what a mutation replays to refresh the page, so it has to be the request that
-            // was listed - archived rows included - and not the filters before the flag was added.
+            // A mutation refresh replays this request, so it must carry `includeArchived` as listed.
             const request = { ...filters, includeArchived: isIncludeArchived };
             setAppliedFilters(request);
             return dispatch(actions.listCertificates(request));
@@ -310,11 +302,8 @@ export default function CertificateList({
         [dispatch, isIncludeArchived],
     );
 
-    /*
-     * Preserved filters are a deep-link restore, so they apply on arrival and never again. The rule for
-     * "never again" is `preservedFilterRestore`: a restore that finds the filters already in place is
-     * finished rather than pending, or it fires later against a tab switch that deliberately cleared them.
-     */
+    // A deep-link restore applies on arrival and never again, or it fires later against a tab switch
+    // that deliberately cleared the filters; `preservedFilterRestore` decides when it is finished.
     const hasRestoredPreservedFilters = useRef(false);
     useEffect(() => {
         if (hasRestoredPreservedFilters.current) return;

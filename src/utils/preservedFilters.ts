@@ -1,22 +1,15 @@
 /**
- * When a list page should put a deep link's filters back.
+ * When a list page should put a deep link's filters back. They apply once and then never again, or a
+ * restore that stayed armed would undo every later clearing of the filters.
  *
- * A link from elsewhere in the application - a dashboard tile, a certificate's detail page - carries
- * the filters it wants shown. They reach the page as `preservedFilters`, and sometimes as the current
- * filters as well, depending on the link. Either way they have to be applied once and then never
- * again: an empty filter set afterwards is a deliberate choice, so a restore that stayed armed would
- * put the link's conditions back the moment a tab switch cleared them, and go on doing it.
- *
- * The subtlety this exists to make explicit is that "applied" includes "was already applied". A link
- * that populated the current filters itself leaves nothing to do, but the restore is finished all the
- * same, and recording that is what stops it firing later against the user's own act.
+ * "Applied" includes "was already applied": a link that populated the current filters itself leaves
+ * nothing to do, but the restore is finished all the same.
  */
 export type PreservedFilterRestore =
-    /** Put the preserved filters into the current filters, and record the restore as done. */
     | 'restore'
     /** Nothing to apply, but the restore is done: the filters are already the ones the link asked for. */
     | 'settled'
-    /** Not a deep-link arrival at all. The restore stays armed, because it has not happened. */
+    /** Not a deep-link arrival, so the restore stays armed. */
     | 'inapplicable';
 
 export const preservedFilterRestore = ({
@@ -24,7 +17,7 @@ export const preservedFilterRestore = ({
     preservedCount,
     currentCount,
 }: {
-    /** Whether the page honours deep-link filters at all - a picker mounted inside a dialog does not. */
+    /** A picker mounted inside a dialog does not honour deep-link filters. */
     withPreservedFilters: boolean;
     preservedCount: number;
     currentCount: number;

@@ -42,10 +42,7 @@ const column = (identifier: string, catalogueLabel: string, overrides: Partial<C
 
 const standardColumns = [column('COMMON_NAME', 'Common Name'), column('NOT_AFTER', 'Expires At')];
 
-/**
- * The platform set as a real page ships it: no `sortable`, unlike `column()` above, which defaults it
- * to `true`. See `withCatalogueSortability`.
- */
+/** As a real page ships it: no `sortable`, unlike `column()` above, which defaults it to `true`. */
 const shippedColumns: ColumnDefinition[] = [
     { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'COMMON_NAME', catalogueLabel: 'Common Name' },
     { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'NOT_AFTER', catalogueLabel: 'Expires At' },
@@ -68,7 +65,6 @@ const stateFilter = {
     value: 'acme',
 };
 
-/** A view carrying a column set, a filter and an ordering none of which is Standard's. */
 const expiryWatch: ListViewModel = {
     uuid: 'view-1',
     name: 'Expiry watch',
@@ -87,11 +83,7 @@ const listRequests = async (page: Page): Promise<SearchRequestModel[]> =>
 
 const lastRequest = async (page: Page): Promise<SearchRequestModel | undefined> => (await listRequests(page)).at(-1);
 
-/**
- * The displayed columns, by column key. Read from the header ids rather than the visible text: the
- * checkbox column has no label and a heading may carry a legend beside its own, so text is the wrong
- * handle for "which columns are shown".
- */
+/** The displayed columns, by header id: a heading's text carries legends and the checkbox has none. */
 const headings = async (page: Page): Promise<string[]> => {
     const ids = await page.locator('thead th[data-id]').evaluateAll((cells) => cells.map((cell) => cell.getAttribute('data-id') ?? ''));
     return ids.filter((id) => id !== '' && id !== '__checkbox__');
@@ -102,7 +94,6 @@ test.describe('PagedList · configurable columns', () => {
         await mount(<PagedListColumnsWithStore rows={rows} standardColumns={standardColumns} catalogue={catalogue} />);
 
         await expect.poll(() => headings(page)).toEqual(['property:COMMON_NAME', 'property:NOT_AFTER']);
-        // The labels are the catalogue's, so a user who never opens the picker sees what shipped before.
         await expect(page.getByRole('button', { name: 'Common Name' })).toBeVisible();
         await expect(page.getByRole('button', { name: 'Expires At' })).toBeVisible();
         await expect(page.getByText('acme.example')).toBeVisible();
@@ -118,8 +109,6 @@ test.describe('PagedList · configurable columns', () => {
         expect(await legend.evaluate((node) => node.closest('button') !== null)).toBe(false);
     });
 
-    // The compatibility guarantee: Standard carries no ordering, so `sort` is absent from the request
-    // it drives, while the columns it displays are named.
     test('names the displayed columns and no ordering under Standard', async ({ mount, page }) => {
         await mount(<PagedListColumnsWithStore rows={rows} standardColumns={standardColumns} catalogue={catalogue} />);
 
@@ -160,8 +149,7 @@ test.describe('PagedList · configurable columns', () => {
     }) => {
         await mount(<PagedListColumnsWithStore rows={rows} standardColumns={standardColumns} catalogue={catalogue} withPagingControl />);
 
-        // Moved off page 1 with a row checked only after the opening view has applied: on page 1 with
-        // nothing checked the assertions below hold whether or not the resets under test run at all.
+        // Only after the opening view has applied: on page 1 with nothing checked this proves nothing.
         await page.getByTestId('go-to-page-two').click();
         await expect.poll(async () => (await lastRequest(page))?.pageNumber).toBe(2);
 
@@ -171,11 +159,7 @@ test.describe('PagedList · configurable columns', () => {
         await expect(page.locator('input[type="checkbox"]:checked')).toHaveCount(0);
     });
 
-    /**
-     * Withheld in the catalogue, not on the column: the catalogue is the authority on what the API can
-     * order by, and the platform set is merged against it in both directions, so a `sortable: false`
-     * written on a shipped column would be corrected rather than obeyed.
-     */
+    /** Withheld in the catalogue, not on the column: the merge would correct a `sortable: false` there. */
     test('renders no sort button on a column the catalogue cannot order on', async ({ mount, page }) => {
         const withoutExpiry = [
             {
@@ -223,8 +207,6 @@ test.describe('PagedList · configurable columns', () => {
             direction: SortDirection.Desc,
         });
 
-        // The filters reach the filters duck, which is where the filter widget reads them from — a view
-        // that only changed the table would leave the widget showing conditions the rows do not honour.
         await expect(page.getByTestId('current-filters')).toContainText('acme');
     });
 
@@ -235,7 +217,6 @@ test.describe('PagedList · configurable columns', () => {
 
         await expect.poll(() => headings(page)).toEqual(['property:NOT_AFTER', 'custom:department|STRING']);
         await expect(page.getByText('Platform')).toBeVisible();
-        // One row carries a Department value and the other does not, so exactly one cell is empty.
         await expect(page.getByTestId('empty-cell')).toHaveCount(1);
     });
 
@@ -252,11 +233,6 @@ test.describe('PagedList · configurable columns', () => {
         await expect(page.getByTestId('add-field-property:SUBJECT_ALTERNATIVE_NAMES')).toHaveCount(0);
     });
 
-    /**
-     * A view stores its columns and its ordering independently, so a column edit can leave the ordering
-     * naming a column that is no longer displayed. An ordering no header can paint is one the user can
-     * neither see nor clear, and it would keep ordering every page they fetch.
-     */
     test('drops an ordering whose column the applied view does not display', async ({ mount, page }) => {
         const orphaned: ListViewModel = {
             ...expiryWatch,
@@ -278,11 +254,6 @@ test.describe('PagedList · configurable columns', () => {
         await expect(page.getByText('acme.example')).toBeVisible();
     });
 
-    /**
-     * The configuration a page passes depends on a catalogue it is still fetching, so the host's first
-     * render has none at all. An applied set initialised from that absent config and never revisited
-     * would leave the table empty for good.
-     */
     test('applies the platform set when the config arrives after the first render', async ({ mount, page }) => {
         await mount(<PagedListColumnsWithStore rows={rows} standardColumns={standardColumns} catalogue={catalogue} withDeferredConfig />);
 
@@ -306,7 +277,6 @@ test.describe('PagedList · configurable columns', () => {
         await expect.poll(() => headings(page)).toEqual(['property:COMMON_NAME', 'property:NOT_AFTER']);
     });
 
-    /** See `withCatalogueSortability` for why a shipped set cannot declare this itself. */
     test('makes the Standard tab sortable from the catalogue, though the shipped set cannot declare it', async ({ mount, page }) => {
         await mount(<PagedListColumnsWithStore rows={rows} standardColumns={shippedColumns} catalogue={catalogue} />);
 
@@ -328,7 +298,6 @@ test.describe('PagedList · configurable columns', () => {
         await mount(<PagedListColumnsWithStore rows={rows} standardColumns={withUnorderable} catalogue={catalogue} />);
 
         await expect.poll(() => headings(page)).toContain('custom:department|STRING');
-        // Published as `sortable: false`, so the heading is a label rather than a button.
         await expect(page.getByRole('button', { name: 'Department' })).toHaveCount(0);
     });
 
@@ -345,12 +314,6 @@ test.describe('PagedList · configurable columns', () => {
         await expect(page.getByRole('button', { name: 'Subject Common Name' })).toHaveCount(0);
     });
 
-    /**
-     * The strip opens its pinned view once the catalogue settles, which is after the page has mounted.
-     * A dashboard link or a deep link from a certificate's detail page has put its filters in the duck
-     * by then, and replacing them with the view's would discard the rows the user actually asked for -
-     * a moment after they asked. The view's columns and ordering still apply.
-     */
     test('keeps filters that arrived with the page when the pinned view opens', async ({ mount, page }) => {
         const incoming = [
             {
@@ -377,7 +340,6 @@ test.describe('PagedList · configurable columns', () => {
         await expect.poll(async () => (await lastRequest(page))?.filters).toEqual(incoming);
     });
 
-    /** Only the first application defers: a tab switch afterwards is the user's own act. */
     test('replaces those filters on the next tab switch', async ({ mount, page }) => {
         const incoming = [
             {
@@ -403,7 +365,6 @@ test.describe('PagedList · configurable columns', () => {
         await expect(page.getByTestId('current-filters')).not.toContainText('from-a-deep-link');
     });
 
-    /** Why a page must not assemble its own refresh request is on `refreshToken`. */
     test('refetches its own request, columns and ordering included, when the page asks for a refresh', async ({ mount, page }) => {
         await mount(
             <PagedListColumnsWithStore

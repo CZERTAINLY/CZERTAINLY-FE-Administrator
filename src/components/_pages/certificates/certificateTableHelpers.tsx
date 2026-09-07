@@ -137,9 +137,8 @@ export const CERTIFICATE_COLUMNS: ColumnDefinition[] = [
         catalogueLabel: 'Has private key',
         type: FilterFieldType.Boolean,
         align: 'center',
-        // A one-percent-wide column carrying nothing but a key icon and its tooltip. The label exists so
-        // the picker can name the column and the header keeps an accessible name, but it stays out of
-        // the visible header row, where it would not fit.
+        // One percent wide and carrying only an icon: the label names it in the picker and to a screen
+        // reader, but would not fit in the visible header row.
         headingHidden: true,
     },
     {
@@ -247,12 +246,9 @@ export function buildCertificateCellRegistry(opts: BuildCertificateRowColumnsOpt
                 {certificate.archived ? 'Yes' : 'No'}
             </Badge>
         ),
-        // Beyond the default set: catalogued fields whose value the listing DTO carries, so each is a
-        // column a user may pick. A catalogued field absent from here is one the listing cannot supply
-        // — key usage, the subject alternative names, the protocol association — and it is deliberately
-        // left out, because the registry is what decides whether the picker offers a property column at
-        // all. Core still advertises those as displayable; OmniTrustILM/core#2180 is where that is
-        // meant to stop.
+        // Beyond the default set: catalogued fields the listing DTO carries, so each is a column a user
+        // may pick. A catalogued field absent from here is one the listing cannot supply, and the
+        // registry is what decides whether the picker offers a property column at all.
         'property:SUBJECTDN': (certificate) => certificate.subjectDn,
         'property:ISSUERDN': (certificate) => certificate.issuerDn,
         'property:ISSUER_SERIAL_NUMBER': (certificate) => certificate.issuerSerialNumber,

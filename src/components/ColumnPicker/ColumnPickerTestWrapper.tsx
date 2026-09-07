@@ -9,7 +9,7 @@ type Props = Readonly<{
     catalogue: SearchFieldDataByGroupDto[];
     /** Withholds the catalogue until released, so a test can make it land after the dialog opened. */
     withheldCatalogue?: boolean;
-    /** The renderable-property gate, as an array: a `Set` does not survive the props boundary. */
+    /** As an array: a `Set` does not survive the props boundary. */
     renderableProperties?: string[];
     onSave?: (columns: ColumnDefinition[]) => void;
 }>;

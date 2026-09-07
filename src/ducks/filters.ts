@@ -43,12 +43,8 @@ type FilterObject = {
     preservedFilters: SearchFilterModel[];
     isFetchingFilters: boolean;
     /**
-     * Whether a catalogue read has settled at least once, success or failure.
-     *
-     * `isFetchingFilters` cannot answer this: it is `false` both before the first read and after it,
-     * so a consumer that waits for the catalogue cannot tell a read still to come from a resource
-     * that publishes no filter fields at all. Failure sets it too, because a failed read settles on
-     * an empty catalogue and would otherwise leave such a consumer waiting for good.
+     * Whether a catalogue read has settled at least once, success or failure. `isFetchingFilters` is
+     * `false` both before the first read and after it, so it cannot tell the two apart.
      */
     hasLoadedFilters: boolean;
 };
@@ -105,11 +101,8 @@ export const slice = createSlice({
             }>,
         ) => {
             updateFilterState(state, action.payload.entity, (filter) => {
-                // The catalogue it already holds is kept: emptying it would leave a settled
-                // `hasLoadedFilters` beside no fields, which is what that flag exists to rule out.
-                // `FilterWidget` reads its own loading state as
-                // `isFetchingFilters && availableFilters.length === 0`, so it shows the fields it has
-                // rather than blanking while a refetch is in flight.
+                // The catalogue already held is kept: emptying it would leave a settled
+                // `hasLoadedFilters` beside no fields, and blank the filter widget for the round trip.
                 filter.isFetchingFilters = true;
             });
         },

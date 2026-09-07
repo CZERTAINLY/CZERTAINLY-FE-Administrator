@@ -31,21 +31,15 @@ export interface ColumnDefinition {
     multiValue?: boolean;
     align?: 'left' | 'center' | 'right';
     /**
-     * Renders the heading for screen readers only, leaving the header cell visually blank.
-     *
-     * For a narrow icon column whose meaning is carried by the icon and its tooltip, where a visible
-     * label would be wider than the column itself. The heading still has to exist: the column is
-     * pickable and sortable, so it needs a name in the picker and an accessible name on the header.
+     * Renders the heading for screen readers only, leaving the header cell visually blank. The heading
+     * still has to exist: the column is pickable and sortable, so it needs a name in both places.
      */
     headingHidden?: boolean;
 }
 
 /**
- * A field the column catalogue offers — `GET /v1/{resource}/search` — paired with the source it was
- * published under. An identifier is unique only within its source, and the catalogue publishes the
- * source once per group rather than on each field, so it is stamped on here.
- *
- * The `displayable` and `sortable` flags the list contract added come from the generated DTO itself.
+ * A catalogue field paired with the source it was published under. An identifier is unique only
+ * within its source, and the catalogue publishes the source per group rather than per field.
  */
 export interface SourcedCatalogueField extends SearchFieldDataDto {
     fieldSource: FilterFieldSource;

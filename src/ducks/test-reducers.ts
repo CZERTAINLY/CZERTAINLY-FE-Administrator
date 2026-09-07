@@ -125,7 +125,6 @@ export type FiltersTestState = {
             currentFilters: unknown[];
             preservedFilters: unknown[];
             isFetchingFilters: boolean;
-            /** Mirrors the real slice: set by a settled read, success or failure alike. */
             hasLoadedFilters: boolean;
         };
     }>;

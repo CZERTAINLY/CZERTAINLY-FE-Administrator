@@ -692,10 +692,6 @@ test.describe('ViewTabs', () => {
         expect(JSON.stringify(action)).not.toContain('hunter2');
     });
 
-    // The column the table cannot show is one the catalogue publishes but the listing cannot display —
-    // a secret's content. That is the only such column that can reach a client: Core filters a view's
-    // columns against the resource catalogue on read, so a field it does not publish never arrives,
-    // and would be rejected outright on the way back if it did.
     test('keeps a column it cannot show when the ordering alone is saved', async ({ mount, page }) => {
         const stale = expiryWatch({
             defaultView: true,
@@ -726,9 +722,6 @@ test.describe('ViewTabs', () => {
         });
     });
 
-    // Core rejects a create or update naming a column its catalogue does not publish, so a display-only
-    // column of the platform default set would make every save of the duplicate fail. It is dropped on
-    // the way out instead; it keeps rendering under Standard, which stores nothing.
     test('drops a display-only column the catalogue does not publish when duplicating', async ({ mount, page }) => {
         await mount(strip({ views: [], standardColumns: [commonName, column('CK_ASSOCIATIONS', 'Associations')] }));
 
@@ -768,8 +761,6 @@ test.describe('ViewTabs', () => {
         await expect(page.getByRole('button', { name: 'Actions for Standard' })).toBeDisabled();
     });
 
-    // The gate belongs to the page's cell registry: a property field it cannot render would show the
-    // empty state in every row, so it is offered nowhere the user could pick it.
     test('keeps a property field the page cannot render out of the column dialog', async ({ mount, page }) => {
         await mount(
             strip({

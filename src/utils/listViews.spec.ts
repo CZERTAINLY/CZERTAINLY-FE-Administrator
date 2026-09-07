@@ -61,7 +61,6 @@ const standardColumns: ColumnDefinition[] = [
     { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'STATUS', catalogueLabel: 'Status' },
 ];
 
-/** A catalogue publishing exactly the fields the standard column set above names. */
 const standardCatalogue: SearchFieldDataByGroupDto[] = [
     {
         filterFieldSource: FilterFieldSource.Property,

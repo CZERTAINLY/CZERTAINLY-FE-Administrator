@@ -134,8 +134,7 @@ function CryptographicKeyList() {
         [keyTypeEnum, keyUsageEnum],
     );
 
-    // The enum legends ride beside their headings rather than inside them: a sortable heading is
-    // itself a button, and a toggletip nested in one would be a control inside a control.
+    // Beside the headings rather than inside them: a sortable heading is itself a button.
     const headerInfo = useMemo(
         () => ({
             'property:CKI_TYPE': <EnumColumnDescription platformEnum={PlatformEnum.KeyType} title="Type" />,
@@ -145,7 +144,7 @@ function CryptographicKeyList() {
         [],
     );
 
-    // Memoised because the host takes the config apart and refetches when its parts change.
+    // Memoised because the host refetches when the config's parts change.
     const configurableColumns = useMemo(
         () => ({
             resource: Resource.Keys,
@@ -172,13 +171,8 @@ function CryptographicKeyList() {
 
     const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listCryptographicKeys(filters)), [dispatch]);
 
-    /*
-     * Back to an unfiltered first page, so the key that was just created is on it - refetched through
-     * the host rather than from a request built here; see `refreshToken` on `PagedList`.
-     *
-     * The token is what guarantees the refetch: after a create from an unfiltered first page - the
-     * common case - the resets below change nothing, so without it the new key would not appear.
-     */
+    // Back to an unfiltered first page, so the key just created is on it. The token is what guarantees
+    // the refetch: from an already unfiltered first page the resets below change nothing.
     const [refreshToken, setRefreshToken] = useState(0);
 
     const handleFormSuccess = useCallback(() => {

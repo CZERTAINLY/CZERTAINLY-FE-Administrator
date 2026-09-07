@@ -36,12 +36,9 @@ export type ColumnCounterState = 'ok' | 'warning' | 'full';
  * so guessing in its absence is what would put them in front of a user.
  *
  * @param renderableProperties the column keys the page has a cell renderer for. A property field
- * outside that set is dropped, because its value lives on the listing entry rather than in the
- * projected attribute map — with no renderer the column can only ever show the empty state, and a
- * column a user can pick must never be permanently blank. The registry is the gate rather than a
- * second hand-kept list precisely so that registering a renderer is the one act that makes a column
- * pickable. Attribute sources are never gated: they render from the projected values, which is
- * source-agnostic. Omitted means no gate at all, which is what a page not yet on the pipeline wants.
+ * outside that set is dropped: its value lives on the listing entry, so with no renderer the column
+ * could only ever show the empty state. Attribute sources render from projected values and are never
+ * gated. Omitted means no gate, which is what a page not yet on the pipeline wants.
  */
 export function toCatalogueFields(
     catalogue: SearchFieldDataByGroupDto[],

@@ -981,10 +981,9 @@ const bulkUpdateRaProfile: AppEpic = (action$, state, deps) => {
                 .pipe(
                     mergeMap(() =>
                         merge(
-                            // The success bumps the page's refresh token, so `PagedList` rebuilds the request from
-                            // the filters, columns and ordering in force when the reply lands. Verification then
-                            // reads that response - the epic dispatching a captured request would replay a stale
-                            // one and, under `switchMap`, cancel a newer listing the user had started meanwhile.
+                            // The success bumps the page's refresh token, so `PagedList` rebuilds the
+                            // request. Replaying a captured one would, under `switchMap`, cancel a newer
+                            // listing the user had started meanwhile.
                             of(slice.actions.bulkUpdateRaProfileSuccess({ uuids: requestedUuids })),
                             verifyAfterRefetch$,
                         ),

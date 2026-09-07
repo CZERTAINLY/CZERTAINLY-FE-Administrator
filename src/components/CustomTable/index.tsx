@@ -47,12 +47,8 @@ type Props = {
      */
     onSortChanged?: (fieldIdentifier: string, direction: SortDirection) => void;
     /**
-     * Whether the active sort is remembered across mounts. Default `true`, for a table whose ordering is
-     * its own state.
-     *
-     * Pass `false` when the sort belongs to something durable of its own — a stored copy is consulted
-     * ahead of the headers, so it would outrank the ordering that thing just applied. With `false`
-     * nothing is read from or written to persistence.
+     * Whether the active sort is remembered across mounts. Pass `false` when the sort belongs to
+     * something durable of its own: a stored copy is consulted ahead of the headers and would outrank it.
      */
     persistSort?: boolean;
     onPageSizeChanged?: (pageSize: number) => void;
@@ -162,8 +158,7 @@ function CustomTable({
     const dispatch = useDispatch();
 
     // A sort restored from persistence outranks the one the headers declare: it is what the user last
-    // chose, and only a header that is actually there and sortable can carry it. A caller that owns
-    // the sort itself is handed nothing here — see `persistSort`.
+    // chose, and only a header that is there and sortable can carry it.
     const persistedSort = useMemo<ActiveSort | undefined>(() => {
         const column = persistedInternalPagination.sortColumn;
         if (!persistSort || !hasPagination || !column) return undefined;
@@ -647,9 +642,8 @@ function CustomTable({
                             'justify-center': header.align === 'center',
                             'justify-end': header.align === 'right',
                         };
-                        // A hidden heading still has to be in the accessibility tree — the cell is only
-                        // visually blank. Wrapped rather than omitted, so a sortable icon column keeps an
-                        // accessible name on its button.
+                        // Wrapped rather than omitted: the cell is only visually blank, and a sortable
+                        // icon column still needs an accessible name on its button.
                         const headingContent = header.headingHidden ? <span className="sr-only">{header.content}</span> : header.content;
                         // `info` sits outside the button: a sortable heading is itself a control, and a
                         // toggletip trigger inside it would nest one interactive element in another, which

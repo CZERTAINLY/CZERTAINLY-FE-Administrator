@@ -13,7 +13,6 @@ import type { ColumnDefinition } from 'types/tableColumns';
 import { createMockStore } from 'utils/test-helpers';
 import PagedList from './PagedList';
 
-/** A listing entry of the shape the pipeline reads: identity, a value per column, projected values. */
 export type StubRow = {
     uuid: string;
     commonName: string;
@@ -25,27 +24,17 @@ type Props = Readonly<{
     rows: StubRow[];
     standardColumns: ColumnDefinition[];
     catalogue: SearchFieldListModel[];
-    /** The stored views of the resource, preloaded because a component test runs no epics. */
     views?: ListViewModel[];
-    /** Withholds the catalogue, which is what the strip waits for before rendering at all. */
     withheldCatalogue?: boolean;
-    /**
-     * Filters already in the duck when the host mounts, as a dashboard link or a deep link from a
-     * detail page leaves them - i.e. before the strip has opened its pinned view.
-     */
+    /** Filters already in the duck when the host mounts, as a deep link leaves them. */
     initialFilters?: SearchFilterModel[];
-    /** Renders a control that bumps `refreshToken`, standing in for a page's own post-create refresh. */
     withRefreshControl?: boolean;
     /**
-     * Renders a control that moves the listing to page 2 with a row selected, for asserting what resets
-     * them. Preloading the duck instead proves nothing: applying the opening view is itself a reset, so
-     * the host is back on page 1 with nothing checked before a test can act.
+     * Renders a control that moves to page 2 with a row selected. Preloading the duck proves nothing:
+     * applying the opening view is itself a reset, and runs before a test can act.
      */
     withPagingControl?: boolean;
-    /**
-     * Mounts with no column configuration at all and supplies it one tick later, which is how a real
-     * page behaves: the configuration depends on a catalogue the page is still fetching when it mounts.
-     */
+    /** Supplies the column configuration a tick after mount, as a page still fetching its catalogue does. */
     withDeferredConfig?: boolean;
 }>;
 
@@ -54,12 +43,10 @@ const registry: CellRegistry<StubRow> = {
     'property:NOT_AFTER': (row) => row.notAfter,
 };
 
-/** Every listing request the host has made, which is what a no-epic test can observe of the fetch. */
 function ListRequests({ requests }: Readonly<{ requests: SearchRequestModel[] }>) {
     return <div data-testid="list-requests">{JSON.stringify(requests)}</div>;
 }
 
-/** The filters the host has put into the filters duck, which is where a view's filters land. */
 function CurrentFilters() {
     const filters = useSelector(
         (state: { filters: FiltersTestState }) =>
@@ -69,10 +56,6 @@ function CurrentFilters() {
     return <div data-testid="current-filters">{JSON.stringify(filters)}</div>;
 }
 
-/**
- * Moves the listing to page 2 with a row selected. A test clicks this after the opening view has
- * applied, so what it asserts afterwards is the reset under test rather than that first application.
- */
 function PagingControl() {
     const dispatch = useDispatch();
 
@@ -90,7 +73,6 @@ function PagingControl() {
     );
 }
 
-/** The listViews actions the strip has dispatched, which is all a no-epic test can observe of them. */
 function DispatchedActions() {
     const dispatched = useSelector((state: { listViews: ListViewsTestState }) => state.listViews.dispatched);
 
@@ -98,12 +80,8 @@ function DispatchedActions() {
 }
 
 /**
- * Mounts {@link PagedList} in its configurable-column mode with a store built browser-side: only
- * serializable props cross into the page, so a store created in the test body arrives with none of
- * its preloaded state and the strip would never see the views or the catalogue.
- *
- * The requests the host makes are collected rather than answered — the pipeline's own behaviour is
- * what each column, filter and ordering ends up in the request, not what comes back.
+ * Mounts {@link PagedList} in configurable-column mode with a store built browser-side: only
+ * serializable props cross into the page, so a store built in the test body arrives with no state.
  */
 export default function PagedListColumnsWithStore({
     rows,
@@ -150,13 +128,10 @@ export default function PagedListColumnsWithStore({
     const [requests, setRequests] = useState<SearchRequestModel[]>([]);
     const [refreshToken, setRefreshToken] = useState(0);
 
-    // Both callbacks are stabilised, as a real page's are: an inline arrow changes identity on every
-    // render, and the host refetches when its list callback changes.
+    // Stabilised as a real page's are: the host refetches when its list callback changes identity.
     const onListCallback = useCallback((request: SearchRequestModel) => setRequests((current) => [...current, request]), []);
     const getAvailableFiltersApi = useCallback(() => of(catalogue), [catalogue]);
 
-    // A page whose configuration depends on a catalogue it is still fetching passes none on the first
-    // render. Deferring it by an effect rather than by a prop is what reproduces that ordering.
     const [configReady, setConfigReady] = useState(!withDeferredConfig);
 
     useEffect(() => {

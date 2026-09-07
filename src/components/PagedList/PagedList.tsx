@@ -35,41 +35,25 @@ import type { SearchFieldListModel, SearchFilterModel, SearchRequestModel } from
 import type { LockWidgetNameEnum } from 'types/user-interface';
 
 /**
- * What a page hands over to be driven by the column pipeline: the platform default column set, the
- * listing entries, and how to render a cell of each.
- *
- * A page that supplies this stops passing `headers` and `data`. The host then owns the applied column
- * set and the applied ordering, renders the saved-view tab strip above the filter widget, and names
- * both in the listing request. A page that supplies nothing keeps passing `headers` and `data` and is
- * untouched — which is what keeps every other list page out of this.
+ * Opts a page into the column pipeline. The host then owns the applied column set and ordering, and
+ * names both in the listing request; a page supplying none of this keeps passing `headers` and `data`.
  */
 export interface ConfigurableColumns<TRow extends object> {
-    /** The resource the saved views belong to, e.g. `Resource.Certificates`. */
     resource: Resource;
-    /** The platform default column set, which is what the Standard tab shows. */
     standardColumns: ColumnDefinition[];
-    /** The listing entries, rendered through the applied columns rather than as a positional array. */
     rows: TRow[];
     getRowId: (row: TRow) => string | number;
-    /**
-     * Cell renderers for the property columns whose value is on the listing entry. Doubles as the
-     * statement of which property columns the page can render at all; see `toCatalogueFields`.
-     */
+    /** Also the gate on which property columns the picker offers; see `toCatalogueFields`. */
     registry?: CellRegistry<TRow>;
     rowOptions?: (row: TRow) => TableDataRow['options'];
-    /** Auxiliary heading content by column key — the enum legends a heading carries beside its label. */
     headerInfo?: Readonly<Record<string, ReactNode>>;
-    /** Named in the column dialog's caption, e.g. "Certificates". */
     resourceLabel?: string;
 }
 
 type Props<TRow extends object> = {
     entity: EntityType;
-    /** The columns a page assembles itself. Omitted by a page on the pipeline. */
     headers?: TableHeader[];
-    /** The rows a page assembles itself. Omitted by a page on the pipeline. */
     data?: TableDataRow[];
-    /** Opts the page into the column pipeline. See {@link ConfigurableColumns}. */
     configurableColumns?: ConfigurableColumns<TRow>;
     isBusy?: boolean;
     multiSelect?: boolean;
@@ -89,13 +73,8 @@ type Props<TRow extends object> = {
     columnForDetail?: string;
     extraFilterComponent?: React.ReactNode;
     /**
-     * Bumped by the page to refetch the listing.
-     *
-     * A page that has to refresh after a mutation of its own - a create dialog closing, say - must not
-     * build a request to do it. The host owns the applied columns and the applied ordering, so a
-     * request assembled by the page would omit both: the reply would carry no projected attribute
-     * values, blanking every custom-attribute column, and would not honour the ordering the header row
-     * is still showing. Changing this makes the host re-run its own request instead.
+     * Bumped by the page to make the host re-run its own request. A request the page assembled would
+     * omit the applied columns and ordering, blanking every attribute column and ignoring the sort.
      */
     refreshToken?: number;
 };
@@ -104,11 +83,6 @@ const EMPTY_HEADERS: TableHeader[] = [];
 const EMPTY_ROWS: TableDataRow[] = [];
 const NO_COLUMNS: ColumnDefinition[] = [];
 
-/**
- * Generic in the row type so a page's own listing model reaches its `getRowId`, its registry and its
- * `rowOptions` unchanged. A page that passes no column config never names it and it infers as
- * `object`, which is what keeps the callers off the pipeline untouched.
- */
 function PagedList<TRow extends object>({
     headers,
     data,
@@ -148,23 +122,15 @@ function PagedList<TRow extends object>({
 
     const currentFilters = useSelector(filterSelectors.currentFilters(entity));
 
-    // The column catalogue is the filter-field catalogue: one read, already in the store because the
-    // filter widget fetches it. `hasLoadedFilters` rather than `!isFetchingFilters`, which is also
-    // false before the first read and so cannot say whether the catalogue is still to come.
+    // `hasLoadedFilters` rather than `!isFetchingFilters`, which is also false before the first read.
     const catalogue = useSelector(filterSelectors.availableFilters(entity));
     const hasLoadedCatalogue = useSelector(filterSelectors.hasLoadedFilters(entity));
 
     const [columnSelection, setColumnSelection] = useState<ColumnDefinition[]>(NO_COLUMNS);
     const [sortSelection, setSortSelection] = useState<ColumnSort | undefined>(undefined);
 
-    /*
-     * The config is taken apart here rather than depended on whole, so that the fetch callback depends
-     * only on `isColumnDriven` plus the applied slice. A caller is expected to memoise the config, but
-     * the host must not need it to: an inlined literal changes identity every render, and a
-     * `getFreshData` that depended on the object would be rebuilt every render, refetch from the effect
-     * that watches it, and never settle. The two render memos below still depend on individual members,
-     * so an inlined config costs them recomputation — wasted work, not a loop.
-     */
+    // Taken apart rather than depended on whole: an unmemoised config would rebuild `getFreshData`
+    // every render, and the effect watching it would refetch forever.
     const isColumnDriven = configurableColumns !== undefined;
     const {
         resource: columnsResource,
@@ -179,28 +145,18 @@ function PagedList<TRow extends object>({
 
     const renderableProperties = useMemo(() => getRenderableProperties(registry), [registry]);
 
-    /*
-     * The applied set falls back to the platform set rather than being seeded from it once.
-     *
-     * `useState`'s initializer runs on the first render only, so a page that supplies its config
-     * conditionally — the certificates page does, being mounted elsewhere as a picker — would keep an
-     * empty applied set if the config arrived later, and render a table with no columns at all. Holding
-     * only the deviation means that state is not representable.
-     */
-    // Merged once, here, because this set is both the fallback below and what the strip resolves
-    // Standard and a view's gaps against; see `withCatalogueSortability`.
-
     const sortableStandardColumns = useMemo(
         () => (hasLoadedCatalogue ? withCatalogueSortability(standardColumns ?? NO_COLUMNS, catalogue) : (standardColumns ?? NO_COLUMNS)),
         [hasLoadedCatalogue, standardColumns, catalogue],
     );
 
+    // Holds only the deviation and falls back, so a config arriving after the first render cannot
+    // leave the table with no columns at all.
     const appliedColumns = useMemo(
         () => (columnSelection.length > 0 ? columnSelection : sortableStandardColumns),
         [columnSelection, sortableStandardColumns],
     );
 
-    /** Never an ordering the header row cannot paint. See {@link toDisplayableSort}. */
     const appliedSort = useMemo(() => toDisplayableSort(sortSelection, appliedColumns), [sortSelection, appliedColumns]);
 
     const totalItems = useSelector(selectors.totalItems(entity));
@@ -234,8 +190,6 @@ function PagedList<TRow extends object>({
             ),
         );
         onCheckedRowsChanged([]);
-        // `refreshToken` is read for its identity alone: a change to it means the page asked for a
-        // refetch of this very request, which the effect below performs when this callback changes.
     }, [
         currentFilters,
         pageSize,
@@ -245,6 +199,7 @@ function PagedList<TRow extends object>({
         isColumnDriven,
         appliedColumns,
         appliedSort,
+        // Read for its identity alone: a change means the page asked to refetch this request.
         refreshToken,
     ]);
 
@@ -283,18 +238,9 @@ function PagedList<TRow extends object>({
     }, [checkedRows, onDeleteCallback, currentFilters, onCheckedRowsChanged, getFreshData]);
 
     /**
-     * Applies a view: its columns, its filters and its ordering together.
-     *
-     * <p><b>State.</b> The filters go through the filters duck, not local state, because the filter
-     * widget reads them from there. Back to page 1 with no selection: the filters change which rows
-     * exist, so a carried-over selection would span rows the user cannot see.
-     *
-     * <p><b>First application.</b> Filters already in the duck survive it. The strip opens its pinned
-     * view after the page has mounted, so filters that arrived with the page — a dashboard link, a
-     * deep link from a detail page — would otherwise be replaced a moment after they were asked for.
-     * The view's columns and ordering still apply.
-     *
-     * <p><b>Later switches.</b> Replace the filters as usual: by then the switch is the user's own act.
+     * Applies a view's columns, filters and ordering together. The first application leaves filters
+     * already in the duck alone: the strip opens its pinned view after a deep link has put its own
+     * filters there, and would replace them a moment after they were asked for.
      */
     const hasAppliedView = useRef(false);
     const onApplyView = useCallback(
@@ -318,14 +264,12 @@ function PagedList<TRow extends object>({
     const onSortChanged = useCallback(
         (key: string, direction: SortDirection) => {
             const next = toColumnSortFromHeader(key, direction, appliedColumns);
-            // The table announces the ordering its headers declare once on mount, which is the one it
-            // was just handed. Treating that echo as a change would refetch, rebuild the headers and
-            // echo again.
+            // The table echoes the ordering its headers declare on mount; treating that as a change
+            // would refetch, rebuild the headers and echo again.
             if (isSameSort(next, appliedSort)) return;
 
             setSortSelection(next);
-            // A different ordering makes the current page number meaningless: page 2 of one ordering is
-            // not page 2 of another.
+            // Page 2 of one ordering is not page 2 of another.
             dispatch(actions.setPagination({ entity, pageSize, pageNumber: 1 }));
         },
         [appliedColumns, appliedSort, dispatch, entity, pageSize],
@@ -392,18 +336,14 @@ function PagedList<TRow extends object>({
         return result.sort((a, b) => (a.icon === 'plus' ? -1 : 1));
     }, [checkedRows, additionalButtons, navigate, addHidden, onDeleteCallback]);
 
-    // An applied ordering counts: a listing sorted by a column the user chose is not in its default
-    // state, so offering no way back from it would strand them there on page 1 at the default size.
+    // An applied ordering counts, or there would be no way back from it.
     const hasNonDefaultViewState = currentFilters.length > 0 || pageNumber > 1 || pageSize !== 10 || appliedSort !== undefined;
 
     const onResetView = useCallback(() => {
         dispatch(filterActions.setCurrentFilters({ entity, currentFilters: [] }));
         dispatch(filterActions.setPreservedFilters({ entity, preservedFilters: [] }));
         dispatch(actions.resetPaging({ entity }));
-        // The ordering goes with the filters, both being state this component owns. The column set does
-        // not: it belongs to the tab the strip is on, and silently moving the user off a saved view from
-        // a button labelled "reset view" would be a bigger surprise than leaving the columns alone. The
-        // strip then reports the drift and offers Revert, which is the control for that.
+        // The columns stay: they belong to the tab the strip is on, and the strip offers Revert.
         setSortSelection(undefined);
         const rootRoute = location.pathname.split('/')[1] ?? '';
         if (rootRoute) {
@@ -438,10 +378,7 @@ function PagedList<TRow extends object>({
 
     return (
         <div className="flex flex-col gap-4 md:gap-8">
-            {/*
-             * Above the filter widget rather than inside it: a view carries its own filters,
-             * so a tab has to read as containing the filter rather than sitting within it.
-             */}
+            {/* Above the filter widget: a view carries its own filters, so a tab contains the filter. */}
             {columnsResource && standardColumns && (
                 <ViewTabs
                     resource={columnsResource}

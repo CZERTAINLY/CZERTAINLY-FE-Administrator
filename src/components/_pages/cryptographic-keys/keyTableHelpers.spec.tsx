@@ -13,11 +13,7 @@ const opts = {
     dateFormatter: (date: string | Date) => new Date(date).toISOString().slice(0, 10),
 };
 
-/**
- * The cells of one key row. The page renders through `buildTableRows`, which is the same `renderCell`
- * over the same registry; assembling them here keeps these assertions pinned to the registry itself
- * rather than to the host that drives it.
- */
+/** The cells of one key row, assembled from the registry rather than through the host. */
 function buildKeyRowColumns(
     item: CryptographicKeyResponseModel,
     options: Parameters<typeof buildKeyCellRegistry>[0],
@@ -49,8 +45,6 @@ const columnAt = (identifier: string) => {
 };
 
 test.describe('keyTableHelpers', () => {
-    // `toHaveLength(KEY_COLUMNS.length)` would hold by construction, the helper being a map over the
-    // same array. What can fail is whether every default column actually produced something to show.
     test('renders a cell with content for every column of the default set', () => {
         const cells = buildKeyRowColumns(buildKey({ usage: ['sign'] as never }), opts);
 
@@ -118,11 +112,6 @@ test.describe('keyTableHelpers', () => {
 });
 
 test.describe('buildKeyCellRegistry', () => {
-    /**
-     * The registry decides whether the picker offers a property column: a field it has no renderer for
-     * could only ever show the empty state. Every field the keys catalogue publishes is renderable
-     * from the list DTO, so every one of them is registered.
-     */
     test('registers every property field the keys catalogue publishes', () => {
         const registry = buildKeyCellRegistry(opts);
 
@@ -151,8 +140,6 @@ test.describe('buildKeyCellRegistry', () => {
         }
     });
 
-    // Key Usage is offered by the picker but stays out of the platform default set, which is the
-    // established set of columns the page opens on.
     test('leaves Key Usage out of the platform default set', () => {
         expect(KEY_COLUMNS.some((column) => column.fieldIdentifier === 'CKI_USAGE')).toBe(false);
     });

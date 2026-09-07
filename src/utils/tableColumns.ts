@@ -68,10 +68,8 @@ export function getSortKey(sort: ColumnSort): string {
 export interface BuildColumnHeadersOptions {
     sort?: ColumnSort;
     /**
-     * Auxiliary heading content by column key — the enum legends the listing pages show beside State,
-     * Type, Algorithm and Format. It rides beside the heading rather than inside it because a sortable
-     * heading is itself a button, and `TableHeader.info` is the slot that keeps an interactive legend
-     * from nesting inside one.
+     * Auxiliary heading content by column key. It rides beside the heading rather than inside it: a
+     * sortable heading is itself a button, and an interactive legend must not nest inside one.
      */
     info?: Readonly<Record<string, ReactNode>>;
 }
@@ -99,11 +97,9 @@ const FIELD_SOURCES: ReadonlySet<string> = new Set<string>(Object.values(FilterF
 /**
  * The column a key names, or `undefined` when the key is not one {@link getColumnKey} produced.
  *
- * Split at the *first* separator only. An attribute identifier is `name|CONTENT_TYPE` and an
- * attribute may be named with a colon of its own, so splitting on every colon would truncate the
- * identifier rather than reject the key. The source is checked against the enum instead of trusted,
- * because these keys come back through `CustomTable` as opaque header ids — including the table's own
- * chrome columns, which name no field at all.
+ * Split at the *first* separator only: an attribute identifier is `name|CONTENT_TYPE` and may carry a
+ * colon of its own. The source is checked against the enum because these keys come back through
+ * `CustomTable` as opaque header ids, including its own chrome columns.
  */
 export function parseColumnKey(key: string): Pick<ColumnDefinition, 'fieldSource' | 'fieldIdentifier'> | undefined {
     const separator = key.indexOf(':');
@@ -117,11 +113,8 @@ export function parseColumnKey(key: string): Pick<ColumnDefinition, 'fieldSource
 }
 
 /**
- * The columns a listing request names, or `undefined` when there are none to name.
- *
- * `undefined` rather than an empty array deliberately: the contract's compatibility guarantee is
- * that omitting `columns` leaves the request identical to one written before the field existed, and
- * an empty array is a value rather than an omission.
+ * The columns a listing request names. `undefined` rather than an empty array: omitting `columns`
+ * leaves the request identical to one written before the field existed, an empty array does not.
  */
 export function toRequestColumns(columns: readonly ColumnDefinition[]): SearchColumnRequestDto[] | undefined {
     if (columns.length === 0) return undefined;

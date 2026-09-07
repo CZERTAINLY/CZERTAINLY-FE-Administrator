@@ -131,7 +131,6 @@ describe('hasLoadedFilters', () => {
         expect(selectors.isFetchingFilters(EntityType.CERTIFICATE)(stateFor(next))).toBe(true);
     });
 
-    /** See `hasLoadedFilters` for the pairing this rules out. */
     test('keeps the catalogue it already has while a later read is in flight', () => {
         const fields = [{ field: 'cn' as any, label: 'CN', multiValue: false, type: 'string' as any }];
         const settled = reducer(

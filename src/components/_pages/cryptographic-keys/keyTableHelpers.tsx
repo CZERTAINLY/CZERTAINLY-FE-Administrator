@@ -148,8 +148,7 @@ export function buildKeyCellRegistry({
         'property:CK_TOKEN_INSTANCE': (item) =>
             item.tokenInstanceName ? <Link to={`../tokens/detail/${item.tokenInstanceUuid}`}>{item.tokenInstanceName}</Link> : null,
         'property:CK_ASSOCIATIONS': (item) => item.associations?.toString(),
-        // Beyond the default set: catalogued and renderable, so the picker offers it. Multi-valued, so
-        // it reads like the groups column rather than as a joined string.
+        // Beyond the default set: catalogued and renderable, so the picker offers it.
         'property:CKI_USAGE': (item) => {
             const usages = (item.usage ?? []).map((usage) => ({ label: getEnumLabel(keyUsageEnum, usage) }));
             return usages.length > 0 ? <MultiValueCell values={usages} dataTestId="cell-key-usage" /> : null;

@@ -345,9 +345,6 @@ test.describe('ColumnPicker', () => {
         expect(saved[0][0].label).toBe('Serial');
     });
 
-    // A property field's value lives on the listing entry, not in the projected attribute map, so a
-    // page with no renderer for it could only ever render the empty state. Offering it would put a
-    // permanently blank column in front of the user.
     test('does not offer a property field the page cannot render', async ({ mount, page }) => {
         await mount(<ColumnPickerTestWrapper columns={[]} catalogue={catalogue} renderableProperties={['property:COMMON_NAME']} />);
 

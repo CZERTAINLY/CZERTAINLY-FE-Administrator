@@ -687,7 +687,6 @@ describe('certificates epics', () => {
                     raProfileRequest: { certificateUuids, raProfileUuid: requestedRaProfileUuid, filters: [] } as any,
                 }),
             );
-            // Allow the epic's PATCH to resolve and emit Success before we feed the page's refetch response.
             await new Promise((resolve) => setTimeout(resolve, 0));
             action$.next(certificatesActions.listCertificatesSuccess(refetchedCertificates as any));
             return collected;

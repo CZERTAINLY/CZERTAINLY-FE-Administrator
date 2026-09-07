@@ -18,11 +18,9 @@ export type CustomTableWithStoreProps = {
     persistedSortColumn?: string;
     persistedSortDirection?: SortDirection;
     onSortChanged?: (fieldIdentifier: string, direction: SortDirection) => void;
-    /** Passed straight through, so a test can exercise the caller-owned-sort path. */
     persistSort?: boolean;
 };
 
-/** Renders what persistence currently holds, which is how a test asserts a write it cannot see. */
 function PersistedSortProbe({ storageKey }: Readonly<{ storageKey: string }>) {
     const persisted = useSelector(tablePaginationSelectors.pagination(storageKey));
     return <div data-testid="persisted-sort">{persisted.sortColumn ? `${persisted.sortColumn}:${persisted.sortDirection}` : 'none'}</div>;

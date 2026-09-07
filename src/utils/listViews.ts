@@ -198,7 +198,6 @@ export function toStorableFilters(
     return filters.filter((filter) => !(secret.has(getColumnKey(filter)) && carriesValue(filter)));
 }
 
-/** Every `(source, identifier)` key the catalogue publishes, `displayable` or not. */
 function catalogueKeys(catalogue: readonly SearchFieldDataByGroupDto[]): Set<string> {
     const keys = new Set<string>();
 
@@ -212,18 +211,12 @@ function catalogueKeys(catalogue: readonly SearchFieldDataByGroupDto[]): Set<str
 }
 
 /**
- * The columns a view is allowed to store: those naming a field the resource's catalogue publishes.
- * Core validates a stored view against that same catalogue and rejects anything outside it, so a
- * display-only column — one a page renders without the catalogue carrying it — would make duplicating
- * Standard fail outright. Such columns keep rendering under Standard, which stores nothing at all.
+ * The columns a view is allowed to store: those naming a field the catalogue publishes. Core rejects
+ * anything outside it, so a display-only column would make every save of the view fail.
  *
- * Read from the raw groups rather than through {@link toCatalogueFields}, which keeps only the
- * displayable ones: a column the *listing* cannot display is still a column the *API* accepts, and
- * such a column is deliberately kept — see {@link toStoredColumnsKeepingUnavailable}. The two rules
- * do not overlap.
- *
- * An empty catalogue is read as "has not arrived" rather than "publishes nothing", because emptying
- * every view on a failed catalogue read is far worse than sending a column the API may reject.
+ * Read from the raw groups rather than through {@link toCatalogueFields}: a column the listing cannot
+ * display is still one the API accepts, and is kept — see {@link toStoredColumnsKeepingUnavailable}.
+ * An empty catalogue is read as "has not arrived", so a failed read does not empty every view.
  */
 export function toStorableColumns(
     columns: readonly ListViewColumnModel[],
@@ -339,11 +332,9 @@ export function isSliceDirty(stored: ViewSlice, current: ViewSlice): boolean {
  * showed it, so the user was never offered the choice — the column picker is the one place such a
  * column is removed, because it is the one place it is shown.
  *
- * Two things make a stored column unrenderable. The catalogue may publish it but mark it
- * undisplayable — a secret's content — or the page may have no cell renderer for it, which is how a
- * property field the listing cannot supply resolves (see `toCatalogueFields`). Both are kept here.
- * A column outside the catalogue entirely is a third case and does not survive
- * {@link toStorableColumns}, which runs after this on every write.
+ * A column may be unrenderable because the catalogue marks it undisplayable, or because the page has
+ * no cell renderer for it. Both are kept. A column outside the catalogue entirely is a third case and
+ * does not survive {@link toStorableColumns}, which runs after this on every write.
  */
 export function toStoredColumnsKeepingUnavailable(
     rendered: readonly ColumnDefinition[],
@@ -360,11 +351,8 @@ export function toStoredColumnsKeepingUnavailable(
 }
 
 /**
- * A create request for a new view holding the given slice.
- *
- * The catalogue is required for the same reason {@link toUpdateRequest} requires it: both sieves run
- * on every write, so no path can store a column the API would reject or a filter value the storage
- * does not protect. See {@link toStorableColumns} and {@link toStorableFilters}.
+ * A create request for a new view holding the given slice. The catalogue is required because both
+ * sieves run on every write. See {@link toStorableColumns} and {@link toStorableFilters}.
  */
 export function toCreateRequest(
     name: string,
@@ -395,8 +383,8 @@ export function toCreateRequest(
  * rewritten on every one of them. The whole row is filtered on the way out, the patch included, so
  * there is no update path left that can carry such a value. See {@link toStorableFilters}.
  *
- * The columns go through the same treatment for a different reason: a column the catalogue does not
- * publish cannot be validated, so the API rejects the whole request. See {@link toStorableColumns}.
+ * The columns go through {@link toStorableColumns} for a different reason: a column the catalogue
+ * does not publish makes the API reject the whole request.
  */
 export function toUpdateRequest(
     view: ListViewModel,
