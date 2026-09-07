@@ -18,9 +18,11 @@ import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
 import type {
     AddTokenProfileRequestDto,
     AuthenticationServiceExceptionDto,
+    BaseAttributeDto,
     BulkTokenProfileKeyUsageRequestDto,
     EditTokenProfileRequestDto,
     ErrorMessageDto,
+    KeyUsage,
     TokenProfileDetailDto,
     TokenProfileDto,
     TokenProfileKeyUsageRequestDto,
@@ -71,6 +73,14 @@ export interface EnableTokenProfilesRequest {
 export interface GetTokenProfileRequest {
     tokenInstanceUuid: string;
     uuid: string;
+}
+
+export interface ListSupportedTokenProfileKeyUsagesRequest {
+    tokenInstanceUuid: string;
+}
+
+export interface ListTokenProfileAttributesRequest {
+    tokenInstanceUuid: string;
 }
 
 export interface ListTokenProfilesRequest {
@@ -338,6 +348,53 @@ export class TokenProfileManagementApi extends BaseAPI {
                 url: '/v1/tokens/{tokenInstanceUuid}/tokenProfiles/{uuid}'
                     .replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid))
                     .replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
+            },
+            opts?.responseOpts,
+        );
+    }
+
+    /**
+     * Returns the key usages supported for the specified token instance
+     * List supported token profile key usages
+     */
+    listSupportedTokenProfileKeyUsages({ tokenInstanceUuid }: ListSupportedTokenProfileKeyUsagesRequest): Observable<Array<KeyUsage>>;
+    listSupportedTokenProfileKeyUsages(
+        { tokenInstanceUuid }: ListSupportedTokenProfileKeyUsagesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<KeyUsage>>>;
+    listSupportedTokenProfileKeyUsages(
+        { tokenInstanceUuid }: ListSupportedTokenProfileKeyUsagesRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<KeyUsage> | AjaxResponse<Array<KeyUsage>>> {
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'listSupportedTokenProfileKeyUsages');
+
+        return this.request<Array<KeyUsage>>(
+            {
+                url: '/v1/tokens/{tokenInstanceUuid}/tokenProfile/keyUsages'.replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid)),
+                method: 'POST',
+            },
+            opts?.responseOpts,
+        );
+    }
+
+    /**
+     * List Token Profile Attributes
+     */
+    listTokenProfileAttributes({ tokenInstanceUuid }: ListTokenProfileAttributesRequest): Observable<Array<BaseAttributeDto>>;
+    listTokenProfileAttributes(
+        { tokenInstanceUuid }: ListTokenProfileAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<BaseAttributeDto>>>;
+    listTokenProfileAttributes(
+        { tokenInstanceUuid }: ListTokenProfileAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'listTokenProfileAttributes');
+
+        return this.request<Array<BaseAttributeDto>>(
+            {
+                url: '/v1/tokens/{tokenInstanceUuid}/tokenProfiles/attributes'.replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid)),
                 method: 'GET',
             },
             opts?.responseOpts,

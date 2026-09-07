@@ -71,6 +71,7 @@ export enum Operation {
     Sync = 'sync',
     Compromise = 'compromise',
     Destroy = 'destroy',
+    ListKeyUsages = 'listKeyUsages',
     UpdateKeyUsage = 'updateKeyUsage',
     Encrypt = 'encrypt',
     Decrypt = 'decrypt',

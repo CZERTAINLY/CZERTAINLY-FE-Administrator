@@ -37,11 +37,11 @@ export interface TokenInstanceRequestDto {
      */
     connectorUuid: string;
     /**
-     * Connector Kind
+     * Connector kind. Required for connectors based on version 1 of the connector framework; omitted for connectors based on version 2 (NG) of the connector framework.
      * @type {string}
      * @memberof TokenInstanceRequestDto
      */
-    kind: string;
+    kind?: string;
     /**
      * Custom Attributes
      * @type {Array<RequestAttribute>}
