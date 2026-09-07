@@ -50,6 +50,8 @@ export type ViewTabsProps = Readonly<{
     isCatalogueLoaded?: boolean;
     /** The platform default column set for this page, which is what the Standard tab shows. */
     standardColumns: ColumnDefinition[];
+    /** The column keys the page has a cell renderer for; gates a stored view's columns and the picker. */
+    renderableProperties?: ReadonlySet<string>;
     /** The columns the table is showing, which a saved view may since have drifted from. */
     columns: ColumnDefinition[];
     /** The filters the table is listing under. A view carries its filters, so they can drift too. */
@@ -83,6 +85,7 @@ export default function ViewTabs({
     catalogue,
     isCatalogueLoaded,
     standardColumns,
+    renderableProperties,
     columns,
     filters,
     sort,
@@ -102,7 +105,7 @@ export default function ViewTabs({
     const [isPickerOpen, setIsPickerOpen] = useState(false);
     const [dialog, setDialog] = useState<PendingDialog | undefined>(undefined);
 
-    const fields = useMemo(() => toCatalogueFields(catalogue), [catalogue]);
+    const fields = useMemo(() => toCatalogueFields(catalogue, renderableProperties), [catalogue, renderableProperties]);
 
     /**
      * The strip is held back until the view list has settled and the catalogue has arrived, and shows
@@ -237,10 +240,10 @@ export default function ViewTabs({
     const createFromCurrent = useCallback(
         (name: string) => {
             tabBeforeCreate.current = activeId;
-            dispatch(listViewActions.createView({ resource, view: toCreateRequest(name, resource, currentSlice) }));
+            dispatch(listViewActions.createView({ resource, view: toCreateRequest(name, resource, currentSlice, catalogue) }));
             setActiveId(PENDING_VIEW_UUID);
         },
-        [dispatch, resource, currentSlice, activeId],
+        [dispatch, resource, currentSlice, activeId, catalogue],
     );
 
     const patchActive = useCallback(
@@ -366,8 +369,10 @@ export default function ViewTabs({
             }
 
             if (event.key === 'Home' || event.key === 'End') {
+                const target = event.key === 'Home' ? visible.at(0) : visible.at(-1);
+                if (!target) return;
                 event.preventDefault();
-                selectByKeyboard(event.key === 'Home' ? visible[0].id : visible[visible.length - 1].id);
+                selectByKeyboard(target.id);
             }
         },
         [visible, activeId, selectByKeyboard],
@@ -383,6 +388,10 @@ export default function ViewTabs({
                     aria-label="Saved views"
                     className="flex items-center gap-x-1"
                     onKeyDown={onStripKeyDown}
+                    // Keyboard reachability does not depend on this: focus sits on the tabs and the keydown bubbles
+                    // up. It is here because an element carrying an interactive role and a key handler has to be
+                    // focusable, and -1 satisfies that while leaving the tabs as the only tab stops.
+                    tabIndex={-1}
                     data-testid={`${dataTestId}-strip`}
                 >
                     {visible.map((tab) => (
@@ -461,6 +470,7 @@ export default function ViewTabs({
                 catalogue={catalogue}
                 columns={pickerColumns}
                 standardColumns={standardColumns}
+                renderableProperties={renderableProperties}
                 resourceLabel={resourceLabel}
                 getSourceLabel={getSourceLabel}
                 dataTestId={`${dataTestId}-picker`}

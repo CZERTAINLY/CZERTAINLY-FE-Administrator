@@ -198,6 +198,36 @@ export function toStorableFilters(
     return filters.filter((filter) => !(secret.has(getColumnKey(filter)) && carriesValue(filter)));
 }
 
+function catalogueKeys(catalogue: readonly SearchFieldDataByGroupDto[]): Set<string> {
+    const keys = new Set<string>();
+
+    for (const group of catalogue) {
+        for (const field of group.searchFieldData ?? []) {
+            keys.add(getColumnKey({ fieldSource: group.filterFieldSource, fieldIdentifier: field.fieldIdentifier }));
+        }
+    }
+
+    return keys;
+}
+
+/**
+ * The columns a view is allowed to store: those naming a field the catalogue publishes. Core rejects
+ * anything outside it, so a display-only column would make every save of the view fail.
+ *
+ * Read from the raw groups rather than through {@link toCatalogueFields}: a column the listing cannot
+ * display is still one the API accepts, and is kept — see {@link toStoredColumnsKeepingUnavailable}.
+ * An empty catalogue is read as "has not arrived", so a failed read does not empty every view.
+ */
+export function toStorableColumns(
+    columns: readonly ListViewColumnModel[],
+    catalogue: readonly SearchFieldDataByGroupDto[],
+): ListViewColumnModel[] {
+    const keys = catalogueKeys(catalogue);
+    if (keys.size === 0) return [...columns];
+
+    return columns.filter((column) => keys.has(getColumnKey(column)));
+}
+
 /**
  * A stored view's columns resolved against the live catalogue. The authoritative statement of how a
  * stored view is read; everything downstream — {@link ResolvedView}, the notice, the picker — states
@@ -301,6 +331,10 @@ export function isSliceDirty(stored: ViewSlice, current: ViewSlice): boolean {
  * Saving an ordering or a filter must not drop a column the listing cannot display. The table never
  * showed it, so the user was never offered the choice — the column picker is the one place such a
  * column is removed, because it is the one place it is shown.
+ *
+ * A column may be unrenderable because the catalogue marks it undisplayable, or because the page has
+ * no cell renderer for it. Both are kept. A column outside the catalogue entirely is a third case and
+ * does not survive {@link toStorableColumns}, which runs after this on every write.
  */
 export function toStoredColumnsKeepingUnavailable(
     rendered: readonly ColumnDefinition[],
@@ -316,13 +350,22 @@ export function toStoredColumnsKeepingUnavailable(
     return stored;
 }
 
-/** A create request for a new view holding the given slice. */
-export function toCreateRequest(name: string, resource: Resource, slice: ViewSlice, defaultView = false): ListViewRequestModel {
+/**
+ * A create request for a new view holding the given slice. The catalogue is required because both
+ * sieves run on every write. See {@link toStorableColumns} and {@link toStorableFilters}.
+ */
+export function toCreateRequest(
+    name: string,
+    resource: Resource,
+    slice: ViewSlice,
+    catalogue: readonly SearchFieldDataByGroupDto[],
+    defaultView = false,
+): ListViewRequestModel {
     return {
         name,
         resource,
-        columns: toStoredColumns(slice.columns),
-        filters: slice.filters,
+        columns: toStorableColumns(toStoredColumns(slice.columns), catalogue),
+        filters: toStorableFilters(slice.filters, catalogue),
         sort: toStoredSort(slice.sort),
         defaultView,
     };
@@ -339,6 +382,9 @@ export function toCreateRequest(name: string, resource: Resource, slice: ViewSli
  * by a client that predates this rule, or by one that does not apply it — would have that plaintext
  * rewritten on every one of them. The whole row is filtered on the way out, the patch included, so
  * there is no update path left that can carry such a value. See {@link toStorableFilters}.
+ *
+ * The columns go through {@link toStorableColumns} for a different reason: a column the catalogue
+ * does not publish makes the API reject the whole request.
  */
 export function toUpdateRequest(
     view: ListViewModel,
@@ -354,5 +400,9 @@ export function toUpdateRequest(
         ...patch,
     };
 
-    return { ...row, filters: toStorableFilters(row.filters ?? [], catalogue) };
+    return {
+        ...row,
+        columns: toStorableColumns(row.columns ?? [], catalogue),
+        filters: toStorableFilters(row.filters ?? [], catalogue),
+    };
 }

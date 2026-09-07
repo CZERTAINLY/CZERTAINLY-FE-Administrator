@@ -1,6 +1,7 @@
 import type { SortDirection, TableHeader } from 'components/CustomTable/types';
+import type { ReactNode } from 'react';
 import type { BaseAttributeContentModel } from 'types/attributes';
-import { AttributeContentType, type FilterFieldSource, FilterFieldType } from 'types/openapi';
+import { AttributeContentType, FilterFieldSource, FilterFieldType, type SearchColumnRequestDto } from 'types/openapi';
 import type { AttributeProjectable, ColumnDefinition, ProjectedAttributeValues } from 'types/tableColumns';
 
 /** Width bounds of one generated column, in pixels. */
@@ -66,6 +67,11 @@ export function getSortKey(sort: ColumnSort): string {
 
 export interface BuildColumnHeadersOptions {
     sort?: ColumnSort;
+    /**
+     * Auxiliary heading content by column key. It rides beside the heading rather than inside it: a
+     * sortable heading is itself a button, and an interactive legend must not nest inside one.
+     */
+    info?: Readonly<Record<string, ReactNode>>;
 }
 
 /**
@@ -84,6 +90,35 @@ export function getColumnHeading(column: ColumnDefinition): string {
  */
 export function getColumnKey(column: Pick<ColumnDefinition, 'fieldSource' | 'fieldIdentifier'>): string {
     return `${column.fieldSource}:${column.fieldIdentifier}`;
+}
+
+const FIELD_SOURCES: ReadonlySet<string> = new Set<string>(Object.values(FilterFieldSource));
+
+/**
+ * The column a key names, or `undefined` when the key is not one {@link getColumnKey} produced.
+ *
+ * Split at the *first* separator only: an attribute identifier is `name|CONTENT_TYPE` and may carry a
+ * colon of its own. The source is checked against the enum because these keys come back through
+ * `CustomTable` as opaque header ids, including its own chrome columns.
+ */
+export function parseColumnKey(key: string): Pick<ColumnDefinition, 'fieldSource' | 'fieldIdentifier'> | undefined {
+    const separator = key.indexOf(':');
+    if (separator <= 0) return undefined;
+
+    const fieldSource = key.slice(0, separator);
+    const fieldIdentifier = key.slice(separator + 1);
+    if (!FIELD_SOURCES.has(fieldSource) || fieldIdentifier === '') return undefined;
+
+    return { fieldSource: fieldSource as FilterFieldSource, fieldIdentifier };
+}
+
+/**
+ * The columns a listing request names. `undefined` rather than an empty array: omitting `columns`
+ * leaves the request identical to one written before the field existed, an empty array does not.
+ */
+export function toRequestColumns(columns: readonly ColumnDefinition[]): SearchColumnRequestDto[] | undefined {
+    if (columns.length === 0) return undefined;
+    return columns.map((column) => ({ fieldSource: column.fieldSource, fieldIdentifier: column.fieldIdentifier }));
 }
 
 /**
@@ -126,9 +161,12 @@ export function buildColumnHeaders(columns: ColumnDefinition[], options: BuildCo
         const sizing = getColumnSizing(column);
         const key = getColumnKey(column);
         const isSorted = options.sort !== undefined && getSortKey(options.sort) === key;
+        const info = options.info?.[key];
         return {
             id: key,
             content: getColumnHeading(column),
+            ...(info ? { info } : {}),
+            ...(column.headingHidden ? { headingHidden: true } : {}),
             sortable: column.sortable === true,
             sort: isSorted ? options.sort?.direction : undefined,
             align: getColumnAlign(column),
