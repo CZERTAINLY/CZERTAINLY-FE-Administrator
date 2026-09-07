@@ -4,30 +4,57 @@ import { FilterFieldSource, Resource, type SearchFieldDataByGroupDto } from 'typ
 import { toCreateRequest, toStandardSlice } from 'utils/listViews';
 import { KEY_COLUMNS } from './keyTableHelpers';
 
-const DISPLAY_ONLY = 'CK_ASSOCIATIONS';
+/**
+ * The cryptographic-key property fields core publishes, stated independently of {@link KEY_COLUMNS}
+ * so a default column core does not catalogue fails these tests instead of joining the fixture.
+ * Mirrors `FilterField.java`; `CK_ASSOCIATIONS` is absent there and so is absent here.
+ */
+const CATALOGUED = [
+    'CKI_ENABLED',
+    'CKI_STATE',
+    'CKI_NAME',
+    'CKI_TYPE',
+    'CKI_USAGE',
+    'CKI_CRYPTOGRAPHIC_ALGORITHM',
+    'CKI_LENGTH',
+    'CKI_FORMAT',
+    'CKI_CREATED',
+    'CK_GROUP',
+    'CK_OWNER',
+    'CK_TOKEN_PROFILE',
+    'CK_TOKEN_INSTANCE',
+];
 
 const keysCatalogue = [
     {
         filterFieldSource: FilterFieldSource.Property,
-        searchFieldData: KEY_COLUMNS.filter((column) => column.fieldIdentifier !== DISPLAY_ONLY).map((column) => ({
-            fieldIdentifier: column.fieldIdentifier,
-            fieldLabel: column.catalogueLabel,
-            type: column.type,
-            conditions: [],
-        })),
+        searchFieldData: CATALOGUED.map((fieldIdentifier) => ({ fieldIdentifier, fieldLabel: fieldIdentifier, conditions: [] })),
     },
 ] as unknown as SearchFieldDataByGroupDto[];
 
 describe('KEY_COLUMNS saved as a view', () => {
-    it('carries the display-only associations column, which the catalogue cannot publish', () => {
-        expect(KEY_COLUMNS.map((column) => column.fieldIdentifier)).toContain(DISPLAY_ONLY);
+    it('names exactly one column the catalogue cannot publish', () => {
+        expect(KEY_COLUMNS.map((column) => column.fieldIdentifier).filter((identifier) => !CATALOGUED.includes(identifier))).toEqual([
+            'CK_ASSOCIATIONS',
+        ]);
     });
 
     it('drops that column on write, so saving the platform default set is accepted', () => {
         const request = toCreateRequest('Standard (copy)', Resource.Keys, toStandardSlice(KEY_COLUMNS), keysCatalogue);
 
-        expect(request.columns.map((column) => column.fieldIdentifier)).toEqual(
-            KEY_COLUMNS.filter((column) => column.fieldIdentifier !== DISPLAY_ONLY).map((column) => column.fieldIdentifier),
-        );
+        expect(request.columns.map((column) => column.fieldIdentifier)).toEqual([
+            'CKI_ENABLED',
+            'CKI_STATE',
+            'CKI_NAME',
+            'CKI_TYPE',
+            'CKI_CRYPTOGRAPHIC_ALGORITHM',
+            'CKI_LENGTH',
+            'CKI_FORMAT',
+            'CKI_CREATED',
+            'CK_GROUP',
+            'CK_OWNER',
+            'CK_TOKEN_PROFILE',
+            'CK_TOKEN_INSTANCE',
+        ]);
     });
 });
