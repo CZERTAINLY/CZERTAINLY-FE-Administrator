@@ -35,6 +35,7 @@ function isEmpty(obj?: object) {
 function SigningRecordsDashboard() {
     const dispatch = useDispatch();
     const statistics = useSelector(selectors.statistics);
+    const statisticsAsOf = useSelector(selectors.statisticsAsOf);
     const isFetching = useSelector(selectors.isFetching);
     const isFetchingSeries = useSelector(selectors.isFetchingSeries);
     const period = useSelector(selectors.period);
@@ -52,6 +53,10 @@ function SigningRecordsDashboard() {
         // run once on mount
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch]);
+
+    // The tiles are read once on mount and never refreshed, so the drill-through has to reproduce the window they
+    // were counted over rather than one measured from the click.
+    const countedAt = () => (statisticsAsOf ? new Date(statisticsAsOf) : new Date());
 
     const equalsFilter = (kind: SigningRecordFilterKind, value: string): SearchFilterModel[] => {
         const field = resolveSigningRecordFilterField(availableFilters, kind);
@@ -143,7 +148,7 @@ function SigningRecordsDashboard() {
                         title="Signings – last 24h"
                         link={LINK}
                         entity={EntityType.SIGNING_RECORD}
-                        onSetFilter={() => buildSigningTimeWindowFilter(availableFilters, SIGNING_WINDOW_HOURS.last24h)}
+                        onSetFilter={() => buildSigningTimeWindowFilter(availableFilters, SIGNING_WINDOW_HOURS.last24h, countedAt())}
                         extraComponent={caption('includes deleted records')}
                     />
                 </div>
@@ -153,7 +158,7 @@ function SigningRecordsDashboard() {
                         title="Signings – last 7d"
                         link={LINK}
                         entity={EntityType.SIGNING_RECORD}
-                        onSetFilter={() => buildSigningTimeWindowFilter(availableFilters, SIGNING_WINDOW_HOURS.last7d)}
+                        onSetFilter={() => buildSigningTimeWindowFilter(availableFilters, SIGNING_WINDOW_HOURS.last7d, countedAt())}
                         extraComponent={caption('includes deleted records')}
                     />
                 </div>

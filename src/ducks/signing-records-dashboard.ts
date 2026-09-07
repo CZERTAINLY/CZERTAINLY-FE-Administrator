@@ -7,6 +7,8 @@ export type State = {
     isFetchingSeries: boolean;
     period: SigningRecordStatisticsPeriod;
     statistics?: SigningRecordStatisticsDto;
+    /** When the statistics were read, so a drill-through can reproduce the window they were counted over. */
+    statisticsAsOf?: string;
 };
 
 export const initialState: State = {
@@ -14,6 +16,7 @@ export const initialState: State = {
     isFetchingSeries: false,
     period: SigningRecordStatisticsPeriod._24h,
     statistics: undefined,
+    statisticsAsOf: undefined,
 };
 
 export const slice = createSlice({
@@ -33,10 +36,11 @@ export const slice = createSlice({
             state.period = action.payload.period;
         },
 
-        getStatisticsSuccess: (state, action: PayloadAction<{ statistics: SigningRecordStatisticsDto }>) => {
+        getStatisticsSuccess: (state, action: PayloadAction<{ statistics: SigningRecordStatisticsDto; asOf: string }>) => {
             state.isFetching = false;
             state.isFetchingSeries = false;
             state.statistics = action.payload.statistics;
+            state.statisticsAsOf = action.payload.asOf;
         },
 
         getStatisticsFailure: (state, _action: PayloadAction<void>) => {
@@ -49,6 +53,7 @@ export const slice = createSlice({
 const selectState = (reduxStore: AppState): State => reduxStore?.[slice.name];
 
 const statistics = createSelector(selectState, (state) => state.statistics);
+const statisticsAsOf = createSelector(selectState, (state) => state.statisticsAsOf);
 const isFetching = createSelector(selectState, (state) => state.isFetching);
 const isFetchingSeries = createSelector(selectState, (state) => state.isFetchingSeries);
 const period = createSelector(selectState, (state) => state.period);
@@ -56,6 +61,7 @@ const period = createSelector(selectState, (state) => state.period);
 export const selectors = {
     selectState,
     statistics,
+    statisticsAsOf,
     isFetching,
     isFetchingSeries,
     period,

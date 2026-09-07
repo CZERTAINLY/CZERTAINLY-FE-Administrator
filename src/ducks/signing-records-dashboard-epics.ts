@@ -12,7 +12,7 @@ const getSigningRecordStatistics: AppEpic = (action$, _state, deps) => {
         filter(isAnyOf(slice.actions.getStatistics, slice.actions.setPeriod)),
         switchMap((action) =>
             deps.apiClients.statisticsDashboard.getSigningRecordStatistics({ period: action.payload.period }).pipe(
-                map((statistics) => slice.actions.getStatisticsSuccess({ statistics })),
+                map((statistics) => slice.actions.getStatisticsSuccess({ statistics, asOf: new Date().toISOString() })),
                 catchError((error) =>
                     of(
                         slice.actions.getStatisticsFailure(),
