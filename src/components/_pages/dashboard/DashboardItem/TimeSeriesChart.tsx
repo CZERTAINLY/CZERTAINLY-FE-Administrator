@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router';
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { SigningRecordStatisticsPeriod } from 'types/openapi';
 import type { SearchFilterModel } from 'types/certificate';
+import { countAxisDomain } from 'utils/chart-axis';
 import type { ColorOptions } from './DonutChart';
 
 const CHART_COLORS = {
@@ -138,7 +139,8 @@ function TimeSeriesChart({
                         tickLine={false}
                     />
                     <YAxis
-                        tickFormatter={(value: number) => String(Math.round(value))}
+                        allowDecimals={false}
+                        domain={countAxisDomain(chartData.map((point) => point.value))}
                         tick={{ fontSize: 12 }}
                         stroke={colors.axis}
                         axisLine={false}

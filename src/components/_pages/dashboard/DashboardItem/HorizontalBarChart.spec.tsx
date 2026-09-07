@@ -19,6 +19,20 @@ test.describe('HorizontalBarChart', () => {
         await expect(component.getByText('+4 more')).toBeVisible();
     });
 
+    test('the count axis labels counts as distinct whole numbers', async ({ mount }) => {
+        const component = await mount(
+            <HorizontalBarChartWithStore
+                title="Top Requesters"
+                data={{ alice: 2, bob: 1 }}
+                entity={EntityType.SIGNING_RECORD}
+                redirect="/signingrecords"
+                onSetFilter={() => []}
+            />,
+        );
+        const ticks = component.locator('.recharts-xAxis-tick-labels .recharts-cartesian-axis-tick-value');
+        await expect(ticks).toHaveText(['0', '1', '2']);
+    });
+
     test('omits the overflow caption when nothing overflows', async ({ mount }) => {
         const component = await mount(
             <HorizontalBarChartWithStore
