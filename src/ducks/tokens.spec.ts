@@ -124,6 +124,19 @@ describe('tokens slice', () => {
         expect(next.isFetchingTokenProviders).toBe(false);
     });
 
+    test('ensureTokenProviders_reusesLoadedCatalogue', () => {
+        // given
+        const cachedProviders = [{ uuid: 'cached-provider' }] as any[];
+        const loadedState = { ...initialState, tokenProviders: cachedProviders };
+
+        // when
+        const next = reducer(loadedState, actions.ensureTokenProviders());
+
+        // then
+        expect(next.tokenProviders).toBe(cachedProviders);
+        expect(next.isFetchingTokenProviders).toBe(false);
+    });
+
     test('getTokenProviderAttributesDescriptors / success / failure', () => {
         // given
         const query = { connectorUuid: 'c-1', kind: 'TOKEN' };
@@ -147,6 +160,73 @@ describe('tokens slice', () => {
 
         // then
         expect(next.isFetchingTokenProviderAttributeDescriptors).toBe(false);
+    });
+
+    test('getTokenProviderAttributesDescriptors ignores stale success and failure actions', () => {
+        // given
+        const previousQueryKey = getTokenAttributesQueryKey({ connectorUuid: 'c-1', kind: 'FIRST' });
+        const currentQuery = { connectorUuid: 'c-1', kind: 'SECOND' };
+        const currentQueryKey = getTokenAttributesQueryKey(currentQuery);
+        const staleDescriptors = [{ uuid: 'stale' }] as any[];
+
+        // when
+        let next = reducer(initialState, actions.getTokenProviderAttributesDescriptors(currentQuery));
+        next = reducer(
+            next,
+            actions.getTokenProviderAttributesDescriptorsSuccess({
+                queryKey: previousQueryKey,
+                attributeDescriptor: staleDescriptors,
+            }),
+        );
+        next = reducer(next, actions.getTokenProviderAttributeDescriptorsFailure({ queryKey: previousQueryKey, error: 'stale' }));
+
+        // then
+        expect(next.tokenProviderAttributesQueryKey).toBe(currentQueryKey);
+        expect(next.isFetchingTokenProviderAttributeDescriptors).toBe(true);
+        expect(next.tokenProviderAttributeDescriptors).toEqual([]);
+        expect(next.tokenProviderAttributeDescriptorsByQueryKey[previousQueryKey]).toEqual(staleDescriptors);
+    });
+
+    test('ensureTokenProviderAttributesDescriptors_reusesSchemaByNormalizedQueryKey', () => {
+        // given
+        const cachedQuery = { connectorUuid: 'connector-1', kind: 'PKCS11' };
+        const cachedQueryKey = getTokenAttributesQueryKey(cachedQuery);
+        const cachedDescriptors = [{ uuid: 'cached-descriptor' }] as any[];
+        const loadedState = {
+            ...initialState,
+            tokenProviderAttributeDescriptorsByQueryKey: { [cachedQueryKey]: cachedDescriptors },
+        };
+
+        // when
+        const next = reducer(
+            loadedState,
+            actions.ensureTokenProviderAttributesDescriptors({ connectorUuid: cachedQuery.connectorUuid, kind: '  PKCS11  ' }),
+        );
+
+        // then
+        expect(next.tokenProviderAttributeDescriptors).toEqual(cachedDescriptors);
+        expect(next.isFetchingTokenProviderAttributeDescriptors).toBe(false);
+        expect(selectors.hasTokenProviderAttributeDescriptors({ tokens: next } as any)).toBe(true);
+    });
+
+    test('connectorMutation_invalidatesProviderCatalogueAndSchemas', () => {
+        // given
+        const queryKey = getTokenAttributesQueryKey({ connectorUuid: 'connector-1' });
+        const loadedState = {
+            ...initialState,
+            tokenProviders: [{ uuid: 'connector-1' }] as any[],
+            tokenProviderAttributeDescriptors: [{ uuid: 'descriptor-1' }] as any[],
+            tokenProviderAttributeDescriptorsByQueryKey: { [queryKey]: [{ uuid: 'descriptor-1' }] as any[] },
+            tokenProviderAttributesQueryKey: queryKey,
+        };
+
+        // when
+        const next = reducer(loadedState, { type: 'connectors/reconnectConnectorSuccess', payload: { uuid: 'connector-1' } });
+
+        // then
+        expect(next.tokenProviders).toBeUndefined();
+        expect(next.tokenProviderAttributeDescriptorsByQueryKey).toEqual({});
+        expect(next.tokenProviderAttributeDescriptors).toEqual([]);
     });
 
     test('getTokenProviderAttributesDescriptors ignores stale success and failure actions', () => {

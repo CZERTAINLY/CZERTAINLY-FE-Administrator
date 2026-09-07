@@ -24,6 +24,7 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import Breadcrumb from 'components/Breadcrumb';
+import CommentPanel from 'components/CommentPanel';
 import Container from 'components/Container';
 
 export default function TokenProfileDetail() {
@@ -274,6 +275,11 @@ export default function TokenProfileDetail() {
                         )}
                     </Container>
                 </Container>
+                {tokenProfile && (
+                    <Container marginTop>
+                        <CommentPanel resource={Resource.TokenProfiles} objectUuid={tokenProfile.uuid} />
+                    </Container>
+                )}
             </Widget>
             <Dialog
                 isOpen={confirmDelete}

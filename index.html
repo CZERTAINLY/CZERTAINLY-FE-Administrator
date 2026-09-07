@@ -12,24 +12,55 @@
             }
         </script>
         <script>
-            // Apply the stored theme before first paint so dark-mode users never see a white flash.
+            // Apply the theme before first paint so dark-mode users never see a white flash.
             // Mirrors utils/theme.ts; it cannot import from it because no module has loaded yet.
             (function () {
-                // Start from the operating system preference, then let an explicit stored choice
-                // override it. Reading storage can throw outright when storage is blocked, so the
+                // Same precedence as initialMode() then resolveTheme(): the user's own choice, then the operator's
+                // default, then the operating system preference - and an explicit 'system' choice returns to the OS
+                // preference rather than keeping the operator default. The operator default is server-held, so what is
+                // read here is the copy cached by the last branding response; on a first-ever visit there is none and
+                // the system preference stands. Reading storage can throw outright when storage is blocked, so the
                 // system preference is resolved first and remains the fallback in that case.
                 var prefersDark = globalThis.matchMedia && globalThis.matchMedia('(prefers-color-scheme: dark)').matches;
                 var resolved = prefersDark ? 'dark' : 'light';
                 try {
+                    var operatorDefault = localStorage.getItem('theme-operator-default');
+                    if (operatorDefault === 'light' || operatorDefault === 'dark') {
+                        resolved = operatorDefault;
+                    }
                     var stored = localStorage.getItem('theme-mode');
                     if (stored === 'light' || stored === 'dark') {
                         resolved = stored;
+                    } else if (stored === 'system') {
+                        // An explicit System choice outranks the operator default, back to the OS preference.
+                        resolved = prefersDark ? 'dark' : 'light';
                     }
                 } catch {
                     // Storage unavailable; the system preference resolved above stands.
                 }
                 document.documentElement.classList.toggle('dark', resolved === 'dark');
                 document.documentElement.style.colorScheme = resolved;
+
+                // Apply the operator's brand colours in the same breath, for the same reason: the colours are
+                // server-held, so what is applied here is the override stylesheet cached by the last branding
+                // response. Without it the first paint of every load would show the platform palette and then swap.
+                // Unlike the theme above, the stylesheet is generated rather than resolved - utils/brand-tokens.ts
+                // owns the colour-to-token mapping and caches its output, so none of that mapping is duplicated here.
+                // On a first-ever visit there is no cache and the platform palette stands until the response lands.
+                try {
+                    var brandCss = localStorage.getItem('theme-brand-css');
+                    // The cache is written from colours already validated as #rrggbb, so this only guards against a
+                    // value that did not come from this application: no @, <, quote, slash or backslash means no
+                    // at-rule, comment, string or url() can be smuggled into the document through it.
+                    if (brandCss && brandCss.length <= 4096 && /^[a-z0-9\s#(),.%:;{}_-]+$/i.test(brandCss)) {
+                        var brandStyle = document.createElement('style');
+                        brandStyle.id = 'brand-tokens';
+                        brandStyle.textContent = brandCss;
+                        document.head.appendChild(brandStyle);
+                    }
+                } catch {
+                    // Storage unavailable; the platform palette stands until the branding response lands.
+                }
             })();
         </script>
         <script type="text/javascript" src="./config.js"></script>

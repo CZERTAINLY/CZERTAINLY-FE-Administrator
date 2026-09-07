@@ -7,6 +7,7 @@ import {
     AuthenticationManagementApi,
     AuthorityManagementApi,
     BrandingApi,
+    CommentsApi,
     CBOMManagementApi,
     CMPProfileManagementApi,
     CallbackApi,
@@ -31,6 +32,7 @@ import {
     GlobalMetadataApi,
     InfoApi,
     InternalNotificationApi,
+    ListViewApi,
     LocationManagementApi,
     NotificationProfileInventoryApi,
     ProxyManagementApi,
@@ -43,6 +45,7 @@ import {
     SettingsApi,
     StatisticsDashboardApi,
     TokenInstanceManagementApi,
+    TokenProfileManagementApi,
     UserManagementApi,
     WorkflowActionsManagementApi,
     WorkflowEventManagementApi,
@@ -66,7 +69,6 @@ import {
     OIDUtilsAPIApi,
 } from 'types/openapi/utils';
 import { TokenInstanceAttributesApi } from './types/token-instance-api';
-import { TokenProfileManagementApi } from './types/token-profile-api';
 
 const apiUrl = (globalThis as typeof globalThis & { __ENV__?: Env }).__ENV__?.API_URL || '/api';
 const configuration = new Configuration({ basePath: apiUrl });
@@ -109,6 +111,8 @@ export interface ApiClients {
     globalMetadata: GlobalMetadataApi;
     settings: SettingsApi;
     branding: BrandingApi;
+    comments: CommentsApi;
+    listViews: ListViewApi;
     scheduler: ScheduledJobsManagementApi;
     approvalProfiles: ApprovalProfileInventoryApi;
     approvals: ApprovalInventoryApi;
@@ -177,6 +181,8 @@ const factories: Partial<{ [K in ApiClientKey]: () => ApiClients[K] }> = {
     globalMetadata: () => new GlobalMetadataApi(configuration),
     settings: () => new SettingsApi(configuration),
     branding: () => new BrandingApi(configuration),
+    comments: () => new CommentsApi(configuration),
+    listViews: () => new ListViewApi(configuration),
     scheduler: () => new ScheduledJobsManagementApi(configuration),
     approvalProfiles: () => new ApprovalProfileInventoryApi(configuration),
     approvals: () => new ApprovalInventoryApi(configuration),
