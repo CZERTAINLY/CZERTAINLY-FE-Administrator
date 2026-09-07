@@ -20,7 +20,7 @@ import type { TokenProfileDetailResponseModel } from 'types/token-profiles';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
 import Switch from 'components/Switch';
-import { selectors as enumSelectors, getEnumLabel, getEnumDescription } from 'ducks/enums';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
 import { buildValidationRules, getFieldErrorMessage } from 'utils/validators-helper';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
@@ -29,6 +29,7 @@ import type { KeyUsage } from '../../../../types/openapi';
 import TabLayout from '../../../Layout/TabLayout';
 import TextInput from 'components/TextInput';
 import TextArea from 'components/TextArea';
+import { getKeyUsageOptions } from '../../cryptographic-keys/KeyUsageSelect';
 
 type TokenProfileFormProps = Readonly<{
     tokenProfileId?: string;
@@ -46,17 +47,6 @@ interface FormValues {
     enabled: boolean;
     // Attribute fields are registered dynamically by AttributeEditor.
     [attributeField: `__attributes__${string}`]: unknown;
-}
-
-export function getSupportedTokenProfileKeyUsageOptions(
-    supportedKeyUsages: KeyUsage[] = [],
-    keyUsageEnum: Parameters<typeof getEnumLabel>[0],
-): { value: KeyUsage; label: string; description?: string }[] {
-    return supportedKeyUsages.map((usage) => ({
-        value: usage,
-        label: getEnumLabel(keyUsageEnum, usage),
-        description: getEnumDescription(keyUsageEnum, usage),
-    }));
 }
 
 export default function TokenProfileForm({
@@ -312,7 +302,7 @@ export default function TokenProfileForm({
     }, [isBusy, resourceCustomAttributes, tokenProfile]);
 
     const keyUsageOptions = useMemo(
-        () => getSupportedTokenProfileKeyUsageOptions(supportedTokenProfileKeyUsages, keyUsageEnum),
+        () => getKeyUsageOptions(supportedTokenProfileKeyUsages, keyUsageEnum),
         [keyUsageEnum, supportedTokenProfileKeyUsages],
     );
 
