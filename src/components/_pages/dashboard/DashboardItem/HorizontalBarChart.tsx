@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { SearchFilterModel } from 'types/certificate';
+import { countAxisDomain } from 'utils/chart-axis';
 import { getDonutChartColorsByRandomNumberOfOptions } from 'utils/dashboard';
 import type { ColorOptions } from './DonutChart';
 
@@ -73,7 +74,8 @@ function HorizontalBarChart({ title, data = {}, entity, redirect, onSetFilter, o
                     <CartesianGrid vertical={false} stroke={themeColors.grid} strokeDasharray="4" />
                     <XAxis
                         type="number"
-                        tickFormatter={(value: number) => String(Math.round(value))}
+                        allowDecimals={false}
+                        domain={countAxisDomain(chartData.map((bar) => bar.value))}
                         tick={{ fontSize: 12 }}
                         stroke={themeColors.axis}
                         axisLine={false}

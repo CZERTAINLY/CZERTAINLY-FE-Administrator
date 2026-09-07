@@ -212,6 +212,16 @@ and asserts WCAG AA (4.5:1) contrast for every text/background pairing, in both 
 non-text contrast (WCAG 1.4.11, 3:1) for `outline` and each `-solid` status token against
 `surface-raised`. Changing a token value to something that fails either threshold fails the suite.
 
+### Charts
+
+The dashboard charts plot counts, so their value axis must be a whole-number axis. Recharts divides
+a small automatic domain into fractional ticks, and formatting those ticks as integers collapses
+them into duplicate labels — a maximum of two signings renders as `0 1 1 2 2`. A count axis
+therefore sets `allowDecimals={false}` and takes its domain from `countAxisDomain` in
+`src/utils/chart-axis.ts`, which pins the top to the highest count while the domain is too narrow
+for recharts to step in whole numbers. Rounding the tick labels instead is what causes the
+duplicates, so a count axis carries no `tickFormatter`.
+
 ### Code Style
 
 Biome enforces linting and formatting: 4-space indent, 140-char line width, single quotes, trailing commas everywhere, semicolons required. Suppress rules only with a justified `biome-ignore` comment.
