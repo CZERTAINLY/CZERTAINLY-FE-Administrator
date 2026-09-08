@@ -173,6 +173,7 @@ function PagedList<TRow extends object>({
 
     const [confirmDelete, setConfirmDelete] = useState(false);
     const hasLoadedOnce = useRef(false);
+    const hasFetchStarted = useRef(false);
 
     const onCheckedRowsChanged = useCallback(
         (rows: (string | number)[]) => {
@@ -181,27 +182,32 @@ function PagedList<TRow extends object>({
         [dispatch, entity],
     );
 
-    const getFreshData = useCallback(() => {
-        onListCallback(
+    const listRequest = useMemo(
+        () =>
             buildListRequest(
                 { itemsPerPage: pageSize, pageNumber: effectivePageNumber, filters: currentFilters },
                 isColumnDriven ? appliedColumns : undefined,
                 appliedSort,
             ),
-        );
+        [currentFilters, pageSize, effectivePageNumber, isColumnDriven, appliedColumns, appliedSort],
+    );
+
+    /**
+     * The fetch is keyed on the request it will send rather than on the values it was built from.
+     * Merging the catalogue's sort capability rebuilds the column objects without changing a byte of
+     * the request — `toRequestColumns` carries only the source and identifier — so depending on the
+     * columns would list a second time for the same request. `listRequestRef` holds the value the
+     * snapshot stands for, and `refreshToken` is read for its identity alone: a change to it means
+     * the page asked to send this same request again.
+     */
+    const listRequestSnapshot = useMemo(() => JSON.stringify(listRequest), [listRequest]);
+    const listRequestRef = useRef(listRequest);
+    listRequestRef.current = listRequest;
+
+    const getFreshData = useCallback(() => {
+        onListCallback(listRequestRef.current);
         onCheckedRowsChanged([]);
-    }, [
-        currentFilters,
-        pageSize,
-        effectivePageNumber,
-        onListCallback,
-        onCheckedRowsChanged,
-        isColumnDriven,
-        appliedColumns,
-        appliedSort,
-        // Read for its identity alone: a change means the page asked to refetch this request.
-        refreshToken,
-    ]);
+    }, [listRequestSnapshot, onListCallback, onCheckedRowsChanged, refreshToken]);
 
     const onPageSizeChanged = useCallback(
         (pageSize: number) => {
@@ -288,7 +294,12 @@ function PagedList<TRow extends object>({
         [isColumnDriven, columnsRows, getRowId, registry, rowOptions, appliedColumns, data],
     );
 
-    if (!isFetchingList && columnRows.length > 0) hasLoadedOnce.current = true;
+    if (isFetchingList) hasFetchStarted.current = true;
+
+    // A finished fetch counts as loaded even when it returned nothing: an empty list that fell back to
+    // the skeleton on every fetch would unmount the filter widget, whose remount re-reads the
+    // catalogue and lists again, and the page would never settle.
+    if (!isFetchingList && (columnRows.length > 0 || hasFetchStarted.current)) hasLoadedOnce.current = true;
 
     useEffect(() => {
         if (listedFiltersSnapshot === currentFiltersSnapshot) return;
