@@ -255,26 +255,26 @@ test.describe('ColumnPicker', () => {
 
     /**
      * A platform default column can be absent from the filter-field catalogue and still renderable —
-     * the keys inventory ships three such columns. Resetting used to mark them unavailable, and the
-     * next Save then silently removed them from the view.
+     * `CK_ASSOCIATIONS` on the keys inventory is one. Reset has to keep such a column available, or
+     * the next Save drops it from the view without saying so.
      */
     test('reset keeps a platform column the catalogue does not publish, and saves it', async ({ mount, page }) => {
         const uncatalogued: ColumnDefinition = {
             fieldSource: FilterFieldSource.Property,
-            fieldIdentifier: 'CKI_ENABLED',
-            catalogueLabel: 'Status',
+            fieldIdentifier: 'CK_ASSOCIATIONS',
+            catalogueLabel: 'Associations',
         };
         const saved: ColumnDefinition[][] = [];
         await mount(picker({ columns: [], standardColumns: [commonName, uncatalogued], onSave: (columns) => saved.push(columns) }));
 
         await page.getByTestId('reset-to-standard').click();
 
-        await expect(page.getByTestId('selected-column-property:CKI_ENABLED')).not.toContainText('Unavailable');
+        await expect(page.getByTestId('selected-column-property:CK_ASSOCIATIONS')).not.toContainText('Unavailable');
 
         await page.getByRole('button', { name: 'Save' }).click();
 
         await expect.poll(() => saved.length).toBe(1);
-        expect(saved[0].map((column) => column.fieldIdentifier)).toEqual(['COMMON_NAME', 'CKI_ENABLED']);
+        expect(saved[0].map((column) => column.fieldIdentifier)).toEqual(['COMMON_NAME', 'CK_ASSOCIATIONS']);
     });
 
     test('refills the selected columns from the platform set', async ({ mount, page }) => {
