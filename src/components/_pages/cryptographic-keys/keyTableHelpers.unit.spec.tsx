@@ -6,7 +6,7 @@ import { KEY_COLUMNS } from './keyTableHelpers';
 
 /**
  * The cryptographic-key property fields core publishes, stated independently of {@link KEY_COLUMNS}
- * so a default column core does not catalogue fails these tests instead of joining the fixture.
+ * so a default column that core does not catalogue fails these tests instead of joining the fixture.
  * Mirrors `FilterField.java`; `CK_ASSOCIATIONS` is absent there and so is absent here.
  */
 const CATALOGUED = [

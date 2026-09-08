@@ -255,8 +255,8 @@ test.describe('ColumnPicker', () => {
 
     /**
      * A platform default column can be absent from the filter-field catalogue and still renderable —
-     * `CK_ASSOCIATIONS` on the keys inventory is one. Resetting used to mark them unavailable, and
-     * the next Save then silently removed them from the view.
+     * `CK_ASSOCIATIONS` on the keys inventory is one. Reset has to keep such a column available, or
+     * the next Save drops it from the view without saying so.
      */
     test('reset keeps a platform column the catalogue does not publish, and saves it', async ({ mount, page }) => {
         const uncatalogued: ColumnDefinition = {
