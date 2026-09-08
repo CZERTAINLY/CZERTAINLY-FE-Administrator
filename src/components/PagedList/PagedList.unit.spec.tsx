@@ -517,6 +517,31 @@ describe('PagedList unit coverage', () => {
         expect(onListCallback).toHaveBeenCalledTimes(1);
     });
 
+    it('names the page default ordering in the first listing request', async () => {
+        const onListCallback = vi.fn();
+        const configurableColumns = {
+            resource: Resource.Certificates,
+            standardColumns: [{ fieldSource: FilterFieldSource.Property, fieldIdentifier: 'COMMON_NAME', catalogueLabel: 'Common Name' }],
+            rows: [],
+            getRowId: (row: any) => row.uuid,
+            defaultSort: { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'COMMON_NAME', direction: 'asc' as const },
+        };
+        mockState.filters.filters[0].filter.availableFilters = [
+            {
+                filterFieldSource: FilterFieldSource.Property,
+                searchFieldData: [{ fieldIdentifier: 'COMMON_NAME', fieldLabel: 'Common Name', sortable: true, displayable: true }],
+            },
+        ];
+
+        await renderPagedList({ onListCallback, configurableColumns, data: undefined, headers: undefined });
+
+        expect(onListCallback).toHaveBeenCalledWith(
+            expect.objectContaining({
+                sort: { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'COMMON_NAME', direction: 'asc' },
+            }),
+        );
+    });
+
     it('uses plural entity name in dialog when multiple rows are selected', async () => {
         mockState.pagings.pagings[0].paging.checkedRows = ['row-1', 'row-2'];
         await renderPagedList({ addHidden: true, onDeleteCallback: vi.fn() });

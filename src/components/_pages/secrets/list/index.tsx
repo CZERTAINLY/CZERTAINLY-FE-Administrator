@@ -1,9 +1,6 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router';
 
-import type { TableDataRow, TableHeader } from 'components/CustomTable';
-import Badge from 'components/Badge';
 import PagedList from 'components/PagedList/PagedList';
 import Dialog from 'components/Dialog';
 import type { WidgetButtonProps } from 'components/WidgetButtons';
@@ -21,11 +18,10 @@ import { actions as vaultProfileActions, selectors as vaultProfileSelectors } fr
 
 import type { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { ComplianceStatus, PlatformEnum, Resource } from 'types/openapi';
+import { PlatformEnum, Resource, type SecretDto } from 'types/openapi';
+import { buildSecretCellRegistry, SECRET_COLUMNS } from '../secretTableHelpers';
 
 import SecretForm from '../form';
-import SecretStateBadge from '../SecretStateBadge';
-import CertificateStatus from 'components/_pages/certificates/CertificateStatus';
 
 export default function SecretsList() {
     const dispatch = useDispatch();
@@ -63,116 +59,30 @@ export default function SecretsList() {
         dispatch(vaultProfileActions.listVaultProfiles());
     }, [dispatch]);
 
-    const headers: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'name',
-                content: 'Name',
-                width: '25%',
-                sortable: true,
-            },
-            {
-                id: 'type',
-                content: 'Type',
-                info: <EnumColumnDescription platformEnum={PlatformEnum.SecretType} title="Type" />,
-                width: '10%',
-                sortable: true,
-            },
-            {
-                id: 'state',
-                content: 'State',
-                info: <EnumColumnDescription platformEnum={PlatformEnum.SecretState} title="State" />,
-                width: '10%',
-                align: 'center',
-                sortable: true,
-            },
-            {
-                id: 'compliance',
-                content: 'Compliance',
-                width: '10%',
-                align: 'center',
-                sortable: false,
-            },
-            {
-                id: 'vaultProfile',
-                content: 'Vault Profile',
-                width: '15%',
-                sortable: true,
-            },
-            {
-                id: 'version',
-                content: 'Version',
-                width: '5%',
-                align: 'center',
-                sortable: true,
-            },
-            {
-                id: 'owner',
-                content: 'Owner',
-                width: '15%',
-                sortable: true,
-            },
-            {
-                id: 'groups',
-                content: 'Groups',
-                width: '15%',
-                sortable: true,
-            },
-            {
-                id: 'status',
-                content: 'Status',
-                width: '5%',
-                align: 'center',
-                sortable: true,
-            },
-        ],
+    const registry = useMemo(
+        () => buildSecretCellRegistry({ secretTypeEnum, secretStateEnum, getEnumLabel, vaultProfiles }),
+        [secretTypeEnum, secretStateEnum, vaultProfiles],
+    );
+
+    const headerInfo = useMemo(
+        () => ({
+            'property:SECRET_TYPE': <EnumColumnDescription platformEnum={PlatformEnum.SecretType} title="Type" />,
+            'property:SECRET_STATE': <EnumColumnDescription platformEnum={PlatformEnum.SecretState} title="State" />,
+        }),
         [],
     );
 
-    const rows: TableDataRow[] = useMemo(
-        () =>
-            secrets.map((secret) => ({
-                id: secret.uuid,
-                columns: [
-                    <span key="name" style={{ whiteSpace: 'nowrap' }}>
-                        <Link to={`./detail/${secret.uuid}`}>{secret.name}</Link>
-                    </span>,
-                    getEnumLabel(secretTypeEnum, secret.type),
-                    <SecretStateBadge key="state" state={secret.state}>
-                        {getEnumLabel(secretStateEnum, secret.state)}
-                    </SecretStateBadge>,
-                    <CertificateStatus key="compliance" status={secret.complianceStatus || ComplianceStatus.Na} asIcon={true} />,
-                    secret.sourceVaultProfile
-                        ? (() => {
-                              const profile = vaultProfiles.find((p) => p.uuid === secret.sourceVaultProfile?.uuid);
-                              const vaultUuid = profile?.vaultInstance?.uuid;
-                              return vaultUuid ? (
-                                  <Link
-                                      to={`/${Resource.VaultProfiles.toLowerCase()}/detail/${vaultUuid}/${secret.sourceVaultProfile.uuid}`}
-                                  >
-                                      {secret.sourceVaultProfile.name}
-                                  </Link>
-                              ) : (
-                                  secret.sourceVaultProfile.name
-                              );
-                          })()
-                        : '',
-                    secret.version ? secret.version.toString() : '',
-                    secret.owner ? <Link to={`../users/detail/${secret.owner.uuid}`}>{secret.owner.name}</Link> : 'Unassigned',
-                    secret.groups && secret.groups.length > 0
-                        ? secret.groups.map((group, i) => (
-                              <Fragment key={group.uuid}>
-                                  <Link to={`../groups/detail/${group.uuid}`}>{group.name}</Link>
-                                  {secret.groups && i !== secret.groups.length - 1 ? ', ' : ''}
-                              </Fragment>
-                          ))
-                        : 'Unassigned',
-                    <Badge key="status" color={secret.enabled ? 'success' : 'danger'}>
-                        {secret.enabled ? 'Enabled' : 'Disabled'}
-                    </Badge>,
-                ],
-            })),
-        [secrets, secretTypeEnum, secretStateEnum, vaultProfiles],
+    const configurableColumns = useMemo(
+        () => ({
+            resource: Resource.Secrets,
+            standardColumns: SECRET_COLUMNS,
+            rows: secrets,
+            getRowId: (secret: SecretDto) => secret.uuid,
+            registry,
+            headerInfo,
+            resourceLabel: 'Secrets',
+        }),
+        [secrets, registry, headerInfo],
     );
 
     const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listSecrets(filters)), [dispatch]);
@@ -311,8 +221,7 @@ export default function SecretsList() {
                 entity={EntityType.SECRET}
                 onListCallback={onListCallback}
                 onDeleteCallback={handleDeleteSecrets}
-                headers={headers}
-                data={rows}
+                configurableColumns={configurableColumns}
                 isBusy={isBusy}
                 title="List of Secrets"
                 entityNameSingular="Secret"

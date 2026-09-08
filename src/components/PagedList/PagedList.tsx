@@ -48,6 +48,11 @@ export interface ConfigurableColumns<TRow extends object> {
     rowOptions?: (row: TRow) => TableDataRow['options'];
     headerInfo?: Readonly<Record<string, ReactNode>>;
     resourceLabel?: string;
+    /**
+     * The ordering the page opens on. A page that sorted client-side before it was column-driven has to name it here,
+     * because a column-driven table hands sorting to the server and would otherwise open in API order.
+     */
+    defaultSort?: ColumnSort;
 }
 
 type Props<TRow extends object> = {
@@ -127,7 +132,7 @@ function PagedList<TRow extends object>({
     const hasLoadedCatalogue = useSelector(filterSelectors.hasLoadedFilters(entity));
 
     const [columnSelection, setColumnSelection] = useState<ColumnDefinition[]>(NO_COLUMNS);
-    const [sortSelection, setSortSelection] = useState<ColumnSort | undefined>(undefined);
+    const [sortSelection, setSortSelection] = useState<ColumnSort | undefined>(configurableColumns?.defaultSort);
 
     // Taken apart rather than depended on whole: an unmemoised config would rebuild `getFreshData`
     // every render, and the effect watching it would refetch forever.

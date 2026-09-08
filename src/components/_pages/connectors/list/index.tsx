@@ -1,27 +1,25 @@
 import { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router';
 
-import Badge from 'components/Badge';
 import { actions, selectors } from 'ducks/connectors';
 
-import type { TableDataRow, TableHeader } from 'components/CustomTable';
 import ForceDeleteErrorTable from 'components/ForceDeleteErrorTable';
 import Dialog from 'components/Dialog';
 import type { WidgetButtonProps } from 'components/WidgetButtons';
 import ConnectorForm from '../form';
-import ConnectorCapabilityBadges from './ConnectorCapabilityBadges';
 import ConnectorCapabilitiesMatrix from './ConnectorCapabilitiesMatrix';
 import PagedList from 'components/PagedList/PagedList';
 
 import { EntityType } from 'ducks/filters';
-import { selectors as enumSelectors } from 'ducks/enums';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { selectors as pagingSelectors } from 'ducks/paging';
 import type { SearchRequestModel } from 'types/certificate';
-import { PlatformEnum } from 'types/openapi';
+import { FilterFieldSource, PlatformEnum, Resource } from 'types/openapi';
+import type { ConnectorResponseModel } from 'types/connectors';
+import { buildConnectorCellRegistry, buildConnectorColumns } from '../connectorTableHelpers';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { getConnectorCapabilities, inventoryStatus } from 'utils/connector';
+import { getConnectorCapabilities } from 'utils/connector';
 import { featureFlags } from 'utils/feature-flags';
 
 import type { ApiClients } from '../../../../api';
@@ -33,6 +31,7 @@ export default function ConnectorList() {
     const connectors = useSelector(selectors.connectors);
 
     const connectorInterfaceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ConnectorInterface));
+    const authTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AuthType));
     const featureFlagEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FeatureFlag));
     const functionGroupCodeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FunctionGroupCode));
 
@@ -150,126 +149,51 @@ export default function ConnectorList() {
         />
     );
 
-    const connectorsRowHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                content: 'Name',
-                sortable: true,
-                sort: 'asc',
-                id: 'connectorName',
-                width: '25%',
-            },
-            {
-                content: 'Ver',
-                sortable: true,
-                id: 'connectorVersion',
-                align: 'center',
-                width: '5%',
-            },
-            {
-                content: 'Interfaces / Function Groups',
-                id: 'connectorInterfaces',
-                width: '15%',
-            },
-            {
-                content: 'Features / Kinds',
-                id: 'connectorFeatures',
-                width: '15%',
-                minWidth: '180px',
-            },
-            ...(featureFlags.isProxiesEnabled
-                ? [
-                      {
-                          content: 'Proxy',
-                          sortable: true,
-                          id: 'connectorProxy',
-                          width: '15%',
-                      } as TableHeader,
-                  ]
-                : []),
-            {
-                content: 'URL',
-                sortable: true,
-                id: 'connectorUrl',
-            },
-            {
-                content: 'Status',
-                sortable: true,
-                id: 'connectorStatus',
-                width: '5%',
-            },
-        ],
-        [],
+    const onOverflowClick = useCallback(
+        (connector: ConnectorResponseModel) => {
+            const { caption } = getConnectorCapabilities(connector, {
+                interfaceEnum: connectorInterfaceEnum,
+                featureEnum: featureFlagEnum,
+                functionGroupEnum: functionGroupCodeEnum,
+            });
+            setCapabilitiesModal({ caption, content: <ConnectorCapabilitiesMatrix connector={connector} /> });
+        },
+        [connectorInterfaceEnum, featureFlagEnum, functionGroupCodeEnum],
     );
 
-    const connectorList: TableDataRow[] = useMemo(
+    const registry = useMemo(
         () =>
-            connectors.map((connector) => {
-                const connectorStatus = inventoryStatus(connector.status);
-
-                const { isV2, caption, capabilityLabels, featureLabels } = getConnectorCapabilities(connector, {
-                    interfaceEnum: connectorInterfaceEnum,
-                    featureEnum: featureFlagEnum,
-                    functionGroupEnum: functionGroupCodeEnum,
-                });
-
-                const openCapabilitiesModal = () =>
-                    setCapabilitiesModal({ caption, content: <ConnectorCapabilitiesMatrix connector={connector} /> });
-
-                return {
-                    id: connector.uuid,
-                    columns: [
-                        <span key="name" style={{ whiteSpace: 'nowrap' }}>
-                            <Link to={`./detail/${connector.uuid}`}>{connector.name}</Link>
-                        </span>,
-                        <span key="version" style={{ whiteSpace: 'nowrap' }}>
-                            {connector.version || '-'}
-                        </span>,
-                        <ConnectorCapabilityBadges
-                            key="interfaces"
-                            labels={capabilityLabels}
-                            color="primary"
-                            testIdPrefix={`interfaces-${connector.uuid}`}
-                            overflowTitle={isV2 ? 'Show all interfaces' : 'Show all function groups'}
-                            onOverflowClick={openCapabilitiesModal}
-                        />,
-                        <ConnectorCapabilityBadges
-                            key="features"
-                            labels={featureLabels}
-                            color="secondary"
-                            testIdPrefix={`features-${connector.uuid}`}
-                            overflowTitle={isV2 ? 'Show all features' : 'Show all kinds'}
-                            onOverflowClick={openCapabilitiesModal}
-                        />,
-                        ...(featureFlags.isProxiesEnabled
-                            ? [
-                                  <span key="proxy" style={{ whiteSpace: 'nowrap' }}>
-                                      {connector.proxy ? (
-                                          <Link to={`../proxies/detail/${connector.proxy.uuid}`}>{connector.proxy.name}</Link>
-                                      ) : (
-                                          '-'
-                                      )}
-                                  </span>,
-                              ]
-                            : []),
-                        <span key="url" style={{ whiteSpace: 'nowrap' }}>
-                            {connector.url}
-                        </span>,
-                        <Badge key="badge" color={connectorStatus[1]}>
-                            {connectorStatus[0]}
-                        </Badge>,
-                    ],
-                };
+            buildConnectorCellRegistry({
+                interfaceEnum: connectorInterfaceEnum,
+                featureEnum: featureFlagEnum,
+                functionGroupEnum: functionGroupCodeEnum,
+                authTypeEnum,
+                getEnumLabel,
+                onOverflowClick,
             }),
-        [connectors, connectorInterfaceEnum, featureFlagEnum, functionGroupCodeEnum],
+        [connectorInterfaceEnum, featureFlagEnum, functionGroupCodeEnum, authTypeEnum, onOverflowClick],
+    );
+
+    const standardColumns = useMemo(() => buildConnectorColumns(featureFlags.isProxiesEnabled), []);
+
+    const configurableColumns = useMemo(
+        () => ({
+            resource: Resource.Connectors,
+            standardColumns,
+            rows: connectors,
+            getRowId: (connector: ConnectorResponseModel) => connector.uuid,
+            registry,
+            defaultSort: { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'CONNECTOR_NAME', direction: 'asc' as const },
+            resourceLabel: 'Connectors',
+        }),
+        [connectors, registry, standardColumns],
     );
 
     return (
         <div className="space-y-4">
             <PagedList
                 entity={EntityType.CONNECTOR}
-                headers={connectorsRowHeaders}
-                data={connectorList}
+                configurableColumns={configurableColumns}
                 isBusy={isBusy}
                 onListCallback={onListCallback}
                 getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.connectorsV2.getConnectorSearchableFields(), [])}

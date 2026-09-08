@@ -1,18 +1,19 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router';
 import PagedList from 'components/PagedList/PagedList';
-import type { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
+import { EnumColumnDescription } from 'components/EnumDescription';
 import ForceDeleteErrorTable from 'components/ForceDeleteErrorTable';
 import { actions, selectors } from 'ducks/signing-records';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { EntityType } from 'ducks/filters';
 import { selectors as pagingSelectors } from 'ducks/paging';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { Resource } from 'types/openapi';
+import { PlatformEnum, Resource, type SigningRecordListDto } from 'types/openapi';
 import type { SearchRequestModel } from 'types/certificate';
 import type { ApiClients } from 'src/api';
 import { dateFormatter } from 'utils/dateUtil';
+import { buildSigningRecordCellRegistry, SIGNING_RECORD_COLUMNS } from '../signingRecordTableHelpers';
 
 function SigningRecordsList() {
     const dispatch = useDispatch();
@@ -23,6 +24,7 @@ function SigningRecordsList() {
     const isBulkDeleting = useSelector(selectors.selectIsBulkDeleting);
     const bulkDeleteErrorMessages = useSelector(selectors.selectBulkDeleteErrorMessages);
     const checkedRows = useSelector(pagingSelectors.checkedRows(EntityType.SIGNING_RECORD));
+    const signingProtocolEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.SigningProtocol));
 
     const [showDeleteErrors, setShowDeleteErrors] = useState(false);
 
@@ -39,36 +41,29 @@ function SigningRecordsList() {
         setShowDeleteErrors(false);
     }, [dispatch]);
 
-    const headers: TableHeader[] = useMemo(
-        () => [
-            { content: 'Name', sortable: true, id: 'name' },
-            { content: 'Signing Profile', sortable: true, id: 'signingProfile' },
-            { content: 'Signing Time', sortable: true, id: 'signingTime' },
-            { content: 'Created At', sortable: true, id: 'createdAt' },
-        ],
+    const registry = useMemo(
+        () => buildSigningRecordCellRegistry({ signingProtocolEnum, getEnumLabel, dateFormatter }),
+        [signingProtocolEnum],
+    );
+
+    const headerInfo = useMemo(
+        () => ({
+            'property:SIGNING_RECORD_PROTOCOL': <EnumColumnDescription platformEnum={PlatformEnum.SigningProtocol} title="Protocol" />,
+        }),
         [],
     );
 
-    const rows: TableDataRow[] = useMemo(
-        () =>
-            signingRecords.map((record) => ({
-                id: record.uuid,
-                columns: [
-                    <Link key="name" to={`./detail/${record.uuid}`}>
-                        {record.name}
-                    </Link>,
-                    record.signingProfile ? (
-                        <Link key="profile" to={`/${Resource.SigningProfiles.toLowerCase()}/detail/${record.signingProfile.uuid}`}>
-                            {record.signingProfile.name} (v{record.signingProfile.version})
-                        </Link>
-                    ) : (
-                        '-'
-                    ),
-                    record.signingTime ? dateFormatter(record.signingTime) : '-',
-                    record.createdAt ? dateFormatter(record.createdAt) : '-',
-                ],
-            })),
-        [signingRecords],
+    const configurableColumns = useMemo(
+        () => ({
+            resource: Resource.SigningRecords,
+            standardColumns: SIGNING_RECORD_COLUMNS,
+            rows: signingRecords,
+            getRowId: (record: SigningRecordListDto) => record.uuid,
+            registry,
+            headerInfo,
+            resourceLabel: 'Signing Records',
+        }),
+        [signingRecords, registry, headerInfo],
     );
 
     const onList = useCallback((filters: SearchRequestModel) => dispatch(actions.listSigningRecords(filters)), [dispatch]);
@@ -93,8 +88,7 @@ function SigningRecordsList() {
                     [],
                 )}
                 filterTitle="Signing Records Filter"
-                headers={headers}
-                data={rows}
+                configurableColumns={configurableColumns}
                 isBusy={isBusy}
                 title="Signing Records"
                 entityNameSingular="a Signing Record"

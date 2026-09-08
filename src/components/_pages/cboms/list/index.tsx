@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router';
 import { firstValueFrom } from 'rxjs';
 import WidgetButtons, { type WidgetButtonProps } from 'components/WidgetButtons';
 import Dialog from 'components/Dialog';
@@ -9,42 +8,26 @@ import CbomUploadDialog from '../CbomUploadDialog';
 import { actions as alertActions } from 'ducks/alerts';
 import { actions, selectors } from 'ducks/cbom';
 import PagedList from 'components/PagedList/PagedList';
-import type { TableDataRow, TableHeader } from 'components/CustomTable';
 import { LockWidgetNameEnum } from 'types/user-interface';
+import { type CbomDto, PlatformEnum, Resource } from 'types/openapi';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { dateFormatter } from 'utils/dateUtil';
+import { buildCbomCellRegistry, CBOM_COLUMNS } from '../cbomTableHelpers';
 import type { SearchRequestModel } from 'types/certificate';
 import { type ApiClients, backendClient } from 'src/api';
 import { EntityType } from 'ducks/filters';
-
-const toFiniteNumber = (value: unknown): number => {
-    const parsed = typeof value === 'number' ? value : Number(value);
-    return Number.isFinite(parsed) ? parsed : 0;
-};
 
 function CbomsList() {
     const dispatch = useDispatch();
 
     const cboms = useSelector(selectors.selectCbomList);
+    const assetSyncStateEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CbomAssetSyncState));
     const isFetching = useSelector(selectors.selectIsFetchingList);
     const isDeleting = useSelector(selectors.selectIsDeleting);
     const isBulkDeleting = useSelector(selectors.selectIsBulkDeleting);
     const isSyncing = useSelector(selectors.selectIsSyncing);
 
     const isBusy = isFetching || isDeleting || isBulkDeleting || isSyncing;
-
-    const headers: TableHeader[] = useMemo(
-        () => [
-            { content: 'Serial number', sortable: true, id: 'serial' },
-            { content: 'Ver.', sortable: true, id: 'version', align: 'center', sortType: 'numeric' },
-            { content: 'Source', sortable: true, id: 'source' },
-            { content: 'Alg.', sortable: true, id: 'algorithm', align: 'center', sortType: 'numeric' },
-            { content: 'Certs', sortable: true, id: 'certificates', align: 'center', sortType: 'numeric' },
-            { content: 'Proto.', sortable: true, id: 'protocol', align: 'center', sortType: 'numeric' },
-            { content: 'Material', sortable: true, id: 'material', align: 'center', sortType: 'numeric' },
-            { content: 'Assets', sortable: true, id: 'assets', align: 'center', sortType: 'numeric' },
-            { content: 'Action', sortable: false, id: 'action', align: 'center' },
-        ],
-        [],
-    );
 
     const copyToClipboard = useCopyToClipboard();
     const [isUploadOpen, setIsUploadOpen] = useState(false);
@@ -106,54 +89,59 @@ function CbomsList() {
         [dispatch, getCbomJson],
     );
 
-    const rows: TableDataRow[] = useMemo(
-        () =>
-            cboms.map((c) => ({
-                id: c.uuid,
-                options: {
-                    rowClassName: c.uuid === highlightedCbomUuid ? 'bg-success-surface' : undefined,
-                },
-                columns: [
-                    <Link key="serial" to={`./detail/${c.uuid}`}>
-                        {c.serialNumber}
-                    </Link>,
-                    toFiniteNumber(c.version),
-                    c.source || '-',
-                    toFiniteNumber(c.algorithms),
-                    toFiniteNumber(c.certificates),
-                    toFiniteNumber(c.protocols),
-                    toFiniteNumber(c.cryptoMaterial),
-                    toFiniteNumber(c.totalAssets),
-                    <WidgetButtons
-                        key={`actions-${c.uuid}`}
-                        buttons={
-                            [
-                                {
-                                    id: 'copy',
-                                    icon: 'copy',
-                                    disabled: false,
-                                    tooltip: 'Copy JSON',
-                                    onClick: (e) => {
-                                        e.stopPropagation();
-                                        void handleCopyCbomJson(c.uuid);
-                                    },
-                                },
-                                {
-                                    id: 'download',
-                                    icon: 'download',
-                                    disabled: false,
-                                    tooltip: 'Download JSON',
-                                    onClick: (e) => {
-                                        e.stopPropagation();
-                                        void handleDownloadCbomJson(c.uuid, c.serialNumber, c.version);
-                                    },
-                                },
-                            ] as WidgetButtonProps[]
-                        }
-                    />,
-                ],
-            })),
-        [cboms, handleCopyCbomJson, handleDownloadCbomJson, highlightedCbomUuid],
+    const renderActions = useCallback(
+        (cbom: CbomDto) => (
+            <WidgetButtons
+                buttons={
+                    [
+                        {
+                            id: 'copy',
+                            icon: 'copy',
+                            disabled: false,
+                            tooltip: 'Copy JSON',
+                            onClick: (e) => {
+                                e.stopPropagation();
+                                void handleCopyCbomJson(cbom.uuid);
+                            },
+                        },
+                        {
+                            id: 'download',
+                            icon: 'download',
+                            disabled: false,
+                            tooltip: 'Download JSON',
+                            onClick: (e) => {
+                                e.stopPropagation();
+                                void handleDownloadCbomJson(cbom.uuid, cbom.serialNumber, cbom.version);
+                            },
+                        },
+                    ] as WidgetButtonProps[]
+                }
+            />
+        ),
+        [handleCopyCbomJson, handleDownloadCbomJson],
+    );
+
+    const registry = useMemo(
+        () => buildCbomCellRegistry({ assetSyncStateEnum, getEnumLabel, dateFormatter, renderActions }),
+        [assetSyncStateEnum, renderActions],
+    );
+
+    const rowOptions = useCallback(
+        (cbom: CbomDto) => (cbom.uuid === highlightedCbomUuid ? { rowClassName: 'bg-success-surface' } : undefined),
+        [highlightedCbomUuid],
+    );
+
+    const configurableColumns = useMemo(
+        () => ({
+            resource: Resource.Cboms,
+            standardColumns: CBOM_COLUMNS,
+            rows: cboms,
+            getRowId: (cbom: CbomDto) => cbom.uuid,
+            registry,
+            rowOptions,
+            resourceLabel: 'CBOMs',
+        }),
+        [cboms, registry, rowOptions],
     );
 
     const onList = useCallback((filters: SearchRequestModel) => dispatch(actions.listCboms(filters)), [dispatch]);
@@ -198,8 +186,7 @@ function CbomsList() {
                 }}
                 getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.cbomManagement.getCbomSearchableFields(), [])}
                 filterTitle="CBOMs Filter"
-                headers={headers}
-                data={rows}
+                configurableColumns={configurableColumns}
                 isBusy={isBusy}
                 title="CBOMs"
                 entityNameSingular="a CBOM"

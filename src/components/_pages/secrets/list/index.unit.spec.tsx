@@ -34,14 +34,18 @@ vi.mock('components/_pages/certificates/CertificateStatus', () => ({
 }));
 
 vi.mock('components/PagedList/PagedList', () => ({
-    default: ({ headers, data, additionalButtons, onDeleteCallback }: any) => (
+    default: ({ configurableColumns, additionalButtons, onDeleteCallback }: any) => (
         <div>
-            <div data-testid="headers">{headers.map((h: any) => h.content).join('|')}</div>
+            <div data-testid="headers">
+                {(configurableColumns?.standardColumns || []).map((column: any) => column.catalogueLabel).join('|')}
+            </div>
             <div data-testid="rows">
-                {(data || []).map((row: any) => (
-                    <div key={row.id} data-testid={`row-${row.id}`}>
-                        {(row.columns || []).map((column: any, index: number) => (
-                            <span key={`${row.id}-col-${index}`}>{column}</span>
+                {(configurableColumns?.rows || []).map((row: any) => (
+                    <div key={configurableColumns.getRowId(row)} data-testid={`row-${configurableColumns.getRowId(row)}`}>
+                        {(configurableColumns.standardColumns || []).map((column: any) => (
+                            <span key={`${configurableColumns.getRowId(row)}-${column.fieldIdentifier}`}>
+                                {configurableColumns.registry?.[`${column.fieldSource}:${column.fieldIdentifier}`]?.(row)}
+                            </span>
                         ))}
                     </div>
                 ))}
