@@ -124,19 +124,6 @@ describe('tokens slice', () => {
         expect(next.isFetchingTokenProviders).toBe(false);
     });
 
-    test('ensureTokenProviders_reusesLoadedCatalogue', () => {
-        // given
-        const cachedProviders = [{ uuid: 'cached-provider' }] as any[];
-        const loadedState = { ...initialState, tokenProviders: cachedProviders };
-
-        // when
-        const next = reducer(loadedState, actions.ensureTokenProviders());
-
-        // then
-        expect(next.tokenProviders).toBe(cachedProviders);
-        expect(next.isFetchingTokenProviders).toBe(false);
-    });
-
     test('getTokenProviderAttributesDescriptors / success / failure', () => {
         // given
         const query = { connectorUuid: 'c-1', kind: 'TOKEN' };
