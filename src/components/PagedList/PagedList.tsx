@@ -174,6 +174,9 @@ function PagedList<TRow extends object>({
     const [confirmDelete, setConfirmDelete] = useState(false);
     const hasLoadedOnce = useRef(false);
     const hasFetchStarted = useRef(false);
+    // State rather than a ref like its neighbours above: releasing the skeleton has to re-render, and
+    // a page whose request never reaches the paging duck would otherwise sit on it for good.
+    const [hasRequested, setHasRequested] = useState(false);
 
     const onCheckedRowsChanged = useCallback(
         (rows: (string | number)[]) => {
@@ -319,6 +322,7 @@ function PagedList<TRow extends object>({
 
     useEffect(() => {
         getFreshData();
+        setHasRequested(true);
     }, [getFreshData]);
 
     const buttons: WidgetButtonProps[] = useMemo(() => {
@@ -373,7 +377,10 @@ function PagedList<TRow extends object>({
         [effectivePageNumber, totalItems, pageSize],
     );
 
-    if (isFetchingList && columnRows.length === 0 && !hasLoadedOnce.current) {
+    // `!hasRequested` holds the skeleton over the render that precedes the effect above. Painting the
+    // real page there mounts the filter widget, which reads the catalogue, only for the request that
+    // effect sends to replace the page with this skeleton and read it again on the way back.
+    if (columnRows.length === 0 && !hasLoadedOnce.current && (isFetchingList || !hasRequested)) {
         const estimatedButtonCount = (addHidden ? 0 : 1) + (onDeleteCallback ? 1 : 0) + (additionalButtons?.length ?? 0);
         return (
             <PagedListSkeleton
