@@ -4,6 +4,7 @@ import { createRoot, type Root } from 'react-dom/client';
 
 import PagedList from './PagedList';
 import { EntityType } from 'ducks/filters';
+import { FilterFieldSource, Resource } from 'types/openapi';
 
 (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -29,6 +30,7 @@ vi.mock('react-router', () => ({
 
 vi.mock('components/FilterWidget', () => ({
     default: ({ title }: any) => <div data-testid="filter-widget">{title}</div>,
+    FilterWidgetSkeleton: ({ title }: any) => <div data-testid="filter-widget-skeleton">{title}</div>,
 }));
 
 vi.mock('components/Widget', () => ({
@@ -454,6 +456,65 @@ describe('PagedList unit coverage', () => {
 
         const dialog = container.querySelector('[data-testid="dialog"]') as HTMLElement;
         expect(dialog.textContent).toContain('CBOM');
+    });
+
+    it('keeps the loaded table mounted while an empty list refetches', async () => {
+        const paging = mockState.pagings.pagings[0].paging;
+        paging.totalItems = 0;
+        paging.isFetchingList = true;
+
+        await renderPagedList({ data: [], getAvailableFiltersApi: vi.fn() });
+        expect(container.querySelector('[data-testid="table"]')).toBeNull();
+
+        paging.isFetchingList = false;
+        await renderPagedList({ data: [], getAvailableFiltersApi: vi.fn() });
+        expect(container.querySelector('[data-testid="table"]')).toBeTruthy();
+
+        paging.isFetchingList = true;
+        await renderPagedList({ data: [], getAvailableFiltersApi: vi.fn() });
+
+        expect(container.querySelector('[data-testid="table"]')).toBeTruthy();
+        expect(container.querySelector('[data-testid="filter-widget"]')).toBeTruthy();
+    });
+
+    it('does not list again when the filter catalogue is re-read', async () => {
+        const onListCallback = vi.fn();
+        const filter = mockState.filters.filters[0].filter;
+
+        await renderPagedList({ onListCallback, getAvailableFiltersApi: vi.fn() });
+        expect(onListCallback).toHaveBeenCalledTimes(1);
+
+        filter.availableFilters = [];
+        await renderPagedList({ onListCallback, getAvailableFiltersApi: vi.fn() });
+
+        expect(onListCallback).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not list again when the catalogue makes a column-driven page sortable', async () => {
+        const onListCallback = vi.fn();
+        const filter = mockState.filters.filters[0].filter;
+
+        // A page ships its column set without sort flags, exactly as the certificate and key
+        // inventories do, so merging the catalogue rebuilds every column object.
+        const configurableColumns = {
+            resource: Resource.Certificates,
+            standardColumns: [{ fieldSource: FilterFieldSource.Property, fieldIdentifier: 'COMMON_NAME', catalogueLabel: 'Common Name' }],
+            rows: [],
+            getRowId: (row: any) => row.uuid,
+        };
+
+        await renderPagedList({ onListCallback, configurableColumns, data: undefined, headers: undefined });
+        expect(onListCallback).toHaveBeenCalledTimes(1);
+
+        filter.availableFilters = [
+            {
+                filterFieldSource: FilterFieldSource.Property,
+                searchFieldData: [{ fieldIdentifier: 'COMMON_NAME', fieldLabel: 'Common Name', sortable: true, displayable: true }],
+            },
+        ];
+        await renderPagedList({ onListCallback, configurableColumns, data: undefined, headers: undefined });
+
+        expect(onListCallback).toHaveBeenCalledTimes(1);
     });
 
     it('uses plural entity name in dialog when multiple rows are selected', async () => {
