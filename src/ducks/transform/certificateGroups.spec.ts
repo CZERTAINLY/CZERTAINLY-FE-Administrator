@@ -1,5 +1,9 @@
 import { describe, expect, test } from 'vitest';
-import { transformCertificateGroupRequestModelToDto, transformCertificateGroupResponseDtoToModel } from './certificateGroups';
+import {
+    transformCertificateGroupRequestModelToDto,
+    transformCertificateGroupResponseDtoToModel,
+    transformGroupUserDtoToModel,
+} from './certificateGroups';
 
 describe('certificateGroups transforms', () => {
     test('transformCertificateGroupRequestModelToDto result customAttributes is undefined when not provided', () => {
@@ -26,5 +30,12 @@ describe('certificateGroups transforms', () => {
         const group = { uuid: 'group-2', name: 'Response Group', customAttributes: [attr] } as any;
         const result = transformCertificateGroupResponseDtoToModel(group);
         expect(result.customAttributes).toHaveLength(1);
+    });
+
+    test('transformGroupUserDtoToModel copies uuid and name into a new object', () => {
+        const dto = { uuid: 'u1', name: 'alice' };
+        const result = transformGroupUserDtoToModel(dto);
+        expect(result).toEqual(dto);
+        expect(result).not.toBe(dto);
     });
 });

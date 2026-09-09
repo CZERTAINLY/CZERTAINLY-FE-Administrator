@@ -66,6 +66,7 @@ export enum LockWidgetNameEnum {
     TokenDetails,
     ListOfGroups,
     GroupDetails,
+    GroupUsers,
     EntityStore,
     EntityDetails,
     LocationsStore,

@@ -341,6 +341,14 @@ test.describe('CustomTable', () => {
         await expect(component.getByText('There are no records to display here yet')).toBeVisible();
     });
 
+    test('should show the caller-provided empty state description when data is empty', async ({ mount }) => {
+        const component = await mount(
+            withProviders(<CustomTable headers={mockHeaders} data={[]} emptyStateDescription="No users are assigned to this group" />),
+        );
+        await expect(component.getByText('No items to show')).toBeVisible();
+        await expect(component.getByText('No users are assigned to this group')).toBeVisible();
+    });
+
     test('should show No matching items when search filters all rows out', async ({ mount }) => {
         const component = await mount(withProviders(<CustomTable headers={mockHeaders} data={mockData} canSearch={true} />));
         await component.getByPlaceholder('Search').fill('xyznonexistent');

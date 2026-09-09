@@ -8,7 +8,7 @@ import { actions, selectors } from 'ducks/certificateGroups';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRunOnSuccessfulFinish } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
 import GroupForm from '../form';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -28,7 +28,9 @@ export default function GroupDetail() {
     const { id } = useParams();
 
     const group = useSelector(selectors.certificateGroup);
+    const groupUsers = useSelector(selectors.groupUsers);
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
+    const isFetchingGroupUsers = useSelector(selectors.isFetchingGroupUsers);
     const isUpdating = useSelector(selectors.isUpdating);
     const updateGroupSucceeded = useSelector(selectors.updateGroupSucceeded);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
@@ -40,9 +42,15 @@ export default function GroupDetail() {
         dispatch(actions.getGroupDetail({ uuid: id }));
     }, [id, dispatch]);
 
+    const getFreshGroupUsers = useCallback(() => {
+        if (!id) return;
+        dispatch(actions.getGroupUsers({ uuid: id }));
+    }, [id, dispatch]);
+
     useEffect(() => {
         getFreshGroupDetails();
-    }, [getFreshGroupDetails, id]);
+        getFreshGroupUsers();
+    }, [getFreshGroupDetails, getFreshGroupUsers]);
 
     useRunOnSuccessfulFinish(isUpdating, updateGroupSucceeded, () => {
         setIsEditModalOpen(false);
@@ -98,8 +106,32 @@ export default function GroupDetail() {
         [group],
     );
 
+    const usersHeaders: TableHeader[] = useMemo(
+        () => [
+            { id: 'username', content: 'Username', sortable: true, sort: 'asc', width: '30%' },
+            { id: 'uuid', content: 'UUID', sortable: true },
+        ],
+        [],
+    );
+
+    const usersData: TableDataRow[] = useMemo(
+        () =>
+            groupUsers.map((user) => ({
+                id: user.uuid,
+                columns: [
+                    <Link key="username" to={`../users/detail/${user.uuid}`}>
+                        {user.name}
+                    </Link>,
+                    <span key="uuid" className="font-mono text-xs text-content-subtle">
+                        {user.uuid}
+                    </span>,
+                ],
+            })),
+        [groupUsers],
+    );
+
     if (isFetchingDetail && !group) {
-        return <DetailPageSkeleton layout="tabs" tabCount={2} />;
+        return <DetailPageSkeleton layout="tabs" tabCount={3} />;
     }
 
     return (
@@ -136,6 +168,27 @@ export default function GroupDetail() {
                                             />
                                         )}
                                     </Container>
+                                ),
+                            },
+                            {
+                                title: 'Users',
+                                content: (
+                                    <Widget
+                                        title="Users"
+                                        titleSize="large"
+                                        busy={isFetchingGroupUsers}
+                                        widgetLockName={LockWidgetNameEnum.GroupUsers}
+                                        refreshAction={getFreshGroupUsers}
+                                    >
+                                        <CustomTable
+                                            headers={usersHeaders}
+                                            data={usersData}
+                                            canSearch={true}
+                                            hasPagination={true}
+                                            isLoading={isFetchingGroupUsers && groupUsers.length === 0}
+                                            emptyStateDescription="No users are assigned to this group"
+                                        />
+                                    </Widget>
                                 ),
                             },
                             {
