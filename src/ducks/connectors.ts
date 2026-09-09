@@ -55,6 +55,9 @@ export type State = {
     isBulkAuthorizing: boolean;
     isRunningCallback: { [key: string]: boolean };
     callbackSeq: { [key: string]: number };
+
+    /** Bumped whenever a mutation needs the listing re-read; the page forwards it as `refreshToken`. */
+    listRefreshToken: number;
 };
 
 function removeConnectorsByUuids(state: State, uuids: string[]) {
@@ -103,6 +106,8 @@ export const initialState: State = {
     isBulkAuthorizing: false,
     isRunningCallback: {},
     callbackSeq: {},
+
+    listRefreshToken: 0,
 };
 
 export const slice = createSlice({
@@ -475,6 +480,9 @@ export const slice = createSlice({
 
         bulkAuthorizeConnectorsSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
             state.isBulkAuthorizing = false;
+            // The host re-reads its own request rather than the epic listing here: the request carries
+            // the applied columns and ordering, which a list action assembled elsewhere cannot.
+            state.listRefreshToken += 1;
         },
 
         bulkAuthorizeConnectorsFailure: (state, action: PayloadAction<void>) => {
@@ -555,6 +563,7 @@ const isReconnecting = createSelector(state, (state) => state.isReconnecting);
 const isBulkReconnecting = createSelector(state, (state) => state.isBulkReconnecting);
 const isAuthorizing = createSelector(state, (state) => state.isAuthorizing);
 const isBulkAuthorizing = createSelector(state, (state) => state.isBulkAuthorizing);
+const listRefreshToken = createSelector(state, (state) => state.listRefreshToken);
 const isRunningCallback = createSelector(state, (state) => state.isRunningCallback);
 
 export const selectors = {
@@ -595,6 +604,7 @@ export const selectors = {
     isAuthorizing,
     isBulkAuthorizing,
     isRunningCallback,
+    listRefreshToken,
 };
 
 export const actions = slice.actions;

@@ -104,6 +104,9 @@ export default function ConnectorList() {
         [dispatch],
     );
 
+    // An approval re-reads through the host so the replayed request keeps the applied columns and ordering.
+    const refreshToken = useSelector(selectors.listRefreshToken);
+
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
@@ -202,6 +205,7 @@ export default function ConnectorList() {
                 addHidden
                 additionalButtons={buttons}
                 pageWidgetLockName={LockWidgetNameEnum.ConnectorStore}
+                refreshToken={refreshToken}
             />
 
             <Dialog

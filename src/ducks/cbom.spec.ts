@@ -182,9 +182,10 @@ describe('cbom slice', () => {
 
         next = reducer(next, actions.bulkDeleteCbomSuccess({ uuids: ['cbom-1', 'cbom-3'] }));
         expect(next.isBulkDeleting).toBe(false);
-        // Items are not spliced optimistically — the epic triggers a server re-fetch.
+        // Items are not spliced optimistically — the host re-reads on the bumped refresh token.
         expect(next.cbomsData!.items).toEqual([{ uuid: 'cbom-1' }, { uuid: 'cbom-2' }, { uuid: 'cbom-3' }]);
         expect(next.cbomsData!.totalItems).toBe(3);
+        expect(next.listRefreshToken).toBe(initialState.listRefreshToken + 1);
 
         next = reducer({ ...next, isBulkDeleting: true }, actions.bulkDeleteCbomFailure({ error: 'err' }));
         expect(next.isBulkDeleting).toBe(false);

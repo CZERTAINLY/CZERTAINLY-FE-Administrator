@@ -2,7 +2,8 @@ import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { actions, selectors } from 'ducks/discoveries';
-import { EntityType } from 'ducks/filters';
+import { EntityType, actions as filterActions } from 'ducks/filters';
+import { actions as pagingActions } from 'ducks/paging';
 import { dateFormatter, durationFormatter } from 'utils/dateUtil';
 
 import type { ApiClients } from '../../../../api';
@@ -53,10 +54,16 @@ function DiscoveryList() {
         setIsAddModalOpen(false);
     }, []);
 
+    // Back to an unfiltered first page, so the discovery just created is on it. The refresh goes through
+    // the token rather than a request assembled here, which would carry no columns and no ordering.
+    const [refreshToken, setRefreshToken] = useState(0);
+
     const handleFormSuccess = useCallback(() => {
         handleCloseAddModal();
-        onListCallback({ itemsPerPage: 10, pageNumber: 1, filters: [] });
-    }, [handleCloseAddModal, onListCallback]);
+        dispatch(filterActions.setCurrentFilters({ entity: EntityType.DISCOVERY, currentFilters: [] }));
+        dispatch(pagingActions.resetPaging({ entity: EntityType.DISCOVERY }));
+        setRefreshToken((token) => token + 1);
+    }, [handleCloseAddModal, dispatch]);
 
     const handleCreateSuccess = useCallback(() => {
         if (!isAddModalOpen) return;
@@ -93,6 +100,7 @@ function DiscoveryList() {
                 pageWidgetLockName={LockWidgetNameEnum.DiscoveriesStore}
                 addHidden
                 additionalButtons={additionalButtons}
+                refreshToken={refreshToken}
             />
             <Dialog
                 isOpen={isAddModalOpen}

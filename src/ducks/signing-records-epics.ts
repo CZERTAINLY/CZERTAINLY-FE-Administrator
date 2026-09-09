@@ -151,8 +151,10 @@ const bulkDeleteSigningRecords: AppEpic = (action$, state, deps) => {
                         // Success alert only when every selected record was deleted; partial
                         // failures surface through bulkDeleteErrorMessages instead.
                         ...(errors.length === 0 ? [alertsSlice.actions.success('Selected Signing Records successfully deleted.')] : []),
-                        // Only re-align the paging slice when the deletion emptied the current page
-                        // and we had to step back; otherwise the re-fetch below is enough.
+                        // Only re-align the paging slice when the deletion emptied the current page and
+                        // we had to step back. The re-read itself rides on the refresh token that
+                        // `bulkDeleteSigningRecordsSuccess` bumps, so the host replays its own request —
+                        // columns and ordering included — rather than one assembled from paging here.
                         ...(pageNumberChanged
                             ? [
                                   pagingActions.setPagination({
@@ -162,7 +164,6 @@ const bulkDeleteSigningRecords: AppEpic = (action$, state, deps) => {
                                   }),
                               ]
                             : []),
-                        slice.actions.listSigningRecords(listParams),
                     );
                 }),
                 catchError((err) =>

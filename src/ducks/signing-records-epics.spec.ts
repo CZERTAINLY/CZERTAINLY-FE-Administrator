@@ -156,7 +156,7 @@ describe('signingRecords epics', () => {
         expect(emitted[1].type).toBe(alertsSlice.actions.success.type);
     });
 
-    test('bulkDeleteSigningRecords success (no errors, page unchanged) emits success, alert and a re-fetch without setPagination', async () => {
+    test('bulkDeleteSigningRecords success emits success and alert, and re-reads through the host rather than listing here', async () => {
         const deps = createDeps({
             bulkDeleteSigningRecords: ({ requestBody }) => {
                 expect(requestBody).toEqual(['rec-1', 'rec-2']);
@@ -165,7 +165,7 @@ describe('signingRecords epics', () => {
         });
 
         // On page 1 with 5 items, deleting 2 still leaves page 1 populated, so the page does not
-        // shift and no setPagination is dispatched — only the re-fetch of the current page.
+        // shift and no setPagination is dispatched.
         const state$ = {
             value: {
                 pagings: {
@@ -187,11 +187,12 @@ describe('signingRecords epics', () => {
             state$,
             deps as any,
         );
-        const emitted = await firstValueFrom(output$.pipe(take(3), toArray()));
+        const emitted = await firstValueFrom(output$.pipe(take(2), toArray()));
 
         expect(emitted[0]).toEqual(slice.actions.bulkDeleteSigningRecordsSuccess({ uuids: ['rec-1', 'rec-2'], errors: [] }));
         expect(emitted[1].type).toBe(alertsSlice.actions.success.type);
-        expect(emitted[2]).toEqual(slice.actions.listSigningRecords({ pageNumber: 1, itemsPerPage: 10, filters: [] }));
+        // The listing is the host's to issue: only its own request names the applied columns and ordering.
+        expect(emitted.some((a: any) => a.type === slice.actions.listSigningRecords.type)).toBe(false);
         expect(emitted.some((a: any) => a.type === pagingActions.setPagination.type)).toBe(false);
     });
 
@@ -222,15 +223,15 @@ describe('signingRecords epics', () => {
             state$,
             deps as any,
         );
-        const emitted = await firstValueFrom(output$.pipe(take(4), toArray()));
+        const emitted = await firstValueFrom(output$.pipe(take(3), toArray()));
 
         expect(emitted[2]).toEqual(pagingActions.setPagination({ entity: EntityType.SIGNING_RECORD, pageNumber: 1, pageSize: 5 }));
-        expect(emitted[3]).toEqual(slice.actions.listSigningRecords({ pageNumber: 1, itemsPerPage: 5, filters: [] }));
+        expect(emitted.some((a: any) => a.type === slice.actions.listSigningRecords.type)).toBe(false);
     });
 
-    test('bulkDeleteSigningRecords with partial errors re-fetches the list without a success alert', async () => {
-        // rec-1 fails, rec-2 is deleted server-side. Since the reducers no longer splice locally,
-        // the deleted row must be removed by a re-fetch — but with no success alert.
+    test('bulkDeleteSigningRecords with partial errors reports the failures without a success alert', async () => {
+        // rec-1 fails, rec-2 is deleted server-side. The deleted row goes when the host re-reads on the
+        // refresh token the success reducer bumps — but there is no success alert.
         const errors = [{ uuid: 'rec-1', name: 'rec-1', message: 'In use' }] as any;
         const deps = createDeps({ bulkDeleteSigningRecords: () => of(errors) });
 
@@ -253,10 +254,10 @@ describe('signingRecords epics', () => {
             state$,
             deps as any,
         );
-        const emitted = await firstValueFrom(output$.pipe(take(4), toArray()));
+        const emitted = await firstValueFrom(output$.pipe(toArray()));
 
         expect(emitted[0]).toEqual(slice.actions.bulkDeleteSigningRecordsSuccess({ uuids: ['rec-1', 'rec-2'], errors }));
-        expect(emitted.some((a: any) => a.type === slice.actions.listSigningRecords.type)).toBe(true);
+        expect(emitted.some((a: any) => a.type === slice.actions.listSigningRecords.type)).toBe(false);
         expect(emitted.some((a: any) => a.type === alertsSlice.actions.success.type)).toBe(false);
         expect(emitted.some((a: any) => a.type === pagingActions.setPagination.type)).toBe(false);
     });

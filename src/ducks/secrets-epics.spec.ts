@@ -149,7 +149,7 @@ describe('secrets epics', () => {
         expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to get Secret content' }));
     });
 
-    test('createSecret success emits createSecretSuccess, redirect and success alert', async () => {
+    test('createSecret success redirects to the inventory without listing it, leaving that to the host', async () => {
         const payload = {
             vaultUuid: 'v-1',
             vaultProfileUuid: 'vp-1',
@@ -160,12 +160,13 @@ describe('secrets epics', () => {
                 attributes: [],
             } as any,
         };
-        const emitted = await runEpic(SecretsEpicIndex.Create, secretsActions.createSecret(payload), {}, 4);
+        const emitted = await runEpic(SecretsEpicIndex.Create, secretsActions.createSecret(payload), {}, 3);
 
         expect(emitted[0].type).toBe(secretsActions.createSecretSuccess.type);
-        expect(emitted[1]).toEqual(secretsActions.listSecrets({ pageNumber: 1, itemsPerPage: 10, filters: [] }));
-        expect(emitted[2]).toEqual(appRedirectActions.redirect({ url: '/secrets' }));
-        expect(emitted[3]).toEqual(alertActions.success('Secret created successfully.'));
+        expect(emitted[1]).toEqual(appRedirectActions.redirect({ url: '/secrets' }));
+        expect(emitted[2]).toEqual(alertActions.success('Secret created successfully.'));
+        // The inventory lists under the columns and ordering it owns, which this request could not name.
+        expect(emitted.some((action: any) => action.type === secretsActions.listSecrets.type)).toBe(false);
     });
 
     test('deleteSecret success emits deleteSecretSuccess and info fetchError', async () => {

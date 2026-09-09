@@ -372,10 +372,12 @@ const createSecret: AppEpic = (action$, state$, deps) => {
                     secretRequestDto: action.payload.request,
                 })
                 .pipe(
+                    // No listing is issued here: the redirect mounts the inventory, which lists under the
+                    // columns and ordering it owns. A request assembled here would carry neither, and
+                    // would race the host's own — leaving whichever landed last on screen.
                     mergeMap((secret) =>
                         of(
                             slice.actions.createSecretSuccess({ secret }),
-                            slice.actions.listSecrets({ pageNumber: 1, itemsPerPage: 10, filters: [] }),
                             appRedirectActions.redirect({ url: '/secrets' }),
                             alertActions.success('Secret created successfully.'),
                         ),

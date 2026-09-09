@@ -68,6 +68,9 @@ function SigningRecordsList() {
 
     const onList = useCallback((filters: SearchRequestModel) => dispatch(actions.listSigningRecords(filters)), [dispatch]);
 
+    // A bulk delete re-reads through the host so the replayed request keeps the applied columns and ordering.
+    const refreshToken = useSelector(selectors.selectListRefreshToken);
+
     return (
         <>
             <PagedList
@@ -96,6 +99,7 @@ function SigningRecordsList() {
                 addHidden
                 hasCheckboxes={true}
                 pageWidgetLockName={LockWidgetNameEnum.ListOfSigningRecords}
+                refreshToken={refreshToken}
             />
 
             <Dialog

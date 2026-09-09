@@ -15,7 +15,8 @@ import { dateFormatter } from 'utils/dateUtil';
 import { buildCbomCellRegistry, CBOM_COLUMNS } from '../cbomTableHelpers';
 import type { SearchRequestModel } from 'types/certificate';
 import { type ApiClients, backendClient } from 'src/api';
-import { EntityType } from 'ducks/filters';
+import { EntityType, actions as filterActions } from 'ducks/filters';
+import { actions as pagingActions } from 'ducks/paging';
 
 function CbomsList() {
     const dispatch = useDispatch();
@@ -150,10 +151,23 @@ function CbomsList() {
     const isUploadSuccess = useSelector(selectors.selectIsUploadSuccess);
     const syncSucceeded = useSelector(selectors.selectSyncSucceeded);
 
+    // Back to an unfiltered first page, so the CBOM the upload produced is on it. The refresh goes
+    // through the token rather than a request assembled here, which would carry no columns and no
+    // ordering — blanking every picker-added column and dropping the applied sort.
+    const [pageRefreshToken, setPageRefreshToken] = useState(0);
+    const deleteRefreshToken = useSelector(selectors.selectListRefreshToken);
+    const refreshToken = pageRefreshToken + deleteRefreshToken;
+
+    const refreshFromFirstPage = useCallback(() => {
+        dispatch(filterActions.setCurrentFilters({ entity: EntityType.CBOM, currentFilters: [] }));
+        dispatch(pagingActions.resetPaging({ entity: EntityType.CBOM }));
+        setPageRefreshToken((token) => token + 1);
+    }, [dispatch]);
+
     useRunOnSuccessfulFinish(isUploading, isUploadSuccess, () => {
         setIsUploadOpen(false);
         setHighlightedCbomUuid(cboms[0]?.uuid);
-        onList({ itemsPerPage: 10, pageNumber: 1, filters: [] });
+        refreshFromFirstPage();
     });
 
     useEffect(() => {
@@ -165,9 +179,7 @@ function CbomsList() {
         return () => globalThis.clearTimeout(timeoutId);
     }, [highlightedCbomUuid]);
 
-    useRunOnSuccessfulFinish(isSyncing, syncSucceeded, () => {
-        onList({ itemsPerPage: 10, pageNumber: 1, filters: [] });
-    });
+    useRunOnSuccessfulFinish(isSyncing, syncSucceeded, refreshFromFirstPage);
 
     return (
         <>
@@ -195,6 +207,7 @@ function CbomsList() {
                 hasCheckboxes={true}
                 additionalButtons={additionalButtons}
                 pageWidgetLockName={LockWidgetNameEnum.ListOfCboms}
+                refreshToken={refreshToken}
             />
 
             <Dialog
