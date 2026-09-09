@@ -131,7 +131,7 @@ export default function GroupDetail() {
     );
 
     if (isFetchingDetail && !group) {
-        return <DetailPageSkeleton layout="tabs" tabCount={3} />;
+        return <DetailPageSkeleton layout="tabs" tabCount={4} />;
     }
 
     return (
