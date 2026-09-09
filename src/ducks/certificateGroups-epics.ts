@@ -9,7 +9,11 @@ import { slice } from './certificateGroups';
 import { actions as userInterfaceActions } from './user-interface';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { transformCertificateGroupRequestModelToDto, transformCertificateGroupResponseDtoToModel } from './transform/certificateGroups';
+import {
+    transformCertificateGroupRequestModelToDto,
+    transformCertificateGroupResponseDtoToModel,
+    transformGroupUserDtoToModel,
+} from './transform/certificateGroups';
 
 const listGroups: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -55,6 +59,32 @@ const getGroupDetail: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.getGroupDetailFailure({ error: extractError(err, 'Failed to get Group detail') }),
                         userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.GroupDetails),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const getGroupUsers: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getGroupUsers.match),
+        switchMap((action) =>
+            deps.apiClients.certificateGroups.getGroupUsers({ uuid: action.payload.uuid }).pipe(
+                switchMap((users) =>
+                    of(
+                        slice.actions.getGroupUsersSuccess({
+                            uuid: action.payload.uuid,
+                            users: users.map(transformGroupUserDtoToModel),
+                        }),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.GroupUsers),
+                    ),
+                ),
+
+                catchError((err) =>
+                    of(
+                        slice.actions.getGroupUsersFailure({ error: extractError(err, 'Failed to get Group users') }),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.GroupUsers),
                     ),
                 ),
             ),
@@ -162,6 +192,6 @@ const bulkDeleteProfiles: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const epics = [listGroups, getGroupDetail, createGroup, updateGroup, deleteGroup, bulkDeleteProfiles];
+const epics = [listGroups, getGroupDetail, getGroupUsers, createGroup, updateGroup, deleteGroup, bulkDeleteProfiles];
 
 export default epics;
