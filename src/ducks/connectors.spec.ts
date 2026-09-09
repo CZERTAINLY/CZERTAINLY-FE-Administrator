@@ -576,4 +576,12 @@ describe('connectors selectors', () => {
         expect(next.connectorAuthAttributes).toBeUndefined();
         expect(next.isFetchingAuthAttributes).toBe(false);
     });
+
+    test('bulkAuthorizeConnectorsSuccess asks the host to re-read its own listing request', () => {
+        const next = reducer({ ...initialState, isBulkAuthorizing: true }, actions.bulkAuthorizeConnectorsSuccess({ uuids: ['c-1'] }));
+
+        expect(next.isBulkAuthorizing).toBe(false);
+        expect(next.listRefreshToken).toBe(initialState.listRefreshToken + 1);
+        expect(selectors.listRefreshToken({ connectors: next } as any)).toBe(initialState.listRefreshToken + 1);
+    });
 });

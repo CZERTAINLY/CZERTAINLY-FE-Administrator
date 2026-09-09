@@ -290,9 +290,16 @@ export function toViewSlice(
     };
 }
 
-/** The Standard tab's own slice: the platform columns, no filters and no ordering of its own. */
-export function toStandardSlice(standardColumns: readonly ColumnDefinition[]): ViewSlice {
-    return { columns: [...standardColumns], filters: [], sort: undefined };
+/**
+ * The Standard tab's own slice: the platform columns, no filters, and the ordering the page declares
+ * as its default.
+ *
+ * The ordering belongs to Standard rather than being an opening value the first render happens to
+ * hold. Applying Standard is what a page load, a tab switch back and a reset all go through, so an
+ * ordering held anywhere else is cleared by the first of them and never comes back.
+ */
+export function toStandardSlice(standardColumns: readonly ColumnDefinition[], sort?: ColumnSort): ViewSlice {
+    return { columns: [...standardColumns], filters: [], sort };
 }
 
 /** A column list reduced to what a view actually stores, so two can be compared for equality. */

@@ -406,12 +406,10 @@ const bulkAuthorizeConnectors: AppEpic = (action$, state, deps) => {
         filter(slice.actions.bulkAuthorizeConnectors.match),
         switchMap((action) =>
             deps.apiClients.connectorsV2.bulkApproveV2({ requestBody: action.payload.uuids }).pipe(
-                mergeMap(() =>
-                    of(
-                        slice.actions.bulkAuthorizeConnectorsSuccess({ uuids: action.payload.uuids }),
-                        slice.actions.listConnectors(entityListParams(EntityType.CONNECTOR, state.value)),
-                    ),
-                ),
+                // The re-read rides on the refresh token that `bulkAuthorizeConnectorsSuccess` bumps, so
+                // the host replays its own request — columns and ordering included — rather than one
+                // assembled from paging and filters here.
+                mergeMap(() => of(slice.actions.bulkAuthorizeConnectorsSuccess({ uuids: action.payload.uuids }))),
 
                 catchError((error) =>
                     of(

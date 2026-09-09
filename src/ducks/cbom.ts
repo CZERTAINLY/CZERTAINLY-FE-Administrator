@@ -28,6 +28,9 @@ export type State = {
     isBulkDeleting: boolean;
     isSyncing: boolean;
     syncSucceeded: boolean;
+
+    /** Bumped whenever a mutation needs the listing re-read; the page forwards it as `refreshToken`. */
+    listRefreshToken: number;
 };
 
 export const initialState: State = {
@@ -44,6 +47,8 @@ export const initialState: State = {
     isBulkDeleting: false,
     isSyncing: false,
     syncSucceeded: false,
+
+    listRefreshToken: 0,
 };
 
 export const slice = createSlice({
@@ -174,8 +179,9 @@ export const slice = createSlice({
 
         bulkDeleteCbomSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
             state.isBulkDeleting = false;
-            // On success the epic re-fetches the list from the server, so no optimistic
-            // list mutation is needed here.
+            // The host re-reads its own request rather than this slice pruning the rows: the request
+            // carries the applied columns and ordering, which a list action assembled elsewhere cannot.
+            state.listRefreshToken += 1;
         },
 
         bulkDeleteCbomFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -220,6 +226,7 @@ export const selectIsDeleting = createSelector(featureSelector, (state) => state
 export const selectIsBulkDeleting = createSelector(featureSelector, (state) => state.isBulkDeleting);
 export const selectIsSyncing = createSelector(featureSelector, (state) => state.isSyncing);
 export const selectSyncSucceeded = createSelector(featureSelector, (state) => state.syncSucceeded);
+export const selectListRefreshToken = createSelector(featureSelector, (state) => state.listRefreshToken);
 
 export const selectors = {
     selectCbomsData,
@@ -239,6 +246,7 @@ export const selectors = {
     selectIsBulkDeleting,
     selectIsSyncing,
     selectSyncSucceeded,
+    selectListRefreshToken,
 };
 
 export const { actions } = slice;

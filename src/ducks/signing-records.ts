@@ -23,6 +23,9 @@ export type State = {
     isFetchingSearchableFields: boolean;
     isDeleting: boolean;
     isBulkDeleting: boolean;
+
+    /** Bumped whenever a mutation needs the listing re-read; the page forwards it as `refreshToken`. */
+    listRefreshToken: number;
 };
 
 export const initialState: State = {
@@ -35,6 +38,8 @@ export const initialState: State = {
     isFetchingSearchableFields: false,
     isDeleting: false,
     isBulkDeleting: false,
+
+    listRefreshToken: 0,
 };
 
 export const slice = createSlice({
@@ -142,10 +147,16 @@ export const slice = createSlice({
         bulkDeleteSigningRecordsSuccess: (state, action: PayloadAction<{ uuids: string[]; errors: BulkActionMessageDto[] }>) => {
             state.isBulkDeleting = false;
 
-            // On success the epic re-fetches the list from the server, so no optimistic
-            // list mutation is needed here — we only surface any per-item failures.
-            if (action.payload.errors?.length > 0) {
-                state.bulkDeleteErrorMessages = action.payload.errors;
+            const errors = action.payload.errors ?? [];
+            if (errors.length > 0) {
+                state.bulkDeleteErrorMessages = errors;
+            }
+
+            // The host re-reads its own request rather than this slice pruning the rows: the request
+            // carries the applied columns and ordering, which a list action assembled elsewhere cannot.
+            // Nothing deleted means nothing to re-read — every uuid came back as a per-item failure.
+            if (action.payload.uuids.length > errors.length) {
+                state.listRefreshToken += 1;
             }
         },
 
@@ -178,6 +189,7 @@ export const selectIsFetchingDetail = createSelector(featureSelector, (state) =>
 export const selectIsFetchingSearchableFields = createSelector(featureSelector, (state) => state.isFetchingSearchableFields);
 export const selectIsDeleting = createSelector(featureSelector, (state) => state.isDeleting);
 export const selectIsBulkDeleting = createSelector(featureSelector, (state) => state.isBulkDeleting);
+export const selectListRefreshToken = createSelector(featureSelector, (state) => state.listRefreshToken);
 
 export const selectors = {
     selectSigningRecordsData,
@@ -193,6 +205,7 @@ export const selectors = {
     selectIsFetchingSearchableFields,
     selectIsDeleting,
     selectIsBulkDeleting,
+    selectListRefreshToken,
 };
 
 export const { actions } = slice;

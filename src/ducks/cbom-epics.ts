@@ -206,8 +206,10 @@ const bulkDeleteCbom: AppEpic = (action$, state, deps) => {
                     return of(
                         slice.actions.bulkDeleteCbomSuccess({ uuids: action.payload.uuids }),
                         alertsSlice.actions.success('Selected CBOMs successfully deleted.'),
-                        // Only re-align the paging slice when the deletion emptied the current page
-                        // and we had to step back; otherwise the re-fetch below is enough.
+                        // Only re-align the paging slice when the deletion emptied the current page and
+                        // we had to step back. The re-read itself rides on the refresh token that
+                        // `bulkDeleteCbomSuccess` bumps, so the host replays its own request — columns
+                        // and ordering included — instead of one assembled from paging and filters here.
                         ...(pageNumberChanged
                             ? [
                                   pagingActions.setPagination({
@@ -217,7 +219,6 @@ const bulkDeleteCbom: AppEpic = (action$, state, deps) => {
                                   }),
                               ]
                             : []),
-                        slice.actions.listCboms(listParams),
                     );
                 }),
                 catchError((err) =>

@@ -50,6 +50,11 @@ export type ViewTabsProps = Readonly<{
     isCatalogueLoaded?: boolean;
     /** The platform default column set for this page, which is what the Standard tab shows. */
     standardColumns: ColumnDefinition[];
+    /**
+     * The ordering the Standard tab lists under, i.e. the page's declared default. Part of Standard,
+     * so returning to the tab restores it and a page opening on it is not reported as drifted.
+     */
+    standardSort?: ColumnSort;
     /** The column keys the page has a cell renderer for; gates a stored view's columns and the picker. */
     renderableProperties?: ReadonlySet<string>;
     /** The columns the table is showing, which a saved view may since have drifted from. */
@@ -85,6 +90,7 @@ export default function ViewTabs({
     catalogue,
     isCatalogueLoaded,
     standardColumns,
+    standardSort,
     renderableProperties,
     columns,
     filters,
@@ -142,11 +148,11 @@ export default function ViewTabs({
      * offering a Save that changes nothing.
      */
     const storedSlice = useMemo(() => {
-        if (!activeView) return toStandardSlice(standardColumns);
+        if (!activeView) return toStandardSlice(standardColumns, standardSort);
 
         const slice = toViewSlice(activeView, fields, standardColumns);
         return { ...slice, filters: toStorableFilters(slice.filters, catalogue) };
-    }, [activeView, fields, standardColumns, catalogue]);
+    }, [activeView, fields, standardColumns, standardSort, catalogue]);
 
     /** The stored columns this table cannot render, which the notice names and the picker can remove. */
     const unavailable = useMemo(() => resolved?.columns.filter((column) => !column.available) ?? [], [resolved]);
@@ -182,9 +188,9 @@ export default function ViewTabs({
 
     const apply = useCallback(
         (view: ListViewModel | undefined) => {
-            applyRef.current(view ? toViewSlice(view, fields, standardColumns) : toStandardSlice(standardColumns));
+            applyRef.current(view ? toViewSlice(view, fields, standardColumns) : toStandardSlice(standardColumns, standardSort));
         },
-        [fields, standardColumns],
+        [fields, standardColumns, standardSort],
     );
 
     const select = useCallback(
@@ -210,10 +216,10 @@ export default function ViewTabs({
         setActiveId(initial);
         applyRef.current(
             initial === STANDARD_VIEW_ID
-                ? toStandardSlice(standardColumns)
+                ? toStandardSlice(standardColumns, standardSort)
                 : toViewSlice(views.find((view) => view.uuid === initial) as ListViewModel, fields, standardColumns),
         );
-    }, [resource, isReady, views, fields, standardColumns]);
+    }, [resource, isReady, views, fields, standardColumns, standardSort]);
 
     // The tab the strip was on when a create started, so a create that fails has somewhere to go back
     // to instead of leaving the strip pointing at a row the rollback has taken away.

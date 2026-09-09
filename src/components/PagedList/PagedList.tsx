@@ -24,6 +24,7 @@ import {
     toColumnSortFromHeader,
     toDisplayableSort,
     withCatalogueSortability,
+    withDeclaredSortability,
 } from './columnState';
 import PagedListSkeleton from './PagedListSkeleton';
 import type { IconName } from 'types/icons';
@@ -48,6 +49,11 @@ export interface ConfigurableColumns<TRow extends object> {
     rowOptions?: (row: TRow) => TableDataRow['options'];
     headerInfo?: Readonly<Record<string, ReactNode>>;
     resourceLabel?: string;
+    /**
+     * The ordering the page opens on. A page that sorted client-side before it was column-driven has to name it here,
+     * because a column-driven table hands sorting to the server and would otherwise open in API order.
+     */
+    defaultSort?: ColumnSort;
 }
 
 type Props<TRow extends object> = {
@@ -126,9 +132,6 @@ function PagedList<TRow extends object>({
     const catalogue = useSelector(filterSelectors.availableFilters(entity));
     const hasLoadedCatalogue = useSelector(filterSelectors.hasLoadedFilters(entity));
 
-    const [columnSelection, setColumnSelection] = useState<ColumnDefinition[]>(NO_COLUMNS);
-    const [sortSelection, setSortSelection] = useState<ColumnSort | undefined>(undefined);
-
     // Taken apart rather than depended on whole: an unmemoised config would rebuild `getFreshData`
     // every render, and the effect watching it would refetch forever.
     const isColumnDriven = configurableColumns !== undefined;
@@ -141,13 +144,20 @@ function PagedList<TRow extends object>({
         rowOptions,
         headerInfo,
         resourceLabel,
+        defaultSort,
     } = configurableColumns ?? ({} as Partial<ConfigurableColumns<TRow>>);
+
+    const [columnSelection, setColumnSelection] = useState<ColumnDefinition[]>(NO_COLUMNS);
+    const [sortSelection, setSortSelection] = useState<ColumnSort | undefined>(defaultSort);
 
     const renderableProperties = useMemo(() => getRenderableProperties(registry), [registry]);
 
     const sortableStandardColumns = useMemo(
-        () => (hasLoadedCatalogue ? withCatalogueSortability(standardColumns ?? NO_COLUMNS, catalogue) : (standardColumns ?? NO_COLUMNS)),
-        [hasLoadedCatalogue, standardColumns, catalogue],
+        () =>
+            hasLoadedCatalogue
+                ? withCatalogueSortability(standardColumns ?? NO_COLUMNS, catalogue)
+                : withDeclaredSortability(standardColumns ?? NO_COLUMNS, defaultSort),
+        [hasLoadedCatalogue, standardColumns, catalogue, defaultSort],
     );
 
     // Holds only the deviation and falls back, so a config arriving after the first render cannot
@@ -351,20 +361,22 @@ function PagedList<TRow extends object>({
         return result.sort((a, b) => (a.icon === 'plus' ? -1 : 1));
     }, [checkedRows, additionalButtons, navigate, addHidden, onDeleteCallback]);
 
-    // An applied ordering counts, or there would be no way back from it.
-    const hasNonDefaultViewState = currentFilters.length > 0 || pageNumber > 1 || pageSize !== 10 || appliedSort !== undefined;
+    // An ordering the page did not declare counts, or there would be no way back from it. Measured
+    // against `defaultSort` rather than against no ordering at all, so a page that opens sorted is not
+    // permanently offering to reset itself to the state it is already in.
+    const hasNonDefaultViewState = currentFilters.length > 0 || pageNumber > 1 || pageSize !== 10 || !isSameSort(appliedSort, defaultSort);
 
     const onResetView = useCallback(() => {
         dispatch(filterActions.setCurrentFilters({ entity, currentFilters: [] }));
         dispatch(filterActions.setPreservedFilters({ entity, preservedFilters: [] }));
         dispatch(actions.resetPaging({ entity }));
         // The columns stay: they belong to the tab the strip is on, and the strip offers Revert.
-        setSortSelection(undefined);
+        setSortSelection(defaultSort);
         const rootRoute = location.pathname.split('/')[1] ?? '';
         if (rootRoute) {
             dispatch(tablePaginationActions.clearPaginationByRootRoute({ rootRoute }));
         }
-    }, [dispatch, entity, location.pathname]);
+    }, [dispatch, entity, location.pathname, defaultSort]);
 
     const paginationData = useMemo(
         () => ({
@@ -407,6 +419,7 @@ function PagedList<TRow extends object>({
                     catalogue={catalogue}
                     isCatalogueLoaded={hasLoadedCatalogue}
                     standardColumns={sortableStandardColumns}
+                    standardSort={defaultSort}
                     renderableProperties={renderableProperties}
                     columns={appliedColumns}
                     filters={currentFilters}

@@ -60,6 +60,20 @@ export function withCatalogueSortability(
 }
 
 /**
+ * A platform column set with the page's own declared ordering marked sortable. The catalogue is the authority on
+ * sortability, but it arrives after the first render, and until it does no column carries the flag — so
+ * `toDisplayableSort` would drop the declared ordering and the first listing request would go out in API order, to be
+ * corrected by a second one. A page naming a `defaultSort` asserts the API can order by that column, which is the same
+ * assertion its static column set already makes; the catalogue still overrules it once read.
+ */
+export function withDeclaredSortability(columns: ColumnDefinition[], sort: ColumnSort | undefined): ColumnDefinition[] {
+    if (!sort) return columns;
+
+    const key = getSortKey(sort);
+    return columns.map((column) => (getColumnKey(column) === key && column.sortable !== true ? { ...column, sortable: true } : column));
+}
+
+/**
  * The listing request for a page state. `columns` and `sort` are spread in only when they carry
  * something, so a request with neither is byte-identical to one written before the contract had them.
  */

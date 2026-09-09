@@ -1,20 +1,18 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router';
-
-import Badge from 'components/Badge';
-import ConnectorLink from 'components/ConnectorLink';
 
 import { actions, selectors } from 'ducks/discoveries';
-import { EntityType } from 'ducks/filters';
+import { EntityType, actions as filterActions } from 'ducks/filters';
+import { actions as pagingActions } from 'ducks/paging';
 import { dateFormatter, durationFormatter } from 'utils/dateUtil';
 
 import type { ApiClients } from '../../../../api';
-import type { TableDataRow, TableHeader } from 'components/CustomTable';
 import PagedList from 'components/PagedList/PagedList';
 import type { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import DiscoveryStatus from '../DiscoveryStatus';
+import { Resource } from 'types/openapi';
+import type { DiscoveryResponseModel } from 'types/discoveries';
+import { buildDiscoveryCellRegistry, DISCOVERY_COLUMNS, DISCOVERY_DEFAULT_SORT } from '../discoveryTableHelpers';
 import Dialog from 'components/Dialog';
 import DiscoveryForm from '../form';
 import type { WidgetButtonProps } from 'components/WidgetButtons';
@@ -31,89 +29,19 @@ function DiscoveryList() {
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
     const isBusy = isDeleting || isBulkDeleting;
 
-    const discoveriesRowHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                content: 'Name',
-                sortable: true,
-                sort: 'asc',
-                id: 'discoveryName',
-                width: 'auto',
-            },
-            {
-                content: 'Discovery Provider',
-                align: 'center',
-                sortable: true,
-                id: 'discoveryProvider',
-                width: '15%',
-            },
-            {
-                content: 'Kinds',
-                align: 'center',
-                sortable: true,
-                id: 'kinds',
-                width: '15%',
-            },
-            {
-                content: 'Start time',
-                align: 'center',
-                sortable: true,
-                id: 'startTime',
-                width: '10%',
-            },
-            {
-                content: 'Duration',
-                align: 'center',
-                sortable: true,
-                id: 'duration',
-                width: '5%',
-            },
-            {
-                content: 'Status',
-                align: 'center',
-                sortable: true,
-                id: 'status',
-                width: '10%',
-            },
-            {
-                content: 'Total Certificates',
-                align: 'center',
-                sortable: true,
-                sortType: 'numeric',
-                id: 'totalCertificates',
-                width: '10%',
-            },
-        ],
-        [],
-    );
+    const registry = useMemo(() => buildDiscoveryCellRegistry({ dateFormatter, durationFormatter }), []);
 
-    const discoveryList: TableDataRow[] = useMemo(
-        () =>
-            discoveries.map((discovery) => ({
-                id: discovery.uuid,
-                columns: [
-                    <Link key="name" to={`./detail/${discovery.uuid}`}>
-                        {discovery.name}
-                    </Link>,
-                    <ConnectorLink key="connector" uuid={discovery.connectorUuid} name={discovery.connectorName} fallback="Unassigned" />,
-                    <Badge key="kind" color="secondary">
-                        {discovery.kind}
-                    </Badge>,
-                    discovery.startTime ? (
-                        <span key="startTime" style={{ whiteSpace: 'nowrap' }}>
-                            {dateFormatter(discovery.startTime)}
-                        </span>
-                    ) : (
-                        ''
-                    ),
-                    <span key={`duration${discovery.uuid}`} style={{ whiteSpace: 'nowrap' }}>
-                        {durationFormatter(discovery.startTime, discovery.endTime)}
-                    </span>,
-                    <DiscoveryStatus key="status" status={discovery.status} />,
-                    discovery.totalCertificatesDiscovered?.toString() || '0',
-                ],
-            })),
-        [discoveries],
+    const configurableColumns = useMemo(
+        () => ({
+            resource: Resource.Discoveries,
+            standardColumns: DISCOVERY_COLUMNS,
+            rows: discoveries,
+            getRowId: (discovery: DiscoveryResponseModel) => discovery.uuid,
+            registry,
+            defaultSort: DISCOVERY_DEFAULT_SORT,
+            resourceLabel: 'Discoveries',
+        }),
+        [discoveries, registry],
     );
 
     const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listDiscoveries(filters)), [dispatch]);
@@ -126,10 +54,16 @@ function DiscoveryList() {
         setIsAddModalOpen(false);
     }, []);
 
+    // Back to an unfiltered first page, so the discovery just created is on it. The refresh goes through
+    // the token rather than a request assembled here, which would carry no columns and no ordering.
+    const [refreshToken, setRefreshToken] = useState(0);
+
     const handleFormSuccess = useCallback(() => {
         handleCloseAddModal();
-        onListCallback({ itemsPerPage: 10, pageNumber: 1, filters: [] });
-    }, [handleCloseAddModal, onListCallback]);
+        dispatch(filterActions.setCurrentFilters({ entity: EntityType.DISCOVERY, currentFilters: [] }));
+        dispatch(pagingActions.resetPaging({ entity: EntityType.DISCOVERY }));
+        setRefreshToken((token) => token + 1);
+    }, [handleCloseAddModal, dispatch]);
 
     const handleCreateSuccess = useCallback(() => {
         if (!isAddModalOpen) return;
@@ -157,8 +91,7 @@ function DiscoveryList() {
                 onListCallback={onListCallback}
                 onDeleteCallback={(uuids) => dispatch(actions.bulkDeleteDiscovery({ uuids }))}
                 getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.discoveries.getDiscoverySearchableFields(), [])}
-                headers={discoveriesRowHeaders}
-                data={discoveryList}
+                configurableColumns={configurableColumns}
                 isBusy={isBusy}
                 title="Discovery Store"
                 entityNameSingular="a Discovery"
@@ -167,6 +100,7 @@ function DiscoveryList() {
                 pageWidgetLockName={LockWidgetNameEnum.DiscoveriesStore}
                 addHidden
                 additionalButtons={additionalButtons}
+                refreshToken={refreshToken}
             />
             <Dialog
                 isOpen={isAddModalOpen}

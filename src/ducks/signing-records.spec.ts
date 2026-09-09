@@ -113,12 +113,13 @@ describe('signingRecords slice', () => {
         const next = reducer(state, actions.bulkDeleteSigningRecordsSuccess({ uuids: ['rec-1', 'rec-3'], errors: [] }));
 
         expect(next.isBulkDeleting).toBe(false);
-        // Bulk delete no longer touches the list or the deleted-uuid signal — the epic re-fetches
-        // from the server (deletedSigningRecordUuids is only used by the detail page's single delete).
+        // Bulk delete no longer touches the list or the deleted-uuid signal — the host re-reads on the
+        // bumped refresh token (deletedSigningRecordUuids is only used by the detail page's single delete).
         expect(next.deletedSigningRecordUuids).toEqual([]);
         expect(next.signingRecordsData?.items).toEqual([{ uuid: 'rec-1' }, { uuid: 'rec-2' }, { uuid: 'rec-3' }]);
         expect(next.signingRecordsData?.totalItems).toBe(3);
         expect(next.bulkDeleteErrorMessages).toEqual([]);
+        expect(next.listRefreshToken).toBe(initialState.listRefreshToken + 1);
     });
 
     test('bulkDeleteSigningRecords success with errors stores messages and keeps items', () => {
@@ -142,6 +143,20 @@ describe('signingRecords slice', () => {
         expect(next.deletedSigningRecordUuids).toEqual([]);
         expect(next.signingRecordsData?.items).toEqual([{ uuid: 'rec-1' }, { uuid: 'rec-2' }]);
         expect(next.signingRecordsData?.totalItems).toBe(2);
+        // rec-2 was deleted, so the listing still has to be re-read.
+        expect(next.listRefreshToken).toBe(initialState.listRefreshToken + 1);
+    });
+
+    test('bulk delete with every item failing asks for no re-read', () => {
+        const errors = [
+            { uuid: 'rec-1', name: 'rec-1', message: 'In use' },
+            { uuid: 'rec-2', name: 'rec-2', message: 'In use' },
+        ] as any;
+
+        const next = reducer(initialState, actions.bulkDeleteSigningRecordsSuccess({ uuids: ['rec-1', 'rec-2'], errors }));
+
+        expect(next.bulkDeleteErrorMessages).toEqual(errors);
+        expect(next.listRefreshToken).toBe(initialState.listRefreshToken);
     });
 
     test('clearDeleteErrorMessages resets bulk delete error messages', () => {

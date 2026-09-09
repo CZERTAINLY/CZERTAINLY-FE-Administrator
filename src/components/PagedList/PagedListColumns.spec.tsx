@@ -83,6 +83,16 @@ const listRequests = async (page: Page): Promise<SearchRequestModel[]> =>
 
 const lastRequest = async (page: Page): Promise<SearchRequestModel | undefined> => (await listRequests(page)).at(-1);
 
+/** The ordering of every request so far, so a later one dropping it cannot pass unnoticed. */
+const requestSorts = async (page: Page): Promise<Array<SearchRequestModel['sort']>> =>
+    (await listRequests(page)).map((request) => request.sort);
+
+const commonNameAsc = {
+    fieldSource: FilterFieldSource.Property,
+    fieldIdentifier: 'COMMON_NAME',
+    direction: SortDirection.Asc,
+};
+
 /** The displayed columns, by header id: a heading's text carries legends and the checkbox has none. */
 const headings = async (page: Page): Promise<string[]> => {
     const ids = await page.locator('thead th[data-id]').evaluateAll((cells) => cells.map((cell) => cell.getAttribute('data-id') ?? ''));
@@ -363,6 +373,49 @@ test.describe('PagedList · configurable columns', () => {
         await page.getByRole('tab', { name: 'Standard' }).click();
 
         await expect(page.getByTestId('current-filters')).not.toContainText('from-a-deep-link');
+    });
+
+    /**
+     * The declared ordering has to survive the Standard view opening over it. The strip waits for its
+     * view list and the catalogue, then applies a slice — so an ordering the first render merely held
+     * is cleared a moment after the page appears, and the inventory lists in API order.
+     */
+    test('keeps the page default ordering when the Standard view opens over it', async ({ mount, page }) => {
+        await mount(
+            <PagedListColumnsWithStore rows={rows} standardColumns={standardColumns} catalogue={catalogue} defaultSort={commonNameAsc} />,
+        );
+
+        // The summary bar first: it names the ordering the table settled on, so the request assertion
+        // below cannot pass on the pre-strip render and miss a clear that arrives a tick later.
+        await expect(page.getByTestId('view-tabs-summary-sort')).toContainText('Sorted by Common Name');
+
+        await expect.poll(() => requestSorts(page)).toEqual([commonNameAsc]);
+    });
+
+    test('restores the page default ordering when the view is reset, rather than clearing it', async ({ mount, page }) => {
+        await mount(
+            <PagedListColumnsWithStore rows={rows} standardColumns={standardColumns} catalogue={catalogue} defaultSort={commonNameAsc} />,
+        );
+        await expect(page.getByRole('tab', { name: 'Standard' })).toBeVisible();
+
+        await page.getByRole('button', { name: 'Expires At' }).click();
+        await expect.poll(async () => (await lastRequest(page))?.sort?.fieldIdentifier).toBe('NOT_AFTER');
+
+        await page.getByTestId('reset-view-icon').click();
+
+        await expect.poll(async () => (await lastRequest(page))?.sort).toEqual(commonNameAsc);
+    });
+
+    /** The declared ordering is the page's resting state, so neither surface may report it as a deviation. */
+    test('reports a page under its declared ordering as untouched, offering neither reset nor save', async ({ mount, page }) => {
+        await mount(
+            <PagedListColumnsWithStore rows={rows} standardColumns={standardColumns} catalogue={catalogue} defaultSort={commonNameAsc} />,
+        );
+
+        await expect(page.getByTestId('view-tabs-summary-sort')).toContainText('Sorted by Common Name');
+
+        await expect(page.getByTestId('view-tabs-summary-unsaved')).toHaveCount(0);
+        await expect(page.getByTestId('reset-view-icon')).toHaveCount(0);
     });
 
     test('refetches its own request, columns and ordering included, when the page asks for a refresh', async ({ mount, page }) => {

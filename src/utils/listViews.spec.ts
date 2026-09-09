@@ -323,6 +323,18 @@ describe('toStandardSlice', () => {
     it('is the platform columns with no filters and no ordering of its own', () => {
         expect(toStandardSlice(standardColumns)).toEqual({ columns: standardColumns, filters: [], sort: undefined });
     });
+
+    it('carries the ordering the page declares as its default', () => {
+        const sort = { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'COMMON_NAME', direction: SortDirection.Asc };
+
+        expect(toStandardSlice(standardColumns, sort)).toEqual({ columns: standardColumns, filters: [], sort });
+    });
+
+    it('reads a page under its declared ordering as clean, so Standard is not born drifted', () => {
+        const sort = { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'COMMON_NAME', direction: SortDirection.Asc };
+
+        expect(isSliceDirty(toStandardSlice(standardColumns, sort), { columns: standardColumns, filters: [], sort })).toBe(false);
+    });
 });
 
 describe('isSliceDirty', () => {

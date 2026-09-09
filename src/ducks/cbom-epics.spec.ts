@@ -330,7 +330,7 @@ describe('cbom epics', () => {
         expect(emitted[1]).toEqual(alertsSlice.actions.error('Failed to delete CBOM. delete failed'));
     });
 
-    test('bulkDeleteCbom success (page unchanged) emits success, alert and a re-fetch without setPagination', async () => {
+    test('bulkDeleteCbom success emits success and alert, and re-reads through the host rather than listing here', async () => {
         const uuids = ['u1', 'u2'];
         const deps = createDeps({
             bulkDeleteCbom: ({ requestBody }) => {
@@ -357,11 +357,12 @@ describe('cbom epics', () => {
         } as any;
 
         const output$ = (cbomEpics[6] as any)(of(slice.actions.bulkDeleteCbom({ uuids })), state$, deps as any);
-        const emitted = await firstValueFrom(output$.pipe(take(3), toArray()));
+        const emitted = await firstValueFrom(output$.pipe(take(2), toArray()));
 
         expect(emitted[0]).toEqual(slice.actions.bulkDeleteCbomSuccess({ uuids }));
         expect(emitted[1].type).toBe(alertsSlice.actions.success.type);
-        expect(emitted[2]).toEqual(slice.actions.listCboms({ pageNumber: 1, itemsPerPage: 10, filters: [] }));
+        // The listing is the host's to issue: only its own request names the applied columns and ordering.
+        expect(emitted.some((a: any) => a.type === slice.actions.listCboms.type)).toBe(false);
         expect(emitted.some((a: any) => a.type === pagingActions.setPagination.type)).toBe(false);
     });
 
@@ -391,11 +392,11 @@ describe('cbom epics', () => {
             state$,
             deps as any,
         );
-        const emitted = await firstValueFrom(output$.pipe(take(4), toArray()));
+        const emitted = await firstValueFrom(output$.pipe(take(3), toArray()));
 
         expect(emitted[0]).toEqual(slice.actions.bulkDeleteCbomSuccess({ uuids: ['c1', 'c2', 'c3', 'c4', 'c5'] }));
         expect(emitted[2]).toEqual(pagingActions.setPagination({ entity: EntityType.CBOM, pageNumber: 1, pageSize: 5 }));
-        expect(emitted[3]).toEqual(slice.actions.listCboms({ pageNumber: 1, itemsPerPage: 5, filters: [] }));
+        expect(emitted.some((a: any) => a.type === slice.actions.listCboms.type)).toBe(false);
     });
 
     test('bulkDeleteCbom failure emits bulkDeleteCbomFailure and error alert', async () => {

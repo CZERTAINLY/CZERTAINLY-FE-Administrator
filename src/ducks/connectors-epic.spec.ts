@@ -668,7 +668,7 @@ describe('connectors epics', () => {
         expect(emitted[1]).toEqual(appRedirectActions.fetchError({ error: err, message: 'Failed to authorize connector' }));
     });
 
-    test('bulkAuthorizeConnectors success refreshes list preserving current pagination and filters', async () => {
+    test('bulkAuthorizeConnectors success re-reads through the host rather than listing here', async () => {
         const currentFilters = [{ fieldSource: 'property', fieldIdentifier: 'name' }] as any;
         const stateValue = {
             pagings: { pagings: [{ entity: EntityType.CONNECTOR, paging: { pageNumber: 2, pageSize: 25 } }] },
@@ -685,11 +685,12 @@ describe('connectors epics', () => {
                     },
                 } as any,
             },
-            2,
+            1,
             stateValue,
         );
         expect(emitted[0]).toEqual(slice.actions.bulkAuthorizeConnectorsSuccess({ uuids: ['c-1', 'c-2'] }));
-        expect(emitted[1]).toEqual(slice.actions.listConnectors({ itemsPerPage: 25, pageNumber: 2, filters: currentFilters }));
+        // The listing is the host's to issue: only its own request names the applied columns and ordering.
+        expect(emitted.some((action: any) => action.type === slice.actions.listConnectors.type)).toBe(false);
     });
 
     test('bulkAuthorizeConnectors failure emits bulkAuthorizeConnectorsFailure and fetchError', async () => {

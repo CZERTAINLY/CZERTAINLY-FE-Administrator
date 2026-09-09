@@ -9,6 +9,7 @@ import {
     toColumnSortFromHeader,
     toDisplayableSort,
     withCatalogueSortability,
+    withDeclaredSortability,
 } from './columnState';
 
 const columns: ColumnDefinition[] = [
@@ -245,5 +246,41 @@ describe('withCatalogueSortability', () => {
 
         expect(merged[0]).toBe(standard[0]);
         expect(merged[1]).toBe(standard[1]);
+    });
+});
+
+describe('withDeclaredSortability', () => {
+    const standard: ColumnDefinition[] = [
+        { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'CONNECTOR_NAME', catalogueLabel: 'Name' },
+        { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'CONNECTOR_URL', catalogueLabel: 'URL' },
+    ];
+    const sort = { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'CONNECTOR_NAME', direction: SortDirection.Asc };
+
+    it('marks the column the page declared its ordering on as sortable', () => {
+        expect(withDeclaredSortability(standard, sort)[0].sortable).toBe(true);
+    });
+
+    it('leaves every other column alone', () => {
+        expect(withDeclaredSortability(standard, sort)[1]).toBe(standard[1]);
+    });
+
+    it('keeps the display properties the page shipped', () => {
+        const shipped: ColumnDefinition[] = [{ ...standard[0], align: 'center', label: 'Connector' }];
+
+        expect(withDeclaredSortability(shipped, sort)[0]).toEqual({ ...shipped[0], sortable: true });
+    });
+
+    it('returns the same set when the page declared no ordering', () => {
+        expect(withDeclaredSortability(standard, undefined)).toBe(standard);
+    });
+
+    it('marks nothing when the declared ordering names no shipped column', () => {
+        const missing = { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'CONNECTOR_STATUS', direction: SortDirection.Asc };
+
+        expect(withDeclaredSortability(standard, missing).some((column) => column.sortable === true)).toBe(false);
+    });
+
+    it('keeps the declared ordering displayable, so the first listing request carries it', () => {
+        expect(toDisplayableSort(sort, withDeclaredSortability(standard, sort))).toEqual(sort);
     });
 });
