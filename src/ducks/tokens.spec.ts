@@ -78,11 +78,24 @@ describe('tokens slice', () => {
     });
 
     test('clearTokenProfileAttributesDescriptors', () => {
+        // given
+        const selectedTokenUuid = 'token-1';
+
+        // when
         const next = reducer(
-            { ...initialState, tokenProfileAttributeDescriptors: [{ uuid: 'd-1' } as any] },
+            {
+                ...initialState,
+                tokenProfileAttributeDescriptors: [{ uuid: 'd-1' } as any],
+                tokenProfileAttributesTokenUuid: selectedTokenUuid,
+                isFetchingTokenProfileAttributesDescriptors: true,
+            },
             actions.clearTokenProfileAttributesDescriptors(),
         );
+
+        // then
         expect(next.tokenProfileAttributeDescriptors).toEqual([]);
+        expect(next.tokenProfileAttributesTokenUuid).toBeUndefined();
+        expect(next.isFetchingTokenProfileAttributesDescriptors).toBe(false);
     });
 
     test('listTokenProviders / success / failure', () => {
@@ -204,18 +217,70 @@ describe('tokens slice', () => {
     });
 
     test('getTokenProfileAttributesDescriptors / success / failure', () => {
-        let next = reducer(initialState, actions.getTokenProfileAttributesDescriptors({ tokenUuid: 't-1' }));
-        expect(next.isFetchingTokenProfileAttributesDescriptors).toBe(true);
-
+        // given
+        const tokenUuid = 'token-1';
         const descriptors = [{ uuid: 'd-1' }] as any[];
-        next = reducer(next, actions.getTokenProfileAttributesDescriptorsSuccess({ tokenUuid: 't-1', attributesDescriptors: descriptors }));
+
+        // when
+        let next = reducer(initialState, actions.getTokenProfileAttributesDescriptors({ tokenUuid }));
+
+        // then
+        expect(next.isFetchingTokenProfileAttributesDescriptors).toBe(true);
+        expect(next.tokenProfileAttributeDescriptors).toEqual([]);
+        expect(next.tokenProfileAttributesTokenUuid).toBe(tokenUuid);
+
+        // when
+        next = reducer(next, actions.getTokenProfileAttributesDescriptorsSuccess({ tokenUuid, attributesDescriptors: descriptors }));
+
+        // then
         expect(next.isFetchingTokenProfileAttributesDescriptors).toBe(false);
         expect(next.tokenProfileAttributeDescriptors).toEqual(descriptors);
 
+        // when
         next = reducer(
             { ...next, isFetchingTokenProfileAttributesDescriptors: true },
-            actions.getTokenProfileAttributesDescriptorsFailure({ error: 'err' }),
+            actions.getTokenProfileAttributesDescriptorsFailure({ tokenUuid, error: 'err' }),
         );
+
+        // then
+        expect(next.isFetchingTokenProfileAttributesDescriptors).toBe(false);
+    });
+
+    test('getTokenProfileAttributesDescriptors_ignoresStaleResponses', () => {
+        // given
+        const firstTokenUuid = 'token-1';
+        const secondTokenUuid = 'token-2';
+        const staleDescriptors = [{ uuid: 'stale-descriptor' }] as any[];
+        const currentDescriptors = [{ uuid: 'current-descriptor' }] as any[];
+
+        // when
+        let next = reducer(initialState, actions.getTokenProfileAttributesDescriptors({ tokenUuid: firstTokenUuid }));
+        next = reducer(next, actions.getTokenProfileAttributesDescriptors({ tokenUuid: secondTokenUuid }));
+        next = reducer(
+            next,
+            actions.getTokenProfileAttributesDescriptorsSuccess({
+                tokenUuid: firstTokenUuid,
+                attributesDescriptors: staleDescriptors,
+            }),
+        );
+        next = reducer(
+            next,
+            actions.getTokenProfileAttributesDescriptorsFailure({
+                tokenUuid: firstTokenUuid,
+                error: 'stale response',
+            }),
+        );
+        next = reducer(
+            next,
+            actions.getTokenProfileAttributesDescriptorsSuccess({
+                tokenUuid: secondTokenUuid,
+                attributesDescriptors: currentDescriptors,
+            }),
+        );
+
+        // then
+        expect(next.tokenProfileAttributesTokenUuid).toBe(secondTokenUuid);
+        expect(next.tokenProfileAttributeDescriptors).toEqual(currentDescriptors);
         expect(next.isFetchingTokenProfileAttributesDescriptors).toBe(false);
     });
 

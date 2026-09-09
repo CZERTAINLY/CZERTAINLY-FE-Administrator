@@ -138,7 +138,7 @@ const ensureTokenProviders: AppEpic = (action$, state$, deps) =>
 
 const requestTokenProviderAttributes = (deps: EpicDependencies, query: ReturnType<typeof normalizeTokenAttributesQuery>) => {
     const queryKey = getTokenAttributesQueryKey(query);
-    return defer(() => deps.apiClients.tokenInstanceAttributes.listTokenAttributes(query)).pipe(
+    return defer(() => deps.apiClients.tokenInstances.listTokenAttributes(query)).pipe(
         map((attributeDescriptors) =>
             slice.actions.getTokenProviderAttributesDescriptorsSuccess({
                 queryKey,
@@ -189,7 +189,7 @@ const getTokenProfileAttributesDescriptors: AppEpic = (action$, state, deps) => 
     return action$.pipe(
         filter(slice.actions.getTokenProfileAttributesDescriptors.match),
         switchMap((action) =>
-            deps.apiClients.tokenInstances.listTokenProfileAttributes({ uuid: action.payload.tokenUuid }).pipe(
+            deps.apiClients.tokenProfiles.listTokenProfileAttributes({ tokenInstanceUuid: action.payload.tokenUuid }).pipe(
                 map((descriptors) =>
                     slice.actions.getTokenProfileAttributesDescriptorsSuccess({
                         tokenUuid: action.payload.tokenUuid,
@@ -200,6 +200,7 @@ const getTokenProfileAttributesDescriptors: AppEpic = (action$, state, deps) => 
                 catchError((err) =>
                     of(
                         slice.actions.getTokenProfileAttributesDescriptorsFailure({
+                            tokenUuid: action.payload.tokenUuid,
                             error: extractError(err, 'Failed to get Token Profile Attribute Descriptor list'),
                         }),
                         appRedirectActions.fetchError({ error: err, message: 'Failed to get Token Profile Attribute Descriptor list' }),

@@ -49,6 +49,8 @@ export default function TokenProfileDetail() {
     const [keyUsageUpdate, setKeyUsageUpdate] = useState<boolean>(false);
 
     const keyUsageEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyUsage));
+    const supportedKeyUsages = useSelector(tokenProfilesSelectors.supportedTokenProfileKeyUsages) ?? [];
+    const isFetchingSupportedKeyUsages = useSelector(tokenProfilesSelectors.isFetchingSupportedTokenProfileKeyUsages);
     const [keyUsages, setKeyUsages] = useState<KeyUsage[]>([]);
     const isBusy = useMemo(
         () => isFetchingProfile || isDeleting || isEnabling || isDisabling || isUpdatingKeyUsage,
@@ -77,6 +79,19 @@ export default function TokenProfileDetail() {
         if (!tokenProfile) return;
         setIsEditModalOpen(true);
     }, [tokenProfile]);
+
+    const onKeyUsageEditClick = useCallback(() => {
+        if (!tokenProfile?.tokenInstanceUuid) return;
+
+        setKeyUsages(tokenProfile.usages);
+        setKeyUsageUpdate(true);
+        dispatch(tokenProfilesActions.clearSupportedTokenProfileKeyUsages());
+        dispatch(
+            tokenProfilesActions.getSupportedTokenProfileKeyUsages({
+                tokenInstanceUuid: tokenProfile.tokenInstanceUuid,
+            }),
+        );
+    }, [dispatch, tokenProfile]);
 
     const onEnableClick = useCallback(() => {
         if (!tokenProfile) return;
@@ -139,11 +154,11 @@ export default function TokenProfileDetail() {
                 disabled: !tokenProfile?.tokenInstanceUuid || false,
                 tooltip: 'Update Key Usages',
                 onClick: () => {
-                    setKeyUsageUpdate(true);
+                    onKeyUsageEditClick();
                 },
             },
         ],
-        [tokenProfile, onEditClick, onDisableClick, onEnableClick],
+        [tokenProfile, onEditClick, onDisableClick, onEnableClick, onKeyUsageEditClick],
     );
 
     const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
@@ -281,12 +296,20 @@ export default function TokenProfileDetail() {
             <Dialog
                 isOpen={keyUsageUpdate}
                 caption="Update Key Usage"
-                body={<KeyUsageSelect value={keyUsages} onChange={setKeyUsages} keyUsageEnum={keyUsageEnum} />}
+                body={
+                    <KeyUsageSelect
+                        value={keyUsages}
+                        onChange={setKeyUsages}
+                        keyUsageEnum={keyUsageEnum}
+                        supportedKeyUsages={supportedKeyUsages}
+                        isDisabled={isFetchingSupportedKeyUsages}
+                    />
+                }
                 toggle={() => setKeyUsageUpdate(false)}
                 size="md"
                 buttons={[
                     { color: 'secondary', variant: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
-                    { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
+                    { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update', disabled: isFetchingSupportedKeyUsages },
                 ]}
             />
 

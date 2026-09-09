@@ -34,13 +34,13 @@ function createDeps(overrides: Record<string, Record<string, unknown>> = {}) {
                 ...overrides.connectorsV2,
             },
             tokenInstances: {
-                listTokenProfileAttributes: () => of([]),
+                listTokenAttributes: () => of([]),
                 listTokenInstanceActivationAttributes: () => of([]),
                 ...overrides.tokenInstances,
             },
-            tokenInstanceAttributes: {
-                listTokenAttributes: () => of([]),
-                ...overrides.tokenInstanceAttributes,
+            tokenProfiles: {
+                listTokenProfileAttributes: () => of([]),
+                ...overrides.tokenProfiles,
             },
         },
     };
@@ -73,7 +73,7 @@ describe('token attribute epics', () => {
             tokenActions.ensureTokenProviderAttributesDescriptors({ connectorUuid, kind }),
             {
                 connectors: { getAttributes: oldConnectorGetAttributes },
-                tokenInstanceAttributes: { listTokenAttributes },
+                tokenInstances: { listTokenAttributes },
             },
         );
 
@@ -95,7 +95,7 @@ describe('token attribute epics', () => {
 
         // when
         await runEpic(ensureTokenProviderAttributesDescriptors, tokenActions.ensureTokenProviderAttributesDescriptors({ connectorUuid }), {
-            tokenInstanceAttributes: { listTokenAttributes },
+            tokenInstances: { listTokenAttributes },
         });
 
         // then
@@ -117,7 +117,7 @@ describe('token attribute epics', () => {
                 tokenActions.getTokenProviderAttributesDescriptors({ connectorUuid, kind: firstKind }),
                 tokenActions.getTokenProviderAttributesDescriptors({ connectorUuid, kind: secondKind }),
             ],
-            { tokenInstanceAttributes: { listTokenAttributes } },
+            { tokenInstances: { listTokenAttributes } },
             2,
         );
 
@@ -134,7 +134,7 @@ describe('token attribute epics', () => {
         const emitted = await runEpic(
             getTokenProviderAttributesDescriptors,
             tokenActions.getTokenProviderAttributesDescriptors({ connectorUuid }),
-            { tokenInstanceAttributes: { listTokenAttributes: () => throwError(() => error) } },
+            { tokenInstances: { listTokenAttributes: () => throwError(() => error) } },
             2,
         );
 
@@ -154,7 +154,7 @@ describe('token attribute epics', () => {
         const emitted = await runEpic(
             getTokenProviderAttributesDescriptors,
             tokenActions.getTokenProviderAttributesDescriptors({ connectorUuid }),
-            { tokenInstanceAttributes: { listTokenAttributes: () => throwError(() => error) } },
+            { tokenInstances: { listTokenAttributes: () => throwError(() => error) } },
             2,
         );
 
@@ -176,7 +176,7 @@ describe('token attribute epics', () => {
         const emitted = await runEpic(
             getTokenProviderAttributesDescriptors,
             tokenActions.getTokenProviderAttributesDescriptors({ connectorUuid }),
-            { tokenInstanceAttributes: { listTokenAttributes } },
+            { tokenInstances: { listTokenAttributes } },
             2,
         );
 
@@ -195,22 +195,31 @@ describe('token attribute epics', () => {
         );
     });
 
-    test('tokenProfileAndActivationAttributes_keepTheirExistingApiMethods', async () => {
+    test('getTokenProfileAttributesDescriptors_usesTokenProfileClient', async () => {
         // given
         const tokenUuid = 'token-1';
         const listTokenProfileAttributes = vi.fn(() => of([]));
-        const listTokenInstanceActivationAttributes = vi.fn(() => of([]));
 
         // when
         await runEpic(getTokenProfileAttributesDescriptors, tokenActions.getTokenProfileAttributesDescriptors({ tokenUuid }), {
-            tokenInstances: { listTokenProfileAttributes },
+            tokenProfiles: { listTokenProfileAttributes },
         });
+
+        // then
+        expect(listTokenProfileAttributes).toHaveBeenCalledWith({ tokenInstanceUuid: tokenUuid });
+    });
+
+    test('getTokenActivationAttributesDescriptors_usesTokenInstanceClient', async () => {
+        // given
+        const tokenUuid = 'token-1';
+        const listTokenInstanceActivationAttributes = vi.fn(() => of([]));
+
+        // when
         await runEpic(getTokenActivationAttributesDescriptors, tokenActions.listActivationAttributeDescriptors({ uuid: tokenUuid }), {
             tokenInstances: { listTokenInstanceActivationAttributes },
         });
 
         // then
-        expect(listTokenProfileAttributes).toHaveBeenCalledWith({ uuid: tokenUuid });
         expect(listTokenInstanceActivationAttributes).toHaveBeenCalledWith({ uuid: tokenUuid });
     });
 });
@@ -344,7 +353,7 @@ describe('token provider listing epic', () => {
         const subscription = ensureTokenProviderAttributesDescriptors(
             actions$ as any,
             state$ as any,
-            createDeps({ tokenInstanceAttributes: { listTokenAttributes } }) as any,
+            createDeps({ tokenInstances: { listTokenAttributes } }) as any,
         ).subscribe();
 
         // when

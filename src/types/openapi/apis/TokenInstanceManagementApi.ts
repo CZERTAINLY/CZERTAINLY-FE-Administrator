@@ -14,7 +14,7 @@
 import type { Observable } from 'rxjs';
 import type { AjaxResponse } from 'rxjs/ajax';
 import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
-import type { OperationOpts, HttpHeaders } from '../runtime';
+import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
 import type {
     AuthenticationServiceExceptionDto,
     BaseAttributeDto,
@@ -50,11 +50,12 @@ export interface GetTokenInstanceRequest {
     uuid: string;
 }
 
-export interface ListTokenInstanceActivationAttributesRequest {
-    uuid: string;
+export interface ListTokenAttributesRequest {
+    connectorUuid: string;
+    kind?: string;
 }
 
-export interface ListTokenProfileAttributesRequest {
+export interface ListTokenInstanceActivationAttributesRequest {
     uuid: string;
 }
 
@@ -208,6 +209,36 @@ export class TokenInstanceManagementApi extends BaseAPI {
     }
 
     /**
+     * List available token attributes for the specified connector
+     */
+    listTokenAttributes({ connectorUuid, kind }: ListTokenAttributesRequest): Observable<Array<BaseAttributeDto>>;
+    listTokenAttributes(
+        { connectorUuid, kind }: ListTokenAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<BaseAttributeDto>>>;
+    listTokenAttributes(
+        { connectorUuid, kind }: ListTokenAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
+        throwIfNullOrUndefined(connectorUuid, 'connectorUuid', 'listTokenAttributes');
+
+        const queryParams: HttpQuery = {};
+
+        if (kind != null) {
+            queryParams['kind'] = kind;
+        }
+
+        return this.request<Array<BaseAttributeDto>>(
+            {
+                url: '/v1/tokens/{connectorUuid}/attributes'.replace('{connectorUuid}', encodeURI(connectorUuid)),
+                method: 'GET',
+                queryParams,
+            },
+            opts?.responseOpts,
+        );
+    }
+
+    /**
      * List Token activation Attributes
      */
     listTokenInstanceActivationAttributes({ uuid }: ListTokenInstanceActivationAttributesRequest): Observable<Array<BaseAttributeDto>>;
@@ -239,29 +270,6 @@ export class TokenInstanceManagementApi extends BaseAPI {
         return this.request<Array<TokenInstanceDto>>(
             {
                 url: '/v1/tokens',
-                method: 'GET',
-            },
-            opts?.responseOpts,
-        );
-    }
-
-    /**
-     * List Token Profile Attributes
-     */
-    listTokenProfileAttributes({ uuid }: ListTokenProfileAttributesRequest): Observable<Array<BaseAttributeDto>>;
-    listTokenProfileAttributes(
-        { uuid }: ListTokenProfileAttributesRequest,
-        opts?: OperationOpts,
-    ): Observable<AjaxResponse<Array<BaseAttributeDto>>>;
-    listTokenProfileAttributes(
-        { uuid }: ListTokenProfileAttributesRequest,
-        opts?: OperationOpts,
-    ): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
-        throwIfNullOrUndefined(uuid, 'uuid', 'listTokenProfileAttributes');
-
-        return this.request<Array<BaseAttributeDto>>(
-            {
-                url: '/v1/tokens/{uuid}/tokenProfiles/attributes'.replace('{uuid}', encodeURI(uuid)),
                 method: 'GET',
             },
             opts?.responseOpts,

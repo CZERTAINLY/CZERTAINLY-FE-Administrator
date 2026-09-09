@@ -20,6 +20,13 @@ import { type KeyUsage, PlatformEnum } from 'types/openapi';
 import type { TokenProfileResponseModel } from 'types/token-profiles';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
+export function getCommonTokenInstanceUuid(checkedRows: string[], tokenProfiles: TokenProfileResponseModel[]): string | undefined {
+    const selectedTokenInstanceUuids = new Set(
+        tokenProfiles.filter((profile) => checkedRows.includes(profile.uuid)).map((profile) => profile.tokenInstanceUuid),
+    );
+    return selectedTokenInstanceUuids.size === 1 ? selectedTokenInstanceUuids.values().next().value : undefined;
+}
+
 function TokenProfileList() {
     const dispatch = useDispatch();
 
@@ -37,6 +44,9 @@ function TokenProfileList() {
     const isBulkEnabling = useSelector(selectors.isBulkEnabling);
     const isBulkDisabling = useSelector(selectors.isBulkDisabling);
     const isBulkUpdatingKeyUsage = useSelector(selectors.isBulkUpdatingKeyUsage);
+    const supportedKeyUsages = useSelector(selectors.supportedTokenProfileKeyUsages);
+    const supportedKeyUsagesTokenInstanceUuid = useSelector(selectors.supportedTokenProfileKeyUsagesTokenInstanceUuid);
+    const isFetchingSupportedKeyUsages = useSelector(selectors.isFetchingSupportedTokenProfileKeyUsages);
     const keyUsageEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyUsage));
 
     const isBusy =
@@ -55,6 +65,8 @@ function TokenProfileList() {
     const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
     const [editingTokenProfileId, setEditingTokenProfileId] = useState<string | undefined>(undefined);
     const [editingTokenId, setEditingTokenId] = useState<string | undefined>(undefined);
+    const bulkTokenInstanceUuid = useMemo(() => getCommonTokenInstanceUuid(checkedRows, tokenProfiles), [checkedRows, tokenProfiles]);
+    const isBulkKeyUsageLoading = isFetchingSupportedKeyUsages || supportedKeyUsagesTokenInstanceUuid !== bulkTokenInstanceUuid;
 
     const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
@@ -104,6 +116,13 @@ function TokenProfileList() {
         setKeyUsageUpdate(false);
     }, [checkedRows, dispatch, keyUsages]);
 
+    const onUpdateKeyUsageClick = useCallback(() => {
+        if (!bulkTokenInstanceUuid) return;
+        dispatch(actions.clearSupportedTokenProfileKeyUsages());
+        dispatch(actions.getSupportedTokenProfileKeyUsages({ tokenInstanceUuid: bulkTokenInstanceUuid }));
+        setKeyUsageUpdate(true);
+    }, [bulkTokenInstanceUuid, dispatch]);
+
     const setCheckedRows = useCallback(
         (rows: (string | number)[]) => {
             dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
@@ -145,14 +164,12 @@ function TokenProfileList() {
             },
             {
                 icon: 'key',
-                disabled: checkedRows.length === 0,
+                disabled: !bulkTokenInstanceUuid,
                 tooltip: 'Update Key Usage',
-                onClick: () => {
-                    setKeyUsageUpdate(true);
-                },
+                onClick: onUpdateKeyUsageClick,
             },
         ],
-        [checkedRows, handleOpenAddModal, onEnableClick, onDisableClick, setKeyUsageUpdate],
+        [checkedRows, bulkTokenInstanceUuid, handleOpenAddModal, onEnableClick, onDisableClick, onUpdateKeyUsageClick],
     );
 
     const tokenProfilesTableHeaders: TableHeader[] = useMemo(
@@ -288,12 +305,20 @@ function TokenProfileList() {
             <Dialog
                 isOpen={keyUsageUpdate}
                 caption="Update Key Usage"
-                body={<KeyUsageSelect value={keyUsages} onChange={setKeyUsages} keyUsageEnum={keyUsageEnum} />}
+                body={
+                    <KeyUsageSelect
+                        value={keyUsages}
+                        onChange={setKeyUsages}
+                        keyUsageEnum={keyUsageEnum}
+                        supportedKeyUsages={supportedKeyUsagesTokenInstanceUuid === bulkTokenInstanceUuid ? supportedKeyUsages : []}
+                        isDisabled={isBulkKeyUsageLoading}
+                    />
+                }
                 toggle={() => setKeyUsageUpdate(false)}
                 size="md"
                 buttons={[
                     { color: 'secondary', variant: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
-                    { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
+                    { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update', disabled: isBulkKeyUsageLoading },
                 ]}
             />
 

@@ -348,6 +348,9 @@ function stripEmptyResourceContent(
     return content;
 }
 
+const isEmptyAttributeContentItem = (item: FormAttributeContentItem): boolean =>
+    item.data === undefined || item.data === null || item.data === '';
+
 function shouldSkipAttribute(
     attribute: string,
     attributes: Record<string, unknown>,
@@ -369,6 +372,7 @@ export function collectFormAttributes(
     descriptors: AttributeDescriptorModel[] | undefined,
     values: FieldValues,
     existingAttributes?: Array<AttributeResponseModel | { name: string; version?: AttributeVersion }>,
+    options?: { omitEmptyContent?: boolean },
 ): AttributeRequestModel[] {
     if (!descriptors || !values[`__attributes__${id}__`]) return [];
 
@@ -389,9 +393,14 @@ export function collectFormAttributes(
 
         if (descriptor.contentType === AttributeContentType.Resource) {
             content = stripEmptyResourceContent(content);
+        } else if (options?.omitEmptyContent && Array.isArray(content)) {
+            content = content.filter((item) => !isEmptyAttributeContentItem(item));
+        } else if (options?.omitEmptyContent && !Array.isArray(content) && isEmptyAttributeContentItem(content)) {
+            content = undefined;
         }
 
         if (content === undefined) continue;
+        if (options?.omitEmptyContent && Array.isArray(content) && content.length === 0) continue;
         if (!Array.isArray(content) && content.data === undefined) continue;
 
         const contentArray = Array.isArray(content) ? content : [content];
