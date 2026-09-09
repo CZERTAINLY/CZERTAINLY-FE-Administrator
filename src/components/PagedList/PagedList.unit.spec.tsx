@@ -1,4 +1,4 @@
-import { act } from 'react';
+import { act, useEffect } from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { createRoot, type Root } from 'react-dom/client';
 
@@ -28,8 +28,15 @@ vi.mock('react-router', () => ({
     useLocation: () => ({ pathname: mockPathname }),
 }));
 
+const filterWidget = vi.hoisted(() => ({ mounts: 0 }));
+
 vi.mock('components/FilterWidget', () => ({
-    default: ({ title }: any) => <div data-testid="filter-widget">{title}</div>,
+    default: ({ title }: any) => {
+        useEffect(() => {
+            filterWidget.mounts += 1;
+        }, []);
+        return <div data-testid="filter-widget">{title}</div>;
+    },
     FilterWidgetSkeleton: ({ title }: any) => <div data-testid="filter-widget-skeleton">{title}</div>,
 }));
 
@@ -141,6 +148,7 @@ describe('PagedList unit coverage', () => {
         dispatch = vi.fn();
         navigate = vi.fn();
         mockPathname = '/test-list';
+        filterWidget.mounts = 0;
         useDispatchMock.mockReturnValue(dispatch);
         useNavigateMock.mockReturnValue(navigate);
 
@@ -456,6 +464,35 @@ describe('PagedList unit coverage', () => {
 
         const dialog = container.querySelector('[data-testid="dialog"]') as HTMLElement;
         expect(dialog.textContent).toContain('CBOM');
+    });
+
+    it('releases the skeleton with no store update behind it, so the flag cannot be a ref', async () => {
+        mockState.pagings.pagings[0].paging.totalItems = 0;
+
+        await renderPagedList({ data: [], onListCallback: vi.fn(), getAvailableFiltersApi: vi.fn() });
+
+        expect(container.querySelector('[data-testid="table"]')).toBeTruthy();
+        expect(container.querySelector('[data-testid="filter-widget"]')).toBeTruthy();
+    });
+
+    it('mounts the filter widget once across a page load, so the catalogue is read once', async () => {
+        const paging = mockState.pagings.pagings[0].paging;
+        paging.totalItems = 0;
+
+        // Stands in for the listing epic, which dispatches the in-flight marker synchronously with
+        // the request. Each render below is one the store would have driven.
+        const onListCallback = vi.fn(() => {
+            paging.isFetchingList = true;
+        });
+        const props = { data: [], onListCallback, getAvailableFiltersApi: vi.fn() };
+
+        await renderPagedList(props);
+        await renderPagedList(props);
+
+        paging.isFetchingList = false;
+        await renderPagedList(props);
+
+        expect(filterWidget.mounts).toBe(1);
     });
 
     it('keeps the loaded table mounted while an empty list refetches', async () => {
