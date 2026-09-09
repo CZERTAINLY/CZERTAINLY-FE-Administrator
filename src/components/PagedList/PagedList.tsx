@@ -24,6 +24,7 @@ import {
     toColumnSortFromHeader,
     toDisplayableSort,
     withCatalogueSortability,
+    withDeclaredSortability,
 } from './columnState';
 import PagedListSkeleton from './PagedListSkeleton';
 import type { IconName } from 'types/icons';
@@ -131,9 +132,6 @@ function PagedList<TRow extends object>({
     const catalogue = useSelector(filterSelectors.availableFilters(entity));
     const hasLoadedCatalogue = useSelector(filterSelectors.hasLoadedFilters(entity));
 
-    const [columnSelection, setColumnSelection] = useState<ColumnDefinition[]>(NO_COLUMNS);
-    const [sortSelection, setSortSelection] = useState<ColumnSort | undefined>(configurableColumns?.defaultSort);
-
     // Taken apart rather than depended on whole: an unmemoised config would rebuild `getFreshData`
     // every render, and the effect watching it would refetch forever.
     const isColumnDriven = configurableColumns !== undefined;
@@ -146,13 +144,20 @@ function PagedList<TRow extends object>({
         rowOptions,
         headerInfo,
         resourceLabel,
+        defaultSort,
     } = configurableColumns ?? ({} as Partial<ConfigurableColumns<TRow>>);
+
+    const [columnSelection, setColumnSelection] = useState<ColumnDefinition[]>(NO_COLUMNS);
+    const [sortSelection, setSortSelection] = useState<ColumnSort | undefined>(defaultSort);
 
     const renderableProperties = useMemo(() => getRenderableProperties(registry), [registry]);
 
     const sortableStandardColumns = useMemo(
-        () => (hasLoadedCatalogue ? withCatalogueSortability(standardColumns ?? NO_COLUMNS, catalogue) : (standardColumns ?? NO_COLUMNS)),
-        [hasLoadedCatalogue, standardColumns, catalogue],
+        () =>
+            hasLoadedCatalogue
+                ? withCatalogueSortability(standardColumns ?? NO_COLUMNS, catalogue)
+                : withDeclaredSortability(standardColumns ?? NO_COLUMNS, defaultSort),
+        [hasLoadedCatalogue, standardColumns, catalogue, defaultSort],
     );
 
     // Holds only the deviation and falls back, so a config arriving after the first render cannot

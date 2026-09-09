@@ -7,9 +7,17 @@ import type { EnumItemModel } from 'types/enums';
 import { FilterFieldSource, FilterFieldType } from 'types/openapi';
 import type { ColumnDefinition } from 'types/tableColumns';
 import { getConnectorCapabilities, inventoryStatus } from 'utils/connector';
+import type { ColumnSort } from 'utils/tableColumns';
 import ConnectorCapabilityBadges from './list/ConnectorCapabilityBadges';
 
 type PlatformEnumMap = { [key: string]: EnumItemModel } | undefined;
+
+/** The ordering the inventory opens on, which it sorted client-side before it was column-driven. */
+export const CONNECTOR_DEFAULT_SORT: ColumnSort = {
+    fieldSource: FilterFieldSource.Property,
+    fieldIdentifier: 'CONNECTOR_NAME',
+    direction: 'asc',
+};
 
 export interface BuildConnectorCellsOpts {
     interfaceEnum: PlatformEnumMap;
@@ -85,7 +93,8 @@ export function buildConnectorCellRegistry({
                 <Link to={`./detail/${connector.uuid}`}>{connector.name}</Link>
             </span>
         ),
-        'property:CONNECTOR_VERSION': (connector) => <span className="whitespace-nowrap">{connector.version}</span>,
+        'property:CONNECTOR_VERSION': (connector) =>
+            connector.version ? <span className="whitespace-nowrap">{connector.version}</span> : null,
         'property:CONNECTOR_INTERFACE': (connector) => {
             const { isV2, capabilityLabels } = capabilities(connector);
             return (

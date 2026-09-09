@@ -21,6 +21,18 @@ export function toFiniteNumber(value: unknown): number {
     return Number.isFinite(parsed) ? parsed : 0;
 }
 
+/** A centred numeric column. Every count this inventory shows is one, differing only in its identifier and headings. */
+function countColumn(fieldIdentifier: string, catalogueLabel: string, label: string): ColumnDefinition {
+    return {
+        fieldSource: FilterFieldSource.Property,
+        fieldIdentifier,
+        catalogueLabel,
+        label,
+        type: FilterFieldType.Number,
+        align: 'center',
+    };
+}
+
 /** The platform default column set for the CBOM inventory: what the page shipped before the picker. */
 export const CBOM_COLUMNS: ColumnDefinition[] = [
     {
@@ -30,55 +42,13 @@ export const CBOM_COLUMNS: ColumnDefinition[] = [
         label: 'Serial number',
         type: FilterFieldType.String,
     },
-    {
-        fieldSource: FilterFieldSource.Property,
-        fieldIdentifier: 'CBOM_VERSION',
-        catalogueLabel: 'Version',
-        label: 'Ver.',
-        type: FilterFieldType.Number,
-        align: 'center',
-    },
+    countColumn('CBOM_VERSION', 'Version', 'Ver.'),
     { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'CBOM_SOURCE', catalogueLabel: 'Source', type: FilterFieldType.String },
-    {
-        fieldSource: FilterFieldSource.Property,
-        fieldIdentifier: 'CBOM_ALGORITHMS_COUNT',
-        catalogueLabel: 'Algorithms Count',
-        label: 'Alg.',
-        type: FilterFieldType.Number,
-        align: 'center',
-    },
-    {
-        fieldSource: FilterFieldSource.Property,
-        fieldIdentifier: 'CBOM_CERTIFICATES_COUNT',
-        catalogueLabel: 'Certificates Count',
-        label: 'Certs',
-        type: FilterFieldType.Number,
-        align: 'center',
-    },
-    {
-        fieldSource: FilterFieldSource.Property,
-        fieldIdentifier: 'CBOM_PROTOCOLS_COUNT',
-        catalogueLabel: 'Protocols Count',
-        label: 'Proto.',
-        type: FilterFieldType.Number,
-        align: 'center',
-    },
-    {
-        fieldSource: FilterFieldSource.Property,
-        fieldIdentifier: 'CBOM_CRYPTO_MATERIAL_COUNT',
-        catalogueLabel: 'Crypto Material Count',
-        label: 'Material',
-        type: FilterFieldType.Number,
-        align: 'center',
-    },
-    {
-        fieldSource: FilterFieldSource.Property,
-        fieldIdentifier: 'CBOM_TOTAL_ASSETS_COUNT',
-        catalogueLabel: 'Total Assets Count',
-        label: 'Assets',
-        type: FilterFieldType.Number,
-        align: 'center',
-    },
+    countColumn('CBOM_ALGORITHMS_COUNT', 'Algorithms Count', 'Alg.'),
+    countColumn('CBOM_CERTIFICATES_COUNT', 'Certificates Count', 'Certs'),
+    countColumn('CBOM_PROTOCOLS_COUNT', 'Protocols Count', 'Proto.'),
+    countColumn('CBOM_CRYPTO_MATERIAL_COUNT', 'Crypto Material Count', 'Material'),
+    countColumn('CBOM_TOTAL_ASSETS_COUNT', 'Total Assets Count', 'Assets'),
 ];
 
 export function buildCbomCellRegistry({

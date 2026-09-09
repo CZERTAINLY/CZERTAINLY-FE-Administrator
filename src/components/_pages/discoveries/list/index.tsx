@@ -9,9 +9,9 @@ import type { ApiClients } from '../../../../api';
 import PagedList from 'components/PagedList/PagedList';
 import type { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { FilterFieldSource, Resource } from 'types/openapi';
+import { Resource } from 'types/openapi';
 import type { DiscoveryResponseModel } from 'types/discoveries';
-import { buildDiscoveryCellRegistry, DISCOVERY_COLUMNS } from '../discoveryTableHelpers';
+import { buildDiscoveryCellRegistry, DISCOVERY_COLUMNS, DISCOVERY_DEFAULT_SORT } from '../discoveryTableHelpers';
 import Dialog from 'components/Dialog';
 import DiscoveryForm from '../form';
 import type { WidgetButtonProps } from 'components/WidgetButtons';
@@ -37,7 +37,7 @@ function DiscoveryList() {
             rows: discoveries,
             getRowId: (discovery: DiscoveryResponseModel) => discovery.uuid,
             registry,
-            defaultSort: { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'DISCOVERY_NAME', direction: 'asc' as const },
+            defaultSort: DISCOVERY_DEFAULT_SORT,
             resourceLabel: 'Discoveries',
         }),
         [discoveries, registry],

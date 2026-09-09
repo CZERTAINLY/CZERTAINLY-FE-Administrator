@@ -5,12 +5,20 @@ import type { CellRegistry } from 'components/CustomTable/columns';
 import type { DiscoveryResponseModel } from 'types/discoveries';
 import { FilterFieldSource, FilterFieldType } from 'types/openapi';
 import type { ColumnDefinition } from 'types/tableColumns';
+import type { ColumnSort } from 'utils/tableColumns';
 import DiscoveryStatus from './DiscoveryStatus';
 
 export interface BuildDiscoveryCellsOpts {
     dateFormatter: (date: string | Date) => string;
     durationFormatter: (start?: string | null, end?: string | null) => string;
 }
+
+/** The ordering the inventory opens on, which it sorted client-side before it was column-driven. */
+export const DISCOVERY_DEFAULT_SORT: ColumnSort = {
+    fieldSource: FilterFieldSource.Property,
+    fieldIdentifier: 'DISCOVERY_NAME',
+    direction: 'asc',
+};
 
 /**
  * The platform default column set for the discoveries inventory.

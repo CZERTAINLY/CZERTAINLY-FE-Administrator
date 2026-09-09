@@ -542,6 +542,40 @@ describe('PagedList unit coverage', () => {
         );
     });
 
+    it('names the page default ordering before the catalogue has been read', async () => {
+        const onListCallback = vi.fn();
+        const configurableColumns = {
+            resource: Resource.Certificates,
+            standardColumns: [{ fieldSource: FilterFieldSource.Property, fieldIdentifier: 'COMMON_NAME', catalogueLabel: 'Common Name' }],
+            rows: [],
+            getRowId: (row: any) => row.uuid,
+            defaultSort: { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'COMMON_NAME', direction: 'asc' as const },
+        };
+        const filter = mockState.filters.filters[0].filter;
+        filter.hasLoadedFilters = false;
+        filter.availableFilters = [];
+
+        await renderPagedList({ onListCallback, configurableColumns, data: undefined, headers: undefined });
+
+        expect(onListCallback).toHaveBeenCalledWith(
+            expect.objectContaining({
+                sort: { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'COMMON_NAME', direction: 'asc' },
+            }),
+        );
+
+        // The catalogue agrees, so the request it was already sending stands and no second listing follows.
+        filter.hasLoadedFilters = true;
+        filter.availableFilters = [
+            {
+                filterFieldSource: FilterFieldSource.Property,
+                searchFieldData: [{ fieldIdentifier: 'COMMON_NAME', fieldLabel: 'Common Name', sortable: true, displayable: true }],
+            },
+        ];
+        await renderPagedList({ onListCallback, configurableColumns, data: undefined, headers: undefined });
+
+        expect(onListCallback).toHaveBeenCalledTimes(1);
+    });
+
     it('uses plural entity name in dialog when multiple rows are selected', async () => {
         mockState.pagings.pagings[0].paging.checkedRows = ['row-1', 'row-2'];
         await renderPagedList({ addHidden: true, onDeleteCallback: vi.fn() });

@@ -1,6 +1,9 @@
+import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
-import { FilterFieldSource, Resource, type SearchFieldDataByGroupDto } from 'types/openapi';
+import { renderCell } from 'components/CustomTable/columns';
+import type { ConnectorResponseModel } from 'types/connectors';
+import { ConnectorVersion, FilterFieldSource, Resource, type SearchFieldDataByGroupDto } from 'types/openapi';
 import type { ColumnDefinition } from 'types/tableColumns';
 import { toCreateRequest, toStandardSlice } from 'utils/listViews';
 import { buildCbomCellRegistry, CBOM_COLUMNS } from './cboms/cbomTableHelpers';
@@ -163,5 +166,35 @@ describe.each(inventories)('$name default columns', ({ resource, columns, regist
             .filter((identifier) => !known.includes(identifier));
 
         expect(stray).toEqual([]);
+    });
+});
+
+/**
+ * A cell that always returns an element renders blank rather than reaching the shared empty state, because
+ * `renderCell` only substitutes it for a renderer that returned nothing. The connector version is the one optional
+ * field in these inventories whose cell carries markup of its own.
+ */
+describe('optional connector version cell', () => {
+    const registry = buildConnectorCellRegistry({
+        interfaceEnum: undefined,
+        featureEnum: undefined,
+        functionGroupEnum: undefined,
+        authTypeEnum: undefined,
+        getEnumLabel: noop,
+        onOverflowClick: () => undefined,
+    });
+    const column = buildConnectorColumns(true).find((candidate) => candidate.fieldIdentifier === 'CONNECTOR_VERSION');
+
+    function render(connector: Partial<ConnectorResponseModel>): string {
+        if (!column) throw new Error('the connectors default set no longer ships a version column');
+        return renderToStaticMarkup(renderCell(connector as ConnectorResponseModel, column, registry));
+    }
+
+    it('reaches the shared empty state when the connector carries no version', () => {
+        expect(render({ uuid: 'connector-1' })).toContain('No value');
+    });
+
+    it('shows the version the connector carries', () => {
+        expect(render({ uuid: 'connector-1', version: ConnectorVersion.V2 })).toContain(ConnectorVersion.V2);
     });
 });

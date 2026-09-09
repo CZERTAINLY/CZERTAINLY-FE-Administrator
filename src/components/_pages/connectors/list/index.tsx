@@ -15,9 +15,9 @@ import { EntityType } from 'ducks/filters';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { selectors as pagingSelectors } from 'ducks/paging';
 import type { SearchRequestModel } from 'types/certificate';
-import { FilterFieldSource, PlatformEnum, Resource } from 'types/openapi';
+import { PlatformEnum, Resource } from 'types/openapi';
 import type { ConnectorResponseModel } from 'types/connectors';
-import { buildConnectorCellRegistry, buildConnectorColumns } from '../connectorTableHelpers';
+import { buildConnectorCellRegistry, buildConnectorColumns, CONNECTOR_DEFAULT_SORT } from '../connectorTableHelpers';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { getConnectorCapabilities } from 'utils/connector';
 import { featureFlags } from 'utils/feature-flags';
@@ -183,7 +183,7 @@ export default function ConnectorList() {
             rows: connectors,
             getRowId: (connector: ConnectorResponseModel) => connector.uuid,
             registry,
-            defaultSort: { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'CONNECTOR_NAME', direction: 'asc' as const },
+            defaultSort: CONNECTOR_DEFAULT_SORT,
             resourceLabel: 'Connectors',
         }),
         [connectors, registry, standardColumns],
