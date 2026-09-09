@@ -230,16 +230,21 @@ describe('resolveColumns', () => {
 
     /**
      * A platform default column can be absent from the filter-field catalogue and still renderable —
-     * the keys inventory ships three such columns. Marking those unavailable would drop them from the
-     * view on the next save.
+     * `CK_ASSOCIATIONS` on the keys inventory is one. Marking those unavailable would drop them from
+     * the view on the next save.
      */
     it('keeps a platform column the catalogue does not publish available', () => {
         const platform: ColumnDefinition[] = [
-            { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'CKI_ENABLED', catalogueLabel: 'Status', align: 'center' },
+            {
+                fieldSource: FilterFieldSource.Property,
+                fieldIdentifier: 'CK_ASSOCIATIONS',
+                catalogueLabel: 'Associations',
+                align: 'center',
+            },
         ];
 
         expect(resolveColumns(platform, fields, platform)[0]).toMatchObject({
-            catalogueLabel: 'Status',
+            catalogueLabel: 'Associations',
             align: 'center',
             available: true,
         });
@@ -247,7 +252,7 @@ describe('resolveColumns', () => {
 
     it('still marks an unknown column unavailable when a standard set is given', () => {
         const platform: ColumnDefinition[] = [
-            { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'CKI_ENABLED', catalogueLabel: 'Status' },
+            { fieldSource: FilterFieldSource.Property, fieldIdentifier: 'CK_ASSOCIATIONS', catalogueLabel: 'Associations' },
         ];
 
         expect(resolveColumns(stored, fields, platform).map((column) => column.available)).toEqual([true, false, true]);
