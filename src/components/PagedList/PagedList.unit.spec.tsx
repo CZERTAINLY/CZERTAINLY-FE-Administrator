@@ -466,7 +466,7 @@ describe('PagedList unit coverage', () => {
         expect(dialog.textContent).toContain('CBOM');
     });
 
-    it('gives up the skeleton even when the listing request never marks itself in flight', async () => {
+    it('releases the skeleton with no store update behind it, so the flag cannot be a ref', async () => {
         mockState.pagings.pagings[0].paging.totalItems = 0;
 
         await renderPagedList({ data: [], onListCallback: vi.fn(), getAvailableFiltersApi: vi.fn() });

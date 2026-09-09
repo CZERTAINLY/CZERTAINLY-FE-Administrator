@@ -176,7 +176,7 @@ function PagedList<TRow extends object>({
     const hasFetchStarted = useRef(false);
     // State rather than a ref like its neighbours above: releasing the skeleton has to re-render, and
     // a page whose request never reaches the paging duck would otherwise sit on it for good.
-    const [hasRequested, setHasRequested] = useState(false);
+    const [hasSentFirstRequest, setHasSentFirstRequest] = useState(false);
 
     const onCheckedRowsChanged = useCallback(
         (rows: (string | number)[]) => {
@@ -322,7 +322,7 @@ function PagedList<TRow extends object>({
 
     useEffect(() => {
         getFreshData();
-        setHasRequested(true);
+        setHasSentFirstRequest(true);
     }, [getFreshData]);
 
     const buttons: WidgetButtonProps[] = useMemo(() => {
@@ -377,10 +377,14 @@ function PagedList<TRow extends object>({
         [effectivePageNumber, totalItems, pageSize],
     );
 
-    // `!hasRequested` holds the skeleton over the render that precedes the effect above. Painting the
-    // real page there mounts the filter widget, which reads the catalogue, only for the request that
-    // effect sends to replace the page with this skeleton and read it again on the way back.
-    if (columnRows.length === 0 && !hasLoadedOnce.current && (isFetchingList || !hasRequested)) {
+    // Holds the skeleton over the render that precedes the listing effect. Painting the real page
+    // there mounts the filter widget, and the request that effect sends unmounts it again — the
+    // remount re-read described in the note on `hasLoadedOnce`. Mounting once instead delays the
+    // widget's catalogue read and the view strip's `listViews` read by a round trip, accepted at the
+    // cost of a pinned view reaching the table a paint after the standard columns.
+    const isAwaitingFirstPage = columnRows.length === 0 && !hasLoadedOnce.current && (isFetchingList || !hasSentFirstRequest);
+
+    if (isAwaitingFirstPage) {
         const estimatedButtonCount = (addHidden ? 0 : 1) + (onDeleteCallback ? 1 : 0) + (additionalButtons?.length ?? 0);
         return (
             <PagedListSkeleton
