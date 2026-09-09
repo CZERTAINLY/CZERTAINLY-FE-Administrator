@@ -1,10 +1,12 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
-import { renderCell } from 'components/CustomTable/columns';
+import { type CellRegistry, renderCell } from 'components/CustomTable/columns';
 import type { ConnectorResponseModel } from 'types/connectors';
+import type { DiscoveryResponseModel } from 'types/discoveries';
 import { ConnectorVersion, FilterFieldSource, Resource, type SearchFieldDataByGroupDto } from 'types/openapi';
 import type { ColumnDefinition } from 'types/tableColumns';
+import { durationFormatter } from 'utils/dateUtil';
 import { toCreateRequest, toStandardSlice } from 'utils/listViews';
 import { buildCbomCellRegistry, CBOM_COLUMNS } from './cboms/cbomTableHelpers';
 import { buildConnectorCellRegistry, buildConnectorColumns } from './connectors/connectorTableHelpers';
@@ -171,11 +173,11 @@ describe.each(inventories)('$name default columns', ({ resource, columns, regist
 
 /**
  * A cell that always returns an element renders blank rather than reaching the shared empty state, because
- * `renderCell` only substitutes it for a renderer that returned nothing. The connector version is the one optional
- * field in these inventories whose cell carries markup of its own.
+ * `renderCell` only substitutes it for a renderer that returned nothing. These are the default columns whose value
+ * can be absent while the cell around it carries markup of its own.
  */
-describe('optional connector version cell', () => {
-    const registry = buildConnectorCellRegistry({
+describe('cells whose value can be absent', () => {
+    const connectorRegistry = buildConnectorCellRegistry({
         interfaceEnum: undefined,
         featureEnum: undefined,
         functionGroupEnum: undefined,
@@ -183,18 +185,40 @@ describe('optional connector version cell', () => {
         getEnumLabel: noop,
         onOverflowClick: () => undefined,
     });
-    const column = buildConnectorColumns(true).find((candidate) => candidate.fieldIdentifier === 'CONNECTOR_VERSION');
+    const discoveryRegistry = buildDiscoveryCellRegistry({ dateFormatter: () => 'a date', durationFormatter });
 
-    function render(connector: Partial<ConnectorResponseModel>): string {
-        if (!column) throw new Error('the connectors default set no longer ships a version column');
-        return renderToStaticMarkup(renderCell(connector as ConnectorResponseModel, column, registry));
+    function render<TRow extends object>(row: TRow, columns: ColumnDefinition[], registry: CellRegistry<TRow>, identifier: string) {
+        const column = columns.find((candidate) => candidate.fieldIdentifier === identifier);
+        if (!column) throw new Error(`the default set no longer ships ${identifier}`);
+        return renderToStaticMarkup(renderCell(row, column, registry));
     }
 
-    it('reaches the shared empty state when the connector carries no version', () => {
-        expect(render({ uuid: 'connector-1' })).toContain('No value');
+    const connectorColumns = buildConnectorColumns(true);
+
+    function connectorVersion(connector: Partial<ConnectorResponseModel>) {
+        return render(connector as ConnectorResponseModel, connectorColumns, connectorRegistry, 'CONNECTOR_VERSION');
+    }
+
+    function discoveryDuration(discovery: Partial<DiscoveryResponseModel>) {
+        return render(discovery as DiscoveryResponseModel, DISCOVERY_COLUMNS, discoveryRegistry, 'DISCOVERY_DURATION');
+    }
+
+    it('reaches the empty state for a connector carrying no version', () => {
+        expect(connectorVersion({ uuid: 'connector-1' })).toContain('No value');
     });
 
-    it('shows the version the connector carries', () => {
-        expect(render({ uuid: 'connector-1', version: ConnectorVersion.V2 })).toContain(ConnectorVersion.V2);
+    it('shows the version a connector carries', () => {
+        expect(connectorVersion({ uuid: 'connector-1', version: ConnectorVersion.V2 })).toContain(ConnectorVersion.V2);
+    });
+
+    it('reaches the empty state for a discovery that has not started', () => {
+        expect(discoveryDuration({ uuid: 'discovery-1' })).toContain('No value');
+    });
+
+    it('shows the duration a started discovery has run for', () => {
+        const markup = discoveryDuration({ uuid: 'discovery-1', startTime: '2026-01-01T00:00:00Z', endTime: '2026-01-01T00:00:05Z' });
+
+        expect(markup).not.toContain('No value');
+        expect(markup).toContain('05');
     });
 });

@@ -83,9 +83,12 @@ export function buildDiscoveryCellRegistry({
         'property:DISCOVERY_KIND': (discovery) => (discovery.kind ? <Badge color="secondary">{discovery.kind}</Badge> : null),
         'property:DISCOVERY_START_TIME': (discovery) =>
             discovery.startTime ? <span className="whitespace-nowrap">{dateFormatter(discovery.startTime)}</span> : null,
-        'property:DISCOVERY_DURATION': (discovery) => (
-            <span className="whitespace-nowrap">{durationFormatter(discovery.startTime, discovery.endTime)}</span>
-        ),
+        'property:DISCOVERY_DURATION': (discovery) => {
+            // The formatter yields nothing for a discovery that has not started, which is an empty cell rather than a
+            // zero duration.
+            const duration = durationFormatter(discovery.startTime, discovery.endTime);
+            return duration ? <span className="whitespace-nowrap">{duration}</span> : null;
+        },
         'property:DISCOVERY_STATUS': (discovery) => <DiscoveryStatus status={discovery.status} />,
         'property:DISCOVERY_TOTAL_CERT_DISCOVERED': (discovery) => discovery.totalCertificatesDiscovered?.toString() ?? '0',
         // Beyond the default set: catalogued and renderable, so the picker offers it.
