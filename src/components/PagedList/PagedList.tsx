@@ -357,20 +357,22 @@ function PagedList<TRow extends object>({
         return result.sort((a, b) => (a.icon === 'plus' ? -1 : 1));
     }, [checkedRows, additionalButtons, navigate, addHidden, onDeleteCallback]);
 
-    // An applied ordering counts, or there would be no way back from it.
-    const hasNonDefaultViewState = currentFilters.length > 0 || pageNumber > 1 || pageSize !== 10 || appliedSort !== undefined;
+    // An ordering the page did not declare counts, or there would be no way back from it. Measured
+    // against `defaultSort` rather than against no ordering at all, so a page that opens sorted is not
+    // permanently offering to reset itself to the state it is already in.
+    const hasNonDefaultViewState = currentFilters.length > 0 || pageNumber > 1 || pageSize !== 10 || !isSameSort(appliedSort, defaultSort);
 
     const onResetView = useCallback(() => {
         dispatch(filterActions.setCurrentFilters({ entity, currentFilters: [] }));
         dispatch(filterActions.setPreservedFilters({ entity, preservedFilters: [] }));
         dispatch(actions.resetPaging({ entity }));
         // The columns stay: they belong to the tab the strip is on, and the strip offers Revert.
-        setSortSelection(undefined);
+        setSortSelection(defaultSort);
         const rootRoute = location.pathname.split('/')[1] ?? '';
         if (rootRoute) {
             dispatch(tablePaginationActions.clearPaginationByRootRoute({ rootRoute }));
         }
-    }, [dispatch, entity, location.pathname]);
+    }, [dispatch, entity, location.pathname, defaultSort]);
 
     const paginationData = useMemo(
         () => ({
@@ -406,6 +408,7 @@ function PagedList<TRow extends object>({
                     catalogue={catalogue}
                     isCatalogueLoaded={hasLoadedCatalogue}
                     standardColumns={sortableStandardColumns}
+                    standardSort={defaultSort}
                     renderableProperties={renderableProperties}
                     columns={appliedColumns}
                     filters={currentFilters}

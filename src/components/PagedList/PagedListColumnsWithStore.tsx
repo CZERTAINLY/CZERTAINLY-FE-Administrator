@@ -10,6 +10,7 @@ import type { SearchFieldListModel, SearchFilterModel, SearchRequestModel } from
 import type { ListViewModel } from 'types/listViews';
 import { FilterFieldSource, Resource } from 'types/openapi';
 import type { ColumnDefinition } from 'types/tableColumns';
+import type { ColumnSort } from 'utils/tableColumns';
 import { createMockStore } from 'utils/test-helpers';
 import PagedList from './PagedList';
 
@@ -25,6 +26,8 @@ type Props = Readonly<{
     standardColumns: ColumnDefinition[];
     catalogue: SearchFieldListModel[];
     views?: ListViewModel[];
+    /** The ordering the page declares as its own, as the connector and discovery inventories do. */
+    defaultSort?: ColumnSort;
     withheldCatalogue?: boolean;
     /** Filters already in the duck when the host mounts, as a deep link leaves them. */
     initialFilters?: SearchFilterModel[];
@@ -88,6 +91,7 @@ export default function PagedListColumnsWithStore({
     standardColumns,
     catalogue,
     views = [],
+    defaultSort,
     withheldCatalogue = false,
     initialFilters = [],
     withRefreshControl = false,
@@ -149,9 +153,10 @@ export default function PagedListColumnsWithStore({
                       registry,
                       headerInfo: { [`${FilterFieldSource.Property}:COMMON_NAME`]: <span data-testid="cn-legend">legend</span> },
                       resourceLabel: 'Certificates',
+                      defaultSort,
                   }
                 : undefined,
-        [configReady, standardColumns, rows],
+        [configReady, standardColumns, rows, defaultSort],
     );
 
     return (
