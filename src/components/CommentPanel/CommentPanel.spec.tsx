@@ -691,7 +691,7 @@ test.describe('CommentPanel', () => {
         const before = (await dispatched(page)).length;
         await page.getByTestId('go-tab-only').click();
         await expect(page.getByTestId('comment-c1')).toHaveAttribute('data-highlighted', 'true');
-        expect((await dispatched(page)).length).toBe(before);
+        expect(await dispatched(page)).toHaveLength(before);
     });
 
     test('re-anchoring on the object already open keeps the panel state, so the chosen direction survives', async ({ mount, page }) => {
