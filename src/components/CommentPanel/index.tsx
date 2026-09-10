@@ -44,14 +44,19 @@ export default function CommentPanel({ resource, objectUuid }: Readonly<Props>) 
     const anchoredRepliesSelector = useMemo(() => selectors.replies(anchor?.replyUuid ? anchor.rootUuid : ''), [anchor]);
     const anchoredReplies = useSelector(anchoredRepliesSelector);
 
+    // The panel state lives as long as the binding to the object: a re-anchor on the same object keeps it, so the
+    // direction the user picked survives, and the epic reads it for the anchored request below.
+    useEffect(() => {
+        return () => {
+            dispatch(actions.clearPanel({ resource, objectUuid }));
+        };
+    }, [dispatch, resource, objectUuid]);
+
     useEffect(() => {
         // The roots page holding the thread and the replies page holding the reply are independent, so both are asked
         // for at once; the reply anchor is what the thread expands onto.
         dispatch(actions.listThreads({ resource, objectUuid, pageNumber: 1, anchorUuid: anchor?.rootUuid }));
         if (anchor?.replyUuid) dispatch(actions.listReplies({ rootUuid: anchor.rootUuid, pageNumber: 1, anchorUuid: anchor.replyUuid }));
-        return () => {
-            dispatch(actions.clearPanel({ resource, objectUuid }));
-        };
     }, [dispatch, resource, objectUuid, anchor]);
 
     const sortDirection = threads?.sortDirection ?? SortDirection.Asc;

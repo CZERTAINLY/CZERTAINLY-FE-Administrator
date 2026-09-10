@@ -694,6 +694,22 @@ test.describe('CommentPanel', () => {
         expect((await dispatched(page)).length).toBe(before);
     });
 
+    test('re-anchoring on the object already open keeps the panel state, so the chosen direction survives', async ({ mount, page }) => {
+        await mount(
+            <CommentPanelWithStore
+                search="?tab=comments"
+                comments={{ threads: { [KEY]: threadsPage([comment('r2', 'two'), comment('r1', 'one')], { sortDirection: 'desc' }) } }}
+                navigateTo={[{ testId: 'go-root', search: '?tab=comments&comment=r1' }]}
+            />,
+        );
+        await expect(page.getByTestId('comment-panel-obj-1-sort')).toHaveText('Newest first');
+
+        await page.getByTestId('go-root').click();
+        await expect(page.getByTestId('comment-r1')).toHaveAttribute('data-highlighted', 'true');
+        await expect(page.getByTestId('comment-panel-obj-1-sort')).toHaveText('Newest first');
+        expect((await dispatched(page)).map((action) => action.type)).not.toContain('comments/clearPanel');
+    });
+
     test('a notification whose comment is gone shows an error and leaves the panel on the first page', async ({ mount, page }) => {
         await mount(
             <CommentPanelWithStore
