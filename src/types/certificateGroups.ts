@@ -12,4 +12,4 @@ export type CertificateGroupRequestModel = Omit<CertificateGroupRequestDto, 'cus
 };
 
 export type GroupUserDto = NameAndUuidDto;
-export type GroupUserModel = GroupUserDto;
+export type GroupUserModel = NameAndUuidDto;
