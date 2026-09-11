@@ -49,8 +49,7 @@ export default function GroupDetail() {
 
     useEffect(() => {
         getFreshGroupDetails();
-        getFreshGroupUsers();
-    }, [getFreshGroupDetails, getFreshGroupUsers]);
+    }, [getFreshGroupDetails]);
 
     useRunOnSuccessfulFinish(isUpdating, updateGroupSucceeded, () => {
         setIsEditModalOpen(false);
@@ -172,6 +171,7 @@ export default function GroupDetail() {
                             },
                             {
                                 title: 'Users',
+                                onClick: getFreshGroupUsers,
                                 content: (
                                     <Widget
                                         title="Users"

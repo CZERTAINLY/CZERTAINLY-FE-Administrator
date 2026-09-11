@@ -66,12 +66,23 @@ describe('GroupDetail users tab', () => {
         vi.clearAllMocks();
     });
 
-    it('requests the members alongside the group detail on mount', async () => {
+    it('requests the group detail on mount but leaves the members until the Users tab is opened', async () => {
         const store = buildStore({});
         const dispatch = vi.spyOn(store, 'dispatch');
         await render(store);
 
         expect(dispatch).toHaveBeenCalledWith(actions.getGroupDetail({ uuid: 'g1' }));
+        expect(dispatch).not.toHaveBeenCalledWith(actions.getGroupUsers({ uuid: 'g1' }));
+
+        await clickTab('Users');
+        expect(dispatch).toHaveBeenCalledWith(actions.getGroupUsers({ uuid: 'g1' }));
+    });
+
+    it('requests the members when the page opens straight on the Users tab', async () => {
+        const store = buildStore({});
+        const dispatch = vi.spyOn(store, 'dispatch');
+        await render(store, '/groups/detail/g1?tab=users');
+
         expect(dispatch).toHaveBeenCalledWith(actions.getGroupUsers({ uuid: 'g1' }));
     });
 
