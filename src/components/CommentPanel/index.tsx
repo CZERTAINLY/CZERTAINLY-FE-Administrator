@@ -1,7 +1,7 @@
 import Button from 'components/Button';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
-import { actions, loadedBefore, loadedWindow, panelKey, remainingAfter, selectors, THREADS_PAGE_SIZE } from 'ducks/comments';
+import { actions, loadedBefore, loadedWindow, panelKey, remainingAfter, selectors } from 'ducks/comments';
 import { ArrowDownWideNarrow, ArrowUpNarrowWide, MessagesSquare } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -62,13 +62,9 @@ export default function CommentPanel({ resource, objectUuid }: Readonly<Props>) 
     const sortDirection = threads?.sortDirection ?? SortDirection.Asc;
     const newestFirst = sortDirection === SortDirection.Desc;
 
-    // Re-reads everything loaded so far as one first page, so a refresh never collapses the list back to one page.
-    const reload = useCallback(() => {
-        const loaded = threads ? loadedWindow(threads) : 0;
-        dispatch(
-            actions.listThreads({ resource, objectUuid, pageNumber: 1, itemsPerPage: Math.max(loaded, THREADS_PAGE_SIZE), sortDirection }),
-        );
-    }, [dispatch, resource, objectUuid, threads, sortDirection]);
+    // Re-reads the roots loaded so far as one first page, plus the replies of every thread that was opened, so a
+    // refresh never collapses the list and picks up replies posted elsewhere.
+    const reload = useCallback(() => dispatch(actions.refreshPanel({ resource, objectUuid })), [dispatch, resource, objectUuid]);
 
     // The other direction is a different list, read from its own first page.
     const onToggleDirection = useCallback(() => {
@@ -79,6 +75,12 @@ export default function CommentPanel({ resource, objectUuid }: Readonly<Props>) 
     // An anchored load lands on the page holding the thread, so there may be roots before the list as well as after.
     const earlier = threads ? loadedBefore(threads) : 0;
     const remaining = threads ? remainingAfter(threads) : 0;
+
+    // Everything up to the page shown is re-read as one first page, the same window a refresh uses.
+    const onLoadEarlier = useCallback(() => {
+        if (!threads) return;
+        dispatch(actions.listThreads({ resource, objectUuid, pageNumber: 1, itemsPerPage: loadedWindow(threads), sortDirection }));
+    }, [dispatch, resource, objectUuid, threads, sortDirection]);
 
     const onLoadMore = useCallback(() => {
         if (!threads) return;
@@ -175,7 +177,7 @@ export default function CommentPanel({ resource, objectUuid }: Readonly<Props>) 
                                 variant="outline"
                                 color="primary"
                                 className="self-start !py-1.5 !px-3 text-xs"
-                                onClick={reload}
+                                onClick={onLoadEarlier}
                                 disabled={threads?.isFetching}
                                 data-testid={`comment-panel-${objectUuid}-load-earlier`}
                             >

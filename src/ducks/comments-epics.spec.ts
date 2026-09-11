@@ -5,7 +5,7 @@ import { toArray } from 'rxjs/operators';
 import { type CommentDto, type CommentResponseDto, Resource, SortDirection } from 'types/openapi';
 import { LockTypeEnum } from 'types/user-interface';
 import { actions as alertActions } from './alerts';
-import { initialState, panelKey, REPLIES_PAGE_SIZE, slice, type State, THREADS_PAGE_SIZE } from './comments';
+import { initialState, panelKey, refreshPanel, REPLIES_PAGE_SIZE, slice, type State, THREADS_PAGE_SIZE } from './comments';
 import epics from './comments-epics';
 
 const resource = Resource.Certificates;
@@ -20,6 +20,7 @@ enum EpicIndex {
     ResolveComment = 3,
     UnresolveComment = 4,
     DeleteComment = 5,
+    RefreshPanel = 6,
 }
 
 /** Same shape the sibling epic specs use: an `AjaxError` cannot be constructed without a real XHR. */
@@ -259,6 +260,45 @@ describe('listReplies epic', () => {
 
         expect(emitted[0]).toEqual(slice.actions.listRepliesFailure({ rootUuid: 'c1' }));
         expect(emitted[1]).toMatchObject({ type: alertActions.error.type, payload: expect.stringContaining('not a thread root') });
+    });
+});
+
+describe('refreshPanel epic', () => {
+    const loaded = (comments: CommentDto[], overrides: Partial<CommentResponseDto> = {}) => ({
+        ...page(comments, overrides),
+        firstPage: 1,
+        isFetching: false,
+        isPosting: false,
+        postSucceeded: false,
+    });
+
+    test('re-reads the roots window and every thread whose replies were opened, as single first pages', async () => {
+        const state = stateWith({
+            threads: {
+                [key]: {
+                    ...loaded([comment('r1'), comment('r2'), comment('r3')], { pageNumber: 2, itemsPerPage: 10 }),
+                    sortDirection: SortDirection.Asc,
+                },
+            },
+            // r1 was opened and paged, r2 was never opened, and the entry for a root of another object is not ours.
+            replies: {
+                r1: loaded([comment('c1')], { pageNumber: 2, itemsPerPage: REPLIES_PAGE_SIZE }),
+                other: loaded([comment('c9')]),
+            },
+        });
+
+        const emitted = await run(EpicIndex.RefreshPanel, refreshPanel({ resource, objectUuid }), createDeps().deps, state);
+
+        expect(emitted).toEqual([
+            slice.actions.listThreads({ resource, objectUuid, pageNumber: 1, itemsPerPage: 20 }),
+            slice.actions.listReplies({ rootUuid: 'r1', pageNumber: 1, itemsPerPage: 40 }),
+        ]);
+    });
+
+    test('a panel that has not loaded yet reads its first page', async () => {
+        const emitted = await run(EpicIndex.RefreshPanel, refreshPanel({ resource, objectUuid }), createDeps().deps);
+
+        expect(emitted).toEqual([slice.actions.listThreads({ resource, objectUuid, pageNumber: 1, itemsPerPage: THREADS_PAGE_SIZE })]);
     });
 });
 

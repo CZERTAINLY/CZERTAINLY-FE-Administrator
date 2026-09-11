@@ -7,7 +7,15 @@ import { type Resource, SortDirection } from 'types/openapi';
 import { LockTypeEnum, type WidgetLockErrorModel } from 'types/user-interface';
 import { extractError, getLockWidgetObject } from 'utils/net';
 import { actions as alertActions } from './alerts';
-import { type CommentRefPayload, loadedWindow, panelKey, REPLIES_PAGE_SIZE, slice, THREADS_PAGE_SIZE } from './comments';
+import {
+    type CommentRefPayload,
+    loadedWindow,
+    panelKey,
+    refreshPanel as refreshPanelAction,
+    REPLIES_PAGE_SIZE,
+    slice,
+    THREADS_PAGE_SIZE,
+} from './comments';
 
 const status = (err: unknown) => (err instanceof AjaxError ? err.status : undefined);
 
@@ -52,6 +60,20 @@ const refreshAfterChange = (state: AppState, resource: Resource, objectUuid: str
     ...(parentUuid ? [refreshReplies(state, parentUuid)] : []),
     refreshThreads(state, resource, objectUuid),
 ];
+
+/** A thread whose replies were never opened has nothing to refresh; one that was opened is re-read even if collapsed since. */
+const refreshPanel: AppEpic = (action$, state$) => {
+    return action$.pipe(
+        filter(refreshPanelAction.match),
+        mergeMap((action) => {
+            const { resource, objectUuid } = action.payload;
+            const state = state$.value;
+            const roots = state.comments?.threads[panelKey(resource, objectUuid)]?.comments ?? [];
+            const opened = roots.filter((root) => state.comments?.replies[root.uuid] !== undefined);
+            return of(refreshThreads(state, resource, objectUuid), ...opened.map((root) => refreshReplies(state, root.uuid)));
+        }),
+    );
+};
 
 const listThreads: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -214,6 +236,6 @@ const deleteComment: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const epics = [listThreads, listReplies, createComment, resolveComment, unresolveComment, deleteComment];
+const epics = [listThreads, listReplies, createComment, resolveComment, unresolveComment, deleteComment, refreshPanel];
 
 export default epics;

@@ -320,9 +320,9 @@ test.describe('CommentPanel', () => {
         const refresh = page.getByTestId('refresh-icon');
         await expect(refresh).toBeEnabled();
         await refresh.click();
-        expect((await dispatched(page)).at(-1)).toMatchObject({
-            type: 'comments/listThreads',
-            payload: { resource: 'certificates', objectUuid: 'obj-1', pageNumber: 1 },
+        expect((await dispatched(page)).at(-1)).toEqual({
+            type: 'comments/refreshPanel',
+            payload: { resource: 'certificates', objectUuid: 'obj-1' },
         });
     });
 

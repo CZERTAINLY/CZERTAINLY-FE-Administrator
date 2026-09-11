@@ -1,4 +1,4 @@
-import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { createAction, createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { AppState } from 'ducks';
 import { type CommentDto, type CommentResponseDto, type Resource, SortDirection } from 'types/openapi';
 import type { WidgetLockErrorModel } from 'types/user-interface';
@@ -269,6 +269,12 @@ export const selectors = {
     busy,
 };
 
-export const actions = slice.actions;
+/**
+ * Re-reads everything the panel shows: the roots window and every thread whose replies are loaded. No state changes
+ * on its own; an epic turns it into the listings, which is what lets a refresh pick up replies posted elsewhere.
+ */
+export const refreshPanel = createAction<ObjectRef>(`${slice.name}/refreshPanel`);
+
+export const actions = { ...slice.actions, refreshPanel };
 
 export default slice.reducer;
