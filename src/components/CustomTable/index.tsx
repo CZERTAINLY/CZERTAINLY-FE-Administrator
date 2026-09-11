@@ -63,6 +63,7 @@ type Props = {
     disableSelectionControls?: boolean;
     disableSearchControls?: boolean;
     isLoading?: boolean;
+    emptyStateDescription?: string;
 };
 
 const emptyCheckedRows: (string | number)[] = [];
@@ -114,6 +115,7 @@ function CustomTable({
     disableSelectionControls = false,
     disableSearchControls = false,
     isLoading = false,
+    emptyStateDescription = 'There are no records to display here yet',
 }: Readonly<Props>) {
     const location = useLocation();
     const [tblData, setTblData] = useState<TableDataRow[]>(data);
@@ -826,7 +828,7 @@ function CustomTable({
                                         <span className="text-xs text-content-subtle">
                                             {data.length > 0
                                                 ? 'Try adjusting your search or filters to see results'
-                                                : 'There are no records to display here yet'}
+                                                : emptyStateDescription}
                                         </span>
                                     </div>
                                 </div>

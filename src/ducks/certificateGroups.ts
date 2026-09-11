@@ -1,7 +1,7 @@
 import { resetSliceState } from 'ducks/reducerUtils';
 import type { AppState } from 'ducks';
 import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { CertificateGroupRequestModel, CertificateGroupResponseModel } from 'types/certificateGroups';
+import type { CertificateGroupRequestModel, CertificateGroupResponseModel, GroupUserModel } from 'types/certificateGroups';
 
 export type State = {
     checkedRows: string[];
@@ -9,8 +9,12 @@ export type State = {
     certificateGroup?: CertificateGroupResponseModel;
     certificateGroups: CertificateGroupResponseModel[];
 
+    groupUsers: GroupUserModel[];
+    groupUsersUuid?: string;
+
     isFetchingList: boolean;
     isFetchingDetail: boolean;
+    isFetchingGroupUsers: boolean;
 
     isCreating: boolean;
     createGroupSucceeded: boolean;
@@ -23,8 +27,10 @@ export type State = {
 export const initialState: State = {
     checkedRows: [],
     certificateGroups: [],
+    groupUsers: [],
     isFetchingList: false,
     isFetchingDetail: false,
+    isFetchingGroupUsers: false,
     isCreating: false,
     createGroupSucceeded: false,
     isDeleting: false,
@@ -75,6 +81,25 @@ export const slice = createSlice({
 
         getGroupDetailFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingDetail = false;
+        },
+
+        getGroupUsers: (state, action: PayloadAction<{ uuid: string }>) => {
+            if (state.groupUsersUuid !== action.payload.uuid) {
+                state.groupUsers = [];
+                state.groupUsersUuid = action.payload.uuid;
+            }
+            state.isFetchingGroupUsers = true;
+        },
+
+        getGroupUsersSuccess: (state, action: PayloadAction<{ uuid: string; users: GroupUserModel[] }>) => {
+            if (state.groupUsersUuid === action.payload.uuid) {
+                state.groupUsers = action.payload.users;
+            }
+            state.isFetchingGroupUsers = false;
+        },
+
+        getGroupUsersFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingGroupUsers = false;
         },
 
         createGroup: (state, action: PayloadAction<CertificateGroupRequestModel>) => {
@@ -152,9 +177,11 @@ const checkedRows = createSelector(state, (state: State) => state.checkedRows);
 
 const certificateGroup = createSelector(state, (state: State) => state.certificateGroup);
 const certificateGroups = createSelector(state, (state: State) => state.certificateGroups);
+const groupUsers = createSelector(state, (state: State) => state.groupUsers);
 
 const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
+const isFetchingGroupUsers = createSelector(state, (state: State) => state.isFetchingGroupUsers);
 const isCreating = createSelector(state, (state: State) => state.isCreating);
 const createGroupSucceeded = createSelector(state, (state: State) => state.createGroupSucceeded);
 const isDeleting = createSelector(state, (state: State) => state.isDeleting);
@@ -169,11 +196,13 @@ export const selectors = {
 
     certificateGroup,
     certificateGroups,
+    groupUsers,
 
     isCreating,
     createGroupSucceeded,
     isFetchingList,
     isFetchingDetail,
+    isFetchingGroupUsers,
     isDeleting,
     isBulkDeleting,
     isUpdating,

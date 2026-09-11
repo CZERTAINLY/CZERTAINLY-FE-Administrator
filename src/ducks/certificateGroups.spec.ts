@@ -56,6 +56,42 @@ describe('certificateGroups slice', () => {
         expect(next.certificateGroup).toBeUndefined();
     });
 
+    test('getGroupUsers / success / failure', () => {
+        let next = reducer(initialState, actions.getGroupUsers({ uuid: 'g1' }));
+        expect(next.isFetchingGroupUsers).toBe(true);
+        expect(next.groupUsers).toEqual([]);
+        expect(next.groupUsersUuid).toBe('g1');
+
+        next = reducer(next, actions.getGroupUsersSuccess({ uuid: 'g1', users: [{ uuid: 'u1', name: 'alice' }] }));
+        expect(next.isFetchingGroupUsers).toBe(false);
+        expect(next.groupUsers).toEqual([{ uuid: 'u1', name: 'alice' }]);
+
+        next = reducer({ ...next, isFetchingGroupUsers: true }, actions.getGroupUsersFailure({ error: 'err' }));
+        expect(next.isFetchingGroupUsers).toBe(false);
+        expect(next.groupUsers).toHaveLength(1);
+    });
+
+    test('getGroupUsers keeps the loaded list while refetching the same group', () => {
+        const loaded = { ...initialState, groupUsers: [{ uuid: 'u1', name: 'alice' }], groupUsersUuid: 'g1' };
+        const next = reducer(loaded, actions.getGroupUsers({ uuid: 'g1' }));
+        expect(next.groupUsers).toHaveLength(1);
+        expect(next.isFetchingGroupUsers).toBe(true);
+    });
+
+    test('getGroupUsers clears the list when a different group is requested', () => {
+        const loaded = { ...initialState, groupUsers: [{ uuid: 'u1', name: 'alice' }], groupUsersUuid: 'g1' };
+        const next = reducer(loaded, actions.getGroupUsers({ uuid: 'g2' }));
+        expect(next.groupUsers).toEqual([]);
+        expect(next.groupUsersUuid).toBe('g2');
+    });
+
+    test('getGroupUsersSuccess ignores a response for a group that is no longer requested', () => {
+        const pending = { ...initialState, groupUsersUuid: 'g2', isFetchingGroupUsers: true };
+        const next = reducer(pending, actions.getGroupUsersSuccess({ uuid: 'g1', users: [{ uuid: 'u1', name: 'alice' }] }));
+        expect(next.groupUsers).toEqual([]);
+        expect(next.isFetchingGroupUsers).toBe(false);
+    });
+
     test('createGroup / success / failure', () => {
         let next = reducer(initialState, actions.createGroup({} as any));
         expect(next.isCreating).toBe(true);
@@ -148,8 +184,10 @@ describe('certificateGroups selectors', () => {
             checkedRows: ['x'],
             certificateGroup: { uuid: 'g1' } as any,
             certificateGroups: [{ uuid: 'g1' } as any],
+            groupUsers: [{ uuid: 'u1', name: 'alice' }],
             isFetchingList: true,
             isFetchingDetail: true,
+            isFetchingGroupUsers: true,
             isCreating: true,
             createGroupSucceeded: true,
             isDeleting: true,
@@ -165,6 +203,8 @@ describe('certificateGroups selectors', () => {
         expect(selectors.certificateGroups(state)).toHaveLength(1);
         expect(selectors.isFetchingList(state)).toBe(true);
         expect(selectors.isFetchingDetail(state)).toBe(true);
+        expect(selectors.groupUsers(state)).toEqual([{ uuid: 'u1', name: 'alice' }]);
+        expect(selectors.isFetchingGroupUsers(state)).toBe(true);
         expect(selectors.isCreating(state)).toBe(true);
         expect(selectors.createGroupSucceeded(state)).toBe(true);
         expect(selectors.isDeleting(state)).toBe(true);

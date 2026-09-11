@@ -3,6 +3,8 @@ import type {
     CertificateGroupRequestModel,
     CertificateGroupResponseDto,
     CertificateGroupResponseModel,
+    GroupUserDto,
+    GroupUserModel,
 } from 'types/certificateGroups';
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from './attributes';
 
@@ -18,4 +20,8 @@ export function transformCertificateGroupResponseDtoToModel(group: CertificateGr
         ...group,
         customAttributes: group.customAttributes?.map(transformAttributeResponseDtoToModel),
     };
+}
+
+export function transformGroupUserDtoToModel(user: GroupUserDto): GroupUserModel {
+    return { ...user };
 }
