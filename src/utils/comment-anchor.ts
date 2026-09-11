@@ -20,9 +20,6 @@ export const commentAnchor = (comment: string | null, thread: string | null): Co
     return thread ? { rootUuid: thread, replyUuid: comment } : { rootUuid: comment };
 };
 
-export const readCommentAnchor = (params: URLSearchParams): CommentAnchor | undefined =>
-    commentAnchor(params.get(COMMENT_PARAM), params.get(THREAD_PARAM));
-
 /**
  * Where a notification leads: its host object, and for a comment notification the comment itself. The subject of a
  * comment notification is the comment; its parent, when present, is the thread root the comment replies to.

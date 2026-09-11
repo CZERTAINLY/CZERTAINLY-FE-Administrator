@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { type NotificationDto, Resource } from 'types/openapi';
-import { notificationTargetPath, readCommentAnchor } from './comment-anchor';
+import { commentAnchor, notificationTargetPath } from './comment-anchor';
 
 const notification = (overrides: Partial<NotificationDto> = {}): NotificationDto => ({
     uuid: 'n1',
@@ -47,13 +47,11 @@ describe('notificationTargetPath', () => {
     });
 });
 
-describe('readCommentAnchor', () => {
+describe('commentAnchor', () => {
     test('reads back what the notification path carries', () => {
-        expect(readCommentAnchor(new URLSearchParams('tab=comments'))).toBeUndefined();
-        expect(readCommentAnchor(new URLSearchParams('comment=root-1'))).toEqual({ rootUuid: 'root-1' });
-        expect(readCommentAnchor(new URLSearchParams('comment=reply-1&thread=root-1'))).toEqual({
-            rootUuid: 'root-1',
-            replyUuid: 'reply-1',
-        });
+        expect(commentAnchor(null, null)).toBeUndefined();
+        expect(commentAnchor(null, 'root-1')).toBeUndefined();
+        expect(commentAnchor('root-1', null)).toEqual({ rootUuid: 'root-1' });
+        expect(commentAnchor('reply-1', 'root-1')).toEqual({ rootUuid: 'root-1', replyUuid: 'reply-1' });
     });
 });
